@@ -1,7 +1,7 @@
 {
-  "name": "data-acquisition-service",
+  "name": "tracking-service",
   "version": "1.0.0",
-  "description": "Microservice for the purpose of storing medical data",
+  "description": "Microservice for the purpose of storing activity tracking",
   "main": "index.js",
   "scripts": {
     "build": "gulp build && npm run build:doc",
@@ -17,14 +17,11 @@
     "type": "git",
     "url": ""
   },
-  "homepage": "http://200.129.82.7:8000/nutes-ocariot/server/Data-Acquisition-Service",
+  "homepage": "http://200.129.82.7:8000/nutes-ocariot/server/tracking-service",
   "keywords": [
     "microservice, nodejs"
   ],
-  "author": "Douglas Rafael <douglas.rafael@nutes.uepb.edu.br>",
-  "contributors": [
-    "Lucas Rocha <lucas.rocha@nutes.uepb.edu.br>"
-  ],
+  "author": "Lucas Rocha <lucas.rocha@nutes.uepb.edu.br>",
   "license": "MIT",
   "nyc": {
     "include": [
@@ -47,6 +44,8 @@
     "all": true
   },
   "dependencies": {
+    "amqp": "^0.2.7",
+    "amqplib": "^0.5.2",
     "body-parser": "^1.18.3",
     "express": "^4.16.3",
     "mongoose": "^5.1.1",

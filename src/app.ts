@@ -7,6 +7,7 @@ import express, { Application, Request, Response, NextFunction } from "express"
 import { ApiException, IExceptionError } from './exceptions/api.exception'
 import database from './../config/database'
 import config from './../config/config'
+import { RabbitMQSubscriber } from './cloud/rabbitmq/rabbitmq.receive'
 
 /**
  * Class App.
@@ -18,13 +19,14 @@ import config from './../config/config'
 export class App {
     private app: Application
     private database: any
-
+    RabbitMQSubscriber: any = new RabbitMQSubscriber()
     /**
      * Class constructor.
      */
     constructor() {
         this.app = express()
         this.bootstrap()
+        RabbitMQSubscriber.startReceive()
     }
 
     /**
