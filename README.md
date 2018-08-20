@@ -1,7 +1,7 @@
-# Data Acquisition Service
+# Activity Tracking Service
 [![license](https://img.shields.io/github/license/mashape/apistatus.svg)](https://opensource.org/licenses/MIT) [![node](https://img.shields.io/badge/node-v8.11.2-red.svg)](https://nodejs.org/) [![npm](https://img.shields.io/badge/npm-v5.5.1-red.svg)](https://nodejs.org/) [![swagger](https://img.shields.io/badge/swagger-v2.0-green.svg)](https://swagger.io/) [![TypeScript](https://badges.frapsoft.com/typescript/love/typescript.png?v=101)](https://www.typescriptlang.org/) 
 --
-Microservice for health data acquisition.
+Microservice for activity tracking data acquisition.
 
 ## Installation and Development Server
 Requires [Node.js](https://nodejs.org/) v8+ and [MongoDB](https://www.mongodb.com) to run.

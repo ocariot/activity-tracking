@@ -40,7 +40,6 @@ export class ApiException extends Error implements IExceptionError {
 /**
  * Interface ErrorRequest
  * 
- * @author Douglas Rafael <douglas.rafael@nutes.uepb.edu.br>
  */
 export interface IExceptionError {
     code: number
