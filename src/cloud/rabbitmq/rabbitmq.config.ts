@@ -26,5 +26,5 @@
  * 
  */
  export class Configuration  {
-    static url: string =  'amqp://vckrcjzy:gJkcqPKbr1jMORaHwLTyDYMKOI4Ul55N@lion.rmq.cloudamqp.com/vckrcjzy'
+    static url: string =  'amqp://localhost:5672'
  }

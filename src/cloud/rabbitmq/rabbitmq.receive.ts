@@ -4,9 +4,16 @@ import { ActivityRepository } from "./../../repositories/activity.repository"
 import { IExceptionError, ApiException } from "./../../exceptions/api.exception"
 import amqp from "amqplib/callback_api"
 
+
+/**
+ * This class is responsible for subscribing the application to 
+ * an instance of RabbitMQ, to consume the data provided and store it 
+ * in the database.
+ */
 export class RabbitMQSubscriber {
     static repository: ActivityRepository
     ActivityModel: any = Activity
+
     /**
      * Variable that will store the connection property.
      */
@@ -15,10 +22,10 @@ export class RabbitMQSubscriber {
     /**
      * Variable to define the queue to receive activity tracking data.
      */
-    private static q: any = "activities"
+    private static q: any = "users"
 
     /**
-     * Empty constructor.
+     * Empty constructor, responsible only for setting the repository value.
      */
     constructor() {
         RabbitMQSubscriber.repository = new ActivityRepository(this.ActivityModel)
@@ -26,14 +33,16 @@ export class RabbitMQSubscriber {
 
     /**
      * Method used to start the connection to the RabbitMQ instance.
-     * @returns any
+     * @returns any. In this implementation, the method does not return any 
+     * type of information, it only prints in the console in case there is 
+     * some connection error with the instance.
      */
     public static startReceive(): any {
         /**
          * Connect with the RabbitMQ instance.
          */
         amqp.connect(Configuration.url, (err, conn) => {
-            if (err) console.log("err", err)
+            if (err) console.log("[AMQP ERROR CONNECT]", err)
             /**
              * Assigns the connection to the variable 'amqpConn'.
              */
@@ -43,7 +52,10 @@ export class RabbitMQSubscriber {
     }
 
     /**
-     * Start consume the activity tracking in a determinated queue.
+     * Start consume the activity tracking in a determinated queue. In this
+     * implementation, the method does not return any type of information,
+     * it only prints in the console in case there is some subscribe error
+     * with the instance.
      */
     private static consumer(): any {
         /**
@@ -58,7 +70,7 @@ export class RabbitMQSubscriber {
              * Receives the channel that will be queued.
              */
             function on_open(err, ch) {
-                if (err) console.log("err", err)
+                if (err) console.log("[AMQP ERROR SUBSCRIBE]", err)
                 /**
                  *  Confirm the queue to receive data.
                  */
@@ -76,11 +88,17 @@ export class RabbitMQSubscriber {
                          */
                         var activity = JSON.parse(activity.content.toString())
 
+                        /**
+                         * Saves the data consumed in the local database. If successful, a 
+                         * successful message will appear. Otherwise, a message will appear 
+                         * stating that there was an error during the process, in addition to 
+                         * the description of the error, following the implementation pattern.
+                         */
                         RabbitMQSubscriber.repository.save(activity)
                             .then((result: IActivity) => {
-                                if (result) console.log(result)
+                                if (result) console.log("[DATA SAVED SUCESSFULLY]")
                             }).catch(err => {
-                                console.log(new ApiException(err.code, err.message))
+                                console.log("[ERROR SAVING DATA]", new ApiException(err.code, err.message))
                             })
                     }
                 },

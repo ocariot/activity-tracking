@@ -22,10 +22,12 @@ export interface IActivity extends Document {
     create_at?: Date
 }
 
+/**
+ * Schema of Activity.
+ */
 const activitySchema = new mongoose.Schema({
     user_id: {
         type: String,
-        index: { unique: true },
         required: 'Id of User is required!'
     },
     name: {

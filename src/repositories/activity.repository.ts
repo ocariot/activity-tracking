@@ -10,13 +10,17 @@ import { resolve, resolveSoa } from 'dns'
  */
 export class ActivityRepository implements IRepository<IActivity> {
 
-    // Model of device can be any.
+    /** 
+     * Model of device can be any.
+     * 
+     */
     ActivityModel: any
 
     removeFields: Object
 
     /**
-     * Constructor.
+     * Constructor method. This method receives a parameter of type ActivityModel,
+     * used to use the Mongoose methods to data manipulate in database.
      * 
      * @param model
      */
@@ -28,8 +32,11 @@ export class ActivityRepository implements IRepository<IActivity> {
 
     /**
      * Save new activity.
-     * @param item - Object to be saved.
-     * @returns - The saved activity.
+     * 
+     * @param item Object to be saved.
+     * @returns Case the save is successful, it will resolve the saved activity.  
+     * If there is an error during the save process, it will reject an error with
+     * code and description, following the implementation pattern.
      */
     save(item: IActivity): Promise<IActivity> {
         return new Promise((resolve, reject) => {
@@ -50,10 +57,24 @@ export class ActivityRepository implements IRepository<IActivity> {
     /**
      * Get all activity associated with an user.
      * 
-     * @param userId 
-     * @param param2 
-     * @param querys 
-     * @returns - A list of activities.
+     * There are two situations where this method can be used.
+     * -> The first situation refers to the consumption of all activities 
+     *    saved in the database. In this case, the userId and deviceId 
+     *    parameters will be null, and the search will be filtered based
+     *    on the query string.
+     * 
+     * -> The second situation refers to the consumption of all activities 
+     *    associated with an user. In this case, the userId parameter should 
+     *    be non-null, and the search will be filtered based on this parameter
+     *    and the query string.
+     * 
+     * @param userId Optional - The user id associated with the activities
+     * @param param2 Parameter not used in this implementation
+     * @param querys Parameter not used in this implementation
+     * @returns Case the get is successful, it will resolve a list of activities 
+     * associated with a user. If there is an error during the get process, it 
+     * will reject an error with code and description, following the implementation 
+     * pattern.
      */
     getAll(userId?: string | undefined, param2?: string | undefined, querys?: any): Promise<IActivity[]> {
         let filter: any = !userId ? {} : { user_id: userId }
@@ -72,11 +93,27 @@ export class ActivityRepository implements IRepository<IActivity> {
 
     /**
      * Get a unique activity associated with an user.
+     *
+     * There are two situations where this method can be used.
      * 
-     * @param activityId 
-     * @param userId 
-     * @param querys 
-     * @returns - The requested activity. 
+     * -> The first situation refers to the consumption of an activity only 
+     *    with its id as a parameter. In this case, the id of the user can 
+     *    be null, and the search will be done only by the id of the activity, 
+     *    which must be non-null.
+     * 
+     * -> The second situation refers to the consumption of an activity having 
+     *    as parameters the id of the user and the id of the activity. In this 
+     *    case, in addition to the id of the activity, the id of the user must 
+     *    be non-null, and the search will be done based on the id of the user 
+     *    and the id of the activity.
+     * 
+     * @param activityId Id of activity 
+     * @param userId Optional - The user id associated with the activitiy
+     * @param querys Parameter not used in this implementation
+     * @returns Case the get is successful, it will resolve a unique activity 
+     * associated with a user. If there is an error during the get process, it 
+     * will reject an error with code and description, following the implementation 
+     * pattern.
      */
     getById(activityId: string, userId?: string | undefined, querys?: any): Promise<IActivity> {
         let filter: any = !userId ? { _id: activityId } : { _id: activityId, user_id: userId }
@@ -98,7 +135,9 @@ export class ActivityRepository implements IRepository<IActivity> {
      * Update a activity's params.
      * 
      * @param item - A activity with params to update.
-     * @returns - The updated activity.
+     * @returns Case the update is successful, it will resolve a updated activity.
+     * If there is an error during the get process, it will reject an error with 
+     * code and description, following the implementation pattern.
      */
     update(item: IActivity): Promise<IActivity> {
         return new Promise((resolve, reject) => {
@@ -118,8 +157,11 @@ export class ActivityRepository implements IRepository<IActivity> {
 
     /**
      * Delete a activity.
+     * 
      * @param id - Id of the activity to be deleted.
-     * @returns - True, if the activity will be deleted.
+     * @returns Case the get is successful, it will resolve a true status. If there 
+     * is an error during the get process, it will reject an error with code and 
+     * description, following the implementation pattern.
      */
     delete(id: string): Promise<boolean> {
         return new Promise((resolve, reject) => {

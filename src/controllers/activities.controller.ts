@@ -12,10 +12,18 @@ import { Validator } from '../utils/validator'
  * @version 1.0
  * @copyright Copyright (c) 2018, NUTES/UEPB. 
  */
-
 export class ActivityController {
+
+    /**
+     * Variable used to gain access to repository methods.
+     */
     repository: ActivityRepository
 
+    /**
+     * Constructor method. This method receives a parameter of type ActivityModel,
+     * used to set the value of the repository property.
+     * @param ActivityModel 
+     */
     constructor(ActivityModel: any) {
         this.repository = new ActivityRepository(ActivityModel)
     }
@@ -24,9 +32,16 @@ export class ActivityController {
     /**
      * Get all activities associated with an user.
      * 
-     * @param req 
-     * @param res 
-     * @returns any
+     * @param req  Object that contains information about the HTTP request to 
+     * get all the activities associated with a user. Should contains the id 
+     * of user in the params.
+     * @param res  HTTP response. If the request is successful, the server
+     * will send a list with the objects that were requested, and return 
+     * status 200. If there is a validation error of the user ID in the request 
+     * or error during the database search process, the system will return the 
+     * error status and description, following the implementation pattern.
+     * @returns In this implementation, the response to server is sended by the 
+     * param 'res'.
      */
     getAllActivities(req: Request, res: Response): any {
         if (!Validator.validateUserId(req.params.user_id)) {
@@ -40,16 +55,23 @@ export class ActivityController {
                     activities[i] = activities[i].toJSON()
                     delete activities[i].user_id
                 }
-                res.send(activities)
+                res.status(200).send(activities)
             }).catch((err: IExceptionError) => res.status(err.code).send(err.toJson()))
     }
 
     /**
     * Save a activity and associates it with a user.
     * 
-    * @param req 
-    * @param res 
-    * @returns any
+    * @param req Object that contains information about the HTTP request to save
+    * an activity and associates it with a user. Should contains the id of user 
+    * in the params and the activity in the body request.
+    * @param res HTTP response. If the request is successful, the server will send
+    * the saved activity object, and the returns status 201. If there is a validation
+    * error of the user ID in the request or error during the database save process, 
+    * the system will return the error status and description, following the 
+    * implementation pattern.
+    * @returns In this implementation, the response to server is sended by the param 
+    * 'res'.
     */
     saveActivity(req: Request, res: Response): any {
         if (!Validator.validateUserId(req.params.user_id)) {
@@ -68,9 +90,16 @@ export class ActivityController {
     /**
     * Get a unique activity associated with an user.
     * 
-    * @param req 
-    * @param res 
-    * @returns any
+    * @param req Object that contains information about the HTTP request to get a 
+    * unique activity associated with an user. Should contains the id of user  and
+    * the id of requested activity in the params.
+    * @param res HTTP response. If the request is successful, the server will send
+    * the request activity object, and the returns status 200. If there is a 
+    * validation error of the user ID in the request or error during the database
+    * search process, the system will return the error status and description, ,
+    * following the implementation pattern.
+    * @returns In this implementation, the response to server is sended by the param
+    * 'res'.
     */
     getActivitiyById(req: Request, res: Response): any {
         if (!Validator.validateUserId(req.params.user_id)) {
@@ -88,9 +117,16 @@ export class ActivityController {
 
     /**
      * Delete a activity associated with an user.
-     * @param req 
-     * @param res 
-     * @returns any
+     * 
+     * @param req Object that contains information about the HTTP request to delete
+     * a unique activity associated with an user. Should contains the id of user  and
+     * the id of activity to be deleted in the params.
+     * @param res HTTP response. If the request is successful, the server will send
+     * a empty object, and the returns status 204. If there is a validation error of
+     * the user ID in the request or error during the database delete process, the 
+     * system will return the error status and description, following the 
+     * implementation pattern.
+     * @returns In this implementation, the response to server is sended by the param'res'.
      */
     deleteActivity(req: Request, res: Response): any {
         if (!Validator.validateUserId(req.params.user_id)) {

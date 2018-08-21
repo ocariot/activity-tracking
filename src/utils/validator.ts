@@ -11,8 +11,9 @@ export class Validator {
     
     /**
      * Validate if id is in ObjectId format (mongoose)
-     * @param id 
-     * @returns valid: true or false
+     * @param id Id to be validated
+     * @returns True, if the id is in the default of an ObjectID and
+     * otherwise, returns False
      */
     public static validateUserId(id): boolean {
         var valid = false;
