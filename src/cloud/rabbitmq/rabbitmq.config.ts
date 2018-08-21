@@ -18,10 +18,15 @@
  * 
  *      --  amqp://user:password@host/Vhost --, where:
  * 
+ * 
  *  -> amqp:// = Protocol used to connect to the instance.
+ *
  *  -> user: The user name defined in the instance.
+ * 
  *  -> password: Password set on the instance.
+ * 
  *  -> host: The host address defined in the instance.
+ * 
  *  -> Vhost: The host path defined in the instance (Can be the same as user)
  * 
  */
