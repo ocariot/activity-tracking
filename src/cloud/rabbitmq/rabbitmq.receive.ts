@@ -22,7 +22,7 @@ export class RabbitMQSubscriber {
     /**
      * Variable to define the queue to receive activity tracking data.
      */
-    private static q: any = "users"
+    private static q: any = "activityQueue"
 
     /**
      * Empty constructor, responsible only for setting the repository value.
@@ -74,7 +74,7 @@ export class RabbitMQSubscriber {
                 /**
                  *  Confirm the queue to receive data.
                  */
-                ch.assertQueue(RabbitMQSubscriber.q)
+                ch.assertQueue(RabbitMQSubscriber.q, {durable: false})
                 /**
                  * Consumes data queued in queue 'users'.
                  */

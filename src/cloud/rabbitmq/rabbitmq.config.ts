@@ -31,5 +31,5 @@
  * 
  */
  export class Configuration  {
-    static url: string =  'amqp://localhost:5672'
+    static url: string =  'amqp://nutes:nutes@192.168.0.117:5672'
  }

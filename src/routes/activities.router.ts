@@ -10,7 +10,6 @@ import { Activity } from '../models/activity'
  * @version 1.0
  * @copyright Copyright (c) 2018, NUTES/UEPB. 
  */
-
 class ActivityRouter implements IRouter<ActivityController> {
     router: Router
     controller: ActivityController
