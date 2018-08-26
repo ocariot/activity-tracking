@@ -44,7 +44,7 @@ export class ActivityController {
      * param 'res'.
      */
     getAllActivities(req: Request, res: Response): any {
-        if (!Validator.validateUserId(req.params.user_id)) {
+        if (!Validator.validateObjectId(req.params.user_id)) {
             let err = new ApiException(400, "Invalid parameter!", "Id of user is invalid!")
             return res.status(err.code).send(err.toJson())
         }
@@ -74,7 +74,7 @@ export class ActivityController {
     * 'res'.
     */
     saveActivity(req: Request, res: Response): any {
-        if (!Validator.validateUserId(req.params.user_id)) {
+        if (!Validator.validateObjectId(req.params.user_id)) {
             let err = new ApiException(400, "Invalid parameter!", "Id of user is invalid!")
             return res.status(err.code).send(err.toJson())
         }
@@ -102,7 +102,7 @@ export class ActivityController {
     * 'res'.
     */
     getActivitiyById(req: Request, res: Response): any {
-        if (!Validator.validateUserId(req.params.user_id)) {
+        if (!Validator.validateObjectId(req.params.user_id)) {
             let err = new ApiException(400, "Invalid parameter!", "Id of user is invalid!")
             return res.status(err.code).send(err.toJson())
         }
@@ -129,7 +129,7 @@ export class ActivityController {
      * @returns In this implementation, the response to server is sended by the param'res'.
      */
     deleteActivity(req: Request, res: Response): any {
-        if (!Validator.validateUserId(req.params.user_id)) {
+        if (!Validator.validateObjectId(req.params.user_id)) {
             let err = new ApiException(400, "Invalid parameter!", "Id of user is invalid!")
             return res.status(err.code).send(err.toJson())
         }

@@ -1,4 +1,6 @@
-import mongoose from 'mongoose';
+import mongoose, { Error } from 'mongoose';
+import { throws } from 'assert';
+import { ApiException } from './../exceptions/api.exception';
 
 /**
  * Validator that validate params from requests.
@@ -8,22 +10,18 @@ import mongoose from 'mongoose';
  * @copyright Copyright (c) 2018, NUTES/UEPB. 
  */
 export class Validator {
-    
+
     /**
      * Validate if id is in ObjectId format (mongoose)
      * @param id Id to be validated
      * @returns True, if the id is in the default of an ObjectID and
      * otherwise, returns False
      */
-    public static validateUserId(id): boolean {
-        var valid = false;
+    public static validateObjectId(id: any): boolean {
         try {
-            if (id == new mongoose.Types.ObjectId("" + id))
-                valid = true;
+            return id == new mongoose.Types.ObjectId(id);
+        } catch (e) {
+            throw new ApiException(400, "Invalid ID", e.message);
         }
-        catch (e) {
-            valid = false;
-        }
-        return valid;
     }
 }
