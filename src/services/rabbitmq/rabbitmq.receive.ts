@@ -17,7 +17,7 @@ export class RabbitMQSubscriber {
     /**
      * Variable that will store the connection property.
      */
-    private static amqpConn: any = null
+    private amqpConn: any = null
 
     /**
      * Variable to define the queue to receive activity tracking data.
@@ -29,6 +29,7 @@ export class RabbitMQSubscriber {
      */
     constructor() {
         RabbitMQSubscriber.repository = new ActivityRepository(this.ActivityModel)
+        this.startReceive()
     }
 
     /**
@@ -37,7 +38,7 @@ export class RabbitMQSubscriber {
      * type of information, it only prints in the console in case there is 
      * some connection error with the instance.
      */
-    public static startReceive(): any {
+    startReceive(): any {
         /**
          * Connect with the RabbitMQ instance.
          */
@@ -46,8 +47,8 @@ export class RabbitMQSubscriber {
             /**
              * Assigns the connection to the variable 'amqpConn'.
              */
-            RabbitMQSubscriber.amqpConn = conn
-            RabbitMQSubscriber.consumer()
+            this.amqpConn = conn
+            this.consumer()
         })
     }
 
@@ -57,15 +58,15 @@ export class RabbitMQSubscriber {
      * it only prints in the console in case there is some subscribe error
      * with the instance.
      */
-    private static consumer(): any {
+    consumer(): any {
         /**
          * If has connection.
          */
-        if (RabbitMQSubscriber.amqpConn) {
+        if (this.amqpConn) {
             /**
              * Create a new channel to receive user information.
              */
-            RabbitMQSubscriber.amqpConn.createChannel(on_open)
+            this.amqpConn.createChannel(on_open)
             /**
              * Receives the channel that will be queued.
              */
@@ -111,7 +112,7 @@ export class RabbitMQSubscriber {
     /**
      * End connection with RabbitMQ instance.
      */
-    private static endConnection(): any {
+    endConnection(): any {
         if (this.amqpConn) {
             this.amqpConn.close()
         }
