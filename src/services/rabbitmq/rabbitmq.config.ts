@@ -31,5 +31,5 @@
  * 
  */
  export class Configuration  {
-    static url: string =  'amqp://nutes:nutes@192.168.0.117:5672'
+    static url: string =  'amqp://activity.app:ocariot@192.168.0.117:5672/activity'
  }

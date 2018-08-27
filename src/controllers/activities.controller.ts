@@ -4,6 +4,7 @@ import { ActivityRepository } from '../repositories/activity.repository'
 import { IActivity } from '../models/activity'
 import { IExceptionError, ApiException } from './../exceptions/api.exception'
 import { Validator } from '../utils/validator'
+import { Refactor } from '../utils/refactor'
 
 /**
  * Controller that implements Activity feature operations.
@@ -45,7 +46,6 @@ export class ActivityController {
      */
     getAllActivities(req: Request, res: Response): any {
         if (Validator.validateObjectId(req.params.user_id)!=true) {
-           
             let err = new ApiException(400, "Invalid parameter!", "Id of user is invalid!")
             return res.status(err.code).send(err.toJson())
         }
@@ -53,10 +53,7 @@ export class ActivityController {
         return this.repository.getAll(req.params.user_id)
             .then((activities: Array<IActivity>) => {
                 for (var i = 0; i < activities.length; i++) {
-                    activities[i] = activities[i].toJSON()
-                    activities[i].id = activities[i]._id
-                    delete activities[i]._id
-                    delete activities[i].user_id
+                    activities[i] = Refactor.refactorObject(activities[i].toJSON())
                 }
                 res.status(200).send(activities)
             }).catch((err: IExceptionError) => res.status(err.code).send(err.toJson()))
@@ -84,10 +81,7 @@ export class ActivityController {
         req.body.user_id = req.params.user_id
         return this.repository.save(new Activity(req.body))
             .then((activity: IActivity) => {
-                activity = activity.toJSON()
-                activity.id = activity._id                
-                delete activity._id
-                delete activity.user_id
+                activity = Refactor.refactorObject(activity.toJSON())
                 return res.status(201).send(activity)
             }).catch((err: IExceptionError) => res.status(err.code).send(err.toJson()))
     }
@@ -114,10 +108,7 @@ export class ActivityController {
 
         return this.repository.getById(req.params.activity_id, req.params.user_id)
             .then((activity: IActivity) => {
-                activity = activity.toJSON()
-                activity.id = activity._id                
-                delete activity._id
-                delete activity.user_id
+                activity = Refactor.refactorObject(activity.toJSON())
                 return res.status(200).send(activity)
             }).catch((err: IExceptionError) => res.status(err.code).send(err.toJson()))
     }
@@ -147,3 +138,4 @@ export class ActivityController {
             }).catch((err: IExceptionError) => res.status(err.code).send(err.toJson()))
     }
 }
+
