@@ -37,12 +37,10 @@ const activitySchema = new mongoose.Schema({
     start_time: {
         type: Date,
         required: "Activity start time is required!",
-        index: {unique:true}
     },
     end_time: {
         type: Date,
         required: "Activity end time is required!",
-        index: {unique:true}
     },
     duration: {
         type: Number,
@@ -74,5 +72,7 @@ activitySchema.pre('save', (next) => {
     // this will run before saving 
     next()
 })
+
+activitySchema.index({user_id: 1, start_time: 1}, {unique: true})
 
 export const Activity = mongoose.model<IActivity>('Activity', activitySchema)
