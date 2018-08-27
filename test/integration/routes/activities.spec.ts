@@ -32,7 +32,7 @@ describe('Routes: Activities', () => {
             it('should return status code 201 with an activity', done => {
 
                 let resultExpect = {
-                    _id: '5a62be07de34500146d9c544',
+                    id: '5a62be07de34500146d9c544',
                     name: 'walk',
                     location: 'UEPB - Universidade Estadual da Paraíba',
                     start_time: '2018-08-07T08:25:00.000Z',
@@ -117,7 +117,7 @@ describe('Routes: Activities', () => {
         it('should return status code 200 and a list of activities', done => {
 
             let resultExpect = [{
-                _id: '5a62be07de34500146d9c544',
+                id: '5a62be07de34500146d9c544',
                 name: 'walk',
                 location: 'UEPB - Universidade Estadual da Paraíba',
                 start_time: '2018-08-07T08:25:00.000Z',
@@ -173,7 +173,7 @@ describe('Routes: Activities', () => {
         it('should return status code 200 and a unique activity', done => {
             let resultExpect =
             {
-                _id: '5a62be07de34500146d9c544',
+                id: '5a62be07de34500146d9c544',
                 name: 'walk',
                 location: 'UEPB - Universidade Estadual da Paraíba',
                 start_time: '2018-08-07T08:25:00.000Z',

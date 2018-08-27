@@ -12,10 +12,10 @@ export interface IActivity extends Document {
     name: string
     location?: string
     start_time: Date
-    end_time: Date
+    end_time?: Date
     duration: number
     intensity_level: string
-    distance: number
+    distance?: number
     calories: number
     steps: number
     create_at?: Date
@@ -38,10 +38,7 @@ const activitySchema = new mongoose.Schema({
         type: Date,
         required: "Activity start time is required!",
     },
-    end_time: {
-        type: Date,
-        required: "Activity end time is required!",
-    },
+    end_time: { type: Date },
     duration: {
         type: Number,
         required: 'Duration of activity is required!'
@@ -50,10 +47,7 @@ const activitySchema = new mongoose.Schema({
         type: String,
         required: 'Intensity level of activity is required!'
     },
-    distance: {
-        type: Number,
-        required: 'Distance traveled during activity is required!'
-    },
+    distance: { type: Number },
     calories: {
         type: Number,
         required: 'Calories spent during activity is required!'
@@ -73,6 +67,6 @@ activitySchema.pre('save', (next) => {
     next()
 })
 
-activitySchema.index({user_id: 1, start_time: 1}, {unique: true})
+activitySchema.index({ user_id: 1, start_time: 1 }, { unique: true })
 
 export const Activity = mongoose.model<IActivity>('Activity', activitySchema)

@@ -21,7 +21,7 @@ export class Validator {
         try {
             return id == new mongoose.Types.ObjectId(id);
         } catch (e) {
-            throw new ApiException(400, "Invalid ID", e.message);
+            return false
         }
     }
 }

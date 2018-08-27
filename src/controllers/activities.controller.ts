@@ -44,7 +44,8 @@ export class ActivityController {
      * param 'res'.
      */
     getAllActivities(req: Request, res: Response): any {
-        if (!Validator.validateObjectId(req.params.user_id)) {
+        if (Validator.validateObjectId(req.params.user_id)!=true) {
+           
             let err = new ApiException(400, "Invalid parameter!", "Id of user is invalid!")
             return res.status(err.code).send(err.toJson())
         }
@@ -53,6 +54,8 @@ export class ActivityController {
             .then((activities: Array<IActivity>) => {
                 for (var i = 0; i < activities.length; i++) {
                     activities[i] = activities[i].toJSON()
+                    activities[i].id = activities[i]._id
+                    delete activities[i]._id
                     delete activities[i].user_id
                 }
                 res.status(200).send(activities)
@@ -82,6 +85,8 @@ export class ActivityController {
         return this.repository.save(new Activity(req.body))
             .then((activity: IActivity) => {
                 activity = activity.toJSON()
+                activity.id = activity._id                
+                delete activity._id
                 delete activity.user_id
                 return res.status(201).send(activity)
             }).catch((err: IExceptionError) => res.status(err.code).send(err.toJson()))
@@ -110,6 +115,8 @@ export class ActivityController {
         return this.repository.getById(req.params.activity_id, req.params.user_id)
             .then((activity: IActivity) => {
                 activity = activity.toJSON()
+                activity.id = activity._id                
+                delete activity._id
                 delete activity.user_id
                 return res.status(200).send(activity)
             }).catch((err: IExceptionError) => res.status(err.code).send(err.toJson()))
