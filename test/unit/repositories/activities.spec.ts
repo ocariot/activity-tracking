@@ -21,7 +21,6 @@ describe('Repositories: Activity', () => {
         "intensity_level": "very",
         "distance": 25.8,
         "calories": 123,
-        "heartrate": 120,
         "steps": 1701
     }
 
@@ -61,7 +60,7 @@ describe('Repositories: Activity', () => {
         context('When there are validation errors', () => {
             it('should return error 400 for the activity with missing required fields', () => {
 
-                let incompleteActivity: IActivity = new Activity({ name: "walk", distance: 25.8, calories: 123, heartrate: 120, steps: 201 })
+                let incompleteActivity: IActivity = new Activity({ name: "walk", distance: 25.8, calories: 123, steps: 201 })
 
                 ActivityFake.create
                     .withArgs(incompleteActivity)
@@ -200,7 +199,6 @@ describe('Repositories: Activity', () => {
                 "intensity_level": "very",
                 "distance": 850.3,
                 "calories": 400,
-                "heartrate": 140,
                 "steps": 10447
             }
 
@@ -238,7 +236,6 @@ describe('Repositories: Activity', () => {
                     "location": "Parque da Criança",
                     "distance": 850.3,
                     "calories": 400,
-                    "heartrate": 140,
                 }
 
                 let mockExec = {
@@ -277,7 +274,6 @@ describe('Repositories: Activity', () => {
                     "location": "Parque da Criança",
                     "distance": 850.3,
                     "calories": 400,
-                    "heartrate": 140,
                 }
 
                 let mockExec = {

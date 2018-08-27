@@ -17,7 +17,6 @@ describe('Routes: Activities', () => {
         intensity_level: 'very',
         distance: 25.8,
         calories: 123,
-        heartrate: 120,
         steps: 1701,
         created_at: '2018-08-10T19:42:40.350Z',
         updatedAt: '2018-08-10T19:42:40.350Z',
@@ -42,7 +41,6 @@ describe('Routes: Activities', () => {
                     intensity_level: 'very',
                     distance: 25.8,
                     calories: 123,
-                    heartrate: 120,
                     steps: 1701,
                     created_at: '2018-08-10T19:42:40.350Z',
                     updatedAt: '2018-08-10T19:42:40.350Z',
@@ -85,7 +83,6 @@ describe('Routes: Activities', () => {
                     end_time: '2018-08-07T09:25:00.000Z',
                     duration: 1075000,
                     calories: 123,
-                    heartrate: 120
                 }
 
                 request
@@ -129,7 +126,6 @@ describe('Routes: Activities', () => {
                 intensity_level: 'very',
                 distance: 25.8,
                 calories: 123,
-                heartrate: 120,
                 steps: 1701,
                 created_at: '2018-08-10T19:42:40.350Z',
                 updatedAt: '2018-08-10T19:42:40.350Z',
@@ -186,7 +182,6 @@ describe('Routes: Activities', () => {
                 intensity_level: 'very',
                 distance: 25.8,
                 calories: 123,
-                heartrate: 120,
                 steps: 1701,
                 created_at: '2018-08-10T19:42:40.350Z',
                 updatedAt: '2018-08-10T19:42:40.350Z',

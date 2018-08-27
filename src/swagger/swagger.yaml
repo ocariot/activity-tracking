@@ -251,7 +251,6 @@ definitions:
     - intensity_level
     - distance
     - calories
-    - heartrate
     - steps
     properties:
       id:
@@ -298,10 +297,6 @@ definitions:
         type: integer
         description: "Calories spent during activity."
         example: 123
-      heartrate:
-        type: integer
-        description: "Average heart rate during activity."
-        example: 120
       steps: 
         type: integer
         description: "Number of steps taken during the activity."

@@ -17,7 +17,6 @@ export interface IActivity extends Document {
     intensity_level: string
     distance: number
     calories: number
-    heartrate: number
     steps: number
     create_at?: Date
 }
@@ -37,11 +36,13 @@ const activitySchema = new mongoose.Schema({
     location: { type: String },
     start_time: {
         type: Date,
-        required: "Activity start time is required!"
+        required: "Activity start time is required!",
+        index: {unique:true}
     },
     end_time: {
         type: Date,
-        required: "Activity end time is required!"
+        required: "Activity end time is required!",
+        index: {unique:true}
     },
     duration: {
         type: Number,
@@ -58,10 +59,6 @@ const activitySchema = new mongoose.Schema({
     calories: {
         type: Number,
         required: 'Calories spent during activity is required!'
-    },
-    heartrate: {
-        type: Number,
-        required: 'Average heart rate during activity is required!'
     },
     steps: {
         type: Number,
