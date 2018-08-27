@@ -301,7 +301,11 @@ definitions:
         type: integer
         description: "Number of steps taken during the activity."
         example: 1701
-        
+      create_at:
+        type: string
+        format: date-time
+        description: "Data e hora no padrão UTC gerada automaticamente no momento em que o recurso é salvo no servidor."
+        readOnly: true 
         
   # Definição do schema de erro padrão para as respostas das requisições
   Error:
