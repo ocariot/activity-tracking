@@ -1,6 +1,7 @@
 import { IActivity } from '../models/activity'
 import { ApiException, IExceptionError } from './../exceptions/api.exception'
 import { IRepository } from './repository.interface'
+import { Validator } from './../utils/validator'
 import { resolve, resolveSoa } from 'dns'
 
 /**
@@ -40,6 +41,8 @@ export class ActivityRepository implements IRepository<IActivity> {
      */
     save(item: IActivity): Promise<IActivity> {
         return new Promise((resolve, reject) => {
+            if(!Validator.validateObjectId(item.user_id)) 
+                return reject(new ApiException(400, "Invalid parameter!", "Id of user is invalid!"))
             this.ActivityModel.create(item)
                 .then((activity: IActivity) => activity)
                 .then((activity) => {
@@ -78,8 +81,9 @@ export class ActivityRepository implements IRepository<IActivity> {
      */
     getAll(userId?: string | undefined, param2?: string | undefined, querys?: any): Promise<IActivity[]> {
         let filter: any = !userId ? {} : { user_id: userId }
-        
         return new Promise((resolve, reject) => {
+            if(!Validator.validateObjectId(filter.user_id)) 
+                return reject(new ApiException(400, "Invalid parameter!", "Id of user is invalid!"))
             this.ActivityModel.find(filter, this.removeFields)
                 .then((activities: Array<IActivity>) => {
                     if (activities.length === 0) return reject(new ApiException(404, 'Activities not found!'))
@@ -117,8 +121,9 @@ export class ActivityRepository implements IRepository<IActivity> {
      */
     getById(activityId: string, userId?: string | undefined, querys?: any): Promise<IActivity> {
         let filter: any = !userId ? { _id: activityId } : { _id: activityId, user_id: userId }
-
         return new Promise((resolve, reject) => {
+            if(!Validator.validateObjectId(filter.user_id)) 
+                return reject(new ApiException(400, "Invalid parameter!", "Id of user is invalid!"))
             this.ActivityModel.findOne(filter)
                 .then((activity: IActivity) => {
                     if (!activity) return reject(new ApiException(404, 'Activity not found!'))
@@ -141,6 +146,8 @@ export class ActivityRepository implements IRepository<IActivity> {
      */
     update(item: IActivity): Promise<IActivity> {
         return new Promise((resolve, reject) => {
+            if(!Validator.validateObjectId(item.user_id)) 
+                return reject(new ApiException(400, "Invalid parameter!", "Id of user is invalid!"))
             this.ActivityModel.findByIdAndUpdate(item._id, item, { new: true })
                 .exec((err, activity) => {
                     if (err) {
@@ -165,6 +172,8 @@ export class ActivityRepository implements IRepository<IActivity> {
      */
     delete(id: string): Promise<boolean> {
         return new Promise((resolve, reject) => {
+            if(!Validator.validateObjectId(id)) 
+                return reject(new ApiException(400, "Invalid parameter!", "Id of user is invalid!"))
             this.ActivityModel.findByIdAndDelete({ _id: id })
                 .exec((err) => {
                     if (err) {
