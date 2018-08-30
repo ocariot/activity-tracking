@@ -60,7 +60,9 @@ describe('Repositories: Activity', () => {
         context('When there are validation errors', () => {
             it('should return error 400 for the activity with missing required fields', () => {
 
-                let incompleteActivity: IActivity = new Activity({ name: "walk", distance: 25.8, calories: 123, steps: 201 })
+                let incompleteActivity: IActivity = new Activity(
+                    {_id: "5a62be07de34500146d9c544", user_id: "5a62be07d6f33400146c9b61",
+                    name: "walk", distance: 25.8, calories: 123, steps: 201 })
 
                 ActivityFake.create
                     .withArgs(incompleteActivity)
@@ -98,13 +100,13 @@ describe('Repositories: Activity', () => {
         it('should return all activities associated with an user', () => {
 
             ActivityFake.find
-                .withArgs({})
+                .withArgs({user_id: "5a62be07d6f33400146c9b61"})
                 .resolves([defaultActivity])
 
             let activityRepository = new ActivityRepository(ActivityFake)
             let resultExpected: Array<IActivity> = [defaultActivity]
 
-            return activityRepository.getAll()
+            return activityRepository.getAll("5a62be07d6f33400146c9b61")
                 .then((activities) => {
                     assert.isNotNull(activities)
                     assert.equal(activities.length, resultExpected.length)
@@ -116,12 +118,12 @@ describe('Repositories: Activity', () => {
             it('should return error 404 and message: Activities not found!', () => {
 
                 ActivityFake.find
-                    .withArgs({})
+                    .withArgs({user_id: "5a62be07d6f33400146c9b61"})
                     .resolves([])
 
                 let activityRepository = new ActivityRepository(ActivityFake)
 
-                return activityRepository.getAll()
+                return activityRepository.getAll("5a62be07d6f33400146c9b61")
                     .catch((err: IExceptionError) => {
                         assert.isNotNull(err)
                         assert.equal(err.code, 404)

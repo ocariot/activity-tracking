@@ -172,8 +172,6 @@ export class ActivityRepository implements IRepository<IActivity> {
      */
     delete(id: string): Promise<boolean> {
         return new Promise((resolve, reject) => {
-            if(!Validator.validateObjectId(id)) 
-                return reject(new ApiException(400, "Invalid parameter!", "Id of user is invalid!"))
             this.ActivityModel.findByIdAndDelete({ _id: id })
                 .exec((err) => {
                     if (err) {
