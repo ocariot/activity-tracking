@@ -34,10 +34,11 @@ export class RabbitMQSubscriber {
 
     /**
      * Method used to start the connection to the RabbitMQ instance.
-     * @returns any. In this implementation, the method does not return any 
-     * type of information, it only prints in the console in case there is 
-     * some connection error with the instance.
-     */
+     * @returns any. If the connection was well done, this method will 
+     * return the connection, atributted in the amqpConn variable. Else, 
+     * it only prints in the console in case there is some connection 
+     * error with the instance.
+     */
     startReceive(): any {
         /**
          * Connect with the RabbitMQ instance.
@@ -121,6 +122,12 @@ export class RabbitMQSubscriber {
         }
     }
 
+    /**
+     * Initial method. This method will only start the consumer
+     * method if the connection is successful, that is, if the 
+     * return of the startReceive () method is different from 
+     * null.
+     */
     private init(){
         if (this.startReceive()){
             this.consumer()
