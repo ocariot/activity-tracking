@@ -29,7 +29,7 @@ export class RabbitMQSubscriber {
      */
     constructor() {
         RabbitMQSubscriber.repository = new ActivityRepository(this.ActivityModel)
-        this.startReceive()
+        this.init()   
     }
 
     /**
@@ -48,7 +48,7 @@ export class RabbitMQSubscriber {
              * Assigns the connection to the variable 'amqpConn'.
              */
             this.amqpConn = conn
-            this.consumer()
+            return this.amqpConn
         })
     }
 
@@ -115,6 +115,12 @@ export class RabbitMQSubscriber {
     endConnection(): any {
         if (this.amqpConn) {
             this.amqpConn.close()
+        }
+    }
+
+    private init(){
+        if (this.startReceive()){
+            this.consumer
         }
     }
 }
