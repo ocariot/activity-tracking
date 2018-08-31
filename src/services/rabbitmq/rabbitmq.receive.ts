@@ -43,7 +43,10 @@ export class RabbitMQSubscriber {
          * Connect with the RabbitMQ instance.
          */
         amqp.connect(Configuration.url, (err, conn) => {
-            if (err) console.log("[AMQP ERROR CONNECT]", err)
+            if (err) {
+                console.log("[AMQP ERROR CONNECT]", err)
+                return
+            }
             /**
              * Assigns the connection to the variable 'amqpConn'.
              */
@@ -120,7 +123,7 @@ export class RabbitMQSubscriber {
 
     private init(){
         if (this.startReceive()){
-            this.consumer
+            this.consumer()
         }
     }
 }
