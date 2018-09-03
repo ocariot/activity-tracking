@@ -75,7 +75,7 @@ export class App {
             }
 
             this.app.use('/api/v1/reference', swaggerUi.serve, swaggerUi.setup(
-                yaml.load('./dist/src/swagger/swagger.yaml'), options)
+                yaml.load('./src/swagger/swagger.yaml'), options)
             )
         }
     }
