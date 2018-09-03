@@ -49,8 +49,8 @@ const activitySchema = new mongoose.Schema({
         type: String,
         required: 'Intensity level of activity is required!'
     },
-    max_intensity: {type: String},
-    max_intensity_duration: {type: String},
+    max_intensity: { type: String },
+    max_intensity_duration: { type: Number },
     distance: { type: Number },
     calories: {
         type: Number,
