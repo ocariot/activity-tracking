@@ -2,21 +2,23 @@ const gulp = require('gulp')
 const ts = require('gulp-typescript')
 const tsProject = ts.createProject('tsconfig.json')
 const nodemon = require('gulp-nodemon')
-const YAML_FILES = ['src/swagger/*.yaml']
+const COPY_YAML = ['src/swagger/*.yaml']
+const COPY_FILES = ['package.json']
 
-gulp.task('ts', ['yaml'], () => {
+gulp.task('ts', ['copy-yaml', 'copy-files'], () => {
     return tsProject.src()
         .pipe(tsProject())
         .js.pipe(gulp.dest("dist"))
 })
 
-gulp.task('yaml', () => {
-    return gulp.src(YAML_FILES)
+gulp.task('copy-yaml', () => {
+    return gulp.src(COPY_YAML)
         .pipe(gulp.dest('dist/src/swagger'))
 })
 
-gulp.task('watch', ['ts', 'serve'], () => {
-    gulp.watch(['*.ts', './config/*.ts', './src/**/*.ts', 'src/swagger/*.yaml'], ['ts'])
+gulp.task('copy-files', () => {
+    return gulp.src(COPY_FILES)
+        .pipe(gulp.dest('dist'))
 })
 
 gulp.task('serve', ['ts'], () => {

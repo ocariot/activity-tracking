@@ -2,7 +2,7 @@
   "name": "tracking-service",
   "version": "1.0.0",
   "description": "Microservice for the purpose of storing activity tracking",
-  "main": "index.js",
+  "main": "server.js",
   "scripts": {
     "build": "gulp build && npm run build:doc",
     "build:doc": "typedoc --options typedoc.json",
