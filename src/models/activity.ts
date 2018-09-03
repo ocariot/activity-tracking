@@ -15,6 +15,8 @@ export interface IActivity extends Document {
     end_time?: Date
     duration: number
     intensity_level: string
+    max_intensity?: string
+    max_intensity_duration?: string
     distance?: number
     calories: number
     steps: number
@@ -47,6 +49,8 @@ const activitySchema = new mongoose.Schema({
         type: String,
         required: 'Intensity level of activity is required!'
     },
+    max_intensity: {type: String},
+    max_intensity_duration: {type: String},
     distance: { type: Number },
     calories: {
         type: Number,
