@@ -21,6 +21,10 @@ gulp.task('copy-files', () => {
         .pipe(gulp.dest('dist'))
 })
 
+gulp.task('watch', ['ts', 'serve'], () => {
+    gulp.watch(['*.ts', './config/*.ts', './src/**/*.ts', 'src/swagger/*.yaml'], ['ts'])
+})
+
 gulp.task('serve', ['ts'], () => {
     nodemon({
         script: "dist/server.js",
