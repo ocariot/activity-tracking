@@ -30,6 +30,6 @@
  *  -> Vhost: The host path defined in the instance (Can be the same as user)
  * 
  */
- export class Configuration  {
-    static url: string =  'amqp://activity.app:ocariot@192.168.0.117:5672/activity'
+export class Configuration  {
+    static url: string =  'amqp://activity.app:ocariot@rabbit1:5672/activity'
  }

@@ -6,12 +6,22 @@
   "scripts": {
     "build": "gulp build && npm run build:doc",
     "build:doc": "typedoc --options typedoc.json",
-    "start": "SET NODE_ENV=prod && node dist/server.js",
+    "start": "run-script-os",
+    "start:win32": "SET NODE_ENV=prod && node dist/server.js",
+    "start:darwin:linux": "export NODE_ENV=prod && node dist/server.js",
     "start:dev": "gulp build:dev",
-    "test": "SET NODE_ENV=test && mocha --opts test/mocha.opts test/**/*.spec.ts",
-    "test:integration": "SET NODE_ENV=test && mocha --opts test/mocha.opts test/integration/**/*.spec.ts",
-    "test:unit": "SET NODE_ENV=test && mocha --opts test/mocha.opts test/unit/**/*.spec.ts",
-    "test:cov": "SET NODE_ENV=test && nyc --reporter=html --reporter=text mocha --opts test/mocha.opts test/**/*.spec.ts"
+    "test": "run-script-os",
+    "test:win32": "SET NODE_ENV=test && mocha --opts test/mocha.opts test/**/*.spec.ts",
+    "test:darwin:linux": "export NODE_ENV=test && mocha --opts test/mocha.opts test/**/*.spec.ts",
+    "test:integration": "run-script-os",
+    "test:integration:win32": "SET NODE_ENV=test && mocha --opts test/mocha.opts test/integration/**/*.spec.ts",
+    "test:integration:darwin:linux": "export NODE_ENV=test && mocha --opts test/mocha.opts test/integration/**/*.spec.ts",
+    "test:unit": "run-script-os",
+    "test:unit:win32": "SET NODE_ENV=test && mocha --opts test/mocha.opts test/unit/**/*.spec.ts",
+    "test:unit:darwin:linux": "export NODE_ENV=test && mocha --opts test/mocha.opts test/unit/**/*.spec.ts",
+    "test:cov": "run-script-os",
+    "test:cov:win32": "SET NODE_ENV=test && nyc --reporter=html --reporter=text mocha --opts test/mocha.opts test/**/*.spec.ts",
+    "test:cov:darwin:linux": "export NODE_ENV=test && nyc --reporter=html --reporter=text mocha --opts test/mocha.opts test/**/*.spec.ts"
   },
   "repository": {
     "type": "git",
@@ -72,6 +82,7 @@
     "supertest": "^3.1.0",
     "ts-node": "^6.0.5",
     "typedoc": "^0.11.1",
-    "typescript": "^2.9.1"
+    "typescript": "^2.9.1",
+    "run-script-os": "^1.0.3"
   }
 }
