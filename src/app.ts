@@ -1,108 +1,123 @@
-import logger from 'morgan'
-import bodyParser from 'body-parser'
-import swaggerUi from 'swagger-ui-express'
+import 'reflect-metadata'
 import yaml from 'yamljs'
-import routes from './routes'
-import express, { Application, Request, Response, NextFunction } from "express"
-import { ApiException, IExceptionError } from './exceptions/api.exception'
-import database from './../config/database'
-import config from './../config/config'
-import { RabbitMQSubscriber } from './services/rabbitmq/rabbitmq.receive'
+import morgan from 'morgan'
+import helmet from 'helmet'
+import bodyParser from 'body-parser'
+import HttpStatus from 'http-status-codes'
+import swaggerUi from 'swagger-ui-express'
+import qs from 'query-strings-parser'
+import express, { Application, Request, Response } from 'express'
+import { Container, inject, injectable } from 'inversify'
+import { InversifyExpressServer } from 'inversify-express-utils'
+import { ApiException } from './ui/exceptions/api.exception'
+import { Default } from './utils/default'
+import { DI } from './di/di'
+import { Identifier } from './di/identifiers'
+import { ILogger } from './utils/custom.logger'
 
 /**
- * Class App.
- * 
- * @author Lucas Rocha <lucas.rocha@nutes.uepb.edu.br>
- * @version 1.0
- * @copyright Copyright (c) 2018, NUTES/UEPB. 
+ * Implementation of class App.
+ * You must initialize all application settings,
+ * such as dependency injection and middleware settings.
  */
+@injectable()
 export class App {
-    private app: Application
-    private database: any
-    private rabbitMQSubscriber: any 
+    private readonly container: Container
+    private express: Application
+
     /**
-     * Class constructor.
+     * Creates an instance of App.
      */
-    constructor() {
-        this.app = express()
+    constructor(@inject(Identifier.LOGGER) private readonly _logger: ILogger) {
+        this.express = express()
+        this.container = DI.getInstance().getContainer()
         this.bootstrap()
-        this.rabbitMQSubscriber = new RabbitMQSubscriber()
     }
 
     /**
      * Get express instance.
-     * 
-     * @returns Application
+     *
+     * @return {Application}
      */
-    getExpress(): Application {
-        return this.app
+    public getExpress(): Application {
+        return this.express
     }
 
     /**
-     * Bootstrap app.
+     * Initialize app settings.
+     *
+     * @private
+     * @return void
      */
-    bootstrap(): void {
-        this.middlewares()
-        this.routes()
+    private bootstrap(): void {
+        this.middleware()
     }
 
     /**
-     * Initialize middlewares.
-     * 
-     * @returns void
+     * Initialize middleware.
+     *
+     * @private
+     * @return void
      */
-    private middlewares(): void {
-        let env = process.env.NODE_ENV
+    private middleware(): void {
+        const inversifyExpress: InversifyExpressServer = new InversifyExpressServer(
+            this.container, null, { rootPath: '/api/v1' })
 
-        /**
-         * Middlewares that must be run
-         * only in the development environment.
-         */
-        if (env != undefined && env.trim() == 'dev')
-            this.app.use(logger('dev'))
+        inversifyExpress.setConfig((app) => {
+            // for handling query strings
+            // {@link https://www.npmjs.com/package/query-strings-parser}
+            app.use(qs({ use_page: true, default: { pagination: { limit: 100 }, sort: { created_at: 'desc' } } }))
 
-        this.app.use(bodyParser.json());
-        this.app.use(bodyParser.urlencoded({ extended: false }))
+            // helps you secure your Express apps by setting various HTTP headers.
+            // {@link https://www.npmjs.com/package/helmet}
+            app.use(helmet())
 
-        /**
-         * Middleware swagger. It should not run in the test environment.
-         */
-        if (env != undefined && env.trim() != 'test') {
-            let options = {
-                customCss: '.swagger-ui .topbar { display: none } .swagger-ui .try-out { display: none}',
-                customfavIcon: 'http://nutes.uepb.edu.br/wp-content/uploads/2014/01/icon.fw_.png',
-                customSiteTitle: `API Reference | ${config.APP_TITLE}`
+            // create application/json parser
+            // {@link https://www.npmjs.com/package/body-parser}
+            app.use(bodyParser.json())
+            // create application/x-www-form-urlencoded parser
+            app.use(bodyParser.urlencoded({ extended: false }))
+
+            app.use(morgan(':remote-addr :remote-user ":method :url HTTP/:http-version" ' +
+                ':status :res[content-length] :response-time ms ":referrer" ":user-agent"', {
+                    stream: { write: (str: string) => this._logger.info(str) }
+                }
+            ))
+
+            // Middleware swagger. It should not run in the test environment.
+            if ((process.env.NODE_ENV || Default.NODE_ENV) !== 'test') {
+                const options = {
+                    customCss: '.swagger-ui .topbar { display: none }',
+                    customfavIcon: 'http://nutes.uepb.edu.br/wp-content/uploads/2014/01/icon.fw_.png',
+                    customSiteTitle: `API Reference | ${Default.APP_TITLE}`
+                }
+
+                app.use('/api/v1/reference', swaggerUi.serve, swaggerUi.setup(yaml.load(Default.SWAGGER_PATH), options))
             }
-
-            this.app.use('/api/v1/reference', swaggerUi.serve, swaggerUi.setup(
-                yaml.load('./src/swagger/swagger.yaml'), options)
-            )
-        }
+        })
+        this.express = inversifyExpress.build()
+        this.handleError()
     }
 
     /**
-     * Initializes as routes available in the application.
-     * 
-     * @returns void
+     * Initializes error routes available in the application.
+     *
+     * @private
+     * @return void
      */
-    private routes(): void {
-        this.app.use('/', routes)
-
+    private handleError(): void {
         // Handle 404
-        this.app.use((req: Request, res: Response) => {
-            let errorMessage: IExceptionError = new ApiException(404, `${req.url} not found.`,
+        this.express.use((req: Request, res: Response) => {
+            const errorMessage: ApiException = new ApiException(404, `${req.url} not found.`,
                 `Specified resource: ${req.url} was not found or does not exist.`)
-
-            res.status(404).send(errorMessage.toJson())
-        });
+            res.status(HttpStatus.NOT_FOUND).send(errorMessage.toJson())
+        })
 
         // Handle 500
-        this.app.use((err: any, req: Request, res: Response, next: NextFunction) => {
-            let errorMessage: IExceptionError = new ApiException(err.code, err.message, err.description)
-
-            res.status(500).send(errorMessage.toJson())
-        });
+        this.express.use((err: any, req: Request, res: Response) => {
+            res.locals
+            const errorMessage: ApiException = new ApiException(err.code, err.message, err.description)
+            res.status(HttpStatus.INTERNAL_SERVER_ERROR).send(errorMessage.toJson())
+        })
     }
 }
-
-export default database.connection().then(() => new App().getExpress())
