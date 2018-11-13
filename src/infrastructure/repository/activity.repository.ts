@@ -8,6 +8,8 @@ import { IEntityMapper } from '../entity/mapper/entity.mapper.interface'
 import { Query } from './query/query'
 import { IEventBus } from '../port/event.bus.interface'
 import { ILogger } from '../../utils/custom.logger'
+import { UserEntity } from '../entity/user.entity'
+import { ActivitySaveEvent } from '../../application/integration-event/event/activity.save.event'
 
 /**
  * Implementation of the activity repository.
@@ -19,10 +21,37 @@ export class ActivityRepository extends BaseRepository<Activity, ActivityEntity>
     constructor(
         @inject(Identifier.ACTIVITY_REPO_MODEL) protected readonly activityModel: any,
         @inject(Identifier.ACTIVITY_ENTITY_MAPPER) protected readonly activityMapper: IEntityMapper<Activity, ActivityEntity>,
-        @inject(Identifier.RABBITMQ_EVENT_BUS) protected readonly _rabbitMQEventBus: IEventBus,
+        @inject(Identifier.RABBITMQ_EVENT_BUS) private readonly _rabbitMQEventBus: IEventBus,
         @inject(Identifier.LOGGER) protected readonly logger: ILogger
     ) {
         super(activityModel, activityMapper, logger)
+    }
+
+    /**
+     * Add a new activity.
+     * The saved activity is published on the event bus.
+     *
+     * @param activity Activity to insert.
+     * @return {Promise<T>}
+     * @throws {ValidationException | ConflictException | RepositoryException}
+     * @override
+     */
+    public create(activity: Activity): Promise<Activity> {
+        const itemNew: UserEntity = this.mapper.transform(activity)
+        return new Promise<Activity>((resolve, reject) => {
+            this.Model.create(itemNew)
+                .then((result: ActivityEntity) => {
+                    const activityResult: Activity = this.mapper.transform(result)
+                    resolve(activityResult)
+
+                    this.logger.info('Publish activity on event bus...')
+                    this._rabbitMQEventBus.publish(
+                        new ActivitySaveEvent('ActivitySaveEvent', new Date(), activityResult),
+                        'activities.save'
+                    )
+                })
+                .catch(err => reject(this.mongoDBErrorListener(err)))
+        })
     }
 
     /**

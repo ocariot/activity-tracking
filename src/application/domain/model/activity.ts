@@ -9,16 +9,16 @@ import { ISerializable } from '../utils/serializable.interface'
  * @implements {ISerializable<Activity>}
  */
 export class Activity extends Entity implements ISerializable<Activity> {
-    private name?: string
-    private start_time?: Date
-    private end_time?: Date
-    private duration?: number
-    private max_intensity?: string
-    private max_intensity_duration?: number
-    private calories?: number
-    private steps?: number
-    private user!: User
-    private created_at?: Date
+    private name?: string // Name of activity, for example: Walk, Run, swim...
+    private start_time?: Date // Activity start time according to the UTC.
+    private end_time?: Date // Activity end time according to the UTC.
+    private duration?: number // Total time in milliseconds spent in the activity.
+    private max_intensity?: string // Maximum intensity reached in the activity.
+    private max_intensity_duration?: number // Time spent in maximum activity intensity, in minutes.
+    private calories?: number // Calories spent during activity.
+    private steps?: number // Number of steps taken during the activity.
+    private user!: User // User belonging to activity.
+    private created_at?: Date // Timestamp according to the UTC pattern, automatically generated that resource is saved on server.
 
     constructor(name?: string, start_time?: Date, end_time?: Date, duration?: number, max_intensity?: string,
                 max_intensity_duration?: number, calories?: number, steps?: number, user?: User, id?: string) {

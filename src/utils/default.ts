@@ -23,8 +23,8 @@ export abstract class Default {
 
     // RabbitMQ
     public static readonly RABBITMQ_AMQP_URI: string = 'amqp://127.0.0.1:5672'
-    public static readonly RABBITMQ_BROKER_NAME: string = 'activity-tracking-service'
-    public static readonly RABBITMQ_QUEUE_NAME: string = 'task_queue'
+    public static readonly RABBITMQ_BROKER_NAME: string = 'tracking-service'
+    public static readonly RABBITMQ_QUEUE_NAME: string = 'tracking_queue'
     public static readonly RABBITMQ_CON_RETRY_COUNT: number = 0 // infinite
     public static readonly RABBITMQ_CON_RETRY_INTERVAL: number = 1000 // 1s
 
