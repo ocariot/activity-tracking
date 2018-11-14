@@ -51,7 +51,10 @@ export class UserEntityMapper implements IEntityMapper<User, UserEntity> {
     public jsonToModel(json: any): User {
         const result: User = new User()
         if (!json) return result
-        if (json !== undefined) result.setId(json)
+
+        if (!(/^[0-9a-fA-F]{24}$/).test(json)) result.setId(json.id)
+        else result.setId(json)// json itself is already the user id
+
         return result
     }
 }

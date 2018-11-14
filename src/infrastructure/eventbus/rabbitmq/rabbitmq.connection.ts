@@ -1,4 +1,4 @@
-import { Connection } from 'amqp-ts'
+import amqp, { Connection } from 'amqp-ts'
 import { inject, injectable } from 'inversify'
 import { IRabbitMQConnection } from '../../port/rabbitmq.connection.interface'
 import { IConnectionFactory } from '../../port/connection.factory.interface'
@@ -19,6 +19,7 @@ export class RabbitMQConnection implements IRabbitMQConnection {
         @inject(Identifier.RABBITMQ_CONNECTION_FACTORY) private readonly _connectionFactory: IConnectionFactory
     ) {
         this._connection = undefined
+        amqp.log.transports.console.level = 'info'
     }
 
     get isConnected(): boolean {

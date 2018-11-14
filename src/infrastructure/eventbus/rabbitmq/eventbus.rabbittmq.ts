@@ -83,7 +83,6 @@ export class EventBusRabbitMQ implements IEventBus, IDisposable {
             this.queue_consumer = true
             await this.queue
                 .activateConsumer((message: Message) => {
-                    // console.log('onMessage', message.getContent())
                     this._logger.info(`Bus event message received: ${message.getContent()}`)
 
                     const event_name: string = message.getContent().event_name

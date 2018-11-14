@@ -41,6 +41,7 @@ export class ActivityRepository extends BaseRepository<Activity, ActivityEntity>
         return new Promise<Activity>((resolve, reject) => {
             this.Model.create(itemNew)
                 .then((result: ActivityEntity) => {
+                    this.logger.debug('re ' + JSON.stringify(result))
                     const activityResult: Activity = this.mapper.transform(result)
                     resolve(activityResult)
 
