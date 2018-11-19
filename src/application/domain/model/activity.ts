@@ -152,17 +152,17 @@ export class Activity extends Entity implements ISerializable<Activity> {
         if (!json) return this
         if (typeof json === 'string') json = JSON.parse(json)
 
-        if (json.id) this.setId(json.id)
-        if (json.name) this.name = json.name
-        if (json.start_time) this.start_time = new Date(json.start_time)
-        if (json.end_time) this.end_time = new Date(json.end_time)
-        if (json.duration) this.duration = json.duration
-        if (json.max_intensity) this.max_intensity = json.max_intensity
-        if (json.max_intensity_duration) this.max_intensity_duration = json.max_intensity_duration
-        if (json.calories) this.calories = json.calories
-        if (json.steps) this.steps = json.steps
-        if (json.created_at) this.created_at = new Date(json.created_at)
-        if (json.user) this.user = new User().deserialize(json.user)
+        if (json.id) super.setId(json.id)
+        if (json.name) this.setName(json.name)
+        if (json.start_time) this.setStartTime(new Date(json.start_time))
+        if (json.end_time) this.setEndTime(new Date(json.end_time))
+        if (json.duration) this.setDuration(json.duration)
+        if (json.max_intensity) this.setMaxIntensity(json.max_intensity)
+        if (json.max_intensity_duration) this.setMaxIntensityDuration(json.max_intensity_duration)
+        if (json.calories) this.setCalories(json.calories)
+        if (json.steps) this.setSteps(json.steps)
+        if (json.created_at) this.setCreatedAt(new Date(json.created_at))
+        if (json.user) this.setUser(new User().deserialize(json.user))
 
         return this
     }
