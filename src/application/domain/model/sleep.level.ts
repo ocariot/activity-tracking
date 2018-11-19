@@ -53,7 +53,11 @@ export class SleepLevel implements ISerializable<SleepLevel> {
         if (!json) return this
         if (typeof json === 'string') json = JSON.parse(json)
 
-        if (json.data_set) this.setDataSet(json.data_set)
+        if (json.data_set) {
+            const dataSetTemp = new Array<SleepLevelDataSet>()
+            json.data_set.forEach(elem => dataSetTemp.push(new SleepLevelDataSet().deserialize(elem)))
+            this.setDataSet(dataSetTemp)
+        }
         if (json.summary) this.setSummary(new SleepLevelSummary().deserialize(json.summary))
 
         return this
