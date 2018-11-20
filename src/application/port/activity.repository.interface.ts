@@ -13,8 +13,8 @@ export interface IActivityRepository extends IRepository<Activity> {
      * Update user activity data.
      *
      * @param activity Containing the data to be updated
-     * @param idUser User ID.
-     * @return {Promise<T>}
+     * @param idUser User unique identifier.
+     * @return {Promise<Activity>}
      * @throws {ValidationException | ConflictException | RepositoryException}
      */
     updateByUser(activity: Activity, idUser: string): Promise<Activity>
@@ -22,8 +22,8 @@ export interface IActivityRepository extends IRepository<Activity> {
     /**
      * Removes activity according to its unique identifier and related user.
      *
-     * @param idActivity Unique identifier.
-     * @param idUser User ID.
+     * @param idActivity Activity unique identifier.
+     * @param idUser User unique identifier.
      * @return {Promise<boolean>}
      * @throws {ValidationException | RepositoryException}
      */

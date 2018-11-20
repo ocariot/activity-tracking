@@ -5,7 +5,7 @@ import { IQuery } from './query.interface'
 /**
  * Activity service interface.
  *
- * @extends {IService}
+ * @extends {IService<Activity>}
  */
 export interface IActivityService extends IService<Activity> {
     /**
@@ -21,10 +21,10 @@ export interface IActivityService extends IService<Activity> {
     /**
      * Retrieve activity by unique identifier (ID)  and related user.
      *
-     * @param idActivity Activity ID.
-     * @param idUser User ID.
+     * @param idActivity Activity unique identifier.
+     * @param idUser User unique identifier.
      * @param query Defines object to be used for queries.
-     * @return {Promise<Array<Activity>>}
+     * @return {Promise<Activity>}
      * @throws {RepositoryException}
      */
     getByIdAndUser(idActivity: string, idUser: string, query: IQuery): Promise<Activity>
@@ -33,8 +33,8 @@ export interface IActivityService extends IService<Activity> {
      * Update user activity data.
      *
      * @param item Containing the data to be updated
-     * @param idUser User ID.
-     * @return {Promise<T>}
+     * @param idUser User unique identifier.
+     * @return {Promise<Activity>}
      * @throws {ValidationException | ConflictException | RepositoryException}
      */
     updateByUser(item: Activity, idUser: string): Promise<Activity>
@@ -42,8 +42,8 @@ export interface IActivityService extends IService<Activity> {
     /**
      * Removes activity according to its unique identifier and related user.
      *
-     * @param idActivity Unique identifier.
-     * @param idUser User ID.
+     * @param idActivity Activity unique identifier.
+     * @param idUser User unique identifier.
      * @return {Promise<boolean>}
      * @throws {ValidationException | RepositoryException}
      */

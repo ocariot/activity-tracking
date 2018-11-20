@@ -63,9 +63,9 @@ export class SleepLevelSummary implements ISerializable<SleepLevelSummary> {
         if (!json) return this
         if (typeof json === 'string') json = JSON.parse(json)
 
-        if (json.awake) this.setAwake(json.awake)
-        if (json.asleep) this.setAsleep(json.asleep)
-        if (json.restless) this.setRestless(json.restless)
+        if (json.awake) this.setAwake(new SleepLevelSummaryData(json.awake.count, json.awake.duration))
+        if (json.asleep) this.setAsleep(new SleepLevelSummaryData(json.asleep.count, json.asleep.duration))
+        if (json.restless) this.setRestless(new SleepLevelSummaryData(json.restless.count, json.restless.duration))
 
         return this
     }

@@ -48,7 +48,7 @@ export class SleepLevelDataSet implements ISerializable<SleepLevelDataSet> {
     public serialize(): any {
         return {
             start_time: this.start_time ? this.start_time.toISOString() : undefined,
-            end_time: this.name,
+            name: this.name,
             duration: this.duration
         }
     }

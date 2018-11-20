@@ -68,7 +68,7 @@ export class SleepLevel implements ISerializable<SleepLevel> {
  * Name of traceable sleep levels.
  */
 export enum NameSleepLevel {
-    AWAKE = 'Awake',
-    ASLEEP = 'Asleep',
-    RESTLESS = 'Restless'
+    AWAKE = 'awake',
+    ASLEEP = 'asleep',
+    RESTLESS = 'restless'
 }

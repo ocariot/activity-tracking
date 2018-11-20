@@ -14,9 +14,6 @@ export class UserEntityMapper implements IEntityMapper<User, UserEntity> {
     /**
      * Convert {User} for {UserEntity}.
      *
-     * @see Before setting the value, it is important to verify that the type is valid.
-     * Therefore, you do not run the risk that in an UPDATE / PATCH action type,
-     * attributes that should not be updated are saved with null values.
      * @see Creation Date should not be mapped to the type the repository understands.
      * Because this attribute is created automatically by the database.
      * Therefore, if a null value is passed at update time, an exception is thrown.

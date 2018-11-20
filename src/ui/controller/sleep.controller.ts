@@ -3,50 +3,50 @@ import { inject } from 'inversify'
 import { controller, httpDelete, httpGet, httpPatch, httpPost, request, response } from 'inversify-express-utils'
 import { Request, Response } from 'express'
 import { Identifier } from '../../di/identifiers'
-import { ApiExceptionManager } from '../exceptions/api.exception.manager'
+import { ApiExceptionManager } from '../exception/api.exception.manager'
 import { Query } from '../../infrastructure/repository/query/query'
-import { ApiException } from '../exceptions/api.exception'
-import { Activity } from '../../application/domain/model/activity'
-import { IActivityService } from '../../application/port/activity.service.interface'
+import { ApiException } from '../exception/api.exception'
 import { User } from '../../application/domain/model/user'
 import { ILogger } from '../../utils/custom.logger'
+import { ISleepService } from '../../application/port/sleep.service.interface'
+import { Sleep } from '../../application/domain/model/sleep'
 
 /**
- * Controller that implements Activity feature operations.
+ * Controller that implements Sleep feature operations.
  *
  * @remarks To define paths, we use library inversify-express-utils.
  * @see {@link https://github.com/inversify/inversify-express-utils} for further information.
  */
-@controller('/users/:user_id/activities')
-export class ActivityController {
+@controller('/users/:user_id/sleep')
+export class SleepController {
 
     /**
-     * Creates an instance of Activity controller.
+     * Creates an instance of Sleep controller.
      *
-     * @param {IActivityService} _activityService
+     * @param {ISleepService} _sleepService
      * @param {ILogger} _logger
      */
     constructor(
-        @inject(Identifier.ACTIVITY_SERVICE) private readonly _activityService: IActivityService,
+        @inject(Identifier.SLEEP_SERVICE) private readonly _sleepService: ISleepService,
         @inject(Identifier.LOGGER) readonly _logger: ILogger
     ) {
     }
 
     /**
-     * Add new activity.
+     * Add new sleep.
      *
      * @param {Request} req
      * @param {Response} res
      */
     @httpPost('/')
-    public async addActivity(@request() req: Request, @response() res: Response) {
+    public async addSleep(@request() req: Request, @response() res: Response) {
         try {
             const user = new User()
-            const activity: Activity = new Activity().deserialize(req.body)
+            const sleep: Sleep = new Sleep().deserialize(req.body)
             user.setId(req.params.user_id)
-            activity.setUser(user)
+            sleep.setUser(user)
 
-            const result: Activity = await this._activityService.add(activity)
+            const result: Sleep = await this._sleepService.add(sleep)
             return res.status(HttpStatus.CREATED).send(result)
         } catch (err) {
             const handlerError = ApiExceptionManager.build(err)
@@ -56,7 +56,7 @@ export class ActivityController {
     }
 
     /**
-     * Get all activities by user.
+     * Get all sleep by user.
      * For the query strings, the query-strings-parser middleware was used.
      * @see {@link https://www.npmjs.com/package/query-strings-parser} for further information.
      *
@@ -64,9 +64,9 @@ export class ActivityController {
      * @param {Response} res
      */
     @httpGet('/')
-    public async getAllActivitiesByUser(@request() req: Request, @response() res: Response): Promise<Response> {
+    public async getAllSleepByUser(@request() req: Request, @response() res: Response): Promise<Response> {
         try {
-            const result = await this._activityService
+            const result = await this._sleepService
                 .getAllByUser(req.params.user_id, new Query().deserialize(req.query))
             return res.status(HttpStatus.OK).send(result)
         } catch (err) {
@@ -77,19 +77,19 @@ export class ActivityController {
     }
 
     /**
-     * Get activity by id and user.
+     * Get sleep by id and user.
      * For the query strings, the query-strings-parser middleware was used.
      * @see {@link https://www.npmjs.com/package/query-strings-parser} for further information.
      *
      * @param {Request} req
      * @param {Response} res
      */
-    @httpGet('/:activity_id')
-    public async getActivityByIdAnByUser(@request() req: Request, @response() res: Response): Promise<Response> {
+    @httpGet('/:sleep_id')
+    public async getSleepByIdAnByUser(@request() req: Request, @response() res: Response): Promise<Response> {
         try {
-            const result: Activity = await this._activityService
-                .getByIdAndUser(req.params.activity_id, req.params.user_id, new Query().deserialize(req.query))
-            if (!result) return res.status(HttpStatus.NOT_FOUND).send(this.getMessageNotFoundActivity())
+            const result: Sleep = await this._sleepService
+                .getByIdAndUser(req.params.sleep_id, req.params.user_id, new Query().deserialize(req.query))
+            if (!result) return res.status(HttpStatus.NOT_FOUND).send(this.getMessageNotFoundSleep())
             return res.status(HttpStatus.OK).send(result)
         } catch (err) {
             const handlerError = ApiExceptionManager.build(err)
@@ -99,18 +99,18 @@ export class ActivityController {
     }
 
     /**
-     * Update activity by user.
+     * Update sleep by user.
      *
      * @param {Request} req
      * @param {Response} res
      */
-    @httpPatch('/:activity_id')
-    public async updateActivityByUser(@request() req: Request, @response() res: Response): Promise<Response> {
+    @httpPatch('/:sleep_id')
+    public async updateSleepByUser(@request() req: Request, @response() res: Response): Promise<Response> {
         try {
-            const activity: Activity = new Activity().deserialize(req.body)
-            activity.setId(req.params.activity_id)
-            const result = await this._activityService.updateByUser(activity, req.params.user_id)
-            if (!result) return res.status(HttpStatus.NOT_FOUND).send(this.getMessageNotFoundActivity())
+            const sleep: Sleep = new Sleep().deserialize(req.body)
+            sleep.setId(req.params.sleep_id)
+            const result = await this._sleepService.updateByUser(sleep, req.params.user_id)
+            if (!result) return res.status(HttpStatus.NOT_FOUND).send(this.getMessageNotFoundSleep())
             return res.status(HttpStatus.OK).send(result)
         } catch (err) {
             const handlerError = ApiExceptionManager.build(err)
@@ -120,16 +120,16 @@ export class ActivityController {
     }
 
     /**
-     * Remove activity by user.
+     * Remove sleep by user.
      *
      * @param {Request} req
      * @param {Response} res
      */
-    @httpDelete('/:activity_id')
-    public async removeActivityByUser(@request() req: Request, @response() res: Response): Promise<Response> {
+    @httpDelete('/:sleep_id')
+    public async removeSleepByUser(@request() req: Request, @response() res: Response): Promise<Response> {
         try {
-            const result: boolean = await this._activityService.removeByUser(req.params.activity_id, req.params.user_id)
-            if (!result) return res.status(HttpStatus.NOT_FOUND).send(this.getMessageNotFoundActivity())
+            const result: boolean = await this._sleepService.removeByUser(req.params.sleep_id, req.params.user_id)
+            if (!result) return res.status(HttpStatus.NOT_FOUND).send(this.getMessageNotFoundSleep())
             return res.status(HttpStatus.NO_CONTENT).send()
         } catch (err) {
             const handlerError = ApiExceptionManager.build(err)
@@ -138,11 +138,11 @@ export class ActivityController {
         }
     }
 
-    private getMessageNotFoundActivity(): object {
+    private getMessageNotFoundSleep(): object {
         return new ApiException(
             HttpStatus.NOT_FOUND,
-            'Activity not found!',
-            'Activity not found or already removed. A new operation for the same resource is not required!'
+            'Sleep not found!',
+            'Sleep not found or already removed. A new operation for the same resource is not required!'
         ).toJson()
     }
 }

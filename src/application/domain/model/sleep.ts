@@ -14,7 +14,7 @@ export class Sleep extends Entity implements ISerializable<Sleep> {
     private end_time?: Date // Sleep end time according to the UTC.
     private duration?: number // Total time in milliseconds spent in all sleep levels.
     private levels?: SleepLevel // Sleep levels tracking.
-    private user!: User // User belonging to activity.
+    private user!: User // User belonging to sleep.
     private created_at?: Date // Timestamp according to the UTC pattern, automatically generated that resource is saved on server.
 
     constructor(start_time?: Date, end_time?: Date, duration?: number, levels?: SleepLevel, user?: User, id?: string) {

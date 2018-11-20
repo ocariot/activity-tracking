@@ -1,8 +1,8 @@
 import 'reflect-metadata'
 import { Container } from 'inversify'
-import { HomeController } from '../ui/controllers/home.controller'
+import { HomeController } from '../ui/controller/home.controller'
 import { Identifier } from './identifiers'
-import { ActivityController } from '../ui/controllers/activity.controller'
+import { ActivityController } from '../ui/controller/activity.controller'
 import { IActivityService } from '../application/port/activity.service.interface'
 import { ActivityService } from '../application/service/activity.service'
 import { IActivityRepository } from '../application/port/activity.repository.interface'
@@ -35,7 +35,15 @@ import { EnvironmentEntity } from '../infrastructure/entity/environment.entity'
 import { EnvironmentRepoModel } from '../infrastructure/database/schema/environment.schema'
 import { Environment } from '../application/domain/model/environment'
 import { EnvironmentEntityMapper } from '../infrastructure/entity/mapper/environment.entity.mapper'
-import { EnvironmentController } from '../ui/controllers/environment.controller'
+import { EnvironmentController } from '../ui/controller/environment.controller'
+import { SleepController } from '../ui/controller/sleep.controller'
+import { ISleepService } from '../application/port/sleep.service.interface'
+import { SleepService } from '../application/service/sleep.service'
+import { ISleepRepository } from '../application/port/sleep.repository.interface'
+import { SleepRepository } from '../infrastructure/repository/sleep.repository'
+import { SleepEntity } from '../infrastructure/entity/sleep.entity'
+import { Sleep } from '../application/domain/model/sleep'
+import { SleepEntityMapper } from '../infrastructure/entity/mapper/sleep.entity.mapper'
 
 export class DI {
     private static instance: DI
@@ -84,10 +92,12 @@ export class DI {
         this.container.bind<HomeController>(Identifier.HOME_CONTROLLER).to(HomeController).inSingletonScope()
         this.container.bind<ActivityController>(Identifier.ACTIVITY_CONTROLLER).to(ActivityController).inSingletonScope()
         this.container.bind<EnvironmentController>(Identifier.ENVIRONMENT_CONTROLLER).to(EnvironmentController).inSingletonScope()
+        this.container.bind<SleepController>(Identifier.SLEEP_CONTROLLER).to(SleepController).inSingletonScope()
 
         // Services
         this.container.bind<IActivityService>(Identifier.ACTIVITY_SERVICE).to(ActivityService).inSingletonScope()
         this.container.bind<IEnvironmentService>(Identifier.ENVIRONMENT_SERVICE).to(EnvironmentService).inSingletonScope()
+        this.container.bind<ISleepService>(Identifier.SLEEP_SERVICE).to(SleepService).inSingletonScope()
 
         // Repositories
         this.container
@@ -96,13 +106,18 @@ export class DI {
         this.container
             .bind<IEnvironmentRepository>(Identifier.ENVIRONMENT_REPOSITORY)
             .to(EnvironmentRepository).inSingletonScope()
+        this.container
+            .bind<ISleepRepository>(Identifier.SLEEP_REPOSITORY)
+            .to(SleepRepository).inSingletonScope()
 
         // Models
         this.container.bind(Identifier.USER_ENTITY).toConstantValue(UserEntity)
         this.container.bind(Identifier.ACTIVITY_ENTITY).toConstantValue(ActivityEntity)
         this.container.bind(Identifier.ENVIRONMENT_ENTITY).toConstantValue(EnvironmentEntity)
+        this.container.bind(Identifier.SLEEP_ENTITY).toConstantValue(SleepEntity)
         this.container.bind(Identifier.ACTIVITY_REPO_MODEL).toConstantValue(ActivityRepoModel)
         this.container.bind(Identifier.ENVIRONMENT_REPO_MODEL).toConstantValue(EnvironmentRepoModel)
+        // this.container.bind(Identifier.SLEEP_REPO_MODEL).toConstantValue(SleepR)
 
         // Mappers
         this.container
@@ -114,6 +129,9 @@ export class DI {
         this.container
             .bind<IEntityMapper<Environment, EnvironmentEntity>>(Identifier.ENVIRONMENT_ENTITY_MAPPER)
             .to(EnvironmentEntityMapper).inSingletonScope()
+        this.container
+            .bind<IEntityMapper<Sleep, SleepEntity>>(Identifier.SLEEP_ENTITY_MAPPER)
+            .to(SleepEntityMapper).inSingletonScope()
 
         // Background Services
         this.container
