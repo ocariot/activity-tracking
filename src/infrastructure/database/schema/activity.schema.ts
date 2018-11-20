@@ -1,6 +1,6 @@
 import Mongoose from 'mongoose'
 
-interface IActivitykModel extends Mongoose.Document {
+interface IActivityModel extends Mongoose.Document {
 }
 
 const activitySchema = new Mongoose.Schema({
@@ -46,4 +46,4 @@ const activitySchema = new Mongoose.Schema({
     }
 )
 activitySchema.index({ user: 1, start_time: 1 }, { unique: true }) // define index at schema level
-export const TaskRepoModel = Mongoose.model<IActivitykModel>('Activity', activitySchema)
+export const ActivityRepoModel = Mongoose.model<IActivityModel>('Activity', activitySchema)

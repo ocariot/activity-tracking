@@ -2,7 +2,7 @@ openapi: 3.0.0
 info:
   version: v1
   title: Tracking Service
-  description: This is the documentation of the RESTful API of the microservice for activity, sleep and food (?) tracking
+  description: This is the documentation of the RESTful API of the microservice for activity, sleep, environment and food (?) tracking
   license:
     name: Apache 2.0
     url: http://www.apache.org/licenses/LICENSE-2.0.html
@@ -11,7 +11,7 @@ servers:
 - description: SwaggerHub API Auto Mocking
   url: https://virtserver.swaggerhub.com/douglas.rafael/tracking-service/v1
 - description: Localhost
-  url: http:://127.0.0.1/api/v1
+  url: http:://127.0.0.1:3000/api/v1
 tags:
 - name: activities
   description: Operations for the Activity resource. Useful for users with administrator permissions.
@@ -21,6 +21,7 @@ tags:
   description: Operations for the Sleep feature. Useful for users with administrator permissions.
 - name: users.sleep
   description: Operations for user Sleep resource.
+- name: environments
 
 paths:
   /activities:
@@ -190,6 +191,12 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Activity'
+        '207':
+          description: Successful request, however, can have several status codes for the case of a list of submitted resources.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MultiStatus'
         '400':
           description: >-
             Request can not be met, syntactically incorrect or violates the
@@ -252,12 +259,15 @@ paths:
               schema:
                 $ref: '#/components/schemas/Error'
       requestBody:
+        required: true
+        description: Activity to be insert
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/Activity'
-        description: Activity to be insert
-        required: true
+              type: array
+              items:
+                $ref: '#/components/schemas/Activity'
+
   /users/{user_id}/activities/{activity_id}:
     get:
       tags:
@@ -654,7 +664,6 @@ paths:
         example: 5a62be07d6f33400146c9b61
         schema:
           type: string
-
       responses:
         '201':
           description: Sleep saved successfully.
@@ -662,6 +671,12 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Sleep'
+        '207':
+          description: Successful request, however, can have several status codes for the case of a list of submitted resources.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MultiStatus'
         '400':
           description: >-
             Request can not be met, syntactically incorrect or violates the
@@ -724,12 +739,14 @@ paths:
               schema:
                 $ref: '#/components/schemas/Error'
       requestBody:
+        description: Activity to be insert
+        required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/Sleep'
-        description: Activity to be insert
-        required: true
+              type: array
+              items:
+                $ref: '#/components/schemas/Sleep'
 
   /users/{user_id}/sleep/{sleep_id}:
     get:
@@ -967,6 +984,163 @@ paths:
               schema:
                 $ref: '#/components/schemas/Error'
 
+
+
+
+  /environments:
+    get:
+      tags:
+      - environments
+      summary: Recover environmental measurements.
+      operationId: getAllEnvironments
+      description: Returns list with record of environment measurements. The query supports field selection, pagination, sorting, and filtering.
+      parameters:
+      - $ref: '#/components/parameters/fieldsParam'
+      - $ref: '#/components/parameters/pageParam'
+      - $ref: '#/components/parameters/limitParam'
+      - $ref: '#/components/parameters/sortParam'
+      - $ref: '#/components/parameters/filterParam'
+      responses:
+        '200':
+          description: Successful requisition.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Environment'
+        '401':
+          description: Authentication failed due to invalid authentication credentials.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '403':
+          description: User does not have permission to get sleep.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: >-
+            Specified resource does not exist. Usually when the URI is incorrect
+            or the resource is not found, or even no longer exists.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '406':
+          description: >-
+            The server is not implementing the media type requested by the
+            client for the application response. Only application/json is
+            currently accepted.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '429':
+          description: The rate limit for requests exceeded.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: >-
+            An internal server error occurred. Although the client appears to
+            provide a correct request, the server encountered an unexpected
+            condition that prevented it from responding to the request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    post:
+      tags:
+      - environments
+      summary: Register the environment measurement data.
+      operationId: saveEnvironment
+      description: Register the environment measurement data.
+      responses:
+        '201':
+          description: Environment saved successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Environment'
+        '207':
+          description: Successful request, however, can have several status codes for the case of a list of submitted resources.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MultiStatus'
+        '400':
+          description: >-
+            Request can not be met, syntactically incorrect or violates the
+            schema. Normally it occurs due to validation issues, such as fields
+            that are expected in the request body and not passed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Authentication failed due to invalid authentication credentials.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '403':
+          description: User does not have permission to register activities.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: >-
+            Specified resource does not exist. Usually when the URI is incorrect
+            or the resource is not found, or even no longer exists.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '406':
+          description: >-
+            The server is not implementing the media type requested by the
+            client for the application response. Only application/json is
+            currently accepted.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '415':
+          description: >-
+            The server does not support the requested payload format. Only
+            application / json is accepted.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '429':
+          description: The rate limit for requests exceeded.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: >-
+            An internal server error occurred. Although the client appears to
+            provide a correct request, the server encountered an unexpected
+            condition that prevented it from responding to the request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+      requestBody:
+        description: Measure of environment to be insert.
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Environment'
+
 components:
   parameters:
     fieldsParam:
@@ -1103,17 +1277,15 @@ components:
           example: walk
         start_time:
           type: string
-          format: date-time
           description: Activity start time according to the UTC.
-          example: 2018-08-15T14:03:40.000Z
+          example: "2018-08-15T14:03:40Z"
         end_time:
           type: string
-          format: date-time
           description: Activity end time according to the UTC.
-          example: 2018-08-15T14:19:21.000Z
+          example: "2018-08-15T14:19:21Z"
         duration:
           type: integer
-          description: Total time in milliseconds spent on activity.
+          description: Total time in milliseconds spent in the activity.
           example: 973000
         max_intensity:
           type: string
@@ -1144,8 +1316,8 @@ components:
           type: string
           format: date-time
           description: >-
-            Date and hour according to the UTC pattern, automatically generated
-            on moment that resource is saved on server.
+            Date and hour according to the UTC pattern,
+            automatically generated that resource is saved on server.
           readOnly: true
     Sleep:
       type: object
@@ -1163,14 +1335,13 @@ components:
           example: 3bc1274329fb282470e45004
         start_time:
           type: string
-          format: date-time
           description: Sleep start time according to the UTC.
-          example: 2018-08-18T01:40:30.000Z
+          example: "2018-08-18T01:40:30Z"
         end_time:
           type: string
           format: date-time
           description: Sleep end time according to the UTC.
-          example: 2018-08-18T09:52:30.000Z
+          example: "2018-08-18T09:52:30Z"
         duration:
           type: integer
           description: Total time in milliseconds spent in all sleep levels.
@@ -1228,29 +1399,103 @@ components:
                       type: integer
                       example: 3
                       description: Total time in minutes spent in the sleep level restless.
-        user:
-          type: object
+
+    Environment:
+      type: object
+      required:
+      - timestamp
+      - temperature
+      - humidity
+      - location
+      properties:
+        id:
           readOnly: true
-          description: User belonging to activity
+          type: string
+          format: uuid
+          description: Automatically generated key field.
+          example: 3bc1274329fb282470e45004
+        timestamp:
+          type: string
+          description: Timestamp according to the UTC.
+          example: "2018-11-19T14:40:00Z"
+        temperature:
+          type: number
+          description: Ambient temperature in °C
+          example: 31.0185
+        humidity:
+          type: number
+          description: Ambient humidity in %
+          example: 41.8415
+        location:
+          type: object
           properties:
-            id:
+            school:
               type: string
-              format: uuid
-              example: 5a62be07de34500146d9c544
+              example: "Unifor"
+            room:
+              type: string
+              example: "Bloco H sala 01"
+            country:
+              type: string
+              example: "BR"
+            city:
+              type: string
+              example: "Fortaleza"
         created_at:
           type: string
           format: date-time
           description: >-
-            Date and hour according to the UTC pattern, automatically generated
-            on moment that resource is saved on server.
+            Date and hour according to the UTC pattern,
+            automatically generated that resource is saved on server.
           readOnly: true
 
-    # Responses
+    MultiStatus:
+      type: object
+      description: Default template for message when a request returns multiple status.
+      required:
+      - success
+      - error
+      properties:
+        success:
+          type: array
+          description: All items that were processed successfully.
+          items:
+            type: object
+            description: Item data processed.
+            properties:
+              code:
+                type: integer
+                description: The requisition status code for the item.
+                example: 201
+              item:
+                type: object
+                description: Item data that was successfully processed.
+        error:
+          type: array
+          description: All items that were were not processed due to some error.
+          items:
+            type: object
+            description: Item data not processed.
+            properties:
+              code:
+                type: integer
+                description: The requisition status code for the item.
+                example: 400
+              message:
+                type: string
+                description: Readable and short description of the error.
+              description:
+                type: string
+                description: Detailed description of the error.
+              item:
+                type: object
+                description: Item data that was not successfully processed
+
     Error:
       type: object
       description: >-
-        Default template for error message. All returned errors will follow this
-        template.
+        Default template for error message.
+        All returned errors will follow this template.
       required:
       - code
       - message

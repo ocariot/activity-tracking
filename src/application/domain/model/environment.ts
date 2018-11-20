@@ -9,10 +9,10 @@ import { Location } from './location'
  * @implements {ISerializable<Environment>}
  */
 export class Environment extends Entity implements ISerializable<Environment> {
-    private timestamp!: Date // Environment start time according to the UTC.
-    private temperature!: number
-    private humidity!: number
-    private location!: Location
+    private timestamp?: Date // Environment start time according to the UTC.
+    private temperature?: number
+    private humidity?: number
+    private location?: Location
     private created_at?: Date // Timestamp according to the UTC pattern, automatically generated that resource is saved on server.
 
     constructor(timestamp?: Date, temperature?: number, humidity?: number, location?: Location, id?: string) {
@@ -23,35 +23,35 @@ export class Environment extends Entity implements ISerializable<Environment> {
         if (location) this.location = location
     }
 
-    public getTimestamp(): Date {
+    public getTimestamp(): Date | undefined {
         return this.timestamp
     }
 
-    public setTimestamp(timestamp: Date) {
+    public setTimestamp(timestamp: Date | undefined) {
         this.timestamp = timestamp
     }
 
-    public getTemperature(): number {
+    public getTemperature(): number | undefined {
         return this.temperature
     }
 
-    public setTemperature(temperature: number) {
+    public setTemperature(temperature: number | undefined) {
         this.temperature = temperature
     }
 
-    public getHumidity(): number {
+    public getHumidity(): number | undefined {
         return this.humidity
     }
 
-    public setHumidity(humidity: number) {
+    public setHumidity(humidity: number | undefined) {
         this.humidity = humidity
     }
 
-    public getLocation(): Location {
+    public getLocation(): Location | undefined {
         return this.location
     }
 
-    public setLocation(location: Location) {
+    public setLocation(location: Location | undefined) {
         this.location = location
     }
 
@@ -82,7 +82,7 @@ export class Environment extends Entity implements ISerializable<Environment> {
             timestamp: this.timestamp ? this.timestamp.toISOString() : this.timestamp,
             temperature: this.temperature,
             humidity: this.humidity,
-            location: this.location.serialize(),
+            location: this.location ? this.location.serialize() : this.location,
             created_at: this.created_at ? this.created_at.toISOString() : this.created_at
         }
     }

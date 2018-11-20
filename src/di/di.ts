@@ -9,7 +9,7 @@ import { IActivityRepository } from '../application/port/activity.repository.int
 import { ActivityRepository } from '../infrastructure/repository/activity.repository'
 import { UserEntity } from '../infrastructure/entity/user.entity'
 import { ActivityEntity } from '../infrastructure/entity/activity.entity'
-import { TaskRepoModel } from '../infrastructure/database/schema/activity.schema'
+import { ActivityRepoModel } from '../infrastructure/database/schema/activity.schema'
 import { UserEntityMapper } from '../infrastructure/entity/mapper/user.entity.mapper'
 import { ActivityEntityMapper } from '../infrastructure/entity/mapper/activity.entity.mapper'
 import { IEntityMapper } from '../infrastructure/entity/mapper/entity.mapper.interface'
@@ -27,6 +27,15 @@ import { Activity } from '../application/domain/model/activity'
 import { BackgroundService } from '../background/background.service'
 import { App } from '../app'
 import { CustomLogger, ILogger } from '../utils/custom.logger'
+import { EnvironmentService } from '../application/service/environment.service'
+import { IEnvironmentService } from '../application/port/environment.service.interface'
+import { IEnvironmentRepository } from '../application/port/environment.repository.interface'
+import { EnvironmentRepository } from '../infrastructure/repository/environment.repository'
+import { EnvironmentEntity } from '../infrastructure/entity/environment.entity'
+import { EnvironmentRepoModel } from '../infrastructure/database/schema/environment.schema'
+import { Environment } from '../application/domain/model/environment'
+import { EnvironmentEntityMapper } from '../infrastructure/entity/mapper/environment.entity.mapper'
+import { EnvironmentController } from '../ui/controllers/environment.controller'
 
 export class DI {
     private static instance: DI
@@ -74,19 +83,26 @@ export class DI {
         // Controllers
         this.container.bind<HomeController>(Identifier.HOME_CONTROLLER).to(HomeController).inSingletonScope()
         this.container.bind<ActivityController>(Identifier.ACTIVITY_CONTROLLER).to(ActivityController).inSingletonScope()
+        this.container.bind<EnvironmentController>(Identifier.ENVIRONMENT_CONTROLLER).to(EnvironmentController).inSingletonScope()
 
         // Services
         this.container.bind<IActivityService>(Identifier.ACTIVITY_SERVICE).to(ActivityService).inSingletonScope()
+        this.container.bind<IEnvironmentService>(Identifier.ENVIRONMENT_SERVICE).to(EnvironmentService).inSingletonScope()
 
         // Repositories
         this.container
             .bind<IActivityRepository>(Identifier.ACTIVITY_REPOSITORY)
             .to(ActivityRepository).inSingletonScope()
+        this.container
+            .bind<IEnvironmentRepository>(Identifier.ENVIRONMENT_REPOSITORY)
+            .to(EnvironmentRepository).inSingletonScope()
 
         // Models
         this.container.bind(Identifier.USER_ENTITY).toConstantValue(UserEntity)
         this.container.bind(Identifier.ACTIVITY_ENTITY).toConstantValue(ActivityEntity)
-        this.container.bind(Identifier.ACTIVITY_REPO_MODEL).toConstantValue(TaskRepoModel)
+        this.container.bind(Identifier.ENVIRONMENT_ENTITY).toConstantValue(EnvironmentEntity)
+        this.container.bind(Identifier.ACTIVITY_REPO_MODEL).toConstantValue(ActivityRepoModel)
+        this.container.bind(Identifier.ENVIRONMENT_REPO_MODEL).toConstantValue(EnvironmentRepoModel)
 
         // Mappers
         this.container
@@ -95,6 +111,9 @@ export class DI {
         this.container
             .bind<IEntityMapper<Activity, ActivityEntity>>(Identifier.ACTIVITY_ENTITY_MAPPER)
             .to(ActivityEntityMapper).inSingletonScope()
+        this.container
+            .bind<IEntityMapper<Environment, EnvironmentEntity>>(Identifier.ENVIRONMENT_ENTITY_MAPPER)
+            .to(EnvironmentEntityMapper).inSingletonScope()
 
         // Background Services
         this.container

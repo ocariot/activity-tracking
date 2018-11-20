@@ -17,7 +17,7 @@ export class ActivityEntityMapper implements IEntityMapper<Activity, ActivityEnt
      * Convert {Activity} for {ActivityEntity}.
      *
      * @see Before setting the value, it is important to verify that the type is valid.
-     * Therefore, you do not run the risk that in an UPDATE / PATCH action type,
+     * Therefore, you do not run the risk that in an UPDATE/PATCH action type,
      * attributes that should not be updated are saved with null values.
      * @see Creation Date should not be mapped to the type the repository understands.
      * Because this attribute is created automatically by the database.

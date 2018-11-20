@@ -74,9 +74,9 @@ export class Location implements ISerializable<Location> {
         if (typeof json === 'string') json = JSON.parse(json)
 
         if (json.school) this.setSchool(json.school)
-        if (json.room) this.setSchool(json.room)
-        if (json.country) this.setSchool(json.country)
-        if (json.city) this.setSchool(json.city)
+        if (json.room) this.setRoom(json.room)
+        if (json.country) this.setCountry(json.country)
+        if (json.city) this.setCity(json.city)
 
         return this
     }

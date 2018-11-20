@@ -8,7 +8,6 @@ import { IEntityMapper } from '../entity/mapper/entity.mapper.interface'
 import { Query } from './query/query'
 import { IEventBus } from '../port/event.bus.interface'
 import { ILogger } from '../../utils/custom.logger'
-import { UserEntity } from '../entity/user.entity'
 import { ActivitySaveEvent } from '../../application/integration-event/event/activity.save.event'
 
 /**
@@ -19,10 +18,10 @@ import { ActivitySaveEvent } from '../../application/integration-event/event/act
 @injectable()
 export class ActivityRepository extends BaseRepository<Activity, ActivityEntity> implements IActivityRepository {
     constructor(
-        @inject(Identifier.ACTIVITY_REPO_MODEL) protected readonly activityModel: any,
-        @inject(Identifier.ACTIVITY_ENTITY_MAPPER) protected readonly activityMapper: IEntityMapper<Activity, ActivityEntity>,
-        @inject(Identifier.RABBITMQ_EVENT_BUS) private readonly _rabbitMQEventBus: IEventBus,
-        @inject(Identifier.LOGGER) protected readonly logger: ILogger
+        @inject(Identifier.ACTIVITY_REPO_MODEL) readonly activityModel: any,
+        @inject(Identifier.ACTIVITY_ENTITY_MAPPER) readonly activityMapper: IEntityMapper<Activity, ActivityEntity>,
+        @inject(Identifier.RABBITMQ_EVENT_BUS) readonly rabbitMQEventBus: IEventBus,
+        @inject(Identifier.LOGGER) readonly logger: ILogger
     ) {
         super(activityModel, activityMapper, logger)
     }
@@ -37,16 +36,15 @@ export class ActivityRepository extends BaseRepository<Activity, ActivityEntity>
      * @override
      */
     public create(activity: Activity): Promise<Activity> {
-        const itemNew: UserEntity = this.mapper.transform(activity)
+        const itemNew: ActivityEntity = this.mapper.transform(activity)
         return new Promise<Activity>((resolve, reject) => {
             this.Model.create(itemNew)
                 .then((result: ActivityEntity) => {
-                    this.logger.debug('re ' + JSON.stringify(result))
                     const activityResult: Activity = this.mapper.transform(result)
                     resolve(activityResult)
 
                     this.logger.info('Publish activity on event bus...')
-                    this._rabbitMQEventBus.publish(
+                    this.rabbitMQEventBus.publish(
                         new ActivitySaveEvent('ActivitySaveEvent', new Date(), activityResult),
                         'activities.save'
                     )

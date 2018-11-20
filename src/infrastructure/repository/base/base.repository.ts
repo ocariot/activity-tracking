@@ -18,9 +18,9 @@ import { ILogger } from '../../../utils/custom.logger'
 export abstract class BaseRepository<T extends Entity, TModel> implements IRepository<T> {
 
     protected constructor(
-        protected readonly Model: any,
-        protected readonly mapper: IEntityMapper<T, TModel>,
-        private readonly _logger: ILogger
+        readonly Model: any,
+        readonly mapper: IEntityMapper<T, TModel>,
+        readonly logger: ILogger
     ) {
     }
 
@@ -96,7 +96,7 @@ export abstract class BaseRepository<T extends Entity, TModel> implements IRepos
 
     protected mongoDBErrorListener(err: any): ValidationException | ConflictException | RepositoryException | undefined {
         if (err && err.name) {
-            this._logger.error(err)
+            this.logger.error(err)
 
             if (err.name === 'ValidationError') {
                 return new ValidationException('Required fields were not provided!', err.message)
