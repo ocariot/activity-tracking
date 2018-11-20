@@ -1,7 +1,7 @@
 {
-  "name": "template-base-ts",
+  "name": "tracking-service",
   "version": "1.0.0",
-  "description": "Base project for implementation of REST API in typescript",
+  "description": "This is the documentation of the RESTful API of the microservice for activity, sleep, environment and food tracking",
   "main": "dist/server.js",
   "scripts": {
     "build": "gulp build",
@@ -20,9 +20,11 @@
   },
   "keywords": [
     "microservice",
-    "nodejs",
-    "typescipt",
-    "express"
+    "tracking",
+    "activity",
+    "sleep",
+    "environment",
+    "food",
   ],
   "author": "NUTES/UEPB",
   "license": "MIT",
