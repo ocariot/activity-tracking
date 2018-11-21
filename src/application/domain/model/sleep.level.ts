@@ -8,12 +8,12 @@ import { SleepLevelSummary } from './sleep.level.summary'
  * @implements {ISerializable<User>}
  */
 export class SleepLevel implements ISerializable<SleepLevel> {
-    private data_set: Array<SleepLevelDataSet> // Sleep level tracking.
-    private summary: SleepLevelSummary // Summary of sleep levels
+    private data_set!: Array<SleepLevelDataSet> // Sleep level tracking.
+    private summary!: SleepLevelSummary // Summary of sleep levels
 
-    constructor(data_set: Array<SleepLevelDataSet>, summary: SleepLevelSummary) {
-        this.data_set = data_set
-        this.summary = summary
+    constructor(data_set?: Array<SleepLevelDataSet>, summary?: SleepLevelSummary) {
+        if (data_set) this.setDataSet(data_set)
+        if (summary) this.setSummary(summary)
     }
 
     public getDataSet(): Array<SleepLevelDataSet> {

@@ -26,7 +26,7 @@ const sleepSchema = new Mongoose.Schema({
                 required: 'Name of sleep level is required!'
             },
             duration: {
-                type: String,
+                type: Number,
                 required: 'Duration of sleep level is required!'
             }
         }],
@@ -43,6 +43,7 @@ const sleepSchema = new Mongoose.Schema({
                 delete ret._id
                 delete ret.__v
                 delete ret.updatedAt
+                delete ret.end_time
                 return ret
             }
         }

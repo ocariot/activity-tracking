@@ -104,7 +104,7 @@ export class Sleep extends Entity implements ISerializable<Sleep> {
         if (json.start_time) this.setStartTime(new Date(json.start_time))
         if (json.end_time) this.setEndTime(new Date(json.end_time))
         if (json.duration) this.setDuration(json.duration)
-        if (json.levels) this.setLevels(json.levels)
+        if (json.levels) this.setLevels(new SleepLevel().deserialize(json.levels))
         if (json.created_at) this.created_at = new Date(json.created_at)
         if (json.user) this.user = new User().deserialize(json.user)
 

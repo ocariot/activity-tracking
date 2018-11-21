@@ -34,14 +34,8 @@ export class SleepEntityMapper implements IEntityMapper<Sleep, SleepEntity> {
         if (item.getDuration()) result.setDuration(item.getDuration())
         if (item.getUser() && item.getUser().getId()) result.setUser(item.getUser().getId())
 
-        const levels = item.getLevels()
+        const levels: SleepLevel | undefined = item.getLevels()
         if (levels && levels.getDataSet()) {
-            console.log(`level set`, levels.getDataSet())
-            // const sleepLevels: Array<SleepLevelDataSet> = []
-            //
-            // levels.getDataSet().forEach((data: SleepLevelDataSet) => {
-            //     sleepLevels.push(new SleepLevelDataSet(data.getStartTime(), data.getName(), data.getDuration()).serialize())
-            // })
             result.setLevels(levels.getDataSet().map((elem: SleepLevelDataSet) => elem.serialize()))
         }
 
@@ -86,30 +80,27 @@ export class SleepEntityMapper implements IEntityMapper<Sleep, SleepEntity> {
         if (json.start_time !== undefined) result.setStartTime(new Date(json.start_time))
         if (json.end_time !== undefined) result.setEndTime(new Date(json.end_time))
         if (json.duration !== undefined) result.setDuration(Number(json.duration))
-        if (json.levels !== undefined) result.setLevels(this.deserializeSleepLevel(json.lavels))
+        if (json.levels !== undefined) result.setLevels(this.deserializeSleepLevel(json.levels))
         if (json.created_at !== undefined) result.setCreatedAt(new Date(json.created_at))
         if (json.user !== undefined) result.setUser(new UserEntityMapper().transform(json.user))
 
         return result
     }
 
-    private deserializeSleepLevel(dataSet: Array<any>): SleepLevel {
-        if (!dataSet || !(dataSet instanceof Array)) {
-            return new SleepLevel([new SleepLevelDataSet()], new SleepLevelSummary())
+    private deserializeSleepLevel(levels: any): SleepLevel {
+        if (!levels) {
+            return new SleepLevel([], new SleepLevelSummary())
         }
 
-        const sleepLevelDataSet: Array<SleepLevelDataSet> = []
-        dataSet.forEach(data => {
-            sleepLevelDataSet.push(new SleepLevelDataSet().deserialize(data))
-        })
-
-        const countAsleep = this.countOfLevel(NameSleepLevel.ASLEEP, dataSet)
-        const countAwake = this.countOfLevel(NameSleepLevel.AWAKE, dataSet)
-        const countRestless = this.countOfLevel(NameSleepLevel.RESTLESS, dataSet)
-        const durationAsleep = this.countDurationOfLevel(NameSleepLevel.ASLEEP, dataSet)
-        const durationAwake = this.countDurationOfLevel(NameSleepLevel.AWAKE, dataSet)
-        const durationRestless = this.countDurationOfLevel(NameSleepLevel.RESTLESS, dataSet)
+        const sleepLevelDataSet: Array<SleepLevelDataSet> = levels.map(elem => new SleepLevelDataSet().deserialize(elem))
         const summary: SleepLevelSummary = new SleepLevelSummary()
+
+        const countAsleep = this.countOfLevel(NameSleepLevel.ASLEEP, levels)
+        const countAwake = this.countOfLevel(NameSleepLevel.AWAKE, levels)
+        const countRestless = this.countOfLevel(NameSleepLevel.RESTLESS, levels)
+        const durationAsleep = this.countDurationOfLevel(NameSleepLevel.ASLEEP, levels)
+        const durationAwake = this.countDurationOfLevel(NameSleepLevel.AWAKE, levels)
+        const durationRestless = this.countDurationOfLevel(NameSleepLevel.RESTLESS, levels)
 
         summary.setAsleep(new SleepLevelSummaryData(countAsleep, durationAsleep))
         summary.setAwake(new SleepLevelSummaryData(countAwake, durationAwake))
@@ -125,6 +116,11 @@ export class SleepEntityMapper implements IEntityMapper<Sleep, SleepEntity> {
         }, 0)
     }
 
+    /**
+     *
+     * @param level
+     * @param dataSet
+     */
     private countDurationOfLevel(level: string, dataSet: Array<any>): number {
         return dataSet.reduce((prev, item) => {
             if (item.name.toLowerCase() === level && item.duration) return prev + item.duration
