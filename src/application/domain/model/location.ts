@@ -81,12 +81,3 @@ export class Location implements ISerializable<Location> {
         return this
     }
 }
-
-/**
- * Name of traceable sleep levels.
- */
-export enum NameSleepLevel {
-    AWAKE = 'Awake',
-    ASLEEP = 'Asleep',
-    RESTLESS = 'Restless'
-}

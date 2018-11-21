@@ -1,32 +1,35 @@
 import Mongoose from 'mongoose'
 
-interface IActivityModel extends Mongoose.Document {
+interface ISleepModel extends Mongoose.Document {
 }
 
 const sleepSchema = new Mongoose.Schema({
-        name: {
-            type: String,
-            required: 'Name of activity is required!'
-        },
         start_time: {
             type: Date,
-            required: 'Activity start time is required!',
+            required: 'Sleep start time is required!'
         },
-        end_time: { type: Date },
+        end_time: {
+            type: Date,
+            required: 'Sleep end time is required!'
+        },
         duration: {
             type: Number,
-            required: 'Duration of activity is required!'
+            required: 'Duration of sleep is required!'
         },
-        max_intensity: { type: String },
-        max_intensity_duration: { type: Number },
-        calories: {
-            type: Number,
-            required: 'Calories spent during activity is required!'
-        },
-        steps: {
-            type: Number,
-            required: 'Number of steps taken during the activity is required!'
-        },
+        levels: [{
+            start_time: {
+                type: Date,
+                required: 'Start time of sleep level is required!'
+            },
+            name: {
+                type: String,
+                required: 'Name of sleep level is required!'
+            },
+            duration: {
+                type: String,
+                required: 'Duration of sleep level is required!'
+            }
+        }],
         user: {
             type: Mongoose.Schema.Types.ObjectId,
             required: 'User required!'
@@ -45,5 +48,6 @@ const sleepSchema = new Mongoose.Schema({
         }
     }
 )
+
 sleepSchema.index({ user: 1, start_time: 1 }, { unique: true }) // define index at schema level
-export const SleepRepoModel = Mongoose.model<IActivityModel>('Sleep', sleepSchema)
+export const SleepRepoModel = Mongoose.model<ISleepModel>('Sleep', sleepSchema)

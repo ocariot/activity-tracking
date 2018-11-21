@@ -44,6 +44,7 @@ import { SleepRepository } from '../infrastructure/repository/sleep.repository'
 import { SleepEntity } from '../infrastructure/entity/sleep.entity'
 import { Sleep } from '../application/domain/model/sleep'
 import { SleepEntityMapper } from '../infrastructure/entity/mapper/sleep.entity.mapper'
+import { SleepRepoModel } from '../infrastructure/database/schema/sleep.schema'
 
 export class DI {
     private static instance: DI
@@ -115,9 +116,10 @@ export class DI {
         this.container.bind(Identifier.ACTIVITY_ENTITY).toConstantValue(ActivityEntity)
         this.container.bind(Identifier.ENVIRONMENT_ENTITY).toConstantValue(EnvironmentEntity)
         this.container.bind(Identifier.SLEEP_ENTITY).toConstantValue(SleepEntity)
+
         this.container.bind(Identifier.ACTIVITY_REPO_MODEL).toConstantValue(ActivityRepoModel)
         this.container.bind(Identifier.ENVIRONMENT_REPO_MODEL).toConstantValue(EnvironmentRepoModel)
-        // this.container.bind(Identifier.SLEEP_REPO_MODEL).toConstantValue(SleepR)
+        this.container.bind(Identifier.SLEEP_REPO_MODEL).toConstantValue(SleepRepoModel)
 
         // Mappers
         this.container
