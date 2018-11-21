@@ -18,16 +18,20 @@ const environmentSchema = new Mongoose.Schema({
         },
         location: {
             school: {
-                type: String
+                type: String,
+                required: 'School is required!'
             },
             room: {
-                type: String
+                type: String,
+                required: 'Room is required!'
             },
             country: {
-                type: String
+                type: String,
+                required: 'Country is required!'
             },
             city: {
-                type: String
+                type: String,
+                required: 'City is required!'
             }
         }
     },
