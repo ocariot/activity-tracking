@@ -6,44 +6,43 @@ info:
   license:
     name: Apache 2.0
     url: http://www.apache.org/licenses/LICENSE-2.0.html
-
 servers:
 - description: SwaggerHub API Auto Mocking
   url: https://virtserver.swaggerhub.com/douglas.rafael/tracking-service/v1
 - description: Localhost
   url: http:://127.0.0.1:3000/api/v1
 tags:
-- name: activities
-  description: Operations for the Activity resource. Useful for users with administrator permissions.
-- name: users.activities
-  description: Operations for user Activity resource.
-- name: sleep
-  description: Operations for the Sleep feature. Useful for users with administrator permissions.
-- name: users.sleep
-  description: Operations for user Sleep resource.
-- name: environments
+  - name: activities
+    description: Operations for the Activity resource. Useful for users with administrator permissions.
+  - name: users.activities
+    description: Operations for user Activity resource.
+  - name: sleep
+    description: Operations for the Sleep feature. Useful for users with administrator permissions.
+  - name: users.sleep
+    description: Operations for user Sleep resource.
+  - name: environments
 
 paths:
   /activities:
     get:
       tags:
-      - activities
+        - activities
       summary: Recover activities from all users.
       operationId: getAllActivities
       description: Returns list with activities of all users. The query supports field selection, pagination, sorting, and filtering.
       parameters:
-      - in: path
-        name: user_id
-        required: true
-        description: Id of user.
-        example: 5a62be07d6f33400146c9b61
-        schema:
-          type: string
-      - $ref: '#/components/parameters/fieldsParam'
-      - $ref: '#/components/parameters/pageParam'
-      - $ref: '#/components/parameters/limitParam'
-      - $ref: '#/components/parameters/sortParam'
-      - $ref: '#/components/parameters/filterParam'
+        - in: path
+          name: user_id
+          required: true
+          description: Id of user.
+          example: 5a62be07d6f33400146c9b61
+          schema:
+            type: string
+        - $ref: '#/components/parameters/fieldsParam'
+        - $ref: '#/components/parameters/pageParam'
+        - $ref: '#/components/parameters/limitParam'
+        - $ref: '#/components/parameters/sortParam'
+        - $ref: '#/components/parameters/filterParam'
       responses:
         '200':
           description: Successful requisition.
@@ -100,23 +99,23 @@ paths:
   /users/{user_id}/activities:
     get:
       tags:
-      - users.activities
+        - users.activities
       summary: Recover activities.
       operationId: getAllActivities
       description: Returns list with activities. The query supports Field Selection, Paging, Sorting, and Filtering.
       parameters:
-      - in: path
-        name: user_id
-        required: true
-        description: Id of user.
-        example: 5a62be07d6f33400146c9b61
-        schema:
-          type: string
-      - $ref: '#/components/parameters/fieldsParam'
-      - $ref: '#/components/parameters/pageParam'
-      - $ref: '#/components/parameters/limitParam'
-      - $ref: '#/components/parameters/sortParam'
-      - $ref: '#/components/parameters/filterParam'
+        - in: path
+          name: user_id
+          required: true
+          description: Id of user.
+          example: 5a62be07d6f33400146c9b61
+          schema:
+            type: string
+        - $ref: '#/components/parameters/fieldsParam'
+        - $ref: '#/components/parameters/pageParam'
+        - $ref: '#/components/parameters/limitParam'
+        - $ref: '#/components/parameters/sortParam'
+        - $ref: '#/components/parameters/filterParam'
       responses:
         '200':
           description: Successful requisition.
@@ -172,18 +171,18 @@ paths:
                 $ref: '#/components/schemas/Error'
     post:
       tags:
-      - users.activities
+        - users.activities
       summary: Register activity.
       operationId: saveActivity
       description: Register a new activity and associate it to an user.
       parameters:
-      - in: path
-        name: user_id
-        required: true
-        description: Id of user.
-        example: 5a62be07d6f33400146c9b61
-        schema:
-          type: string
+        - in: path
+          name: user_id
+          required: true
+          description: Id of user.
+          example: 5a62be07d6f33400146c9b61
+          schema:
+            type: string
       responses:
         '201':
           description: Activity saved sucessfully.
@@ -271,25 +270,25 @@ paths:
   /users/{user_id}/activities/{activity_id}:
     get:
       tags:
-      - users.activities
+        - users.activities
       summary: Recover activity data.
       operationId: getActivitiyById
       description: Recover the activity data associated with an user.
       parameters:
-      - in: path
-        name: user_id
-        required: true
-        description: Id of user.
-        example: 5a62be07d6f33400146c9b61
-        schema:
-          type: string
-      - in: path
-        name: activity_id
-        required: true
-        description: Id of activity.
-        example: 5a62be07d6e34500146d9c544
-        schema:
-          type: string
+        - in: path
+          name: user_id
+          required: true
+          description: Id of user.
+          example: 5a62be07d6f33400146c9b61
+          schema:
+            type: string
+        - in: path
+          name: activity_id
+          required: true
+          description: Id of activity.
+          example: 5a62be07d6e34500146d9c544
+          schema:
+            type: string
       responses:
         '200':
           description: Successful requisition.
@@ -343,25 +342,25 @@ paths:
                 $ref: '#/components/schemas/Error'
     patch:
       tags:
-      - users.activities
+        - users.activities
       summary: Update activity data.
       description: Update the activity data.
       operationId: updateActivity
       parameters:
-      - in: path
-        name: user_id
-        required: true
-        description: Id of user.
-        example: 5a62be07d6f33400146c9b61
-        schema:
-          type: string
-      - in: path
-        name: activity_id
-        required: true
-        description: Id of activity.
-        example: 5a62be07d6e34500146d9c544
-        schema:
-          type: string
+        - in: path
+          name: user_id
+          required: true
+          description: Id of user.
+          example: 5a62be07d6f33400146c9b61
+          schema:
+            type: string
+        - in: path
+          name: activity_id
+          required: true
+          description: Id of activity.
+          example: 5a62be07d6e34500146d9c544
+          schema:
+            type: string
       responses:
         '200':
           description: Updated activity data.
@@ -437,25 +436,25 @@ paths:
         required: true
     delete:
       tags:
-      - users.activities
+        - users.activities
       summary: Delete activity data.
       description: Delete the activity data.
       operationId: deleteActivity
       parameters:
-      - in: path
-        name: user_id
-        required: true
-        description: Id of user.
-        example: 5a62be07d6f33400146c9b61
-        schema:
-          type: string
-      - in: path
-        name: activity_id
-        required: true
-        description: Id of activity.
-        example: 5a62be07d6e34500146d9c544
-        schema:
-          type: string
+        - in: path
+          name: user_id
+          required: true
+          description: Id of user.
+          example: 5a62be07d6f33400146c9b61
+          schema:
+            type: string
+        - in: path
+          name: activity_id
+          required: true
+          description: Id of activity.
+          example: 5a62be07d6e34500146d9c544
+          schema:
+            type: string
       responses:
         '204':
           description: Operation performed successfully. There is no data to be returned.
@@ -506,23 +505,23 @@ paths:
   /sleep:
     get:
       tags:
-      - sleep
+        - sleep
       summary: Recover sleep record of all users.
       operationId: getAllSleep
       description: Returns the sleep record list of all users. The query supports field selection, pagination, sorting, and filtering.
       parameters:
-      - in: path
-        name: user_id
-        required: true
-        description: Id of user.
-        example: 5a62be07d6f33400146c9b61
-        schema:
-          type: string
-      - $ref: '#/components/parameters/fieldsParam'
-      - $ref: '#/components/parameters/pageParam'
-      - $ref: '#/components/parameters/limitParam'
-      - $ref: '#/components/parameters/sortParam'
-      - $ref: '#/components/parameters/filterParam'
+        - in: path
+          name: user_id
+          required: true
+          description: Id of user.
+          example: 5a62be07d6f33400146c9b61
+          schema:
+            type: string
+        - $ref: '#/components/parameters/fieldsParam'
+        - $ref: '#/components/parameters/pageParam'
+        - $ref: '#/components/parameters/limitParam'
+        - $ref: '#/components/parameters/sortParam'
+        - $ref: '#/components/parameters/filterParam'
       responses:
         '200':
           description: Successful requisition.
@@ -580,23 +579,23 @@ paths:
   /users/{user_id}/sleep:
     get:
       tags:
-      - users.sleep
+        - users.sleep
       summary: Recover sleep record of user.
       operationId: getAllSleepByUser
       description: Returns list with sleep record. The query supports field selection, pagination, sorting, and filtering.
       parameters:
-      - in: path
-        name: user_id
-        required: true
-        description: Id of user.
-        example: 5a62be07d6f33400146c9b61
-        schema:
-          type: string
-      - $ref: '#/components/parameters/fieldsParam'
-      - $ref: '#/components/parameters/pageParam'
-      - $ref: '#/components/parameters/limitParam'
-      - $ref: '#/components/parameters/sortParam'
-      - $ref: '#/components/parameters/filterParam'
+        - in: path
+          name: user_id
+          required: true
+          description: Id of user.
+          example: 5a62be07d6f33400146c9b61
+          schema:
+            type: string
+        - $ref: '#/components/parameters/fieldsParam'
+        - $ref: '#/components/parameters/pageParam'
+        - $ref: '#/components/parameters/limitParam'
+        - $ref: '#/components/parameters/sortParam'
+        - $ref: '#/components/parameters/filterParam'
       responses:
         '200':
           description: Successful requisition.
@@ -652,18 +651,18 @@ paths:
                 $ref: '#/components/schemas/Error'
     post:
       tags:
-      - users.sleep
+        - users.sleep
       summary: Register sleep.
       operationId: saveSleep
       description: Register a new sleep and associate it to an user.
       parameters:
-      - in: path
-        name: user_id
-        required: true
-        description: Id of user.
-        example: 5a62be07d6f33400146c9b61
-        schema:
-          type: string
+        - in: path
+          name: user_id
+          required: true
+          description: Id of user.
+          example: 5a62be07d6f33400146c9b61
+          schema:
+            type: string
       responses:
         '201':
           description: Sleep saved successfully.
@@ -751,25 +750,25 @@ paths:
   /users/{user_id}/sleep/{sleep_id}:
     get:
       tags:
-      - users.sleep
+        - users.sleep
       summary: Recover sleep data.
       operationId: getSleepById
       description: Recover the sleep data associated with an user.
       parameters:
-      - in: path
-        name: user_id
-        required: true
-        description: Id of user.
-        example: 5a62be07d6f33400146c9b61
-        schema:
-          type: string
-      - in: path
-        name: sleep_id
-        required: true
-        description: Id of sleep.
-        example: 3bc1274329fb282470e45004
-        schema:
-          type: string
+        - in: path
+          name: user_id
+          required: true
+          description: Id of user.
+          example: 5a62be07d6f33400146c9b61
+          schema:
+            type: string
+        - in: path
+          name: sleep_id
+          required: true
+          description: Id of sleep.
+          example: 3bc1274329fb282470e45004
+          schema:
+            type: string
       responses:
         '200':
           description: Successful requisition.
@@ -823,25 +822,25 @@ paths:
                 $ref: '#/components/schemas/Error'
     patch:
       tags:
-      - users.sleep
+        - users.sleep
       summary: Update sleep data.
       description: Update the sleep data.
       operationId: updateSleep
       parameters:
-      - in: path
-        name: user_id
-        required: true
-        description: Id of user.
-        example: 5a62be07d6f33400146c9b61
-        schema:
-          type: string
-      - in: path
-        name: sleep_id
-        required: true
-        description: Id of sleep.
-        example: 3bc1274329fb282470e45004
-        schema:
-          type: string
+        - in: path
+          name: user_id
+          required: true
+          description: Id of user.
+          example: 5a62be07d6f33400146c9b61
+          schema:
+            type: string
+        - in: path
+          name: sleep_id
+          required: true
+          description: Id of sleep.
+          example: 3bc1274329fb282470e45004
+          schema:
+            type: string
       responses:
         '200':
           description: Updated activity data.
@@ -917,25 +916,25 @@ paths:
         required: true
     delete:
       tags:
-      - users.sleep
+        - users.sleep
       summary: Delete sleep data.
       description: Delete the sleep data.
       operationId: deleteSleep
       parameters:
-      - in: path
-        name: user_id
-        required: true
-        description: Id of user.
-        example: 5a62be07d6f33400146c9b61
-        schema:
-          type: string
-      - in: path
-        name: sleep_id
-        required: true
-        description: Id of sleep.
-        example: 3bc1274329fb282470e45004
-        schema:
-          type: string
+        - in: path
+          name: user_id
+          required: true
+          description: Id of user.
+          example: 5a62be07d6f33400146c9b61
+          schema:
+            type: string
+        - in: path
+          name: sleep_id
+          required: true
+          description: Id of sleep.
+          example: 3bc1274329fb282470e45004
+          schema:
+            type: string
       responses:
         '204':
           description: Operation performed successfully. There is no data to be returned.
@@ -990,16 +989,16 @@ paths:
   /environments:
     get:
       tags:
-      - environments
+        - environments
       summary: Recover environmental measurements.
       operationId: getAllEnvironments
       description: Returns list with record of environment measurements. The query supports field selection, pagination, sorting, and filtering.
       parameters:
-      - $ref: '#/components/parameters/fieldsParam'
-      - $ref: '#/components/parameters/pageParam'
-      - $ref: '#/components/parameters/limitParam'
-      - $ref: '#/components/parameters/sortParam'
-      - $ref: '#/components/parameters/filterParam'
+        - $ref: '#/components/parameters/fieldsParam'
+        - $ref: '#/components/parameters/pageParam'
+        - $ref: '#/components/parameters/limitParam'
+        - $ref: '#/components/parameters/sortParam'
+        - $ref: '#/components/parameters/filterParam'
       responses:
         '200':
           description: Successful requisition.
@@ -1055,7 +1054,7 @@ paths:
                 $ref: '#/components/schemas/Error'
     post:
       tags:
-      - environments
+        - environments
       summary: Register the environment measurement data.
       operationId: saveEnvironment
       description: Register the environment measurement data.
@@ -1192,7 +1191,7 @@ components:
         items:
           type: string
         default:
-        - created_at
+          - created_at
     filterParam:
       in: query
       name: ''
@@ -1257,13 +1256,13 @@ components:
     Activity:
       type: object
       required:
-      - name
-      - start_time
-      - end_time
-      - duration
-      - intensity_level
-      - calories
-      - steps
+        - name
+        - start_time
+        - end_time
+        - duration
+        - intensity_level
+        - calories
+        - steps
       properties:
         id:
           readOnly: true
@@ -1322,10 +1321,10 @@ components:
     Sleep:
       type: object
       required:
-      - start_time
-      - end_time
-      - duration
-      - levels
+        - start_time
+        - end_time
+        - duration
+        - levels
       properties:
         id:
           readOnly: true
@@ -1365,6 +1364,76 @@ components:
                   duration:
                     type: integer
                     description: Total in milliseconds of the time spent on the level.
+              example:
+                - start_time: "2018-08-18T01:40:30.00Z"
+                  name: restless
+                  duration: 60000
+                - start_time: "2018-08-18T01:41:30.00Z"
+                  name: asleep
+                  duration: 360000
+                - start_time: "2018-08-18T01:47:30.00Z"
+                  name: restless
+                  duration: 240000
+                - start_time: "2018-08-18T01:51:30.00Z"
+                  name: asleep
+                  duration: 60000
+                - start_time: "2018-08-18T01:52:30.00Z"
+                  name: restless
+                  duration: 60000
+                - start_time: "2018-08-18T01:53:30.00Z"
+                  name: asleep
+                  duration: 2100000
+                - start_time: "2018-08-18T02:28:30.00Z"
+                  name: restless
+                  duration: 240000
+                - start_time: "2018-08-18T02:32:30.00Z"
+                  name: awake
+                  duration: 180000
+                - start_time: "2018-08-18T02:35:30.00Z"
+                  name: asleep
+                  duration: 15120000
+                - start_time: "2018-08-18T06:47:30.00Z"
+                  name: restless
+                  duration: 60000
+                - start_time: "2018-08-18T06:48:30.00Z"
+                  name: asleep
+                  duration: 2580000
+                - start_time: "2018-08-18T07:31:30.00Z"
+                  name: restless
+                  duration: 120000
+                - start_time: "2018-08-18T07:33:30.00Z"
+                  name: asleep
+                  duration: 120000
+                - start_time: "2018-08-18T07:35:30.00Z"
+                  name: restless
+                  duration: 60000
+                - start_time: "2018-08-18T07:36:30.00Z"
+                  name: asleep
+                  duration: 1200000
+                - start_time: "2018-08-18T07:56:30.00Z"
+                  name: restless
+                  duration: 60000
+                - start_time: "2018-08-18T07:57:30.00Z"
+                  name: asleep
+                  duration: 2580000
+                - start_time: "2018-08-18T08:40:30.00Z"
+                  name: restless
+                  duration: 180000
+                - start_time: "2018-08-18T08:43:30.00Z"
+                  name: asleep
+                  duration: 1200000
+                - start_time: "2018-08-18T09:03:30.00Z"
+                  name: restless
+                  duration: 60000
+                - start_time: "2018-08-18T09:04:30.00Z"
+                  name: asleep
+                  duration: 1740000
+                - start_time: "2018-08-18T09:03:30.00Z"
+                  name: restless
+                  duration: 180000
+                - start_time: "2018-08-18T09:36:30.00Z"
+                  name: asleep
+                  duration: 960000
             sumary:
               type: object
               readOnly: true
@@ -1374,7 +1443,7 @@ components:
                   properties:
                     count:
                       type: integer
-                      example: 0
+                      example: 11
                     duration:
                       type: integer
                       example: 467
@@ -1397,16 +1466,16 @@ components:
                       example: 11
                     duration:
                       type: integer
-                      example: 3
+                      example: 22
                       description: Total time in minutes spent in the sleep level restless.
 
     Environment:
       type: object
       required:
-      - timestamp
-      - temperature
-      - humidity
-      - location
+        - timestamp
+        - temperature
+        - humidity
+        - location
       properties:
         id:
           readOnly: true
@@ -1453,8 +1522,8 @@ components:
       type: object
       description: Default template for message when a request returns multiple status.
       required:
-      - success
-      - error
+        - success
+        - error
       properties:
         success:
           type: array
@@ -1497,9 +1566,9 @@ components:
         Default template for error message.
         All returned errors will follow this template.
       required:
-      - code
-      - message
-      - description
+        - code
+        - message
+        - description
       properties:
         code:
           type: integer

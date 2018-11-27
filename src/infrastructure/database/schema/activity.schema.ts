@@ -10,7 +10,7 @@ const activitySchema = new Mongoose.Schema({
         },
         start_time: {
             type: Date,
-            required: 'Activity start time is required!',
+            required: 'Activity start time is required!'
         },
         end_time: { type: Date },
         duration: {
@@ -27,6 +27,18 @@ const activitySchema = new Mongoose.Schema({
             type: Number,
             required: 'Number of steps taken during the activity is required!'
         },
+        levels: [
+            {
+                name: {
+                    type: String,
+                    required: 'Name of activity level is required!'
+                },
+                duration: {
+                    type: Number,
+                    required: 'Duration of activity level is required!'
+                }
+            }
+        ],
         user: {
             type: Mongoose.Schema.Types.ObjectId,
             required: 'User required!'
@@ -39,7 +51,6 @@ const activitySchema = new Mongoose.Schema({
                 ret.id = ret._id
                 delete ret._id
                 delete ret.__v
-                delete ret.updatedAt
                 return ret
             }
         }

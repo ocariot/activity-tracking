@@ -49,7 +49,6 @@ export class EnvironmentEntityMapper implements IEntityMapper<Environment, Envir
         result.setTemperature(item.getTemperature())
         result.setHumidity(item.getHumidity())
         result.setLocation(new Location().deserialize(item.getLocation()))
-        result.setCreatedAt(item.getCreatedAt())
 
         return result
     }
@@ -70,7 +69,6 @@ export class EnvironmentEntityMapper implements IEntityMapper<Environment, Envir
         if (json.temperature !== undefined) result.setTemperature(Number(json.temperature))
         if (json.humidity !== undefined) result.setHumidity(Number(json.humidity))
         if (json.location !== undefined) result.setLocation(new Location().deserialize(json.location))
-        if (json.created_at !== undefined) result.setCreatedAt(new Date(json.created_at))
 
         return result
     }

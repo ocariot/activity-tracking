@@ -16,7 +16,7 @@ const sleepSchema = new Mongoose.Schema({
             type: Number,
             required: 'Duration of sleep is required!'
         },
-        levels: [{
+        stages: [{
             start_time: {
                 type: Date,
                 required: 'Start time of sleep level is required!'
@@ -42,8 +42,6 @@ const sleepSchema = new Mongoose.Schema({
                 ret.id = ret._id
                 delete ret._id
                 delete ret.__v
-                delete ret.updatedAt
-                delete ret.end_time
                 return ret
             }
         }

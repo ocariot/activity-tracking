@@ -6,9 +6,7 @@ import { ActivityEntity } from '../entity/activity.entity'
 import { BaseRepository } from './base/base.repository'
 import { IEntityMapper } from '../entity/mapper/entity.mapper.interface'
 import { Query } from './query/query'
-import { IEventBus } from '../port/event.bus.interface'
 import { ILogger } from '../../utils/custom.logger'
-import { ActivitySaveEvent } from '../../application/integration-event/event/activity.save.event'
 
 /**
  * Implementation of the activity repository.
@@ -20,37 +18,9 @@ export class ActivityRepository extends BaseRepository<Activity, ActivityEntity>
     constructor(
         @inject(Identifier.ACTIVITY_REPO_MODEL) readonly activityModel: any,
         @inject(Identifier.ACTIVITY_ENTITY_MAPPER) readonly activityMapper: IEntityMapper<Activity, ActivityEntity>,
-        @inject(Identifier.RABBITMQ_EVENT_BUS) readonly rabbitMQEventBus: IEventBus,
         @inject(Identifier.LOGGER) readonly logger: ILogger
     ) {
         super(activityModel, activityMapper, logger)
-    }
-
-    /**
-     * Add a new activity.
-     * The saved activity is published on the event bus.
-     *
-     * @param activity Activity to insert.
-     * @return {Promise<T>}
-     * @throws {ValidationException | ConflictException | RepositoryException}
-     * @override
-     */
-    public create(activity: Activity): Promise<Activity> {
-        const itemNew: ActivityEntity = this.mapper.transform(activity)
-        return new Promise<Activity>((resolve, reject) => {
-            this.Model.create(itemNew)
-                .then((result: ActivityEntity) => {
-                    const activityResult: Activity = this.mapper.transform(result)
-                    resolve(activityResult)
-
-                    this.logger.info('Publish activity on event bus...')
-                    this.rabbitMQEventBus.publish(
-                        new ActivitySaveEvent('ActivitySaveEvent', new Date(), activityResult),
-                        'activities.save'
-                    )
-                })
-                .catch(err => reject(this.mongoDBErrorListener(err)))
-        })
     }
 
     /**

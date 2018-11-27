@@ -1,11 +1,11 @@
 import { ISerializable } from '../utils/serializable.interface'
 
 /**
- * The implementation of the data set entity present in the sleep levels.
+ * The implementation of the data set entity present in the sleep stages.
  *
- * @implements {ISerializable<SleepLevelDataSet>}
+ * @implements {ISerializable<SleepStageDataSet>}
  */
-export class SleepLevelDataSet implements ISerializable<SleepLevelDataSet> {
+export class SleepStageDataSet implements ISerializable<SleepStageDataSet> {
     private start_time!: Date // Date and time of the start of the level according to the UTC.
     private name!: string // Sleep level name (awake, asleep or restless).
     private duration!: number // Total in milliseconds of the time spent on the level.
@@ -58,13 +58,13 @@ export class SleepLevelDataSet implements ISerializable<SleepLevelDataSet> {
      *
      * @param json
      */
-    public deserialize(json: any): SleepLevelDataSet {
+    public deserialize(json: any): SleepStageDataSet {
         if (!json) return this
         if (typeof json === 'string') json = JSON.parse(json)
 
         if (json.start_time) this.setStartTime(new Date(json.start_time))
         if (json.name) this.setName(json.name)
-        if (json.duration) this.setDuration(json.duration)
+        if (json.duration !== undefined) this.setDuration(json.duration)
 
         return this
     }

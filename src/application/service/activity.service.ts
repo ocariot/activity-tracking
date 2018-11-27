@@ -6,6 +6,9 @@ import { Activity } from '../domain/model/activity'
 import { ActivityValidator } from '../domain/validator/activity.validator'
 import { ConflictException } from '../domain/exception/conflict.exception'
 import { IQuery } from '../port/query.interface'
+import { IEventBus } from '../../infrastructure/port/event.bus.interface'
+import { ActivitySaveEvent } from '../integration-event/event/activity.save.event'
+import { ILogger } from '../../utils/custom.logger'
 
 /**
  * Implementing activity Service.
@@ -15,7 +18,9 @@ import { IQuery } from '../port/query.interface'
 @injectable()
 export class ActivityService implements IActivityService {
 
-    constructor(@inject(Identifier.ACTIVITY_REPOSITORY) private readonly _activityRepository: IActivityRepository) {
+    constructor(@inject(Identifier.ACTIVITY_REPOSITORY) private readonly _activityRepository: IActivityRepository,
+                @inject(Identifier.RABBITMQ_EVENT_BUS) readonly eventBus: IEventBus,
+                @inject(Identifier.LOGGER) readonly logger: ILogger) {
     }
 
     /**
@@ -30,7 +35,19 @@ export class ActivityService implements IActivityService {
         ActivityValidator.validate(activity)
         const activityExist = await this._activityRepository.checkExist(activity)
         if (activityExist) throw new ConflictException('Activity is already registered...')
-        return this._activityRepository.create(activity)
+
+        try {
+            const activitySaved: Activity = await this._activityRepository.create(activity)
+
+            this.logger.info(`Activity with ID: ${activitySaved.getId()} published on event bus...`)
+            this.eventBus.publish(
+                new ActivitySaveEvent('ActivitySaveEvent', new Date(), activitySaved),
+                'activities.save'
+            )
+            return Promise.resolve(activitySaved)
+        } catch (err) {
+            return Promise.reject(err)
+        }
     }
 
     /**

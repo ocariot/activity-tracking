@@ -3,10 +3,10 @@ import { UserEntityMapper } from './user.entity.mapper'
 import { IEntityMapper } from './entity.mapper.interface'
 import { Sleep } from '../../../application/domain/model/sleep'
 import { SleepEntity } from '../sleep.entity'
-import { NameSleepLevel, SleepLevel } from '../../../application/domain/model/sleep.level'
-import { SleepLevelDataSet } from '../../../application/domain/model/sleep.level.data.set'
-import { SleepLevelSummary } from '../../../application/domain/model/sleep.level.summary'
-import { SleepLevelSummaryData } from '../../../application/domain/model/sleep.level.summary.data'
+import { NameSleepStage, SleepStage } from '../../../application/domain/model/sleep.stage'
+import { SleepStageDataSet } from '../../../application/domain/model/sleep.stage.data.set'
+import { SleepStageSummary } from '../../../application/domain/model/sleep.stage.summary'
+import { SleepStageSummaryData } from '../../../application/domain/model/sleep.stage.summary.data'
 
 @injectable()
 export class SleepEntityMapper implements IEntityMapper<Sleep, SleepEntity> {
@@ -34,11 +34,14 @@ export class SleepEntityMapper implements IEntityMapper<Sleep, SleepEntity> {
         if (item.getDuration()) result.setDuration(item.getDuration())
         if (item.getUser() && item.getUser().getId()) result.setUser(item.getUser().getId())
 
-        const levels: SleepLevel | undefined = item.getLevels()
-        if (levels && levels.getDataSet()) {
-            result.setLevels(levels.getDataSet().map((elem: SleepLevelDataSet) => elem.serialize()))
+        /**
+         * For the object of type SleepEntity, there is an array containing
+         * the staging data set, ie it does not contain summary.
+         */
+        const stages: SleepStage | undefined = item.getStages()
+        if (stages && stages.getDataSet()) {
+            result.setStages(stages.getDataSet().map((elem: SleepStageDataSet) => elem.serialize()))
         }
-
         return result
     }
 
@@ -56,11 +59,10 @@ export class SleepEntityMapper implements IEntityMapper<Sleep, SleepEntity> {
         result.setStartTime(item.getStartTime())
         result.setEndTime(item.getEndTime())
         result.setDuration(item.getDuration())
-        result.setCreatedAt(item.getCreatedAt())
         result.setUser(new UserEntityMapper().transform(item.getUser()))
 
-        const levels = item.getLevels()
-        if (levels) result.setLevels(this.deserializeSleepLevel(levels))
+        const stages = item.getStages()
+        if (stages) result.setStages(this.deserializeSleepStage(stages))
 
         return result
     }
@@ -80,50 +82,49 @@ export class SleepEntityMapper implements IEntityMapper<Sleep, SleepEntity> {
         if (json.start_time !== undefined) result.setStartTime(new Date(json.start_time))
         if (json.end_time !== undefined) result.setEndTime(new Date(json.end_time))
         if (json.duration !== undefined) result.setDuration(Number(json.duration))
-        if (json.levels !== undefined) result.setLevels(this.deserializeSleepLevel(json.levels))
-        if (json.created_at !== undefined) result.setCreatedAt(new Date(json.created_at))
+        if (json.stages !== undefined) result.setStages(this.deserializeSleepStage(json.stages))
         if (json.user !== undefined) result.setUser(new UserEntityMapper().transform(json.user))
 
         return result
     }
 
-    private deserializeSleepLevel(levels: any): SleepLevel {
-        if (!levels) {
-            return new SleepLevel([], new SleepLevelSummary())
+    private deserializeSleepStage(stages: any): SleepStage {
+        if (!stages) {
+            return new SleepStage([], new SleepStageSummary())
         }
 
-        const sleepLevelDataSet: Array<SleepLevelDataSet> = levels.map(elem => new SleepLevelDataSet().deserialize(elem))
-        const summary: SleepLevelSummary = new SleepLevelSummary()
+        const sleepStageDataSet: Array<SleepStageDataSet> = stages.map(elem => new SleepStageDataSet().deserialize(elem))
+        const summary: SleepStageSummary = new SleepStageSummary()
 
-        const countAsleep = this.countOfLevel(NameSleepLevel.ASLEEP, levels)
-        const countAwake = this.countOfLevel(NameSleepLevel.AWAKE, levels)
-        const countRestless = this.countOfLevel(NameSleepLevel.RESTLESS, levels)
-        const durationAsleep = this.countDurationOfLevel(NameSleepLevel.ASLEEP, levels)
-        const durationAwake = this.countDurationOfLevel(NameSleepLevel.AWAKE, levels)
-        const durationRestless = this.countDurationOfLevel(NameSleepLevel.RESTLESS, levels)
+        const countAsleep = this.countOfStage(NameSleepStage.ASLEEP, stages)
+        const countAwake = this.countOfStage(NameSleepStage.AWAKE, stages)
+        const countRestless = this.countOfStage(NameSleepStage.RESTLESS, stages)
+        const durationAsleep = this.countDurationOfStage(NameSleepStage.ASLEEP, stages)
+        const durationAwake = this.countDurationOfStage(NameSleepStage.AWAKE, stages)
+        const durationRestless = this.countDurationOfStage(NameSleepStage.RESTLESS, stages)
 
-        summary.setAsleep(new SleepLevelSummaryData(countAsleep, durationAsleep))
-        summary.setAwake(new SleepLevelSummaryData(countAwake, durationAwake))
-        summary.setRestless(new SleepLevelSummaryData(countRestless, durationRestless))
+        summary.setAsleep(new SleepStageSummaryData(countAsleep, durationAsleep))
+        summary.setAwake(new SleepStageSummaryData(countAwake, durationAwake))
+        summary.setRestless(new SleepStageSummaryData(countRestless, durationRestless))
 
-        return new SleepLevel(sleepLevelDataSet, summary)
+        return new SleepStage(sleepStageDataSet, summary)
     }
 
-    private countOfLevel(level: string, dataSet: Array<any>): number {
+    private countOfStage(stage: string, dataSet: Array<any>): number {
         return dataSet.reduce((prev, item) => {
-            if (item.name.toLowerCase() === level) return prev + 1
+            if (item.name.toLowerCase() === stage) return prev + 1
             return prev
         }, 0)
     }
 
     /**
      *
-     * @param level
+     * @param stage
      * @param dataSet
      */
-    private countDurationOfLevel(level: string, dataSet: Array<any>): number {
+    private countDurationOfStage(stage: string, dataSet: Array<any>): number {
         return dataSet.reduce((prev, item) => {
-            if (item.name.toLowerCase() === level && item.duration) return prev + item.duration
+            if (item.name.toLowerCase() === stage && item.duration) return prev + item.duration
             return prev
         }, 0)
     }

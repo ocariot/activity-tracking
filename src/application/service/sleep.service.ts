@@ -6,6 +6,9 @@ import { ISleepService } from '../port/sleep.service.interface'
 import { ISleepRepository } from '../port/sleep.repository.interface'
 import { Sleep } from '../domain/model/sleep'
 import { SleepValidator } from '../domain/validator/sleep.validator'
+import { IEventBus } from '../../infrastructure/port/event.bus.interface'
+import { ILogger } from '../../utils/custom.logger'
+import { SleepSaveEvent } from '../integration-event/event/sleep.save.event'
 
 /**
  * Implementing sleep Service.
@@ -15,7 +18,9 @@ import { SleepValidator } from '../domain/validator/sleep.validator'
 @injectable()
 export class SleepService implements ISleepService {
 
-    constructor(@inject(Identifier.SLEEP_REPOSITORY) private readonly _sleepRepository: ISleepRepository) {
+    constructor(@inject(Identifier.SLEEP_REPOSITORY) private readonly _sleepRepository: ISleepRepository,
+                @inject(Identifier.RABBITMQ_EVENT_BUS) readonly eventBus: IEventBus,
+                @inject(Identifier.LOGGER) readonly logger: ILogger) {
     }
 
     /**
@@ -30,7 +35,19 @@ export class SleepService implements ISleepService {
         SleepValidator.validate(sleep)
         const sleepExist = await this._sleepRepository.checkExist(sleep)
         if (sleepExist) throw new ConflictException('Sleep is already registered...')
-        return this._sleepRepository.create(sleep)
+
+        try {
+            const sleepSaved: Sleep = await this._sleepRepository.create(sleep)
+
+            this.logger.info(`Sleep with ID: ${sleepSaved.getId()} published on event bus...`)
+            this.eventBus.publish(
+                new SleepSaveEvent('SleepSaveEvent', new Date(), sleepSaved),
+                'sleep.save'
+            )
+            return Promise.resolve(sleepSaved)
+        } catch (err) {
+            return Promise.reject(err)
+        }
     }
 
     /**

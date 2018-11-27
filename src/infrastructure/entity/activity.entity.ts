@@ -4,10 +4,9 @@ export class ActivityEntity {
     private start_time?: Date
     private end_time?: Date
     private duration?: number
-    private max_intensity?: string
-    private max_intensity_duration?: number
     private calories?: number
     private steps?: number
+    private levels?: Array<any>
     private user?: string
     private created_at?: Date
 
@@ -51,20 +50,12 @@ export class ActivityEntity {
         this.duration = value
     }
 
-    public getMaxIntensity(): string | undefined {
-        return this.max_intensity
+    public getLevels(): Array<any> | undefined {
+        return this.levels
     }
 
-    public setMaxIntensity(value: string | undefined) {
-        this.max_intensity = value
-    }
-
-    public getMaxIntensityDuration(): number | undefined {
-        return this.max_intensity_duration
-    }
-
-    public setMaxIntensityDuration(value: number | undefined) {
-        this.max_intensity_duration = value
+    public setLevels(levels: Array<any> | undefined): void {
+        this.levels = levels
     }
 
     public getCalories(): number | undefined {

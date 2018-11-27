@@ -7,8 +7,8 @@ import { IntegrationEvent } from '../../../application/integration-event/event/i
 import { IIntegrationEventHandler } from '../../../application/integration-event/handler/integration.event.handler.interface'
 import { Identifier } from '../../../di/identifiers'
 import { IDisposable } from '../../port/disposable.interface'
-import StartConsumerResult = Queue.StartConsumerResult
 import { ILogger } from '../../../utils/custom.logger'
+import StartConsumerResult = Queue.StartConsumerResult
 
 @injectable()
 export class EventBusRabbitMQ implements IEventBus, IDisposable {
@@ -38,14 +38,18 @@ export class EventBusRabbitMQ implements IEventBus, IDisposable {
         await this._connection.conn.completeConfiguration()
 
         const exchange: Exchange = this._connection.conn.declareExchange(
-            this.getBrokerName(), 'topic', { durable: true }) // name, type, options
-        exchange.send(new Message(event), routing_key) // message, key
+            this.getExchangeName(), 'topic', { durable: true }) // name, type, options
+
+        const message: Message = new Message(event)
+        message.properties.appId = Default.APP_ID
+        exchange.send(message, routing_key) // message, key
 
         this._logger.info(`Publish event: ${event.event_name}`)
     }
 
     /**
      * Subscribe in topic.
+     * Os eventos q
      *
      * @param event {IntegrationEvent}
      * @param handler {IIntegrationEventHandler<IntegrationEvent>}
@@ -60,7 +64,7 @@ export class EventBusRabbitMQ implements IEventBus, IDisposable {
 
         this.queue = this._connection.conn.declareQueue(this.getQueueName(), { durable: true })
         const exchange: Exchange = this._connection.conn.declareExchange(
-            this.getBrokerName(), 'topic', { durable: true }) // name, type, options
+            this.getExchangeName(), 'topic', { durable: true }) // name, type, options
         this.event_handlers.set(event.event_name, handler)
 
         await this.queue.bind(exchange, routing_key)
@@ -83,8 +87,9 @@ export class EventBusRabbitMQ implements IEventBus, IDisposable {
             this.queue_consumer = true
             await this.queue
                 .activateConsumer((message: Message) => {
-                    this._logger.info(`Bus event message received: ${message.getContent()}`)
+                    if (message.properties.appId === Default.APP_ID) return
 
+                    this._logger.info(`Bus event message received!`)
                     const event_name: string = message.getContent().event_name
                     if (event_name) {
                         const event_handler: IIntegrationEventHandler<IntegrationEvent> | undefined =
@@ -105,8 +110,8 @@ export class EventBusRabbitMQ implements IEventBus, IDisposable {
      *
      * @return {string}
      */
-    private getBrokerName(): string {
-        return process.env.RABBITMQ_BROKER_NAME || Default.RABBITMQ_BROKER_NAME
+    private getExchangeName(): string {
+        return process.env.RABBITMQ_EXCHANGE_NAME || Default.RABBITMQ_EXCHANGE_NAME
     }
 
     /**

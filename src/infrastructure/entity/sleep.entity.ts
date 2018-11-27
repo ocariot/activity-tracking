@@ -2,8 +2,8 @@ export class SleepEntity {
     private id?: string
     private start_time?: Date // Sleep start time according to the UTC.
     private end_time?: Date // Sleep end time according to the UTC.
-    private duration?: number // Total time in milliseconds spent in all sleep levels.
-    private levels?: Array<any> // Sleep levels tracking.
+    private duration?: number // Total time in milliseconds spent in all sleep stages.
+    private stages?: Array<any> // Sleep stages tracking.
     private user?: string // User id.
     private created_at?: Date // Timestamp according to the UTC pattern, automatically generated that resource is saved on server.
 
@@ -39,12 +39,12 @@ export class SleepEntity {
         this.duration = duration
     }
 
-    public getLevels(): Array<any> | undefined {
-        return this.levels
+    public getStages(): Array<any> | undefined {
+        return this.stages
     }
 
-    public setLevels(levels: Array<any> | undefined): void {
-        this.levels = levels
+    public setStages(levels: Array<any> | undefined): void {
+        this.stages = levels
     }
 
     public getUser(): string | undefined {

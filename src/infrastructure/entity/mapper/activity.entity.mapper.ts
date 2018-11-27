@@ -3,6 +3,7 @@ import { ActivityEntity } from '../activity.entity'
 import { Activity } from '../../../application/domain/model/activity'
 import { UserEntityMapper } from './user.entity.mapper'
 import { IEntityMapper } from './entity.mapper.interface'
+import { ActivityLevel } from '../../../application/domain/model/activity.level'
 
 @injectable()
 export class ActivityEntityMapper implements IEntityMapper<Activity, ActivityEntity> {
@@ -29,11 +30,12 @@ export class ActivityEntityMapper implements IEntityMapper<Activity, ActivityEnt
         if (item.getStartTime()) result.setStartTime(item.getStartTime())
         if (item.getEndTime()) result.setEndTime(item.getEndTime())
         if (item.getDuration()) result.setDuration(item.getDuration())
-        if (item.getMaxIntensity()) result.setMaxIntensity(item.getMaxIntensity())
-        if (item.getMaxIntensityDuration()) result.setMaxIntensityDuration(item.getMaxIntensityDuration())
         if (item.getCalories()) result.setCalories(item.getCalories())
         if (item.getSteps()) result.setSteps(item.getSteps())
         if (item.getUser() && item.getUser().getId()) result.setUser(item.getUser().getId())
+
+        const levels: Array<ActivityLevel> | undefined = item.getLevels()
+        if (levels) result.setLevels(levels.map((elem: ActivityLevel) => elem.serialize()))
 
         return result
     }
@@ -53,11 +55,9 @@ export class ActivityEntityMapper implements IEntityMapper<Activity, ActivityEnt
         result.setStartTime(item.getStartTime())
         result.setEndTime(item.getEndTime())
         result.setDuration(item.getDuration())
-        result.setMaxIntensity(item.getMaxIntensity())
-        result.setMaxIntensityDuration(item.getMaxIntensityDuration())
         result.setCalories(item.getCalories())
         result.setSteps(item.getSteps())
-        result.setCreatedAt(item.getCreatedAt())
+        result.setLevels(item.getLevels())
         result.setUser(new UserEntityMapper().transform(item.getUser()))
 
         return result
@@ -79,11 +79,9 @@ export class ActivityEntityMapper implements IEntityMapper<Activity, ActivityEnt
         if (json.start_time !== undefined) result.setStartTime(new Date(json.start_time))
         if (json.end_time !== undefined) result.setEndTime(new Date(json.end_time))
         if (json.duration !== undefined) result.setDuration(Number(json.duration))
-        if (json.max_intensity !== undefined) result.setMaxIntensity(json.max_intensity)
-        if (json.max_intensity_duration !== undefined) result.setMaxIntensityDuration(Number(json.max_intensity_duration))
         if (json.calories !== undefined) result.setCalories(Number(json.calories))
         if (json.steps !== undefined) result.setSteps(Number(json.steps))
-        if (json.created_at !== undefined) result.setCreatedAt(new Date(json.created_at))
+        if (json.levels !== undefined) result.setLevels(json.levels.map(item => new ActivityLevel().deserialize(item)))
         if (json.user !== undefined) result.setUser(new UserEntityMapper().transform(json.user))
 
         return result

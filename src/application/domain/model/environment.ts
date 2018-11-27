@@ -13,7 +13,6 @@ export class Environment extends Entity implements ISerializable<Environment> {
     private temperature?: number
     private humidity?: number
     private location?: Location
-    private created_at?: Date // Timestamp according to the UTC pattern, automatically generated that resource is saved on server.
 
     constructor(timestamp?: Date, temperature?: number, humidity?: number, location?: Location, id?: string) {
         super(id)
@@ -55,14 +54,6 @@ export class Environment extends Entity implements ISerializable<Environment> {
         this.location = location
     }
 
-    public getCreatedAt(): Date | undefined {
-        return this.created_at
-    }
-
-    public setCreatedAt(value: Date | undefined) {
-        this.created_at = value
-    }
-
     /**
      * Called as default when the object
      * is displayed in console.log()
@@ -82,8 +73,7 @@ export class Environment extends Entity implements ISerializable<Environment> {
             timestamp: this.timestamp ? this.timestamp.toISOString() : this.timestamp,
             temperature: this.temperature,
             humidity: this.humidity,
-            location: this.location ? this.location.serialize() : this.location,
-            created_at: this.created_at ? this.created_at.toISOString() : this.created_at
+            location: this.location ? this.location.serialize() : this.location
         }
     }
 
@@ -101,7 +91,6 @@ export class Environment extends Entity implements ISerializable<Environment> {
         if (json.temperature) this.setTemperature(json.temperature)
         if (json.humidity) this.setHumidity(json.humidity)
         if (json.location) this.setLocation(new Location().deserialize(json.location))
-        if (json.created_at) this.created_at = new Date(json.created_at)
 
         return this
     }

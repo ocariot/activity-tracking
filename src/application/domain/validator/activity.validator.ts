@@ -12,6 +12,7 @@ export class ActivityValidator {
         if (!activity.getDuration()) fields.push('Duration')
         if (!activity.getCalories()) fields.push('Calories')
         if (!activity.getSteps()) fields.push('Steps')
+        if (!activity.getLevels()) fields.push('Levels')
 
         if (fields.length > 0) {
             throw new ValidationException('Required fields were not provided...',
