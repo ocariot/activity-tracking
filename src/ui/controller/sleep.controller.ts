@@ -138,6 +138,9 @@ export class SleepController {
         }
     }
 
+    /**
+     * Default message when resource is not found or does not exist.
+     */
     private getMessageNotFoundSleep(): object {
         return new ApiException(
             HttpStatus.NOT_FOUND,

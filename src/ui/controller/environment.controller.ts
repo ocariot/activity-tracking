@@ -1,6 +1,6 @@
 import HttpStatus from 'http-status-codes'
 import { inject } from 'inversify'
-import { controller, httpGet, httpPost, request, response } from 'inversify-express-utils'
+import { controller, httpDelete, httpGet, httpPost, request, response } from 'inversify-express-utils'
 import { Request, Response } from 'express'
 import { Identifier } from '../../di/identifiers'
 import { ApiExceptionManager } from '../exception/api.exception.manager'
@@ -8,6 +8,7 @@ import { Query } from '../../infrastructure/repository/query/query'
 import { ILogger } from '../../utils/custom.logger'
 import { Environment } from '../../application/domain/model/environment'
 import { IEnvironmentService } from '../../application/port/environment.service.interface'
+import { ApiException } from '../exception/api.exception'
 
 /**
  * Controller that implements Environment feature operations.
@@ -68,5 +69,35 @@ export class EnvironmentController {
             return res.status(handlerError.code)
                 .send(handlerError.toJson())
         }
+    }
+
+    /**
+     * Remove sleep by user.
+     *
+     * @param {Request} req
+     * @param {Response} res
+     */
+    @httpDelete('/:environment_id')
+    public async removeEnvironmentById(@request() req: Request, @response() res: Response): Promise<Response> {
+        try {
+            const result: boolean = await this._environmentService.remove(req.params.environment_id)
+            if (!result) return res.status(HttpStatus.NOT_FOUND).send(this.getMessageNotFoundEnvironment())
+            return res.status(HttpStatus.NO_CONTENT).send()
+        } catch (err) {
+            const handlerError = ApiExceptionManager.build(err)
+            return res.status(handlerError.code)
+                .send(handlerError.toJson())
+        }
+    }
+
+    /**
+     * Default message when resource is not found or does not exist.
+     */
+    private getMessageNotFoundEnvironment(): object {
+        return new ApiException(
+            HttpStatus.NOT_FOUND,
+            'Measurement of environment not found!',
+            'Measurement of environment not found or already removed. A new operation for the same resource is not required!'
+        ).toJson()
     }
 }

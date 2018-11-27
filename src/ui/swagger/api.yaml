@@ -983,14 +983,11 @@ paths:
               schema:
                 $ref: '#/components/schemas/Error'
 
-
-
-
   /environments:
     get:
       tags:
         - environments
-      summary: Recover environmental measurements.
+      summary: Recover environment measurements.
       operationId: getAllEnvironments
       description: Returns list with record of environment measurements. The query supports field selection, pagination, sorting, and filtering.
       parameters:
@@ -1140,6 +1137,69 @@ paths:
             schema:
               $ref: '#/components/schemas/Environment'
 
+  /environments/{environment_id}:
+    delete:
+      tags:
+        - environments
+      summary: Delete measurement environment.
+      description: Delete environment measurement data.
+      operationId: removeEnvironmentById
+      parameters:
+        - in: path
+          name: environment_id
+          required: true
+          description: Environment measurement id.
+          example: 5bfc5c29d6adac2a10d22b03
+          schema:
+            type: string
+      responses:
+        '204':
+          description: Operation performed successfully. There is no data to be returned.
+        '401':
+          description: Authentication failed due to invalid authentication credentials.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '403':
+          description: User does not have permission to delete environmental measurement.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: >-
+            Specified resource does not exist. Usually when the URI is incorrect
+            or the resource is not found, or even no longer exists.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '406':
+          description: >-
+            The server is not implementing the media type requested by the
+            client for the application response. Only application/json is
+            currently accepted.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '429':
+          description: The rate limit for requests exceeded.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: >-
+            An internal server error occurred. Although the client appears to
+            provide a correct request, the server encountered an unexpected
+            condition that prevented it from responding to the request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
 components:
   parameters:
     fieldsParam:
@@ -1190,8 +1250,7 @@ components:
         type: array
         items:
           type: string
-        default:
-          - created_at
+
     filterParam:
       in: query
       name: ''
@@ -1260,9 +1319,8 @@ components:
         - start_time
         - end_time
         - duration
-        - intensity_level
         - calories
-        - steps
+        - levels
       properties:
         id:
           readOnly: true
@@ -1286,14 +1344,6 @@ components:
           type: integer
           description: Total time in milliseconds spent in the activity.
           example: 973000
-        max_intensity:
-          type: string
-          description: Maximum intensity reached in the activity.
-          example: very
-        max_intensity_duration:
-          type: integer
-          description: Time spent in maximum activity intensity, in minutes.
-          example: 12
         calories:
           type: integer
           description: Calories spent during activity.
@@ -1302,6 +1352,27 @@ components:
           type: integer
           description: Number of steps taken during the activity.
           example: 1340
+        levels:
+          type: array
+          description: Activity levels.
+          items:
+            type: object
+            properties:
+              name:
+                type: string
+                description: Name of activity level (sedentary, light, fair or very).
+              duration:
+                type: number
+                description: Total time spent in milliseconds on the level.
+          example:
+            - name: sedentary
+              duration: 0
+            - name: lightly
+              duration: 180000
+            - name: fairly
+              duration: 420000
+            - name: very
+              duration: 300000
         user:
           type: object
           readOnly: true
@@ -1311,20 +1382,13 @@ components:
               type: string
               format: uuid
               example: 5a62be07de34500146d9c544
-        created_at:
-          type: string
-          format: date-time
-          description: >-
-            Date and hour according to the UTC pattern,
-            automatically generated that resource is saved on server.
-          readOnly: true
     Sleep:
       type: object
       required:
         - start_time
         - end_time
         - duration
-        - levels
+        - stages
       properties:
         id:
           readOnly: true
@@ -1334,24 +1398,25 @@ components:
           example: 3bc1274329fb282470e45004
         start_time:
           type: string
-          description: Sleep start time according to the UTC.
+          format: date-time
+          description: Date and time of sleep onset in UTC format, according to ISO 8601.
           example: "2018-08-18T01:40:30Z"
         end_time:
           type: string
           format: date-time
-          description: Sleep end time according to the UTC.
+          description: End date and time of sleep in UTC format, according to ISO 8601.
           example: "2018-08-18T09:52:30Z"
         duration:
           type: integer
-          description: Total time in milliseconds spent in all sleep levels.
+          description: Total time in milliseconds spent in all sleep stages.
           example: 29520000
-        levels:
+        stages:
           type: object
-          description: Sleep levels tracking.
+          description: Sleep stages tracking.
           properties:
             data_set:
               type: array
-              description: Sleep level tracking.
+              description: Sleep stages tracking.
               items:
                 type: object
                 properties:
@@ -1360,7 +1425,7 @@ components:
                     description: Date and time of the start of the level.
                   name:
                     type: string
-                    description: Sleep level name (awake, asleep or restless).
+                    description: Sleep stage name (awake, asleep or restless).
                   duration:
                     type: integer
                     description: Total in milliseconds of the time spent on the level.
@@ -1447,7 +1512,7 @@ components:
                     duration:
                       type: integer
                       example: 467
-                      description: Total time in minutes spent in the sleep level asleep.
+                      description: Total time in minutes spent in the sleep stage asleep.
                 awake:
                   type: object
                   properties:
@@ -1457,7 +1522,7 @@ components:
                     duration:
                       type: integer
                       example: 3
-                      description: Total time in minutes spent in the sleep level awake.
+                      description: Total time in minutes spent in the sleep stage awake.
                 restless:
                   type: object
                   properties:
@@ -1467,7 +1532,16 @@ components:
                     duration:
                       type: integer
                       example: 22
-                      description: Total time in minutes spent in the sleep level restless.
+                      description: Total time in minutes spent in the sleep stage restless.
+        user:
+          type: object
+          readOnly: true
+          description: User belonging to activity
+          properties:
+            id:
+              type: string
+              format: uuid
+              example: 5a62be07de34500146d9c544
 
     Environment:
       type: object
@@ -1482,7 +1556,7 @@ components:
           type: string
           format: uuid
           description: Automatically generated key field.
-          example: 3bc1274329fb282470e45004
+          example: 5bfc5c29d6adac2a10d22b03
         timestamp:
           type: string
           description: Timestamp according to the UTC.
@@ -1510,13 +1584,6 @@ components:
             city:
               type: string
               example: "Fortaleza"
-        created_at:
-          type: string
-          format: date-time
-          description: >-
-            Date and hour according to the UTC pattern,
-            automatically generated that resource is saved on server.
-          readOnly: true
 
     MultiStatus:
       type: object

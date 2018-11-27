@@ -138,6 +138,9 @@ export class ActivityController {
         }
     }
 
+    /**
+     * Default message when resource is not found or does not exist.
+     */
     private getMessageNotFoundActivity(): object {
         return new ApiException(
             HttpStatus.NOT_FOUND,

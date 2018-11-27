@@ -61,11 +61,18 @@ export class EnvironmentService implements IEnvironmentService {
         return this._environmentRepository.find(query)
     }
 
-    public getById(id: string | number, query: IQuery): Promise<Environment> {
-        throw new Error('Unsupported feature!')
+    /**
+     * Remove Measurement from the environment according to its unique identifier.
+     *
+     * @param id Unique identifier.
+     * @return {Promise<boolean>}
+     * @throws {ValidationException | RepositoryException}
+     */
+    public remove(id: string | number): Promise<boolean> {
+        return this._environmentRepository.delete(id)
     }
 
-    public remove(id: string | number): Promise<boolean> {
+    public getById(id: string | number, query: IQuery): Promise<Environment> {
         throw new Error('Unsupported feature!')
     }
 
