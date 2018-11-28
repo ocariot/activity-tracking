@@ -42,6 +42,7 @@ export class ActivityController {
     public async addActivity(@request() req: Request, @response() res: Response) {
         try {
             const user = new User()
+
             const activity: Activity = new Activity().deserialize(req.body)
             user.setId(req.params.user_id)
             activity.setUser(user)

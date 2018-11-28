@@ -65,7 +65,7 @@ export class Location implements ISerializable<Location> {
     }
 
     /**
-     * Transform JSON into SleepStage object.
+     * Transform JSON into Location object.
      *
      * @param json
      */

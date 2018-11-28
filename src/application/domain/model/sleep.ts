@@ -1,7 +1,7 @@
 import { Entity } from './entity'
 import { ISerializable } from '../utils/serializable.interface'
 import { User } from './user'
-import { SleepStage } from './sleep.stage'
+import { SleepPattern } from './sleep.pattern'
 
 /**
  * Implementation of the sleep entity.
@@ -13,15 +13,15 @@ export class Sleep extends Entity implements ISerializable<Sleep> {
     private start_time?: Date // Sleep start time according to the UTC.
     private end_time?: Date // Sleep end time according to the UTC.
     private duration?: number // Total time in milliseconds spent in all sleep levels.
-    private stages?: SleepStage // Sleep levels tracking.
+    private pattern?: SleepPattern // Sleep pattern tracking.
     private user!: User // User belonging to sleep.
 
-    constructor(start_time?: Date, end_time?: Date, duration?: number, levels?: SleepStage, user?: User, id?: string) {
+    constructor(start_time?: Date, end_time?: Date, duration?: number, levels?: SleepPattern, user?: User, id?: string) {
         super(id)
         this.setStartTime(start_time)
         this.setEndTime(end_time)
         this.setDuration(duration)
-        this.setStages(levels)
+        this.setPattern(levels)
         this.setUser(user)
     }
 
@@ -49,12 +49,12 @@ export class Sleep extends Entity implements ISerializable<Sleep> {
         this.duration = duration
     }
 
-    public getStages(): SleepStage | undefined {
-        return this.stages
+    public getPattern(): SleepPattern | undefined {
+        return this.pattern
     }
 
-    public setStages(levels: SleepStage | undefined): void {
-        this.stages = levels
+    public setPattern(pattern: SleepPattern | undefined): void {
+        this.pattern = pattern
     }
 
     public getUser(): User {
@@ -76,7 +76,7 @@ export class Sleep extends Entity implements ISerializable<Sleep> {
             start_time: this.start_time ? this.start_time.toISOString() : undefined,
             end_time: this.end_time ? this.end_time.toISOString() : undefined,
             duration: this.duration,
-            levels: this.stages ? this.stages.serialize() : undefined,
+            pattern: this.pattern ? this.pattern.serialize() : undefined,
             user: this.user ? this.user.serialize() : undefined
         }
     }
@@ -94,7 +94,7 @@ export class Sleep extends Entity implements ISerializable<Sleep> {
         if (json.start_time) this.setStartTime(new Date(json.start_time))
         if (json.end_time) this.setEndTime(new Date(json.end_time))
         if (json.duration !== undefined) this.setDuration(json.duration)
-        if (json.stages) this.setStages(new SleepStage().deserialize(json.stages))
+        if (json.pattern) this.setPattern(new SleepPattern().deserialize(json.pattern))
         if (json.user) this.setUser(new User().deserialize(json.user))
 
         return this

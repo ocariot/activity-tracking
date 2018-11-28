@@ -1,13 +1,13 @@
 import { ISerializable } from '../utils/serializable.interface'
 
 /**
- * The implementation of the entity summary data of sleep stages.
+ * The implementation of the entity summary data of sleep pattern.
  *
- * @implements {ISerializable<SleepStageSummaryData>}
+ * @implements {ISerializable<SleepPatternSummaryData>}
  */
-export class SleepStageSummaryData implements ISerializable<SleepStageSummaryData> {
+export class SleepPatternSummaryData implements ISerializable<SleepPatternSummaryData> {
     private count: number
-    private duration: number
+    private duration: number // in minutes
 
     constructor(count: number, duration: number) {
         this.count = count
@@ -43,11 +43,11 @@ export class SleepStageSummaryData implements ISerializable<SleepStageSummaryDat
     }
 
     /**
-     * Transform JSON into Sleep Stage Summary object.
+     * Transform JSON into SleepPatternSummaryData object.
      *
      * @param json
      */
-    public deserialize(json: any): SleepStageSummaryData {
+    public deserialize(json: any): SleepPatternSummaryData {
         if (!json) return this
         if (typeof json === 'string') json = JSON.parse(json)
 

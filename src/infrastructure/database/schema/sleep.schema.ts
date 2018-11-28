@@ -16,18 +16,18 @@ const sleepSchema = new Mongoose.Schema({
             type: Number,
             required: 'Duration of sleep is required!'
         },
-        stages: [{
+        pattern: [{
             start_time: {
                 type: Date,
-                required: 'Start time of sleep level is required!'
+                required: 'Start time of sleep pattern is required!'
             },
             name: {
                 type: String,
-                required: 'Name of sleep level is required!'
+                required: 'Name of sleep pattern is required!'
             },
             duration: {
                 type: Number,
-                required: 'Duration of sleep level is required!'
+                required: 'Duration of sleep pattern is required!'
             }
         }],
         user: {

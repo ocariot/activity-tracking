@@ -3,10 +3,10 @@ import { UserEntityMapper } from './user.entity.mapper'
 import { IEntityMapper } from './entity.mapper.interface'
 import { Sleep } from '../../../application/domain/model/sleep'
 import { SleepEntity } from '../sleep.entity'
-import { NameSleepStage, SleepStage } from '../../../application/domain/model/sleep.stage'
-import { SleepStageDataSet } from '../../../application/domain/model/sleep.stage.data.set'
-import { SleepStageSummary } from '../../../application/domain/model/sleep.stage.summary'
-import { SleepStageSummaryData } from '../../../application/domain/model/sleep.stage.summary.data'
+import { NameSleepStage, SleepPattern } from '../../../application/domain/model/sleep.pattern'
+import { SleepPatternDataSet } from '../../../application/domain/model/sleep.pattern.data.set'
+import { SleepPatternSummary } from '../../../application/domain/model/sleep.pattern.summary'
+import { SleepPatternSummaryData } from '../../../application/domain/model/sleep.pattern.summary.data'
 
 @injectable()
 export class SleepEntityMapper implements IEntityMapper<Sleep, SleepEntity> {
@@ -38,9 +38,9 @@ export class SleepEntityMapper implements IEntityMapper<Sleep, SleepEntity> {
          * For the object of type SleepEntity, there is an array containing
          * the staging data set, ie it does not contain summary.
          */
-        const stages: SleepStage | undefined = item.getStages()
-        if (stages && stages.getDataSet()) {
-            result.setStages(stages.getDataSet().map((elem: SleepStageDataSet) => elem.serialize()))
+        const pattern: SleepPattern | undefined = item.getPattern()
+        if (pattern && pattern.getDataSet()) {
+            result.setPattern(pattern.getDataSet().map((elem: SleepPatternDataSet) => elem.serialize()))
         }
         return result
     }
@@ -61,8 +61,8 @@ export class SleepEntityMapper implements IEntityMapper<Sleep, SleepEntity> {
         result.setDuration(item.getDuration())
         result.setUser(new UserEntityMapper().transform(item.getUser()))
 
-        const stages = item.getStages()
-        if (stages) result.setStages(this.deserializeSleepStage(stages))
+        const pattern = item.getPattern()
+        if (pattern) result.setPattern(this.deserializeSleepStage(pattern))
 
         return result
     }
@@ -82,32 +82,32 @@ export class SleepEntityMapper implements IEntityMapper<Sleep, SleepEntity> {
         if (json.start_time !== undefined) result.setStartTime(new Date(json.start_time))
         if (json.end_time !== undefined) result.setEndTime(new Date(json.end_time))
         if (json.duration !== undefined) result.setDuration(Number(json.duration))
-        if (json.stages !== undefined) result.setStages(this.deserializeSleepStage(json.stages))
+        if (json.pattern !== undefined) result.setPattern(this.deserializeSleepStage(json.pattern))
         if (json.user !== undefined) result.setUser(new UserEntityMapper().transform(json.user))
 
         return result
     }
 
-    private deserializeSleepStage(stages: any): SleepStage {
-        if (!stages) {
-            return new SleepStage([], new SleepStageSummary())
+    private deserializeSleepStage(pattern: any): SleepPattern {
+        if (!pattern) {
+            return new SleepPattern([], new SleepPatternSummary())
         }
 
-        const sleepStageDataSet: Array<SleepStageDataSet> = stages.map(elem => new SleepStageDataSet().deserialize(elem))
-        const summary: SleepStageSummary = new SleepStageSummary()
+        const sleepStageDataSet: Array<SleepPatternDataSet> = pattern.map(elem => new SleepPatternDataSet().deserialize(elem))
+        const summary: SleepPatternSummary = new SleepPatternSummary()
 
-        const countAsleep = this.countOfStage(NameSleepStage.ASLEEP, stages)
-        const countAwake = this.countOfStage(NameSleepStage.AWAKE, stages)
-        const countRestless = this.countOfStage(NameSleepStage.RESTLESS, stages)
-        const durationAsleep = this.countDurationOfStage(NameSleepStage.ASLEEP, stages)
-        const durationAwake = this.countDurationOfStage(NameSleepStage.AWAKE, stages)
-        const durationRestless = this.countDurationOfStage(NameSleepStage.RESTLESS, stages)
+        const countAsleep = this.countOfStage(NameSleepStage.ASLEEP, pattern)
+        const countAwake = this.countOfStage(NameSleepStage.AWAKE, pattern)
+        const countRestless = this.countOfStage(NameSleepStage.RESTLESS, pattern)
+        const durationAsleep = this.countDurationOfStage(NameSleepStage.ASLEEP, pattern)
+        const durationAwake = this.countDurationOfStage(NameSleepStage.AWAKE, pattern)
+        const durationRestless = this.countDurationOfStage(NameSleepStage.RESTLESS, pattern)
 
-        summary.setAsleep(new SleepStageSummaryData(countAsleep, durationAsleep))
-        summary.setAwake(new SleepStageSummaryData(countAwake, durationAwake))
-        summary.setRestless(new SleepStageSummaryData(countRestless, durationRestless))
+        summary.setAsleep(new SleepPatternSummaryData(countAsleep, durationAsleep))
+        summary.setAwake(new SleepPatternSummaryData(countAwake, durationAwake))
+        summary.setRestless(new SleepPatternSummaryData(countRestless, durationRestless))
 
-        return new SleepStage(sleepStageDataSet, summary)
+        return new SleepPattern(sleepStageDataSet, summary)
     }
 
     private countOfStage(stage: string, dataSet: Array<any>): number {
