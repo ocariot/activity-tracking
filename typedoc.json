@@ -13,5 +13,5 @@
     "suppressExcessPropertyErrors": "true",
     "suppressImplicitAnyIndexErrors": "true",
     "module": "commonjs",
-    "name": "Activity Tracking Service"
+    "name": "Template Base TypeScript - Documentation"
 }

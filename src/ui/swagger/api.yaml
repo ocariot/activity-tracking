@@ -1,0 +1,1651 @@
+openapi: 3.0.0
+info:
+  version: v1
+  title: Tracking Service
+  description: This is the documentation of the RESTful API of the microservice for activity, sleep, environment and food (?) tracking
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+servers:
+- description: SwaggerHub API Auto Mocking
+  url: https://virtserver.swaggerhub.com/douglas.rafael/tracking-service/v1
+- description: Localhost
+  url: http:://127.0.0.1:3000/api/v1
+tags:
+  - name: activities
+    description: Operations for the Activity resource. Useful for users with administrator permissions.
+  - name: users.activities
+    description: Operations for user Activity resource.
+  - name: sleep
+    description: Operations for the Sleep feature. Useful for users with administrator permissions.
+  - name: users.sleep
+    description: Operations for user Sleep resource.
+  - name: environments
+
+paths:
+  /activities:
+    get:
+      tags:
+        - activities
+      summary: Recover activities from all users.
+      operationId: getAllActivities
+      description: Returns list with activities of all users. The query supports field selection, pagination, sorting, and filtering.
+      parameters:
+        - in: path
+          name: user_id
+          required: true
+          description: Id of user.
+          example: 5a62be07d6f33400146c9b61
+          schema:
+            type: string
+        - $ref: '#/components/parameters/fieldsParam'
+        - $ref: '#/components/parameters/pageParam'
+        - $ref: '#/components/parameters/limitParam'
+        - $ref: '#/components/parameters/sortParam'
+        - $ref: '#/components/parameters/filterParam'
+      responses:
+        '200':
+          description: Successful requisition.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Activity'
+        '401':
+          description: Authentication failed due to invalid authentication credentials.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '403':
+          description: User does not have permission to get activities.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: >-
+            Specified resource does not exist. Usually when the URI is incorrect
+            or the resource is not found, or even no longer exists.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '406':
+          description: >-
+            The server is not implementing the media type requested by the
+            client for the application response. Only application/json is
+            currently accepted.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '429':
+          description: The rate limit for requests exceeded.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: >-
+            An internal server error occurred. Although the client appears to
+            provide a correct request, the server encountered an unexpected
+            condition that prevented it from responding to the request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /users/{user_id}/activities:
+    get:
+      tags:
+        - users.activities
+      summary: Recover activities.
+      operationId: getAllActivities
+      description: Returns list with activities. The query supports Field Selection, Paging, Sorting, and Filtering.
+      parameters:
+        - in: path
+          name: user_id
+          required: true
+          description: Id of user.
+          example: 5a62be07d6f33400146c9b61
+          schema:
+            type: string
+        - $ref: '#/components/parameters/fieldsParam'
+        - $ref: '#/components/parameters/pageParam'
+        - $ref: '#/components/parameters/limitParam'
+        - $ref: '#/components/parameters/sortParam'
+        - $ref: '#/components/parameters/filterParam'
+      responses:
+        '200':
+          description: Successful requisition.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Activity'
+        '401':
+          description: Authentication failed due to invalid authentication credentials.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '403':
+          description: User does not have permission to get activities.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: >-
+            Specified resource does not exist. Usually when the URI is incorrect
+            or the resource is not found, or even no longer exists.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '406':
+          description: >-
+            The server is not implementing the media type requested by the
+            client for the application response. Only application/json is
+            currently accepted.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '429':
+          description: The rate limit for requests exceeded.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: >-
+            An internal server error occurred. Although the client appears to
+            provide a correct request, the server encountered an unexpected
+            condition that prevented it from responding to the request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    post:
+      tags:
+        - users.activities
+      summary: Register activity.
+      operationId: saveActivity
+      description: Register a new activity and associate it to an user.
+      parameters:
+        - in: path
+          name: user_id
+          required: true
+          description: Id of user.
+          example: 5a62be07d6f33400146c9b61
+          schema:
+            type: string
+      responses:
+        '201':
+          description: Activity saved sucessfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Activity'
+        '207':
+          description: Successful request, however, can have several status codes for the case of a list of submitted resources.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MultiStatus'
+        '400':
+          description: >-
+            Request can not be met, syntactically incorrect or violates the
+            schema. Normally it occurs due to validation issues, such as fields
+            that are expected in the request body and not passed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Authentication failed due to invalid authentication credentials.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '403':
+          description: User does not have permission to register activities.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: >-
+            Specified resource does not exist. Usually when the URI is incorrect
+            or the resource is not found, or even no longer exists.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '406':
+          description: >-
+            The server is not implementing the media type requested by the
+            client for the application response. Only application/json is
+            currently accepted.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '415':
+          description: >-
+            The server does not support the requested payload format. Only
+            application / json is accepted.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '429':
+          description: The rate limit for requests exceeded.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: >-
+            An internal server error occurred. Although the client appears to
+            provide a correct request, the server encountered an unexpected
+            condition that prevented it from responding to the request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+      requestBody:
+        required: true
+        description: Activity to be insert
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: '#/components/schemas/Activity'
+
+  /users/{user_id}/activities/{activity_id}:
+    get:
+      tags:
+        - users.activities
+      summary: Recover activity data.
+      operationId: getActivitiyById
+      description: Recover the activity data associated with an user.
+      parameters:
+        - in: path
+          name: user_id
+          required: true
+          description: Id of user.
+          example: 5a62be07d6f33400146c9b61
+          schema:
+            type: string
+        - in: path
+          name: activity_id
+          required: true
+          description: Id of activity.
+          example: 5a62be07d6e34500146d9c544
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successful requisition.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Activity'
+        '401':
+          description: Authentication failed due to invalid authentication credentials.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '403':
+          description: User does not have permission to get activities.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: >-
+            Specified resource does not exist. Usually when the URI is incorrect
+            or the resource is not found, or even no longer exists.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '406':
+          description: >-
+            The server is not implementing the media type requested by the
+            client for the application response. Only application/json is
+            currently accepted.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '429':
+          description: The rate limit for requests exceeded.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: >-
+            An internal server error occurred. Although the client appears to
+            provide a correct request, the server encountered an unexpected
+            condition that prevented it from responding to the request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    patch:
+      tags:
+        - users.activities
+      summary: Update activity data.
+      description: Update the activity data.
+      operationId: updateActivity
+      parameters:
+        - in: path
+          name: user_id
+          required: true
+          description: Id of user.
+          example: 5a62be07d6f33400146c9b61
+          schema:
+            type: string
+        - in: path
+          name: activity_id
+          required: true
+          description: Id of activity.
+          example: 5a62be07d6e34500146d9c544
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Updated activity data.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Activity'
+        '401':
+          description: Authentication failed due to invalid authentication credentials.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '403':
+          description: User does not have permission to update activity data.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: >-
+            Specified resource does not exist. Usually when the URI is incorrect
+            or the resource is not found, or even no longer exists.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '406':
+          description: >-
+            The server is not implementing the media type requested by the client
+            for the application response. Only application/json is currently
+            accepted.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '409':
+          description: ->
+            Conflicts have probably occurred with data that can not be duplicated.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '415':
+          description: >-
+            The server does not support the requested payload format. Only
+            application/json is accepted.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '429':
+          description: The rate limit for requests exceeded.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: >-
+            An internal server error occurred. Although the client appears to
+            provide a correct request, the server encountered an unexpected
+            condition that prevented it from responding to the request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Activity'
+        description: Data of the activity to be updated.
+        required: true
+    delete:
+      tags:
+        - users.activities
+      summary: Delete activity data.
+      description: Delete the activity data.
+      operationId: deleteActivity
+      parameters:
+        - in: path
+          name: user_id
+          required: true
+          description: Id of user.
+          example: 5a62be07d6f33400146c9b61
+          schema:
+            type: string
+        - in: path
+          name: activity_id
+          required: true
+          description: Id of activity.
+          example: 5a62be07d6e34500146d9c544
+          schema:
+            type: string
+      responses:
+        '204':
+          description: Operation performed successfully. There is no data to be returned.
+        '401':
+          description: Authentication failed due to invalid authentication credentials.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '403':
+          description: User does not have permission to delete activities.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: >-
+            Specified resource does not exist. Usually when the URI is incorrect
+            or the resource is not found, or even no longer exists.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '406':
+          description: >-
+            The server is not implementing the media type requested by the
+            client for the application response. Only application/json is
+            currently accepted.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '429':
+          description: The rate limit for requests exceeded.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: >-
+            An internal server error occurred. Although the client appears to
+            provide a correct request, the server encountered an unexpected
+            condition that prevented it from responding to the request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /sleep:
+    get:
+      tags:
+        - sleep
+      summary: Recover sleep record of all users.
+      operationId: getAllSleep
+      description: Returns the sleep record list of all users. The query supports field selection, pagination, sorting, and filtering.
+      parameters:
+        - in: path
+          name: user_id
+          required: true
+          description: Id of user.
+          example: 5a62be07d6f33400146c9b61
+          schema:
+            type: string
+        - $ref: '#/components/parameters/fieldsParam'
+        - $ref: '#/components/parameters/pageParam'
+        - $ref: '#/components/parameters/limitParam'
+        - $ref: '#/components/parameters/sortParam'
+        - $ref: '#/components/parameters/filterParam'
+      responses:
+        '200':
+          description: Successful requisition.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Sleep'
+        '401':
+          description: Authentication failed due to invalid authentication credentials.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '403':
+          description: User does not have permission to get sleep.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: >-
+            Specified resource does not exist. Usually when the URI is incorrect
+            or the resource is not found, or even no longer exists.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '406':
+          description: >-
+            The server is not implementing the media type requested by the
+            client for the application response. Only application/json is
+            currently accepted.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '429':
+          description: The rate limit for requests exceeded.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: >-
+            An internal server error occurred. Although the client appears to
+            provide a correct request, the server encountered an unexpected
+            condition that prevented it from responding to the request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /users/{user_id}/sleep:
+    get:
+      tags:
+        - users.sleep
+      summary: Recover sleep record of user.
+      operationId: getAllSleepByUser
+      description: Returns list with sleep record. The query supports field selection, pagination, sorting, and filtering.
+      parameters:
+        - in: path
+          name: user_id
+          required: true
+          description: Id of user.
+          example: 5a62be07d6f33400146c9b61
+          schema:
+            type: string
+        - $ref: '#/components/parameters/fieldsParam'
+        - $ref: '#/components/parameters/pageParam'
+        - $ref: '#/components/parameters/limitParam'
+        - $ref: '#/components/parameters/sortParam'
+        - $ref: '#/components/parameters/filterParam'
+      responses:
+        '200':
+          description: Successful requisition.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Sleep'
+        '401':
+          description: Authentication failed due to invalid authentication credentials.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '403':
+          description: User does not have permission to get sleep.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: >-
+            Specified resource does not exist. Usually when the URI is incorrect
+            or the resource is not found, or even no longer exists.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '406':
+          description: >-
+            The server is not implementing the media type requested by the
+            client for the application response. Only application/json is
+            currently accepted.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '429':
+          description: The rate limit for requests exceeded.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: >-
+            An internal server error occurred. Although the client appears to
+            provide a correct request, the server encountered an unexpected
+            condition that prevented it from responding to the request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    post:
+      tags:
+        - users.sleep
+      summary: Register sleep.
+      operationId: saveSleep
+      description: Register a new sleep and associate it to an user.
+      parameters:
+        - in: path
+          name: user_id
+          required: true
+          description: Id of user.
+          example: 5a62be07d6f33400146c9b61
+          schema:
+            type: string
+      responses:
+        '201':
+          description: Sleep saved successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Sleep'
+        '207':
+          description: Successful request, however, can have several status codes for the case of a list of submitted resources.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MultiStatus'
+        '400':
+          description: >-
+            Request can not be met, syntactically incorrect or violates the
+            schema. Normally it occurs due to validation issues, such as fields
+            that are expected in the request body and not passed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Authentication failed due to invalid authentication credentials.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '403':
+          description: User does not have permission to register activities.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: >-
+            Specified resource does not exist. Usually when the URI is incorrect
+            or the resource is not found, or even no longer exists.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '406':
+          description: >-
+            The server is not implementing the media type requested by the
+            client for the application response. Only application/json is
+            currently accepted.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '415':
+          description: >-
+            The server does not support the requested payload format. Only
+            application / json is accepted.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '429':
+          description: The rate limit for requests exceeded.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: >-
+            An internal server error occurred. Although the client appears to
+            provide a correct request, the server encountered an unexpected
+            condition that prevented it from responding to the request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+      requestBody:
+        description: Activity to be insert
+        required: true
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: '#/components/schemas/Sleep'
+
+  /users/{user_id}/sleep/{sleep_id}:
+    get:
+      tags:
+        - users.sleep
+      summary: Recover sleep data.
+      operationId: getSleepById
+      description: Recover the sleep data associated with an user.
+      parameters:
+        - in: path
+          name: user_id
+          required: true
+          description: Id of user.
+          example: 5a62be07d6f33400146c9b61
+          schema:
+            type: string
+        - in: path
+          name: sleep_id
+          required: true
+          description: Id of sleep.
+          example: 3bc1274329fb282470e45004
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successful requisition.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Sleep'
+        '401':
+          description: Authentication failed due to invalid authentication credentials.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '403':
+          description: User does not have permission to get sleep.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: >-
+            Specified resource does not exist. Usually when the URI is incorrect
+            or the resource is not found, or even no longer exists.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '406':
+          description: >-
+            The server is not implementing the media type requested by the
+            client for the application response. Only application/json is
+            currently accepted.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '429':
+          description: The rate limit for requests exceeded.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: >-
+            An internal server error occurred. Although the client appears to
+            provide a correct request, the server encountered an unexpected
+            condition that prevented it from responding to the request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    patch:
+      tags:
+        - users.sleep
+      summary: Update sleep data.
+      description: Update the sleep data.
+      operationId: updateSleep
+      parameters:
+        - in: path
+          name: user_id
+          required: true
+          description: Id of user.
+          example: 5a62be07d6f33400146c9b61
+          schema:
+            type: string
+        - in: path
+          name: sleep_id
+          required: true
+          description: Id of sleep.
+          example: 3bc1274329fb282470e45004
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Updated activity data.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Sleep'
+        '401':
+          description: Authentication failed due to invalid authentication credentials.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '403':
+          description: User does not have permission to update sleep data.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: >-
+            Specified resource does not exist. Usually when the URI is incorrect
+            or the resource is not found, or even no longer exists.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '406':
+          description: >-
+            The server is not implementing the media type requested by the client
+            for the application response. Only application/json is currently
+            accepted.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '409':
+          description: ->
+            Conflicts have probably occurred with data that can not be duplicated.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '415':
+          description: >-
+            The server does not support the requested payload format. Only
+            application/json is accepted.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '429':
+          description: The rate limit for requests exceeded.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: >-
+            An internal server error occurred. Although the client appears to
+            provide a correct request, the server encountered an unexpected
+            condition that prevented it from responding to the request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Activity'
+        description: Data of the activity to be updated.
+        required: true
+    delete:
+      tags:
+        - users.sleep
+      summary: Delete sleep data.
+      description: Delete the sleep data.
+      operationId: deleteSleep
+      parameters:
+        - in: path
+          name: user_id
+          required: true
+          description: Id of user.
+          example: 5a62be07d6f33400146c9b61
+          schema:
+            type: string
+        - in: path
+          name: sleep_id
+          required: true
+          description: Id of sleep.
+          example: 3bc1274329fb282470e45004
+          schema:
+            type: string
+      responses:
+        '204':
+          description: Operation performed successfully. There is no data to be returned.
+        '401':
+          description: Authentication failed due to invalid authentication credentials.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '403':
+          description: User does not have permission to delete sleep.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: >-
+            Specified resource does not exist. Usually when the URI is incorrect
+            or the resource is not found, or even no longer exists.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '406':
+          description: >-
+            The server is not implementing the media type requested by the
+            client for the application response. Only application/json is
+            currently accepted.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '429':
+          description: The rate limit for requests exceeded.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: >-
+            An internal server error occurred. Although the client appears to
+            provide a correct request, the server encountered an unexpected
+            condition that prevented it from responding to the request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /environments:
+    get:
+      tags:
+        - environments
+      summary: Recover environment measurements.
+      operationId: getAllEnvironments
+      description: Returns list with record of environment measurements. The query supports field selection, pagination, sorting, and filtering.
+      parameters:
+        - $ref: '#/components/parameters/fieldsParam'
+        - $ref: '#/components/parameters/pageParam'
+        - $ref: '#/components/parameters/limitParam'
+        - $ref: '#/components/parameters/sortParam'
+        - $ref: '#/components/parameters/filterParam'
+      responses:
+        '200':
+          description: Successful requisition.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Environment'
+        '401':
+          description: Authentication failed due to invalid authentication credentials.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '403':
+          description: User does not have permission to get sleep.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: >-
+            Specified resource does not exist. Usually when the URI is incorrect
+            or the resource is not found, or even no longer exists.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '406':
+          description: >-
+            The server is not implementing the media type requested by the
+            client for the application response. Only application/json is
+            currently accepted.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '429':
+          description: The rate limit for requests exceeded.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: >-
+            An internal server error occurred. Although the client appears to
+            provide a correct request, the server encountered an unexpected
+            condition that prevented it from responding to the request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    post:
+      tags:
+        - environments
+      summary: Register the environment measurement data.
+      operationId: saveEnvironment
+      description: Register the environment measurement data.
+      responses:
+        '201':
+          description: Environment saved successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Environment'
+        '207':
+          description: Successful request, however, can have several status codes for the case of a list of submitted resources.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MultiStatus'
+        '400':
+          description: >-
+            Request can not be met, syntactically incorrect or violates the
+            schema. Normally it occurs due to validation issues, such as fields
+            that are expected in the request body and not passed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Authentication failed due to invalid authentication credentials.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '403':
+          description: User does not have permission to register activities.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: >-
+            Specified resource does not exist. Usually when the URI is incorrect
+            or the resource is not found, or even no longer exists.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '406':
+          description: >-
+            The server is not implementing the media type requested by the
+            client for the application response. Only application/json is
+            currently accepted.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '415':
+          description: >-
+            The server does not support the requested payload format. Only
+            application / json is accepted.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '429':
+          description: The rate limit for requests exceeded.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: >-
+            An internal server error occurred. Although the client appears to
+            provide a correct request, the server encountered an unexpected
+            condition that prevented it from responding to the request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+      requestBody:
+        description: Measure of environment to be insert.
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Environment'
+
+  /environments/{environment_id}:
+    delete:
+      tags:
+        - environments
+      summary: Delete measurement environment.
+      description: Delete environment measurement data.
+      operationId: removeEnvironmentById
+      parameters:
+        - in: path
+          name: environment_id
+          required: true
+          description: Environment measurement id.
+          example: 5bfc5c29d6adac2a10d22b03
+          schema:
+            type: string
+      responses:
+        '204':
+          description: Operation performed successfully. There is no data to be returned.
+        '401':
+          description: Authentication failed due to invalid authentication credentials.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '403':
+          description: User does not have permission to delete environmental measurement.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: >-
+            Specified resource does not exist. Usually when the URI is incorrect
+            or the resource is not found, or even no longer exists.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '406':
+          description: >-
+            The server is not implementing the media type requested by the
+            client for the application response. Only application/json is
+            currently accepted.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '429':
+          description: The rate limit for requests exceeded.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: >-
+            An internal server error occurred. Although the client appears to
+            provide a correct request, the server encountered an unexpected
+            condition that prevented it from responding to the request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+components:
+  parameters:
+    fieldsParam:
+      in: query
+      name: fields
+      required: false
+      description: >-
+        Allows you to retrieve only the information you want. To do this,
+        simply provide the name of the attributes separated by commas.
+        For example: **_fields=field1,field2_** indicates that only
+        field1 and field2 should be listed in the query result.
+      schema:
+        type: array
+        items:
+          type: string
+    pageParam:
+      in: query
+      name: page
+      required: false
+      description: The page number.
+      schema:
+        type: integer
+        format: int32
+        minimum: 1
+        default: 1
+    limitParam:
+      in: query
+      name: limit
+      required: false
+      description: The number of items to return.
+      schema:
+        type: integer
+        format: int32
+        maximum: 100
+        default: 20
+    sortParam:
+      in: query
+      name: sort
+      required: false
+      description: >-
+        Contains the names of the attributes, separated by commas, that
+        will be used to sort the result of the query. For ascending sort,
+        use the '+' character before the attribute name. For descending
+        sort, use the '-' character before the attribute name. By default,
+        the order is ascending, so the '+' symbol is optional, just enter
+        the attribute.
+      schema:
+        type: array
+        items:
+          type: string
+
+    filterParam:
+      in: query
+      name: ''
+      required: false
+      description: >-
+        To filter a collection by multiple concurrent attributes or filter
+        multiple values for an attribute, simply use the attribute/property
+        name with an equal sign and the expected values, separated by a comma.
+        **_property=value1,value2,value3_**. The query is not case sensitive.
+        Example: **_?name=elvis,john_** to retrieve exactly the same users with
+        elvis or john name.
+        For filtering with logical operators, just follow the syntax:
+        **_property=operator:value_**. The available operators are:
+         - **gt** -> Defines which value of the attribute is greater than
+                    (that is,>) the specified value.
+         - **gte** -> Defines which attribute value is greater than or equal to
+                    (that is,>=) the specified value.
+         - **lt** -> Define the value of the attribute to be less than (that is, <)
+                    the specified value.
+         - **lte** -> Defines which value of the attribute is less than or equal to
+                    (that is, <=) the specified value.
+
+        Example: **_?field1=gte:80&age=lt:100_** to recover the users with age
+        is greater than or equal to 80 and less then 100.
+      schema:
+        type: string
+    dateStartParam:
+      in: query
+      name: date_start
+      required: false
+      description: >-
+        Define start date in format: YYYY-MM-DD ou YYYY-MM-DD hh:mm:ss. The
+        attribute used for the query will be the registration_date.
+      schema:
+        type: string
+    dateEndParam:
+      in: query
+      name: date_end
+      required: false
+      description: >-
+        Define end date in format: YYYY-MM-DD ou YYYY-MM-DD hh:mm:ss.The
+        attribute used for the query will be the registration_date.
+      schema:
+        type: string
+        default: today
+    periodParam:
+      in: query
+      name: period
+      required: false
+      description: |-
+        Sets the period from the available ones:
+         - **[1..n]d** - Total days (1d, 2d, ...)
+         - **[1..n]w** - Total of weeks (1w, 2w, ...)
+         - **[1..n]m** - Total of months (1m, 2m, ...)
+         - **[1..n]y** - Total of years (1y, 2y, ...)
+
+        The attribute used for the query will be the registration_date.
+      schema:
+        type: string
+  # Reosurces
+  schemas:
+    Activity:
+      type: object
+      required:
+        - name
+        - start_time
+        - end_time
+        - duration
+        - calories
+        - levels
+      properties:
+        id:
+          readOnly: true
+          type: string
+          format: uuid
+          description: Automatically generated key field.
+          example: 5a62be07de34500146d9c544
+        name:
+          type: string
+          description: Name of activity.
+          example: walk
+        start_time:
+          type: string
+          description: Activity start time according to the UTC.
+          example: "2018-08-15T14:03:40Z"
+        end_time:
+          type: string
+          description: Activity end time according to the UTC.
+          example: "2018-08-15T14:19:21Z"
+        duration:
+          type: integer
+          description: Total time in milliseconds spent in the activity.
+          example: 973000
+        calories:
+          type: integer
+          description: Calories spent during activity.
+          example: 100
+        steps:
+          type: integer
+          description: Number of steps taken during the activity.
+          example: 1340
+        levels:
+          type: array
+          description: Activity levels.
+          items:
+            type: object
+            properties:
+              name:
+                type: string
+                description: Name of activity level (sedentary, light, fair or very).
+              duration:
+                type: number
+                description: Total time spent in milliseconds on the level.
+          example:
+            - name: sedentary
+              duration: 0
+            - name: lightly
+              duration: 180000
+            - name: fairly
+              duration: 420000
+            - name: very
+              duration: 300000
+        user:
+          type: object
+          readOnly: true
+          description: User belonging to activity
+          properties:
+            id:
+              type: string
+              format: uuid
+              example: 5a62be07de34500146d9c544
+    Sleep:
+      type: object
+      required:
+        - start_time
+        - end_time
+        - duration
+        - stages
+      properties:
+        id:
+          readOnly: true
+          type: string
+          format: uuid
+          description: Automatically generated key field.
+          example: 3bc1274329fb282470e45004
+        start_time:
+          type: string
+          format: date-time
+          description: Date and time of sleep onset in UTC format, according to ISO 8601.
+          example: "2018-08-18T01:40:30Z"
+        end_time:
+          type: string
+          format: date-time
+          description: End date and time of sleep in UTC format, according to ISO 8601.
+          example: "2018-08-18T09:52:30Z"
+        duration:
+          type: integer
+          description: Total time in milliseconds spent in all sleep stages.
+          example: 29520000
+        stages:
+          type: object
+          description: Sleep stages tracking.
+          properties:
+            data_set:
+              type: array
+              description: Sleep stages tracking.
+              items:
+                type: object
+                properties:
+                  start_time:
+                    type: string
+                    description: Date and time of the start of the level.
+                  name:
+                    type: string
+                    description: Sleep stage name (awake, asleep or restless).
+                  duration:
+                    type: integer
+                    description: Total in milliseconds of the time spent on the level.
+              example:
+                - start_time: "2018-08-18T01:40:30.00Z"
+                  name: restless
+                  duration: 60000
+                - start_time: "2018-08-18T01:41:30.00Z"
+                  name: asleep
+                  duration: 360000
+                - start_time: "2018-08-18T01:47:30.00Z"
+                  name: restless
+                  duration: 240000
+                - start_time: "2018-08-18T01:51:30.00Z"
+                  name: asleep
+                  duration: 60000
+                - start_time: "2018-08-18T01:52:30.00Z"
+                  name: restless
+                  duration: 60000
+                - start_time: "2018-08-18T01:53:30.00Z"
+                  name: asleep
+                  duration: 2100000
+                - start_time: "2018-08-18T02:28:30.00Z"
+                  name: restless
+                  duration: 240000
+                - start_time: "2018-08-18T02:32:30.00Z"
+                  name: awake
+                  duration: 180000
+                - start_time: "2018-08-18T02:35:30.00Z"
+                  name: asleep
+                  duration: 15120000
+                - start_time: "2018-08-18T06:47:30.00Z"
+                  name: restless
+                  duration: 60000
+                - start_time: "2018-08-18T06:48:30.00Z"
+                  name: asleep
+                  duration: 2580000
+                - start_time: "2018-08-18T07:31:30.00Z"
+                  name: restless
+                  duration: 120000
+                - start_time: "2018-08-18T07:33:30.00Z"
+                  name: asleep
+                  duration: 120000
+                - start_time: "2018-08-18T07:35:30.00Z"
+                  name: restless
+                  duration: 60000
+                - start_time: "2018-08-18T07:36:30.00Z"
+                  name: asleep
+                  duration: 1200000
+                - start_time: "2018-08-18T07:56:30.00Z"
+                  name: restless
+                  duration: 60000
+                - start_time: "2018-08-18T07:57:30.00Z"
+                  name: asleep
+                  duration: 2580000
+                - start_time: "2018-08-18T08:40:30.00Z"
+                  name: restless
+                  duration: 180000
+                - start_time: "2018-08-18T08:43:30.00Z"
+                  name: asleep
+                  duration: 1200000
+                - start_time: "2018-08-18T09:03:30.00Z"
+                  name: restless
+                  duration: 60000
+                - start_time: "2018-08-18T09:04:30.00Z"
+                  name: asleep
+                  duration: 1740000
+                - start_time: "2018-08-18T09:03:30.00Z"
+                  name: restless
+                  duration: 180000
+                - start_time: "2018-08-18T09:36:30.00Z"
+                  name: asleep
+                  duration: 960000
+            sumary:
+              type: object
+              readOnly: true
+              properties:
+                asleep:
+                  type: object
+                  properties:
+                    count:
+                      type: integer
+                      example: 11
+                    duration:
+                      type: integer
+                      example: 467
+                      description: Total time in minutes spent in the sleep stage asleep.
+                awake:
+                  type: object
+                  properties:
+                    count:
+                      type: integer
+                      example: 1
+                    duration:
+                      type: integer
+                      example: 3
+                      description: Total time in minutes spent in the sleep stage awake.
+                restless:
+                  type: object
+                  properties:
+                    count:
+                      type: integer
+                      example: 11
+                    duration:
+                      type: integer
+                      example: 22
+                      description: Total time in minutes spent in the sleep stage restless.
+        user:
+          type: object
+          readOnly: true
+          description: User belonging to activity
+          properties:
+            id:
+              type: string
+              format: uuid
+              example: 5a62be07de34500146d9c544
+
+    Environment:
+      type: object
+      required:
+        - timestamp
+        - temperature
+        - humidity
+        - location
+      properties:
+        id:
+          readOnly: true
+          type: string
+          format: uuid
+          description: Automatically generated key field.
+          example: 5bfc5c29d6adac2a10d22b03
+        timestamp:
+          type: string
+          description: Timestamp according to the UTC.
+          example: "2018-11-19T14:40:00Z"
+        temperature:
+          type: number
+          description: Ambient temperature in °C
+          example: 31.0185
+        humidity:
+          type: number
+          description: Ambient humidity in %
+          example: 41.8415
+        location:
+          type: object
+          properties:
+            school:
+              type: string
+              example: "Unifor"
+            room:
+              type: string
+              example: "Bloco H sala 01"
+            country:
+              type: string
+              example: "BR"
+            city:
+              type: string
+              example: "Fortaleza"
+
+    MultiStatus:
+      type: object
+      description: Default template for message when a request returns multiple status.
+      required:
+        - success
+        - error
+      properties:
+        success:
+          type: array
+          description: All items that were processed successfully.
+          items:
+            type: object
+            description: Item data processed.
+            properties:
+              code:
+                type: integer
+                description: The requisition status code for the item.
+                example: 201
+              item:
+                type: object
+                description: Item data that was successfully processed.
+        error:
+          type: array
+          description: All items that were were not processed due to some error.
+          items:
+            type: object
+            description: Item data not processed.
+            properties:
+              code:
+                type: integer
+                description: The requisition status code for the item.
+                example: 400
+              message:
+                type: string
+                description: Readable and short description of the error.
+              description:
+                type: string
+                description: Detailed description of the error.
+              item:
+                type: object
+                description: Item data that was not successfully processed
+
+    Error:
+      type: object
+      description: >-
+        Default template for error message.
+        All returned errors will follow this template.
+      required:
+        - code
+        - message
+        - description
+      properties:
+        code:
+          type: integer
+          description: >-
+            Unique API code that indicates specific details of the error, or
+            the actual status code of the response when the unique code is not
+            appropriate.
+        message:
+          type: string
+          description: Readable and short description of the error.
+        description:
+          type: string
+          description: Detailed description of the error.
