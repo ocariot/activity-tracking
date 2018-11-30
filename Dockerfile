@@ -1,4 +1,4 @@
-FROM node:11.12.0
+FROM node:10.14.1
 
 # create and set app directory
 RUN mkdir -p /usr/src/ts/
