@@ -113,13 +113,13 @@ export class Activity extends Entity implements ISerializable<Activity> {
         return {
             id: this.getId(),
             name: this.name,
-            start_time: this.start_time ? this.start_time.toISOString() : undefined,
-            end_time: this.end_time ? this.end_time.toISOString() : undefined,
+            start_time: this.start_time ? this.start_time.toISOString() : this.start_time,
+            end_time: this.end_time ? this.end_time.toISOString() : this.end_time,
             duration: this.duration,
             calories: this.calories,
             steps: this.steps,
-            levels: this.levels,
-            user: this.user ? this.user.serialize() : undefined
+            levels: this.levels ? this.levels.map(item => item.serialize()) : this.levels,
+            user: this.user ? this.user.serialize() : this.user
         }
     }
 
@@ -132,15 +132,15 @@ export class Activity extends Entity implements ISerializable<Activity> {
         if (!json) return this
         if (typeof json === 'string') json = JSON.parse(json)
 
-        if (json.id) super.setId(json.id)
-        if (json.name) this.setName(json.name)
-        if (json.start_time) this.setStartTime(new Date(json.start_time))
-        if (json.end_time) this.setEndTime(new Date(json.end_time))
+        if (json.id !== undefined) super.setId(json.id)
+        if (json.name !== undefined) this.setName(json.name)
+        if (json.start_time !== undefined) this.setStartTime(new Date(json.start_time))
+        if (json.end_time !== undefined) this.setEndTime(new Date(json.end_time))
         if (json.duration !== undefined) this.setDuration(json.duration)
         if (json.calories !== undefined) this.setCalories(json.calories)
         if (json.steps !== undefined) this.setSteps(json.steps)
-        if (json.levels) this.setLevels(json.levels.map(item => new ActivityLevel().deserialize(item)))
-        if (json.user) this.setUser(new User().deserialize(json.user))
+        if (json.levels !== undefined) this.setLevels(json.levels.map(item => new ActivityLevel().deserialize(item)))
+        if (json.user !== undefined) this.setUser(new User().deserialize(json.user))
 
         return this
     }

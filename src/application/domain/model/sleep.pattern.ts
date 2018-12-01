@@ -39,8 +39,8 @@ export class SleepPattern implements ISerializable<SleepPattern> {
      */
     public serialize(): any {
         return {
-            data_set: this.data_set,
-            summary: this.summary.serialize()
+            data_set: this.data_set ? this.data_set.map(item => item.serialize()) : this.data_set,
+            summary: this.summary ? this.summary.serialize() : this.summary
         }
     }
 
@@ -53,12 +53,12 @@ export class SleepPattern implements ISerializable<SleepPattern> {
         if (!json) return this
         if (typeof json === 'string') json = JSON.parse(json)
 
-        if (json.data_set) {
+        if (json.data_set !== undefined) {
             const dataSetTemp = new Array<SleepPatternDataSet>()
             json.data_set.forEach(elem => dataSetTemp.push(new SleepPatternDataSet().deserialize(elem)))
             this.setDataSet(dataSetTemp)
         }
-        if (json.summary) this.setSummary(new SleepPatternSummary().deserialize(json.summary))
+        if (json.summary !== undefined) this.setSummary(new SleepPatternSummary().deserialize(json.summary))
 
         return this
     }
@@ -67,7 +67,7 @@ export class SleepPattern implements ISerializable<SleepPattern> {
 /**
  * Name of traceable sleep stages.
  */
-export enum NameSleepStage {
+export enum NameSleepPattern {
     AWAKE = 'awake',
     ASLEEP = 'asleep',
     RESTLESS = 'restless'

@@ -73,11 +73,11 @@ export class Sleep extends Entity implements ISerializable<Sleep> {
     public serialize(): any {
         return {
             id: super.getId(),
-            start_time: this.start_time ? this.start_time.toISOString() : undefined,
-            end_time: this.end_time ? this.end_time.toISOString() : undefined,
+            start_time: this.start_time ? this.start_time.toISOString() : this.start_time,
+            end_time: this.end_time ? this.end_time.toISOString() : this.end_time,
             duration: this.duration,
-            pattern: this.pattern ? this.pattern.serialize() : undefined,
-            user: this.user ? this.user.serialize() : undefined
+            pattern: this.pattern ? this.pattern.serialize() : this.pattern,
+            user: this.user ? this.user.serialize() : this.user
         }
     }
 
@@ -90,12 +90,12 @@ export class Sleep extends Entity implements ISerializable<Sleep> {
         if (!json) return this
         if (typeof json === 'string') json = JSON.parse(json)
 
-        if (json.id) super.setId(json.id)
-        if (json.start_time) this.setStartTime(new Date(json.start_time))
-        if (json.end_time) this.setEndTime(new Date(json.end_time))
+        if (json.id !== undefined) super.setId(json.id)
+        if (json.start_time !== undefined) this.setStartTime(new Date(json.start_time))
+        if (json.end_time !== undefined) this.setEndTime(new Date(json.end_time))
         if (json.duration !== undefined) this.setDuration(json.duration)
-        if (json.pattern) this.setPattern(new SleepPattern().deserialize(json.pattern))
-        if (json.user) this.setUser(new User().deserialize(json.user))
+        if (json.pattern !== undefined) this.setPattern(new SleepPattern().deserialize(json.pattern))
+        if (json.user !== undefined) this.setUser(new User().deserialize(json.user))
 
         return this
     }

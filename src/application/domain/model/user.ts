@@ -32,7 +32,7 @@ export class User extends Entity implements ISerializable<User> {
         if (!json) return this
         if (typeof json === 'string') json = JSON.parse(json)
 
-        if (json.id) this.setId(json.id)
+        if (json.id !== undefined) this.setId(json.id)
 
         return this
     }

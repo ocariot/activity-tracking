@@ -47,7 +47,7 @@ export class SleepPatternDataSet implements ISerializable<SleepPatternDataSet> {
      */
     public serialize(): any {
         return {
-            start_time: this.start_time ? this.start_time.toISOString() : undefined,
+            start_time: this.start_time ? this.start_time.toISOString() : this.start_time,
             name: this.name,
             duration: this.duration
         }
@@ -62,8 +62,8 @@ export class SleepPatternDataSet implements ISerializable<SleepPatternDataSet> {
         if (!json) return this
         if (typeof json === 'string') json = JSON.parse(json)
 
-        if (json.start_time) this.setStartTime(new Date(json.start_time))
-        if (json.name) this.setName(json.name)
+        if (json.start_time !== undefined) this.setStartTime(new Date(json.start_time))
+        if (json.name !== undefined) this.setName(json.name)
         if (json.duration !== undefined) this.setDuration(json.duration)
 
         return this

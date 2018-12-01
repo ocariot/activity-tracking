@@ -51,7 +51,7 @@ export class ActivityLevel implements ISerializable<ActivityLevel> {
         if (!json) return this
         if (typeof json === 'string') json = JSON.parse(json)
 
-        if (json.name) this.setName(json.name)
+        if (json.name !== undefined) this.setName(json.name)
         if (json.duration !== undefined) this.setDuration(json.duration)
 
         return this

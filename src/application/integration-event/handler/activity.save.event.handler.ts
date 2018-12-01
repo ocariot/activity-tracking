@@ -24,6 +24,7 @@ export class ActivitySaveEventHandler implements IIntegrationEventHandler<Activi
 
     public async handle(event: ActivitySaveEvent): Promise<void> {
         const activity: Activity = new Activity().deserialize(event.activity)
+
         try {
             ActivityValidator.validate(activity)
             const activityExist = await this._activityRepository.checkExist(activity)

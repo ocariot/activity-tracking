@@ -4,11 +4,14 @@ import { IIntegrationEventHandler } from '../../src/application/integration-even
 
 export class EventBusRabbimqMock implements IEventBus {
 
-    public publish(event: IntegrationEvent, routing_key: string): void {
+    public publish(event: IntegrationEvent<any>, routing_key: string): void {
         return
     }
 
-    public subscribe(event: IntegrationEvent, handler: IIntegrationEventHandler<IntegrationEvent>, routing_key: string): void {
+    public subscribe(
+        event: IntegrationEvent<any>,
+        handler: IIntegrationEventHandler<IntegrationEvent<any>>,
+        routing_key: string): void {
         return
     }
 

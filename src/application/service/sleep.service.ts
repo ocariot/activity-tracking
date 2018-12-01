@@ -40,7 +40,6 @@ export class SleepService implements ISleepService {
             const sleepSaved: Sleep = await this._sleepRepository.create(sleep)
 
             this.logger.info(`Sleep with ID: ${sleepSaved.getId()} published on event bus...`)
-            console.log(new SleepSaveEvent('SleepSaveEvent', new Date(), sleepSaved))
             this.eventBus.publish(
                 new SleepSaveEvent('SleepSaveEvent', new Date(), sleepSaved),
                 'sleep.save'

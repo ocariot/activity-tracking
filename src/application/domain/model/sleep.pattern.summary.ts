@@ -63,9 +63,11 @@ export class SleepPatternSummary implements ISerializable<SleepPatternSummary> {
         if (!json) return this
         if (typeof json === 'string') json = JSON.parse(json)
 
-        if (json.awake) this.setAwake(new SleepPatternSummaryData(json.awake.count, json.awake.duration))
-        if (json.asleep) this.setAsleep(new SleepPatternSummaryData(json.asleep.count, json.asleep.duration))
-        if (json.restless) this.setRestless(new SleepPatternSummaryData(json.restless.count, json.restless.duration))
+        if (json.awake !== undefined) this.setAwake(new SleepPatternSummaryData(json.awake.count, json.awake.duration))
+        if (json.asleep !== undefined) this.setAsleep(new SleepPatternSummaryData(json.asleep.count, json.asleep.duration))
+        if (json.restless !== undefined) {
+            this.setRestless(new SleepPatternSummaryData(json.restless.count, json.restless.duration))
+        }
 
         return this
     }

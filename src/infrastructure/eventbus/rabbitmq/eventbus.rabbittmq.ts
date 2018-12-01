@@ -12,7 +12,7 @@ import StartConsumerResult = Queue.StartConsumerResult
 
 @injectable()
 export class EventBusRabbitMQ implements IEventBus, IDisposable {
-    private event_handlers: Map<string, IIntegrationEventHandler<IntegrationEvent>>
+    private event_handlers: Map<string, IIntegrationEventHandler<IntegrationEvent<any>>>
     private queue_consumer: boolean
     private queue!: Queue
 
@@ -31,20 +31,20 @@ export class EventBusRabbitMQ implements IEventBus, IDisposable {
      * @param routing_key {string}
      * @return {Promise<void>}
      */
-    public async publish(event: IntegrationEvent, routing_key: string): Promise<void> {
+    public async publish(event: IntegrationEvent<any>, routing_key: string): Promise<void> {
         if (!this._connection.isConnected) await this._connection.tryConnect()
         if (!this._connection.conn) return
 
         await this._connection.conn.completeConfiguration()
 
         const exchange: Exchange = this._connection.conn.declareExchange(
-            this.getExchangeName(), 'topic', { durable: true }) // name, type, options
+            Default.RABBITMQ_EXCHANGE_NAME, 'topic', { durable: true }) // name, type, options
 
-        const message: Message = new Message(event)
+        const message: Message = new Message(event.serialize())
         message.properties.appId = Default.APP_ID
         exchange.send(message, routing_key) // message, key
 
-        this._logger.info(`Publish event: ${event.event_name}`)
+        this._logger.info(`Event "${event.event_name}" published in RabbitMQ.`)
     }
 
     /**
@@ -57,14 +57,14 @@ export class EventBusRabbitMQ implements IEventBus, IDisposable {
      *
      * @return {Promise<void>}
      */
-    public async subscribe(event: IntegrationEvent, handler: IIntegrationEventHandler<IntegrationEvent>,
+    public async subscribe(event: IntegrationEvent<any>, handler: IIntegrationEventHandler<IntegrationEvent<any>>,
                            routing_key: string): Promise<void> {
         if (!this._connection.isConnected) await this._connection.tryConnect()
         if (this.event_handlers.has(event.event_name) || !this._connection.conn) return
 
-        this.queue = this._connection.conn.declareQueue(this.getQueueName(), { durable: true })
+        this.queue = this._connection.conn.declareQueue(Default.RABBITMQ_QUEUE_NAME, { durable: true })
         const exchange: Exchange = this._connection.conn.declareExchange(
-            this.getExchangeName(), 'topic', { durable: true }) // name, type, options
+            Default.RABBITMQ_EXCHANGE_NAME, 'topic', { durable: true }) // name, type, options
         this.event_handlers.set(event.event_name, handler)
 
         await this.queue.bind(exchange, routing_key)
@@ -87,12 +87,12 @@ export class EventBusRabbitMQ implements IEventBus, IDisposable {
             this.queue_consumer = true
             await this.queue
                 .activateConsumer((message: Message) => {
-                    if (message.properties.appId === Default.APP_ID) return
+                    // if (message.properties.appId === Default.APP_ID) return
 
                     this._logger.info(`Bus event message received!`)
                     const event_name: string = message.getContent().event_name
                     if (event_name) {
-                        const event_handler: IIntegrationEventHandler<IntegrationEvent> | undefined =
+                        const event_handler: IIntegrationEventHandler<IntegrationEvent<any>> | undefined =
                             this.event_handlers.get(event_name)
                         if (event_handler) {
                             event_handler.handle(message.getContent())
@@ -103,24 +103,6 @@ export class EventBusRabbitMQ implements IEventBus, IDisposable {
                     this._logger.info('Queue consumer successfully created!')
                 })
         }
-    }
-
-    /**
-     * Retrieve the name of the broker.
-     *
-     * @return {string}
-     */
-    private getExchangeName(): string {
-        return process.env.RABBITMQ_EXCHANGE_NAME || Default.RABBITMQ_EXCHANGE_NAME
-    }
-
-    /**
-     * Retrieve the queue name.
-     *
-     * @return {string}
-     */
-    private getQueueName(): string {
-        return process.env.RABBITMQ_QUEUE_NAME || Default.RABBITMQ_QUEUE_NAME
     }
 
     /**

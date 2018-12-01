@@ -86,11 +86,11 @@ export class Environment extends Entity implements ISerializable<Environment> {
         if (!json) return this
         if (typeof json === 'string') json = JSON.parse(json)
 
-        if (json.id) super.setId(json.id)
-        if (json.timestamp) this.setTimestamp(new Date(json.timestamp))
-        if (json.temperature) this.setTemperature(json.temperature)
-        if (json.humidity) this.setHumidity(json.humidity)
-        if (json.location) this.setLocation(new Location().deserialize(json.location))
+        if (json.id !== undefined) super.setId(json.id)
+        if (json.timestamp !== undefined) this.setTimestamp(new Date(json.timestamp))
+        if (json.temperature !== undefined) this.setTemperature(json.temperature)
+        if (json.humidity !== undefined) this.setHumidity(json.humidity)
+        if (json.location !== undefined) this.setLocation(new Location().deserialize(json.location))
 
         return this
     }

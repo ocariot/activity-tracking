@@ -81,9 +81,12 @@ export class ActivityEntityMapper implements IEntityMapper<Activity, ActivityEnt
         if (json.duration !== undefined) result.setDuration(Number(json.duration))
         if (json.calories !== undefined) result.setCalories(Number(json.calories))
         if (json.steps !== undefined) result.setSteps(Number(json.steps))
-        if (json.levels !== undefined) result.setLevels(json.levels.map(item => new ActivityLevel().deserialize(item)))
+        if (json.levels !== undefined) {
+            const activityLevels: Array<ActivityLevel> = []
+            for (const item of json.levels) activityLevels.push(new ActivityLevel().deserialize(item))
+            result.setLevels(activityLevels)
+        }
         if (json.user !== undefined) result.setUser(new UserEntityMapper().transform(json.user))
-
         return result
     }
 }
