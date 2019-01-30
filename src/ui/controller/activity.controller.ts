@@ -6,13 +6,13 @@ import { Identifier } from '../../di/identifiers'
 import { ApiExceptionManager } from '../exception/api.exception.manager'
 import { Query } from '../../infrastructure/repository/query/query'
 import { ApiException } from '../exception/api.exception'
-import { Activity } from '../../application/domain/model/activity'
+import { PhysicalActivity } from '../../application/domain/model/physical.activity'
 import { IActivityService } from '../../application/port/activity.service.interface'
-import { User } from '../../application/domain/model/user'
+import { Child } from '../../application/domain/model/child'
 import { ILogger } from '../../utils/custom.logger'
 
 /**
- * Controller that implements Activity feature operations.
+ * Controller that implements PhysicalActivity feature operations.
  *
  * @remarks To define paths, we use library inversify-express-utils.
  * @see {@link https://github.com/inversify/inversify-express-utils} for further information.
@@ -21,7 +21,7 @@ import { ILogger } from '../../utils/custom.logger'
 export class ActivityController {
 
     /**
-     * Creates an instance of Activity controller.
+     * Creates an instance of PhysicalActivity controller.
      *
      * @param {IActivityService} _activityService
      * @param {ILogger} _logger
@@ -41,13 +41,13 @@ export class ActivityController {
     @httpPost('/')
     public async addActivity(@request() req: Request, @response() res: Response) {
         try {
-            const user = new User()
+            const user = new Child()
 
-            const activity: Activity = new Activity().deserialize(req.body)
+            const activity: PhysicalActivity = new PhysicalActivity().deserialize(req.body)
             user.setId(req.params.user_id)
             activity.setUser(user)
 
-            const result: Activity = await this._activityService.add(activity)
+            const result: PhysicalActivity = await this._activityService.add(activity)
             return res.status(HttpStatus.CREATED).send(result)
         } catch (err) {
             const handlerError = ApiExceptionManager.build(err)
@@ -57,7 +57,7 @@ export class ActivityController {
     }
 
     /**
-     * Get all activities by user.
+     * Get all activities by child.
      * For the query strings, the query-strings-parser middleware was used.
      * @see {@link https://www.npmjs.com/package/query-strings-parser} for further information.
      *
@@ -78,7 +78,7 @@ export class ActivityController {
     }
 
     /**
-     * Get activity by id and user.
+     * Get activity by id and child.
      * For the query strings, the query-strings-parser middleware was used.
      * @see {@link https://www.npmjs.com/package/query-strings-parser} for further information.
      *
@@ -88,7 +88,7 @@ export class ActivityController {
     @httpGet('/:activity_id')
     public async getActivityByIdAnByUser(@request() req: Request, @response() res: Response): Promise<Response> {
         try {
-            const result: Activity = await this._activityService
+            const result: PhysicalActivity = await this._activityService
                 .getByIdAndUser(req.params.activity_id, req.params.user_id, new Query().deserialize(req.query))
             if (!result) return res.status(HttpStatus.NOT_FOUND).send(this.getMessageNotFoundActivity())
             return res.status(HttpStatus.OK).send(result)
@@ -100,7 +100,7 @@ export class ActivityController {
     }
 
     /**
-     * Update activity by user.
+     * Update activity by child.
      *
      * @param {Request} req
      * @param {Response} res
@@ -108,7 +108,7 @@ export class ActivityController {
     @httpPatch('/:activity_id')
     public async updateActivityByUser(@request() req: Request, @response() res: Response): Promise<Response> {
         try {
-            const activity: Activity = new Activity().deserialize(req.body)
+            const activity: PhysicalActivity = new PhysicalActivity().deserialize(req.body)
             activity.setId(req.params.activity_id)
             const result = await this._activityService.updateByUser(activity, req.params.user_id)
             if (!result) return res.status(HttpStatus.NOT_FOUND).send(this.getMessageNotFoundActivity())
@@ -121,7 +121,7 @@ export class ActivityController {
     }
 
     /**
-     * Remove activity by user.
+     * Remove activity by child.
      *
      * @param {Request} req
      * @param {Response} res
@@ -145,8 +145,8 @@ export class ActivityController {
     private getMessageNotFoundActivity(): object {
         return new ApiException(
             HttpStatus.NOT_FOUND,
-            'Activity not found!',
-            'Activity not found or already removed. A new operation for the same resource is not required!'
+            'PhysicalActivity not found!',
+            'PhysicalActivity not found or already removed. A new operation for the same resource is not required!'
         ).toJson()
     }
 }

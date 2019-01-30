@@ -9,9 +9,9 @@ import { Sleep } from '../domain/model/sleep'
  */
 export interface ISleepService extends IService<Sleep> {
     /**
-     * List the sleep of a user.
+     * List the sleep of a child.
      *
-     * @param idUser User ID.
+     * @param idUser Child ID.
      * @param query Defines object to be used for queries.
      * @return {Promise<Array<Sleep>>}
      * @throws {RepositoryException}
@@ -19,10 +19,10 @@ export interface ISleepService extends IService<Sleep> {
     getAllByUser(idUser: string, query: IQuery): Promise<Array<Sleep>>
 
     /**
-     * Retrieve sleep by unique identifier (ID)  and related user.
+     * Retrieve sleep by unique identifier (ID)  and related child.
      *
      * @param idSleep Sleep unique identifier.
-     * @param idUser User unique identifier.
+     * @param idUser Child unique identifier.
      * @param query Defines object to be used for queries.
      * @return {Promise<Sleep>}
      * @throws {RepositoryException}
@@ -30,20 +30,20 @@ export interface ISleepService extends IService<Sleep> {
     getByIdAndUser(idSleep: string, idUser: string, query: IQuery): Promise<Sleep>
 
     /**
-     * Update user sleep data.
+     * Update child sleep data.
      *
      * @param item Containing the data to be updated
-     * @param idUser User unique identifier.
+     * @param idUser Child unique identifier.
      * @return {Promise<Sleep>}
      * @throws {ValidationException | ConflictException | RepositoryException}
      */
     updateByUser(item: Sleep, idUser: string): Promise<Sleep>
 
     /**
-     * Removes sleep according to its unique identifier and related user.
+     * Removes sleep according to its unique identifier and related child.
      *
      * @param idSleep Sleep unique identifier.
-     * @param idUser User unique identifier.
+     * @param idUser Child unique identifier.
      * @return {Promise<boolean>}
      * @throws {ValidationException | RepositoryException}
      */

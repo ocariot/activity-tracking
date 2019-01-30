@@ -11,7 +11,7 @@ export class MongoDBConnectionFactory implements IConnectionFactory {
         useFindAndModify: false,
         bufferMaxEntries: 0,
         reconnectTries: this.getRetryCount(),
-        reconnectInterval: this.getRetryInterval()
+        reconnectInterval: Default.MONGODB_CON_RETRY_INTERVAL
     }
 
     public createConnection(): Promise<Connection> {
@@ -40,16 +40,7 @@ export class MongoDBConnectionFactory implements IConnectionFactory {
      * @return {number}
      */
     private getRetryCount(): number {
-        const retryCount = Number(process.env.MONGODB_CON_RETRY_COUNT) || Default.MONGODB_CON_RETRY_COUNT
+        const retryCount = Default.MONGODB_CON_RETRY_COUNT
         return (retryCount === 0) ? Number.MAX_SAFE_INTEGER : retryCount
-    }
-
-    /**
-     * Retrieve the time interval in ms for a new attempt to reconnect.
-     *
-     * @return {number}
-     */
-    private getRetryInterval(): number {
-        return Number(process.env.MONGODB_CON_RETRY_INTERVAL) || Default.MONGODB_CON_RETRY_INTERVAL
     }
 }

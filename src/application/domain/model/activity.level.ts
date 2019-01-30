@@ -1,60 +1,54 @@
-import { ISerializable } from '../utils/serializable.interface'
+import { IJSONSerializable } from '../utils/json.serializable.interface'
+import { IJSONDeserializable } from '../utils/json.deserializable.interface'
+import { JsonUtils } from '../utils/json.utils'
 
 /**
  * Entity implementation of the activity levels.
  *
- * @implements {ISerializable<ActivityLevel>}
+ * @implements {IJSONSerializable, IJSONDeserializable<ActivityLevel>}
  */
-export class ActivityLevel implements ISerializable<ActivityLevel> {
-    private name!: string // Name of activity level (sedentary, light, fair or very).
-    private duration!: number // Total time spent in milliseconds on the level.
+export class ActivityLevel implements IJSONSerializable, IJSONDeserializable<ActivityLevel> {
+    private _name!: string // Name of activity level (sedentary, light, fair or very).
+    private _duration!: number // Total time spent in milliseconds on the level.
 
     constructor(name?: string, duration?: number) {
-        if (name) this.setName(name)
-        if (duration) this.setDuration(duration)
+        if (name) this.name = name
+        if (duration) this.duration = duration
     }
 
-    public getName(): string {
-        return this.name
+    get name(): string {
+        return this._name
     }
 
-    public setName(name: string) {
-        this.name = name
+    set name(value: string) {
+        this._name = value
     }
 
-    public getDuration(): number {
-        return this.duration
+    get duration(): number {
+        return this._duration
     }
 
-    public setDuration(duration: number) {
-        this.duration = duration
+    set duration(value: number) {
+        this._duration = value
     }
 
-    /**
-     * Convert this object to json.
-     *
-     * @returns {object}
-     */
-    public serialize(): any {
+    public fromJSON(json: any): ActivityLevel {
+        if (!json) return this
+        if (typeof json === 'string' && JsonUtils.isJsonString(json)) {
+            json = JSON.parse(json)
+        }
+
+        if (json.name !== undefined) this.name = json.name
+        if (json.duration !== undefined) this.duration = json.duration
+
+        return this
+    }
+
+    public toJSON(): any {
         return {
             name: this.name,
             duration: this.duration
         }
-    }
-
-    /**
-     * Transform JSON into ActivityLevel object.
-     *
-     * @param json
-     */
-    public deserialize(json: any): ActivityLevel {
-        if (!json) return this
-        if (typeof json === 'string') json = JSON.parse(json)
-
-        if (json.name !== undefined) this.setName(json.name)
-        if (json.duration !== undefined) this.setDuration(json.duration)
-
-        return this
     }
 }
 

@@ -1,12 +1,12 @@
 import { inject, injectable } from 'inversify'
 import { Identifier } from '../../di/identifiers'
 import { BaseRepository } from './base/base.repository'
-import { IEntityMapper } from '../entity/mapper/entity.mapper.interface'
 import { Query } from './query/query'
 import { ILogger } from '../../utils/custom.logger'
 import { IEnvironmentRepository } from '../../application/port/environment.repository.interface'
 import { Environment } from '../../application/domain/model/environment'
 import { EnvironmentEntity } from '../entity/environment.entity'
+import { IEntityMapper } from '../port/entity.mapper.interface'
 
 /**
  * Implementation of the environment repository.
@@ -25,7 +25,7 @@ export class EnvironmentRepository extends BaseRepository<Environment, Environme
 
     /**
      * Checks if an environment already has a registration.
-     * What differs from one environment to another is the start date and associated user.
+     * What differs from one environment to another is the start date and associated child.
      *
      * @param environment
      * @return {Promise<boolean>} True if it exists or False, otherwise
@@ -34,8 +34,8 @@ export class EnvironmentRepository extends BaseRepository<Environment, Environme
     public async checkExist(environment: Environment): Promise<boolean> {
         const query: Query = new Query()
         return new Promise<boolean>((resolve, reject) => {
-            if (environment.getTimestamp() && environment.getLocation()) {
-                query.filters = { timestamp: environment.getTimestamp(), location: environment.getLocation() }
+            if (environment.measurements && environment.location) {
+                query.filters = { timestamp: environment.measurements, location: environment.location }
             }
             super.findOne(query)
                 .then((result: Environment) => {

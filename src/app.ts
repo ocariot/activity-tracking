@@ -78,8 +78,8 @@ export class App {
             // create application/x-www-form-urlencoded parser
             app.use(bodyParser.urlencoded({ extended: false }))
 
-            app.use(morgan(':remote-addr :remote-user ":method :url HTTP/:http-version" ' +
-                ':status :res[content-length] :response-time ms ":referrer" ":user-agent"', {
+            app.use(morgan(':remote-addr :remote-child ":method :url HTTP/:http-version" ' +
+                ':status :res[content-length] :response-time ms ":referrer" ":child-agent"', {
                     stream: { write: (str: string) => this._logger.info(str) }
                 }
             ))

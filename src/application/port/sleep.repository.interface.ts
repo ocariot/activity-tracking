@@ -3,35 +3,35 @@ import { Sleep } from '../domain/model/sleep'
 
 /**
  * Interface of the sleep repository.
- * Must be implemented by the user repository at the infrastructure layer.
+ * Must be implemented by the sleep repository at the infrastructure layer.
  *
  * @see {@link SleepRepository} for further information.
  * @extends {IRepository<Sleep>}
  */
 export interface ISleepRepository extends IRepository<Sleep> {
     /**
-     * Update user sleep data.
+     * Update child sleep data.
      *
      * @param sleep Containing the data to be updated
-     * @param idUser User unique identifier.
+     * @param childId Child unique identifier.
      * @return {Promise<Sleep>}
      * @throws {ValidationException | ConflictException | RepositoryException}
      */
-    updateByUser(sleep: Sleep, idUser: string): Promise<Sleep>
+    updateByChild(sleep: Sleep, childId: string): Promise<Sleep>
 
     /**
-     * Removes sleep according to its unique identifier and related user.
+     * Removes sleep according to its unique identifier and related child.
      *
-     * @param idSleep Sleep unique identifier.
-     * @param idUser User unique identifier.
+     * @param sleepId Sleep unique identifier.
+     * @param childId Child unique identifier.
      * @return {Promise<boolean>}
      * @throws {ValidationException | RepositoryException}
      */
-    removeByUser(idSleep: string | number, idUser: string): Promise<boolean>
+    removeByChild(sleepId: string | number, childId: string): Promise<boolean>
 
     /**
      * Checks if an sleep already has a registration.
-     * What differs from one sleep to another is the start date and associated user.
+     * What differs from one sleep to another is the start date and associated child.
      *
      * @param sleep
      * @return {Promise<boolean>} True if it exists or False, otherwise

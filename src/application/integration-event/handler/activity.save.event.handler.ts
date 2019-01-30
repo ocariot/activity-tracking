@@ -2,10 +2,10 @@ import { inject } from 'inversify'
 import { Identifier } from '../../../di/identifiers'
 import { IIntegrationEventHandler } from './integration.event.handler.interface'
 import { ActivitySaveEvent } from '../event/activity.save.event'
-import { Activity } from '../../domain/model/activity'
+import { PhysicalActivity } from '../../domain/model/physical.activity'
 import { CustomLogger } from '../../../utils/custom.logger'
 import { IActivityRepository } from '../../port/activity.repository.interface'
-import { ActivityValidator } from '../../domain/validator/activity.validator'
+import { CreatePhysicalActivityValidator } from '../../domain/validator/create.physical.activity.validator'
 import { ConflictException } from '../../domain/exception/conflict.exception'
 
 export class ActivitySaveEventHandler implements IIntegrationEventHandler<ActivitySaveEvent> {
@@ -23,16 +23,16 @@ export class ActivitySaveEventHandler implements IIntegrationEventHandler<Activi
     }
 
     public async handle(event: ActivitySaveEvent): Promise<void> {
-        const activity: Activity = new Activity().deserialize(event.activity)
+        const activity: PhysicalActivity = new PhysicalActivity().fromJSON(event.activity)
 
         try {
-            ActivityValidator.validate(activity)
+            CreatePhysicalActivityValidator.validate(activity)
             const activityExist = await this._activityRepository.checkExist(activity)
-            if (activityExist) throw new ConflictException('Activity is already registered...')
+            if (activityExist) throw new ConflictException('PhysicalActivity is already registered...')
 
             await this._activityRepository
                 .create(activity)
-                .then((result: Activity) => {
+                .then((result: PhysicalActivity) => {
                     this._logger.info(`Action for event ${event.event_name} successfully held!`)
                 })
         } catch (err) {

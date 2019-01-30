@@ -1,41 +1,41 @@
 import { IRepository } from './repository.interface'
-import { Activity } from '../domain/model/activity'
+import { PhysicalActivity } from '../domain/model/physical.activity'
 
 /**
  * Interface of the activity repository.
- * Must be implemented by the user repository at the infrastructure layer.
+ * Must be implemented by the activity repository at the infrastructure layer.
  *
  * @see {@link ActivityRepository} for further information.
- * @extends {IRepository<Activity>}
+ * @extends {IRepository<PhysicalActivity>}
  */
-export interface IActivityRepository extends IRepository<Activity> {
+export interface IActivityRepository extends IRepository<PhysicalActivity> {
     /**
-     * Update user activity data.
+     * Update child activity data.
      *
      * @param activity Containing the data to be updated
-     * @param idUser User unique identifier.
-     * @return {Promise<Activity>}
+     * @param childId Child unique identifier.
+     * @return {Promise<PhysicalActivity>}
      * @throws {ValidationException | ConflictException | RepositoryException}
      */
-    updateByUser(activity: Activity, idUser: string): Promise<Activity>
+    updateByChild(activity: PhysicalActivity, childId: string): Promise<PhysicalActivity>
 
     /**
-     * Removes activity according to its unique identifier and related user.
+     * Removes activity according to its unique identifier and related child.
      *
-     * @param idActivity Activity unique identifier.
-     * @param idUser User unique identifier.
+     * @param activityId PhysicalActivity unique identifier.
+     * @param childId Child unique identifier.
      * @return {Promise<boolean>}
      * @throws {ValidationException | RepositoryException}
      */
-    removeByUser(idActivity: string | number, idUser: string): Promise<boolean>
+    removeByChild(activityId: string | number, childId: string): Promise<boolean>
 
     /**
      * Checks if an activity already has a registration.
-     * What differs from one activity to another is the start date and associated user.
+     * What differs from one activity to another is the start date and associated child.
      *
      * @param activity
      * @return {Promise<boolean>} True if it exists or False, otherwise
      * @throws {ValidationException | RepositoryException}
      */
-    checkExist(activity: Activity): Promise<boolean>
+    checkExist(activity: PhysicalActivity): Promise<boolean>
 }

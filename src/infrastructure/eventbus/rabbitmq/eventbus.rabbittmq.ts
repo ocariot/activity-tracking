@@ -40,7 +40,7 @@ export class EventBusRabbitMQ implements IEventBus, IDisposable {
         const exchange: Exchange = this._connection.conn.declareExchange(
             Default.RABBITMQ_EXCHANGE_NAME, 'topic', { durable: true }) // name, type, options
 
-        const message: Message = new Message(event.serialize())
+        const message: Message = new Message(event.toJSON())
         message.properties.appId = Default.APP_ID
         exchange.send(message, routing_key) // message, key
 

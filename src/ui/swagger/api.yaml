@@ -13,13 +13,13 @@ servers:
   url: http:://127.0.0.1:3000/api/v1
 tags:
   - name: activities
-    description: Operations for the Activity resource. Useful for users with administrator permissions.
+    description: Operations for the PhysicalActivity resource. Useful for users with administrator permissions.
   - name: users.activities
-    description: Operations for user Activity resource.
+    description: Operations for child PhysicalActivity resource.
   - name: sleep
     description: Operations for the Sleep feature. Useful for users with administrator permissions.
   - name: users.sleep
-    description: Operations for user Sleep resource.
+    description: Operations for child Sleep resource.
   - name: environments
 
 paths:
@@ -34,7 +34,7 @@ paths:
         - in: path
           name: user_id
           required: true
-          description: Id of user.
+          description: Id of child.
           example: 5a62be07d6f33400146c9b61
           schema:
             type: string
@@ -51,7 +51,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/Activity'
+                  $ref: '#/components/schemas/PhysicalActivity'
         '401':
           description: Authentication failed due to invalid authentication credentials.
           content:
@@ -59,7 +59,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/Error'
         '403':
-          description: User does not have permission to get activities.
+          description: Child does not have permission to get activities.
           content:
             application/json:
               schema:
@@ -107,7 +107,7 @@ paths:
         - in: path
           name: user_id
           required: true
-          description: Id of user.
+          description: Id of child.
           example: 5a62be07d6f33400146c9b61
           schema:
             type: string
@@ -124,7 +124,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/Activity'
+                  $ref: '#/components/schemas/PhysicalActivity'
         '401':
           description: Authentication failed due to invalid authentication credentials.
           content:
@@ -132,7 +132,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/Error'
         '403':
-          description: User does not have permission to get activities.
+          description: Child does not have permission to get activities.
           content:
             application/json:
               schema:
@@ -174,22 +174,22 @@ paths:
         - users.activities
       summary: Register activity.
       operationId: saveActivity
-      description: Register a new activity and associate it to an user.
+      description: Register a new activity and associate it to an child.
       parameters:
         - in: path
           name: user_id
           required: true
-          description: Id of user.
+          description: Id of child.
           example: 5a62be07d6f33400146c9b61
           schema:
             type: string
       responses:
         '201':
-          description: Activity saved sucessfully.
+          description: PhysicalActivity saved sucessfully.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Activity'
+                $ref: '#/components/schemas/PhysicalActivity'
         '207':
           description: Successful request, however, can have several status codes for the case of a list of submitted resources.
           content:
@@ -212,7 +212,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/Error'
         '403':
-          description: User does not have permission to register activities.
+          description: Child does not have permission to register activities.
           content:
             application/json:
               schema:
@@ -259,13 +259,13 @@ paths:
                 $ref: '#/components/schemas/Error'
       requestBody:
         required: true
-        description: Activity to be insert
+        description: PhysicalActivity to be insert
         content:
           application/json:
             schema:
               type: array
               items:
-                $ref: '#/components/schemas/Activity'
+                $ref: '#/components/schemas/PhysicalActivity'
 
   /users/{user_id}/activities/{activity_id}:
     get:
@@ -273,12 +273,12 @@ paths:
         - users.activities
       summary: Recover activity data.
       operationId: getActivitiyById
-      description: Recover the activity data associated with an user.
+      description: Recover the activity data associated with an child.
       parameters:
         - in: path
           name: user_id
           required: true
-          description: Id of user.
+          description: Id of child.
           example: 5a62be07d6f33400146c9b61
           schema:
             type: string
@@ -295,7 +295,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Activity'
+                $ref: '#/components/schemas/PhysicalActivity'
         '401':
           description: Authentication failed due to invalid authentication credentials.
           content:
@@ -303,7 +303,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/Error'
         '403':
-          description: User does not have permission to get activities.
+          description: Child does not have permission to get activities.
           content:
             application/json:
               schema:
@@ -350,7 +350,7 @@ paths:
         - in: path
           name: user_id
           required: true
-          description: Id of user.
+          description: Id of child.
           example: 5a62be07d6f33400146c9b61
           schema:
             type: string
@@ -367,7 +367,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Activity'
+                $ref: '#/components/schemas/PhysicalActivity'
         '401':
           description: Authentication failed due to invalid authentication credentials.
           content:
@@ -375,7 +375,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/Error'
         '403':
-          description: User does not have permission to update activity data.
+          description: Child does not have permission to update activity data.
           content:
             application/json:
               schema:
@@ -431,7 +431,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/Activity'
+              $ref: '#/components/schemas/PhysicalActivity'
         description: Data of the activity to be updated.
         required: true
     delete:
@@ -444,7 +444,7 @@ paths:
         - in: path
           name: user_id
           required: true
-          description: Id of user.
+          description: Id of child.
           example: 5a62be07d6f33400146c9b61
           schema:
             type: string
@@ -465,7 +465,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/Error'
         '403':
-          description: User does not have permission to delete activities.
+          description: Child does not have permission to delete activities.
           content:
             application/json:
               schema:
@@ -513,7 +513,7 @@ paths:
         - in: path
           name: user_id
           required: true
-          description: Id of user.
+          description: Id of child.
           example: 5a62be07d6f33400146c9b61
           schema:
             type: string
@@ -538,7 +538,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/Error'
         '403':
-          description: User does not have permission to get sleep.
+          description: Child does not have permission to get sleep.
           content:
             application/json:
               schema:
@@ -580,14 +580,14 @@ paths:
     get:
       tags:
         - users.sleep
-      summary: Recover sleep record of user.
+      summary: Recover sleep record of child.
       operationId: getAllSleepByUser
       description: Returns list with sleep record. The query supports field selection, pagination, sorting, and filtering.
       parameters:
         - in: path
           name: user_id
           required: true
-          description: Id of user.
+          description: Id of child.
           example: 5a62be07d6f33400146c9b61
           schema:
             type: string
@@ -612,7 +612,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/Error'
         '403':
-          description: User does not have permission to get sleep.
+          description: Child does not have permission to get sleep.
           content:
             application/json:
               schema:
@@ -654,12 +654,12 @@ paths:
         - users.sleep
       summary: Register sleep.
       operationId: saveSleep
-      description: Register a new sleep and associate it to an user.
+      description: Register a new sleep and associate it to an child.
       parameters:
         - in: path
           name: user_id
           required: true
-          description: Id of user.
+          description: Id of child.
           example: 5a62be07d6f33400146c9b61
           schema:
             type: string
@@ -692,7 +692,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/Error'
         '403':
-          description: User does not have permission to register activities.
+          description: Child does not have permission to register activities.
           content:
             application/json:
               schema:
@@ -738,7 +738,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/Error'
       requestBody:
-        description: Activity to be insert
+        description: PhysicalActivity to be insert
         required: true
         content:
           application/json:
@@ -753,12 +753,12 @@ paths:
         - users.sleep
       summary: Recover sleep data.
       operationId: getSleepById
-      description: Recover the sleep data associated with an user.
+      description: Recover the sleep data associated with an child.
       parameters:
         - in: path
           name: user_id
           required: true
-          description: Id of user.
+          description: Id of child.
           example: 5a62be07d6f33400146c9b61
           schema:
             type: string
@@ -783,7 +783,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/Error'
         '403':
-          description: User does not have permission to get sleep.
+          description: Child does not have permission to get sleep.
           content:
             application/json:
               schema:
@@ -830,7 +830,7 @@ paths:
         - in: path
           name: user_id
           required: true
-          description: Id of user.
+          description: Id of child.
           example: 5a62be07d6f33400146c9b61
           schema:
             type: string
@@ -855,7 +855,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/Error'
         '403':
-          description: User does not have permission to update sleep data.
+          description: Child does not have permission to update sleep data.
           content:
             application/json:
               schema:
@@ -911,7 +911,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/Activity'
+              $ref: '#/components/schemas/PhysicalActivity'
         description: Data of the activity to be updated.
         required: true
     delete:
@@ -924,7 +924,7 @@ paths:
         - in: path
           name: user_id
           required: true
-          description: Id of user.
+          description: Id of child.
           example: 5a62be07d6f33400146c9b61
           schema:
             type: string
@@ -945,7 +945,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/Error'
         '403':
-          description: User does not have permission to delete sleep.
+          description: Child does not have permission to delete sleep.
           content:
             application/json:
               schema:
@@ -1012,7 +1012,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/Error'
         '403':
-          description: User does not have permission to get sleep.
+          description: Child does not have permission to get sleep.
           content:
             application/json:
               schema:
@@ -1084,7 +1084,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/Error'
         '403':
-          description: User does not have permission to register activities.
+          description: Child does not have permission to register activities.
           content:
             application/json:
               schema:
@@ -1162,7 +1162,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/Error'
         '403':
-          description: User does not have permission to delete environmental measurement.
+          description: Child does not have permission to delete environmental measurement.
           content:
             application/json:
               schema:
@@ -1334,11 +1334,11 @@ components:
           example: walk
         start_time:
           type: string
-          description: Activity start time according to the UTC.
+          description: PhysicalActivity start time according to the UTC.
           example: "2018-08-15T14:03:40Z"
         end_time:
           type: string
-          description: Activity end time according to the UTC.
+          description: PhysicalActivity end time according to the UTC.
           example: "2018-08-15T14:19:21Z"
         duration:
           type: integer
@@ -1354,7 +1354,7 @@ components:
           example: 1340
         levels:
           type: array
-          description: Activity levels.
+          description: PhysicalActivity levels.
           items:
             type: object
             properties:
@@ -1376,7 +1376,7 @@ components:
         user:
           type: object
           readOnly: true
-          description: User belonging to activity
+          description: Child belonging to activity
           properties:
             id:
               type: string
@@ -1536,7 +1536,7 @@ components:
         user:
           type: object
           readOnly: true
-          description: User belonging to activity
+          description: Child belonging to activity
           properties:
             id:
               type: string

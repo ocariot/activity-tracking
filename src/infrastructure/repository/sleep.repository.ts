@@ -1,12 +1,12 @@
 import { inject, injectable } from 'inversify'
 import { Identifier } from '../../di/identifiers'
 import { BaseRepository } from './base/base.repository'
-import { IEntityMapper } from '../entity/mapper/entity.mapper.interface'
 import { Query } from './query/query'
 import { ILogger } from '../../utils/custom.logger'
 import { ISleepRepository } from '../../application/port/sleep.repository.interface'
 import { Sleep } from '../../application/domain/model/sleep'
 import { SleepEntity } from '../entity/sleep.entity'
+import { IEntityMapper } from '../port/entity.mapper.interface'
 
 /**
  * Implementation of the sleep repository.
@@ -25,7 +25,7 @@ export class SleepRepository extends BaseRepository<Sleep, SleepEntity> implemen
 
     /**
      * Checks if an sleep already has a registration.
-     * What differs from one sleep to another is the start date and associated user.
+     * What differs from one sleep to another is the start date and associated child.
      *
      * @param sleep
      * @return {Promise<boolean>} True if it exists or False, otherwise
@@ -34,8 +34,8 @@ export class SleepRepository extends BaseRepository<Sleep, SleepEntity> implemen
     public async checkExist(sleep: Sleep): Promise<boolean> {
         const query: Query = new Query()
         return new Promise<boolean>((resolve, reject) => {
-            if (sleep.getStartTime() && sleep.getUser()) {
-                query.filters = { start_time: sleep.getStartTime(), user: sleep.getUser().getId() }
+            if (sleep.start_time && sleep.child_id) {
+                query.filters = { start_time: sleep.start_time, child: sleep.child_id }
             }
             super.findOne(query)
                 .then((result: Sleep) => {
@@ -47,17 +47,17 @@ export class SleepRepository extends BaseRepository<Sleep, SleepEntity> implemen
     }
 
     /**
-     * Update user sleep data.
+     * Update child sleep data.
      *
      * @param sleep Containing the data to be updated
-     * @param idUser User unique identifier.
+     * @param childId Child unique identifier.
      * @return {Promise<T>}
      * @throws {ValidationException | ConflictException | RepositoryException}
      */
-    public updateByUser(sleep: Sleep, idUser: string): Promise<Sleep> {
+    public updateByChild(sleep: Sleep, childId: string): Promise<Sleep> {
         const itemUp: SleepEntity = this.sleepMapper.transform(sleep)
         return new Promise<Sleep>((resolve, reject) => {
-            this.Model.findOneAndUpdate({ user: idUser, _id: itemUp.getId() }, itemUp, { new: true })
+            this.Model.findOneAndUpdate({ child_id: childId, _id: itemUp.id }, itemUp, { new: true })
                 .exec()
                 .then(result => {
                     if (!result) return resolve(undefined)
@@ -68,16 +68,16 @@ export class SleepRepository extends BaseRepository<Sleep, SleepEntity> implemen
     }
 
     /**
-     * Removes sleep according to its unique identifier and related user.
+     * Removes sleep according to its unique identifier and related child.
      *
-     * @param idSleep Unique identifier.
-     * @param idUser User unique identifier.
+     * @param sleepId Unique identifier.
+     * @param childId Child unique identifier.
      * @return {Promise<boolean>}
      * @throws {ValidationException | RepositoryException}
      */
-    public removeByUser(idSleep: string | number, idUser: string): Promise<boolean> {
+    public removeByChild(sleepId: string | number, childId: string): Promise<boolean> {
         return new Promise<boolean>((resolve, reject) => {
-            this.Model.findOneAndDelete({ user: idUser, _id: idSleep })
+            this.Model.findOneAndDelete({ child: childId, _id: sleepId })
                 .exec()
                 .then(result => {
                     if (!result) return resolve(false)

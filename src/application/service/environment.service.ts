@@ -5,7 +5,7 @@ import { IEnvironmentRepository } from '../port/environment.repository.interface
 import { IEnvironmentService } from '../port/environment.service.interface'
 import { Environment } from '../domain/model/environment'
 import { IQuery } from '../port/query.interface'
-import { EnvironmentValidator } from '../domain/validator/environment.validator'
+import { CreateEnvironmentValidator } from '../domain/validator/create.environment.validator'
 import { IEventBus } from '../../infrastructure/port/event.bus.interface'
 import { ILogger } from '../../utils/custom.logger'
 import { EnvironmentSaveEvent } from '../integration-event/event/environment.save.event'
@@ -33,7 +33,7 @@ export class EnvironmentService implements IEnvironmentService {
      * @throws {ConflictException | RepositoryException} If a data conflict occurs, as an existing environment.
      */
     public async add(environment: Environment): Promise<Environment> {
-        EnvironmentValidator.validate(environment)
+        CreateEnvironmentValidator.validate(environment)
         const environmentExist = await this._environmentRepository.checkExist(environment)
         if (environmentExist) throw new ConflictException('Measurement of environment is already registered...')
         try {

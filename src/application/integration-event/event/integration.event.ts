@@ -1,15 +1,11 @@
-import { ISerializable } from '../../domain/utils/serializable.interface'
+import { IJSONSerializable } from '../../domain/utils/json.serializable.interface'
 
-export abstract class IntegrationEvent<T> implements ISerializable<T> {
+export abstract class IntegrationEvent<T> implements IJSONSerializable {
 
     protected constructor(readonly event_name: string, readonly timestamp?: Date) {
     }
 
-    public serialize(): any {
-        throw new Error('Not implemented!')
-    }
-
-    public deserialize(item: any): T {
+    public toJSON(): any {
         throw new Error('Not implemented!')
     }
 }

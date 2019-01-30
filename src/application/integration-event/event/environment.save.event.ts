@@ -11,7 +11,7 @@ export class EnvironmentSaveEvent extends IntegrationEvent<Environment> {
         return {
             event_name: this.event_name,
             timestamp: this.timestamp,
-            environment: this.environment.serialize()
+            environment: this.environment.toJSON()
         }
     }
 }

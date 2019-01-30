@@ -3,7 +3,7 @@ import { Environment } from '../domain/model/environment'
 
 /**
  * Interface of the Environment repository.
- * Must be implemented by the user repository at the infrastructure layer.
+ * Must be implemented by the child repository at the infrastructure layer.
  *
  * @see {@link EnvironmentRepository} for further information.
  * @extends {IRepository<Environment>}

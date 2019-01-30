@@ -30,35 +30,17 @@ export class Pagination implements IPagination {
         this._limit = value
     }
 
-    /**
-     * Called as default when the object
-     * is displayed in console.log()
-     */
-    public toJSON(): string {
-        return JSON.stringify(this.serialize())
-    }
-
-    /**
-     * Convert this object to json.
-     *
-     * @returns {any}
-     */
-    public serialize(): any {
-        return {
-            page: this.page,
-            limit: this.limit
-        }
-    }
-
-    /**
-     * Transform JSON into Pagination object.
-     *
-     * @param json
-     */
-    public deserialize(json: any): Pagination {
+    public fromJSON(json: any): Pagination {
         if (!json) return this
         if (json.page) this.page = json.page
         if (json.limit) this.limit = json.limit
         return this
+    }
+
+    public toJSON(): any {
+        return {
+            page: this.page,
+            limit: this.limit
+        }
     }
 }

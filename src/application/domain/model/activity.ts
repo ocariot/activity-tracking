@@ -1,147 +1,78 @@
 import { Entity } from './entity'
-import { User } from './user'
-import { ISerializable } from '../utils/serializable.interface'
-import { ActivityLevel } from './activity.level'
+import { IJSONSerializable } from '../utils/json.serializable.interface'
+import { IJSONDeserializable } from '../utils/json.deserializable.interface'
+import { JsonUtils } from '../utils/json.utils'
 
 /**
  * Implementation of the activity entity.
  *
  * @extends {Entity}
- * @implements {ISerializable<Activity>}
+ * @implements { IJSONSerializable, IJSONDeserializable<Activity>
  */
-export class Activity extends Entity implements ISerializable<Activity> {
-    private name?: string // Name of activity, for example: Walk, Run, swim...
-    private start_time?: Date // Activity start time according to the UTC.
-    private end_time?: Date // Activity end time according to the UTC.
-    private duration?: number // Total time in milliseconds spent in the activity.
-    private calories?: number // Calories spent during activity.
-    private steps?: number // Number of steps taken during the activity.
-    private levels?: Array<ActivityLevel> // Activity levels (sedentary, light, fair or very).
-    private user!: User // User belonging to activity.
+export class Activity extends Entity implements IJSONSerializable, IJSONDeserializable<Activity> {
+    private _start_time?: Date // PhysicalActivity start time according to the UTC.
+    private _end_time?: Date // PhysicalActivity end time according to the UTC.
+    private _duration?: number // Total time in milliseconds spent in the activity.
+    private _child_id!: string // Child ID belonging to activity.
 
-    constructor(name?: string, start_time?: Date, end_time?: Date, duration?: number, calories?: number,
-                steps?: number, levels?: Array<ActivityLevel>, user?: User, id?: string) {
-        super(id)
-        this.name = name
-        this.start_time = start_time
-        this.end_time = end_time
-        this.duration = duration
-        this.calories = calories
-        this.steps = steps
-        this.levels = levels
-        this.setUser(user)
+    constructor() {
+        super()
     }
 
-    public getName(): string | undefined {
-        return this.name
+    get start_time(): Date | undefined {
+        return this._start_time
     }
 
-    public setName(value: string | undefined) {
-        this.name = value
+    set start_time(value: Date | undefined) {
+        this._start_time = value
     }
 
-    public getStartTime(): Date | undefined {
-        return this.start_time
+    get end_time(): Date | undefined {
+        return this._end_time
     }
 
-    public setStartTime(value: Date | undefined) {
-        this.start_time = value
+    set end_time(value: Date | undefined) {
+        this._end_time = value
     }
 
-    public getEndTime(): Date | undefined {
-        return this.end_time
+    get duration(): number | undefined {
+        return this._duration
     }
 
-    public setEndTime(value: Date | undefined) {
-        this.end_time = value
+    set duration(value: number | undefined) {
+        this._duration = value
     }
 
-    public getDuration(): number | undefined {
-        return this.duration
+    get child_id(): string {
+        return this._child_id
     }
 
-    public setDuration(value: number | undefined) {
-        this.duration = value
+    set child_id(value: string) {
+        this._child_id = value
     }
 
-    public getCalories(): number | undefined {
-        return this.calories
-    }
-
-    public setCalories(value: number | undefined) {
-        this.calories = value
-    }
-
-    public getSteps(): number | undefined {
-        return this.steps
-    }
-
-    public setSteps(value: number | undefined) {
-        this.steps = value
-    }
-
-    public getLevels(): Array<ActivityLevel> | undefined {
-        return this.levels
-    }
-
-    public setLevels(levels: Array<ActivityLevel> | undefined) {
-        this.levels = levels
-    }
-
-    public getUser(): User {
-        return this.user
-    }
-
-    public setUser(value: User | undefined) {
-        if (value) this.user = value
-    }
-
-    /**
-     * Called as default when the object
-     * is displayed in console.log()
-     */
-    public toJSON(): string {
-        return this.serialize()
-    }
-
-    /**
-     * Convert this object to json.
-     *
-     * @returns {any}
-     */
-    public serialize(): any {
-        return {
-            id: this.getId(),
-            name: this.name,
-            start_time: this.start_time ? this.start_time.toISOString() : this.start_time,
-            end_time: this.end_time ? this.end_time.toISOString() : this.end_time,
-            duration: this.duration,
-            calories: this.calories,
-            steps: this.steps,
-            levels: this.levels ? this.levels.map(item => item.serialize()) : this.levels,
-            user: this.user ? this.user.serialize() : this.user
-        }
-    }
-
-    /**
-     * Transform JSON into Activity object.
-     *
-     * @param json
-     */
-    public deserialize(json: any): Activity {
+    public fromJSON(json: any): Activity {
         if (!json) return this
-        if (typeof json === 'string') json = JSON.parse(json)
+        if (typeof json === 'string' && JsonUtils.isJsonString(json)) {
+            json = JSON.parse(json)
+        }
 
-        if (json.id !== undefined) super.setId(json.id)
-        if (json.name !== undefined) this.setName(json.name)
-        if (json.start_time !== undefined) this.setStartTime(new Date(json.start_time))
-        if (json.end_time !== undefined) this.setEndTime(new Date(json.end_time))
-        if (json.duration !== undefined) this.setDuration(json.duration)
-        if (json.calories !== undefined) this.setCalories(json.calories)
-        if (json.steps !== undefined) this.setSteps(json.steps)
-        if (json.levels !== undefined) this.setLevels(json.levels.map(item => new ActivityLevel().deserialize(item)))
-        if (json.user !== undefined) this.setUser(new User().deserialize(json.user))
+        if (json.id !== undefined) super.id = json.id
+        if (json.start_time !== undefined) this.start_time = new Date(json.start_time)
+        if (json.end_time !== undefined) this.end_time = new Date(json.end_time)
+        if (json.duration !== undefined) this.end_time = json.duration
+        if (json.child_id !== undefined) this.child_id = json.child_id
 
         return this
+    }
+
+    public toJSON(): any {
+        return {
+            id: super.id,
+            start_time: this.start_time,
+            end_time: this.end_time,
+            duration: this.duration,
+            child_id: this.child_id
+        }
     }
 }

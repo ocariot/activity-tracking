@@ -7,13 +7,13 @@ import { IActivityService } from '../application/port/activity.service.interface
 import { ActivityService } from '../application/service/activity.service'
 import { IActivityRepository } from '../application/port/activity.repository.interface'
 import { ActivityRepository } from '../infrastructure/repository/activity.repository'
-import { UserEntity } from '../infrastructure/entity/user.entity'
+import { UserEntity } from '../infrastructure/entity/child.entity'
 import { ActivityEntity } from '../infrastructure/entity/activity.entity'
 import { ActivityRepoModel } from '../infrastructure/database/schema/activity.schema'
-import { UserEntityMapper } from '../infrastructure/entity/mapper/user.entity.mapper'
+import { UserEntityMapper } from '../infrastructure/entity/mapper/child.entity.mapper'
 import { ActivityEntityMapper } from '../infrastructure/entity/mapper/activity.entity.mapper'
 import { IEntityMapper } from '../infrastructure/entity/mapper/entity.mapper.interface'
-import { User } from '../application/domain/model/user'
+import { Child } from '../application/domain/model/child'
 import { RabbitMQConnectionFactory } from '../infrastructure/eventbus/rabbitmq/rabbitmp.connection.factory'
 import { RabbitMQConnection } from '../infrastructure/eventbus/rabbitmq/rabbitmq.connection'
 import { EventBusRabbitMQ } from '../infrastructure/eventbus/rabbitmq/eventbus.rabbittmq'
@@ -23,7 +23,7 @@ import { IDBConnection } from '../infrastructure/port/db.connection.interface'
 import { IRabbitMQConnection } from '../infrastructure/port/rabbitmq.connection.interface'
 import { IConnectionFactory } from '../infrastructure/port/connection.factory.interface'
 import { IEventBus } from '../infrastructure/port/event.bus.interface'
-import { Activity } from '../application/domain/model/activity'
+import { PhysicalActivity } from '../application/domain/model/physical.activity'
 import { BackgroundService } from '../background/background.service'
 import { App } from '../app'
 import { CustomLogger, ILogger } from '../utils/custom.logger'
@@ -123,10 +123,10 @@ export class DI {
 
         // Mappers
         this.container
-            .bind<IEntityMapper<User, UserEntity>>(Identifier.USER_ENTITY_MAPPER)
+            .bind<IEntityMapper<Child, UserEntity>>(Identifier.USER_ENTITY_MAPPER)
             .to(UserEntityMapper).inSingletonScope()
         this.container
-            .bind<IEntityMapper<Activity, ActivityEntity>>(Identifier.ACTIVITY_ENTITY_MAPPER)
+            .bind<IEntityMapper<PhysicalActivity, ActivityEntity>>(Identifier.ACTIVITY_ENTITY_MAPPER)
             .to(ActivityEntityMapper).inSingletonScope()
         this.container
             .bind<IEntityMapper<Environment, EnvironmentEntity>>(Identifier.ENVIRONMENT_ENTITY_MAPPER)

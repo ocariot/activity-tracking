@@ -6,7 +6,7 @@ import { Identifier } from '../../di/identifiers'
 import { ApiExceptionManager } from '../exception/api.exception.manager'
 import { Query } from '../../infrastructure/repository/query/query'
 import { ApiException } from '../exception/api.exception'
-import { User } from '../../application/domain/model/user'
+import { Child } from '../../application/domain/model/child'
 import { ILogger } from '../../utils/custom.logger'
 import { ISleepService } from '../../application/port/sleep.service.interface'
 import { Sleep } from '../../application/domain/model/sleep'
@@ -41,7 +41,7 @@ export class SleepController {
     @httpPost('/')
     public async addSleep(@request() req: Request, @response() res: Response) {
         try {
-            const user = new User()
+            const user = new Child()
             const sleep: Sleep = new Sleep().deserialize(req.body)
             user.setId(req.params.user_id)
             sleep.setUser(user)
@@ -56,7 +56,7 @@ export class SleepController {
     }
 
     /**
-     * Get all sleep by user.
+     * Get all sleep by child.
      * For the query strings, the query-strings-parser middleware was used.
      * @see {@link https://www.npmjs.com/package/query-strings-parser} for further information.
      *
@@ -77,7 +77,7 @@ export class SleepController {
     }
 
     /**
-     * Get sleep by id and user.
+     * Get sleep by id and child.
      * For the query strings, the query-strings-parser middleware was used.
      * @see {@link https://www.npmjs.com/package/query-strings-parser} for further information.
      *
@@ -99,7 +99,7 @@ export class SleepController {
     }
 
     /**
-     * Update sleep by user.
+     * Update sleep by child.
      *
      * @param {Request} req
      * @param {Response} res
@@ -120,7 +120,7 @@ export class SleepController {
     }
 
     /**
-     * Remove sleep by user.
+     * Remove sleep by child.
      *
      * @param {Request} req
      * @param {Response} res

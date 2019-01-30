@@ -5,17 +5,17 @@
  * @abstract
  */
 export class Entity {
-    private id?: string
+    private _id?: string
 
     protected constructor(id?: string) {
-        this.id = id
+        this._id = id
     }
 
-    public getId(): string | undefined {
-        return this.id
+    get id(): string | undefined {
+        return this._id
     }
 
-    public setId(value: string | undefined) {
-        if (value) this.id = value
+    set id(value: string | undefined) {
+        this._id = value
     }
 }

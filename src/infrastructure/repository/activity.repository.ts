@@ -1,12 +1,12 @@
 import { inject, injectable } from 'inversify'
 import { Identifier } from '../../di/identifiers'
 import { IActivityRepository } from '../../application/port/activity.repository.interface'
-import { Activity } from '../../application/domain/model/activity'
+import { PhysicalActivity } from '../../application/domain/model/physical.activity'
 import { ActivityEntity } from '../entity/activity.entity'
 import { BaseRepository } from './base/base.repository'
-import { IEntityMapper } from '../entity/mapper/entity.mapper.interface'
 import { Query } from './query/query'
 import { ILogger } from '../../utils/custom.logger'
+import { IEntityMapper } from '../port/entity.mapper.interface'
 
 /**
  * Implementation of the activity repository.
@@ -14,10 +14,10 @@ import { ILogger } from '../../utils/custom.logger'
  * @implements {IActivityRepository}
  */
 @injectable()
-export class ActivityRepository extends BaseRepository<Activity, ActivityEntity> implements IActivityRepository {
+export class ActivityRepository extends BaseRepository<PhysicalActivity, ActivityEntity> implements IActivityRepository {
     constructor(
         @inject(Identifier.ACTIVITY_REPO_MODEL) readonly activityModel: any,
-        @inject(Identifier.ACTIVITY_ENTITY_MAPPER) readonly activityMapper: IEntityMapper<Activity, ActivityEntity>,
+        @inject(Identifier.ACTIVITY_ENTITY_MAPPER) readonly activityMapper: IEntityMapper<PhysicalActivity, ActivityEntity>,
         @inject(Identifier.LOGGER) readonly logger: ILogger
     ) {
         super(activityModel, activityMapper, logger)
@@ -25,20 +25,20 @@ export class ActivityRepository extends BaseRepository<Activity, ActivityEntity>
 
     /**
      * Checks if an activity already has a registration.
-     * What differs from one activity to another is the start date and associated user.
+     * What differs from one activity to another is the start date and associated child.
      *
      * @param activity
      * @return {Promise<boolean>} True if it exists or False, otherwise
      * @throws {ValidationException | RepositoryException}
      */
-    public async checkExist(activity: Activity): Promise<boolean> {
+    public async checkExist(activity: PhysicalActivity): Promise<boolean> {
         const query: Query = new Query()
         return new Promise<boolean>((resolve, reject) => {
-            if (activity.getStartTime() && activity.getUser()) {
-                query.filters = { start_time: activity.getStartTime(), user: activity.getUser().getId() }
+            if (activity.start_time && activity.child_id) {
+                query.filters = { start_time: activity.start_time, child: activity.child_id }
             }
             super.findOne(query)
-                .then((result: Activity) => {
+                .then((result: PhysicalActivity) => {
                     if (result) return resolve(true)
                     return resolve(false)
                 })
@@ -47,17 +47,17 @@ export class ActivityRepository extends BaseRepository<Activity, ActivityEntity>
     }
 
     /**
-     * Update user activity data.
+     * Update child activity data.
      *
      * @param activity Containing the data to be updated
-     * @param idUser User ID.
+     * @param childId Child ID.
      * @return {Promise<T>}
      * @throws {ValidationException | ConflictException | RepositoryException}
      */
-    public updateByUser(activity: Activity, idUser: string): Promise<Activity> {
+    public updateByChild(activity: PhysicalActivity, childId: string): Promise<PhysicalActivity> {
         const itemUp: ActivityEntity = this.activityMapper.transform(activity)
-        return new Promise<Activity>((resolve, reject) => {
-            this.Model.findOneAndUpdate({ user: idUser, _id: itemUp.getId() }, itemUp, { new: true })
+        return new Promise<PhysicalActivity>((resolve, reject) => {
+            this.Model.findOneAndUpdate({ child_id: childId, _id: itemUp.id }, itemUp, { new: true })
                 .exec()
                 .then(result => {
                     if (!result) return resolve(undefined)
@@ -68,16 +68,16 @@ export class ActivityRepository extends BaseRepository<Activity, ActivityEntity>
     }
 
     /**
-     * Removes activity according to its unique identifier and related user.
+     * Removes activity according to its unique identifier and related child.
      *
-     * @param idActivity Unique identifier.
-     * @param idUser User ID.
+     * @param activityId Unique identifier.
+     * @param childId Child ID.
      * @return {Promise<boolean>}
      * @throws {ValidationException | RepositoryException}
      */
-    public removeByUser(idActivity: string | number, idUser: string): Promise<boolean> {
+    public removeByChild(activityId: string | number, childId: string): Promise<boolean> {
         return new Promise<boolean>((resolve, reject) => {
-            this.Model.findOneAndDelete({ user: idUser, _id: idActivity })
+            this.Model.findOneAndDelete({ child: childId, _id: activityId })
                 .exec()
                 .then(result => {
                     if (!result) return resolve(false)

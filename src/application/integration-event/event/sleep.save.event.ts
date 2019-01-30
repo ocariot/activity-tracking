@@ -11,7 +11,7 @@ export class SleepSaveEvent extends IntegrationEvent<Sleep> {
         return {
             event_name: this.event_name,
             timestamp: this.timestamp,
-            sleep: this.sleep.serialize()
+            sleep: this.sleep.toJSON()
         }
     }
 }

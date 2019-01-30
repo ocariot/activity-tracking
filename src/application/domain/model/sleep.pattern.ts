@@ -1,66 +1,58 @@
-import { ISerializable } from '../utils/serializable.interface'
 import { SleepPatternDataSet } from './sleep.pattern.data.set'
 import { SleepPatternSummary } from './sleep.pattern.summary'
+import { IJSONSerializable } from '../utils/json.serializable.interface'
+import { IJSONDeserializable } from '../utils/json.deserializable.interface'
+import { JsonUtils } from '../utils/json.utils'
 
 /**
  * Implementation of the entity of the pattern of sleep.
  *
- * @implements {ISerializable<SleepPattern>}
+ * @implements {IJSONSerializable, IJSONDeserializable<SleepPattern>}
  */
-export class SleepPattern implements ISerializable<SleepPattern> {
-    private data_set!: Array<SleepPatternDataSet> // Sleep pattern tracking.
-    private summary!: SleepPatternSummary // Summary of sleep pattern.
+export class SleepPattern implements IJSONSerializable, IJSONDeserializable<SleepPattern> {
+    private _data_set!: Array<SleepPatternDataSet> // Sleep pattern tracking.
+    private _summary!: SleepPatternSummary // Summary of sleep pattern.
 
     constructor(data_set?: Array<SleepPatternDataSet>, summary?: SleepPatternSummary) {
-        if (data_set) this.setDataSet(data_set)
-        if (summary) this.setSummary(summary)
+        if (data_set) this.data_set = data_set
+        if (summary) this.summary = summary
     }
 
-    public getDataSet(): Array<SleepPatternDataSet> {
-        return this.data_set
+    get data_set(): Array<SleepPatternDataSet> {
+        return this._data_set
     }
 
-    public setDataSet(data_set: Array<SleepPatternDataSet>) {
-        this.data_set = data_set
+    set data_set(value: Array<SleepPatternDataSet>) {
+        this._data_set = value
     }
 
-    public getSummary(): SleepPatternSummary {
-        return this.summary
+    get summary(): SleepPatternSummary {
+        return this._summary
     }
 
-    public setSummary(summary: SleepPatternSummary) {
-        this.summary = summary
+    set summary(value: SleepPatternSummary) {
+        this._summary = value
     }
 
-    /**
-     * Convert this object to json.
-     *
-     * @returns {object}
-     */
-    public serialize(): any {
-        return {
-            data_set: this.data_set ? this.data_set.map(item => item.serialize()) : this.data_set,
-            summary: this.summary ? this.summary.serialize() : this.summary
-        }
-    }
-
-    /**
-     * Transform JSON into SleepPattern object.
-     *
-     * @param json
-     */
-    public deserialize(json: any): SleepPattern {
+    public fromJSON(json: any): SleepPattern {
         if (!json) return this
-        if (typeof json === 'string') json = JSON.parse(json)
-
-        if (json.data_set !== undefined) {
-            const dataSetTemp = new Array<SleepPatternDataSet>()
-            json.data_set.forEach(elem => dataSetTemp.push(new SleepPatternDataSet().deserialize(elem)))
-            this.setDataSet(dataSetTemp)
+        if (typeof json === 'string' && JsonUtils.isJsonString(json)) {
+            json = JSON.parse(json)
         }
-        if (json.summary !== undefined) this.setSummary(new SleepPatternSummary().deserialize(json.summary))
+
+        if (json.data_set !== undefined && json.data_set instanceof Array) {
+            this.data_set = json.data_set.map(patternDataSet => new SleepPatternDataSet().fromJSON(patternDataSet))
+        }
+        if (json.summary !== undefined) this.summary = new SleepPatternSummary().fromJSON(json.summary)
 
         return this
+    }
+
+    public toJSON(): any {
+        return {
+            data_set: this.data_set ? this.data_set.map(item => item.toJSON()) : this.data_set,
+            summary: this.summary ? this.summary.toJSON() : this.summary
+        }
     }
 }
 

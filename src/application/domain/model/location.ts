@@ -1,83 +1,77 @@
-import { ISerializable } from '../utils/serializable.interface'
+import { IJSONSerializable } from '../utils/json.serializable.interface'
+import { IJSONDeserializable } from '../utils/json.deserializable.interface'
+import { JsonUtils } from '../utils/json.utils'
 
 /**
  * Implementation of the entity location.
  *
- * @implements {ISerializable<Location>}
+ * @implements {IJSONSerializable, IJSONDeserializable<Location>}
  */
-export class Location implements ISerializable<Location> {
-    private school?: string
-    private room?: string
-    private country?: string
-    private city?: string
+export class Location implements IJSONSerializable, IJSONDeserializable<Location> {
+    private _local!: string // Local where device is installed.
+    private _room!: string // Room where device is installed.
+    private _latitude?: string // Latitude from place's geolocation.
+    private _longitude?: string // Longitude from place's geolocation.
 
-    constructor(school?: string, room?: string, country?: string, city?: string) {
-        this.school = school
-        this.room = room
-        this.country = country
-        this.city = city
+    constructor(local?: string, room?: string, latitude?: string, longitude?: string) {
+        if (local) this.local = local
+        if (room) this.room = room
+        if (latitude) this.latitude = latitude
+        if (longitude) this.longitude = longitude
     }
 
-    public getSchool(): string | undefined {
-        return this.school
+    get local(): string {
+        return this._local
     }
 
-    public setSchool(school: string) {
-        this.school = school
+    set local(value: string) {
+        this._local = value
     }
 
-    public getRoom(): string | undefined {
-        return this.room
+    get room(): string {
+        return this._room
     }
 
-    public setRoom(room: string) {
-        this.room = room
+    set room(value: string) {
+        this._room = value
     }
 
-    public getCountry(): string | undefined {
-        return this.country
+    get latitude(): string | undefined {
+        return this._latitude
     }
 
-    public setCountry(country: string) {
-        this.country = country
+    set latitude(value: string | undefined) {
+        this._latitude = value
     }
 
-    public getCity(): string | undefined {
-        return this.city
+    get longitude(): string | undefined {
+        return this._longitude
     }
 
-    public setCity(city: string) {
-        this.city = city
+    set longitude(value: string | undefined) {
+        this._longitude = value
     }
 
-    /**
-     * Convert this object to json.
-     *
-     * @returns {object}
-     */
-    public serialize(): any {
-        return {
-            school: this.school,
-            room: this.room,
-            country: this.country,
-            city: this.city
-        }
-    }
-
-    /**
-     * Transform JSON into Location object.
-     *
-     * @param json
-     */
-    public deserialize(json: any): Location {
+    public fromJSON(json: any): Location {
         if (!json) return this
-        if (typeof json === 'string') json = JSON.parse(json)
+        if (typeof json === 'string' && JsonUtils.isJsonString(json)) {
+            json = JSON.parse(json)
+        }
 
-        if (json.school !== undefined) this.setSchool(json.school)
-        if (json.room !== undefined) this.setRoom(json.room)
-        if (json.country !== undefined) this.setCountry(json.country)
-        if (json.city !== undefined) this.setCity(json.city)
+        if (json.local !== undefined) this.local = json.local
+        if (json.room !== undefined) this.room = json.room
+        if (json.latitude !== undefined) this.latitude = json.latitude
+        if (json.longitude !== undefined) this.longitude = json.longitude
 
         return this
+    }
+
+    public toJSON(): any {
+        return {
+            local: this.local,
+            room: this.room,
+            latitude: this.latitude,
+            longitude: this.longitude
+        }
     }
 }

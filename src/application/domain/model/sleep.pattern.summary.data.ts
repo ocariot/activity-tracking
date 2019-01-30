@@ -1,59 +1,53 @@
-import { ISerializable } from '../utils/serializable.interface'
+import { IJSONSerializable } from '../utils/json.serializable.interface'
+import { IJSONDeserializable } from '../utils/json.deserializable.interface'
+import { JsonUtils } from '../utils/json.utils'
 
 /**
  * The implementation of the entity summary data of sleep pattern.
  *
- * @implements {ISerializable<SleepPatternSummaryData>}
+ * @implements {IJSONSerializable, IJSONDeserializable<SleepPatternSummaryData>}
  */
-export class SleepPatternSummaryData implements ISerializable<SleepPatternSummaryData> {
-    private count: number
-    private duration: number // in minutes
+export class SleepPatternSummaryData implements IJSONSerializable, IJSONDeserializable<SleepPatternSummaryData> {
+    private _count: number
+    private _duration: number // in minutes
 
     constructor(count: number, duration: number) {
-        this.count = count
-        this.duration = duration
+        this._count = count
+        this._duration = duration
     }
 
-    public getCount(): number {
-        return this.count
+    get count(): number {
+        return this._count
     }
 
-    public setCount(count: number) {
-        this.count = count
+    set count(value: number) {
+        this._count = value
     }
 
-    public getDuration(): number {
-        return this.duration
+    get duration(): number {
+        return this._duration
     }
 
-    public setDuration(duration: number) {
-        this.duration = duration
+    set duration(value: number) {
+        this._duration = value
     }
 
-    /**
-     * Convert this object to json.
-     *
-     * @returns {object}
-     */
-    public serialize(): any {
+    public fromJSON(json: any): SleepPatternSummaryData {
+        if (!json) return this
+        if (typeof json === 'string' && JsonUtils.isJsonString(json)) {
+            json = JSON.parse(json)
+        }
+
+        if (json.count !== undefined) this.count = json.count
+        if (json.duration !== undefined) this.duration = json.duration
+
+        return this
+    }
+
+    public toJSON(): any {
         return {
             count: this.count,
             duration: this.duration
         }
-    }
-
-    /**
-     * Transform JSON into SleepPatternSummaryData object.
-     *
-     * @param json
-     */
-    public deserialize(json: any): SleepPatternSummaryData {
-        if (!json) return this
-        if (typeof json === 'string') json = JSON.parse(json)
-
-        if (json.count !== undefined) this.setCount(json.count)
-        if (json.duration !== undefined) this.setDuration(json.duration)
-
-        return this
     }
 }

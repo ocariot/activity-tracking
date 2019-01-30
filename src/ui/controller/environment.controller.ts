@@ -72,7 +72,7 @@ export class EnvironmentController {
     }
 
     /**
-     * Remove sleep by user.
+     * Remove sleep by child.
      *
      * @param {Request} req
      * @param {Response} res

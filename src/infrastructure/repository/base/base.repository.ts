@@ -4,9 +4,10 @@ import { RepositoryException } from '../../../application/domain/exception/repos
 import { Entity } from '../../../application/domain/model/entity'
 import { ValidationException } from '../../../application/domain/exception/validation.exception'
 import { ConflictException } from '../../../application/domain/exception/conflict.exception'
-import { IEntityMapper } from '../../entity/mapper/entity.mapper.interface'
+import { IEntityMapper } from '../../port/entity.mapper.interface'
 import { IQuery } from '../../../application/port/query.interface'
 import { ILogger } from '../../../utils/custom.logger'
+import { Query } from '../query/query'
 
 /**
  * Base implementation of the repository.
@@ -28,13 +29,19 @@ export abstract class BaseRepository<T extends Entity, TModel> implements IRepos
         const itemNew: TModel = this.mapper.transform(item)
         return new Promise<T>((resolve, reject) => {
             this.Model.create(itemNew)
-                .then((result: TModel) => resolve(this.mapper.transform(result)))
+                .then((result) => {
+                    // Required due to 'populate ()' routine.
+                    // If there is no need for 'populate ()', the return will suffice.
+                    const query = new Query()
+                    query.filters = result._id
+                    return resolve(this.findOne(query))
+                })
                 .catch(err => reject(this.mongoDBErrorListener(err)))
         })
     }
 
     public find(query: IQuery): Promise<Array<T>> {
-        const q: any = query.serialize()
+        const q: any = query.toJSON()
         return new Promise<Array<T>>((resolve, reject) => {
             this.Model.find(q.filters)
                 .select(q.fields)
@@ -48,9 +55,10 @@ export abstract class BaseRepository<T extends Entity, TModel> implements IRepos
     }
 
     public findOne(query: IQuery): Promise<T> {
+        const q: any = query.toJSON()
         return new Promise<T>((resolve, reject) => {
-            this.Model.findOne(query.serialize().filters)
-                .select(query.serialize().fields)
+            this.Model.findOne(q.filters)
+                .select(q.fields)
                 .exec()
                 .then((result: TModel) => {
                     if (!result) return resolve(undefined)
@@ -61,9 +69,9 @@ export abstract class BaseRepository<T extends Entity, TModel> implements IRepos
     }
 
     public update(item: T): Promise<T> {
-        const itemUp: T = this.mapper.transform(item)
+        const itemUp: any = this.mapper.transform(item)
         return new Promise<T>((resolve, reject) => {
-            this.Model.findOneAndUpdate({ _id: itemUp.getId() }, itemUp, { new: true })
+            this.Model.findOneAndUpdate({ _id: itemUp.id }, itemUp, { new: true })
                 .exec()
                 .then((result: TModel) => {
                     if (!result) return resolve(undefined)
@@ -87,7 +95,7 @@ export abstract class BaseRepository<T extends Entity, TModel> implements IRepos
 
     public count(query: IQuery): Promise<number> {
         return new Promise<number>((resolve, reject) => {
-            this.Model.estimatedDocumentCount(query.serialize().filters)
+            this.Model.countDocuments(query.toJSON().filters)
                 .exec()
                 .then(result => resolve(Number(result)))
                 .catch(err => reject(this.mongoDBErrorListener(err)))

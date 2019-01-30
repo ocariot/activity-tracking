@@ -1,49 +1,49 @@
 import { IService } from './service.interface'
-import { Activity } from '../domain/model/activity'
+import { PhysicalActivity } from '../domain/model/physical.activity'
 import { IQuery } from './query.interface'
 
 /**
- * Activity service interface.
+ * PhysicalActivity service interface.
  *
- * @extends {IService<Activity>}
+ * @extends {IService<PhysicalActivity>}
  */
-export interface IActivityService extends IService<Activity> {
+export interface IActivityService extends IService<PhysicalActivity> {
     /**
-     * List the activities of a user.
+     * List the activities of a child.
      *
-     * @param idUser User ID.
+     * @param idUser Child ID.
      * @param query Defines object to be used for queries.
-     * @return {Promise<Array<Activity>>}
+     * @return {Promise<Array<PhysicalActivity>>}
      * @throws {RepositoryException}
      */
-    getAllByUser(idUser: string, query: IQuery): Promise<Array<Activity>>
+    getAllByUser(idUser: string, query: IQuery): Promise<Array<PhysicalActivity>>
 
     /**
-     * Retrieve activity by unique identifier (ID)  and related user.
+     * Retrieve activity by unique identifier (ID)  and related child.
      *
-     * @param idActivity Activity unique identifier.
-     * @param idUser User unique identifier.
+     * @param idActivity PhysicalActivity unique identifier.
+     * @param idUser Child unique identifier.
      * @param query Defines object to be used for queries.
-     * @return {Promise<Activity>}
+     * @return {Promise<PhysicalActivity>}
      * @throws {RepositoryException}
      */
-    getByIdAndUser(idActivity: string, idUser: string, query: IQuery): Promise<Activity>
+    getByIdAndUser(idActivity: string, idUser: string, query: IQuery): Promise<PhysicalActivity>
 
     /**
-     * Update user activity data.
+     * Update child activity data.
      *
      * @param item Containing the data to be updated
-     * @param idUser User unique identifier.
-     * @return {Promise<Activity>}
+     * @param idUser Child unique identifier.
+     * @return {Promise<PhysicalActivity>}
      * @throws {ValidationException | ConflictException | RepositoryException}
      */
-    updateByUser(item: Activity, idUser: string): Promise<Activity>
+    updateByUser(item: PhysicalActivity, idUser: string): Promise<PhysicalActivity>
 
     /**
-     * Removes activity according to its unique identifier and related user.
+     * Removes activity according to its unique identifier and related child.
      *
-     * @param idActivity Activity unique identifier.
-     * @param idUser User unique identifier.
+     * @param idActivity PhysicalActivity unique identifier.
+     * @param idUser Child unique identifier.
      * @return {Promise<boolean>}
      * @throws {ValidationException | RepositoryException}
      */

@@ -1,97 +1,81 @@
 import { Entity } from './entity'
-import { ISerializable } from '../utils/serializable.interface'
 import { Location } from './location'
+import { IJSONSerializable } from '../utils/json.serializable.interface'
+import { IJSONDeserializable } from '../utils/json.deserializable.interface'
+import { Measurement } from './measurement'
+import { JsonUtils } from '../utils/json.utils'
 
 /**
  * Entity implementation for environment measurements.
  *
  * @extends {Entity}
- * @implements {ISerializable<Environment>}
+ * @implements {IJSONSerializable, IJSONDeserializable<Environment>}
  */
-export class Environment extends Entity implements ISerializable<Environment> {
-    private timestamp?: Date // Environment start time according to the UTC.
-    private temperature?: number
-    private humidity?: number
-    private location?: Location
+export class Environment extends Entity implements IJSONSerializable, IJSONDeserializable<Environment> {
+    private _institution_id?: string // Id of institution associated with a environment.
+    private _location?: Location // Sensor Location
+    private _measurements?: Array<Measurement> // Associated Measurements
+    private _climatized?: boolean // Boolean variable to identify if a environment is climatized.
 
-    constructor(timestamp?: Date, temperature?: number, humidity?: number, location?: Location, id?: string) {
-        super(id)
-        if (timestamp) this.timestamp = timestamp
-        if (temperature) this.temperature = temperature
-        if (humidity) this.humidity = humidity
-        if (location) this.location = location
+    constructor() {
+        super()
     }
 
-    public getTimestamp(): Date | undefined {
-        return this.timestamp
+    get institution_id(): string | undefined {
+        return this._institution_id
     }
 
-    public setTimestamp(timestamp: Date | undefined) {
-        this.timestamp = timestamp
+    set institution_id(value: string | undefined) {
+        this._institution_id = value
     }
 
-    public getTemperature(): number | undefined {
-        return this.temperature
+    get location(): Location | undefined {
+        return this._location
     }
 
-    public setTemperature(temperature: number | undefined) {
-        this.temperature = temperature
+    set location(value: Location | undefined) {
+        this._location = value
     }
 
-    public getHumidity(): number | undefined {
-        return this.humidity
+    get measurements(): Array<Measurement> | undefined {
+        return this._measurements
     }
 
-    public setHumidity(humidity: number | undefined) {
-        this.humidity = humidity
+    set measurements(value: Array<Measurement> | undefined) {
+        this._measurements = value
     }
 
-    public getLocation(): Location | undefined {
-        return this.location
+    get climatized(): boolean | undefined {
+        return this._climatized
     }
 
-    public setLocation(location: Location | undefined) {
-        this.location = location
+    set climatized(value: boolean | undefined) {
+        this._climatized = value
     }
 
-    /**
-     * Called as default when the object
-     * is displayed in console.log()
-     */
-    public toJSON(): string {
-        return this.serialize()
-    }
-
-    /**
-     * Convert this object to json.
-     *
-     * @returns {any}
-     */
-    public serialize(): any {
-        return {
-            id: this.getId(),
-            timestamp: this.timestamp ? this.timestamp.toISOString() : this.timestamp,
-            temperature: this.temperature,
-            humidity: this.humidity,
-            location: this.location ? this.location.serialize() : this.location
-        }
-    }
-
-    /**
-     * Transform JSON into Activity object.
-     *
-     * @param json
-     */
-    public deserialize(json: any): Environment {
+    public fromJSON(json: any): Environment {
         if (!json) return this
-        if (typeof json === 'string') json = JSON.parse(json)
+        if (typeof json === 'string' && JsonUtils.isJsonString(json)) {
+            json = JSON.parse(json)
+        }
 
-        if (json.id !== undefined) super.setId(json.id)
-        if (json.timestamp !== undefined) this.setTimestamp(new Date(json.timestamp))
-        if (json.temperature !== undefined) this.setTemperature(json.temperature)
-        if (json.humidity !== undefined) this.setHumidity(json.humidity)
-        if (json.location !== undefined) this.setLocation(new Location().deserialize(json.location))
+        if (json.id !== undefined) super.id = json.id
+        if (json.institution_id !== undefined) this.institution_id = json.institution_id
+        if (json.location !== undefined) this.location = new Location().fromJSON(json.location)
+        if (json.measurements !== undefined && json.measurements instanceof Array) {
+            this.measurements = json.measurements.map(item => new Measurement().fromJSON(item))
+        }
+        if (json.climatized !== undefined) this.climatized = json.climatized
 
         return this
+    }
+
+    public toJSON(): any {
+        return {
+            id: super.id,
+            location: this.location ? this.location.toJSON() : this.location,
+            measurements: this.measurements ? this.measurements.map(item => item.toJSON()) : this.measurements,
+            climatized: this.climatized
+        }
     }
 }

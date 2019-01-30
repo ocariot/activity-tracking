@@ -9,8 +9,7 @@ const activitySchema = new Mongoose.Schema({
             required: 'Name of activity is required!'
         },
         start_time: {
-            type: Date,
-            required: 'Activity start time is required!'
+            type: Date
         },
         end_time: { type: Date },
         duration: {
@@ -20,8 +19,7 @@ const activitySchema = new Mongoose.Schema({
         max_intensity: { type: String },
         max_intensity_duration: { type: Number },
         calories: {
-            type: Number,
-            required: 'Calories spent during activity is required!'
+            type: Number
         },
         steps: {
             type: Number,
@@ -39,9 +37,9 @@ const activitySchema = new Mongoose.Schema({
                 }
             }
         ],
-        user: {
+        child: {
             type: Mongoose.Schema.Types.ObjectId,
-            required: 'User required!'
+            required: 'Child required!'
         }
     },
     {
@@ -56,5 +54,5 @@ const activitySchema = new Mongoose.Schema({
         }
     }
 )
-activitySchema.index({ user: 1, start_time: 1 }, { unique: true }) // define index at schema level
-export const ActivityRepoModel = Mongoose.model<IActivityModel>('Activity', activitySchema)
+activitySchema.index({ child: 1, start_time: 1 }, { unique: true }) // define index at schema level
+export const ActivityRepoModel = Mongoose.model<IActivityModel>('PhysicalActivity', activitySchema)

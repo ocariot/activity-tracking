@@ -1,14 +1,14 @@
 import { ValidationException } from '../exception/validation.exception'
 import { Environment } from '../model/environment'
 
-export class EnvironmentValidator {
+export class CreateEnvironmentValidator {
     public static validate(environment: Environment): void | ValidationException {
         const fields: Array<string> = []
 
         // validate null
-        if (!environment.getTimestamp()) fields.push('Timestamp')
-        if (!environment.getTemperature()) fields.push('Temperature')
-        if (!environment.getHumidity()) fields.push('Humidity')
+        if (!environment.institution_id) fields.push('institution_id')
+        if (!environment.location) fields.push('location')
+        if (!environment.) fields.push('Humidity')
 
         const location = environment.getLocation()
         if (!location) {

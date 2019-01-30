@@ -1,15 +1,17 @@
-import { ISerializable } from '../utils/serializable.interface'
 import { SleepPatternSummaryData } from './sleep.pattern.summary.data'
+import { IJSONSerializable } from '../utils/json.serializable.interface'
+import { IJSONDeserializable } from '../utils/json.deserializable.interface'
+import { JsonUtils } from '../utils/json.utils'
 
 /**
  * The implementation of the summary entity of sleep pattern.
  *
- * @implements {ISerializable<SleepPatternSummary>}
+ * @implements {IJSONSerializable, IJSONDeserializable<SleepPatternSummary>}
  */
-export class SleepPatternSummary implements ISerializable<SleepPatternSummary> {
-    private awake!: SleepPatternSummaryData
-    private asleep!: SleepPatternSummaryData
-    private restless!: SleepPatternSummaryData
+export class SleepPatternSummary implements IJSONSerializable, IJSONDeserializable<SleepPatternSummary> {
+    private _awake!: SleepPatternSummaryData
+    private _asleep!: SleepPatternSummaryData
+    private _restless!: SleepPatternSummaryData
 
     constructor(awake?: SleepPatternSummaryData, asleep?: SleepPatternSummaryData, restless?: SleepPatternSummaryData) {
         if (awake) this.awake = awake
@@ -17,58 +19,50 @@ export class SleepPatternSummary implements ISerializable<SleepPatternSummary> {
         if (restless) this.restless = restless
     }
 
-    public getAwake(): SleepPatternSummaryData {
-        return this.awake
+    get awake(): SleepPatternSummaryData {
+        return this._awake
     }
 
-    public setAwake(awake: SleepPatternSummaryData) {
-        this.awake = awake
+    set awake(value: SleepPatternSummaryData) {
+        this._awake = value
     }
 
-    public getAsleep(): SleepPatternSummaryData {
-        return this.asleep
+    get asleep(): SleepPatternSummaryData {
+        return this._asleep
     }
 
-    public setAsleep(asleep: SleepPatternSummaryData) {
-        this.asleep = asleep
+    set asleep(value: SleepPatternSummaryData) {
+        this._asleep = value
     }
 
-    public getRestless(): SleepPatternSummaryData {
-        return this.restless
+    get restless(): SleepPatternSummaryData {
+        return this._restless
     }
 
-    public setRestless(restless: SleepPatternSummaryData) {
-        this.restless = restless
+    set restless(value: SleepPatternSummaryData) {
+        this._restless = value
     }
 
-    /**
-     * Convert this object to json.
-     *
-     * @returns {object}
-     */
-    public serialize(): any {
+    public fromJSON(json: any): SleepPatternSummary {
+        if (!json) return this
+        if (typeof json === 'string' && JsonUtils.isJsonString(json)) {
+            json = JSON.parse(json)
+        }
+
+        if (json.awake !== undefined) this.awake = new SleepPatternSummaryData(json.awake.count, json.awake.duration)
+        if (json.asleep !== undefined) this.asleep = new SleepPatternSummaryData(json.asleep.count, json.asleep.duration)
+        if (json.restless !== undefined) {
+            this.restless = new SleepPatternSummaryData(json.restless.count, json.restless.duration)
+        }
+
+        return this
+    }
+
+    public toJSON(): any {
         return {
             awake: this.awake,
             asleep: this.asleep,
             restless: this.restless
         }
-    }
-
-    /**
-     * Transform JSON into SleepPatternSummary object.
-     *
-     * @param json
-     */
-    public deserialize(json: any): SleepPatternSummary {
-        if (!json) return this
-        if (typeof json === 'string') json = JSON.parse(json)
-
-        if (json.awake !== undefined) this.setAwake(new SleepPatternSummaryData(json.awake.count, json.awake.duration))
-        if (json.asleep !== undefined) this.setAsleep(new SleepPatternSummaryData(json.asleep.count, json.asleep.duration))
-        if (json.restless !== undefined) {
-            this.setRestless(new SleepPatternSummaryData(json.restless.count, json.restless.duration))
-        }
-
-        return this
     }
 }

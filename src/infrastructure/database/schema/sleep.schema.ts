@@ -30,9 +30,9 @@ const sleepSchema = new Mongoose.Schema({
                 required: 'Duration of sleep pattern is required!'
             }
         }],
-        user: {
+        child: {
             type: Mongoose.Schema.Types.ObjectId,
-            required: 'User required!'
+            required: 'Child required!'
         }
     },
     {
@@ -48,5 +48,5 @@ const sleepSchema = new Mongoose.Schema({
     }
 )
 
-sleepSchema.index({ user: 1, start_time: 1 }, { unique: true }) // define index at schema level
+sleepSchema.index({ child: 1, start_time: 1 }, { unique: true }) // define index at schema level
 export const SleepRepoModel = Mongoose.model<ISleepModel>('Sleep', sleepSchema)

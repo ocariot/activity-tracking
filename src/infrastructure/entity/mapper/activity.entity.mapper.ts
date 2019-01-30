@@ -1,92 +1,76 @@
 import { injectable } from 'inversify'
-import { ActivityEntity } from '../activity.entity'
-import { Activity } from '../../../application/domain/model/activity'
-import { UserEntityMapper } from './user.entity.mapper'
-import { IEntityMapper } from './entity.mapper.interface'
+import { PhysicalActivity } from '../../../application/domain/model/physical.activity'
 import { ActivityLevel } from '../../../application/domain/model/activity.level'
+import { PhysicalActivityEntity } from '../physical.activity.entity'
+import { IEntityMapper } from '../../port/entity.mapper.interface'
 
 @injectable()
-export class ActivityEntityMapper implements IEntityMapper<Activity, ActivityEntity> {
+export class ActivityEntityMapper implements IEntityMapper<PhysicalActivity, PhysicalActivityEntity> {
 
     public transform(item: any): any {
-        if (item instanceof Activity) return this.modelToModelEntity(item)
-        if (item instanceof ActivityEntity) return this.modelEntityToModel(item)
+        if (item instanceof PhysicalActivity) return this.modelToModelEntity(item)
         return this.jsonToModel(item) // json
     }
 
     /**
-     * Convert {Activity} for {ActivityEntity}.
+     * Convert {PhysicalActivity} for {PhysicalActivityEntity}.
      *
      * @see Creation Date should not be mapped to the type the repository understands.
      * Because this attribute is created automatically by the database.
      * Therefore, if a null value is passed at update time, an exception is thrown.
      * @param item
      */
-    public modelToModelEntity(item: Activity): ActivityEntity {
-        const result: ActivityEntity = new ActivityEntity()
+    public modelToModelEntity(item: PhysicalActivity): PhysicalActivityEntity {
+        const result: PhysicalActivityEntity = new PhysicalActivityEntity()
 
-        if (item.getId()) result.setId(item.getId())
-        if (item.getName()) result.setName(item.getName())
-        if (item.getStartTime()) result.setStartTime(item.getStartTime())
-        if (item.getEndTime()) result.setEndTime(item.getEndTime())
-        if (item.getDuration()) result.setDuration(item.getDuration())
-        if (item.getCalories()) result.setCalories(item.getCalories())
-        if (item.getSteps()) result.setSteps(item.getSteps())
-        if (item.getUser() && item.getUser().getId()) result.setUser(item.getUser().getId())
-
-        const levels: Array<ActivityLevel> | undefined = item.getLevels()
-        if (levels) result.setLevels(levels.map((elem: ActivityLevel) => elem.serialize()))
+        if (item.id) result.id = item.id
+        if (item.start_time) result.start_time = item.start_time
+        if (item.end_time) result.end_time = item.end_time
+        if (item.duration) result.duration = item.duration
+        if (item.child_id) result.child_id = item.child_id
+        if (item.name) result.name = item.name
+        if (item.calories) result.calories = item.calories
+        if (item.steps) result.steps = item.steps
+        if (item.levels && item.levels instanceof Array) {
+            result.levels = item.levels.map((elem: ActivityLevel) => elem.toJSON())
+        }
 
         return result
     }
 
     /**
-     * Convert {ActivityEntity} for {Activity}.
+     * Convert {PhysicalActivityEntity} for {PhysicalActivity}.
      *
      * @see Each attribute must be mapped only if it contains an assigned value,
      * because at some point the attribute accessed may not exist.
      * @param item
      */
-    public modelEntityToModel(item: ActivityEntity): Activity {
-        const result: Activity = new Activity()
-
-        result.setId(item.getId())
-        result.setName(item.getName())
-        result.setStartTime(item.getStartTime())
-        result.setEndTime(item.getEndTime())
-        result.setDuration(item.getDuration())
-        result.setCalories(item.getCalories())
-        result.setSteps(item.getSteps())
-        result.setLevels(item.getLevels())
-        result.setUser(new UserEntityMapper().transform(item.getUser()))
-
-        return result
+    public modelEntityToModel(item: PhysicalActivityEntity): PhysicalActivity {
+        throw Error('Not implemented!')
     }
 
     /**
-     * Convert JSON for Activity.
+     * Convert JSON for PhysicalActivity.
      *
      * @see Each attribute must be mapped only if it contains an assigned value,
      * because at some point the attribute accessed may not exist.
      * @param json
      */
-    public jsonToModel(json: any): Activity {
-        const result: Activity = new Activity()
+    public jsonToModel(json: any): PhysicalActivity {
+        const result: PhysicalActivity = new PhysicalActivity()
 
-        if (!json) return result
-        if (json.id !== undefined) result.setId(json.id)
-        if (json.name !== undefined) result.setName(json.name)
-        if (json.start_time !== undefined) result.setStartTime(new Date(json.start_time))
-        if (json.end_time !== undefined) result.setEndTime(new Date(json.end_time))
-        if (json.duration !== undefined) result.setDuration(Number(json.duration))
-        if (json.calories !== undefined) result.setCalories(Number(json.calories))
-        if (json.steps !== undefined) result.setSteps(Number(json.steps))
-        if (json.levels !== undefined) {
-            const activityLevels: Array<ActivityLevel> = []
-            for (const item of json.levels) activityLevels.push(new ActivityLevel().deserialize(item))
-            result.setLevels(activityLevels)
+        if (json.id !== undefined) result.id = json.id
+        if (json.start_time !== undefined) result.start_time = json.start_time
+        if (json.end_time !== undefined) result.end_time = json.end_time
+        if (json.duration !== undefined) result.duration = json.duration
+        if (json.name !== undefined) result.name = json.name
+        if (json.calories !== undefined) result.calories = json.calories
+        if (json.steps !== undefined) result.steps = json.steps
+        if (json.child_id !== undefined) result.child_id = json.child_id
+        if (json.levels !== undefined && json.levels instanceof Array) {
+            result.levels = json.levels.map(elem => new ActivityLevel().fromJSON(elem))
         }
-        if (json.user !== undefined) result.setUser(new UserEntityMapper().transform(json.user))
+
         return result
     }
 }

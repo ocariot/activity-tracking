@@ -5,7 +5,7 @@ import { IQuery } from '../port/query.interface'
 import { ISleepService } from '../port/sleep.service.interface'
 import { ISleepRepository } from '../port/sleep.repository.interface'
 import { Sleep } from '../domain/model/sleep'
-import { SleepValidator } from '../domain/validator/sleep.validator'
+import { CreateSleepValidator } from '../domain/validator/create.sleep.validator'
 import { IEventBus } from '../../infrastructure/port/event.bus.interface'
 import { ILogger } from '../../utils/custom.logger'
 import { SleepSaveEvent } from '../integration-event/event/sleep.save.event'
@@ -32,7 +32,7 @@ export class SleepService implements ISleepService {
      * @throws {ConflictException | RepositoryException} If a data conflict occurs, as an existing sleep.
      */
     public async add(sleep: Sleep): Promise<Sleep> {
-        SleepValidator.validate(sleep)
+        CreateSleepValidator.validate(sleep)
         const sleepExist = await this._sleepRepository.checkExist(sleep)
         if (sleepExist) throw new ConflictException('Sleep is already registered...')
 
@@ -75,54 +75,54 @@ export class SleepService implements ISleepService {
     }
 
     /**
-     * Retrieve sleep by unique identifier (ID) and user ID.
+     * Retrieve sleep by unique identifier (ID) and child ID.
      *
      * @param idSleep Sleep unique identifier.
-     * @param idUser User unique identifier.
+     * @param idUser Child unique identifier.
      * @param query Defines object to be used for queries.
      * @return {Promise<Array<Sleep>>}
      * @throws {RepositoryException}
      */
     public getByIdAndUser(idSleep: string, idUser: string, query: IQuery): Promise<Sleep> {
-        query.filters = { _id: idSleep, user: idUser }
+        query.filters = { _id: idSleep, child: idUser }
         return this._sleepRepository.findOne(query)
     }
 
     /**
-     * List the sleep of a user.
+     * List the sleep of a child.
      *
-     * @param idUser User unique identifier.
+     * @param idUser Child unique identifier.
      * @param query Defines object to be used for queries.
      * @return {Promise<Sleep>}
      * @throws {ValidationException | RepositoryException}
      */
     public getAllByUser(idUser: string, query: IQuery): Promise<Array<Sleep>> {
-        query.filters = Object.assign({ user: idUser }, query.filters)
+        query.filters = Object.assign({ child: idUser }, query.filters)
         return this._sleepRepository.find(query)
     }
 
     /**
-     * Update user sleep data.
+     * Update child sleep data.
      *
      * @param sleep Containing the data to be updated
-     * @param idUser User unique identifier.
+     * @param idUser Child unique identifier.
      * @return {Promise<Sleep>}
      * @throws {ValidationException | ConflictException | RepositoryException}
      */
     public updateByUser(sleep: Sleep, idUser: string): Promise<Sleep> {
-        return this._sleepRepository.updateByUser(sleep, idUser)
+        return this._sleepRepository.updateByChild(sleep, idUser)
     }
 
     /**
-     * Remove sleep according to its unique identifier and related user.
+     * Remove sleep according to its unique identifier and related child.
      *
      * @param idSleep Unique identifier.
-     * @param idUser User unique identifier.
+     * @param idUser Child unique identifier.
      * @return {Promise<boolean>}
      * @throws {ValidationException | RepositoryException}
      */
     public removeByUser(idSleep: string | number, idUser: string): Promise<boolean> {
-        return this._sleepRepository.removeByUser(idSleep, idUser)
+        return this._sleepRepository.removeByChild(idSleep, idUser)
     }
 
     public async update(sleep: Sleep): Promise<Sleep> {
