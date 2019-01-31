@@ -74,7 +74,6 @@ export class Query implements IQuery {
     }
 
     public addFilter(filter: object): void {
-        // this.filters = Object.assign(this.filters, filter)
         this.filters = {
             ...this.filters,
             ...filter

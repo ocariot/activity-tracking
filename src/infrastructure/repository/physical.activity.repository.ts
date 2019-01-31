@@ -1,6 +1,6 @@
 import { inject, injectable } from 'inversify'
 import { Identifier } from '../../di/identifiers'
-import { IActivityRepository } from '../../application/port/activity.repository.interface'
+import { IPhysicalActivityRepository } from '../../application/port/physical.activity.repository.interface'
 import { PhysicalActivity } from '../../application/domain/model/physical.activity'
 import { ActivityEntity } from '../entity/activity.entity'
 import { BaseRepository } from './base/base.repository'
@@ -11,10 +11,11 @@ import { IEntityMapper } from '../port/entity.mapper.interface'
 /**
  * Implementation of the activity repository.
  *
- * @implements {IActivityRepository}
+ * @implements {IPhysicalActivityRepository}
  */
 @injectable()
-export class ActivityRepository extends BaseRepository<PhysicalActivity, ActivityEntity> implements IActivityRepository {
+export class PhysicalActivityRepository extends BaseRepository<PhysicalActivity, ActivityEntity>
+    implements IPhysicalActivityRepository {
     constructor(
         @inject(Identifier.ACTIVITY_REPO_MODEL) readonly activityModel: any,
         @inject(Identifier.ACTIVITY_ENTITY_MAPPER) readonly activityMapper: IEntityMapper<PhysicalActivity, ActivityEntity>,
@@ -35,7 +36,7 @@ export class ActivityRepository extends BaseRepository<PhysicalActivity, Activit
         const query: Query = new Query()
         return new Promise<boolean>((resolve, reject) => {
             if (activity.start_time && activity.child_id) {
-                query.filters = { start_time: activity.start_time, child: activity.child_id }
+                query.filters = { start_time: activity.start_time, child_id: activity.child_id }
             }
             super.findOne(query)
                 .then((result: PhysicalActivity) => {
@@ -77,7 +78,7 @@ export class ActivityRepository extends BaseRepository<PhysicalActivity, Activit
      */
     public removeByChild(activityId: string | number, childId: string): Promise<boolean> {
         return new Promise<boolean>((resolve, reject) => {
-            this.Model.findOneAndDelete({ child: childId, _id: activityId })
+            this.Model.findOneAndDelete({ child_id: childId, _id: activityId })
                 .exec()
                 .then(result => {
                     if (!result) return resolve(false)

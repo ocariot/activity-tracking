@@ -1,5 +1,7 @@
 import { ValidationException } from '../exception/validation.exception'
 import { Environment } from '../model/environment'
+import { LocationValidator } from './location.validator'
+import { MeasurementValidator } from './measurement.validator'
 
 export class CreateEnvironmentValidator {
     public static validate(environment: Environment): void | ValidationException {
@@ -8,17 +10,9 @@ export class CreateEnvironmentValidator {
         // validate null
         if (!environment.institution_id) fields.push('institution_id')
         if (!environment.location) fields.push('location')
-        if (!environment.) fields.push('Humidity')
-
-        const location = environment.getLocation()
-        if (!location) {
-            fields.push('School', 'Room', 'Country', 'and City')
-        } else {
-            if (!location.getSchool()) fields.push('School')
-            if (!location.getRoom()) fields.push('Room')
-            if (!location.getCountry()) fields.push('Country')
-            if (!location.getCity()) fields.push('City')
-        }
+        else LocationValidator.validate(environment.location)
+        if (!environment.measurements) fields.push('measurements')
+        else environment.measurements.forEach(measurement => MeasurementValidator.validate(measurement))
 
         if (fields.length > 0) {
             throw new ValidationException('Required fields were not provided...',

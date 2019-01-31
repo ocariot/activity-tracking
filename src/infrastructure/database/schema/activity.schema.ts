@@ -1,25 +1,28 @@
 import Mongoose from 'mongoose'
 
-interface IActivityModel extends Mongoose.Document {
+interface IPhysicalActivityModel extends Mongoose.Document {
 }
 
-const activitySchema = new Mongoose.Schema({
+const physicalActivitySchema = new Mongoose.Schema({
         name: {
             type: String,
-            required: 'Name of activity is required!'
+            required: true
         },
         start_time: {
-            type: Date
+            type: Date,
+            required: true
         },
-        end_time: { type: Date },
+        end_time: {
+            type: Date,
+            required: true
+        },
         duration: {
             type: Number,
-            required: 'Duration of activity is required!'
+            required: true
         },
-        max_intensity: { type: String },
-        max_intensity_duration: { type: Number },
         calories: {
-            type: Number
+            type: Number,
+            required: true
         },
         steps: {
             type: Number,
@@ -29,17 +32,17 @@ const activitySchema = new Mongoose.Schema({
             {
                 name: {
                     type: String,
-                    required: 'Name of activity level is required!'
+                    required: true
                 },
                 duration: {
                     type: Number,
-                    required: 'Duration of activity level is required!'
+                    required: true
                 }
             }
         ],
-        child: {
+        child_id: {
             type: Mongoose.Schema.Types.ObjectId,
-            required: 'Child required!'
+            required: true
         }
     },
     {
@@ -54,5 +57,5 @@ const activitySchema = new Mongoose.Schema({
         }
     }
 )
-activitySchema.index({ child: 1, start_time: 1 }, { unique: true }) // define index at schema level
-export const ActivityRepoModel = Mongoose.model<IActivityModel>('PhysicalActivity', activitySchema)
+physicalActivitySchema.index({ child_id: 1, start_time: 1 }, { unique: true }) // define index at schema level
+export const ActivityRepoModel = Mongoose.model<IPhysicalActivityModel>('PhysicalActivity', physicalActivitySchema)

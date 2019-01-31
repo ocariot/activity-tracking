@@ -4,7 +4,7 @@ import { IIntegrationEventHandler } from './integration.event.handler.interface'
 import { ActivitySaveEvent } from '../event/activity.save.event'
 import { PhysicalActivity } from '../../domain/model/physical.activity'
 import { CustomLogger } from '../../../utils/custom.logger'
-import { IActivityRepository } from '../../port/activity.repository.interface'
+import { IPhysicalActivityRepository } from '../../port/physical.activity.repository.interface'
 import { CreatePhysicalActivityValidator } from '../../domain/validator/create.physical.activity.validator'
 import { ConflictException } from '../../domain/exception/conflict.exception'
 
@@ -17,7 +17,7 @@ export class ActivitySaveEventHandler implements IIntegrationEventHandler<Activi
      * @param _logger
      */
     constructor(
-        @inject(Identifier.ACTIVITY_REPOSITORY) private readonly _activityRepository: IActivityRepository,
+        @inject(Identifier.ACTIVITY_REPOSITORY) private readonly _activityRepository: IPhysicalActivityRepository,
         @inject(Identifier.LOGGER) private readonly _logger: CustomLogger
     ) {
     }

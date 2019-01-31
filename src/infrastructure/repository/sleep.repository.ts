@@ -35,7 +35,7 @@ export class SleepRepository extends BaseRepository<Sleep, SleepEntity> implemen
         const query: Query = new Query()
         return new Promise<boolean>((resolve, reject) => {
             if (sleep.start_time && sleep.child_id) {
-                query.filters = { start_time: sleep.start_time, child: sleep.child_id }
+                query.filters = { start_time: sleep.start_time, child_id: sleep.child_id }
             }
             super.findOne(query)
                 .then((result: Sleep) => {
@@ -77,7 +77,7 @@ export class SleepRepository extends BaseRepository<Sleep, SleepEntity> implemen
      */
     public removeByChild(sleepId: string | number, childId: string): Promise<boolean> {
         return new Promise<boolean>((resolve, reject) => {
-            this.Model.findOneAndDelete({ child: childId, _id: sleepId })
+            this.Model.findOneAndDelete({ child_id: childId, _id: sleepId })
                 .exec()
                 .then(result => {
                     if (!result) return resolve(false)

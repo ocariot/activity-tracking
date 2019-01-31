@@ -39,7 +39,7 @@ export class SleepService implements ISleepService {
         try {
             const sleepSaved: Sleep = await this._sleepRepository.create(sleep)
 
-            this.logger.info(`Sleep with ID: ${sleepSaved.getId()} published on event bus...`)
+            this.logger.info(`Sleep with ID: ${sleepSaved.id} published on event bus...`)
             this.eventBus.publish(
                 new SleepSaveEvent('SleepSaveEvent', new Date(), sleepSaved),
                 'sleep.save'
@@ -77,27 +77,27 @@ export class SleepService implements ISleepService {
     /**
      * Retrieve sleep by unique identifier (ID) and child ID.
      *
-     * @param idSleep Sleep unique identifier.
-     * @param idUser Child unique identifier.
+     * @param sleepId Sleep unique identifier.
+     * @param userId Child unique identifier.
      * @param query Defines object to be used for queries.
      * @return {Promise<Array<Sleep>>}
      * @throws {RepositoryException}
      */
-    public getByIdAndUser(idSleep: string, idUser: string, query: IQuery): Promise<Sleep> {
-        query.filters = { _id: idSleep, child: idUser }
+    public getByIdAndChild(sleepId: string, userId: string, query: IQuery): Promise<Sleep> {
+        query.filters = { _id: sleepId, child_id: userId }
         return this._sleepRepository.findOne(query)
     }
 
     /**
      * List the sleep of a child.
      *
-     * @param idUser Child unique identifier.
+     * @param userId Child unique identifier.
      * @param query Defines object to be used for queries.
      * @return {Promise<Sleep>}
      * @throws {ValidationException | RepositoryException}
      */
-    public getAllByUser(idUser: string, query: IQuery): Promise<Array<Sleep>> {
-        query.filters = Object.assign({ child: idUser }, query.filters)
+    public getAllByChild(userId: string, query: IQuery): Promise<Array<Sleep>> {
+        query.addFilter({ child_id: userId })
         return this._sleepRepository.find(query)
     }
 
@@ -105,24 +105,24 @@ export class SleepService implements ISleepService {
      * Update child sleep data.
      *
      * @param sleep Containing the data to be updated
-     * @param idUser Child unique identifier.
+     * @param userId Child unique identifier.
      * @return {Promise<Sleep>}
      * @throws {ValidationException | ConflictException | RepositoryException}
      */
-    public updateByUser(sleep: Sleep, idUser: string): Promise<Sleep> {
-        return this._sleepRepository.updateByChild(sleep, idUser)
+    public updateByChild(sleep: Sleep, userId: string): Promise<Sleep> {
+        return this._sleepRepository.updateByChild(sleep, userId)
     }
 
     /**
      * Remove sleep according to its unique identifier and related child.
      *
-     * @param idSleep Unique identifier.
-     * @param idUser Child unique identifier.
+     * @param sleepId Unique identifier.
+     * @param userId Child unique identifier.
      * @return {Promise<boolean>}
      * @throws {ValidationException | RepositoryException}
      */
-    public removeByUser(idSleep: string | number, idUser: string): Promise<boolean> {
-        return this._sleepRepository.removeByChild(idSleep, idUser)
+    public removeByChild(sleepId: string | number, userId: string): Promise<boolean> {
+        return this._sleepRepository.removeByChild(sleepId, userId)
     }
 
     public async update(sleep: Sleep): Promise<Sleep> {

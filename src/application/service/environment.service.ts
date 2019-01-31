@@ -34,12 +34,14 @@ export class EnvironmentService implements IEnvironmentService {
      */
     public async add(environment: Environment): Promise<Environment> {
         CreateEnvironmentValidator.validate(environment)
-        const environmentExist = await this._environmentRepository.checkExist(environment)
-        if (environmentExist) throw new ConflictException('Measurement of environment is already registered...')
+
         try {
+            const environmentExist = await this._environmentRepository.checkExist(environment)
+            if (environmentExist) throw new ConflictException('Measurement of environment is already registered...')
+
             const environmentSaved: Environment = await this._environmentRepository.create(environment)
 
-            this.logger.info(`Measurement of environment with ID: ${environmentSaved.getId()} published on event bus...`)
+            this.logger.info(`Measurement of environment with ID: ${environmentSaved.id} published on event bus...`)
             this.eventBus.publish(
                 new EnvironmentSaveEvent('EnvironmentSaveEvent', new Date(), environmentSaved),
                 'environments.save'

@@ -4,7 +4,7 @@
  *
  * @abstract
  */
-export class Entity {
+export abstract class Entity {
     private _id?: string
 
     protected constructor(id?: string) {

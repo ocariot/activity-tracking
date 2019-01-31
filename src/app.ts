@@ -1,5 +1,4 @@
 import 'reflect-metadata'
-import yaml from 'yamljs'
 import morgan from 'morgan'
 import helmet from 'helmet'
 import bodyParser from 'body-parser'
@@ -61,7 +60,7 @@ export class App {
      */
     private middleware(): void {
         const inversifyExpress: InversifyExpressServer = new InversifyExpressServer(
-            this.container, null, { rootPath: '/api/v1' })
+            this.container, null, { rootPath: '/' })
 
         inversifyExpress.setConfig((app) => {
             // for handling query strings
@@ -78,8 +77,8 @@ export class App {
             // create application/x-www-form-urlencoded parser
             app.use(bodyParser.urlencoded({ extended: false }))
 
-            app.use(morgan(':remote-addr :remote-child ":method :url HTTP/:http-version" ' +
-                ':status :res[content-length] :response-time ms ":referrer" ":child-agent"', {
+            app.use(morgan(':remote-addr :remote-user ":method :url HTTP/:http-version" ' +
+                ':status :res[content-length] :response-time ms ":referrer" ":user-agent"', {
                     stream: { write: (str: string) => this._logger.info(str) }
                 }
             ))
@@ -87,12 +86,12 @@ export class App {
             // Middleware swagger. It should not run in the test environment.
             if ((process.env.NODE_ENV || Default.NODE_ENV) !== 'test') {
                 const options = {
+                    swaggerUrl: Default.SWAGGER_URI,
                     customCss: '.swagger-ui .topbar { display: none }',
-                    customfavIcon: 'http://nutes.uepb.edu.br/wp-content/uploads/2014/01/icon.fw_.png',
+                    customfavIcon: Default.LOGO_URI,
                     customSiteTitle: `API Reference | ${Default.APP_TITLE}`
                 }
-
-                app.use('/api/v1/reference', swaggerUi.serve, swaggerUi.setup(yaml.load(Default.SWAGGER_PATH), options))
+                app.use('/reference', swaggerUi.serve, swaggerUi.setup(null, options))
             }
         })
         this.express = inversifyExpress.build()

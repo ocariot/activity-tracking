@@ -59,7 +59,7 @@ export class SleepPattern implements IJSONSerializable, IJSONDeserializable<Slee
 /**
  * Name of traceable sleep stages.
  */
-export enum NameSleepPattern {
+export enum SleepPatternType {
     AWAKE = 'awake',
     ASLEEP = 'asleep',
     RESTLESS = 'restless'

@@ -34,8 +34,8 @@ export class EnvironmentRepository extends BaseRepository<Environment, Environme
     public async checkExist(environment: Environment): Promise<boolean> {
         const query: Query = new Query()
         return new Promise<boolean>((resolve, reject) => {
-            if (environment.measurements && environment.location) {
-                query.filters = { timestamp: environment.measurements, location: environment.location }
+            if (environment.timestamp && environment.location) {
+                query.filters = { timestamp: environment.timestamp, location: environment.location }
             }
             super.findOne(query)
                 .then((result: Environment) => {

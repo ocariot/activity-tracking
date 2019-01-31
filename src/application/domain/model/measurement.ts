@@ -11,13 +11,11 @@ export class Measurement implements IJSONSerializable, IJSONDeserializable<Measu
     private _type!: string // Type of measurement.
     private _value!: number // Value of measurement.
     private _unit!: string // Unit of measurement.
-    private _timestamp!: Date // Timestamp according to the UTC.
 
-    constructor(type?: string, value?: number, unit?: string, timestamp?: Date) {
+    constructor(type?: string, value?: number, unit?: string) {
         if (type) this.type = type
         if (value) this.value = value
         if (unit) this.unit = unit
-        if (timestamp) this.timestamp = timestamp
     }
 
     get type(): string {
@@ -25,7 +23,7 @@ export class Measurement implements IJSONSerializable, IJSONDeserializable<Measu
     }
 
     set type(value: string) {
-        this._type = value
+        this._type = value.toLowerCase().trim()
     }
 
     get value(): number {
@@ -44,14 +42,6 @@ export class Measurement implements IJSONSerializable, IJSONDeserializable<Measu
         this._unit = value
     }
 
-    get timestamp(): Date {
-        return this._timestamp
-    }
-
-    set timestamp(value: Date) {
-        this._timestamp = value
-    }
-
     public fromJSON(json: any): Measurement {
         if (!json) return this
         if (typeof json === 'string' && JsonUtils.isJsonString(json)) {
@@ -61,7 +51,6 @@ export class Measurement implements IJSONSerializable, IJSONDeserializable<Measu
         if (json.type !== undefined) this.type = json.type
         if (json.value !== undefined) this.value = json.value
         if (json.unit !== undefined) this.unit = json.unit
-        if (json.timestamp !== undefined) this.timestamp = new Date(json.timestamp)
 
         return this
     }
@@ -70,8 +59,7 @@ export class Measurement implements IJSONSerializable, IJSONDeserializable<Measu
         return {
             type: this.type,
             value: this.value,
-            unit: this.unit,
-            timestamp: this.timestamp
+            unit: this.unit
         }
     }
 }

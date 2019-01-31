@@ -4,6 +4,7 @@ import { IJSONSerializable } from '../utils/json.serializable.interface'
 import { IJSONDeserializable } from '../utils/json.deserializable.interface'
 import { Measurement } from './measurement'
 import { JsonUtils } from '../utils/json.utils'
+import { DatetimeValidator } from '../validator/datetime.validator'
 
 /**
  * Entity implementation for environment measurements.
@@ -16,6 +17,7 @@ export class Environment extends Entity implements IJSONSerializable, IJSONDeser
     private _location?: Location // Sensor Location
     private _measurements?: Array<Measurement> // Associated Measurements
     private _climatized?: boolean // Boolean variable to identify if a environment is climatized.
+    private _timestamp!: Date // Timestamp according to the UTC.
 
     constructor() {
         super()
@@ -53,6 +55,19 @@ export class Environment extends Entity implements IJSONSerializable, IJSONDeser
         this._climatized = value
     }
 
+    get timestamp(): Date {
+        return this._timestamp
+    }
+
+    set timestamp(value: Date) {
+        this._timestamp = value
+    }
+
+    public convertDatetimeString(value: string): Date {
+        DatetimeValidator.validate(value)
+        return new Date(value)
+    }
+
     public fromJSON(json: any): Environment {
         if (!json) return this
         if (typeof json === 'string' && JsonUtils.isJsonString(json)) {
@@ -66,6 +81,7 @@ export class Environment extends Entity implements IJSONSerializable, IJSONDeser
             this.measurements = json.measurements.map(item => new Measurement().fromJSON(item))
         }
         if (json.climatized !== undefined) this.climatized = json.climatized
+        if (json.timestamp !== undefined) this.timestamp = this.convertDatetimeString(json.timestamp)
 
         return this
     }
@@ -75,7 +91,8 @@ export class Environment extends Entity implements IJSONSerializable, IJSONDeser
             id: super.id,
             location: this.location ? this.location.toJSON() : this.location,
             measurements: this.measurements ? this.measurements.map(item => item.toJSON()) : this.measurements,
-            climatized: this.climatized
+            climatized: this.climatized,
+            timestamp: this.timestamp.toISOString()
         }
     }
 }

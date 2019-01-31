@@ -5,10 +5,10 @@ import { PhysicalActivity } from '../domain/model/physical.activity'
  * Interface of the activity repository.
  * Must be implemented by the activity repository at the infrastructure layer.
  *
- * @see {@link ActivityRepository} for further information.
+ * @see {@link PhysicalActivityRepository} for further information.
  * @extends {IRepository<PhysicalActivity>}
  */
-export interface IActivityRepository extends IRepository<PhysicalActivity> {
+export interface IPhysicalActivityRepository extends IRepository<PhysicalActivity> {
     /**
      * Update child activity data.
      *

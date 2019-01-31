@@ -1,12 +1,10 @@
 import HttpStatus from 'http-status-codes'
 import { inject } from 'inversify'
-import { controller, httpDelete, httpGet, httpPost, request, response } from 'inversify-express-utils'
+import { controller, httpDelete, request, response } from 'inversify-express-utils'
 import { Request, Response } from 'express'
 import { Identifier } from '../../di/identifiers'
 import { ApiExceptionManager } from '../exception/api.exception.manager'
-import { Query } from '../../infrastructure/repository/query/query'
 import { ILogger } from '../../utils/custom.logger'
-import { Environment } from '../../application/domain/model/environment'
 import { IEnvironmentService } from '../../application/port/environment.service.interface'
 import { ApiException } from '../exception/api.exception'
 
@@ -31,45 +29,45 @@ export class EnvironmentController {
     ) {
     }
 
-    /**
-     * Add new environment measurement.
-     *
-     * @param {Request} req
-     * @param {Response} res
-     */
-    @httpPost('/')
-    public async addEnvironment(@request() req: Request, @response() res: Response) {
-        try {
-            const environment: Environment = new Environment().deserialize(req.body)
-            const result: Environment = await this._environmentService.add(environment)
-            return res.status(HttpStatus.CREATED).send(result)
-        } catch (err) {
-            const handlerError = ApiExceptionManager.build(err)
-            return res.status(handlerError.code)
-                .send(handlerError.toJson())
-        }
-    }
-
-    /**
-     * Get all ambient measurements.
-     *
-     * For the query strings, the query-strings-parser middleware was used.
-     * @see {@link https://www.npmjs.com/package/query-strings-parser} for further information.
-     *
-     * @param {Request} req
-     * @param {Response} res
-     */
-    @httpGet('/')
-    public async getAllEnvironments(@request() req: Request, @response() res: Response): Promise<Response> {
-        try {
-            const result = await this._environmentService.getAll(new Query().deserialize(req.query))
-            return res.status(HttpStatus.OK).send(result)
-        } catch (err) {
-            const handlerError = ApiExceptionManager.build(err)
-            return res.status(handlerError.code)
-                .send(handlerError.toJson())
-        }
-    }
+    // /**
+    //  * Add new environment measurement.
+    //  *
+    //  * @param {Request} req
+    //  * @param {Response} res
+    //  */
+    // @httpPost('/')
+    // public async addEnvironment(@request() req: Request, @response() res: Response) {
+    //     try {
+    //         const environment: Environment = new Environment().deserialize(req.body)
+    //         const result: Environment = await this._environmentService.add(environment)
+    //         return res.status(HttpStatus.CREATED).send(result)
+    //     } catch (err) {
+    //         const handlerError = ApiExceptionManager.build(err)
+    //         return res.status(handlerError.code)
+    //             .send(handlerError.toJson())
+    //     }
+    // }
+    //
+    // /**
+    //  * Get all ambient measurements.
+    //  *
+    //  * For the query strings, the query-strings-parser middleware was used.
+    //  * @see {@link https://www.npmjs.com/package/query-strings-parser} for further information.
+    //  *
+    //  * @param {Request} req
+    //  * @param {Response} res
+    //  */
+    // @httpGet('/')
+    // public async getAllEnvironments(@request() req: Request, @response() res: Response): Promise<Response> {
+    //     try {
+    //         const result = await this._environmentService.getAll(new Query().deserialize(req.query))
+    //         return res.status(HttpStatus.OK).send(result)
+    //     } catch (err) {
+    //         const handlerError = ApiExceptionManager.build(err)
+    //         return res.status(handlerError.code)
+    //             .send(handlerError.toJson())
+    //     }
+    // }
 
     /**
      * Remove sleep by child.

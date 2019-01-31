@@ -31,7 +31,7 @@ export class SleepPatternDataSet implements IJSONSerializable, IJSONDeserializab
     }
 
     set name(value: string) {
-        this._name = value
+        this._name = value.toLowerCase().trim()
     }
 
     get duration(): number {

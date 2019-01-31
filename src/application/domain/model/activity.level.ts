@@ -21,7 +21,7 @@ export class ActivityLevel implements IJSONSerializable, IJSONDeserializable<Act
     }
 
     set name(value: string) {
-        this._name = value
+        this._name = value.toLowerCase().trim()
     }
 
     get duration(): number {
@@ -55,7 +55,7 @@ export class ActivityLevel implements IJSONSerializable, IJSONDeserializable<Act
 /**
  * Name of traceable activity levels.
  */
-export enum NameActivityLevel {
+export enum ActivityLevelType {
     SEDENTARY = 'sedentary',
     LIGHTLY = 'lightly',
     FAIRLY = 'fairly',

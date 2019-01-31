@@ -1,7 +1,7 @@
 import { injectable } from 'inversify'
 import { Sleep } from '../../../application/domain/model/sleep'
 import { SleepEntity } from '../sleep.entity'
-import { NameSleepPattern, SleepPattern } from '../../../application/domain/model/sleep.pattern'
+import { SleepPatternType, SleepPattern } from '../../../application/domain/model/sleep.pattern'
 import { SleepPatternDataSet } from '../../../application/domain/model/sleep.pattern.data.set'
 import { SleepPatternSummary } from '../../../application/domain/model/sleep.pattern.summary'
 import { SleepPatternSummaryData } from '../../../application/domain/model/sleep.pattern.summary.data'
@@ -82,12 +82,12 @@ export class SleepEntityMapper implements IEntityMapper<Sleep, SleepEntity> {
         const sleepPatternDataSet: Array<SleepPatternDataSet> = pattern.map(elem => new SleepPatternDataSet().fromJSON(elem))
         const summary: SleepPatternSummary = new SleepPatternSummary()
 
-        const countAsleep = this.countOfPattern(NameSleepPattern.ASLEEP, pattern)
-        const countAwake = this.countOfPattern(NameSleepPattern.AWAKE, pattern)
-        const countRestless = this.countOfPattern(NameSleepPattern.RESTLESS, pattern)
-        const durationAsleep = this.countDurationOfPattern(NameSleepPattern.ASLEEP, pattern)
-        const durationAwake = this.countDurationOfPattern(NameSleepPattern.AWAKE, pattern)
-        const durationRestless = this.countDurationOfPattern(NameSleepPattern.RESTLESS, pattern)
+        const countAsleep = this.countOfPattern(SleepPatternType.ASLEEP, pattern)
+        const countAwake = this.countOfPattern(SleepPatternType.AWAKE, pattern)
+        const countRestless = this.countOfPattern(SleepPatternType.RESTLESS, pattern)
+        const durationAsleep = this.countDurationOfPattern(SleepPatternType.ASLEEP, pattern)
+        const durationAwake = this.countDurationOfPattern(SleepPatternType.AWAKE, pattern)
+        const durationRestless = this.countDurationOfPattern(SleepPatternType.RESTLESS, pattern)
 
         summary.asleep = new SleepPatternSummaryData(countAsleep, durationAsleep)
         summary.awake = new SleepPatternSummaryData(countAwake, durationAwake)

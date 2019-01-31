@@ -6,7 +6,7 @@ import { CustomLogger } from '../utils/custom.logger'
 import { ActivitySaveEventHandler } from '../application/integration-event/handler/activity.save.event.handler'
 import { DI } from '../di/di'
 import { ActivitySaveEvent } from '../application/integration-event/event/activity.save.event'
-import { IActivityRepository } from '../application/port/activity.repository.interface'
+import { IPhysicalActivityRepository } from '../application/port/physical.activity.repository.interface'
 
 @injectable()
 export class BackgroundService {
@@ -30,7 +30,7 @@ export class BackgroundService {
              */
             const activitySaveEvent = new ActivitySaveEvent('ActivitySaveEvent', new Date())
             const event_save_handle = new ActivitySaveEventHandler(
-                this._diContainer.get<IActivityRepository>(Identifier.ACTIVITY_REPOSITORY), this._logger)
+                this._diContainer.get<IPhysicalActivityRepository>(Identifier.ACTIVITY_REPOSITORY), this._logger)
             await this._eventBus.subscribe(activitySaveEvent, event_save_handle, 'activities.save')
         } catch (err) {
             this._logger.error('Error initializing services in background: '.concat(err.message))

@@ -3,17 +3,13 @@ import { Container } from 'inversify'
 import { HomeController } from '../ui/controller/home.controller'
 import { Identifier } from './identifiers'
 import { ActivityController } from '../ui/controller/activity.controller'
-import { IActivityService } from '../application/port/activity.service.interface'
+import { IPhysicalActivityService } from '../application/port/physical.activity.service.interface'
 import { ActivityService } from '../application/service/activity.service'
-import { IActivityRepository } from '../application/port/activity.repository.interface'
-import { ActivityRepository } from '../infrastructure/repository/activity.repository'
-import { UserEntity } from '../infrastructure/entity/child.entity'
+import { IPhysicalActivityRepository } from '../application/port/physical.activity.repository.interface'
+import { PhysicalActivityRepository } from '../infrastructure/repository/physical.activity.repository'
 import { ActivityEntity } from '../infrastructure/entity/activity.entity'
 import { ActivityRepoModel } from '../infrastructure/database/schema/activity.schema'
-import { UserEntityMapper } from '../infrastructure/entity/mapper/child.entity.mapper'
 import { ActivityEntityMapper } from '../infrastructure/entity/mapper/activity.entity.mapper'
-import { IEntityMapper } from '../infrastructure/entity/mapper/entity.mapper.interface'
-import { Child } from '../application/domain/model/child'
 import { RabbitMQConnectionFactory } from '../infrastructure/eventbus/rabbitmq/rabbitmp.connection.factory'
 import { RabbitMQConnection } from '../infrastructure/eventbus/rabbitmq/rabbitmq.connection'
 import { EventBusRabbitMQ } from '../infrastructure/eventbus/rabbitmq/eventbus.rabbittmq'
@@ -45,6 +41,7 @@ import { SleepEntity } from '../infrastructure/entity/sleep.entity'
 import { Sleep } from '../application/domain/model/sleep'
 import { SleepEntityMapper } from '../infrastructure/entity/mapper/sleep.entity.mapper'
 import { SleepRepoModel } from '../infrastructure/database/schema/sleep.schema'
+import { IEntityMapper } from '../infrastructure/port/entity.mapper.interface'
 
 export class DI {
     private static instance: DI
@@ -96,14 +93,14 @@ export class DI {
         this.container.bind<SleepController>(Identifier.SLEEP_CONTROLLER).to(SleepController).inSingletonScope()
 
         // Services
-        this.container.bind<IActivityService>(Identifier.ACTIVITY_SERVICE).to(ActivityService).inSingletonScope()
+        this.container.bind<IPhysicalActivityService>(Identifier.ACTIVITY_SERVICE).to(ActivityService).inSingletonScope()
         this.container.bind<IEnvironmentService>(Identifier.ENVIRONMENT_SERVICE).to(EnvironmentService).inSingletonScope()
         this.container.bind<ISleepService>(Identifier.SLEEP_SERVICE).to(SleepService).inSingletonScope()
 
         // Repositories
         this.container
-            .bind<IActivityRepository>(Identifier.ACTIVITY_REPOSITORY)
-            .to(ActivityRepository).inSingletonScope()
+            .bind<IPhysicalActivityRepository>(Identifier.ACTIVITY_REPOSITORY)
+            .to(PhysicalActivityRepository).inSingletonScope()
         this.container
             .bind<IEnvironmentRepository>(Identifier.ENVIRONMENT_REPOSITORY)
             .to(EnvironmentRepository).inSingletonScope()
@@ -112,19 +109,11 @@ export class DI {
             .to(SleepRepository).inSingletonScope()
 
         // Models
-        this.container.bind(Identifier.USER_ENTITY).toConstantValue(UserEntity)
-        this.container.bind(Identifier.ACTIVITY_ENTITY).toConstantValue(ActivityEntity)
-        this.container.bind(Identifier.ENVIRONMENT_ENTITY).toConstantValue(EnvironmentEntity)
-        this.container.bind(Identifier.SLEEP_ENTITY).toConstantValue(SleepEntity)
-
         this.container.bind(Identifier.ACTIVITY_REPO_MODEL).toConstantValue(ActivityRepoModel)
         this.container.bind(Identifier.ENVIRONMENT_REPO_MODEL).toConstantValue(EnvironmentRepoModel)
         this.container.bind(Identifier.SLEEP_REPO_MODEL).toConstantValue(SleepRepoModel)
 
         // Mappers
-        this.container
-            .bind<IEntityMapper<Child, UserEntity>>(Identifier.USER_ENTITY_MAPPER)
-            .to(UserEntityMapper).inSingletonScope()
         this.container
             .bind<IEntityMapper<PhysicalActivity, ActivityEntity>>(Identifier.ACTIVITY_ENTITY_MAPPER)
             .to(ActivityEntityMapper).inSingletonScope()

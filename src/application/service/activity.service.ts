@@ -1,7 +1,7 @@
 import { inject, injectable } from 'inversify'
 import { Identifier } from '../../di/identifiers'
-import { IActivityService } from '../port/activity.service.interface'
-import { IActivityRepository } from '../port/activity.repository.interface'
+import { IPhysicalActivityService } from '../port/physical.activity.service.interface'
+import { IPhysicalActivityRepository } from '../port/physical.activity.repository.interface'
 import { PhysicalActivity } from '../domain/model/physical.activity'
 import { CreatePhysicalActivityValidator } from '../domain/validator/create.physical.activity.validator'
 import { ConflictException } from '../domain/exception/conflict.exception'
@@ -13,12 +13,12 @@ import { ILogger } from '../../utils/custom.logger'
 /**
  * Implementing activity Service.
  *
- * @implements {IActivityService}
+ * @implements {IPhysicalActivityService}
  */
 @injectable()
-export class ActivityService implements IActivityService {
+export class ActivityService implements IPhysicalActivityService {
 
-    constructor(@inject(Identifier.ACTIVITY_REPOSITORY) private readonly _activityRepository: IActivityRepository,
+    constructor(@inject(Identifier.ACTIVITY_REPOSITORY) private readonly _activityRepository: IPhysicalActivityRepository,
                 @inject(Identifier.RABBITMQ_EVENT_BUS) readonly eventBus: IEventBus,
                 @inject(Identifier.LOGGER) readonly logger: ILogger) {
     }
@@ -33,13 +33,14 @@ export class ActivityService implements IActivityService {
      */
     public async add(activity: PhysicalActivity): Promise<PhysicalActivity> {
         CreatePhysicalActivityValidator.validate(activity)
-        const activityExist = await this._activityRepository.checkExist(activity)
-        if (activityExist) throw new ConflictException('PhysicalActivity is already registered...')
 
         try {
+            const activityExist = await this._activityRepository.checkExist(activity)
+            if (activityExist) throw new ConflictException('Physical Activity is already registered...')
+
             const activitySaved: PhysicalActivity = await this._activityRepository.create(activity)
 
-            this.logger.info(`Activity with ID: ${activitySaved.getId()} published on event bus...`)
+            this.logger.info(`Physical Activity with ID: ${activitySaved.id} published on event bus...`)
             this.eventBus.publish(
                 new ActivitySaveEvent('ActivitySaveEvent', new Date(), activitySaved),
                 'activities.save'
@@ -77,27 +78,27 @@ export class ActivityService implements IActivityService {
     /**
      * Retrieve activity by unique identifier (ID) and child ID.
      *
-     * @param idActivity PhysicalActivity ID.
-     * @param idUser Child ID.
+     * @param activityId PhysicalActivity ID.
+     * @param childId Child ID.
      * @param query Defines object to be used for queries.
      * @return {Promise<Array<PhysicalActivity>>}
      * @throws {RepositoryException}
      */
-    public getByIdAndUser(idActivity: string, idUser: string, query: IQuery): Promise<PhysicalActivity> {
-        query.filters = { _id: idActivity, child: idUser }
+    public getByIdAndChild(activityId: string, childId: string, query: IQuery): Promise<PhysicalActivity> {
+        query.filters = { _id: activityId, child_id: childId }
         return this._activityRepository.findOne(query)
     }
 
     /**
      * List the activities of a child.
      *
-     * @param idUser Child ID.
+     * @param childId Child ID.
      * @param query Defines object to be used for queries.
-     * @return {Promise<PhysicalActivity>}
+     * @return {Promise<PhysicalActivity>}`
      * @throws {ValidationException | RepositoryException}
      */
-    public getAllByUser(idUser: string, query: IQuery): Promise<Array<PhysicalActivity>> {
-        query.filters = Object.assign({ child: idUser }, query.filters)
+    public getAllByChild(childId: string, query: IQuery): Promise<Array<PhysicalActivity>> {
+        query.addFilter({ child_id: childId })
         return this._activityRepository.find(query)
     }
 
@@ -105,27 +106,27 @@ export class ActivityService implements IActivityService {
      * Update child activity data.
      *
      * @param activity Containing the data to be updated
-     * @param idUser Child ID.
+     * @param childId Child ID.
      * @return {Promise<PhysicalActivity>}
      * @throws {ValidationException | ConflictException | RepositoryException}
      */
-    public updateByUser(activity: PhysicalActivity, idUser: string): Promise<PhysicalActivity> {
-        return this._activityRepository.updateByChild(activity, idUser)
+    public updateByChild(activity: PhysicalActivity, childId: string): Promise<PhysicalActivity> {
+        return this._activityRepository.updateByChild(activity, childId)
     }
 
     /**
      * Removes activity according to its unique identifier and related child.
      *
-     * @param idActivity Unique identifier.
-     * @param idUser Child ID.
+     * @param activityId Unique identifier.
+     * @param childId Child ID.
      * @return {Promise<boolean>}
      * @throws {ValidationException | RepositoryException}
      */
-    public removeByUser(idActivity: string | number, idUser: string): Promise<boolean> {
-        return this._activityRepository.removeByChild(idActivity, idUser)
+    public removeByChild(activityId: string | number, childId: string): Promise<boolean> {
+        return this._activityRepository.removeByChild(activityId, childId)
     }
 
-    public async update(activity: PhysicalActivity): Promise<PhysicalActivity> {
+    public async update(physicalActivity: PhysicalActivity): Promise<PhysicalActivity> {
         throw new Error('Unsupported feature!')
     }
 

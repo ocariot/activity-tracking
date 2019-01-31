@@ -5,7 +5,7 @@ import { Default } from '../../../utils/default'
 
 @injectable()
 export class RabbitMQConnectionFactory implements IConnectionFactory {
-    protected options = { retries: this.getRetryCount(), interval: this.getRetryInterval() }
+    protected options = { retries: Default.RABBITMQ_CON_RETRY_COUNT, interval: Default.RABBITMQ_CON_RETRY_INTERVAL }
 
     /**
      * Create instance of {@link Connection} Class belonging
@@ -27,23 +27,5 @@ export class RabbitMQConnectionFactory implements IConnectionFactory {
      */
     protected getAmqpUri(): string {
         return process.env.RABBITMQ_AMQP_URI || Default.RABBITMQ_AMQP_URI
-    }
-
-    /**
-     * Retrieve the number of retries to reconnect.
-     *
-     * @return {number}
-     */
-    private getRetryCount(): number {
-        return Number(process.env.RABBITMQ_CON_RETRY_COUNT) || Default.RABBITMQ_CON_RETRY_COUNT
-    }
-
-    /**
-     * Retrieve the time interval in ms for a new attempt to reconnect.
-     *
-     * @return {number}
-     */
-    private getRetryInterval(): number {
-        return Number(process.env.RABBITMQ_CON_RETRY_INTERVAL) || Default.RABBITMQ_CON_RETRY_INTERVAL
     }
 }
