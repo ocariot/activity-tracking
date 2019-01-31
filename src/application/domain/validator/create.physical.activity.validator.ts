@@ -13,7 +13,6 @@ export class CreatePhysicalActivityValidator {
         if (activity.calories === undefined) fields.push('calories')
         if (activity.duration === undefined) fields.push('duration')
         if (!activity.child_id) fields.push('child_id')
-
         if (activity.levels) PhysicalActivityLevelsValidator.validate(activity.levels)
 
         if (fields.length > 0) {

@@ -9,10 +9,7 @@ export class SleepPatternValidator {
 
         // validate null
         if (!sleepPattern.data_set) fields.push('data_set')
-        else if (!sleepPattern.data_set.length) {
-            throw new ValidationException(message, 'The data_set collection must not be empty!')
-        }
-        else sleepPattern.data_set.forEach(item => SleepPatternDataSetValidator.validate(item))
+        else SleepPatternDataSetValidator.validate(sleepPattern.data_set)
 
         if (fields.length > 0) {
             throw new ValidationException(message,

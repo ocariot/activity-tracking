@@ -6,8 +6,8 @@ export class LocationValidator {
         const fields: Array<string> = []
 
         // validate null
-        if (!location.local) fields.push('local')
-        if (!location.room) fields.push('room')
+        if (!location.local) fields.push('location local')
+        if (!location.room) fields.push('location room')
 
         if (fields.length > 0) {
             throw new ValidationException('Location are not in a format that is supported...',

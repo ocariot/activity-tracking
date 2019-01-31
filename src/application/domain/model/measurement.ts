@@ -69,7 +69,5 @@ export class Measurement implements IJSONSerializable, IJSONDeserializable<Measu
  */
 export enum MeasurementType {
     TEMPERATURE = 'temperature',
-    HUMIDITY = 'humidity',
-    HEART_RATE = 'heartrate',
-    BODY_MASS = 'bodymass'
+    HUMIDITY = 'humidity'
 }

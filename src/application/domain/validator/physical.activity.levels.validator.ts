@@ -14,11 +14,12 @@ export class PhysicalActivityLevelsValidator {
 
         levels.forEach((level: ActivityLevel) => {
             // validate null
-            if (level.name && !levelsTypes.includes(level.name)) {
+            if (!level.name) fields.push('level name')
+            else if (!levelsTypes.includes(level.name)) {
                 throw new ValidationException(`The name of level provided "${level.name}" is not supported...`,
                     'The names of the allowed levels are: '.concat(Object.values(ActivityLevelType).join(', '), '.'))
             }
-            if (level.duration === undefined) fields.push('duration')
+            if (level.duration === undefined) fields.push('level duration')
         })
 
         if (levelsTypes.length !== levels.filter(item => levelsTypes.includes(item.name)).length) {

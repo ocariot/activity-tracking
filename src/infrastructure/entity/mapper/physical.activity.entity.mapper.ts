@@ -30,8 +30,8 @@ export class PhysicalActivityEntityMapper implements IEntityMapper<PhysicalActiv
         if (item.child_id) result.child_id = item.child_id
         if (item.name) result.name = item.name
         if (item.calories) result.calories = item.calories
-        if (item.steps) result.steps = item.steps
-        if (item.levels) {
+        if (item.steps !== undefined) result.steps = item.steps
+        if (item.levels !== undefined) {
             result.levels = item.levels.map((elem: ActivityLevel) => elem.toJSON())
         }
 
