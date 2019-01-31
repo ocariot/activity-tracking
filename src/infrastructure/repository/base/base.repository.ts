@@ -27,7 +27,6 @@ export abstract class BaseRepository<T extends Entity, TModel> implements IRepos
 
     public create(item: T): Promise<T> {
         const itemNew: TModel = this.mapper.transform(item)
-        console.log(`item`, itemNew)
         return new Promise<T>((resolve, reject) => {
             this.Model.create(itemNew)
                 .then((result) => {
@@ -50,7 +49,9 @@ export abstract class BaseRepository<T extends Entity, TModel> implements IRepos
                 .skip(Number((q.pagination.limit * q.pagination.page) - q.pagination.limit))
                 .limit(Number(q.pagination.limit))
                 .exec() // execute query
-                .then((result: Array<TModel>) => resolve(result.map(item => this.mapper.transform(item))))
+                .then((result: Array<TModel>) => {
+                    resolve(result.map(item => this.mapper.transform(item)))
+                })
                 .catch(err => reject(this.mongoDBErrorListener(err)))
         })
     }

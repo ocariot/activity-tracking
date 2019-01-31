@@ -23,7 +23,6 @@ export class EnvironmentEntityMapper implements IEntityMapper<Environment, Envir
      */
     public modelToModelEntity(item: Environment): EnvironmentEntity {
         const result: EnvironmentEntity = new EnvironmentEntity()
-        console.log('env', item.toJSON())
 
         if (item.id) result.id = item.id
         if (item.institution_id) result.institution_id = item.institution_id
@@ -34,7 +33,6 @@ export class EnvironmentEntityMapper implements IEntityMapper<Environment, Envir
             result.measurements = item.measurements.map((measurement: Measurement) => measurement.toJSON())
         }
 
-        console.log('env re', result)
         return result
     }
 

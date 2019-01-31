@@ -95,7 +95,7 @@ export class Query implements IQuery {
         }
 
         if (json.pagination) this.pagination = new Pagination().fromJSON(json.pagination)
-        if (json.filters) this.filters = new Object(json.filters)
+        if (json.filters) this.filters = json.filters
 
         return this
     }

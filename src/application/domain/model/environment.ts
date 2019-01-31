@@ -89,6 +89,7 @@ export class Environment extends Entity implements IJSONSerializable, IJSONDeser
     public toJSON(): any {
         return {
             id: super.id,
+            institution_id: this.institution_id,
             location: this.location ? this.location.toJSON() : this.location,
             measurements: this.measurements ? this.measurements.map(item => item.toJSON()) : this.measurements,
             climatized: this.climatized,
