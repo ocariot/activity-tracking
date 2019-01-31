@@ -28,7 +28,7 @@ export class MongoDBConnectionFactory implements IConnectionFactory {
      * @return {string}
      */
     private getDBUri(): string {
-        if (process.env.NODE_ENV === 'test') {
+        if (process.env.NODE_ENV && process.env.NODE_ENV === 'test') {
             return process.env.MONGODB_URI_TEST || Default.MONGODB_URI_TEST
         }
         return process.env.MONGODB_URI || Default.MONGODB_URI
