@@ -4,4 +4,5 @@ export class EnvironmentEntity {
     public location?: any // Sensor Location
     public measurements?: Array<any> // Associated Measurements
     public climatized?: boolean // Boolean variable to identify if a environment is climatized.
+    public timestamp?: Date // Boolean variable to identify if a environment is climatized.
 }

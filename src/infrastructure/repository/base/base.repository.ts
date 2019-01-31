@@ -27,6 +27,7 @@ export abstract class BaseRepository<T extends Entity, TModel> implements IRepos
 
     public create(item: T): Promise<T> {
         const itemNew: TModel = this.mapper.transform(item)
+        console.log(`item`, itemNew)
         return new Promise<T>((resolve, reject) => {
             this.Model.create(itemNew)
                 .then((result) => {
@@ -103,7 +104,6 @@ export abstract class BaseRepository<T extends Entity, TModel> implements IRepos
     }
 
     protected mongoDBErrorListener(err: any): ValidationException | ConflictException | RepositoryException | undefined {
-        console.log(`err`, err)
         if (err && err.name) {
             this.logger.error(err)
 

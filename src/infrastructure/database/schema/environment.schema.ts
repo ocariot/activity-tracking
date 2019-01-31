@@ -4,35 +4,40 @@ interface IEnvironmentModel extends Mongoose.Document {
 }
 
 const environmentSchema = new Mongoose.Schema({
-        timestamp: {
-            type: Date,
-            required: 'Timestamp of the environment measurement is required!'
-        },
-        temperature: {
-            type: Number,
-            required: 'Temperature is required!'
-        },
-        humidity: {
-            type: Number,
-            required: 'Humidity is required!'
+        institution_id: {
+            type: Mongoose.Schema.Types.ObjectId,
+            required: true
         },
         location: {
-            school: {
+            local: {
                 type: String,
-                required: 'School is required!'
+                required: true
             },
             room: {
                 type: String,
-                required: 'Room is required!'
+                required: true
             },
-            country: {
+            latitude: { type: Number },
+            longitude: { type: Number }
+        },
+        measurements: {
+            type: {
                 type: String,
-                required: 'Country is required!'
+                required: true
             },
-            city: {
+            value: {
+                type: Number,
+                required: true
+            },
+            unit: {
                 type: String,
-                required: 'City is required!'
+                required: true
             }
+        },
+        climatized: { type: Boolean },
+        timestamp: {
+            type: Date,
+            required: true
         }
     },
     {

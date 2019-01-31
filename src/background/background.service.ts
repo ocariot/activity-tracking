@@ -3,10 +3,16 @@ import { Identifier } from '../di/identifiers'
 import { IDBConnection } from '../infrastructure/port/db.connection.interface'
 import { IEventBus } from '../infrastructure/port/event.bus.interface'
 import { CustomLogger } from '../utils/custom.logger'
-import { ActivitySaveEventHandler } from '../application/integration-event/handler/activity.save.event.handler'
+import { PhysicalActivitySaveEventHandler } from '../application/integration-event/handler/physical.activity.save.event.handler'
 import { DI } from '../di/di'
-import { ActivitySaveEvent } from '../application/integration-event/event/activity.save.event'
+import { PhysicalActivitySaveEvent } from '../application/integration-event/event/physical.activity.save.event'
 import { IPhysicalActivityRepository } from '../application/port/physical.activity.repository.interface'
+import { ISleepRepository } from '../application/port/sleep.repository.interface'
+import { EnvironmentSaveEvent } from '../application/integration-event/event/environment.save.event'
+import { SleepSaveEvent } from '../application/integration-event/event/sleep.save.event'
+import { SleepSaveEventHandler } from '../application/integration-event/handler/sleep.save.event.handler'
+import { EnvironmentSaveEventHandler } from '../application/integration-event/handler/environment.save.event.handler'
+import { IEnvironmentRepository } from '../application/port/environment.repository.interface'
 
 @injectable()
 export class BackgroundService {
@@ -26,12 +32,28 @@ export class BackgroundService {
             await this._mongodb.tryConnect() // Initialize mongodb
 
             /**
-             * Subscribe in event activity save
+             * Subscribe in event physical activity save
              */
-            const activitySaveEvent = new ActivitySaveEvent('ActivitySaveEvent', new Date())
-            const event_save_handle = new ActivitySaveEventHandler(
+            const activitySaveEvent = new PhysicalActivitySaveEvent('PhysicalActivitySaveEvent', new Date())
+            const activityEventSaveHandler = new PhysicalActivitySaveEventHandler(
                 this._diContainer.get<IPhysicalActivityRepository>(Identifier.ACTIVITY_REPOSITORY), this._logger)
-            await this._eventBus.subscribe(activitySaveEvent, event_save_handle, 'activities.save')
+            await this._eventBus.subscribe(activitySaveEvent, activityEventSaveHandler, 'activities.save')
+
+            /**
+             * Subscribe in event sleep save
+             */
+            const sleepSaveEvent = new SleepSaveEvent('SleepSaveEvent', new Date())
+            const sleepEventSaveHandler = new SleepSaveEventHandler(
+                this._diContainer.get<ISleepRepository>(Identifier.SLEEP_REPOSITORY), this._logger)
+            await this._eventBus.subscribe(sleepSaveEvent, sleepEventSaveHandler, 'sleep.save')
+
+            /**
+             * Subscribe in event environment save
+             */
+            const environmentSaveEvent = new EnvironmentSaveEvent('EnvironmentSaveEvent', new Date())
+            const environmentSaveEventHandler = new EnvironmentSaveEventHandler(
+                this._diContainer.get<IEnvironmentRepository>(Identifier.ENVIRONMENT_REPOSITORY), this._logger)
+            await this._eventBus.subscribe(environmentSaveEvent, environmentSaveEventHandler, 'environments.save')
         } catch (err) {
             this._logger.error('Error initializing services in background: '.concat(err.message))
         }

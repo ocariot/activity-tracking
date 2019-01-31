@@ -26,7 +26,7 @@ const physicalActivitySchema = new Mongoose.Schema({
         },
         steps: {
             type: Number,
-            required: 'Number of steps taken during the activity is required!'
+            required: 'Number of steps taken during the physicalActivity is required!'
         },
         levels: [
             {

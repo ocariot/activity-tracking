@@ -32,7 +32,7 @@ export class ActivityController {
     }
 
     /**
-     * Retrieve physical activity list of all children.
+     * Retrieve physical physicalActivity list of all children.
      * For the query strings, the query-strings-parser middleware was used.
      * @see {@link https://www.npmjs.com/package/query-strings-parser} for further information.
      *
@@ -52,7 +52,7 @@ export class ActivityController {
     }
 
     /**
-     * Add new physical activity.
+     * Add new physical physicalActivity.
      *
      * @param {Request} req
      * @param {Response} res
@@ -94,7 +94,7 @@ export class ActivityController {
     }
 
     /**
-     * Get activity by id and child.
+     * Get physicalActivity by id and child.
      * For the query strings, the query-strings-parser middleware was used.
      * @see {@link https://www.npmjs.com/package/query-strings-parser} for further information.
      *
@@ -116,7 +116,7 @@ export class ActivityController {
     }
 
     /**
-     * Update physical activity of the child.
+     * Update physical physicalActivity of the child.
      *
      * @param {Request} req
      * @param {Response} res
@@ -138,7 +138,7 @@ export class ActivityController {
     }
 
     /**
-     * Remove physical activity of the child.
+     * Remove physical physicalActivity of the child.
      *
      * @param {Request} req
      * @param {Response} res

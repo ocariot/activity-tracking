@@ -7,12 +7,12 @@ import { CreatePhysicalActivityValidator } from '../domain/validator/create.phys
 import { ConflictException } from '../domain/exception/conflict.exception'
 import { IQuery } from '../port/query.interface'
 import { IEventBus } from '../../infrastructure/port/event.bus.interface'
-import { ActivitySaveEvent } from '../integration-event/event/activity.save.event'
+import { PhysicalActivitySaveEvent } from '../integration-event/event/physical.activity.save.event'
 import { ILogger } from '../../utils/custom.logger'
 import { UpdatePhysicalActivityValidator } from '../domain/validator/update.physical.activity.validator'
 
 /**
- * Implementing activity Service.
+ * Implementing physicalActivity Service.
  *
  * @implements {IPhysicalActivityService}
  */
@@ -25,12 +25,12 @@ export class ActivityService implements IPhysicalActivityService {
     }
 
     /**
-     * Adds a new activity.
-     * Before adding, it is checked whether the activity already exists.
+     * Adds a new physicalActivity.
+     * Before adding, it is checked whether the physicalActivity already exists.
      *
      * @param {PhysicalActivity} activity
      * @returns {(Promise<PhysicalActivity>)}
-     * @throws {ConflictException | RepositoryException} If a data conflict occurs, as an existing activity.
+     * @throws {ConflictException | RepositoryException} If a data conflict occurs, as an existing physicalActivity.
      */
     public async add(activity: PhysicalActivity): Promise<PhysicalActivity> {
         CreatePhysicalActivityValidator.validate(activity)
@@ -43,7 +43,7 @@ export class ActivityService implements IPhysicalActivityService {
 
             this.logger.info(`Physical Activity with ID: ${activitySaved.id} published on event bus...`)
             this.eventBus.publish(
-                new ActivitySaveEvent('ActivitySaveEvent', new Date(), activitySaved),
+                new PhysicalActivitySaveEvent('PhysicalActivitySaveEvent', new Date(), activitySaved),
                 'activities.save'
             )
             return Promise.resolve(activitySaved)
@@ -53,7 +53,7 @@ export class ActivityService implements IPhysicalActivityService {
     }
 
     /**
-     * Get the data of all activity in the infrastructure.
+     * Get the data of all physicalActivity in the infrastructure.
      *
      * @param query Defines object to be used for queries.
      * @return {Promise<Array<PhysicalActivity>>}
@@ -64,7 +64,7 @@ export class ActivityService implements IPhysicalActivityService {
     }
 
     /**
-     * Get in infrastructure the activity data.
+     * Get in infrastructure the physicalActivity data.
      *
      * @param id Unique identifier.
      * @param query Defines object to be used for queries.
@@ -77,7 +77,7 @@ export class ActivityService implements IPhysicalActivityService {
     }
 
     /**
-     * Retrieve activity by unique identifier (ID) and child ID.
+     * Retrieve physicalActivity by unique identifier (ID) and child ID.
      *
      * @param activityId PhysicalActivity ID.
      * @param childId Child ID.
@@ -104,7 +104,7 @@ export class ActivityService implements IPhysicalActivityService {
     }
 
     /**
-     * Update child activity data.
+     * Update child physicalActivity data.
      *
      * @param activity Containing the data to be updated
      * @param childId Child ID.
@@ -117,7 +117,7 @@ export class ActivityService implements IPhysicalActivityService {
     }
 
     /**
-     * Removes activity according to its unique identifier and related child.
+     * Removes physicalActivity according to its unique identifier and related child.
      *
      * @param activityId Unique identifier.
      * @param childId Child ID.

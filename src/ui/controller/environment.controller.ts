@@ -1,12 +1,14 @@
 import HttpStatus from 'http-status-codes'
 import { inject } from 'inversify'
-import { controller, httpDelete, request, response } from 'inversify-express-utils'
+import { controller, httpDelete, httpGet, httpPost, request, response } from 'inversify-express-utils'
 import { Request, Response } from 'express'
 import { Identifier } from '../../di/identifiers'
 import { ApiExceptionManager } from '../exception/api.exception.manager'
 import { ILogger } from '../../utils/custom.logger'
 import { IEnvironmentService } from '../../application/port/environment.service.interface'
 import { ApiException } from '../exception/api.exception'
+import { Environment } from '../../application/domain/model/environment'
+import { Query } from '../../infrastructure/repository/query/query'
 
 /**
  * Controller that implements Environment feature operations.
@@ -29,45 +31,45 @@ export class EnvironmentController {
     ) {
     }
 
-    // /**
-    //  * Add new environment measurement.
-    //  *
-    //  * @param {Request} req
-    //  * @param {Response} res
-    //  */
-    // @httpPost('/')
-    // public async addEnvironment(@request() req: Request, @response() res: Response) {
-    //     try {
-    //         const environment: Environment = new Environment().deserialize(req.body)
-    //         const result: Environment = await this._environmentService.add(environment)
-    //         return res.status(HttpStatus.CREATED).send(result)
-    //     } catch (err) {
-    //         const handlerError = ApiExceptionManager.build(err)
-    //         return res.status(handlerError.code)
-    //             .send(handlerError.toJson())
-    //     }
-    // }
-    //
-    // /**
-    //  * Get all ambient measurements.
-    //  *
-    //  * For the query strings, the query-strings-parser middleware was used.
-    //  * @see {@link https://www.npmjs.com/package/query-strings-parser} for further information.
-    //  *
-    //  * @param {Request} req
-    //  * @param {Response} res
-    //  */
-    // @httpGet('/')
-    // public async getAllEnvironments(@request() req: Request, @response() res: Response): Promise<Response> {
-    //     try {
-    //         const result = await this._environmentService.getAll(new Query().deserialize(req.query))
-    //         return res.status(HttpStatus.OK).send(result)
-    //     } catch (err) {
-    //         const handlerError = ApiExceptionManager.build(err)
-    //         return res.status(handlerError.code)
-    //             .send(handlerError.toJson())
-    //     }
-    // }
+    /**
+     * Add new environment measurement.
+     *
+     * @param {Request} req
+     * @param {Response} res
+     */
+    @httpPost('/')
+    public async addEnvironment(@request() req: Request, @response() res: Response) {
+        try {
+            const environment: Environment = new Environment().fromJSON(req.body)
+            const result: Environment = await this._environmentService.add(environment)
+            return res.status(HttpStatus.CREATED).send(result)
+        } catch (err) {
+            const handlerError = ApiExceptionManager.build(err)
+            return res.status(handlerError.code)
+                .send(handlerError.toJson())
+        }
+    }
+
+    /**
+     * Get all ambient measurements.
+     *
+     * For the query strings, the query-strings-parser middleware was used.
+     * @see {@link https://www.npmjs.com/package/query-strings-parser} for further information.
+     *
+     * @param {Request} req
+     * @param {Response} res
+     */
+    @httpGet('/')
+    public async getAllEnvironments(@request() req: Request, @response() res: Response): Promise<Response> {
+        try {
+            const result = await this._environmentService.getAll(new Query().fromJSON(req.query))
+            return res.status(HttpStatus.OK).send(result)
+        } catch (err) {
+            const handlerError = ApiExceptionManager.build(err)
+            return res.status(handlerError.code)
+                .send(handlerError.toJson())
+        }
+    }
 
     /**
      * Remove sleep by child.
@@ -79,7 +81,7 @@ export class EnvironmentController {
     public async removeEnvironmentById(@request() req: Request, @response() res: Response): Promise<Response> {
         try {
             const result: boolean = await this._environmentService.remove(req.params.environment_id)
-            if (!result) return res.status(HttpStatus.NOT_FOUND).send(this.getMessageNotFoundEnvironment())
+            if (!result) return res.status(HttpStatus.NOT_FOUND).send(this.getMessageEnvironmentNotFound())
             return res.status(HttpStatus.NO_CONTENT).send()
         } catch (err) {
             const handlerError = ApiExceptionManager.build(err)
@@ -91,7 +93,7 @@ export class EnvironmentController {
     /**
      * Default message when resource is not found or does not exist.
      */
-    private getMessageNotFoundEnvironment(): object {
+    private getMessageEnvironmentNotFound(): object {
         return new ApiException(
             HttpStatus.NOT_FOUND,
             'Measurement of environment not found!',

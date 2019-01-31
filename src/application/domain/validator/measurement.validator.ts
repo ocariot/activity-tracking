@@ -8,7 +8,7 @@ export class MeasurementValidator {
         // validate null
         if (!measurement.type) fields.push('type')
         else if (!Object.values(MeasurementType).includes(measurement.type)) {
-            throw new ValidationException('The type of measurement provided is not supported...',
+            throw new ValidationException(`The type of measurement provided "${measurement.type}" is not supported...`,
                 'The types allowed are: '.concat(Object.values(MeasurementType).join(', '), '.'))
         }
         if (measurement.value === undefined) fields.push('value')

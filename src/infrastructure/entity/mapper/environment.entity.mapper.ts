@@ -28,7 +28,8 @@ export class EnvironmentEntityMapper implements IEntityMapper<Environment, Envir
         if (item.institution_id) result.institution_id = item.institution_id
         if (item.location) result.location = item.location.toJSON()
         if (item.climatized) result.location = item.climatized
-        if (item.measurements && item.measurements instanceof Array) {
+        if (item.timestamp) result.timestamp = item.timestamp
+        if (item.measurements) {
             result.measurements = item.measurements.map((measurement: Measurement) => measurement.toJSON())
         }
 
@@ -61,7 +62,8 @@ export class EnvironmentEntityMapper implements IEntityMapper<Environment, Envir
         if (json.institution_id) result.institution_id = json.institution_id
         if (json.location) result.location = new Location().fromJSON(json.location)
         if (json.climatized) result.location = json.climatized
-        if (json.measurements && json.measurements instanceof Array) {
+        if (json.timestamp) result.timestamp = json.timestamp
+        if (json.measurements) {
             result.measurements = json.measurements.map(item => new Measurement().fromJSON(item))
         }
 

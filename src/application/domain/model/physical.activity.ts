@@ -5,15 +5,15 @@ import { ActivityLevel } from './activity.level'
 import { Activity } from './activity'
 
 /**
- * Implementation of the physical activity entity.
+ * Implementation of the physical physicalActivity entity.
  *
  * @extends {Entity}
  * @implements { IJSONSerializable, IJSONDeserializable<Activity>
  */
 export class PhysicalActivity extends Activity implements IJSONSerializable, IJSONDeserializable<PhysicalActivity> {
-    private _name?: string // Name of physical activity.
-    private _calories?: number // Calories spent during physical activity.
-    private _steps?: number // Number of steps taken during the physical activity.
+    private _name?: string // Name of physical physicalActivity.
+    private _calories?: number // Calories spent during physical physicalActivity.
+    private _steps?: number // Number of steps taken during the physical physicalActivity.
     private _levels?: Array<ActivityLevel> // PhysicalActivity levels (sedentary, light, fair or very).
 
     constructor() {

@@ -6,7 +6,7 @@ export class EnvironmentSaveEvent extends IntegrationEvent<Environment> {
         super(event_name, timestamp)
     }
 
-    public serialize(): any {
+    public toJSON(): any {
         if (!this.environment) return {}
         return {
             event_name: this.event_name,

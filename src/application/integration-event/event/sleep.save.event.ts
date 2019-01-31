@@ -6,7 +6,7 @@ export class SleepSaveEvent extends IntegrationEvent<Sleep> {
         super(event_name, timestamp)
     }
 
-    public serialize(): any {
+    public toJSON(): any {
         if (!this.sleep) return {}
         return {
             event_name: this.event_name,

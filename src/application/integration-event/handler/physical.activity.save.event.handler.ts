@@ -1,17 +1,17 @@
 import { inject } from 'inversify'
 import { Identifier } from '../../../di/identifiers'
 import { IIntegrationEventHandler } from './integration.event.handler.interface'
-import { ActivitySaveEvent } from '../event/activity.save.event'
+import { PhysicalActivitySaveEvent } from '../event/physical.activity.save.event'
 import { PhysicalActivity } from '../../domain/model/physical.activity'
 import { CustomLogger } from '../../../utils/custom.logger'
 import { IPhysicalActivityRepository } from '../../port/physical.activity.repository.interface'
 import { CreatePhysicalActivityValidator } from '../../domain/validator/create.physical.activity.validator'
 import { ConflictException } from '../../domain/exception/conflict.exception'
 
-export class ActivitySaveEventHandler implements IIntegrationEventHandler<ActivitySaveEvent> {
+export class PhysicalActivitySaveEventHandler implements IIntegrationEventHandler<PhysicalActivitySaveEvent> {
 
     /**
-     * Creates an instance of ActivityRemoveEventHandler.
+     * Creates an instance of ActivitySaveEventHandler.
      *
      * @param _activityRepository
      * @param _logger
@@ -22,13 +22,13 @@ export class ActivitySaveEventHandler implements IIntegrationEventHandler<Activi
     ) {
     }
 
-    public async handle(event: ActivitySaveEvent): Promise<void> {
-        const activity: PhysicalActivity = new PhysicalActivity().fromJSON(event.activity)
+    public async handle(event: PhysicalActivitySaveEvent): Promise<void> {
+        const activity: PhysicalActivity = new PhysicalActivity().fromJSON(event.physicalActivity)
 
         try {
             CreatePhysicalActivityValidator.validate(activity)
             const activityExist = await this._activityRepository.checkExist(activity)
-            if (activityExist) throw new ConflictException('PhysicalActivity is already registered...')
+            if (activityExist) throw new ConflictException('Physical Activity is already registered...')
 
             await this._activityRepository
                 .create(activity)
