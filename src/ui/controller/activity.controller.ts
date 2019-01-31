@@ -52,36 +52,6 @@ export class ActivityController {
     }
 
     /**
-     * Recover the logs.
-     * For the query strings, the query-strings-parser middleware was used.
-     * @see {@link https://www.npmjs.com/package/query-strings-parser} for further information.
-     *
-     * @param {Request} req
-     * @param {Response} res
-     */
-    @httpGet('/:child_id/physicalactivities/logs/date/:date_start/:date_end')
-    public async getLogs(@request() req: Request, @response() res: Response): Promise<Response> {
-        return res.status(HttpStatus.OK).send(
-            '<div style="text-align: center;"><h1>Sorry :(<br>Feature not implemented.</h1>' +
-            '<h2>Do not worry, it will be added soon... \\0/</h2></div>')
-    }
-
-    /**
-     * Recover the logs.
-     * For the query strings, the query-strings-parser middleware was used.
-     * @see {@link https://www.npmjs.com/package/query-strings-parser} for further information.
-     *
-     * @param {Request} req
-     * @param {Response} res
-     */
-    @httpGet('/:child_id/physicalactivities/logs/:reource/date/:date_start/:date_end')
-    public async getLogByResource(@request() req: Request, @response() res: Response): Promise<Response> {
-        return res.status(HttpStatus.OK).send(
-            '<div style="text-align: center;"><h1>Sorry :(<br>Feature not implemented.</h1>' +
-            '<h2>Do not worry, it will be added soon... \\0/</h2></div>')
-    }
-
-    /**
      * Add new physical activity.
      *
      * @param {Request} req
@@ -136,7 +106,7 @@ export class ActivityController {
         try {
             const result: PhysicalActivity = await this._activityService
                 .getByIdAndChild(req.params.physicalactivity_id, req.params.child_id, new Query().fromJSON(req.query))
-            if (!result) return res.status(HttpStatus.NOT_FOUND).send(this.getMessageNotFoundActivity())
+            if (!result) return res.status(HttpStatus.NOT_FOUND).send(this.getMessageNotActivityFound())
             return res.status(HttpStatus.OK).send(result)
         } catch (err) {
             const handlerError = ApiExceptionManager.build(err)
@@ -155,10 +125,10 @@ export class ActivityController {
     public async updatePhysicalActivityOfChild(@request() req: Request, @response() res: Response): Promise<Response> {
         try {
             const physicalActivity: PhysicalActivity = new PhysicalActivity().fromJSON(req.body)
-            physicalActivity.id = req.params.activity_id
+            physicalActivity.id = req.params.physicalactivity_id
 
             const result = await this._activityService.updateByChild(physicalActivity, req.params.child_id)
-            if (!result) return res.status(HttpStatus.NOT_FOUND).send(this.getMessageNotFoundActivity())
+            if (!result) return res.status(HttpStatus.NOT_FOUND).send(this.getMessageNotActivityFound())
             return res.status(HttpStatus.OK).send(result)
         } catch (err) {
             const handlerError = ApiExceptionManager.build(err)
@@ -186,9 +156,39 @@ export class ActivityController {
     }
 
     /**
+     * Recover the logs.
+     * For the query strings, the query-strings-parser middleware was used.
+     * @see {@link https://www.npmjs.com/package/query-strings-parser} for further information.
+     *
+     * @param {Request} req
+     * @param {Response} res
+     */
+    @httpGet('/:child_id/physicalactivities/logs/date/:date_start/:date_end')
+    public async getLogs(@request() req: Request, @response() res: Response): Promise<Response> {
+        return res.status(HttpStatus.OK).send(
+            '<div style="text-align: center;"><h1>Sorry :(<br>Feature not implemented.</h1>' +
+            '<h2>Do not worry, it will be added soon... \\0/</h2></div>')
+    }
+
+    /**
+     * Recover the logs.
+     * For the query strings, the query-strings-parser middleware was used.
+     * @see {@link https://www.npmjs.com/package/query-strings-parser} for further information.
+     *
+     * @param {Request} req
+     * @param {Response} res
+     */
+    @httpGet('/:child_id/physicalactivities/logs/:reource/date/:date_start/:date_end')
+    public async getLogByResource(@request() req: Request, @response() res: Response): Promise<Response> {
+        return res.status(HttpStatus.OK).send(
+            '<div style="text-align: center;"><h1>Sorry :(<br>Feature not implemented.</h1>' +
+            '<h2>Do not worry, it will be added soon... \\0/</h2></div>')
+    }
+
+    /**
      * Default message when resource is not found or does not exist.
      */
-    private getMessageNotFoundActivity(): object {
+    private getMessageNotActivityFound(): object {
         return new ApiException(
             HttpStatus.NOT_FOUND,
             'Physical Activity not found!',

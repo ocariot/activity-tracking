@@ -9,6 +9,7 @@ import { CreateSleepValidator } from '../domain/validator/create.sleep.validator
 import { IEventBus } from '../../infrastructure/port/event.bus.interface'
 import { ILogger } from '../../utils/custom.logger'
 import { SleepSaveEvent } from '../integration-event/event/sleep.save.event'
+import { UpdateSleepValidator } from '../domain/validator/update.sleep.validator'
 
 /**
  * Implementing sleep Service.
@@ -33,10 +34,11 @@ export class SleepService implements ISleepService {
      */
     public async add(sleep: Sleep): Promise<Sleep> {
         CreateSleepValidator.validate(sleep)
-        const sleepExist = await this._sleepRepository.checkExist(sleep)
-        if (sleepExist) throw new ConflictException('Sleep is already registered...')
 
         try {
+            const sleepExist = await this._sleepRepository.checkExist(sleep)
+            if (sleepExist) throw new ConflictException('Sleep is already registered...')
+
             const sleepSaved: Sleep = await this._sleepRepository.create(sleep)
 
             this.logger.info(`Sleep with ID: ${sleepSaved.id} published on event bus...`)
@@ -78,26 +80,26 @@ export class SleepService implements ISleepService {
      * Retrieve sleep by unique identifier (ID) and child ID.
      *
      * @param sleepId Sleep unique identifier.
-     * @param userId Child unique identifier.
+     * @param childId Child unique identifier.
      * @param query Defines object to be used for queries.
      * @return {Promise<Array<Sleep>>}
      * @throws {RepositoryException}
      */
-    public getByIdAndChild(sleepId: string, userId: string, query: IQuery): Promise<Sleep> {
-        query.filters = { _id: sleepId, child_id: userId }
+    public getByIdAndChild(sleepId: string, childId: string, query: IQuery): Promise<Sleep> {
+        query.filters = { _id: sleepId, child_id: childId }
         return this._sleepRepository.findOne(query)
     }
 
     /**
      * List the sleep of a child.
      *
-     * @param userId Child unique identifier.
+     * @param childId Child unique identifier.
      * @param query Defines object to be used for queries.
      * @return {Promise<Sleep>}
      * @throws {ValidationException | RepositoryException}
      */
-    public getAllByChild(userId: string, query: IQuery): Promise<Array<Sleep>> {
-        query.addFilter({ child_id: userId })
+    public getAllByChild(childId: string, query: IQuery): Promise<Array<Sleep>> {
+        query.addFilter({ child_id: childId })
         return this._sleepRepository.find(query)
     }
 
@@ -105,24 +107,25 @@ export class SleepService implements ISleepService {
      * Update child sleep data.
      *
      * @param sleep Containing the data to be updated
-     * @param userId Child unique identifier.
+     * @param childId Child unique identifier.
      * @return {Promise<Sleep>}
      * @throws {ValidationException | ConflictException | RepositoryException}
      */
-    public updateByChild(sleep: Sleep, userId: string): Promise<Sleep> {
-        return this._sleepRepository.updateByChild(sleep, userId)
+    public updateByChild(sleep: Sleep, childId: string): Promise<Sleep> {
+        UpdateSleepValidator.validate(sleep)
+        return this._sleepRepository.updateByChild(sleep, childId)
     }
 
     /**
      * Remove sleep according to its unique identifier and related child.
      *
      * @param sleepId Unique identifier.
-     * @param userId Child unique identifier.
+     * @param childId Child unique identifier.
      * @return {Promise<boolean>}
      * @throws {ValidationException | RepositoryException}
      */
-    public removeByChild(sleepId: string | number, userId: string): Promise<boolean> {
-        return this._sleepRepository.removeByChild(sleepId, userId)
+    public removeByChild(sleepId: string | number, childId: string): Promise<boolean> {
+        return this._sleepRepository.removeByChild(sleepId, childId)
     }
 
     public async update(sleep: Sleep): Promise<Sleep> {

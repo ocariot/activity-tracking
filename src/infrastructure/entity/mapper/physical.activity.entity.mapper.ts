@@ -5,7 +5,7 @@ import { PhysicalActivityEntity } from '../physical.activity.entity'
 import { IEntityMapper } from '../../port/entity.mapper.interface'
 
 @injectable()
-export class ActivityEntityMapper implements IEntityMapper<PhysicalActivity, PhysicalActivityEntity> {
+export class PhysicalActivityEntityMapper implements IEntityMapper<PhysicalActivity, PhysicalActivityEntity> {
 
     public transform(item: any): any {
         if (item instanceof PhysicalActivity) return this.modelToModelEntity(item)

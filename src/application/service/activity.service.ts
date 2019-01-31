@@ -9,6 +9,7 @@ import { IQuery } from '../port/query.interface'
 import { IEventBus } from '../../infrastructure/port/event.bus.interface'
 import { ActivitySaveEvent } from '../integration-event/event/activity.save.event'
 import { ILogger } from '../../utils/custom.logger'
+import { UpdatePhysicalActivityValidator } from '../domain/validator/update.physical.activity.validator'
 
 /**
  * Implementing activity Service.
@@ -111,6 +112,7 @@ export class ActivityService implements IPhysicalActivityService {
      * @throws {ValidationException | ConflictException | RepositoryException}
      */
     public updateByChild(activity: PhysicalActivity, childId: string): Promise<PhysicalActivity> {
+        UpdatePhysicalActivityValidator.validate(activity)
         return this._activityRepository.updateByChild(activity, childId)
     }
 

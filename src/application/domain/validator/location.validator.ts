@@ -10,7 +10,7 @@ export class LocationValidator {
         if (!location.room) fields.push('room')
 
         if (fields.length > 0) {
-            throw new ValidationException('Location are not in a format that is supported!',
+            throw new ValidationException('Location are not in a format that is supported...',
                 'Validation of location failed: '.concat(fields.join(', ')).concat(' is required!'))
         }
     }

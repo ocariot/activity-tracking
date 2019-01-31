@@ -6,33 +6,33 @@ interface ISleepModel extends Mongoose.Document {
 const sleepSchema = new Mongoose.Schema({
         start_time: {
             type: Date,
-            required: 'Sleep start time is required!'
+            required: true
         },
         end_time: {
             type: Date,
-            required: 'Sleep end time is required!'
+            required: true
         },
         duration: {
             type: Number,
-            required: 'Duration of sleep is required!'
+            required: true
         },
         pattern: [{
             start_time: {
                 type: Date,
-                required: 'Start time of sleep pattern is required!'
+                required: true
             },
             name: {
                 type: String,
-                required: 'Name of sleep pattern is required!'
+                required: true
             },
             duration: {
                 type: Number,
-                required: 'Duration of sleep pattern is required!'
+                required: true
             }
         }],
-        child: {
+        child_id: {
             type: Mongoose.Schema.Types.ObjectId,
-            required: 'Child required!'
+            required: true
         }
     },
     {
@@ -48,5 +48,5 @@ const sleepSchema = new Mongoose.Schema({
     }
 )
 
-sleepSchema.index({ child: 1, start_time: 1 }, { unique: true }) // define index at schema level
+sleepSchema.index({ child_id: 1, start_time: 1 }, { unique: true }) // define index at schema level
 export const SleepRepoModel = Mongoose.model<ISleepModel>('Sleep', sleepSchema)

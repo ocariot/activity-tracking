@@ -75,9 +75,8 @@ export class SleepEntityMapper implements IEntityMapper<Sleep, SleepEntity> {
     }
 
     private deserializeSleepPattern(pattern: any): SleepPattern {
-        if (!pattern) {
-            return new SleepPattern([], new SleepPatternSummary())
-        }
+        const sleepParttern: SleepPattern = new SleepPattern()
+        if (!pattern) return sleepParttern
 
         const sleepPatternDataSet: Array<SleepPatternDataSet> = pattern.map(elem => new SleepPatternDataSet().fromJSON(elem))
         const summary: SleepPatternSummary = new SleepPatternSummary()
@@ -93,7 +92,9 @@ export class SleepEntityMapper implements IEntityMapper<Sleep, SleepEntity> {
         summary.awake = new SleepPatternSummaryData(countAwake, durationAwake)
         summary.restless = new SleepPatternSummaryData(countRestless, durationRestless)
 
-        return new SleepPattern(sleepPatternDataSet, summary)
+        sleepParttern.data_set = sleepPatternDataSet
+        sleepParttern.summary = summary
+        return sleepParttern
     }
 
     /**

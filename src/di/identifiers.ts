@@ -28,7 +28,7 @@ export abstract class Identifier {
     public static readonly ENVIRONMENT_REPO_MODEL: any = Symbol.for('EnvironmentRepoModel')
 
     // Mappers
-    public static readonly ACTIVITY_ENTITY_MAPPER: any = Symbol.for('ActivityEntityMapper')
+    public static readonly ACTIVITY_ENTITY_MAPPER: any = Symbol.for('PhysicalActivityEntityMapper')
     public static readonly ENVIRONMENT_ENTITY_MAPPER: any = Symbol.for('EnvironmentEntityMapper')
     public static readonly SLEEP_ENTITY_MAPPER: any = Symbol.for('SleepEntityMapper')
 

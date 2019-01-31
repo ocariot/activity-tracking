@@ -13,11 +13,6 @@ export class SleepPattern implements IJSONSerializable, IJSONDeserializable<Slee
     private _data_set!: Array<SleepPatternDataSet> // Sleep pattern tracking.
     private _summary!: SleepPatternSummary // Summary of sleep pattern.
 
-    constructor(data_set?: Array<SleepPatternDataSet>, summary?: SleepPatternSummary) {
-        if (data_set) this.data_set = data_set
-        if (summary) this.summary = summary
-    }
-
     get data_set(): Array<SleepPatternDataSet> {
         return this._data_set
     }

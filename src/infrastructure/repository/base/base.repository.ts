@@ -103,6 +103,7 @@ export abstract class BaseRepository<T extends Entity, TModel> implements IRepos
     }
 
     protected mongoDBErrorListener(err: any): ValidationException | ConflictException | RepositoryException | undefined {
+        console.log(`err`, err)
         if (err && err.name) {
             this.logger.error(err)
 

@@ -9,7 +9,7 @@ import { IPhysicalActivityRepository } from '../application/port/physical.activi
 import { PhysicalActivityRepository } from '../infrastructure/repository/physical.activity.repository'
 import { ActivityEntity } from '../infrastructure/entity/activity.entity'
 import { ActivityRepoModel } from '../infrastructure/database/schema/activity.schema'
-import { ActivityEntityMapper } from '../infrastructure/entity/mapper/activity.entity.mapper'
+import { PhysicalActivityEntityMapper } from '../infrastructure/entity/mapper/physical.activity.entity.mapper'
 import { RabbitMQConnectionFactory } from '../infrastructure/eventbus/rabbitmq/rabbitmp.connection.factory'
 import { RabbitMQConnection } from '../infrastructure/eventbus/rabbitmq/rabbitmq.connection'
 import { EventBusRabbitMQ } from '../infrastructure/eventbus/rabbitmq/eventbus.rabbittmq'
@@ -116,7 +116,7 @@ export class DI {
         // Mappers
         this.container
             .bind<IEntityMapper<PhysicalActivity, ActivityEntity>>(Identifier.ACTIVITY_ENTITY_MAPPER)
-            .to(ActivityEntityMapper).inSingletonScope()
+            .to(PhysicalActivityEntityMapper).inSingletonScope()
         this.container
             .bind<IEntityMapper<Environment, EnvironmentEntity>>(Identifier.ENVIRONMENT_ENTITY_MAPPER)
             .to(EnvironmentEntityMapper).inSingletonScope()

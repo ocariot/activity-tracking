@@ -11,41 +11,41 @@ export interface ISleepService extends IService<Sleep> {
     /**
      * List the sleep of a child.
      *
-     * @param userId Child ID.
+     * @param childId Child ID.
      * @param query Defines object to be used for queries.
      * @return {Promise<Array<Sleep>>}
      * @throws {RepositoryException}
      */
-    getAllByChild(userId: string, query: IQuery): Promise<Array<Sleep>>
+    getAllByChild(childId: string, query: IQuery): Promise<Array<Sleep>>
 
     /**
      * Retrieve sleep by unique identifier (ID)  and related child.
      *
      * @param sleepId Sleep unique identifier.
-     * @param userId Child unique identifier.
+     * @param childId Child unique identifier.
      * @param query Defines object to be used for queries.
      * @return {Promise<Sleep>}
      * @throws {RepositoryException}
      */
-    getByIdAndChild(sleepId: string, userId: string, query: IQuery): Promise<Sleep>
+    getByIdAndChild(sleepId: string, childId: string, query: IQuery): Promise<Sleep>
 
     /**
      * Update child sleep data.
      *
      * @param item Containing the data to be updated
-     * @param userId Child unique identifier.
+     * @param childId Child unique identifier.
      * @return {Promise<Sleep>}
      * @throws {ValidationException | ConflictException | RepositoryException}
      */
-    updateByChild(item: Sleep, userId: string): Promise<Sleep>
+    updateByChild(item: Sleep, childId: string): Promise<Sleep>
 
     /**
      * Removes sleep according to its unique identifier and related child.
      *
      * @param sleepId Sleep unique identifier.
-     * @param userId Child unique identifier.
+     * @param childId Child unique identifier.
      * @return {Promise<boolean>}
      * @throws {ValidationException | RepositoryException}
      */
-    removeByChild(sleepId: string | number, userId: string): Promise<boolean>
+    removeByChild(sleepId: string | number, childId: string): Promise<boolean>
 }
