@@ -9,7 +9,7 @@ import { ILogger } from '../../utils/custom.logger'
 import { IEntityMapper } from '../port/entity.mapper.interface'
 
 /**
- * Implementation of the physicalActivity repository.
+ * Implementation of the physicalactivity repository.
  *
  * @implements {IPhysicalActivityRepository}
  */
@@ -25,8 +25,8 @@ export class PhysicalActivityRepository extends BaseRepository<PhysicalActivity,
     }
 
     /**
-     * Checks if an physicalActivity already has a registration.
-     * What differs from one physicalActivity to another is the start date and associated child.
+     * Checks if an physicalactivity already has a registration.
+     * What differs from one physicalactivity to another is the start date and associated child.
      *
      * @param activity
      * @return {Promise<boolean>} True if it exists or False, otherwise
@@ -48,7 +48,7 @@ export class PhysicalActivityRepository extends BaseRepository<PhysicalActivity,
     }
 
     /**
-     * Update child physicalActivity data.
+     * Update child physicalactivity data.
      *
      * @param activity Containing the data to be updated
      * @param childId Child ID.
@@ -69,7 +69,7 @@ export class PhysicalActivityRepository extends BaseRepository<PhysicalActivity,
     }
 
     /**
-     * Removes physicalActivity according to its unique identifier and related child.
+     * Removes physicalactivity according to its unique identifier and related child.
      *
      * @param activityId Unique identifier.
      * @param childId Child ID.

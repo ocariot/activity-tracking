@@ -2,7 +2,7 @@ openapi: 3.0.0
 info:
   version: v1
   title: Tracking Service
-  description: This is the documentation of the RESTful API of the microservice for physicalActivity, sleep, environment and food (?) tracking
+  description: This is the documentation of the RESTful API of the microservice for physicalactivity, sleep, environment and food (?) tracking
   license:
     name: Apache 2.0
     url: http://www.apache.org/licenses/LICENSE-2.0.html
@@ -172,9 +172,9 @@ paths:
     post:
       tags:
         - users.activities
-      summary: Register physicalActivity.
+      summary: Register physicalactivity.
       operationId: saveActivity
-      description: Register a new physicalActivity and associate it to an child.
+      description: Register a new physicalactivity and associate it to an child.
       parameters:
         - in: path
           name: user_id
@@ -271,9 +271,9 @@ paths:
     get:
       tags:
         - users.activities
-      summary: Recover physicalActivity data.
+      summary: Recover physicalactivity data.
       operationId: getActivitiyById
-      description: Recover the physicalActivity data associated with an child.
+      description: Recover the physicalactivity data associated with an child.
       parameters:
         - in: path
           name: user_id
@@ -285,7 +285,7 @@ paths:
         - in: path
           name: activity_id
           required: true
-          description: Id of physicalActivity.
+          description: Id of physicalactivity.
           example: 5a62be07d6e34500146d9c544
           schema:
             type: string
@@ -343,8 +343,8 @@ paths:
     patch:
       tags:
         - users.activities
-      summary: Update physicalActivity data.
-      description: Update the physicalActivity data.
+      summary: Update physicalactivity data.
+      description: Update the physicalactivity data.
       operationId: updateActivity
       parameters:
         - in: path
@@ -357,13 +357,13 @@ paths:
         - in: path
           name: activity_id
           required: true
-          description: Id of physicalActivity.
+          description: Id of physicalactivity.
           example: 5a62be07d6e34500146d9c544
           schema:
             type: string
       responses:
         '200':
-          description: Updated physicalActivity data.
+          description: Updated physicalactivity data.
           content:
             application/json:
               schema:
@@ -375,7 +375,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/Error'
         '403':
-          description: Child does not have permission to update physicalActivity data.
+          description: Child does not have permission to update physicalactivity data.
           content:
             application/json:
               schema:
@@ -432,13 +432,13 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/PhysicalActivity'
-        description: Data of the physicalActivity to be updated.
+        description: Data of the physicalactivity to be updated.
         required: true
     delete:
       tags:
         - users.activities
-      summary: Delete physicalActivity data.
-      description: Delete the physicalActivity data.
+      summary: Delete physicalactivity data.
+      description: Delete the physicalactivity data.
       operationId: deleteActivity
       parameters:
         - in: path
@@ -451,7 +451,7 @@ paths:
         - in: path
           name: activity_id
           required: true
-          description: Id of physicalActivity.
+          description: Id of physicalactivity.
           example: 5a62be07d6e34500146d9c544
           schema:
             type: string
@@ -843,7 +843,7 @@ paths:
             type: string
       responses:
         '200':
-          description: Updated physicalActivity data.
+          description: Updated physicalactivity data.
           content:
             application/json:
               schema:
@@ -912,7 +912,7 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/PhysicalActivity'
-        description: Data of the physicalActivity to be updated.
+        description: Data of the physicalactivity to be updated.
         required: true
     delete:
       tags:
@@ -1330,7 +1330,7 @@ components:
           example: 5a62be07de34500146d9c544
         name:
           type: string
-          description: Name of physicalActivity.
+          description: Name of physicalactivity.
           example: walk
         start_time:
           type: string
@@ -1342,15 +1342,15 @@ components:
           example: "2018-08-15T14:19:21Z"
         duration:
           type: integer
-          description: Total time in milliseconds spent in the physicalActivity.
+          description: Total time in milliseconds spent in the physicalactivity.
           example: 973000
         calories:
           type: integer
-          description: Calories spent during physicalActivity.
+          description: Calories spent during physicalactivity.
           example: 100
         steps:
           type: integer
-          description: Number of steps taken during the physicalActivity.
+          description: Number of steps taken during the physicalactivity.
           example: 1340
         levels:
           type: array
@@ -1360,7 +1360,7 @@ components:
             properties:
               name:
                 type: string
-                description: Name of physicalActivity level (sedentary, light, fair or very).
+                description: Name of physicalactivity level (sedentary, light, fair or very).
               duration:
                 type: number
                 description: Total time spent in milliseconds on the level.
@@ -1376,7 +1376,7 @@ components:
         user:
           type: object
           readOnly: true
-          description: Child belonging to physicalActivity
+          description: Child belonging to physicalactivity
           properties:
             id:
               type: string
@@ -1536,7 +1536,7 @@ components:
         user:
           type: object
           readOnly: true
-          description: Child belonging to physicalActivity
+          description: Child belonging to physicalactivity
           properties:
             id:
               type: string

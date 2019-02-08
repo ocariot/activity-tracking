@@ -19,7 +19,7 @@ export interface IPhysicalActivityService extends IService<PhysicalActivity> {
     getAllByChild(childId: string, query: IQuery): Promise<Array<PhysicalActivity>>
 
     /**
-     * Retrieve physicalActivity by unique identifier (ID)  and related child.
+     * Retrieve physicalactivity by unique identifier (ID)  and related child.
      *
      * @param activityId PhysicalActivity unique identifier.
      * @param childId Child unique identifier.
@@ -30,7 +30,7 @@ export interface IPhysicalActivityService extends IService<PhysicalActivity> {
     getByIdAndChild(activityId: string, childId: string, query: IQuery): Promise<PhysicalActivity>
 
     /**
-     * Update child physicalActivity data.
+     * Update child physicalactivity data.
      *
      * @param physicalActivity Containing the data to be updated
      * @param userId Child unique identifier.
@@ -40,7 +40,7 @@ export interface IPhysicalActivityService extends IService<PhysicalActivity> {
     updateByChild(physicalActivity: PhysicalActivity, userId: string): Promise<PhysicalActivity>
 
     /**
-     * Removes physicalActivity according to its unique identifier and related child.
+     * Removes physicalactivity according to its unique identifier and related child.
      *
      * @param activityId PhysicalActivity unique identifier.
      * @param childId Child unique identifier.

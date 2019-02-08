@@ -3,12 +3,12 @@ import { IJSONDeserializable } from '../utils/json.deserializable.interface'
 import { JsonUtils } from '../utils/json.utils'
 
 /**
- * Entity implementation of the physicalActivity levels.
+ * Entity implementation of the physicalactivity levels.
  *
  * @implements {IJSONSerializable, IJSONDeserializable<ActivityLevel>}
  */
 export class ActivityLevel implements IJSONSerializable, IJSONDeserializable<ActivityLevel> {
-    private _name!: string // Name of physicalActivity level (sedentary, light, fair or very).
+    private _name!: string // Name of physicalactivity level (sedentary, light, fair or very).
     private _duration!: number // Total time spent in milliseconds on the level.
 
     constructor(name?: string, duration?: number) {
@@ -53,7 +53,7 @@ export class ActivityLevel implements IJSONSerializable, IJSONDeserializable<Act
 }
 
 /**
- * Name of traceable physicalActivity levels.
+ * Name of traceable physicalactivity levels.
  */
 export enum ActivityLevelType {
     SEDENTARY = 'sedentary',

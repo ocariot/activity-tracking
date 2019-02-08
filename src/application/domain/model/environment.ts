@@ -93,7 +93,7 @@ export class Environment extends Entity implements IJSONSerializable, IJSONDeser
             location: this.location ? this.location.toJSON() : this.location,
             measurements: this.measurements ? this.measurements.map(item => item.toJSON()) : this.measurements,
             climatized: this.climatized,
-            timestamp: this.timestamp.toISOString()
+            timestamp: this.timestamp
         }
     }
 }

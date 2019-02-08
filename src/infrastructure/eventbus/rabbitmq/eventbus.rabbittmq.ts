@@ -37,8 +37,7 @@ export class EventBusRabbitMQ implements IEventBus, IDisposable {
 
         await this._connection.conn.completeConfiguration()
 
-        const exchange: Exchange = this._connection.conn.declareExchange(
-            Default.RABBITMQ_EXCHANGE_NAME, 'topic', { durable: true }) // name, type, options
+        const exchange: Exchange = this._connection.conn.declareExchange(event.type, 'topic', { durable: true })
 
         const message: Message = new Message(event.toJSON())
         message.properties.appId = Default.APP_ID
@@ -63,14 +62,19 @@ export class EventBusRabbitMQ implements IEventBus, IDisposable {
         if (this.event_handlers.has(event.event_name) || !this._connection.conn) return
 
         this.queue = this._connection.conn.declareQueue(Default.RABBITMQ_QUEUE_NAME, { durable: true })
-        const exchange: Exchange = this._connection.conn.declareExchange(
-            Default.RABBITMQ_EXCHANGE_NAME, 'topic', { durable: true }) // name, type, options
-        this.event_handlers.set(event.event_name, handler)
 
-        await this.queue.bind(exchange, routing_key)
-        await this.internalSubscribe()
+        const exchange: Exchange = this._connection.conn.declareExchange(event.type, 'topic', { durable: true })
 
-        this._logger.info(`Subscribe event: ${event.event_name}`)
+        const initialized = await exchange.initialized
+        if (initialized) {
+            this.event_handlers.set(event.event_name, handler)
+            await this.queue.bind(exchange, routing_key)
+            await this.internalSubscribe()
+
+            this._logger.info(`Subscribe event: ${event.event_name}`)
+        } else {
+            this._logger.error(`Subscribe event ERROR EXCHANGE: ${event.event_name}`)
+        }
     }
 
     /**
@@ -91,6 +95,8 @@ export class EventBusRabbitMQ implements IEventBus, IDisposable {
 
                     this._logger.info(`Bus event message received!`)
                     const event_name: string = message.getContent().event_name
+                    console.log(`event_name`, event_name)
+                    console.log(`content`, message.getContent())
                     if (event_name) {
                         const event_handler: IIntegrationEventHandler<IntegrationEvent<any>> | undefined =
                             this.event_handlers.get(event_name)

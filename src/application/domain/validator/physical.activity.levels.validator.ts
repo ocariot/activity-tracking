@@ -29,7 +29,7 @@ export class PhysicalActivityLevelsValidator {
 
         if (fields.length > 0) {
             throw new ValidationException('Level are not in a format that is supported...',
-                'Validation of physical physicalActivity levels failed: '.concat(fields.join(', ')).concat(' is required!'))
+                'Validation of physical physicalactivity levels failed: '.concat(fields.join(', ')).concat(' is required!'))
         }
     }
 }

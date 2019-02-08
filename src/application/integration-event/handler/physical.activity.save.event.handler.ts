@@ -23,8 +23,7 @@ export class PhysicalActivitySaveEventHandler implements IIntegrationEventHandle
     }
 
     public async handle(event: PhysicalActivitySaveEvent): Promise<void> {
-        const activity: PhysicalActivity = new PhysicalActivity().fromJSON(event.physicalActivity)
-
+        const activity: PhysicalActivity = new PhysicalActivity().fromJSON(event.physicalactivity)
         try {
             CreatePhysicalActivityValidator.validate(activity)
             const activityExist = await this._activityRepository.checkExist(activity)

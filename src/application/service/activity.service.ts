@@ -12,7 +12,7 @@ import { ILogger } from '../../utils/custom.logger'
 import { UpdatePhysicalActivityValidator } from '../domain/validator/update.physical.activity.validator'
 
 /**
- * Implementing physicalActivity Service.
+ * Implementing physicalactivity Service.
  *
  * @implements {IPhysicalActivityService}
  */
@@ -25,12 +25,12 @@ export class ActivityService implements IPhysicalActivityService {
     }
 
     /**
-     * Adds a new physicalActivity.
-     * Before adding, it is checked whether the physicalActivity already exists.
+     * Adds a new physicalactivity.
+     * Before adding, it is checked whether the physicalactivity already exists.
      *
      * @param {PhysicalActivity} activity
      * @returns {(Promise<PhysicalActivity>)}
-     * @throws {ConflictException | RepositoryException} If a data conflict occurs, as an existing physicalActivity.
+     * @throws {ConflictException | RepositoryException} If a data conflict occurs, as an existing physicalactivity.
      */
     public async add(activity: PhysicalActivity): Promise<PhysicalActivity> {
         CreatePhysicalActivityValidator.validate(activity)
@@ -53,7 +53,7 @@ export class ActivityService implements IPhysicalActivityService {
     }
 
     /**
-     * Get the data of all physicalActivity in the infrastructure.
+     * Get the data of all physicalactivity in the infrastructure.
      *
      * @param query Defines object to be used for queries.
      * @return {Promise<Array<PhysicalActivity>>}
@@ -64,7 +64,7 @@ export class ActivityService implements IPhysicalActivityService {
     }
 
     /**
-     * Get in infrastructure the physicalActivity data.
+     * Get in infrastructure the physicalactivity data.
      *
      * @param id Unique identifier.
      * @param query Defines object to be used for queries.
@@ -77,7 +77,7 @@ export class ActivityService implements IPhysicalActivityService {
     }
 
     /**
-     * Retrieve physicalActivity by unique identifier (ID) and child ID.
+     * Retrieve physicalactivity by unique identifier (ID) and child ID.
      *
      * @param activityId PhysicalActivity ID.
      * @param childId Child ID.
@@ -104,7 +104,7 @@ export class ActivityService implements IPhysicalActivityService {
     }
 
     /**
-     * Update child physicalActivity data.
+     * Update child physicalactivity data.
      *
      * @param activity Containing the data to be updated
      * @param childId Child ID.
@@ -117,7 +117,7 @@ export class ActivityService implements IPhysicalActivityService {
     }
 
     /**
-     * Removes physicalActivity according to its unique identifier and related child.
+     * Removes physicalactivity according to its unique identifier and related child.
      *
      * @param activityId Unique identifier.
      * @param childId Child ID.

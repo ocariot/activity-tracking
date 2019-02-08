@@ -5,7 +5,7 @@ import { JsonUtils } from '../utils/json.utils'
 import { DatetimeValidator } from '../validator/datetime.validator'
 
 /**
- * Implementation of the physicalActivity entity.
+ * Implementation of the physicalactivity entity.
  *
  * @extends {Entity}
  * @implements { IJSONSerializable, IJSONDeserializable<Activity>
@@ -13,8 +13,8 @@ import { DatetimeValidator } from '../validator/datetime.validator'
 export class Activity extends Entity implements IJSONSerializable, IJSONDeserializable<Activity> {
     private _start_time?: Date // PhysicalActivity start time according to the UTC.
     private _end_time?: Date // PhysicalActivity end time according to the UTC.
-    private _duration?: number // Total time in milliseconds spent in the physicalActivity.
-    private _child_id!: string // Child ID belonging to physicalActivity.
+    private _duration?: number // Total time in milliseconds spent in the physicalactivity.
+    private _child_id!: string // Child ID belonging to physicalactivity.
 
     constructor() {
         super()
