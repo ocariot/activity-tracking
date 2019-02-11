@@ -23,21 +23,29 @@ export class PhysicalActivitySaveEventHandler implements IIntegrationEventHandle
     }
 
     public async handle(event: PhysicalActivitySaveEvent): Promise<void> {
-        const activity: PhysicalActivity = new PhysicalActivity().fromJSON(event.physicalactivity)
         try {
+            // 1. Convert json physical activity to object.
+            const activity: PhysicalActivity = new PhysicalActivity().fromJSON(event.physicalactivity)
+
+            // 2. Validate object based on create action.
             CreatePhysicalActivityValidator.validate(activity)
+
+            // 3. Checks whether the object already has a record.
+            // If it exists, an exception of type ConflictException is thrown.
             const activityExist = await this._activityRepository.checkExist(activity)
             if (activityExist) throw new ConflictException('Physical Activity is already registered...')
 
-            await this._activityRepository
-                .create(activity)
-                .then((result: PhysicalActivity) => {
-                    this._logger.info(`Action for event ${event.event_name} successfully held!`)
-                })
+            // 4. Try to save the  physical activity.
+            // Exceptions of type RepositoryException and ValidationException can be triggered.
+            await this._activityRepository.create(activity)
+
+            // 5. If got here, it's because the action was successful.
+            this._logger.info(`Action for event ${event.event_name} successfully held!`)
         } catch (err) {
             this._logger.error(`An error occurred while attempting `
                 .concat(`perform the operation with the ${event.event_name} name event. `)
-                .concat(err.message))
+                .concat(err.message)
+                .concat(err.description ? ' ' + err.description : ''))
         }
     }
 }

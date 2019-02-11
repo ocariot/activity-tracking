@@ -126,8 +126,9 @@ export class ActivityController {
         try {
             const physicalActivity: PhysicalActivity = new PhysicalActivity().fromJSON(req.body)
             physicalActivity.id = req.params.physicalactivity_id
+            physicalActivity.child_id = req.params.child_id
 
-            const result = await this._activityService.updateByChild(physicalActivity, req.params.child_id)
+            const result = await this._activityService.updateByChild(physicalActivity)
             if (!result) return res.status(HttpStatus.NOT_FOUND).send(this.getMessageNotActivityFound())
             return res.status(HttpStatus.OK).send(result)
         } catch (err) {

@@ -126,8 +126,9 @@ export class SleepController {
         try {
             const sleepUpdate: Sleep = new Sleep().fromJSON(req.body)
             sleepUpdate.id = req.params.sleep_id
+            sleepUpdate.child_id = req.params.child_id
 
-            const result = await this._sleepService.updateByChild(sleepUpdate, req.params.child_id)
+            const result = await this._sleepService.updateByChild(sleepUpdate)
             if (!result) return res.status(HttpStatus.NOT_FOUND).send(this.getMessageSleepNotFound())
             return res.status(HttpStatus.OK).send(result)
         } catch (err) {

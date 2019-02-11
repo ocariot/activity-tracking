@@ -13,7 +13,7 @@ export abstract class Identifier {
     public static readonly ENVIRONMENT_CONTROLLER: any = Symbol.for('EnvironmentController')
 
     // Services
-    public static readonly ACTIVITY_SERVICE: any = Symbol.for('ActivityService')
+    public static readonly ACTIVITY_SERVICE: any = Symbol.for('PhysicalActivityService')
     public static readonly SLEEP_SERVICE: any = Symbol.for('SleepService')
     public static readonly ENVIRONMENT_SERVICE: any = Symbol.for('EnvironmentService')
 

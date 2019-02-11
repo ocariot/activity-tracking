@@ -13,11 +13,10 @@ export interface ISleepRepository extends IRepository<Sleep> {
      * Update child sleep data.
      *
      * @param sleep Containing the data to be updated
-     * @param childId Child unique identifier.
      * @return {Promise<Sleep>}
      * @throws {ValidationException | ConflictException | RepositoryException}
      */
-    updateByChild(sleep: Sleep, childId: string): Promise<Sleep>
+    updateByChild(sleep: Sleep): Promise<Sleep>
 
     /**
      * Removes sleep according to its unique identifier and related child.
@@ -27,7 +26,7 @@ export interface ISleepRepository extends IRepository<Sleep> {
      * @return {Promise<boolean>}
      * @throws {ValidationException | RepositoryException}
      */
-    removeByChild(sleepId: string | number, childId: string): Promise<boolean>
+    removeByChild(sleepId: string, childId: string): Promise<boolean>
 
     /**
      * Checks if an sleep already has a registration.

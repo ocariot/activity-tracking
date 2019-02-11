@@ -10,6 +10,8 @@ import { IEventBus } from '../../infrastructure/port/event.bus.interface'
 import { ILogger } from '../../utils/custom.logger'
 import { SleepSaveEvent } from '../integration-event/event/sleep.save.event'
 import { UpdateSleepValidator } from '../domain/validator/update.sleep.validator'
+import { UuidValidator } from '../domain/validator/uuid.validator'
+import { Strings } from '../../utils/strings'
 
 /**
  * Implementing sleep Service.
@@ -33,19 +35,26 @@ export class SleepService implements ISleepService {
      * @throws {ConflictException | RepositoryException} If a data conflict occurs, as an existing sleep.
      */
     public async add(sleep: Sleep): Promise<Sleep> {
-        CreateSleepValidator.validate(sleep)
-
         try {
+            // 1. Validate the object.
+            CreateSleepValidator.validate(sleep)
+
+            // 2. Checks if sleep already exists.
             const sleepExist = await this._sleepRepository.checkExist(sleep)
             if (sleepExist) throw new ConflictException('Sleep is already registered...')
 
+            // 3. Create new sleep register.
             const sleepSaved: Sleep = await this._sleepRepository.create(sleep)
 
-            this.logger.info(`Sleep with ID: ${sleepSaved.id} published on event bus...`)
-            this.eventBus.publish(
-                new SleepSaveEvent('SleepSaveEvent', new Date(), sleepSaved),
-                'sleep.save'
-            )
+            // 4. If created successfully, the object is published on the message bus.
+            if (sleepSaved) {
+                this.logger.info(`Sleep with ID: ${sleepSaved.id} published on event bus...`)
+                this.eventBus.publish(
+                    new SleepSaveEvent('SleepSaveEvent', new Date(), sleepSaved),
+                    'sleep.save'
+                )
+            }
+            // 5. Returns the created object.
             return Promise.resolve(sleepSaved)
         } catch (err) {
             return Promise.reject(err)
@@ -72,8 +81,7 @@ export class SleepService implements ISleepService {
      * @throws {RepositoryException}
      */
     public async getById(id: string | number, query: IQuery): Promise<Sleep> {
-        query.filters = { _id: id }
-        return this._sleepRepository.findOne(query)
+        throw new Error('Unsupported feature!')
     }
 
     /**
@@ -86,7 +94,10 @@ export class SleepService implements ISleepService {
      * @throws {RepositoryException}
      */
     public getByIdAndChild(sleepId: string, childId: string, query: IQuery): Promise<Sleep> {
-        query.filters = { _id: sleepId, child_id: childId }
+        UuidValidator.validate(childId, Strings.CHILD.PARAM_ID_NOT_VALID_FORMAT)
+        UuidValidator.validate(sleepId, Strings.SLEEP.PARAM_ID_NOT_VALID_FORMAT)
+
+        query.addFilter({ _id: sleepId, child_id: childId })
         return this._sleepRepository.findOne(query)
     }
 
@@ -99,6 +110,8 @@ export class SleepService implements ISleepService {
      * @throws {ValidationException | RepositoryException}
      */
     public getAllByChild(childId: string, query: IQuery): Promise<Array<Sleep>> {
+        UuidValidator.validate(childId, Strings.CHILD.PARAM_ID_NOT_VALID_FORMAT)
+
         query.addFilter({ child_id: childId })
         return this._sleepRepository.find(query)
     }
@@ -107,13 +120,12 @@ export class SleepService implements ISleepService {
      * Update child sleep data.
      *
      * @param sleep Containing the data to be updated
-     * @param childId Child unique identifier.
      * @return {Promise<Sleep>}
      * @throws {ValidationException | ConflictException | RepositoryException}
      */
-    public updateByChild(sleep: Sleep, childId: string): Promise<Sleep> {
+    public updateByChild(sleep: Sleep): Promise<Sleep> {
         UpdateSleepValidator.validate(sleep)
-        return this._sleepRepository.updateByChild(sleep, childId)
+        return this._sleepRepository.updateByChild(sleep)
     }
 
     /**
@@ -124,7 +136,10 @@ export class SleepService implements ISleepService {
      * @return {Promise<boolean>}
      * @throws {ValidationException | RepositoryException}
      */
-    public removeByChild(sleepId: string | number, childId: string): Promise<boolean> {
+    public removeByChild(sleepId: string, childId: string): Promise<boolean> {
+        UuidValidator.validate(childId, Strings.CHILD.PARAM_ID_NOT_VALID_FORMAT)
+        UuidValidator.validate(sleepId, Strings.SLEEP.PARAM_ID_NOT_VALID_FORMAT)
+
         return this._sleepRepository.removeByChild(sleepId, childId)
     }
 
@@ -132,7 +147,7 @@ export class SleepService implements ISleepService {
         throw new Error('Unsupported feature!')
     }
 
-    public async remove(id: string | number): Promise<boolean> {
+    public async remove(id: string): Promise<boolean> {
         throw new Error('Unsupported feature!')
     }
 }

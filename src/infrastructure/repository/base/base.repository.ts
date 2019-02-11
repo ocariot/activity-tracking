@@ -105,14 +105,13 @@ export abstract class BaseRepository<T extends Entity, TModel> implements IRepos
     }
 
     protected mongoDBErrorListener(err: any): ValidationException | ConflictException | RepositoryException | undefined {
+        console.log('eer', err)
         if (err && err.name) {
-            this.logger.error(err)
-
             if (err.name === 'ValidationError') {
                 return new ValidationException('Required fields were not provided!', err.message)
             } else if (err.name === 'CastError' || new RegExp(/(invalid format)/i).test(err)) {
-                return new ValidationException('The given ID is in invalid format.',
-                    'A 12 bytes hexadecimal ID similar to this')
+                return new ValidationException('Some ID provided, does not have a valid format.',
+                    'A 24-byte hex ID similar to this: 507f191e810c19729de860ea, is expected.')
             } else if (err.name === 'MongoError' && err.code === 11000) {
                 return new ConflictException('A registration with the same unique data already exists!')
             } else if (err.name === 'ObjectParameterError') {

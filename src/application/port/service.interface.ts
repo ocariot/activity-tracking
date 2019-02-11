@@ -33,7 +33,7 @@ export interface IService<T> {
      * @return {Promise<T>}
      * @throws {ValidationException | RepositoryException}
      */
-    getById(id: string | number, query: IQuery): Promise<T>
+    getById(id: string, query: IQuery): Promise<T>
 
     /**
      * Updates item data.
@@ -51,5 +51,5 @@ export interface IService<T> {
      * @return {Promise<boolean>}
      * @throws {ValidationException | RepositoryException}
      */
-    remove(id: string | number): Promise<boolean>
+    remove(id: string): Promise<boolean>
 }

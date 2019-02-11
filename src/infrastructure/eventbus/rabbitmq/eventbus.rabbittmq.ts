@@ -95,8 +95,7 @@ export class EventBusRabbitMQ implements IEventBus, IDisposable {
 
                     this._logger.info(`Bus event message received!`)
                     const event_name: string = message.getContent().event_name
-                    console.log(`event_name`, event_name)
-                    console.log(`content`, message.getContent())
+
                     if (event_name) {
                         const event_handler: IIntegrationEventHandler<IntegrationEvent<any>> | undefined =
                             this.event_handlers.get(event_name)

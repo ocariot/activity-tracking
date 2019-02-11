@@ -51,14 +51,17 @@ export class PhysicalActivityRepository extends BaseRepository<PhysicalActivity,
      * Update child physicalactivity data.
      *
      * @param activity Containing the data to be updated
-     * @param childId Child ID.
      * @return {Promise<T>}
      * @throws {ValidationException | ConflictException | RepositoryException}
      */
-    public updateByChild(activity: PhysicalActivity, childId: string): Promise<PhysicalActivity> {
+    public updateByChild(activity: PhysicalActivity): Promise<PhysicalActivity> {
         const itemUp: ActivityEntity = this.activityMapper.transform(activity)
         return new Promise<PhysicalActivity>((resolve, reject) => {
-            this.Model.findOneAndUpdate({ child_id: childId, _id: itemUp.id }, itemUp, { new: true })
+            this.Model.findOneAndUpdate({
+                    child_id: itemUp.child_id,
+                    _id: itemUp.id
+                },
+                itemUp, { new: true })
                 .exec()
                 .then(result => {
                     if (!result) return resolve(undefined)

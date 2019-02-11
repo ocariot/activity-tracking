@@ -33,11 +33,10 @@ export interface ISleepService extends IService<Sleep> {
      * Update child sleep data.
      *
      * @param item Containing the data to be updated
-     * @param childId Child unique identifier.
      * @return {Promise<Sleep>}
      * @throws {ValidationException | ConflictException | RepositoryException}
      */
-    updateByChild(item: Sleep, childId: string): Promise<Sleep>
+    updateByChild(item: Sleep): Promise<Sleep>
 
     /**
      * Removes sleep according to its unique identifier and related child.
@@ -47,5 +46,5 @@ export interface ISleepService extends IService<Sleep> {
      * @return {Promise<boolean>}
      * @throws {ValidationException | RepositoryException}
      */
-    removeByChild(sleepId: string | number, childId: string): Promise<boolean>
+    removeByChild(sleepId: string, childId: string): Promise<boolean>
 }

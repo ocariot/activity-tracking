@@ -1,6 +1,8 @@
 import { ValidationException } from '../exception/validation.exception'
 import { Sleep } from '../model/sleep'
 import { SleepPatternValidator } from './sleep.pattern.validator'
+import { UuidValidator } from './uuid.validator'
+import { Strings } from '../../../utils/strings'
 
 export class CreateSleepValidator {
     public static validate(sleep: Sleep): void | ValidationException {
@@ -11,7 +13,7 @@ export class CreateSleepValidator {
         if (!sleep.end_time) fields.push('end_time')
         if (sleep.duration === undefined) fields.push('duration')
         if (!sleep.child_id) fields.push('child_id')
-
+        else UuidValidator.validate(sleep.child_id, Strings.CHILD.PARAM_ID_NOT_VALID_FORMAT)
         if (!sleep.pattern) fields.push('pattern')
         else SleepPatternValidator.validate(sleep.pattern)
 

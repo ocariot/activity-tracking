@@ -13,11 +13,10 @@ export interface IPhysicalActivityRepository extends IRepository<PhysicalActivit
      * Update child physicalactivity data.
      *
      * @param activity Containing the data to be updated
-     * @param childId Child unique identifier.
      * @return {Promise<PhysicalActivity>}
      * @throws {ValidationException | ConflictException | RepositoryException}
      */
-    updateByChild(activity: PhysicalActivity, childId: string): Promise<PhysicalActivity>
+    updateByChild(activity: PhysicalActivity): Promise<PhysicalActivity>
 
     /**
      * Removes physicalactivity according to its unique identifier and related child.
@@ -27,7 +26,7 @@ export interface IPhysicalActivityRepository extends IRepository<PhysicalActivit
      * @return {Promise<boolean>}
      * @throws {ValidationException | RepositoryException}
      */
-    removeByChild(activityId: string | number, childId: string): Promise<boolean>
+    removeByChild(activityId: string, childId: string): Promise<boolean>
 
     /**
      * Checks if an physicalactivity already has a registration.

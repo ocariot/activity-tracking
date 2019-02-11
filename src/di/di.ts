@@ -4,7 +4,7 @@ import { HomeController } from '../ui/controller/home.controller'
 import { Identifier } from './identifiers'
 import { ActivityController } from '../ui/controller/activity.controller'
 import { IPhysicalActivityService } from '../application/port/physical.activity.service.interface'
-import { ActivityService } from '../application/service/activity.service'
+import { PhysicalActivityService } from '../application/service/physical.activity.service'
 import { IPhysicalActivityRepository } from '../application/port/physical.activity.repository.interface'
 import { PhysicalActivityRepository } from '../infrastructure/repository/physical.activity.repository'
 import { ActivityEntity } from '../infrastructure/entity/activity.entity'
@@ -93,7 +93,7 @@ export class DI {
         this.container.bind<SleepController>(Identifier.SLEEP_CONTROLLER).to(SleepController).inSingletonScope()
 
         // Services
-        this.container.bind<IPhysicalActivityService>(Identifier.ACTIVITY_SERVICE).to(ActivityService).inSingletonScope()
+        this.container.bind<IPhysicalActivityService>(Identifier.ACTIVITY_SERVICE).to(PhysicalActivityService).inSingletonScope()
         this.container.bind<IEnvironmentService>(Identifier.ENVIRONMENT_SERVICE).to(EnvironmentService).inSingletonScope()
         this.container.bind<ISleepService>(Identifier.SLEEP_SERVICE).to(SleepService).inSingletonScope()
 

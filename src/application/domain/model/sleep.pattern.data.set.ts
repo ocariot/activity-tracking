@@ -1,7 +1,6 @@
 import { IJSONSerializable } from '../utils/json.serializable.interface'
 import { IJSONDeserializable } from '../utils/json.deserializable.interface'
 import { JsonUtils } from '../utils/json.utils'
-import { DatetimeValidator } from '../validator/datetime.validator'
 
 /**
  * The implementation of the data set entity present in the sleep pattern.
@@ -37,11 +36,6 @@ export class SleepPatternDataSet implements IJSONSerializable, IJSONDeserializab
         this._duration = value
     }
 
-    public convertDatetimeString(value: string): Date {
-        DatetimeValidator.validate(value)
-        return new Date(value)
-    }
-
     public fromJSON(json: any): SleepPatternDataSet {
         if (!json) return this
         if (typeof json === 'string' && JsonUtils.isJsonString(json)) {
@@ -57,7 +51,7 @@ export class SleepPatternDataSet implements IJSONSerializable, IJSONDeserializab
 
     public toJSON(): any {
         return {
-            start_time: this.start_time.toISOString(),
+            start_time: this.start_time ? this.start_time.toISOString() : this.start_time,
             name: this.name,
             duration: this.duration
         }

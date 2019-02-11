@@ -33,11 +33,10 @@ export interface IPhysicalActivityService extends IService<PhysicalActivity> {
      * Update child physicalactivity data.
      *
      * @param physicalActivity Containing the data to be updated
-     * @param userId Child unique identifier.
      * @return {Promise<PhysicalActivity>}
      * @throws {ValidationException | ConflictException | RepositoryException}
      */
-    updateByChild(physicalActivity: PhysicalActivity, userId: string): Promise<PhysicalActivity>
+    updateByChild(physicalActivity: PhysicalActivity): Promise<PhysicalActivity>
 
     /**
      * Removes physicalactivity according to its unique identifier and related child.
@@ -47,5 +46,5 @@ export interface IPhysicalActivityService extends IService<PhysicalActivity> {
      * @return {Promise<boolean>}
      * @throws {ValidationException | RepositoryException}
      */
-    removeByChild(activityId: string | number, childId: string): Promise<boolean>
+    removeByChild(activityId: string, childId: string): Promise<boolean>
 }
