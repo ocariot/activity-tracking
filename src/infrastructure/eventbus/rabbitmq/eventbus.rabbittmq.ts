@@ -17,7 +17,8 @@ export class EventBusRabbitMQ implements IEventBus, IDisposable {
     private queue!: Queue
 
     constructor(
-        @inject(Identifier.RABBITMQ_CONNECTION) private _connection: IRabbitMQConnection,
+        @inject(Identifier.RABBITMQ_CONNECTION) private _connectionPub: IRabbitMQConnection,
+        @inject(Identifier.RABBITMQ_CONNECTION) private _connectionSub: IRabbitMQConnection,
         @inject(Identifier.LOGGER) private readonly _logger: ILogger
     ) {
         this.event_handlers = new Map()
@@ -32,12 +33,12 @@ export class EventBusRabbitMQ implements IEventBus, IDisposable {
      * @return {Promise<void>}
      */
     public async publish(event: IntegrationEvent<any>, routing_key: string): Promise<void> {
-        if (!this._connection.isConnected) await this._connection.tryConnect()
-        if (!this._connection.conn) return
+        if (!this._connectionPub.isConnected) await this._connectionPub.tryConnect()
+        if (!this._connectionPub.conn) return
 
-        await this._connection.conn.completeConfiguration()
+        await this._connectionPub.conn.completeConfiguration()
 
-        const exchange: Exchange = this._connection.conn.declareExchange(event.type, 'topic', { durable: true })
+        const exchange: Exchange = this._connectionPub.conn.declareExchange(event.type, 'topic', { durable: true })
 
         const message: Message = new Message(event.toJSON())
         message.properties.appId = Default.APP_ID
@@ -58,12 +59,12 @@ export class EventBusRabbitMQ implements IEventBus, IDisposable {
      */
     public async subscribe(event: IntegrationEvent<any>, handler: IIntegrationEventHandler<IntegrationEvent<any>>,
                            routing_key: string): Promise<void> {
-        if (!this._connection.isConnected) await this._connection.tryConnect()
-        if (this.event_handlers.has(event.event_name) || !this._connection.conn) return
+        if (!this._connectionSub.isConnected) await this._connectionSub.tryConnect()
+        if (this.event_handlers.has(event.event_name) || !this._connectionSub.conn) return
 
-        this.queue = this._connection.conn.declareQueue(Default.RABBITMQ_QUEUE_NAME, { durable: true })
+        this.queue = this._connectionSub.conn.declareQueue(Default.RABBITMQ_QUEUE_NAME, { durable: true })
 
-        const exchange: Exchange = this._connection.conn.declareExchange(event.type, 'topic', { durable: true })
+        const exchange: Exchange = this._connectionSub.conn.declareExchange(event.type, 'topic', { durable: true })
 
         const initialized = await exchange.initialized
         if (initialized) {
@@ -120,7 +121,8 @@ export class EventBusRabbitMQ implements IEventBus, IDisposable {
             await this.queue.stopConsumer()
             await this.queue.close()
         }
-        if (this._connection.conn) await this._connection.conn.close()
-        this._connection.conn = undefined
+        if (this._connectionPub.conn) await this._connectionPub.conn.close()
+        if (this._connectionSub.conn) await this._connectionSub.conn.close()
+        this._connectionPub.conn = undefined
     }
 }

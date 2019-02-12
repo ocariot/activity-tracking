@@ -41,7 +41,6 @@ export class EnvironmentService implements IEnvironmentService {
 
             // 2. Checks if environment already exists.
             const environmentExist = await this._environmentRepository.checkExist(environment)
-            console.log('existenv', environmentExist)
             if (environmentExist) throw new ConflictException('Measurement of environment is already registered...')
 
             // 3. Create new environment register.
@@ -54,11 +53,9 @@ export class EnvironmentService implements IEnvironmentService {
                     new EnvironmentSaveEvent('EnvironmentSaveEvent', new Date(), environmentSaved),
                     'environments.save'
                 )
-            }
-            // 5. Returns the created object.
+            }// 5. Returns the created object.
             return Promise.resolve(environmentSaved)
         } catch (err) {
-            console.log('ConflictException', err.message)
             return Promise.reject(err)
         }
     }

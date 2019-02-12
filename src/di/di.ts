@@ -130,7 +130,7 @@ export class DI {
             .to(RabbitMQConnectionFactory).inSingletonScope()
         this.container
             .bind<IRabbitMQConnection>(Identifier.RABBITMQ_CONNECTION)
-            .to(RabbitMQConnection).inSingletonScope()
+            .to(RabbitMQConnection)
         this.container
             .bind<IEventBus>(Identifier.RABBITMQ_EVENT_BUS)
             .to(EventBusRabbitMQ).inSingletonScope()

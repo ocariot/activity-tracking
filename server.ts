@@ -20,11 +20,8 @@ import { App } from './src/app'
  *  The fastest way is to create a copy of the .env.example file.
  *
  *  NOTE: For the production environment it is highly recommended not to use .env.
- *  Manually enter the environment variables that are required for your application.
  */
-if ((process.env.NODE_ENV || Default.NODE_ENV) !== 'production') {
-    require(`dotenv`).config()
-}
+require(`dotenv`).config()
 
 const logger: ILogger = DI.getInstance().getContainer().get<ILogger>(Identifier.LOGGER)
 const app: Application = (DI.getInstance().getContainer().get<App>(Identifier.APP)).getExpress()
