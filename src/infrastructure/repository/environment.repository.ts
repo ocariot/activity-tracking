@@ -35,7 +35,13 @@ export class EnvironmentRepository extends BaseRepository<Environment, Environme
         const query: Query = new Query()
         return new Promise<boolean>((resolve, reject) => {
             if (environment.timestamp && environment.location) {
-                query.filters = { timestamp: environment.timestamp, location: environment.location }
+                query.filters = {
+                    'timestamp': environment.timestamp,
+                    'location.local': environment.location.local,
+                    'location.room': environment.location.room,
+                    'location.latitude': environment.location.latitude,
+                    'location.longitude': environment.location.longitude
+                }
             }
             super.findOne(query)
                 .then((result: Environment) => {

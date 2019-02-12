@@ -105,7 +105,6 @@ export abstract class BaseRepository<T extends Entity, TModel> implements IRepos
     }
 
     protected mongoDBErrorListener(err: any): ValidationException | ConflictException | RepositoryException | undefined {
-        console.log('eer', err)
         if (err && err.name) {
             if (err.name === 'ValidationError') {
                 return new ValidationException('Required fields were not provided!', err.message)
