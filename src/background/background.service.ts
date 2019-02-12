@@ -27,7 +27,6 @@ export class BackgroundService {
     }
 
     public async startServices(): Promise<void> {
-        this._logger.debug('startServices()')
         try {
             await this._mongodb.tryConnect() // Initialize mongodb
 
@@ -60,7 +59,6 @@ export class BackgroundService {
     }
 
     public async stopServices(): Promise<void> {
-        this._logger.debug('stopServices()')
         try {
             await this._eventBus.dispose()
             await this._mongodb.dispose()

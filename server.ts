@@ -7,6 +7,7 @@ import { ILogger } from './src/utils/custom.logger'
 import { BackgroundService } from './src/background/background.service'
 import { Default } from './src/utils/default'
 import { App } from './src/app'
+import { readFileSync } from 'fs'
 
 /**
  * Used only in development or test to load environment variables.
@@ -28,58 +29,47 @@ const app: Application = (DI.getInstance().getContainer().get<App>(Identifier.AP
 const backgroundServices: BackgroundService = DI.getInstance().getContainer().get(Identifier.BACKGROUND_SERVICE)
 const port_http = process.env.PORT_HTTP || Default.PORT_HTTP
 const port_https = process.env.PORT_HTTPS || Default.PORT_HTTPS
-
-/**
- * SSL certificate is generated.
- * When accessed HTTP, is redirected to HTTPS.
- * Note: Should be used only in the production environment,
- * for the development and testing environment, HTTP should be used.
- */
-if ((process.env.NODE_ENV || Default.NODE_ENV) === 'production') {
-    /**
-     * Returns an instance of node-greenlock with additional helper methods.
-     * See {@link https://github.com/Daplie/greenlock-express} for more details.
-     */
-    const lex = require('greenlock-express').create({
-        // set to https://acme-v02.api.letsencrypt.org/directory in production
-        // set to https://acme-staging-v02.api.letsencrypt.org/directory in dev
-        server: 'https://acme-v02.api.letsencrypt.org/directory',
-        version: 'draft-12',
-        email: 'myemail@mydomain.com',
-        // When set to true, this always accepts the LetsEncrypt TOS. When a string it checks the agreement url first.
-        agreeTos: true,
-        // Can be either of:
-        // An explicit array of allowed domains such as [ 'example.com', 'www.example.com' ]
-        // A callback function (opts, certs, cb) { cb(null, { options: opts, certs: certs }); }
-        // for setting email, agreeTos, domains, etc (as shown in usage example above)
-        approveDomains: ['mydomain.com', 'www.mydomain.com']
-    })
-
-    http.createServer(lex.middleware(require('redirect-https'))).listen(port_http)
-
-    // handles your app
-    https.createServer(lex.httpsOptions, lex.middleware(app))
-        .listen(port_https, () => {
-            backgroundServices.startServices()
-            initListener()
-            logger.debug(`Server HTTP running on port ${port_https}`)
-        })
-} else { // Development environment, test and others
-    /**
-     * Up Server HTTP.
-     * Accessing http will be redirected to https.
-     */
-    http.createServer(app)
-        .listen(port_http, () => {
-            backgroundServices.startServices()
-            initListener()
-            logger.info(`Server HTTP running on port ${port_http}`)
-        })
+const https_options = {
+    key: readFileSync(process.env.HTTPS_PRIVATE_KEY_CERT_PATH || Default.PRIVATE_KEY_CERT_PATH),
+    cert: readFileSync(process.env.HTTPS_CERT_PATH || Default.CERT_PATH)
 }
 
+/**
+ * Initializes HTTP server and redirects accesses to HTTPS.
+ */
+http.createServer((req, res) => {
+    const host = req.headers.host || ''
+    const newLocation = 'https://' + host.replace(/:\d+/, ':' + port_https) + req.url
+    console.log('res', newLocation)
+    res.writeHead(301, { Location: newLocation })
+    res.end()
+}).listen(port_http)
+
+/**
+ * Initializes HTTPS server.
+ * After the successful startup, listener is initialized
+ * for important events and background services.
+ */
+https.createServer(https_options, app)
+    .listen(port_https, () => {
+        initListener()
+        backgroundServices.startServices()
+            .then(() => {
+                logger.info('Initialized background services.')
+            })
+        logger.debug(`Server HTTPS running on port ${port_https}`)
+    })
+
+/**
+ * Function to listen to the SIGINT event and end services
+ * in the background, when the respective event is triggered.
+ */
 function initListener(): void {
     process.on('SIGINT', () => {
         backgroundServices.stopServices()
+            .then(() => {
+                logger.info('Stopped background services.')
+            })
         process.exit()
     })
 }

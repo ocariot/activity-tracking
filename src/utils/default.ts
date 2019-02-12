@@ -32,4 +32,9 @@ export abstract class Default {
 
     // Log
     public static readonly LOG_DIR: string = 'logs'
+
+    // Certificate
+    // To generate self-signed certificates, see: https://devcenter.heroku.com/articles/ssl-certificate-self
+    public static readonly PRIVATE_KEY_CERT_PATH: string = 'cert/server.key'
+    public static readonly CERT_PATH: string = 'cert/server.crt'
 }
