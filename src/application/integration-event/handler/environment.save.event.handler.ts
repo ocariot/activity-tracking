@@ -9,6 +9,7 @@ import { CreateEnvironmentValidator } from '../../domain/validator/create.enviro
 import { Environment } from '../../domain/model/environment'
 
 export class EnvironmentSaveEventHandler implements IIntegrationEventHandler<EnvironmentSaveEvent> {
+    private count: number = 0
 
     /**
      * Creates an instance of EnvironmentSaveEventHandler.
@@ -40,7 +41,7 @@ export class EnvironmentSaveEventHandler implements IIntegrationEventHandler<Env
             await this._environmentRepository.create(environment)
 
             // 5. If got here, it's because the action was successful.
-            this._logger.info(`Action for event ${event.event_name} successfully held!`)
+            this._logger.info(`Action for event ${event.event_name} successfully held! TOTAL: ${++this.count}`)
         } catch (err) {
             this._logger.error(`An error occurred while attempting `
                 .concat(`perform the operation with the ${event.event_name} name event. `)

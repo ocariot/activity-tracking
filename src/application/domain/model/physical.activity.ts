@@ -1,7 +1,7 @@
 import { IJSONSerializable } from '../utils/json.serializable.interface'
 import { IJSONDeserializable } from '../utils/json.deserializable.interface'
 import { JsonUtils } from '../utils/json.utils'
-import { ActivityLevel } from './activity.level'
+import { PhysicalActivityLevel } from './physical.activity.level'
 import { Activity } from './activity'
 
 /**
@@ -14,7 +14,7 @@ export class PhysicalActivity extends Activity implements IJSONSerializable, IJS
     private _name?: string // Name of physical physicalactivity.
     private _calories?: number // Calories spent during physical physicalactivity.
     private _steps?: number // Number of steps taken during the physical physicalactivity.
-    private _levels?: Array<ActivityLevel> // PhysicalActivity levels (sedentary, light, fair or very).
+    private _levels?: Array<PhysicalActivityLevel> // PhysicalActivity levels (sedentary, light, fair or very).
 
     constructor() {
         super()
@@ -44,11 +44,11 @@ export class PhysicalActivity extends Activity implements IJSONSerializable, IJS
         this._steps = value
     }
 
-    get levels(): Array<ActivityLevel> | undefined {
+    get levels(): Array<PhysicalActivityLevel> | undefined {
         return this._levels
     }
 
-    set levels(value: Array<ActivityLevel> | undefined) {
+    set levels(value: Array<PhysicalActivityLevel> | undefined) {
         this._levels = value
     }
 
@@ -64,7 +64,7 @@ export class PhysicalActivity extends Activity implements IJSONSerializable, IJS
         if (json.calories !== undefined) this.calories = json.calories
         if (json.steps !== undefined) this.steps = json.steps
         if (json.levels !== undefined && json.levels instanceof Array) {
-            this.levels = json.levels.map(level => new ActivityLevel().fromJSON(level))
+            this.levels = json.levels.map(level => new PhysicalActivityLevel().fromJSON(level))
         }
 
         return this

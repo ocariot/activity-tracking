@@ -92,9 +92,10 @@ export class EventBusRabbitMQ implements IEventBus, IDisposable {
             this.queue_consumer = true
             await this.queue
                 .activateConsumer((message: Message) => {
+                    message.ack() // acknowledge that the message has been received (and processed)
                     if (message.properties.appId === Default.APP_ID) return
 
-                    this._logger.info(`Bus event message received!`)
+                    // this._logger.info(`Bus event message received!`)
                     const event_name: string = message.getContent().event_name
 
                     if (event_name) {
@@ -104,9 +105,9 @@ export class EventBusRabbitMQ implements IEventBus, IDisposable {
                             event_handler.handle(message.getContent())
                         }
                     }
-                }, { noAck: true })
+                }, { noAck: false })
                 .then((result: StartConsumerResult) => {
-                    this._logger.info('Queue consumer successfully created!')
+                    this._logger.info('Queue activate consumer successfully created! ')
                 })
         }
     }

@@ -9,6 +9,7 @@ import { CreateSleepValidator } from '../../domain/validator/create.sleep.valida
 import { SleepSaveEvent } from '../event/sleep.save.event'
 
 export class SleepSaveEventHandler implements IIntegrationEventHandler<SleepSaveEvent> {
+    private count: number = 0
 
     /**
      * Creates an instance of SleepSaveEventHandler.
@@ -40,7 +41,7 @@ export class SleepSaveEventHandler implements IIntegrationEventHandler<SleepSave
             await this._sleepRepository.create(sleep)
 
             // 5. If got here, it's because the action was successful.
-            this._logger.info(`Action for event ${event.event_name} successfully held!`)
+            this._logger.info(`Action for event ${event.event_name} successfully held! TOTAL: ${++this.count}`)
         } catch (err) {
             this._logger.error(`An error occurred while attempting `
                 .concat(`perform the operation with the ${event.event_name} name event. `)

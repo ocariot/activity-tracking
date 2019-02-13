@@ -1,8 +1,8 @@
 import { ValidationException } from '../exception/validation.exception'
-import { ActivityLevel, ActivityLevelType } from '../model/activity.level'
+import { PhysicalActivityLevel, ActivityLevelType } from '../model/physical.activity.level'
 
 export class PhysicalActivityLevelsValidator {
-    public static validate(levels: Array<ActivityLevel>): void | ValidationException {
+    public static validate(levels: Array<PhysicalActivityLevel>): void | ValidationException {
         const fields: Array<string> = []
         const message: string = 'Level are not in a format that is supported!'
         const levelsTypes = Object.values(ActivityLevelType)
@@ -12,7 +12,7 @@ export class PhysicalActivityLevelsValidator {
                 .concat(levelsTypes.join(', '), '.'))
         }
 
-        levels.forEach((level: ActivityLevel) => {
+        levels.forEach((level: PhysicalActivityLevel) => {
             // validate null
             if (!level.name) fields.push('level name')
             else if (!levelsTypes.includes(level.name)) {

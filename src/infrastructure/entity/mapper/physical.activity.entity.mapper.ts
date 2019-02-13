@@ -1,6 +1,6 @@
 import { injectable } from 'inversify'
 import { PhysicalActivity } from '../../../application/domain/model/physical.activity'
-import { ActivityLevel } from '../../../application/domain/model/activity.level'
+import { PhysicalActivityLevel } from '../../../application/domain/model/physical.activity.level'
 import { PhysicalActivityEntity } from '../physical.activity.entity'
 import { IEntityMapper } from '../../port/entity.mapper.interface'
 
@@ -32,7 +32,7 @@ export class PhysicalActivityEntityMapper implements IEntityMapper<PhysicalActiv
         if (item.calories) result.calories = item.calories
         if (item.steps !== undefined) result.steps = item.steps
         if (item.levels !== undefined) {
-            result.levels = item.levels.map((elem: ActivityLevel) => elem.toJSON())
+            result.levels = item.levels.map((elem: PhysicalActivityLevel) => elem.toJSON())
         }
 
         return result
@@ -68,7 +68,7 @@ export class PhysicalActivityEntityMapper implements IEntityMapper<PhysicalActiv
         if (json.steps !== undefined) result.steps = json.steps
         if (json.child_id !== undefined) result.child_id = json.child_id
         if (json.levels !== undefined) {
-            result.levels = json.levels.map(elem => new ActivityLevel().fromJSON(elem))
+            result.levels = json.levels.map(elem => new PhysicalActivityLevel().fromJSON(elem))
         }
 
         return result

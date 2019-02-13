@@ -5,9 +5,9 @@ import { JsonUtils } from '../utils/json.utils'
 /**
  * Entity implementation of the physicalactivity levels.
  *
- * @implements {IJSONSerializable, IJSONDeserializable<ActivityLevel>}
+ * @implements {IJSONSerializable, IJSONDeserializable<PhysicalActivityLevel>}
  */
-export class ActivityLevel implements IJSONSerializable, IJSONDeserializable<ActivityLevel> {
+export class PhysicalActivityLevel implements IJSONSerializable, IJSONDeserializable<PhysicalActivityLevel> {
     private _name!: string // Name of physicalactivity level (sedentary, light, fair or very).
     private _duration!: number // Total time spent in milliseconds on the level.
 
@@ -32,7 +32,7 @@ export class ActivityLevel implements IJSONSerializable, IJSONDeserializable<Act
         this._duration = value
     }
 
-    public fromJSON(json: any): ActivityLevel {
+    public fromJSON(json: any): PhysicalActivityLevel {
         if (!json) return this
         if (typeof json === 'string' && JsonUtils.isJsonString(json)) {
             json = JSON.parse(json)

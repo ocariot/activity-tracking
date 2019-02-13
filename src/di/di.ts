@@ -12,7 +12,7 @@ import { ActivityRepoModel } from '../infrastructure/database/schema/activity.sc
 import { PhysicalActivityEntityMapper } from '../infrastructure/entity/mapper/physical.activity.entity.mapper'
 import { RabbitMQConnectionFactory } from '../infrastructure/eventbus/rabbitmq/rabbitmp.connection.factory'
 import { RabbitMQConnection } from '../infrastructure/eventbus/rabbitmq/rabbitmq.connection'
-import { EventBusRabbitMQ } from '../infrastructure/eventbus/rabbitmq/eventbus.rabbittmq'
+import { EventBusRabbitMQ } from '../infrastructure/eventbus/rabbitmq/eventbus.rabbitmq'
 import { MongoDBConnectionFactory } from '../infrastructure/database/mongodb.connection.factory'
 import { MongoDBConnection } from '../infrastructure/database/mongodb.connection'
 import { IDBConnection } from '../infrastructure/port/db.connection.interface'

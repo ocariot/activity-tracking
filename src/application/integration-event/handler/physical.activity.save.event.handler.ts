@@ -9,6 +9,7 @@ import { CreatePhysicalActivityValidator } from '../../domain/validator/create.p
 import { ConflictException } from '../../domain/exception/conflict.exception'
 
 export class PhysicalActivitySaveEventHandler implements IIntegrationEventHandler<PhysicalActivitySaveEvent> {
+    private count: number = 0
 
     /**
      * Creates an instance of ActivitySaveEventHandler.
@@ -40,7 +41,7 @@ export class PhysicalActivitySaveEventHandler implements IIntegrationEventHandle
             await this._activityRepository.create(activity)
 
             // 5. If got here, it's because the action was successful.
-            this._logger.info(`Action for event ${event.event_name} successfully held!`)
+            this._logger.info(`Action for event ${event.event_name} successfully held! TOTAL: ${++this.count}`)
         } catch (err) {
             this._logger.error(`An error occurred while attempting `
                 .concat(`perform the operation with the ${event.event_name} name event. `)
