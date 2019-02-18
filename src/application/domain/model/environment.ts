@@ -52,7 +52,7 @@ export class Environment extends Entity implements IJSONSerializable, IJSONDeser
     }
 
     set climatized(value: boolean | undefined) {
-        this._climatized = value
+        this._climatized = value !== undefined ? value : false
     }
 
     get timestamp(): Date {
@@ -63,7 +63,7 @@ export class Environment extends Entity implements IJSONSerializable, IJSONDeser
         this._timestamp = value
     }
 
-    public convertDatetimeString(value: string): Date {
+    private convertDatetimeString(value: string): Date {
         DatetimeValidator.validate(value)
         return new Date(value)
     }
@@ -80,7 +80,7 @@ export class Environment extends Entity implements IJSONSerializable, IJSONDeser
         if (json.measurements !== undefined && json.measurements instanceof Array) {
             this.measurements = json.measurements.map(item => new Measurement().fromJSON(item))
         }
-        if (json.climatized !== undefined) this.climatized = json.climatized
+        this.climatized = json.climatized
         if (json.timestamp !== undefined) this.timestamp = this.convertDatetimeString(json.timestamp)
 
         return this

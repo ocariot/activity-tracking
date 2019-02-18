@@ -16,7 +16,7 @@ export class CreatePhysicalActivityValidator {
         if (activity.duration === undefined) fields.push('duration')
         if (!activity.child_id) fields.push('child_id')
         else UuidValidator.validate(activity.child_id, Strings.CHILD.PARAM_ID_NOT_VALID_FORMAT)
-        if (activity.levels) PhysicalActivityLevelsValidator.validate(activity.levels)
+        if (activity.levels && activity.levels.length > 0) PhysicalActivityLevelsValidator.validate(activity.levels)
 
         if (fields.length > 0) {
             throw new ValidationException('Required fields were not provided...',

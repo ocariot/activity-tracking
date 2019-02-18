@@ -29,7 +29,7 @@ export class EnvironmentEntityMapper implements IEntityMapper<Environment, Envir
         if (item.location) result.location = item.location.toJSON()
         if (item.climatized !== undefined) result.climatized = item.climatized
         if (item.timestamp) result.timestamp = item.timestamp
-        if (item.measurements) {
+        if (item.measurements && item.measurements.length > 0) {
             result.measurements = item.measurements.map((measurement: Measurement) => measurement.toJSON())
         }
 
@@ -58,12 +58,12 @@ export class EnvironmentEntityMapper implements IEntityMapper<Environment, Envir
         const result: Environment = new Environment()
 
         if (!json) return result
-        if (json.id) result.id = json.id
-        if (json.institution_id) result.institution_id = json.institution_id
-        if (json.location) result.location = new Location().fromJSON(json.location)
-        if (json.climatized) result.climatized = json.climatized
-        if (json.timestamp) result.timestamp = json.timestamp
-        if (json.measurements) {
+        if (json.id !== undefined) result.id = json.id
+        if (json.institution_id !== undefined) result.institution_id = json.institution_id
+        if (json.location !== undefined) result.location = new Location().fromJSON(json.location)
+        if (json.climatized !== undefined) result.climatized = json.climatized
+        if (json.timestamp !== undefined) result.timestamp = json.timestamp
+        if (json.measurements !== undefined) {
             result.measurements = json.measurements.map(item => new Measurement().fromJSON(item))
         }
 
