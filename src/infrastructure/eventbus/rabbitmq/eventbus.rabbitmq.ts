@@ -8,17 +8,20 @@ import { IIntegrationEventHandler } from '../../../application/integration-event
 import { Identifier } from '../../../di/identifiers'
 import { IDisposable } from '../../port/disposable.interface'
 import { ILogger } from '../../../utils/custom.logger'
+import { EventBusException } from '../../../application/domain/exception/eventbus.exception'
 import StartConsumerResult = Queue.StartConsumerResult
 
 @injectable()
 export class EventBusRabbitMQ implements IEventBus, IDisposable {
+    private readonly RABBITMQ_QUEUE_NAME: string = 'tracking_queue'
+
     private event_handlers: Map<string, IIntegrationEventHandler<IntegrationEvent<any>>>
     private queue_consumer: boolean
     private queue!: Queue
 
     constructor(
-        @inject(Identifier.RABBITMQ_CONNECTION) private _connectionPub: IRabbitMQConnection,
-        @inject(Identifier.RABBITMQ_CONNECTION) private _connectionSub: IRabbitMQConnection,
+        @inject(Identifier.RABBITMQ_CONNECTION) public connectionPub: IRabbitMQConnection,
+        @inject(Identifier.RABBITMQ_CONNECTION) public connectionSub: IRabbitMQConnection,
         @inject(Identifier.LOGGER) private readonly _logger: ILogger
     ) {
         this.event_handlers = new Map()
@@ -32,19 +35,30 @@ export class EventBusRabbitMQ implements IEventBus, IDisposable {
      * @param routing_key {string}
      * @return {Promise<void>}
      */
-    public async publish(event: IntegrationEvent<any>, routing_key: string): Promise<void> {
-        if (!this._connectionPub.isConnected) await this._connectionPub.tryConnect()
-        if (!this._connectionPub.conn) return
+    public async publish(event: IntegrationEvent<any>, routing_key: string): Promise<boolean> {
+        try {
+            if (!this.connectionPub.isConnected) {
+                throw new EventBusException(`Could not publish the event: ${event.event_name}.`,
+                    'There is no connection to RabbitMQ!')
+            }
+            if (!this.connectionPub.conn) return Promise.resolve(false)
 
-        await this._connectionPub.conn.completeConfiguration()
+            await this.connectionPub.conn.completeConfiguration()
 
-        const exchange: Exchange = this._connectionPub.conn.declareExchange(event.type, 'topic', { durable: true })
+            const exchange: Exchange = this.connectionPub.conn.declareExchange(event.type, 'topic', { durable: true })
+            if (await exchange.initialized) {
+                const message: Message = new Message(event.toJSON())
+                message.properties.appId = Default.APP_ID
+                exchange.send(message, routing_key)
 
-        const message: Message = new Message(event.toJSON())
-        message.properties.appId = Default.APP_ID
-        exchange.send(message, routing_key) // message, key
-
-        this._logger.info(`Event "${event.event_name}" published in RabbitMQ.`)
+                await exchange.close()
+                return Promise.resolve(true)
+            }
+            throw new EventBusException(`Could not publish the event: ${event.event_name}.`,
+                'An error occurred in the creation/initialization of Exchange.')
+        } catch (err) {
+            return Promise.reject(err)
+        }
     }
 
     /**
@@ -58,23 +72,32 @@ export class EventBusRabbitMQ implements IEventBus, IDisposable {
      * @return {Promise<void>}
      */
     public async subscribe(event: IntegrationEvent<any>, handler: IIntegrationEventHandler<IntegrationEvent<any>>,
-                           routing_key: string): Promise<void> {
-        if (!this._connectionSub.isConnected) await this._connectionSub.tryConnect()
-        if (this.event_handlers.has(event.event_name) || !this._connectionSub.conn) return
+                           routing_key: string): Promise<boolean> {
+        try {
+            if (!this.connectionSub.isConnected) {
+                throw new EventBusException(`Could not subscribe up for the event: ${event.event_name}.`,
+                    'There is no connection to RabbitMQ!')
+            }
 
-        this.queue = this._connectionSub.conn.declareQueue(Default.RABBITMQ_QUEUE_NAME, { durable: true })
+            // Check if are already registered or there is no connection.
+            if (this.event_handlers.has(event.event_name) || !this.connectionSub.conn) {
+                return Promise.resolve(false)
+            }
 
-        const exchange: Exchange = this._connectionSub.conn.declareExchange(event.type, 'topic', { durable: true })
+            this.queue = this.connectionSub.conn.declareQueue(this.RABBITMQ_QUEUE_NAME, { durable: true })
 
-        const initialized = await exchange.initialized
-        if (initialized) {
-            this.event_handlers.set(event.event_name, handler)
-            await this.queue.bind(exchange, routing_key)
-            await this.internalSubscribe()
+            const exchange: Exchange = this.connectionSub.conn.declareExchange(event.type, 'topic', { durable: true })
+            if (await exchange.initialized) {
+                this.event_handlers.set(event.event_name, handler)
+                await this.queue.bind(exchange, routing_key)
+                await this.internalSubscribe()
 
-            this._logger.info(`Subscribe event: ${event.event_name}`)
-        } else {
-            this._logger.error(`Subscribe event ERROR EXCHANGE: ${event.event_name}`)
+                return Promise.resolve(true)
+            }
+            throw new EventBusException(`Could not subscribe up for the event: ${event.event_name}.`,
+                'An error occurred in the creation/initialization of Exchange.')
+        } catch (err) {
+            return Promise.reject(err)
         }
     }
 
@@ -93,6 +116,7 @@ export class EventBusRabbitMQ implements IEventBus, IDisposable {
             await this.queue
                 .activateConsumer((message: Message) => {
                     message.ack() // acknowledge that the message has been received (and processed)
+
                     if (message.properties.appId === Default.APP_ID) return
 
                     // this._logger.info(`Bus event message received!`)
@@ -122,8 +146,7 @@ export class EventBusRabbitMQ implements IEventBus, IDisposable {
             await this.queue.stopConsumer()
             await this.queue.close()
         }
-        if (this._connectionPub.conn) await this._connectionPub.conn.close()
-        if (this._connectionSub.conn) await this._connectionSub.conn.close()
-        this._connectionPub.conn = undefined
+        if (this.connectionPub.conn) await this.connectionPub.conn.close()
+        if (this.connectionSub.conn) await this.connectionSub.conn.close()
     }
 }

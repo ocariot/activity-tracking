@@ -40,7 +40,6 @@ const https_options = {
 http.createServer((req, res) => {
     const host = req.headers.host || ''
     const newLocation = 'https://' + host.replace(/:\d+/, ':' + port_https) + req.url
-    console.log('res', newLocation)
     res.writeHead(301, { Location: newLocation })
     res.end()
 }).listen(port_http)

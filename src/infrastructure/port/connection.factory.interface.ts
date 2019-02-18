@@ -1,3 +1,3 @@
 export interface IConnectionFactory {
-    createConnection(): Promise<any>
+    createConnection(_retries: number, _interval: number): Promise<any>
 }

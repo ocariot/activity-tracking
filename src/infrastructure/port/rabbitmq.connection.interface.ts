@@ -3,5 +3,5 @@ export interface IRabbitMQConnection {
 
     conn?: any
 
-    tryConnect(): Promise<void>
+    tryConnect(retries: number, interval: number): Promise<void>
 }

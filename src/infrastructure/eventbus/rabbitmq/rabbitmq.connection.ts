@@ -38,7 +38,13 @@ export class RabbitMQConnection implements IRabbitMQConnection {
      *
      * @return Promise<void>
      */
-    public async tryConnect(): Promise<void> {
-        this._connection = await this._connectionFactory.createConnection()
+    public async tryConnect(retries: number, interval: number): Promise<void> {
+        try {
+            this._connection = await this._connectionFactory.createConnection(retries, interval)
+            if (this._connection) return Promise.resolve()
+            return Promise.reject()
+        } catch (err) {
+            return Promise.reject(err)
+        }
     }
 }

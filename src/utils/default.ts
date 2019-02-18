@@ -24,11 +24,10 @@ export abstract class Default {
     public static readonly MONGODB_CON_RETRY_INTERVAL: number = 1000 // 1s
 
     // RabbitMQ
-    public static readonly RABBITMQ_AMQP_URI: string = 'amqp://127.0.0.1:5672'
-    public static readonly RABBITMQ_EXCHANGE_NAME: string = 'tracking-service'
-    public static readonly RABBITMQ_QUEUE_NAME: string = 'tracking_queue'
-    public static readonly RABBITMQ_CON_RETRY_COUNT: number = 0 // infinite
-    public static readonly RABBITMQ_CON_RETRY_INTERVAL: number = 1000 // 1s
+    public static readonly RABBITMQ_HOST: string = '127.0.0.1:5672'
+    public static readonly RABBITMQ_PORT: number = 5672
+    public static readonly RABBITMQ_USERNAME: string = 'guest'
+    public static readonly RABBITMQ_PASSWORD: string = 'guest'
 
     // Log
     public static readonly LOG_DIR: string = 'logs'

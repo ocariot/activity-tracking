@@ -16,7 +16,7 @@ import { EventEmitter } from 'events'
 @injectable()
 export class MongoDBConnection implements IDBConnection {
     private _connection?: Connection
-    private _eventConnection: EventEmitter
+    private readonly _eventConnection: EventEmitter
 
     constructor(
         @inject(Identifier.MONGODB_CONNECTION_FACTORY) private readonly _connectionFactory: IConnectionFactory,
@@ -27,7 +27,6 @@ export class MongoDBConnection implements IDBConnection {
 
     get conn(): Connection | undefined {
         return this._connection
-        this.tryConnect()
     }
 
     get eventConnection(): EventEmitter {
@@ -47,7 +46,7 @@ export class MongoDBConnection implements IDBConnection {
      */
     public async tryConnect(): Promise<void> {
         const _this = this
-        await this._connectionFactory.createConnection()
+        await this._connectionFactory.createConnection(0, 1500)
             .then((connection: Connection) => {
                 this._eventConnection.emit('connected')
                 this._connection = connection
