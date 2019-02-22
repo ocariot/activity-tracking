@@ -19,16 +19,19 @@ export abstract class Identifier {
 
     // Repositories
     public static readonly ACTIVITY_REPOSITORY: any = Symbol.for('PhysicalActivityRepository')
+    public static readonly ACTIVITY_LOG_REPOSITORY: any = Symbol.for('PhysicalActivityLogRepository')
     public static readonly SLEEP_REPOSITORY: any = Symbol.for('SleepRepository')
     public static readonly ENVIRONMENT_REPOSITORY: any = Symbol.for('EnvironmentRepository')
 
     // Models
     public static readonly ACTIVITY_REPO_MODEL: any = Symbol.for('ActivityRepoModel')
+    public static readonly ACTIVITY_LOG_REPO_MODEL: any = Symbol.for('ActivityLogRepoModel')
     public static readonly SLEEP_REPO_MODEL: any = Symbol.for('SleepRepoModel')
     public static readonly ENVIRONMENT_REPO_MODEL: any = Symbol.for('EnvironmentRepoModel')
 
     // Mappers
     public static readonly ACTIVITY_ENTITY_MAPPER: any = Symbol.for('PhysicalActivityEntityMapper')
+    public static readonly ACTIVITY_LOG_ENTITY_MAPPER: any = Symbol.for('PhysicalActivityLogEntityMapper')
     public static readonly ENVIRONMENT_ENTITY_MAPPER: any = Symbol.for('EnvironmentEntityMapper')
     public static readonly SLEEP_ENTITY_MAPPER: any = Symbol.for('SleepEntityMapper')
 

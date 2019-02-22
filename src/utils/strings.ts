@@ -17,6 +17,14 @@ export abstract class Strings {
         PARAM_ID_NOT_VALID_FORMAT: 'Parameter {child_id} is not in valid format!'
     }
 
+    public static readonly DATE_START: any = {
+        PARAM_ID_NOT_VALID_FORMAT: 'Parameter {date_start} is not in valid format!'
+    }
+
+    public static readonly DATE_END: any = {
+        PARAM_ID_NOT_VALID_FORMAT: 'Parameter {date_end} is not in valid format!'
+    }
+
     public static readonly PHYSICAL_ACTIVITY: any = {
         PARAM_ID_NOT_VALID_FORMAT: 'Parameter {physicalactivity_id} is not in valid format!'
     }

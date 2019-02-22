@@ -37,11 +37,17 @@ import { ISleepService } from '../application/port/sleep.service.interface'
 import { SleepService } from '../application/service/sleep.service'
 import { ISleepRepository } from '../application/port/sleep.repository.interface'
 import { SleepRepository } from '../infrastructure/repository/sleep.repository'
+import { PhysicalActivityLogRepository } from '../infrastructure/repository/physical.activity.log.repository'
 import { SleepEntity } from '../infrastructure/entity/sleep.entity'
 import { Sleep } from '../application/domain/model/sleep'
 import { SleepEntityMapper } from '../infrastructure/entity/mapper/sleep.entity.mapper'
 import { SleepRepoModel } from '../infrastructure/database/schema/sleep.schema'
 import { IEntityMapper } from '../infrastructure/port/entity.mapper.interface'
+import {IPhysicalActivityLogRepository} from '../application/port/physical.activity.log.repository.interface'
+import {PhysicalActivityLogEntity} from '../infrastructure/entity/physical.activity.log.entity'
+import {PhysicalActivityLog} from '../application/domain/model/physical.activity.log'
+import {PhysicalActivityLogEntityMapper} from '../infrastructure/entity/mapper/physical.activity.log.entity.mapper'
+import {ActivityLogRepoModel} from '../infrastructure/database/schema/activity.log.schema'
 
 export class DI {
     private static instance: DI
@@ -102,6 +108,9 @@ export class DI {
             .bind<IPhysicalActivityRepository>(Identifier.ACTIVITY_REPOSITORY)
             .to(PhysicalActivityRepository).inSingletonScope()
         this.container
+            .bind<IPhysicalActivityLogRepository>(Identifier.ACTIVITY_LOG_REPOSITORY)
+            .to(PhysicalActivityLogRepository).inSingletonScope()
+        this.container
             .bind<IEnvironmentRepository>(Identifier.ENVIRONMENT_REPOSITORY)
             .to(EnvironmentRepository).inSingletonScope()
         this.container
@@ -110,6 +119,7 @@ export class DI {
 
         // Models
         this.container.bind(Identifier.ACTIVITY_REPO_MODEL).toConstantValue(ActivityRepoModel)
+        this.container.bind(Identifier.ACTIVITY_LOG_REPO_MODEL).toConstantValue(ActivityLogRepoModel)
         this.container.bind(Identifier.ENVIRONMENT_REPO_MODEL).toConstantValue(EnvironmentRepoModel)
         this.container.bind(Identifier.SLEEP_REPO_MODEL).toConstantValue(SleepRepoModel)
 
@@ -117,6 +127,9 @@ export class DI {
         this.container
             .bind<IEntityMapper<PhysicalActivity, ActivityEntity>>(Identifier.ACTIVITY_ENTITY_MAPPER)
             .to(PhysicalActivityEntityMapper).inSingletonScope()
+        this.container
+            .bind<IEntityMapper<PhysicalActivityLog, PhysicalActivityLogEntity>>(Identifier.ACTIVITY_LOG_ENTITY_MAPPER)
+            .to(PhysicalActivityLogEntityMapper).inSingletonScope()
         this.container
             .bind<IEntityMapper<Environment, EnvironmentEntity>>(Identifier.ENVIRONMENT_ENTITY_MAPPER)
             .to(EnvironmentEntityMapper).inSingletonScope()
