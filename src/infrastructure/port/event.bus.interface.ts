@@ -14,4 +14,6 @@ export interface IEventBus extends IDisposable {
         handler: IIntegrationEventHandler<IntegrationEvent<any>>,
         routing_key: string
     ): Promise<boolean>
+
+    enableLogger(value: boolean): void
 }

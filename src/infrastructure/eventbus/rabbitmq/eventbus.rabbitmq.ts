@@ -1,5 +1,5 @@
 import { inject, injectable } from 'inversify'
-import { Exchange, Message, Queue } from 'amqp-ts'
+import amqp, { Exchange, Message, Queue } from 'amqp-ts'
 import { IEventBus } from '../../port/event.bus.interface'
 import { IRabbitMQConnection } from '../../port/rabbitmq.connection.interface'
 import { Default } from '../../../utils/default'
@@ -33,7 +33,7 @@ export class EventBusRabbitMQ implements IEventBus, IDisposable {
      *
      * @param event {IntegrationEvent}
      * @param routing_key {string}
-     * @return {Promise<void>}
+     * @return {Promise<boolean>}
      */
     public async publish(event: IntegrationEvent<any>, routing_key: string): Promise<boolean> {
         try {
@@ -68,8 +68,7 @@ export class EventBusRabbitMQ implements IEventBus, IDisposable {
      * @param event {IntegrationEvent}
      * @param handler {IIntegrationEventHandler<IntegrationEvent>}
      * @param routing_key {string}
-     *
-     * @return {Promise<void>}
+     * @return {Promise<boolean>}
      */
     public async subscribe(event: IntegrationEvent<any>, handler: IIntegrationEventHandler<IntegrationEvent<any>>,
                            routing_key: string): Promise<boolean> {
@@ -131,7 +130,10 @@ export class EventBusRabbitMQ implements IEventBus, IDisposable {
                     }
                 }, { noAck: false })
                 .then((result: StartConsumerResult) => {
-                    this._logger.info('Queue activate consumer successfully created! ')
+                    this._logger.info('Queue consumer successfully created! ')
+                })
+                .catch(err => {
+                    throw new EventBusException('Failed to activate the queue consumer!', err.message)
                 })
         }
     }
@@ -148,5 +150,18 @@ export class EventBusRabbitMQ implements IEventBus, IDisposable {
         }
         if (this.connectionPub.conn) await this.connectionPub.conn.close()
         if (this.connectionSub.conn) await this.connectionSub.conn.close()
+    }
+
+    /**
+     * Enables logging.
+     *
+     * @param value
+     */
+    public enableLogger(value: boolean): void {
+        if (value) {
+            amqp.log.transports.console.level = 'info'
+            return
+        }
+        amqp.log.transports.console.level = 'none'
     }
 }

@@ -26,6 +26,8 @@ const pubSleepTotal: number = 10
 const pubEnvironmentTotal: number = 10
 
 describe('EVENT BUS', () => {
+    before(() => eventBus.enableLogger(false))
+
     after(async () => {
         await eventBus.dispose()
     })

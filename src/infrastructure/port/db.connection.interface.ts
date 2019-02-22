@@ -4,5 +4,5 @@ import { EventEmitter } from 'events'
 export interface IDBConnection extends IDisposable {
     eventConnection: EventEmitter
 
-    tryConnect(): void
+    tryConnect(retries: number, interval: number): void
 }

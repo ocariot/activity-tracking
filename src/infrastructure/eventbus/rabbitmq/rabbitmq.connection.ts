@@ -1,4 +1,4 @@
-import amqp, { Connection } from 'amqp-ts'
+import { Connection } from 'amqp-ts'
 import { inject, injectable } from 'inversify'
 import { IRabbitMQConnection } from '../../port/rabbitmq.connection.interface'
 import { IConnectionFactory } from '../../port/connection.factory.interface'
@@ -18,8 +18,6 @@ export class RabbitMQConnection implements IRabbitMQConnection {
     constructor(
         @inject(Identifier.RABBITMQ_CONNECTION_FACTORY) private readonly _connectionFactory: IConnectionFactory
     ) {
-        this._connection = undefined
-        amqp.log.transports.console.level = 'info'
     }
 
     get isConnected(): boolean {
@@ -36,15 +34,24 @@ export class RabbitMQConnection implements IRabbitMQConnection {
      * are made to connect according to the parameter {@link _options}
      * which sets the total number of retries and the delay
      *
+     * @param retries Total attempts to be made until give up reconnecting
+     * @param interval Interval in milliseconds between each attempt
      * @return Promise<void>
      */
-    public async tryConnect(retries: number, interval: number): Promise<void> {
-        try {
-            this._connection = await this._connectionFactory.createConnection(retries, interval)
-            if (this._connection) return Promise.resolve()
-            return Promise.reject()
-        } catch (err) {
-            return Promise.reject(err)
-        }
+    public tryConnect(retries: number, interval: number): Promise<void> {
+        return new Promise<void>((resolve, reject) => {
+            if (this._connection) return resolve()
+
+            this._connectionFactory
+                .createConnection(retries, interval)
+                .then((connection: Connection) => {
+                    this._connection = connection
+                    return resolve()
+                })
+                .catch(err => {
+                    this._connection = undefined
+                    return reject(err)
+                })
+        })
     }
 }

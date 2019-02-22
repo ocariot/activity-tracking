@@ -20,8 +20,6 @@ export abstract class Default {
     // MongoDB
     public static readonly MONGODB_URI: string = 'mongodb://127.0.0.1:27017/tracking-service'
     public static readonly MONGODB_URI_TEST: string = 'mongodb://127.0.0.1:27017/tracking-service-test'
-    public static readonly MONGODB_CON_RETRY_COUNT: number = 0 // infinite
-    public static readonly MONGODB_CON_RETRY_INTERVAL: number = 1000 // 1s
 
     // RabbitMQ
     public static readonly RABBITMQ_HOST: string = '127.0.0.1:5672'

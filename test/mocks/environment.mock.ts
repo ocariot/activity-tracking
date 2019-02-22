@@ -12,7 +12,7 @@ export class EnvironmentMock extends Environment {
     private generateEnvironment(): Environment {
         const environment: Environment = new Environment()
         environment.id = this.generateObjectId()
-        environment.institution_id = `5a62be07de34500146d9c624`
+        environment.institution_id = `5c6dd16ea1a67d0034e6108b`
         environment.timestamp = new Date()
         environment.climatized = (Math.random() >= 0.5)
         environment.measurements = this.generateMeasurements()

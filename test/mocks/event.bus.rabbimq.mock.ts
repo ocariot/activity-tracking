@@ -26,4 +26,8 @@ export class EventBusRabbimqMock implements IEventBus {
     public dispose(): Promise<void> {
         return Promise.resolve()
     }
+
+    public enableLogger(): void {
+        // logger
+    }
 }

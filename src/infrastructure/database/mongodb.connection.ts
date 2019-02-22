@@ -42,11 +42,13 @@ export class MongoDBConnection implements IDBConnection {
      * a new attempt will be made every 2 seconds. After the successful
      * connection, reconnection will be automatically managed by the MongoDB driver.
      *
+     * @param retries Total attempts to be made until give up reconnecting
+     * @param interval Interval in milliseconds between each attempt
      * @return {Promise<void>}
      */
-    public async tryConnect(): Promise<void> {
+    public async tryConnect(retries: number, interval: number): Promise<void> {
         const _this = this
-        await this._connectionFactory.createConnection(0, 1500)
+        await this._connectionFactory.createConnection(retries, interval)
             .then((connection: Connection) => {
                 this._eventConnection.emit('connected')
                 this._connection = connection
@@ -54,8 +56,9 @@ export class MongoDBConnection implements IDBConnection {
             })
             .catch((err) => {
                 this._eventConnection.emit('disconnected')
-                setTimeout(() => {
-                    _this.tryConnect().then()
+                this._connection = undefined
+                setTimeout(async () => {
+                    _this.tryConnect(retries, interval).then()
                 }, 2000)
             })
     }
@@ -67,18 +70,20 @@ export class MongoDBConnection implements IDBConnection {
      */
     private connectionStatusListener(connection: Connection | undefined): void {
         if (!connection) {
+            this._connection = undefined
             this._eventConnection.emit('disconnected')
             return
         }
 
         connection.on('connected', (con) => {
             this._eventConnection.emit('connected')
-            this._logger.info(`MongoDB connection open...`)
+            this._logger.warn('Established MongoDB connection...')
         })
 
         connection.on('disconnected', () => {
+            this._connection = undefined
             this._eventConnection.emit('disconnected')
-            this._logger.info(`MongoDB connection disconnected...`)
+            this._logger.warn('Connection to MongoDB was lost...')
         })
     }
 
