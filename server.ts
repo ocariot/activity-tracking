@@ -22,7 +22,7 @@ import { readFileSync } from 'fs'
  *
  *  NOTE: For the production environment it is highly recommended not to use .env.
  */
-require(`dotenv`).config()
+require(`dotenv`).load()
 
 const logger: ILogger = DI.getInstance().getContainer().get<ILogger>(Identifier.LOGGER)
 const app: Application = (DI.getInstance().getContainer().get<App>(Identifier.APP)).getExpress()
@@ -30,8 +30,8 @@ const backgroundServices: BackgroundService = DI.getInstance().getContainer().ge
 const port_http = process.env.PORT_HTTP || Default.PORT_HTTP
 const port_https = process.env.PORT_HTTPS || Default.PORT_HTTPS
 const https_options = {
-    key: readFileSync(process.env.HTTPS_PRIVATE_KEY_CERT_PATH || Default.PRIVATE_KEY_CERT_PATH),
-    cert: readFileSync(process.env.HTTPS_CERT_PATH || Default.CERT_PATH)
+    key: readFileSync(process.env.PRIVATE_KEY_CERT_PATH || Default.PRIVATE_KEY_CERT_PATH),
+    cert: readFileSync(process.env.CERT_PATH || Default.CERT_PATH)
 }
 
 /**

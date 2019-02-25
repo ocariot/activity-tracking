@@ -74,4 +74,9 @@ docs
 bash.exe.stackdump
 
 # Certificate
-cert
+.certs
+*.pem
+*.crt
+*.key
+*.csr
+certs
