@@ -1,13 +1,13 @@
 import { IEventBus } from '../../src/infrastructure/port/event.bus.interface'
 import { IntegrationEvent } from '../../src/application/integration-event/event/integration.event'
 import { IIntegrationEventHandler } from '../../src/application/integration-event/handler/integration.event.handler.interface'
-import { IRabbitMQConnection } from '../../src/infrastructure/port/rabbitmq.connection.interface'
+import { IEventBusConnection } from '../../src/infrastructure/port/event.bus.connection.interface'
 
 export class EventBusRabbimqMock implements IEventBus {
-    public connectionPub: IRabbitMQConnection
-    public connectionSub: IRabbitMQConnection
+    public connectionPub: IEventBusConnection
+    public connectionSub: IEventBusConnection
 
-    constructor(connectionPub: IRabbitMQConnection, connectionSub: IRabbitMQConnection) {
+    constructor(connectionPub: IEventBusConnection, connectionSub: IEventBusConnection) {
         this.connectionPub = connectionPub
         this.connectionSub = connectionSub
     }

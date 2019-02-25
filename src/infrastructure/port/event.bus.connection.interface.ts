@@ -1,4 +1,4 @@
-export interface IRabbitMQConnection {
+export interface IEventBusConnection {
     isConnected: boolean
 
     conn?: any

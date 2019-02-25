@@ -4,7 +4,7 @@ import { IConnectionFactory } from '../port/connection.factory.interface'
 import { Default } from '../../utils/default'
 
 @injectable()
-export class MongoDBConnectionFactory implements IConnectionFactory {
+export class ConnectionFactoryMongoDB implements IConnectionFactory {
     private readonly options = {
         useNewUrlParser: true,
         useCreateIndex: true,

@@ -1,11 +1,11 @@
 import { IDisposable } from './disposable.interface'
 import { IntegrationEvent } from '../../application/integration-event/event/integration.event'
 import { IIntegrationEventHandler } from '../../application/integration-event/handler/integration.event.handler.interface'
-import { IRabbitMQConnection } from './rabbitmq.connection.interface'
+import { IEventBusConnection } from './event.bus.connection.interface'
 
 export interface IEventBus extends IDisposable {
-    connectionPub: IRabbitMQConnection
-    connectionSub: IRabbitMQConnection
+    connectionPub: IEventBusConnection
+    connectionSub: IEventBusConnection
 
     publish(event: IntegrationEvent<any>, routing_key: string): Promise<boolean>
 

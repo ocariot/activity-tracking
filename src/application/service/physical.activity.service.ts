@@ -12,6 +12,7 @@ import { ILogger } from '../../utils/custom.logger'
 import { UpdatePhysicalActivityValidator } from '../domain/validator/update.physical.activity.validator'
 import { UuidValidator } from '../domain/validator/uuid.validator'
 import { Strings } from '../../utils/strings'
+import { IIntegrationEventRepository } from '../port/integration.event.repository.interface'
 
 /**
  * Implementing physicalactivity Service.
@@ -22,6 +23,7 @@ import { Strings } from '../../utils/strings'
 export class PhysicalActivityService implements IPhysicalActivityService {
 
     constructor(@inject(Identifier.ACTIVITY_REPOSITORY) private readonly _activityRepository: IPhysicalActivityRepository,
+                @inject(Identifier.INTEGRATION_EVENT_REPOSITORY) private readonly _integrationEventRepository: IIntegrationEventRepository,
                 @inject(Identifier.RABBITMQ_EVENT_BUS) readonly eventBus: IEventBus,
                 @inject(Identifier.LOGGER) readonly logger: ILogger) {
     }
@@ -48,13 +50,16 @@ export class PhysicalActivityService implements IPhysicalActivityService {
 
             // 4. If created successfully, the object is published on the message bus.
             if (activitySaved) {
-                this.logger.info(`Physical Activity with ID: ${activitySaved.id} published on event bus...`)
-                this.eventBus.publish(
-                    new PhysicalActivitySaveEvent('PhysicalActivitySaveEvent', new Date(), activitySaved),
-                    'activities.save'
-                )
+                const event: PhysicalActivitySaveEvent = new PhysicalActivitySaveEvent('PhysicalActivitySaveEvent',
+                    new Date(), activitySaved)
+                if (!(await this.eventBus.publish(event, 'activities.save'))) {
+                    // 5. Save Event for submission attempt later when there is connection to message channel.
+                    this.saveEvent(event)
+                } else {
+                    this.logger.info(`Physical Activity with ID: ${activitySaved.id} published on event bus...`)
+                }
             }
-            // 5. Returns the created object.
+            // 6. Returns the created object.
             return Promise.resolve(activitySaved)
         } catch (err) {
             return Promise.reject(err)
@@ -149,5 +154,27 @@ export class PhysicalActivityService implements IPhysicalActivityService {
 
     public async remove(id: string): Promise<boolean> {
         throw new Error('Unsupported feature!')
+    }
+
+    /**
+     * Saves the event to the database.
+     * Useful when it is not possible to run the event and want to perform the
+     * operation at another time.
+     * @param event
+     */
+    private saveEvent(event: PhysicalActivitySaveEvent): void {
+        const saveEvent: any = event.toJSON()
+        saveEvent.__operation = 'publish'
+        saveEvent.__routing_key = 'activities.save'
+        this._integrationEventRepository
+            .create(JSON.parse(JSON.stringify(saveEvent)))
+            .then(() => {
+                this.logger.warn(`Could not publish the event named ${event.event_name}.`
+                    .concat(` The event was saved in the database for a possible recovery.`))
+            })
+            .catch(err => {
+                this.logger.error(`There was an error trying to save the name event: ${event.event_name}.`
+                    .concat(`Error: ${err.message}. Event: ${JSON.stringify(saveEvent)}`))
+            })
     }
 }

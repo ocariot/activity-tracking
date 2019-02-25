@@ -1,7 +1,7 @@
 import { inject, injectable } from 'inversify'
 import amqp, { Exchange, Message, Queue } from 'amqp-ts'
 import { IEventBus } from '../../port/event.bus.interface'
-import { IRabbitMQConnection } from '../../port/rabbitmq.connection.interface'
+import { IEventBusConnection } from '../../port/event.bus.connection.interface'
 import { Default } from '../../../utils/default'
 import { IntegrationEvent } from '../../../application/integration-event/event/integration.event'
 import { IIntegrationEventHandler } from '../../../application/integration-event/handler/integration.event.handler.interface'
@@ -20,8 +20,8 @@ export class EventBusRabbitMQ implements IEventBus, IDisposable {
     private queue!: Queue
 
     constructor(
-        @inject(Identifier.RABBITMQ_CONNECTION) public connectionPub: IRabbitMQConnection,
-        @inject(Identifier.RABBITMQ_CONNECTION) public connectionSub: IRabbitMQConnection,
+        @inject(Identifier.RABBITMQ_CONNECTION) public connectionPub: IEventBusConnection,
+        @inject(Identifier.RABBITMQ_CONNECTION) public connectionSub: IEventBusConnection,
         @inject(Identifier.LOGGER) private readonly _logger: ILogger
     ) {
         this.event_handlers = new Map()
@@ -37,15 +37,10 @@ export class EventBusRabbitMQ implements IEventBus, IDisposable {
      */
     public async publish(event: IntegrationEvent<any>, routing_key: string): Promise<boolean> {
         try {
-            if (!this.connectionPub.isConnected) {
-                throw new EventBusException(`Could not publish the event: ${event.event_name}.`,
-                    'There is no connection to RabbitMQ!')
-            }
-            if (!this.connectionPub.conn) return Promise.resolve(false)
-
-            await this.connectionPub.conn.completeConfiguration()
+            if (!this.connectionPub.isConnected) return Promise.resolve(false)
 
             const exchange: Exchange = this.connectionPub.conn.declareExchange(event.type, 'topic', { durable: true })
+
             if (await exchange.initialized) {
                 const message: Message = new Message(event.toJSON())
                 message.properties.appId = Default.APP_ID
@@ -73,15 +68,8 @@ export class EventBusRabbitMQ implements IEventBus, IDisposable {
     public async subscribe(event: IntegrationEvent<any>, handler: IIntegrationEventHandler<IntegrationEvent<any>>,
                            routing_key: string): Promise<boolean> {
         try {
-            if (!this.connectionSub.isConnected) {
-                throw new EventBusException(`Could not subscribe up for the event: ${event.event_name}.`,
-                    'There is no connection to RabbitMQ!')
-            }
-
-            // Check if are already registered or there is no connection.
-            if (this.event_handlers.has(event.event_name) || !this.connectionSub.conn) {
-                return Promise.resolve(false)
-            }
+            if (!this.connectionSub.isConnected) return Promise.resolve(false)
+            if (this.event_handlers.has(event.event_name)) return Promise.resolve(true)
 
             this.queue = this.connectionSub.conn.declareQueue(this.RABBITMQ_QUEUE_NAME, { durable: true })
 
@@ -148,6 +136,7 @@ export class EventBusRabbitMQ implements IEventBus, IDisposable {
             await this.queue.stopConsumer()
             await this.queue.close()
         }
+        this.event_handlers.clear()
         if (this.connectionPub.conn) await this.connectionPub.conn.close()
         if (this.connectionSub.conn) await this.connectionSub.conn.close()
     }

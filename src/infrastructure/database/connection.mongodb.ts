@@ -14,7 +14,7 @@ import { EventEmitter } from 'events'
  * @implements {IDBConnection}
  */
 @injectable()
-export class MongoDBConnection implements IDBConnection {
+export class ConnectionMongoDB implements IDBConnection {
     private _connection?: Connection
     private readonly _eventConnection: EventEmitter
 

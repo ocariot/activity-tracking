@@ -9,9 +9,8 @@ export class SleepSaveEvent extends IntegrationEvent<Sleep> {
     public toJSON(): any {
         if (!this.sleep) return {}
         return {
-            event_name: this.event_name,
-            timestamp: this.timestamp,
-            sleep: this.sleep.toJSON()
+            ...super.toJSON(),
+            ...{ sleep: this.sleep.toJSON() }
         }
     }
 }

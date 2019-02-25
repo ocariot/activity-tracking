@@ -8,10 +8,10 @@ export class EnvironmentSaveEvent extends IntegrationEvent<Environment> {
 
     public toJSON(): any {
         if (!this.environment) return {}
+
         return {
-            event_name: this.event_name,
-            timestamp: this.timestamp,
-            environment: this.environment.toJSON()
+            ...super.toJSON(),
+            ...{ environment: this.environment.toJSON() }
         }
     }
 }
