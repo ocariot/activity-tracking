@@ -15,9 +15,6 @@ export class PhysicalActivityLogEntityMapper implements IEntityMapper<PhysicalAc
     /**
      * Convert {PhysicalActivityLog} for {PhysicalActivityLogEntity}.
      *
-     * @see Creation Date should not be mapped to the type the repository understands.
-     * Because this attribute is created automatically by the database.
-     * Therefore, if a null value is passed at update time, an exception is thrown.
      * @param item
      */
     public modelToModelEntity(item: PhysicalActivityLog): PhysicalActivityLogEntity {

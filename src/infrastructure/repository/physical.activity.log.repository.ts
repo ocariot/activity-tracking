@@ -1,11 +1,11 @@
 import {BaseRepository} from './base/base.repository'
 import {PhysicalActivityLog} from '../../application/domain/model/physical.activity.log'
-import {IPhysicalActivityLogRepository} from '../../application/port/physical.activity.log.repository.interface'
 import {PhysicalActivityLogEntity} from '../entity/physical.activity.log.entity'
 import {inject, injectable} from 'inversify'
 import {Identifier} from '../../di/identifiers'
 import {IEntityMapper} from '../port/entity.mapper.interface'
 import {ILogger} from '../../utils/custom.logger'
+import { IPhysicalActivityLogRepository } from '../../application/port/physical.activity.log.repository.interface'
 
 @injectable()
 export class PhysicalActivityLogRepository extends BaseRepository<PhysicalActivityLog, PhysicalActivityLogEntity>

@@ -14,12 +14,14 @@ export abstract class Identifier {
 
     // Services
     public static readonly ACTIVITY_SERVICE: any = Symbol.for('PhysicalActivityService')
+    public static readonly ACTIVITY_LOG_SERVICE: any = Symbol.for('PhysicalActivityLogService')
     public static readonly SLEEP_SERVICE: any = Symbol.for('SleepService')
     public static readonly ENVIRONMENT_SERVICE: any = Symbol.for('EnvironmentService')
 
     // Repositories
     public static readonly ACTIVITY_REPOSITORY: any = Symbol.for('PhysicalActivityRepository')
     public static readonly ACTIVITY_LOG_REPOSITORY: any = Symbol.for('PhysicalActivityLogRepository')
+    public static readonly LOG_REPOSITORY: any = Symbol.for('LogRepository')
     public static readonly SLEEP_REPOSITORY: any = Symbol.for('SleepRepository')
     public static readonly ENVIRONMENT_REPOSITORY: any = Symbol.for('EnvironmentRepository')
 
@@ -32,6 +34,7 @@ export abstract class Identifier {
     // Mappers
     public static readonly ACTIVITY_ENTITY_MAPPER: any = Symbol.for('PhysicalActivityEntityMapper')
     public static readonly ACTIVITY_LOG_ENTITY_MAPPER: any = Symbol.for('PhysicalActivityLogEntityMapper')
+    public static readonly LOG_ENTITY_MAPPER: any = Symbol.for('LogEntityMapper')
     public static readonly ENVIRONMENT_ENTITY_MAPPER: any = Symbol.for('EnvironmentEntityMapper')
     public static readonly SLEEP_ENTITY_MAPPER: any = Symbol.for('SleepEntityMapper')
 

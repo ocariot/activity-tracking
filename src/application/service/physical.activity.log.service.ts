@@ -4,9 +4,11 @@ import { Strings } from '../../utils/strings'
 import { UuidValidator } from '../domain/validator/uuid.validator'
 import { IPhysicalActivityLogService } from '../port/physical.activity.log.service.interface'
 import { IQuery } from '../port/query.interface'
-import { PhysicalActivityLog } from 'application/domain/model/physical.activity.log'
+import { PhysicalActivityLog, PhysicalActivityLogType } from 'application/domain/model/physical.activity.log'
 import { IPhysicalActivityLogRepository } from '../port/physical.activity.log.repository.interface'
 import { Log } from '../domain/model/log'
+import { DatetimeValidator } from '../domain/validator/datetime.validator'
+import { ILogRepository } from '../port/log.repository.interface'
 
 /**
  * Implementing physicalactivitylog service
@@ -17,7 +19,8 @@ import { Log } from '../domain/model/log'
 export class PhysicalActivityLogService implements IPhysicalActivityLogService {
 
     constructor(
-        @inject(Identifier.ACTIVITY_LOG_REPOSITORY) private readonly _activityLogRepository: IPhysicalActivityLogRepository) {
+        @inject(Identifier.ACTIVITY_LOG_REPOSITORY) private readonly _activityLogRepository: IPhysicalActivityLogRepository,
+        @inject(Identifier.LOG_REPOSITORY) private readonly _logRepository: ILogRepository) {
     }
 
     /**
@@ -66,10 +69,15 @@ export class PhysicalActivityLogService implements IPhysicalActivityLogService {
      */
     public getByChildAndDate(childId: string, dateStart: Date, dateEnd: Date, query: IQuery): Promise<PhysicalActivityLog> {
         UuidValidator.validate(childId, Strings.CHILD.PARAM_ID_NOT_VALID_FORMAT)
-        // UuidValidator.validate(dateStart, Strings.DATE_START.PARAM_ID_NOT_VALID_FORMAT)
-        // UuidValidator.validate(dateEnd, Strings.DATE_END.PARAM_ID_NOT_VALID_FORMAT)
+        DatetimeValidator.validateDateLog(dateStart.toString(), dateEnd.toString())
 
-        query.addFilter({ child_id: childId, date_start: dateStart, date_end: dateEnd })
+        query.addFilter({
+            child_id: childId,
+            $and: [
+                { date: { $lte: dateEnd } },
+                { date: { $gte: dateStart } }
+            ]
+        })
         return this._activityLogRepository.findOne(query)
     }
 
@@ -84,12 +92,20 @@ export class PhysicalActivityLogService implements IPhysicalActivityLogService {
      * @return {Promise<Array<Log>>}
      * @throws {RepositoryException}
      */
-    public getByChildResourceAndDate(childId: string, desiredResource: string, dateStart: Date, dateEnd: Date, query: IQuery):
-        Promise<Array<Log>> {
+    public getByChildResourceAndDate(childId: string, desiredResource: PhysicalActivityLogType, dateStart: Date,
+                                     dateEnd: Date, query: IQuery): Promise<Array<Log>> {
         UuidValidator.validate(childId, Strings.CHILD.PARAM_ID_NOT_VALID_FORMAT)
+        DatetimeValidator.validateDateLog(dateStart.toString(), dateEnd.toString())
 
-        query.addFilter({ child_id: childId, resource: desiredResource, date_start: dateStart, date_end: dateEnd })
-        return this._activityLogRepository.find(query)
+        query.addFilter({
+            child_id: childId,
+            type: desiredResource,
+            $and: [
+                { date: { $lte: dateEnd } },
+                { date: { $gte: dateStart } }
+            ]
+        })
+        return this._logRepository.find(query)
     }
 
     public async update(physicalActivityLog: PhysicalActivityLog): Promise<PhysicalActivityLog> {
@@ -99,5 +115,4 @@ export class PhysicalActivityLogService implements IPhysicalActivityLogService {
     public async remove(id: string): Promise<boolean> {
         throw new Error('Unsupported feature!')
     }
-
 }

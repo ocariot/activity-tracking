@@ -1,17 +1,19 @@
 import { IJSONSerializable } from '../utils/json.serializable.interface'
 import { IJSONDeserializable } from '../utils/json.deserializable.interface'
 import { JsonUtils } from '../utils/json.utils'
+import { Entity } from './entity'
 
 /**
  * Entity implementation of the individual log of the PhysicalActivity.
  * 
  * @implements {IJSONSerializable, IJSONDeserializable<Log>}
  */
-export class Log implements IJSONSerializable, IJSONDeserializable<Log> {
+export class Log extends Entity implements IJSONSerializable, IJSONDeserializable<Log> {
     private _date!: Date // Date of the log according to the format yyyy-MM-dd.
     private _value!: number // Total time in milliseconds spent in the day.
 
     constructor(date?: Date, value?: number) {
+        super()
         if (date) this.date = date
         if (value) this.value = value
     }

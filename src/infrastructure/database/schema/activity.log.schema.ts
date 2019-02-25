@@ -4,30 +4,22 @@ interface IPhysicalActivityLogModel extends Mongoose.Document {
 }
 
 const physicalActivityLogSchema = new Mongoose.Schema({
-        steps: [
-            {
-                date: {
-                    type: Date,
-                    required: true
-                },
-                value: {
-                    type: Number,
-                    required: true
-                }
-            }
-        ],
-        calories: [
-            {
-                date: {
-                    type: Date,
-                    required: true
-                },
-                value: {
-                    type: Number,
-                    required: true
-                }
-            }
-        ]
+        type: {
+            type: String,
+            required: true
+        },
+        date: {
+            type: Date,
+            required: true
+        },
+        value: {
+            type: Number,
+            required: true
+        },
+        child_id: {
+            type: Mongoose.Schema.Types.ObjectId,
+            required: true
+        }
     },
     {
         timestamps: { createdAt: 'created_at', updatedAt: false },
