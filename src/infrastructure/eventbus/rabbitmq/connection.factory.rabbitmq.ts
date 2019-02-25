@@ -4,7 +4,7 @@ import { IConnectionFactory } from '../../port/connection.factory.interface'
 import { Default } from '../../../utils/default'
 
 @injectable()
-export class RabbitMQConnectionFactory implements IConnectionFactory {
+export class ConnectionFactoryRabbitMQ implements IConnectionFactory {
     /**
      * Create instance of {@link Connection} Class belonging
      * to the amqp-ts library to connect to RabbitMQ.
@@ -26,6 +26,7 @@ export class RabbitMQConnectionFactory implements IConnectionFactory {
             await conn.initialized
             return Promise.resolve(conn)
         } catch (err) {
+            console.error(`broker error`, err.message)
             return Promise.reject(err)
         }
     }

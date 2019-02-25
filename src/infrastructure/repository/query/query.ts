@@ -73,6 +73,11 @@ export class Query implements IQuery {
         this._filters = value
     }
 
+    public addOrdination(field: string, order: string): void {
+        if (!this.ordination) this.ordination = new Map()
+        this.ordination.set(field, order)
+    }
+
     public addFilter(filter: object): void {
         this.filters = {
             ...this.filters,

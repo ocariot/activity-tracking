@@ -1,4 +1,4 @@
-import { Container, inject } from 'inversify'
+import { Container, inject, injectable } from 'inversify'
 import { Identifier } from '../../di/identifiers'
 import { IEventBus } from '../../infrastructure/port/event.bus.interface'
 import { ILogger } from '../../utils/custom.logger'
@@ -12,12 +12,20 @@ import { ISleepRepository } from '../../application/port/sleep.repository.interf
 import { EnvironmentSaveEvent } from '../../application/integration-event/event/environment.save.event'
 import { EnvironmentSaveEventHandler } from '../../application/integration-event/handler/environment.save.event.handler'
 import { IEnvironmentRepository } from '../../application/port/environment.repository.interface'
+import { Query } from '../../infrastructure/repository/query/query'
+import { IIntegrationEventRepository } from '../../application/port/integration.event.repository.interface'
+import { PhysicalActivity } from '../../application/domain/model/physical.activity'
+import { Sleep } from '../../application/domain/model/sleep'
+import { Environment } from '../../application/domain/model/environment'
+import { IntegrationEvent } from '../../application/integration-event/event/integration.event'
 
+@injectable()
 export class EventBusTask {
     private readonly _diContainer: Container
 
     constructor(
         @inject(Identifier.RABBITMQ_EVENT_BUS) private readonly _eventBus: IEventBus,
+        @inject(Identifier.INTEGRATION_EVENT_REPOSITORY) private readonly _integrationEventRepository: IIntegrationEventRepository,
         @inject(Identifier.LOGGER) private readonly _logger: ILogger
     ) {
         this._diContainer = DI.getInstance().getContainer()
@@ -100,9 +108,71 @@ export class EventBusTask {
             .tryConnect(0, 1500)
             .then(() => {
                 this._logger.info('Connection to publish established successfully!')
+
+                setInterval(this.internalPublishSavedEvents, 300000, // 5min
+                    this.publishEvent,
+                    this._eventBus,
+                    this._integrationEventRepository,
+                    this._logger)
             })
             .catch(err => {
                 this._logger.error(`Error trying to get connection to Event Bus for event publishing. ${err.message}`)
             })
+    }
+
+    private async internalPublishSavedEvents(
+        publishEvent: any, eventBus: IEventBus, integrationEventRepository: IIntegrationEventRepository,
+        logger: ILogger): Promise<void> {
+        if (!eventBus.connectionPub.isConnected) return
+
+        try {
+            const result: Array<any> = await integrationEventRepository.find(new Query())
+            result.forEach((item: IntegrationEvent<any>) => {
+                const event: any = item.toJSON()
+                publishEvent(event, eventBus)
+                    .then(pubResult => {
+                        if (pubResult) {
+                            logger.info(`Event with name ${event.event_name}, which was saved, `
+                                .concat(`was successfully published to the event bus.`))
+                            integrationEventRepository.delete(event.id)
+                                .catch(err => {
+                                    logger.error(`Error trying to remove saved event: ${err.message}`)
+                                })
+                        }
+                    })
+                    .catch(() => {
+                        logger.error(`Error while trying to publish event saved with ID: ${event.id}`)
+                    })
+            })
+        } catch (err) {
+            logger.error(`Error retrieving saved events: ${err.message}`)
+        }
+    }
+
+    private publishEvent(event: any, eventBus: IEventBus): Promise<boolean> {
+        if (event.event_name === 'PhysicalActivitySaveEvent') {
+            const physicalActivitySaveEvent: PhysicalActivitySaveEvent = new PhysicalActivitySaveEvent(
+                event.event_name,
+                event.timestamp,
+                new PhysicalActivity().fromJSON(event.physicalactivity)
+            )
+            return eventBus.publish(physicalActivitySaveEvent, event.__routing_key)
+        } else if (event.event_name === 'SleepSaveEvent') {
+            const sleepSaveEvent: SleepSaveEvent = new SleepSaveEvent(
+                event.event_name,
+                event.timestamp,
+                new Sleep().fromJSON(event.sleep)
+            )
+            return eventBus.publish(sleepSaveEvent, event.__routing_key)
+        } else if (event.event_name === 'EnvironmentSaveEvent') {
+            const environmentSaveEvent: EnvironmentSaveEvent = new EnvironmentSaveEvent(
+                event.event_name,
+                event.timestamp,
+                new Environment().fromJSON(event.environment)
+            )
+            return eventBus.publish(environmentSaveEvent, event.__routing_key)
+        }
+
+        return Promise.resolve(false)
     }
 }

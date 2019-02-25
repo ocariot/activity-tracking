@@ -1,18 +1,21 @@
-import { inject, injectable } from 'inversify'
+import { Container, inject, injectable } from 'inversify'
 import { Identifier } from '../di/identifiers'
 import { IDBConnection } from '../infrastructure/port/db.connection.interface'
 import { IEventBus } from '../infrastructure/port/event.bus.interface'
 import { ILogger } from '../utils/custom.logger'
 import { EventBusTask } from './task/eventbus.task'
+import { DI } from '../di/di'
 
 @injectable()
 export class BackgroundService {
+    private container: Container
 
     constructor(
         @inject(Identifier.MONGODB_CONNECTION) private readonly _mongodb: IDBConnection,
         @inject(Identifier.RABBITMQ_EVENT_BUS) private readonly _eventBus: IEventBus,
         @inject(Identifier.LOGGER) private readonly _logger: ILogger
     ) {
+        this.container = DI.getInstance().getContainer()
     }
 
     public async startServices(): Promise<void> {
@@ -25,7 +28,8 @@ export class BackgroundService {
 
             // Perform task responsible for signature and event publishing routines,
             // which for some reason could not be sent and saved for later submission.
-            new EventBusTask(this._eventBus, this._logger).run()
+            const eventBusTask: EventBusTask = this.container.get(Identifier.EVENT_BUS_TASK)
+            eventBusTask.run()
         } catch (err) {
             this._logger.error(`Error initializing services in background! ${err.message}`)
         }

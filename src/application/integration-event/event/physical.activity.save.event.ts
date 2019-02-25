@@ -10,9 +10,8 @@ export class PhysicalActivitySaveEvent extends IntegrationEvent<PhysicalActivity
     public toJSON(): any {
         if (!this.physicalactivity) return {}
         return {
-            event_name: this.event_name,
-            timestamp: this.timestamp,
-            physicalactivity: this.physicalactivity.toJSON()
+            ...super.toJSON(),
+            ...{ physicalactivity: this.physicalactivity.toJSON() }
         }
     }
 }

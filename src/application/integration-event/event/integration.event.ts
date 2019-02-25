@@ -6,7 +6,11 @@ export abstract class IntegrationEvent<T> implements IJSONSerializable {
     }
 
     public toJSON(): any {
-        throw new Error('Not implemented!')
+        return {
+            event_name: this.event_name,
+            timestamp: this.timestamp,
+            type: this.type
+        }
     }
 }
 
