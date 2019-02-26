@@ -28,10 +28,6 @@ const pubEnvironmentTotal: number = 10
 describe('EVENT BUS', () => {
     before(() => eventBus.enableLogger(false))
 
-    after(async () => {
-        await eventBus.dispose()
-    })
-
     describe('CONNECTION', () => {
         it('should return EventBusException with message without connection when publishing.', () => {
             return eventBus

@@ -22,6 +22,7 @@ import { IntegrationEvent } from '../../application/integration-event/event/inte
 @injectable()
 export class EventBusTask {
     private readonly _diContainer: Container
+    private handlerPub: any
 
     constructor(
         @inject(Identifier.RABBITMQ_EVENT_BUS) private readonly _eventBus: IEventBus,
@@ -35,6 +36,15 @@ export class EventBusTask {
     public run(): void {
         this.subscribeEvents()
         this.publishSavedEvents()
+    }
+
+    public async stop(): Promise<void> {
+        try {
+            await this._eventBus.dispose()
+            if (this.handlerPub) clearInterval(this.handlerPub)
+        } catch (err) {
+            return Promise.reject(new Error(`Error stopping EventBusTask! ${err.message}`))
+        }
     }
 
     /**
@@ -109,7 +119,7 @@ export class EventBusTask {
             .then(() => {
                 this._logger.info('Connection to publish established successfully!')
 
-                setInterval(this.internalPublishSavedEvents, 300000, // 5min
+                this.handlerPub = setInterval(this.internalPublishSavedEvents, 300000, // 5min
                     this.publishEvent,
                     this._eventBus,
                     this._integrationEventRepository,

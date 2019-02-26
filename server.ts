@@ -10,19 +10,16 @@ import { App } from './src/app'
 import { readFileSync } from 'fs'
 
 /**
- * Used only in development or test to load environment variables.
- * NOTE:
- *  For the development and testing environment, create the .env file
- *  in the root directory of your project and add your environment variables
- *  to new lines in the format NAME=VALUE. For example:
+ *  Create the .env file in the root directory of your project
+ *  and add your environment variables to new lines in the
+ *  format NAME=VALUE. For example:
  *      DB_HOST=localhost
  *      DB_USER=root
  *      DB_PASS=mypass
- *  The fastest way is to create a copy of the .env.example file.
  *
- *  NOTE: For the production environment it is highly recommended not to use .env.
+ *  The fastest way is to create a copy of the .env.example file.
  */
-require(`dotenv`).load()
+require('dotenv').load()
 
 const logger: ILogger = DI.getInstance().getContainer().get<ILogger>(Identifier.LOGGER)
 const app: Application = (DI.getInstance().getContainer().get<App>(Identifier.APP)).getExpress()
@@ -51,12 +48,16 @@ http.createServer((req, res) => {
  */
 https.createServer(https_options, app)
     .listen(port_https, () => {
+        logger.debug(`Server HTTPS running on port ${port_https}`)
+
         initListener()
         backgroundServices.startServices()
             .then(() => {
-                logger.info('Initialized background services.')
+                logger.debug('Background services successfully initialized...')
             })
-        logger.debug(`Server HTTPS running on port ${port_https}`)
+            .catch(err => {
+                logger.error(err.message)
+            })
     })
 
 /**
@@ -64,11 +65,13 @@ https.createServer(https_options, app)
  * in the background, when the respective event is triggered.
  */
 function initListener(): void {
-    process.on('SIGINT', () => {
-        backgroundServices.stopServices()
-            .then(() => {
-                logger.info('Stopped background services.')
-            })
+    process.on('SIGINT', async () => {
+        try {
+            await backgroundServices.stopServices()
+            logger.debug('Background services successfully closed...')
+        } catch (err) {
+            logger.error(`There was an error stopping all background services. ${err.message}`)
+        }
         process.exit()
     })
 }

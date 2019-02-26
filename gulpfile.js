@@ -6,8 +6,8 @@ const gulp = require('gulp'),
     ts = require('gulp-typescript'),
     nodemon = require('gulp-nodemon')
 
-// TSLIST
-gulp.task('lint', () => {
+// TSLINT
+gulp.task('ts-lint', () => {
     const config = {formatter: 'verbose'}
     return gulp.src(['src/**/*.ts'])
         .pipe(tslint(config))
@@ -16,46 +16,47 @@ gulp.task('lint', () => {
         }))
 })
 
-// BUILD
-gulp.task('build:ts', ['copy-files'], () => {
-    const tsProject = ts.createProject('tsconfig.json', {typescript: require('typescript')})
-    return tsProject.src()
-        .pipe(tsProject())
-        .on('error', (err) => {
-            console.log('build error:', err.message)
-            process.exit(1)
-        })
-        .js.pipe(gulp.dest('dist/'))
-})
-
 // COPY FILES
-gulp.task('copy-files', ['copy-yaml'], () => {
-    const COPY_FILES = ['package.json']
+gulp.task('copy-files', () => {
+    const COPY_FILES = ['package.json', '.env']
     return gulp.src(COPY_FILES)
         .pipe(gulp.dest('dist'))
 })
 
-gulp.task('copy-yaml', () => {
-    const COPY_YAML = ['src/ui/swagger/*.yaml']
-    return gulp.src(COPY_YAML)
-        .pipe(gulp.dest('dist/src/ui/swagger'))
-})
-
 // WATCH
-gulp.task('watch', () => {
-    gulp.watch(['./**/*.ts', './src/utils/swagger/*.yaml', '.env'], ['build'])
+gulp.task('watch', (done) => {
+    gulp.watch('./**/*.ts')
+    nodemon({
+        script: 'dist/server.js',
+        tasks: ['build'],
+        ext: 'ts json',
+        ignore: ['node_modules/', 'package.json', 'tsconfig.json']
+    }).on('restart', () => {
+        console.log('##################################### // ######################################')
+        console.log('########################### (0/ Server restarted... ###########################')
+        console.log('##################################### // ######################################')
+    }).on('crash', function () {
+        console.error('Application has crashed!\n')
+        stream.emit('restart', 10)  // restart the server in 10 seconds
+    })
+    done()
 })
 
 // BUILD DEFAULT
-gulp.task('build', ['lint', 'build:ts'])
+gulp.task('build', gulp.series(['ts-lint', 'copy-files'], function transpiler() {
+        const tsProject = ts.createProject(
+            'tsconfig.json',
+            {typescript: require('typescript')}
+        )
+        return tsProject.src()
+            .pipe(tsProject())
+            .js.pipe(gulp.dest('dist'))
+            .on('error', (err) => {
+                console.error('Build error:', err.message)
+                // process.exit(1)
+            })
+    }
+))
 
 // BUILD DEV
-gulp.task('dev', ['build', 'watch'], () => {
-    return nodemon({
-        script: 'dist/server.js',
-        watch: 'dist/server.js',
-        ignore: ['node_modules/']
-    }).on('restart', () => {
-        console.log('restarted!')
-    })
-})
+gulp.task('dev', gulp.series(['build', 'watch']))

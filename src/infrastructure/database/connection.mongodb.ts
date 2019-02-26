@@ -50,13 +50,15 @@ export class ConnectionMongoDB implements IDBConnection {
         const _this = this
         await this._connectionFactory.createConnection(retries, interval)
             .then((connection: Connection) => {
-                this._eventConnection.emit('connected')
                 this._connection = connection
                 this.connectionStatusListener(this._connection)
+                this._eventConnection.emit('connected')
+                this._logger.info('Connection established with MongoDB...')
             })
             .catch((err) => {
-                this._eventConnection.emit('disconnected')
                 this._connection = undefined
+                this._eventConnection.emit('disconnected')
+                this._logger.warn(`Error trying to connect for the first time with mongoDB: ${err.message}`)
                 setTimeout(async () => {
                     _this.tryConnect(retries, interval).then()
                 }, 2000)
@@ -75,9 +77,9 @@ export class ConnectionMongoDB implements IDBConnection {
             return
         }
 
-        connection.on('connected', (con) => {
+        connection.on('connected', () => {
+            this._logger.warn('Reconnection established with MongoDB...')
             this._eventConnection.emit('connected')
-            this._logger.warn('Established MongoDB connection...')
         })
 
         connection.on('disconnected', () => {

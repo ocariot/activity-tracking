@@ -79,4 +79,5 @@ bash.exe.stackdump
 *.crt
 *.key
 *.csr
+*.cert
 certs

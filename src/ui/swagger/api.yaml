@@ -1812,7 +1812,7 @@ components:
           type: string
           format: uuid
           description: Id of institution associated with a environment.
-          example: 5a62be07de34500146d9c544
+          example: 5a62be07de34500146d9c624
         location:
           $ref: '#/components/schemas/Location'
         measurements:
@@ -1849,6 +1849,7 @@ components:
           type: boolean
           description: Boolean variable to identify if a environment is climatized.
           example: true
+          default: false
         timestamp:
           type: string
           description: Timestamp in UTC format, according to ISO 8601.
