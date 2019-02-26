@@ -1,6 +1,6 @@
 import { IService } from './service.interface'
-import { PhysicalActivityLog, PhysicalActivityLogType } from 'application/domain/model/physical.activity.log'
-import { Log } from 'application/domain/model/log'
+import { PhysicalActivityLog } from 'application/domain/model/physical.activity.log'
+import { Log, LogType } from 'application/domain/model/log'
 import { IQuery } from './query.interface'
 
 /**
@@ -9,6 +9,16 @@ import { IQuery } from './query.interface'
  * @extends {IService<PhysicalActivityLog}
  */
 export interface IPhysicalActivityLogService extends IService<PhysicalActivityLog> {
+
+    /**
+     * Add a new activity log.
+     *
+     * @param activityLog Log to insert.
+     * @return {Promise<Log>}
+     * @throws {ValidationException | ConflictException | RepositoryException}
+     */
+    addLogs(activityLog: Array<Log>): Promise<Array<Log>>
+
     /**
      * List the physical activities logs with information on the total steps and calories of a child in a given period.
      *
@@ -32,6 +42,6 @@ export interface IPhysicalActivityLogService extends IService<PhysicalActivityLo
      * @return {Promise<Array<Log>>}
      * @throws {RepositoryException}
      */
-    getByChildResourceAndDate(childId: string, desiredResource: PhysicalActivityLogType, dateStart: Date,
+    getByChildResourceAndDate(childId: string, desiredResource: LogType, dateStart: Date,
                               dateEnd: Date, query: IQuery): Promise<Array<Log>>
 }

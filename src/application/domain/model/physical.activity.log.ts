@@ -57,8 +57,3 @@ export class PhysicalActivityLog extends Entity implements IJSONSerializable, IJ
         }
     }
 }
-
-export enum PhysicalActivityLogType {
-    STEPS = 'steps',
-    CALORIES = 'calories',
-}

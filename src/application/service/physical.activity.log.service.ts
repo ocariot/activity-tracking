@@ -4,11 +4,12 @@ import { Strings } from '../../utils/strings'
 import { UuidValidator } from '../domain/validator/uuid.validator'
 import { IPhysicalActivityLogService } from '../port/physical.activity.log.service.interface'
 import { IQuery } from '../port/query.interface'
-import { PhysicalActivityLog, PhysicalActivityLogType } from 'application/domain/model/physical.activity.log'
+import { PhysicalActivityLog } from 'application/domain/model/physical.activity.log'
 import { IPhysicalActivityLogRepository } from '../port/physical.activity.log.repository.interface'
-import { Log } from '../domain/model/log'
-import { DatetimeValidator } from '../domain/validator/datetime.validator'
+import { Log, LogType } from '../domain/model/log'
 import { ILogRepository } from '../port/log.repository.interface'
+import { CreatePhysicalActivityLogValidator } from '../domain/validator/create.physical.activity.log.validator'
+import { DatelogValidator } from '../domain/validator/datelog.validator'
 
 /**
  * Implementing physicalactivitylog service
@@ -24,14 +25,31 @@ export class PhysicalActivityLogService implements IPhysicalActivityLogService {
     }
 
     /**
-     * Adds a new physicalactivitylog.
+     * Adds a new physicalactivitylog array.
      *
-     * @param {PhysicalActivityLog} activityLog
-     * @returns {(Promise<PhysicalActivityLog>)}
+     * @param {Array<Log>} activityLogs
+     * @returns {(Promise<Array<Log>>)}
      * @throws {ConflictException | RepositoryException} If a data conflict occurs, as an existing physicalactivitylog.
      */
-    public async add(activityLog: PhysicalActivityLog): Promise<PhysicalActivityLog> {
-        throw new Error('Unsupported feature!')
+    public async addLogs(activityLogs: Array<Log>): Promise<Array<Log>> {
+        try {
+            // 1. Validate the object.
+            activityLogs.forEach(async (elem) => {
+                try {
+                    CreatePhysicalActivityLogValidator.validate(elem)
+
+                    // 2. Create new physical activity log register.
+                    await this._logRepository.create(elem)
+                } catch (err) {
+                    // console.log('Deu erro', err.message, elem.toJSON())
+                }
+            })
+
+            // 3. Returns the created object.
+            return Promise.resolve(activityLogs)
+        } catch (err) {
+            return Promise.reject(err)
+        }
     }
 
     /**
@@ -69,7 +87,8 @@ export class PhysicalActivityLogService implements IPhysicalActivityLogService {
      */
     public getByChildAndDate(childId: string, dateStart: Date, dateEnd: Date, query: IQuery): Promise<PhysicalActivityLog> {
         UuidValidator.validate(childId, Strings.CHILD.PARAM_ID_NOT_VALID_FORMAT)
-        DatetimeValidator.validateDateLog(dateStart.toString(), dateEnd.toString())
+        DatelogValidator.validate(dateStart.toString())
+        DatelogValidator.validate(dateEnd.toString())
 
         query.addFilter({
             child_id: childId,
@@ -92,10 +111,11 @@ export class PhysicalActivityLogService implements IPhysicalActivityLogService {
      * @return {Promise<Array<Log>>}
      * @throws {RepositoryException}
      */
-    public getByChildResourceAndDate(childId: string, desiredResource: PhysicalActivityLogType, dateStart: Date,
+    public getByChildResourceAndDate(childId: string, desiredResource: LogType, dateStart: Date,
                                      dateEnd: Date, query: IQuery): Promise<Array<Log>> {
         UuidValidator.validate(childId, Strings.CHILD.PARAM_ID_NOT_VALID_FORMAT)
-        DatetimeValidator.validateDateLog(dateStart.toString(), dateEnd.toString())
+        DatelogValidator.validate(dateStart.toString())
+        DatelogValidator.validate(dateEnd.toString())
 
         query.addFilter({
             child_id: childId,
@@ -106,6 +126,13 @@ export class PhysicalActivityLogService implements IPhysicalActivityLogService {
             ]
         })
         return this._logRepository.find(query)
+    }
+
+    /**
+     * Unimplemented methods
+     */
+    public async add(activityLog: PhysicalActivityLog): Promise<PhysicalActivityLog> {
+        throw new Error('Unsupported feature!')
     }
 
     public async update(physicalActivityLog: PhysicalActivityLog): Promise<PhysicalActivityLog> {

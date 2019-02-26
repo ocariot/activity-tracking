@@ -18,7 +18,7 @@ export class PhysicalActivityLevelsValidator {
                 throw new ValidationException(`The name of level provided "${level.name}" is not supported...`,
                     `The names of the allowed levels are: ${levelsTypes.join(', ')}.`)
             }
-            if (level.duration === undefined) fields.push('level duration')
+            if (level.duration === undefined || level.duration < 0) fields.push('level duration')
         })
 
         if (levelsTypes.length !== levels.filter(item => levelsTypes.includes(item.name)).length) {

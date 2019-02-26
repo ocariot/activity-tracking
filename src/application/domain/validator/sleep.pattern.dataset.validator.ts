@@ -20,7 +20,7 @@ export class SleepPatternDataSetValidator {
                 throw new ValidationException(`The sleep pattern name provided "${data.name}" is not supported...`,
                     'The names of the allowed patterns are: '.concat(sleepPatternTypes.join(', '), '.'))
             }
-            if (data.duration === undefined) fields.push('data_set duration')
+            if (data.duration === undefined || data.duration < 0) fields.push('data_set duration')
         })
 
         if (fields.length > 0) {

@@ -162,6 +162,35 @@ export class ActivityController {
     }
 
     /**
+     * Add new physicalactivitylog.
+     *
+     * @param {Request} req
+     * @param {Response} res
+     */
+    @httpPost('/:child_id/physicalactivities/logs/:resource')
+    public async saveLog(@request() req: Request, @response() res: Response) {
+        try {
+
+            const activityLogs: Array<Log> = []
+            if (req.body instanceof Array) {
+                req.body.forEach(item => {
+                    const log: Log = new Log().fromJSON(item)
+                    log.type = req.params.resource
+                    log.child_id = req.params.child_id
+                    activityLogs.push(log)
+                })
+            }
+
+            const result: Array<Log> = await this._activityLogService.addLogs(activityLogs)
+            return res.status(HttpStatus.CREATED).send(result)
+        } catch (err) {
+            const handlerError = ApiExceptionManager.build(err)
+            return res.status(handlerError.code)
+                .send(handlerError.toJson())
+        }
+    }
+
+    /**
      * Recover the logs.
      * For the query strings, the query-strings-parser middleware was used.
      * @see {@link https://www.npmjs.com/package/query-strings-parser} for further information.
