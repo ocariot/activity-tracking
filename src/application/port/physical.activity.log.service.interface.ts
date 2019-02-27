@@ -29,7 +29,7 @@ export interface IPhysicalActivityLogService extends IService<PhysicalActivityLo
      * @return {Promise<PhysicalActivityLog>}
      * @throws {RepositoryException}
      */
-    getByChildAndDate(childId: string, dateStart: Date, dateEnd: Date, query: IQuery): Promise<PhysicalActivityLog>
+    getByChildAndDate(childId: string, dateStart: Date, dateEnd: Date, query: IQuery): Promise<Array<Log>>
 
     /**
      * List the physical activities logs with information on the total steps or calories of a child in a given period

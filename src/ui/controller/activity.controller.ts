@@ -10,7 +10,7 @@ import { PhysicalActivity } from '../../application/domain/model/physical.activi
 import { IPhysicalActivityService } from '../../application/port/physical.activity.service.interface'
 import { ILogger } from '../../utils/custom.logger'
 import { IPhysicalActivityLogService } from '../../application/port/physical.activity.log.service.interface'
-import { PhysicalActivityLog } from '../../application/domain/model/physical.activity.log'
+// import { PhysicalActivityLog } from '../../application/domain/model/physical.activity.log'
 import { Log } from '../../application/domain/model/log'
 
 /**
@@ -201,7 +201,7 @@ export class ActivityController {
     @httpGet('/:child_id/physicalactivities/logs/date/:date_start/:date_end')
     public async getLogs(@request() req: Request, @response() res: Response): Promise<Response> {
         try {
-            const result: PhysicalActivityLog = await this._activityLogService
+            const result: Array<Log> = await this._activityLogService
                 .getByChildAndDate(req.params.child_id, req.params.date_start, req.params.date_end, new Query().fromJSON(req.query))
             if (!result) return res.status(HttpStatus.NOT_FOUND).send(this.getMessageNotActivityLogFound())
             return res.status(HttpStatus.OK).send(result)

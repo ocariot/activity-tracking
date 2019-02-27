@@ -9,5 +9,4 @@ import { Log } from '../domain/model/log'
  * @extends {IRepository<Log>}
  */
 export interface ILogRepository extends IRepository<Log> {
-
 }

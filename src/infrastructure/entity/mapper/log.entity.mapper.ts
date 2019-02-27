@@ -20,7 +20,7 @@ export class LogEntityMapper implements IEntityMapper<Log, LogEntity> {
         const result: LogEntity = new LogEntity()
 
         if (item.id) result.id = item.id
-        if (item.date) result.date = item.date
+        if (item.date) result.date = new Date((item.date).concat('T00:00:00'))
         if (item.value !== undefined) result.value = item.value
         if (item.type) result.type = item.type
         if (item.child_id) result.child_id = item.child_id
@@ -50,7 +50,7 @@ export class LogEntityMapper implements IEntityMapper<Log, LogEntity> {
         const result: Log = new Log()
 
         if (json.id !== undefined) result.id = json.id
-        if (json.date !== undefined) result.date = json.date
+        if (json.date !== undefined) result.date = (json.date.toLocaleString()).replace(' 00:00:00', '')
         if (json.value !== undefined) result.value = json.value
         if (json.type !== undefined) result.type = json.type
         if (json.child_id !== undefined) result.child_id = json.child_id

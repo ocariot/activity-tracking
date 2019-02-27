@@ -5,11 +5,12 @@ import { UuidValidator } from '../domain/validator/uuid.validator'
 import { IPhysicalActivityLogService } from '../port/physical.activity.log.service.interface'
 import { IQuery } from '../port/query.interface'
 import { PhysicalActivityLog } from 'application/domain/model/physical.activity.log'
-import { IPhysicalActivityLogRepository } from '../port/physical.activity.log.repository.interface'
+// import { IPhysicalActivityLogRepository } from '../port/physical.activity.log.repository.interface'
 import { Log, LogType } from '../domain/model/log'
 import { ILogRepository } from '../port/log.repository.interface'
 import { CreatePhysicalActivityLogValidator } from '../domain/validator/create.physical.activity.log.validator'
 import { DatelogValidator } from '../domain/validator/datelog.validator'
+import { Query } from '../../infrastructure/repository/query/query'
 
 /**
  * Implementing physicalactivitylog service
@@ -20,12 +21,12 @@ import { DatelogValidator } from '../domain/validator/datelog.validator'
 export class PhysicalActivityLogService implements IPhysicalActivityLogService {
 
     constructor(
-        @inject(Identifier.ACTIVITY_LOG_REPOSITORY) private readonly _activityLogRepository: IPhysicalActivityLogRepository,
+        // @inject(Identifier.ACTIVITY_LOG_REPOSITORY) private readonly _activityLogRepository: IPhysicalActivityLogRepository,
         @inject(Identifier.LOG_REPOSITORY) private readonly _logRepository: ILogRepository) {
     }
 
     /**
-     * Adds a new physicalactivitylog array.
+     * Adds a new log array.
      *
      * @param {Array<Log>} activityLogs
      * @returns {(Promise<Array<Log>>)}
@@ -33,15 +34,32 @@ export class PhysicalActivityLogService implements IPhysicalActivityLogService {
      */
     public async addLogs(activityLogs: Array<Log>): Promise<Array<Log>> {
         try {
-            // 1. Validate the object.
             activityLogs.forEach(async (elem) => {
                 try {
+                    // 1. Validate the object.
                     CreatePhysicalActivityLogValidator.validate(elem)
 
-                    // 2. Create new physical activity log register.
-                    await this._logRepository.create(elem)
+                    // 2. Build a query
+                    const query: IQuery = new Query()
+                    query.filters = {
+                        type: elem.type,
+                        date: elem.date.concat('T00:00:00')
+                    }
+
+                    // 3. Check if it already exists in the database
+                    const log = await this._logRepository.findOne(query)
+
+                    if (log) { // If exists
+                        // 4a. Update physical activity log.
+                        elem.value += log.value
+                        await this._logRepository.update(elem)
+                    }
+                    else {
+                        // 4b. Create new physical activity log.
+                        await this._logRepository.create(elem)
+                    }
                 } catch (err) {
-                    // console.log('Deu erro', err.message, elem.toJSON())
+                    console.log('Deu erro', err.message)
                 }
             })
 
@@ -85,7 +103,7 @@ export class PhysicalActivityLogService implements IPhysicalActivityLogService {
      * @return {Promise<PhysicalActivityLog>}
      * @throws {RepositoryException}
      */
-    public getByChildAndDate(childId: string, dateStart: Date, dateEnd: Date, query: IQuery): Promise<PhysicalActivityLog> {
+    public async getByChildAndDate(childId: string, dateStart: Date, dateEnd: Date, query: IQuery): Promise<Array<Log>> {
         UuidValidator.validate(childId, Strings.CHILD.PARAM_ID_NOT_VALID_FORMAT)
         DatelogValidator.validate(dateStart.toString())
         DatelogValidator.validate(dateEnd.toString())
@@ -93,11 +111,12 @@ export class PhysicalActivityLogService implements IPhysicalActivityLogService {
         query.addFilter({
             child_id: childId,
             $and: [
-                { date: { $lte: dateEnd } },
-                { date: { $gte: dateStart } }
+                { date: { $lte: dateEnd.toString().concat('T00:00:00') } },
+                { date: { $gte: dateStart.toString().concat('T00:00:00') } }
             ]
         })
-        return this._activityLogRepository.findOne(query)
+
+        return this._logRepository.find(query)
     }
 
     /**
@@ -121,8 +140,8 @@ export class PhysicalActivityLogService implements IPhysicalActivityLogService {
             child_id: childId,
             type: desiredResource,
             $and: [
-                { date: { $lte: dateEnd } },
-                { date: { $gte: dateStart } }
+                { date: { $lte: dateEnd.toString().concat('T00:00:00') } },
+                { date: { $gte: dateStart.toString().concat('T00:00:00') } }
             ]
         })
         return this._logRepository.find(query)
