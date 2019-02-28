@@ -2,7 +2,6 @@ import HttpStatus from 'http-status-codes'
 import { inject, injectable } from 'inversify'
 import { Identifier } from '../../di/identifiers'
 import { Strings } from '../../utils/strings'
-import { UuidValidator } from '../domain/validator/uuid.validator'
 import { ILogService } from '../port/log.service.interface'
 import { IQuery } from '../port/query.interface'
 import { Log, LogType } from '../domain/model/log'
@@ -16,6 +15,7 @@ import { StatusSuccess } from '../domain/model/status.success'
 import { StatusError } from '../domain/model/status.error'
 import { ValidationException } from '../domain/exception/validation.exception'
 import { ConflictException } from '../domain/exception/conflict.exception'
+import { ObjectIdValidator } from '../domain/validator/object.id.validator'
 
 /**
  * Implementing physicalactivitylog service
@@ -127,7 +127,7 @@ export class LogService implements ILogService {
      * @throws {RepositoryException}
      */
     public async getByChildAndDate(childId: string, dateStart: Date, dateEnd: Date, query: IQuery): Promise<PhysicalActivityLog> {
-        UuidValidator.validate(childId, Strings.CHILD.PARAM_ID_NOT_VALID_FORMAT)
+        ObjectIdValidator.validate(childId, Strings.CHILD.PARAM_ID_NOT_VALID_FORMAT)
         DatelogValidator.validate(dateStart.toString())
         DatelogValidator.validate(dateEnd.toString())
 
@@ -173,7 +173,7 @@ export class LogService implements ILogService {
      */
     public getByChildResourceAndDate(childId: string, desiredResource: LogType, dateStart: Date,
                                      dateEnd: Date, query: IQuery): Promise<Array<Log>> {
-        UuidValidator.validate(childId, Strings.CHILD.PARAM_ID_NOT_VALID_FORMAT)
+        ObjectIdValidator.validate(childId, Strings.CHILD.PARAM_ID_NOT_VALID_FORMAT)
         DatelogValidator.validate(dateStart.toString())
         DatelogValidator.validate(dateEnd.toString())
 

@@ -1,8 +1,8 @@
 import { ValidationException } from '../exception/validation.exception'
-import { UuidValidator } from './uuid.validator'
 import { Strings } from '../../../utils/strings'
 import { Log } from '../model/log'
 import { LogTypeValidator } from './log.type.validator'
+import { ObjectIdValidator } from './object.id.validator'
 
 export class CreateLogValidator {
     public static validate(activityLog: Log): void | ValidationException {
@@ -18,7 +18,7 @@ export class CreateLogValidator {
                 'Physical Activity log validation failed: '.concat(Strings.ERROR_MESSAGE.NEGATIVE_PARAMETER))
         }
         if (!activityLog.child_id) fields.push('child_id')
-        else UuidValidator.validate(activityLog.child_id, Strings.CHILD.PARAM_ID_NOT_VALID_FORMAT)
+        else ObjectIdValidator.validate(activityLog.child_id, Strings.CHILD.PARAM_ID_NOT_VALID_FORMAT)
 
         if (fields.length > 0) {
             throw new ValidationException('Required fields were not provided...',
