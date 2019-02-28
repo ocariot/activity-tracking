@@ -9,6 +9,10 @@ import { ApiException } from '../exception/api.exception'
 import { PhysicalActivity } from '../../application/domain/model/physical.activity'
 import { IPhysicalActivityService } from '../../application/port/physical.activity.service.interface'
 import { ILogger } from '../../utils/custom.logger'
+import { ILogService } from '../../application/port/log.service.interface'
+import { Log } from '../../application/domain/model/log'
+import { PhysicalActivityLog } from '../../application/domain/model/physical.activity.log'
+import { MultiStatus } from '../../application/domain/model/multi.status'
 
 /**
  * Controller that implements PhysicalActivity feature operations.
@@ -23,10 +27,12 @@ export class ActivityController {
      * Creates an instance of PhysicalActivity controller.
      *
      * @param {IPhysicalActivityService} _activityService
+     * @param {ILogService} _activityLogService
      * @param {ILogger} _logger
      */
     constructor(
         @inject(Identifier.ACTIVITY_SERVICE) private readonly _activityService: IPhysicalActivityService,
+        @inject(Identifier.ACTIVITY_LOG_SERVICE) private readonly _activityLogService: ILogService,
         @inject(Identifier.LOGGER) readonly _logger: ILogger
     ) {
     }
@@ -157,18 +163,32 @@ export class ActivityController {
     }
 
     /**
-     * Recover the logs.
-     * For the query strings, the query-strings-parser middleware was used.
-     * @see {@link https://www.npmjs.com/package/query-strings-parser} for further information.
+     * Add new physicalactivitylog.
      *
      * @param {Request} req
      * @param {Response} res
      */
-    @httpGet('/:child_id/physicalactivities/logs/date/:date_start/:date_end')
-    public async getLogs(@request() req: Request, @response() res: Response): Promise<Response> {
-        return res.status(HttpStatus.OK).send(
-            '<div style="text-align: center;"><h1>Sorry :(<br>Feature not implemented.</h1>' +
-            '<h2>Do not worry, it will be added soon... \\0/</h2></div>')
+    @httpPost('/:child_id/physicalactivities/logs/:resource')
+    public async saveLog(@request() req: Request, @response() res: Response) {
+        try {
+
+            const activityLogs: Array<Log> = []
+            if (req.body instanceof Array) {
+                req.body.forEach(item => {
+                    const log: Log = new Log().fromJSON(item)
+                    log.type = req.params.resource
+                    log.child_id = req.params.child_id
+                    activityLogs.push(log)
+                })
+            }
+
+            const result: MultiStatus<Log> = await this._activityLogService.addLogs(activityLogs)
+            return res.status(HttpStatus.CREATED).send(result)
+        } catch (err) {
+            const handlerError = ApiExceptionManager.build(err)
+            return res.status(handlerError.code)
+                .send(handlerError.toJson())
+        }
     }
 
     /**
@@ -179,11 +199,41 @@ export class ActivityController {
      * @param {Request} req
      * @param {Response} res
      */
-    @httpGet('/:child_id/physicalactivities/logs/:reource/date/:date_start/:date_end')
+    @httpGet('/:child_id/physicalactivities/logs/date/:date_start/:date_end')
+    public async getLogs(@request() req: Request, @response() res: Response): Promise<Response> {
+        try {
+            const result: PhysicalActivityLog = await this._activityLogService
+                .getByChildAndDate(req.params.child_id, req.params.date_start, req.params.date_end, new Query().fromJSON(req.query))
+            if (!result) return res.status(HttpStatus.NOT_FOUND).send(this.getMessageNotActivityLogFound())
+            return res.status(HttpStatus.OK).send(result)
+        } catch (err) {
+            const handlerError = ApiExceptionManager.build(err)
+            return res.status(handlerError.code)
+                .send(handlerError.toJson())
+        }
+    }
+
+    /**
+     * Recover the logs.
+     * For the query strings, the query-strings-parser middleware was used.
+     * @see {@link https://www.npmjs.com/package/query-strings-parser} for further information.
+     *
+     * @param {Request} req
+     * @param {Response} res
+     */
+    @httpGet('/:child_id/physicalactivities/logs/:resource/date/:date_start/:date_end')
     public async getLogByResource(@request() req: Request, @response() res: Response): Promise<Response> {
-        return res.status(HttpStatus.OK).send(
-            '<div style="text-align: center;"><h1>Sorry :(<br>Feature not implemented.</h1>' +
-            '<h2>Do not worry, it will be added soon... \\0/</h2></div>')
+        try {
+            const result: Array<Log> = await this._activityLogService
+                .getByChildResourceAndDate(req.params.child_id, req.params.resource, req.params.date_start, req.params.date_end,
+                    new Query().fromJSON(req.query))
+            if (!result) return res.status(HttpStatus.NOT_FOUND).send(this.getMessageNotActivityLogFound())
+            return res.status(HttpStatus.OK).send(result)
+        } catch (err) {
+            const handlerError = ApiExceptionManager.build(err)
+            return res.status(handlerError.code)
+                .send(handlerError.toJson())
+        }
     }
 
     /**
@@ -194,6 +244,14 @@ export class ActivityController {
             HttpStatus.NOT_FOUND,
             'Physical Activity not found!',
             'Physical Activity not found or already removed. A new operation for the same resource is not required!'
+        ).toJson()
+    }
+
+    private getMessageNotActivityLogFound(): object {
+        return new ApiException(
+            HttpStatus.NOT_FOUND,
+            'Physical Activity log not found!',
+            'Physical Activity log not found. A new operation for the same resource is not required!'
         ).toJson()
     }
 }

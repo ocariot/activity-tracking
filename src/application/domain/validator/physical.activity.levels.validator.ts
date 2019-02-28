@@ -1,5 +1,6 @@
 import { ValidationException } from '../exception/validation.exception'
 import { PhysicalActivityLevel, ActivityLevelType } from '../model/physical.activity.level'
+import { Strings } from '../../../utils/strings'
 
 export class PhysicalActivityLevelsValidator {
     public static validate(levels: Array<PhysicalActivityLevel>): void | ValidationException {
@@ -19,6 +20,10 @@ export class PhysicalActivityLevelsValidator {
                     `The names of the allowed levels are: ${levelsTypes.join(', ')}.`)
             }
             if (level.duration === undefined) fields.push('level duration')
+            else if (level.duration < 0) {
+                throw new ValidationException('Some (or several) duration field of levels array is invalid...',
+                    'Physical Activity Level validation failed: '.concat(Strings.ERROR_MESSAGE.NEGATIVE_PARAMETER))
+            }
         })
 
         if (levelsTypes.length !== levels.filter(item => levelsTypes.includes(item.name)).length) {

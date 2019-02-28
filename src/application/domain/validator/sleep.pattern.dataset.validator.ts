@@ -1,6 +1,7 @@
 import { ValidationException } from '../exception/validation.exception'
 import { SleepPatternDataSet } from '../model/sleep.pattern.data.set'
 import { SleepPatternType } from '../model/sleep.pattern'
+import { Strings } from '../../../utils/strings'
 
 export class SleepPatternDataSetValidator {
     public static validate(dataset: Array<SleepPatternDataSet>): void | ValidationException {
@@ -21,6 +22,10 @@ export class SleepPatternDataSetValidator {
                     'The names of the allowed patterns are: '.concat(sleepPatternTypes.join(', '), '.'))
             }
             if (data.duration === undefined) fields.push('data_set duration')
+            else if (data.duration < 0) {
+                throw new ValidationException('Some (or several) duration field of sleep pattern is invalid...',
+                    'Sleep Pattern validation failed: '.concat(Strings.ERROR_MESSAGE.NEGATIVE_PARAMETER))
+            }
         })
 
         if (fields.length > 0) {

@@ -46,6 +46,17 @@ import { IIntegrationEventRepository } from '../application/port/integration.eve
 import { IntegrationEventRepository } from '../infrastructure/repository/integration.event.repository'
 import { IntegrationEventRepoModel } from '../infrastructure/database/schema/integration.event.schema'
 import { EventBusTask } from '../background/task/eventbus.task'
+import { PhysicalActivityLogEntity } from '../infrastructure/entity/physical.activity.log.entity'
+import { PhysicalActivityLog } from '../application/domain/model/physical.activity.log'
+import { PhysicalActivityLogEntityMapper } from '../infrastructure/entity/mapper/physical.activity.log.entity.mapper'
+import { ActivityLogRepoModel } from '../infrastructure/database/schema/activity.log.schema'
+import { ILogRepository } from '../application/port/log.repository.interface'
+import { LogRepository } from '../infrastructure/repository/log.repository'
+import { Log } from '../application/domain/model/log'
+import { LogEntity } from '../infrastructure/entity/log.entity'
+import { LogEntityMapper } from '../infrastructure/entity/mapper/log.entity.mapper'
+import { LogService } from '../application/service/log.service'
+import { ILogService } from '../application/port/log.service.interface'
 
 export class DI {
     private static instance: DI
@@ -98,6 +109,7 @@ export class DI {
 
         // Services
         this.container.bind<IPhysicalActivityService>(Identifier.ACTIVITY_SERVICE).to(PhysicalActivityService).inSingletonScope()
+        this.container.bind<ILogService>(Identifier.ACTIVITY_LOG_SERVICE).to(LogService).inSingletonScope()
         this.container.bind<IEnvironmentService>(Identifier.ENVIRONMENT_SERVICE).to(EnvironmentService).inSingletonScope()
         this.container.bind<ISleepService>(Identifier.SLEEP_SERVICE).to(SleepService).inSingletonScope()
 
@@ -105,6 +117,9 @@ export class DI {
         this.container
             .bind<IPhysicalActivityRepository>(Identifier.ACTIVITY_REPOSITORY)
             .to(PhysicalActivityRepository).inSingletonScope()
+        this.container
+            .bind<ILogRepository>(Identifier.LOG_REPOSITORY)
+            .to(LogRepository).inSingletonScope()
         this.container
             .bind<IEnvironmentRepository>(Identifier.ENVIRONMENT_REPOSITORY)
             .to(EnvironmentRepository).inSingletonScope()
@@ -117,6 +132,7 @@ export class DI {
 
         // Models
         this.container.bind(Identifier.ACTIVITY_REPO_MODEL).toConstantValue(ActivityRepoModel)
+        this.container.bind(Identifier.ACTIVITY_LOG_REPO_MODEL).toConstantValue(ActivityLogRepoModel)
         this.container.bind(Identifier.ENVIRONMENT_REPO_MODEL).toConstantValue(EnvironmentRepoModel)
         this.container.bind(Identifier.SLEEP_REPO_MODEL).toConstantValue(SleepRepoModel)
         this.container.bind(Identifier.INTEGRATION_EVENT_REPO_MODEL).toConstantValue(IntegrationEventRepoModel)
@@ -125,6 +141,12 @@ export class DI {
         this.container
             .bind<IEntityMapper<PhysicalActivity, ActivityEntity>>(Identifier.ACTIVITY_ENTITY_MAPPER)
             .to(PhysicalActivityEntityMapper).inSingletonScope()
+        this.container
+            .bind<IEntityMapper<PhysicalActivityLog, PhysicalActivityLogEntity>>(Identifier.ACTIVITY_LOG_ENTITY_MAPPER)
+            .to(PhysicalActivityLogEntityMapper).inSingletonScope()
+        this.container
+            .bind<IEntityMapper<Log, LogEntity>>(Identifier.LOG_ENTITY_MAPPER)
+            .to(LogEntityMapper).inSingletonScope()
         this.container
             .bind<IEntityMapper<Environment, EnvironmentEntity>>(Identifier.ENVIRONMENT_ENTITY_MAPPER)
             .to(EnvironmentEntityMapper).inSingletonScope()

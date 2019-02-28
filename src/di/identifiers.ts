@@ -14,23 +14,29 @@ export abstract class Identifier {
 
     // Services
     public static readonly ACTIVITY_SERVICE: any = Symbol.for('PhysicalActivityService')
+    public static readonly ACTIVITY_LOG_SERVICE: any = Symbol.for('LogService')
     public static readonly SLEEP_SERVICE: any = Symbol.for('SleepService')
     public static readonly ENVIRONMENT_SERVICE: any = Symbol.for('EnvironmentService')
 
     // Repositories
     public static readonly ACTIVITY_REPOSITORY: any = Symbol.for('PhysicalActivityRepository')
+    public static readonly ACTIVITY_LOG_REPOSITORY: any = Symbol.for('PhysicalActivityLogRepository')
+    public static readonly LOG_REPOSITORY: any = Symbol.for('LogRepository')
     public static readonly SLEEP_REPOSITORY: any = Symbol.for('SleepRepository')
     public static readonly ENVIRONMENT_REPOSITORY: any = Symbol.for('EnvironmentRepository')
     public static readonly INTEGRATION_EVENT_REPOSITORY: any = Symbol.for('IntegrationEventRepository')
 
     // Models
     public static readonly ACTIVITY_REPO_MODEL: any = Symbol.for('ActivityRepoModel')
+    public static readonly ACTIVITY_LOG_REPO_MODEL: any = Symbol.for('ActivityLogRepoModel')
     public static readonly SLEEP_REPO_MODEL: any = Symbol.for('SleepRepoModel')
     public static readonly ENVIRONMENT_REPO_MODEL: any = Symbol.for('EnvironmentRepoModel')
     public static readonly INTEGRATION_EVENT_REPO_MODEL: any = Symbol.for('IntegrationEventRepoModel')
 
     // Mappers
     public static readonly ACTIVITY_ENTITY_MAPPER: any = Symbol.for('PhysicalActivityEntityMapper')
+    public static readonly ACTIVITY_LOG_ENTITY_MAPPER: any = Symbol.for('PhysicalActivityLogEntityMapper')
+    public static readonly LOG_ENTITY_MAPPER: any = Symbol.for('LogEntityMapper')
     public static readonly ENVIRONMENT_ENTITY_MAPPER: any = Symbol.for('EnvironmentEntityMapper')
     public static readonly SLEEP_ENTITY_MAPPER: any = Symbol.for('SleepEntityMapper')
 

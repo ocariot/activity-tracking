@@ -1,8 +1,8 @@
 import { ValidationException } from '../exception/validation.exception'
 import { PhysicalActivity } from '../model/physical.activity'
 import { PhysicalActivityLevelsValidator } from './physical.activity.levels.validator'
-import { ObjectIdValidator } from './object.id.validator'
 import { Strings } from '../../../utils/strings'
+import { ObjectIdValidator } from './object.id.validator'
 
 export class CreatePhysicalActivityValidator {
     public static validate(activity: PhysicalActivity): void | ValidationException {
@@ -13,7 +13,19 @@ export class CreatePhysicalActivityValidator {
         if (!activity.end_time) fields.push('end_time')
         if (!activity.name) fields.push('name')
         if (activity.calories === undefined) fields.push('calories')
+        else if (activity.calories < 0) {
+            throw new ValidationException('Calories field is invalid...',
+                'Physical Activity validation failed: '.concat(Strings.ERROR_MESSAGE.NEGATIVE_PARAMETER))
+        }
         if (activity.duration === undefined) fields.push('duration')
+        else if (activity.duration < 0) {
+            throw new ValidationException('Duration field is invalid...',
+                'Physical Activity validation failed: '.concat(Strings.ERROR_MESSAGE.NEGATIVE_PARAMETER))
+        }
+        if (activity.steps !== undefined && activity.steps < 0) {
+            throw new ValidationException('Steps field is invalid...',
+                'Physical Activity validation failed: '.concat(Strings.ERROR_MESSAGE.NEGATIVE_PARAMETER))
+        }
         if (!activity.child_id) fields.push('child_id')
         else ObjectIdValidator.validate(activity.child_id, Strings.CHILD.PARAM_ID_NOT_VALID_FORMAT)
         if (activity.levels && activity.levels.length > 0) PhysicalActivityLevelsValidator.validate(activity.levels)
