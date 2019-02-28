@@ -107,7 +107,6 @@ export abstract class BaseRepository<T extends Entity, TModel> implements IRepos
     protected mongoDBErrorListener(err: any): ValidationException | ConflictException | RepositoryException | undefined {
         if (err && err.name) {
             if (err.name === 'ValidationError') {
-                console.log('===', err)
                 return new ValidationException('Required fields were not provided!', err.message)
             } else if (err.name === 'CastError' || new RegExp(/(invalid format)/i).test(err)) {
                 return new ValidationException('Some ID provided, does not have a valid format.',

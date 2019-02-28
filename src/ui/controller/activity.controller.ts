@@ -9,9 +9,10 @@ import { ApiException } from '../exception/api.exception'
 import { PhysicalActivity } from '../../application/domain/model/physical.activity'
 import { IPhysicalActivityService } from '../../application/port/physical.activity.service.interface'
 import { ILogger } from '../../utils/custom.logger'
-import { IPhysicalActivityLogService } from '../../application/port/physical.activity.log.service.interface'
-// import { PhysicalActivityLog } from '../../application/domain/model/physical.activity.log'
+import { ILogService } from '../../application/port/log.service.interface'
 import { Log } from '../../application/domain/model/log'
+import { PhysicalActivityLog } from '../../application/domain/model/physical.activity.log'
+import { MultiStatus } from '../../application/domain/model/multi.status'
 
 /**
  * Controller that implements PhysicalActivity feature operations.
@@ -26,12 +27,12 @@ export class ActivityController {
      * Creates an instance of PhysicalActivity controller.
      *
      * @param {IPhysicalActivityService} _activityService
-     * @param {IPhysicalActivityLogService} _activityLogService
+     * @param {ILogService} _activityLogService
      * @param {ILogger} _logger
      */
     constructor(
         @inject(Identifier.ACTIVITY_SERVICE) private readonly _activityService: IPhysicalActivityService,
-        @inject(Identifier.ACTIVITY_LOG_SERVICE) private readonly _activityLogService: IPhysicalActivityLogService,
+        @inject(Identifier.ACTIVITY_LOG_SERVICE) private readonly _activityLogService: ILogService,
         @inject(Identifier.LOGGER) readonly _logger: ILogger
     ) {
     }
@@ -181,7 +182,7 @@ export class ActivityController {
                 })
             }
 
-            const result: Array<Log> = await this._activityLogService.addLogs(activityLogs)
+            const result: MultiStatus<Log> = await this._activityLogService.addLogs(activityLogs)
             return res.status(HttpStatus.CREATED).send(result)
         } catch (err) {
             const handlerError = ApiExceptionManager.build(err)
@@ -201,7 +202,7 @@ export class ActivityController {
     @httpGet('/:child_id/physicalactivities/logs/date/:date_start/:date_end')
     public async getLogs(@request() req: Request, @response() res: Response): Promise<Response> {
         try {
-            const result: Array<Log> = await this._activityLogService
+            const result: PhysicalActivityLog = await this._activityLogService
                 .getByChildAndDate(req.params.child_id, req.params.date_start, req.params.date_end, new Query().fromJSON(req.query))
             if (!result) return res.status(HttpStatus.NOT_FOUND).send(this.getMessageNotActivityLogFound())
             return res.status(HttpStatus.OK).send(result)

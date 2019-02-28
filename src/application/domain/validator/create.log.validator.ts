@@ -4,7 +4,7 @@ import { Strings } from '../../../utils/strings'
 import { Log } from '../model/log'
 import { LogTypeValidator } from './log.type.validator'
 
-export class CreatePhysicalActivityLogValidator {
+export class CreateLogValidator {
     public static validate(activityLog: Log): void | ValidationException {
         const fields: Array<string> = []
 
@@ -12,7 +12,11 @@ export class CreatePhysicalActivityLogValidator {
         if (!activityLog.type) fields.push('type')
         else LogTypeValidator.validate((activityLog.type))
         if (!activityLog.date) fields.push('date')
-        if (activityLog.value === undefined || activityLog.value < 0) fields.push('value')
+        if (activityLog.value === undefined) fields.push('value')
+        else if (activityLog.value < 0) {
+            throw new ValidationException('Value field is invalid...',
+                'Physical Activity log validation failed: '.concat(Strings.ERROR_MESSAGE.NEGATIVE_PARAMETER))
+        }
         if (!activityLog.child_id) fields.push('child_id')
         else UuidValidator.validate(activityLog.child_id, Strings.CHILD.PARAM_ID_NOT_VALID_FORMAT)
 

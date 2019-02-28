@@ -1,27 +1,31 @@
+import HttpStatus from 'http-status-codes'
 import { inject, injectable } from 'inversify'
 import { Identifier } from '../../di/identifiers'
 import { Strings } from '../../utils/strings'
 import { UuidValidator } from '../domain/validator/uuid.validator'
-import { IPhysicalActivityLogService } from '../port/physical.activity.log.service.interface'
+import { ILogService } from '../port/log.service.interface'
 import { IQuery } from '../port/query.interface'
-import { PhysicalActivityLog } from 'application/domain/model/physical.activity.log'
-// import { IPhysicalActivityLogRepository } from '../port/physical.activity.log.repository.interface'
 import { Log, LogType } from '../domain/model/log'
 import { ILogRepository } from '../port/log.repository.interface'
-import { CreatePhysicalActivityLogValidator } from '../domain/validator/create.physical.activity.log.validator'
+import { CreateLogValidator } from '../domain/validator/create.log.validator'
 import { DatelogValidator } from '../domain/validator/datelog.validator'
 import { Query } from '../../infrastructure/repository/query/query'
+import { PhysicalActivityLog } from '../domain/model/physical.activity.log'
+import { MultiStatus } from '../domain/model/multi.status'
+import { StatusSuccess } from '../domain/model/status.success'
+import { StatusError } from '../domain/model/status.error'
+import { ValidationException } from '../domain/exception/validation.exception'
+import { ConflictException } from '../domain/exception/conflict.exception'
 
 /**
  * Implementing physicalactivitylog service
  *
- * @implements {IPhysicalActivityLogService}
+ * @implements {ILogService}
  */
 @injectable()
-export class PhysicalActivityLogService implements IPhysicalActivityLogService {
+export class LogService implements ILogService {
 
     constructor(
-        // @inject(Identifier.ACTIVITY_LOG_REPOSITORY) private readonly _activityLogRepository: IPhysicalActivityLogRepository,
         @inject(Identifier.LOG_REPOSITORY) private readonly _logRepository: ILogRepository) {
     }
 
@@ -29,15 +33,19 @@ export class PhysicalActivityLogService implements IPhysicalActivityLogService {
      * Adds a new log array.
      *
      * @param {Array<Log>} activityLogs
-     * @returns {(Promise<Array<Log>>)}
-     * @throws {ConflictException | RepositoryException} If a data conflict occurs, as an existing physicalactivitylog.
+     * @returns {Promise<Array<Log>>}
+     * @throws { RepositoryException}
      */
-    public async addLogs(activityLogs: Array<Log>): Promise<Array<Log>> {
-        try {
-            activityLogs.forEach(async (elem) => {
+    public async addLogs(activityLogs: Array<Log>): Promise<MultiStatus<Log>> {
+        // try {
+            const multiStatus: MultiStatus<Log> = new MultiStatus<Log>()
+            const statusSuccessArr: Array<StatusSuccess<Log>> = new Array<StatusSuccess<Log>>()
+            const statusErrorArr: Array<StatusError<Log>> = new Array<StatusError<Log>>()
+
+            for (const elem of activityLogs) {
                 try {
                     // 1. Validate the object.
-                    CreatePhysicalActivityLogValidator.validate(elem)
+                    CreateLogValidator.validate(elem)
 
                     // 2. Build a query
                     const query: IQuery = new Query()
@@ -51,23 +59,38 @@ export class PhysicalActivityLogService implements IPhysicalActivityLogService {
 
                     if (log) { // If exists
                         // 4a. Update physical activity log.
-                        elem.value += log.value
-                        await this._logRepository.update(elem)
-                    }
-                    else {
+                        log.value += elem.value
+                        await this._logRepository.update(log)
+
+                        // 5. Create a StatusSuccess object for the construction of the MultiStatus response
+                        const statusSuccess: StatusSuccess<Log> = new StatusSuccess<Log>(HttpStatus.CREATED, elem)
+                        statusSuccessArr.push(statusSuccess)
+                    } else {
                         // 4b. Create new physical activity log.
                         await this._logRepository.create(elem)
+
+                        // 5. Create a StatusSuccess object for the construction of the MultiStatus response
+                        const statusSuccess: StatusSuccess<Log> = new StatusSuccess<Log>(HttpStatus.CREATED, elem)
+                        statusSuccessArr.push(statusSuccess)
                     }
                 } catch (err) {
-                    console.log('Deu erro', err.message)
+                    let statusCode: number = HttpStatus.INTERNAL_SERVER_ERROR
+                    if (err instanceof ValidationException) statusCode = HttpStatus.BAD_REQUEST
+                    if (err instanceof ConflictException) statusCode = HttpStatus.CONFLICT
+                    // 6. Create a StatusError object for the construction of the MultiStatus response
+                    const statusError: StatusError<Log> = new StatusError<Log>(statusCode, err.message, err.description, elem)
+                    statusErrorArr.push(statusError)
                 }
-            })
+            }
+
+            multiStatus.success = statusSuccessArr
+            multiStatus.error = statusErrorArr
 
             // 3. Returns the created object.
-            return Promise.resolve(activityLogs)
-        } catch (err) {
-            return Promise.reject(err)
-        }
+            return Promise.resolve(multiStatus)
+        // } catch (err) {
+        //     return Promise.reject(err)
+        // }
     }
 
     /**
@@ -77,7 +100,7 @@ export class PhysicalActivityLogService implements IPhysicalActivityLogService {
      * @return {Promise<Array<PhysicalActivityLog>>}
      * @throws {RepositoryException}
      */
-    public async getAll(query: IQuery): Promise<Array<PhysicalActivityLog>> {
+    public async getAll(query: IQuery): Promise<Array<Log>> {
         throw new Error('Unsupported feature!')
     }
 
@@ -89,7 +112,7 @@ export class PhysicalActivityLogService implements IPhysicalActivityLogService {
      * @return {Promise<PhysicalActivityLog>}
      * @throws {RepositoryException}
      */
-    public async getById(id: string, query: IQuery): Promise<PhysicalActivityLog> {
+    public async getById(id: string, query: IQuery): Promise<Log> {
         throw new Error('Unsupported feature!')
     }
 
@@ -103,7 +126,7 @@ export class PhysicalActivityLogService implements IPhysicalActivityLogService {
      * @return {Promise<PhysicalActivityLog>}
      * @throws {RepositoryException}
      */
-    public async getByChildAndDate(childId: string, dateStart: Date, dateEnd: Date, query: IQuery): Promise<Array<Log>> {
+    public async getByChildAndDate(childId: string, dateStart: Date, dateEnd: Date, query: IQuery): Promise<PhysicalActivityLog> {
         UuidValidator.validate(childId, Strings.CHILD.PARAM_ID_NOT_VALID_FORMAT)
         DatelogValidator.validate(dateStart.toString())
         DatelogValidator.validate(dateEnd.toString())
@@ -116,7 +139,25 @@ export class PhysicalActivityLogService implements IPhysicalActivityLogService {
             ]
         })
 
-        return this._logRepository.find(query)
+        try {
+            // Create a PhysicalActivityLog object with all the resources listed with arrays
+            const physical: PhysicalActivityLog = new PhysicalActivityLog()
+            const stepsArr: Array<Log> = new Array<Log>()
+            const caloriesArr: Array<Log> = new Array<Log>()
+
+            const logs: Array<Log> = await this._logRepository.find(query)
+            logs.forEach(item => {
+                if (item.type === 'steps') stepsArr.push(item)
+                else if (item.type === 'calories') caloriesArr.push(item)
+            })
+
+            physical.steps = stepsArr
+            physical.calories = caloriesArr
+
+            return Promise.resolve(physical)
+        } catch (err) {
+            return Promise.reject(err)
+        }
     }
 
     /**
@@ -144,17 +185,18 @@ export class PhysicalActivityLogService implements IPhysicalActivityLogService {
                 { date: { $gte: dateStart.toString().concat('T00:00:00') } }
             ]
         })
+
         return this._logRepository.find(query)
     }
 
     /**
      * Unimplemented methods
      */
-    public async add(activityLog: PhysicalActivityLog): Promise<PhysicalActivityLog> {
+    public async add(activityLog: Log): Promise<Log> {
         throw new Error('Unsupported feature!')
     }
 
-    public async update(physicalActivityLog: PhysicalActivityLog): Promise<PhysicalActivityLog> {
+    public async update(activityLog: Log): Promise<Log> {
         throw new Error('Unsupported feature!')
     }
 

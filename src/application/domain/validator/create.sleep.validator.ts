@@ -11,7 +11,11 @@ export class CreateSleepValidator {
         // validate null
         if (!sleep.start_time) fields.push('start_time')
         if (!sleep.end_time) fields.push('end_time')
-        if (sleep.duration === undefined || sleep.duration < 0) fields.push('duration')
+        if (sleep.duration === undefined) fields.push('duration')
+        else if (sleep.duration < 0) {
+            throw new ValidationException('Duration field is invalid...',
+                'Sleep validation failed: '.concat(Strings.ERROR_MESSAGE.NEGATIVE_PARAMETER))
+        }
         if (!sleep.child_id) fields.push('child_id')
         else UuidValidator.validate(sleep.child_id, Strings.CHILD.PARAM_ID_NOT_VALID_FORMAT)
         if (!sleep.pattern) fields.push('pattern')

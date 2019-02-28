@@ -1,14 +1,15 @@
 import { IService } from './service.interface'
-import { PhysicalActivityLog } from 'application/domain/model/physical.activity.log'
 import { Log, LogType } from 'application/domain/model/log'
 import { IQuery } from './query.interface'
+import { PhysicalActivityLog } from '../domain/model/physical.activity.log'
+import { MultiStatus } from '../domain/model/multi.status'
 
 /**
  * PhysicalActivityLog service interface.
  *
  * @extends {IService<PhysicalActivityLog}
  */
-export interface IPhysicalActivityLogService extends IService<PhysicalActivityLog> {
+export interface ILogService extends IService<Log> {
 
     /**
      * Add a new activity log.
@@ -17,7 +18,7 @@ export interface IPhysicalActivityLogService extends IService<PhysicalActivityLo
      * @return {Promise<Log>}
      * @throws {ValidationException | ConflictException | RepositoryException}
      */
-    addLogs(activityLog: Array<Log>): Promise<Array<Log>>
+    addLogs(activityLog: Array<Log>): Promise<MultiStatus<Log>>
 
     /**
      * List the physical activities logs with information on the total steps and calories of a child in a given period.
@@ -29,7 +30,7 @@ export interface IPhysicalActivityLogService extends IService<PhysicalActivityLo
      * @return {Promise<PhysicalActivityLog>}
      * @throws {RepositoryException}
      */
-    getByChildAndDate(childId: string, dateStart: Date, dateEnd: Date, query: IQuery): Promise<Array<Log>>
+    getByChildAndDate(childId: string, dateStart: Date, dateEnd: Date, query: IQuery): Promise<PhysicalActivityLog>
 
     /**
      * List the physical activities logs with information on the total steps or calories of a child in a given period

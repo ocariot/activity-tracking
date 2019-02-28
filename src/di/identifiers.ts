@@ -14,7 +14,7 @@ export abstract class Identifier {
 
     // Services
     public static readonly ACTIVITY_SERVICE: any = Symbol.for('PhysicalActivityService')
-    public static readonly ACTIVITY_LOG_SERVICE: any = Symbol.for('PhysicalActivityLogService')
+    public static readonly ACTIVITY_LOG_SERVICE: any = Symbol.for('LogService')
     public static readonly SLEEP_SERVICE: any = Symbol.for('SleepService')
     public static readonly ENVIRONMENT_SERVICE: any = Symbol.for('EnvironmentService')
 

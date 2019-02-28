@@ -37,24 +37,22 @@ import { ISleepService } from '../application/port/sleep.service.interface'
 import { SleepService } from '../application/service/sleep.service'
 import { ISleepRepository } from '../application/port/sleep.repository.interface'
 import { SleepRepository } from '../infrastructure/repository/sleep.repository'
-import { PhysicalActivityLogRepository } from '../infrastructure/repository/physical.activity.log.repository'
 import { SleepEntity } from '../infrastructure/entity/sleep.entity'
 import { Sleep } from '../application/domain/model/sleep'
 import { SleepEntityMapper } from '../infrastructure/entity/mapper/sleep.entity.mapper'
 import { SleepRepoModel } from '../infrastructure/database/schema/sleep.schema'
 import { IEntityMapper } from '../infrastructure/port/entity.mapper.interface'
-import {IPhysicalActivityLogRepository} from '../application/port/physical.activity.log.repository.interface'
-import {PhysicalActivityLogEntity} from '../infrastructure/entity/physical.activity.log.entity'
-import {PhysicalActivityLog} from '../application/domain/model/physical.activity.log'
-import {PhysicalActivityLogEntityMapper} from '../infrastructure/entity/mapper/physical.activity.log.entity.mapper'
-import {ActivityLogRepoModel} from '../infrastructure/database/schema/activity.log.schema'
+import { PhysicalActivityLogEntity } from '../infrastructure/entity/physical.activity.log.entity'
+import { PhysicalActivityLog } from '../application/domain/model/physical.activity.log'
+import { PhysicalActivityLogEntityMapper } from '../infrastructure/entity/mapper/physical.activity.log.entity.mapper'
+import { ActivityLogRepoModel } from '../infrastructure/database/schema/activity.log.schema'
 import { ILogRepository } from '../application/port/log.repository.interface'
 import { LogRepository } from '../infrastructure/repository/log.repository'
 import { Log } from '../application/domain/model/log'
 import { LogEntity } from '../infrastructure/entity/log.entity'
 import { LogEntityMapper } from '../infrastructure/entity/mapper/log.entity.mapper'
-import { PhysicalActivityLogService } from '../application/service/physical.activity.log.service'
-import { IPhysicalActivityLogService } from '../application/port/physical.activity.log.service.interface'
+import { LogService } from '../application/service/log.service'
+import { ILogService } from '../application/port/log.service.interface'
 
 export class DI {
     private static instance: DI
@@ -107,7 +105,7 @@ export class DI {
 
         // Services
         this.container.bind<IPhysicalActivityService>(Identifier.ACTIVITY_SERVICE).to(PhysicalActivityService).inSingletonScope()
-        this.container.bind<IPhysicalActivityLogService>(Identifier.ACTIVITY_LOG_SERVICE).to(PhysicalActivityLogService).inSingletonScope()
+        this.container.bind<ILogService>(Identifier.ACTIVITY_LOG_SERVICE).to(LogService).inSingletonScope()
         this.container.bind<IEnvironmentService>(Identifier.ENVIRONMENT_SERVICE).to(EnvironmentService).inSingletonScope()
         this.container.bind<ISleepService>(Identifier.SLEEP_SERVICE).to(SleepService).inSingletonScope()
 
@@ -115,9 +113,6 @@ export class DI {
         this.container
             .bind<IPhysicalActivityRepository>(Identifier.ACTIVITY_REPOSITORY)
             .to(PhysicalActivityRepository).inSingletonScope()
-        this.container
-            .bind<IPhysicalActivityLogRepository>(Identifier.ACTIVITY_LOG_REPOSITORY)
-            .to(PhysicalActivityLogRepository).inSingletonScope()
         this.container
             .bind<ILogRepository>(Identifier.LOG_REPOSITORY)
             .to(LogRepository).inSingletonScope()

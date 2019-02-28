@@ -40,11 +40,11 @@ export class PhysicalActivityLog extends Entity implements IJSONSerializable, IJ
         }
 
         if (json.steps !== undefined && json.steps instanceof Array) {
-            this.steps = json.steps.map(steps => new Log().fromJSON(steps))
+            this._steps = json.steps.map(steps => new Log().fromJSON(steps))
         }
 
         if (json.calories !== undefined && json.calories instanceof Array) {
-            this.calories = json.calories.map(calories => new Log().fromJSON(calories))
+            this._calories = json.calories.map(calories => new Log().fromJSON(calories))
         }
 
         return this
@@ -52,8 +52,8 @@ export class PhysicalActivityLog extends Entity implements IJSONSerializable, IJ
 
     public toJSON(): any {
         return {
-            steps: this.steps ? this.steps.map(item => item.toJSON()) : this.steps,
-            calories: this.calories ? this.calories.map(item => item.toJSON()) : this.calories
+            steps: this._steps ? this._steps.map(item => item.toJSON()) : this._steps,
+            calories: this._calories ? this._calories.map(item => item.toJSON()) : this._calories
         }
     }
 }

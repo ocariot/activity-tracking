@@ -12,9 +12,20 @@ export class CreatePhysicalActivityValidator {
         if (!activity.start_time) fields.push('start_time')
         if (!activity.end_time) fields.push('end_time')
         if (!activity.name) fields.push('name')
-        if (activity.calories === undefined || activity.calories < 0) fields.push('calories')
-        if (activity.duration === undefined || activity.duration < 0) fields.push('duration')
-        if (activity.steps !== undefined && activity.steps < 0) fields.push('steps')
+        if (activity.calories === undefined) fields.push('calories')
+        else if (activity.calories < 0) {
+            throw new ValidationException('Calories field is invalid...',
+                'Physical Activity validation failed: '.concat(Strings.ERROR_MESSAGE.NEGATIVE_PARAMETER))
+        }
+        if (activity.duration === undefined) fields.push('duration')
+        else if (activity.duration < 0) {
+            throw new ValidationException('Duration field is invalid...',
+                'Physical Activity validation failed: '.concat(Strings.ERROR_MESSAGE.NEGATIVE_PARAMETER))
+        }
+        if (activity.steps !== undefined && activity.steps < 0) {
+            throw new ValidationException('Steps field is invalid...',
+                'Physical Activity validation failed: '.concat(Strings.ERROR_MESSAGE.NEGATIVE_PARAMETER))
+        }
         if (!activity.child_id) fields.push('child_id')
         else UuidValidator.validate(activity.child_id, Strings.CHILD.PARAM_ID_NOT_VALID_FORMAT)
         if (activity.levels && activity.levels.length > 0) PhysicalActivityLevelsValidator.validate(activity.levels)
