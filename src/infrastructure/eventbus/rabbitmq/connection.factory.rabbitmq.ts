@@ -26,7 +26,6 @@ export class ConnectionFactoryRabbitMQ implements IConnectionFactory {
             await conn.initialized
             return Promise.resolve(conn)
         } catch (err) {
-            console.error(`broker error`, err.message)
             return Promise.reject(err)
         }
     }

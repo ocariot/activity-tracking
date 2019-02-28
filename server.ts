@@ -68,9 +68,10 @@ function initListener(): void {
     process.on('SIGINT', async () => {
         try {
             await backgroundServices.stopServices()
-            logger.debug('Background services successfully closed...')
         } catch (err) {
             logger.error(`There was an error stopping all background services. ${err.message}`)
+        } finally {
+            logger.debug('Background services successfully closed...')
         }
         process.exit()
     })

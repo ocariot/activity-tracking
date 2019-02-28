@@ -58,7 +58,6 @@ export class EventBusRabbitMQ implements IEventBus, IDisposable {
 
     /**
      * Subscribe in topic.
-     * Os eventos q
      *
      * @param event {IntegrationEvent}
      * @param handler {IIntegrationEventHandler<IntegrationEvent>}

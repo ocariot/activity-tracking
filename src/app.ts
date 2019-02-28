@@ -1,5 +1,6 @@
 import 'reflect-metadata'
 import morgan from 'morgan'
+import accessControl from 'express-ip-access-control'
 import helmet from 'helmet'
 import bodyParser from 'body-parser'
 import HttpStatus from 'http-status-codes'
@@ -63,6 +64,9 @@ export class App {
             this.container, null, { rootPath: '/' })
 
         inversifyExpress.setConfig((app) => {
+            // ip whitelist setup
+            this.setupWhitelist(app)
+
             // for handling query strings
             // {@link https://www.npmjs.com/package/query-strings-parser}
             app.use(qs({ use_page: true, default: { pagination: { limit: 100 }, sort: { created_at: 'desc' } } }))
@@ -96,6 +100,37 @@ export class App {
         })
         this.express = inversifyExpress.build()
         this.handleError()
+    }
+
+    /**
+     * Access control based on IP addresses.
+     * Allow only requests from IPs in the whitelist.
+     *
+     * @param app
+     */
+    private setupWhitelist(app: Application): void {
+        let whitelist = Default.IP_WHITELIST
+        if (process.env.IP_WHITELIST) {
+            whitelist = process.env.IP_WHITELIST
+                .replace(/[\[\]]/g, '')
+                .split(',')
+                .map(item => item.trim())
+        }
+
+        // Accept requests from any origin.
+        if (whitelist.includes('*') ||
+            whitelist.includes('')) return
+
+        app.use(accessControl({
+            mode: 'allow',
+            allows: whitelist,
+            log: (clientIp, access) => {
+                if (!access) this._logger.warn(`Access denied for IP ${clientIp}`)
+            },
+            statusCode: 401,
+            message: new ApiException(401, 'UNAUTHORIZED',
+                'Client is not allowed to access the service...').toJson()
+        }))
     }
 
     /**

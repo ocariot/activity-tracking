@@ -34,16 +34,14 @@ gulp.task('watch', (done) => {
     }).on('restart', () => {
         console.log('##################################### // ######################################')
         console.log('########################### (0/ Server restarted... ###########################')
-        console.log('##################################### // ######################################')
     }).on('crash', function () {
-        console.error('Application has crashed!\n')
-        stream.emit('restart', 10)  // restart the server in 10 seconds
+        console.error('Application has crashed!')
     })
     done()
 })
 
 // BUILD DEFAULT
-gulp.task('build', gulp.series(['ts-lint', 'copy-files'], function transpiler() {
+gulp.task('build', gulp.series(['ts-lint', 'copy-files'], function compiler() {
         const tsProject = ts.createProject(
             'tsconfig.json',
             {typescript: require('typescript')}
