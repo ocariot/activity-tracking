@@ -1,7 +1,7 @@
 import { ValidationException } from '../exception/validation.exception'
 import { PhysicalActivity } from '../model/physical.activity'
 import { PhysicalActivityLevelsValidator } from './physical.activity.levels.validator'
-import { UuidValidator } from './uuid.validator'
+import { ObjectIdValidator } from './object.id.validator'
 import { Strings } from '../../../utils/strings'
 
 export class CreatePhysicalActivityValidator {
@@ -15,7 +15,7 @@ export class CreatePhysicalActivityValidator {
         if (activity.calories === undefined) fields.push('calories')
         if (activity.duration === undefined) fields.push('duration')
         if (!activity.child_id) fields.push('child_id')
-        else UuidValidator.validate(activity.child_id, Strings.CHILD.PARAM_ID_NOT_VALID_FORMAT)
+        else ObjectIdValidator.validate(activity.child_id, Strings.CHILD.PARAM_ID_NOT_VALID_FORMAT)
         if (activity.levels && activity.levels.length > 0) PhysicalActivityLevelsValidator.validate(activity.levels)
 
         if (fields.length > 0) {

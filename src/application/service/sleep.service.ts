@@ -10,7 +10,7 @@ import { IEventBus } from '../../infrastructure/port/event.bus.interface'
 import { ILogger } from '../../utils/custom.logger'
 import { SleepSaveEvent } from '../integration-event/event/sleep.save.event'
 import { UpdateSleepValidator } from '../domain/validator/update.sleep.validator'
-import { UuidValidator } from '../domain/validator/uuid.validator'
+import { ObjectIdValidator } from '../domain/validator/object.id.validator'
 import { Strings } from '../../utils/strings'
 import { IIntegrationEventRepository } from '../port/integration.event.repository.interface'
 
@@ -98,8 +98,8 @@ export class SleepService implements ISleepService {
      * @throws {RepositoryException}
      */
     public getByIdAndChild(sleepId: string, childId: string, query: IQuery): Promise<Sleep> {
-        UuidValidator.validate(childId, Strings.CHILD.PARAM_ID_NOT_VALID_FORMAT)
-        UuidValidator.validate(sleepId, Strings.SLEEP.PARAM_ID_NOT_VALID_FORMAT)
+        ObjectIdValidator.validate(childId, Strings.CHILD.PARAM_ID_NOT_VALID_FORMAT)
+        ObjectIdValidator.validate(sleepId, Strings.SLEEP.PARAM_ID_NOT_VALID_FORMAT)
 
         query.addFilter({ _id: sleepId, child_id: childId })
         return this._sleepRepository.findOne(query)
@@ -114,7 +114,7 @@ export class SleepService implements ISleepService {
      * @throws {ValidationException | RepositoryException}
      */
     public getAllByChild(childId: string, query: IQuery): Promise<Array<Sleep>> {
-        UuidValidator.validate(childId, Strings.CHILD.PARAM_ID_NOT_VALID_FORMAT)
+        ObjectIdValidator.validate(childId, Strings.CHILD.PARAM_ID_NOT_VALID_FORMAT)
 
         query.addFilter({ child_id: childId })
         return this._sleepRepository.find(query)
@@ -141,8 +141,8 @@ export class SleepService implements ISleepService {
      * @throws {ValidationException | RepositoryException}
      */
     public removeByChild(sleepId: string, childId: string): Promise<boolean> {
-        UuidValidator.validate(childId, Strings.CHILD.PARAM_ID_NOT_VALID_FORMAT)
-        UuidValidator.validate(sleepId, Strings.SLEEP.PARAM_ID_NOT_VALID_FORMAT)
+        ObjectIdValidator.validate(childId, Strings.CHILD.PARAM_ID_NOT_VALID_FORMAT)
+        ObjectIdValidator.validate(sleepId, Strings.SLEEP.PARAM_ID_NOT_VALID_FORMAT)
 
         return this._sleepRepository.removeByChild(sleepId, childId)
     }

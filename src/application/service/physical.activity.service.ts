@@ -10,7 +10,7 @@ import { IEventBus } from '../../infrastructure/port/event.bus.interface'
 import { PhysicalActivitySaveEvent } from '../integration-event/event/physical.activity.save.event'
 import { ILogger } from '../../utils/custom.logger'
 import { UpdatePhysicalActivityValidator } from '../domain/validator/update.physical.activity.validator'
-import { UuidValidator } from '../domain/validator/uuid.validator'
+import { ObjectIdValidator } from '../domain/validator/object.id.validator'
 import { Strings } from '../../utils/strings'
 import { IIntegrationEventRepository } from '../port/integration.event.repository.interface'
 
@@ -99,8 +99,8 @@ export class PhysicalActivityService implements IPhysicalActivityService {
      * @throws {RepositoryException}
      */
     public getByIdAndChild(activityId: string, childId: string, query: IQuery): Promise<PhysicalActivity> {
-        UuidValidator.validate(childId, Strings.CHILD.PARAM_ID_NOT_VALID_FORMAT)
-        UuidValidator.validate(activityId, Strings.PHYSICAL_ACTIVITY.PARAM_ID_NOT_VALID_FORMAT)
+        ObjectIdValidator.validate(childId, Strings.CHILD.PARAM_ID_NOT_VALID_FORMAT)
+        ObjectIdValidator.validate(activityId, Strings.PHYSICAL_ACTIVITY.PARAM_ID_NOT_VALID_FORMAT)
 
         query.addFilter({ _id: activityId, child_id: childId })
         return this._activityRepository.findOne(query)
@@ -115,7 +115,7 @@ export class PhysicalActivityService implements IPhysicalActivityService {
      * @throws {ValidationException | RepositoryException}
      */
     public getAllByChild(childId: string, query: IQuery): Promise<Array<PhysicalActivity>> {
-        UuidValidator.validate(childId, Strings.CHILD.PARAM_ID_NOT_VALID_FORMAT)
+        ObjectIdValidator.validate(childId, Strings.CHILD.PARAM_ID_NOT_VALID_FORMAT)
 
         query.addFilter({ child_id: childId })
         return this._activityRepository.find(query)
@@ -142,8 +142,8 @@ export class PhysicalActivityService implements IPhysicalActivityService {
      * @throws {ValidationException | RepositoryException}
      */
     public removeByChild(activityId: string, childId: string): Promise<boolean> {
-        UuidValidator.validate(childId, Strings.CHILD.PARAM_ID_NOT_VALID_FORMAT)
-        UuidValidator.validate(activityId, Strings.PHYSICAL_ACTIVITY.PARAM_ID_NOT_VALID_FORMAT)
+        ObjectIdValidator.validate(childId, Strings.CHILD.PARAM_ID_NOT_VALID_FORMAT)
+        ObjectIdValidator.validate(activityId, Strings.PHYSICAL_ACTIVITY.PARAM_ID_NOT_VALID_FORMAT)
 
         return this._activityRepository.removeByChild(activityId, childId)
     }

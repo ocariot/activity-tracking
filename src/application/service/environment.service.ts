@@ -9,7 +9,7 @@ import { CreateEnvironmentValidator } from '../domain/validator/create.environme
 import { IEventBus } from '../../infrastructure/port/event.bus.interface'
 import { ILogger } from '../../utils/custom.logger'
 import { EnvironmentSaveEvent } from '../integration-event/event/environment.save.event'
-import { UuidValidator } from '../domain/validator/uuid.validator'
+import { ObjectIdValidator } from '../domain/validator/object.id.validator'
 import { Strings } from '../../utils/strings'
 import { IIntegrationEventRepository } from '../port/integration.event.repository.interface'
 
@@ -85,7 +85,7 @@ export class EnvironmentService implements IEnvironmentService {
      * @throws {ValidationException | RepositoryException}
      */
     public remove(id: string): Promise<boolean> {
-        UuidValidator.validate(id, Strings.ENVIRONMENT.PARAM_ID_NOT_VALID_FORMAT)
+        ObjectIdValidator.validate(id, Strings.ENVIRONMENT.PARAM_ID_NOT_VALID_FORMAT)
         return this._environmentRepository.delete(id)
     }
 
