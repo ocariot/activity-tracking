@@ -8,7 +8,7 @@ export class CreateLogValidator {
     public static validate(activityLog: Log): void | ValidationException {
         const fields: Array<string> = []
 
-        // validate null and correct attribute types
+        // validate null and correct attribute types.
         if (!activityLog.type) fields.push('type')
         else LogTypeValidator.validate((activityLog.type))
         if (!activityLog.date) fields.push('date')

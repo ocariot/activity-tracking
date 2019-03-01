@@ -14,6 +14,21 @@ export class UpdatePhysicalActivityValidator {
             ObjectIdValidator.validate(physicalActivity.id, Strings.PHYSICAL_ACTIVITY.PARAM_ID_NOT_VALID_FORMAT)
         }
 
+        if (physicalActivity.duration && physicalActivity.duration < 0) {
+                throw new ValidationException('Duration field is invalid...',
+                    'Physical Activity validation failed: '.concat(Strings.ERROR_MESSAGE.NEGATIVE_PARAMETER))
+        }
+
+        if (physicalActivity.calories && physicalActivity.calories < 0) {
+                throw new ValidationException('Calories field is invalid...',
+                    'Physical Activity validation failed: '.concat(Strings.ERROR_MESSAGE.NEGATIVE_PARAMETER))
+        }
+
+        if (physicalActivity.steps && physicalActivity.steps < 0) {
+                throw new ValidationException('Steps field is invalid...',
+                    'Physical Activity validation failed: '.concat(Strings.ERROR_MESSAGE.NEGATIVE_PARAMETER))
+        }
+
         if (physicalActivity.levels && physicalActivity.levels.length) {
             PhysicalActivityLevelsValidator.validate(physicalActivity.levels)
         }
