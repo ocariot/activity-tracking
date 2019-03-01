@@ -28,4 +28,4 @@ const integrationEventSchema = new Mongoose.Schema({
     }
 )
 
-export const IntegrationEventRepoModel = Mongoose.model<IIntegrationEventModel>('IntegrclearationEvent', integrationEventSchema)
+export const IntegrationEventRepoModel = Mongoose.model<IIntegrationEventModel>('IntegrationEvent', integrationEventSchema)

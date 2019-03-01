@@ -1,7 +1,7 @@
 import { inject, injectable } from 'inversify'
 import amqp, { Exchange, Message, Queue } from 'amqp-ts'
 import { IEventBus } from '../../port/event.bus.interface'
-import { IEventBusConnection } from '../../port/event.bus.connection.interface'
+import { IConnectionEventBus } from '../../port/connection.event.bus.interface'
 import { Default } from '../../../utils/default'
 import { IntegrationEvent } from '../../../application/integration-event/event/integration.event'
 import { IIntegrationEventHandler } from '../../../application/integration-event/handler/integration.event.handler.interface'
@@ -20,8 +20,8 @@ export class EventBusRabbitMQ implements IEventBus, IDisposable {
     private queue!: Queue
 
     constructor(
-        @inject(Identifier.RABBITMQ_CONNECTION) public connectionPub: IEventBusConnection,
-        @inject(Identifier.RABBITMQ_CONNECTION) public connectionSub: IEventBusConnection,
+        @inject(Identifier.RABBITMQ_CONNECTION) public connectionPub: IConnectionEventBus,
+        @inject(Identifier.RABBITMQ_CONNECTION) public connectionSub: IConnectionEventBus,
         @inject(Identifier.LOGGER) private readonly _logger: ILogger
     ) {
         this.event_handlers = new Map()

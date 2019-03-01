@@ -2,7 +2,7 @@ import { Connection } from 'mongoose'
 import { inject, injectable } from 'inversify'
 import { IConnectionFactory } from '../port/connection.factory.interface'
 import { Identifier } from '../../di/identifiers'
-import { IDBConnection } from '../port/db.connection.interface'
+import { IConnectionDB } from '../port/connection.db.interface'
 import { ILogger } from '../../utils/custom.logger'
 import { EventEmitter } from 'events'
 
@@ -11,10 +11,10 @@ import { EventEmitter } from 'events'
  * To implement the MongoDB abstraction the mongoose library was used.
  *
  * @see {@link https://mongoosejs.com/} for more details.
- * @implements {IDBConnection}
+ * @implements {IConnectionDB}
  */
 @injectable()
-export class ConnectionMongoDB implements IDBConnection {
+export class ConnectionMongoDB implements IConnectionDB {
     private _connection?: Connection
     private readonly _eventConnection: EventEmitter
 

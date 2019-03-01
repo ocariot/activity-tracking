@@ -1,4 +1,4 @@
-export interface IEventBusConnection {
+export interface IConnectionEventBus {
     isConnected: boolean
 
     conn?: any

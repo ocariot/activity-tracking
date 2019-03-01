@@ -1,13 +1,13 @@
 import { IEventBus } from '../../src/infrastructure/port/event.bus.interface'
 import { IntegrationEvent } from '../../src/application/integration-event/event/integration.event'
 import { IIntegrationEventHandler } from '../../src/application/integration-event/handler/integration.event.handler.interface'
-import { IEventBusConnection } from '../../src/infrastructure/port/event.bus.connection.interface'
+import { IConnectionEventBus } from '../../src/infrastructure/port/connection.event.bus.interface'
 
 export class EventBusRabbimqMock implements IEventBus {
-    public connectionPub: IEventBusConnection
-    public connectionSub: IEventBusConnection
+    public connectionPub: IConnectionEventBus
+    public connectionSub: IConnectionEventBus
 
-    constructor(connectionPub: IEventBusConnection, connectionSub: IEventBusConnection) {
+    constructor(connectionPub: IConnectionEventBus, connectionSub: IConnectionEventBus) {
         this.connectionPub = connectionPub
         this.connectionSub = connectionSub
     }

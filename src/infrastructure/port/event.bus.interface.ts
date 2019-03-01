@@ -1,11 +1,11 @@
 import { IDisposable } from './disposable.interface'
 import { IntegrationEvent } from '../../application/integration-event/event/integration.event'
 import { IIntegrationEventHandler } from '../../application/integration-event/handler/integration.event.handler.interface'
-import { IEventBusConnection } from './event.bus.connection.interface'
+import { IConnectionEventBus } from './connection.event.bus.interface'
 
 export interface IEventBus extends IDisposable {
-    connectionPub: IEventBusConnection
-    connectionSub: IEventBusConnection
+    connectionPub: IConnectionEventBus
+    connectionSub: IConnectionEventBus
 
     publish(event: IntegrationEvent<any>, routing_key: string): Promise<boolean>
 

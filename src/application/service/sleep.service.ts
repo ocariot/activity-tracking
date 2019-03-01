@@ -24,8 +24,8 @@ export class SleepService implements ISleepService {
 
     constructor(@inject(Identifier.SLEEP_REPOSITORY) private readonly _sleepRepository: ISleepRepository,
                 @inject(Identifier.INTEGRATION_EVENT_REPOSITORY) private readonly _integrationEventRepository: IIntegrationEventRepository,
-                @inject(Identifier.RABBITMQ_EVENT_BUS) readonly eventBus: IEventBus,
-                @inject(Identifier.LOGGER) readonly logger: ILogger) {
+                @inject(Identifier.RABBITMQ_EVENT_BUS) private readonly _eventBus: IEventBus,
+                @inject(Identifier.LOGGER) private readonly _logger: ILogger) {
     }
 
     /**
@@ -51,11 +51,11 @@ export class SleepService implements ISleepService {
             // 4. If created successfully, the object is published on the message bus.
             if (sleepSaved) {
                 const event: SleepSaveEvent = new SleepSaveEvent('SleepSaveEvent', new Date(), sleepSaved)
-                if (!(await this.eventBus.publish(event, 'sleep.save'))) {
+                if (!(await this._eventBus.publish(event, 'sleep.save'))) {
                     // 5. Save Event for submission attempt later when there is connection to message channel.
                     this.saveEvent(event)
                 } else {
-                    this.logger.info(`Sleep with ID: ${sleepSaved.id} published on event bus...`)
+                    this._logger.info(`Sleep with ID: ${sleepSaved.id} published on event bus...`)
                 }
             }
             // 5. Returns the created object.
@@ -168,11 +168,11 @@ export class SleepService implements ISleepService {
         this._integrationEventRepository
             .create(JSON.parse(JSON.stringify(saveEvent)))
             .then(() => {
-                this.logger.warn(`Could not publish the event named ${event.event_name}.`
+                this._logger.warn(`Could not publish the event named ${event.event_name}.`
                     .concat(` The event was saved in the database for a possible recovery.`))
             })
             .catch(err => {
-                this.logger.error(`There was an error trying to save the name event: ${event.event_name}.`
+                this._logger.error(`There was an error trying to save the name event: ${event.event_name}.`
                     .concat(`Error: ${err.message}. Event: ${JSON.stringify(saveEvent)}`))
             })
     }

@@ -24,8 +24,8 @@ export class EnvironmentService implements IEnvironmentService {
     constructor(
         @inject(Identifier.ENVIRONMENT_REPOSITORY) private readonly _environmentRepository: IEnvironmentRepository,
         @inject(Identifier.INTEGRATION_EVENT_REPOSITORY) private readonly _integrationEventRepository: IIntegrationEventRepository,
-        @inject(Identifier.RABBITMQ_EVENT_BUS) readonly eventBus: IEventBus,
-        @inject(Identifier.LOGGER) readonly logger: ILogger) {
+        @inject(Identifier.RABBITMQ_EVENT_BUS) private readonly _eventBus: IEventBus,
+        @inject(Identifier.LOGGER) private readonly _logger: ILogger) {
     }
 
     /**
@@ -52,11 +52,11 @@ export class EnvironmentService implements IEnvironmentService {
             if (environmentSaved) {
                 const event: EnvironmentSaveEvent = new EnvironmentSaveEvent('EnvironmentSaveEvent',
                     new Date(), environmentSaved)
-                if (!(await this.eventBus.publish(event, 'environments.save'))) {
+                if (!(await this._eventBus.publish(event, 'environments.save'))) {
                     // 5. Save Event for submission attempt later when there is connection to message channel.
                     this.saveEvent(event)
                 } else {
-                    this.logger.info(`Measurement of environment with ID: ${environmentSaved.id} published on event bus...`)
+                    this._logger.info(`Measurement of environment with ID: ${environmentSaved.id} published on event bus...`)
                 }
             }
             // 6. Returns the created object.
@@ -110,11 +110,11 @@ export class EnvironmentService implements IEnvironmentService {
         this._integrationEventRepository
             .create(JSON.parse(JSON.stringify(saveEvent)))
             .then(() => {
-                this.logger.warn(`Could not publish the event named ${event.event_name}.`
+                this._logger.warn(`Could not publish the event named ${event.event_name}.`
                     .concat(` The event was saved in the database for a possible recovery.`))
             })
             .catch(err => {
-                this.logger.error(`There was an error trying to save the name event: ${event.event_name}.`
+                this._logger.error(`There was an error trying to save the name event: ${event.event_name}.`
                     .concat(`Error: ${err.message}. Event: ${JSON.stringify(saveEvent)}`))
             })
     }

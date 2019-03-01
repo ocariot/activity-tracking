@@ -1,6 +1,6 @@
 import { Connection } from 'amqp-ts'
 import { inject, injectable } from 'inversify'
-import { IEventBusConnection } from '../../port/event.bus.connection.interface'
+import { IConnectionEventBus } from '../../port/connection.event.bus.interface'
 import { IConnectionFactory } from '../../port/connection.factory.interface'
 import { Identifier } from '../../../di/identifiers'
 
@@ -9,10 +9,10 @@ import { Identifier } from '../../../di/identifiers'
  * To implement the RabbitMQ abstraction the amqp-ts library was used.
  *
  * @see {@link https://github.com/abreits/amqp-ts} for more details.
- * @implements {IEventBusConnection}
+ * @implements {IConnectionEventBus}
  */
 @injectable()
-export class ConnectionRabbitMQ implements IEventBusConnection {
+export class ConnectionRabbitMQ implements IConnectionEventBus {
     private _connection?: Connection
 
     constructor(

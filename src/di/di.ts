@@ -15,8 +15,8 @@ import { ConnectionRabbitMQ } from '../infrastructure/eventbus/rabbitmq/connecti
 import { EventBusRabbitMQ } from '../infrastructure/eventbus/rabbitmq/eventbus.rabbitmq'
 import { ConnectionFactoryMongoDB } from '../infrastructure/database/connection.factory.mongodb'
 import { ConnectionMongoDB } from '../infrastructure/database/connection.mongodb'
-import { IDBConnection } from '../infrastructure/port/db.connection.interface'
-import { IEventBusConnection } from '../infrastructure/port/event.bus.connection.interface'
+import { IConnectionDB } from '../infrastructure/port/connection.db.interface'
+import { IConnectionEventBus } from '../infrastructure/port/connection.event.bus.interface'
 import { IConnectionFactory } from '../infrastructure/port/connection.factory.interface'
 import { IEventBus } from '../infrastructure/port/event.bus.interface'
 import { PhysicalActivity } from '../application/domain/model/physical.activity'
@@ -159,7 +159,7 @@ export class DI {
             .bind<IConnectionFactory>(Identifier.RABBITMQ_CONNECTION_FACTORY)
             .to(ConnectionFactoryRabbitMQ).inSingletonScope()
         this.container
-            .bind<IEventBusConnection>(Identifier.RABBITMQ_CONNECTION)
+            .bind<IConnectionEventBus>(Identifier.RABBITMQ_CONNECTION)
             .to(ConnectionRabbitMQ)
         this.container
             .bind<IEventBus>(Identifier.RABBITMQ_EVENT_BUS)
@@ -168,7 +168,7 @@ export class DI {
             .bind<IConnectionFactory>(Identifier.MONGODB_CONNECTION_FACTORY)
             .to(ConnectionFactoryMongoDB).inSingletonScope()
         this.container
-            .bind<IDBConnection>(Identifier.MONGODB_CONNECTION)
+            .bind<IConnectionDB>(Identifier.MONGODB_CONNECTION)
             .to(ConnectionMongoDB).inSingletonScope()
         this.container
             .bind(Identifier.BACKGROUND_SERVICE)

@@ -19,7 +19,7 @@ import { ObjectIdValidator } from '../domain/validator/object.id.validator'
 import { LogTypeValidator } from '../domain/validator/log.type.validator'
 
 /**
- * Implementing physicalactivitylog service
+ * Implementing physical activity service
  *
  * @implements {ILogService}
  */

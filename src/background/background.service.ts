@@ -1,19 +1,15 @@
-import { Container, inject, injectable } from 'inversify'
+import { inject, injectable } from 'inversify'
 import { Identifier } from '../di/identifiers'
-import { IDBConnection } from '../infrastructure/port/db.connection.interface'
-import { EventBusTask } from './task/eventbus.task'
-import { DI } from '../di/di'
+import { IConnectionDB } from '../infrastructure/port/connection.db.interface'
+import { IBackgroundTask } from '../application/port/background.task.interface'
 
 @injectable()
 export class BackgroundService {
-    private container: Container
-    private eventBusTask: EventBusTask
 
     constructor(
-        @inject(Identifier.MONGODB_CONNECTION) private readonly _mongodb: IDBConnection
+        @inject(Identifier.MONGODB_CONNECTION) private readonly _mongodb: IConnectionDB,
+        @inject(Identifier.EVENT_BUS_TASK) private readonly _eventBusTask: IBackgroundTask,
     ) {
-        this.container = DI.getInstance().getContainer()
-        this.eventBusTask = this.container.get<EventBusTask>(Identifier.EVENT_BUS_TASK)
     }
 
     public async startServices(): Promise<void> {
@@ -25,7 +21,7 @@ export class BackgroundService {
 
             // Perform task responsible for signature and event publishing routines,
             // which for some reason could not be sent and saved for later submission.
-            this.eventBusTask.run()
+            this._eventBusTask.run()
         } catch (err) {
             return Promise.reject(new Error(`Error initializing services in background! ${err.message}`))
         }
@@ -34,7 +30,7 @@ export class BackgroundService {
     public async stopServices(): Promise<void> {
         try {
             await this._mongodb.dispose()
-            await this.eventBusTask.stop()
+            await this._eventBusTask.stop()
         } catch (err) {
             return Promise.reject(new Error(`Error stopping MongoDB! ${err.message}`))
         }

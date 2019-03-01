@@ -145,7 +145,7 @@ export class ActivityController {
     }
 
     /**
-     * Remove physical physicalactivity of the child.
+     * Remove physical physical activity of the child.
      *
      * @param {Request} req
      * @param {Response} res
@@ -163,7 +163,7 @@ export class ActivityController {
     }
 
     /**
-     * Add new physicalactivitylog.
+     * Add new physical activity.
      *
      * @param {Request} req
      * @param {Response} res
