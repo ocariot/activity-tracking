@@ -8,9 +8,7 @@
  * @abstract
  */
 export abstract class Default {
-    public static readonly APP_TITLE: string = 'Tracking Service'
     public static readonly APP_ID: string = 'activity.app'
-    public static readonly APP_DESCRIPTION: string = 'Micro-service for tracking physicalactivity, sleep and food.'
     public static readonly NODE_ENV: string = 'development' // development, test, production
     public static readonly PORT_HTTP: number = 3000
     public static readonly PORT_HTTPS: number = 3001

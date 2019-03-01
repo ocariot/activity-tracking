@@ -15,6 +15,7 @@ import { Default } from './utils/default'
 import { DI } from './di/di'
 import { Identifier } from './di/identifiers'
 import { ILogger } from './utils/custom.logger'
+import { Strings } from './utils/strings'
 
 /**
  * Implementation of class App.
@@ -178,7 +179,7 @@ export class App {
                 swaggerUrl: Default.SWAGGER_URI,
                 customCss: '.swagger-ui .topbar { display: none }',
                 customfavIcon: Default.LOGO_URI,
-                customSiteTitle: `API Reference | ${Default.APP_TITLE}`
+                customSiteTitle: `API Reference | ${Strings.APP.TITLE}`
             }
             this.express.use('/reference', swaggerUi.serve, swaggerUi.setup(null, options))
         }

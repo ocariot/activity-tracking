@@ -23,7 +23,7 @@ Install the dependencies, start the local MongoDB, and start the server.
 $ npm install
 $ npm run start:dev
 ```
-Navigate to `http://127.0.0.1/api/v1`.
+Navigate to `http://127.0.0.1:3000`.
 
 ## Build
 - Run `npm run build` to build the project. The build artifacts will be stored in the `dist/` directory.
