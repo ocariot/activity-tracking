@@ -116,8 +116,10 @@ export class EventBusTask {
     private publishSavedEvents(): void {
         this._eventBus.connectionPub
             .tryConnect(0, 1500)
-            .then(() => {
+            .then(async () => {
                 this._logger.info('Connection to publish established successfully!')
+                await this.internalPublishSavedEvents(this.publishEvent, this._eventBus,
+                    this._integrationEventRepository, this._logger)
 
                 this.handlerPub = setInterval(this.internalPublishSavedEvents, 300000, // 5min
                     this.publishEvent,
