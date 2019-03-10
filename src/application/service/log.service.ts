@@ -7,7 +7,7 @@ import { IQuery } from '../port/query.interface'
 import { Log, LogType } from '../domain/model/log'
 import { ILogRepository } from '../port/log.repository.interface'
 import { CreateLogValidator } from '../domain/validator/create.log.validator'
-import { DatelogValidator } from '../domain/validator/datelog.validator'
+import { DateValidator } from '../domain/validator/date.validator'
 import { Query } from '../../infrastructure/repository/query/query'
 import { PhysicalActivityLog } from '../domain/model/physical.activity.log'
 import { MultiStatus } from '../domain/model/multi.status'
@@ -129,8 +129,8 @@ export class LogService implements ILogService {
      */
     public async getByChildAndDate(childId: string, dateStart: Date, dateEnd: Date, query: IQuery): Promise<PhysicalActivityLog> {
         ObjectIdValidator.validate(childId, Strings.CHILD.PARAM_ID_NOT_VALID_FORMAT)
-        DatelogValidator.validate(dateStart.toString())
-        DatelogValidator.validate(dateEnd.toString())
+        DateValidator.validate(dateStart.toString())
+        DateValidator.validate(dateEnd.toString())
 
         query.addFilter({
             child_id: childId,
@@ -176,8 +176,8 @@ export class LogService implements ILogService {
                                      dateEnd: Date, query: IQuery): Promise<Array<Log>> {
         ObjectIdValidator.validate(childId, Strings.CHILD.PARAM_ID_NOT_VALID_FORMAT)
         LogTypeValidator.validate(desiredResource)
-        DatelogValidator.validate(dateStart.toString())
-        DatelogValidator.validate(dateEnd.toString())
+        DateValidator.validate(dateStart.toString())
+        DateValidator.validate(dateEnd.toString())
 
         query.addFilter({
             child_id: childId,

@@ -1,6 +1,6 @@
 import { ValidationException } from '../exception/validation.exception'
 
-export class DatelogValidator {
+export class DateValidator {
     public static validate(datetime: string): void | ValidationException {
         // validate ISO 8601
         if (!(/^\d{4}-\d\d-\d\d$/i).test(datetime)) {
