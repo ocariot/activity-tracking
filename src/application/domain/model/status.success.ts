@@ -40,7 +40,7 @@ export class StatusSuccess<T> implements IJSONSerializable, IJSONDeserializable<
         }
 
         if (json.code !== undefined) this.code = json.code
-        if (json.item !== undefined) this.item = json.date
+        if (json.item !== undefined) this.item = json.item
 
         return this
     }

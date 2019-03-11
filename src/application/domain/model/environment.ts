@@ -63,7 +63,7 @@ export class Environment extends Entity implements IJSONSerializable, IJSONDeser
         this._timestamp = value
     }
 
-    private convertDatetimeString(value: string): Date {
+    public convertDatetimeString(value: string): Date {
         DatetimeValidator.validate(value)
         return new Date(value)
     }

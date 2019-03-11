@@ -62,7 +62,7 @@ export class StatusError<T> implements IJSONSerializable, IJSONDeserializable<St
         if (json.code !== undefined) this.code = json.code
         if (json.message !== undefined) this.message = json.message
         if (json.description !== undefined) this.description = json.description
-        if (json.item !== undefined) this.item = json.date
+        if (json.item !== undefined) this.item = json.item
 
         return this
     }

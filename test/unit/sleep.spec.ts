@@ -1,3 +1,4 @@
+import HttpStatus from 'http-status-codes'
 import supertest from 'supertest'
 import { expect } from 'chai'
 import { App } from '../../src/app'
@@ -26,10 +27,11 @@ describe('Routes: Users', () => {
         context('when an id is specified', () => {
             it('should return status code 200 with one child', () => {
                 return request
-                    .get('/api/v1/users/5bc741ebb93071066073560b/sleep/')
+                    // .get('/api/v1/users/5bc741ebb93071066073560b/sleep/')
+                    .get('/users/children/5a62be07d6f33400146c9b61/sleep/')
                     .expect('Content-Type', /json/)
                     .then(res => {
-                        expect(res.statusCode).to.eql(201)
+                        expect(res.statusCode).to.eql(HttpStatus.OK)
                     })
             })
         })
