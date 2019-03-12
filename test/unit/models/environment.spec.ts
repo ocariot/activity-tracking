@@ -80,17 +80,19 @@ describe('Models: Environment', () => {
     })
 
     describe('toJSON()', () => {
-        it('should return a JSON from Environment model', () => {
-            let result = new Environment().fromJSON(environmentJSON)
-            result = result.toJSON()
-            assert(result.id, 'Environment id (id of entity class) must not be undefined')
-            assert.propertyVal(result, 'id', environmentJSON.id)
-            assert(result.institution_id, 'institution_id must not be undefined')
-            assert.propertyVal(result, 'institution_id', environmentJSON.institution_id)
-            assert(result.location, 'location must not be undefined')
-            assert(result.measurements, 'measurements must not be undefined')
-            assert.typeOf(result.climatized, 'boolean')
-            assert(result.timestamp, 'timestamp must not be undefined')
+        context('when the Environment model is correct', () => {
+            it('should return a JSON from Environment model', () => {
+                let result = new Environment().fromJSON(environmentJSON)
+                result = result.toJSON()
+                assert(result.id, 'Environment id (id of entity class) must not be undefined')
+                assert.propertyVal(result, 'id', environmentJSON.id)
+                assert(result.institution_id, 'institution_id must not be undefined')
+                assert.propertyVal(result, 'institution_id', environmentJSON.institution_id)
+                assert(result.location, 'location must not be undefined')
+                assert(result.measurements, 'measurements must not be undefined')
+                assert.typeOf(result.climatized, 'boolean')
+                assert(result.timestamp, 'timestamp must not be undefined')
+            })
         })
     })
 })

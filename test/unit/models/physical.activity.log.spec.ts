@@ -35,11 +35,13 @@ describe('Models: PhysicalActivityLog', () => {
     })
 
     describe('toJSON()', () => {
-        it('should return a JSON from PhysicalActivityLog model', () => {
-            let result = new PhysicalActivityLog().fromJSON(activityLogJSON)
-            result = result.toJSON()
-            assert(result.steps, 'steps must not be undefined')
-            assert(result.calories, 'calories must not be undefined')
+        context('when the PhysicalActivityLog model is correct', () => {
+            it('should return a JSON from PhysicalActivityLog model', () => {
+                let result = new PhysicalActivityLog().fromJSON(activityLogJSON)
+                result = result.toJSON()
+                assert(result.steps, 'steps must not be undefined')
+                assert(result.calories, 'calories must not be undefined')
+            })
         })
     })
 })

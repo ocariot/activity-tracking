@@ -57,15 +57,17 @@ describe('Models: Log', () => {
     })
 
     describe('toJSON()', () => {
-        it('should return a JSON from Log model', () => {
-            let result = new Log().fromJSON(logJSON)
-            result = result.toJSON()
-            assert(result.date, 'date must not be undefined')
-            assert.typeOf(result.date, 'string')
-            assert.propertyVal(result, 'date', logJSON.date)
-            assert(result.value, 'value must not be undefined')
-            assert.typeOf(result.value, 'number')
-            assert.propertyVal(result, 'value', logJSON.value)
+        context('when the Log model is correct', () => {
+            it('should return a JSON from Log model', () => {
+                let result = new Log().fromJSON(logJSON)
+                result = result.toJSON()
+                assert(result.date, 'date must not be undefined')
+                assert.typeOf(result.date, 'string')
+                assert.propertyVal(result, 'date', logJSON.date)
+                assert(result.value, 'value must not be undefined')
+                assert.typeOf(result.value, 'number')
+                assert.propertyVal(result, 'value', logJSON.value)
+            })
         })
     })
 })

@@ -37,11 +37,13 @@ describe('Models: MultiStatus', () => {
     })
 
     describe('toJSON()', () => {
-        it('should return a JSON from MultiStatus model', () => {
-            let result = new MultiStatus().fromJSON(multiStatusJSON)
-            result = result.toJSON()
-            assert(result.success, 'success must not be undefined')
-            assert(result.error, 'error must not be undefined')
+        context('when the MultiStatus model is correct', () => {
+            it('should return a JSON from MultiStatus model', () => {
+                let result = new MultiStatus().fromJSON(multiStatusJSON)
+                result = result.toJSON()
+                assert(result.success, 'success must not be undefined')
+                assert(result.error, 'error must not be undefined')
+            })
         })
     })
 })

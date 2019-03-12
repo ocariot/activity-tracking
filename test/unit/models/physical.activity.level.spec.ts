@@ -42,15 +42,17 @@ describe('Models: PhysicalActivityLevel', () => {
     })
 
     describe('toJSON()', () => {
-        it('should return a JSON from PhysicalActivityLevel model', () => {
-            let result = new PhysicalActivityLevel().fromJSON(activityLevelJSON)
-            result = result.toJSON()
-            assert(result.name, 'name must not be undefined')
-            assert.typeOf(result.name, 'string')
-            assert.propertyVal(result, 'name', activityLevelJSON.name)
-            assert(result.duration, 'duration must not be undefined')
-            assert.typeOf(result.duration, 'number')
-            assert.propertyVal(result, 'duration', activityLevelJSON.duration)
+        context('when the PhysicalActivityLevel model is correct', () => {
+            it('should return a JSON from PhysicalActivityLevel model', () => {
+                let result = new PhysicalActivityLevel().fromJSON(activityLevelJSON)
+                result = result.toJSON()
+                assert(result.name, 'name must not be undefined')
+                assert.typeOf(result.name, 'string')
+                assert.propertyVal(result, 'name', activityLevelJSON.name)
+                assert(result.duration, 'duration must not be undefined')
+                assert.typeOf(result.duration, 'number')
+                assert.propertyVal(result, 'duration', activityLevelJSON.duration)
+            })
         })
     })
 })

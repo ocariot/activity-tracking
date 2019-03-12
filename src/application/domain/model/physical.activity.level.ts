@@ -8,20 +8,20 @@ import { JsonUtils } from '../utils/json.utils'
  * @implements {IJSONSerializable, IJSONDeserializable<PhysicalActivityLevel>}
  */
 export class PhysicalActivityLevel implements IJSONSerializable, IJSONDeserializable<PhysicalActivityLevel> {
-    private _name!: string // Name of physicalactivity level (sedentary, light, fair or very).
+    private _name!: ActivityLevelType // Name of physicalactivity level (sedentary, light, fair or very).
     private _duration!: number // Total time spent in milliseconds on the level.
 
-    constructor(name?: string, duration?: number) {
+    constructor(name?: ActivityLevelType, duration?: number) {
         if (name) this.name = name
         if (duration) this.duration = duration
     }
 
-    get name(): string {
+    get name(): ActivityLevelType {
         return this._name
     }
 
-    set name(value: string) {
-        this._name = value.toLowerCase().trim()
+    set name(value: ActivityLevelType) {
+        this._name = value
     }
 
     get duration(): number {

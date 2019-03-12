@@ -46,16 +46,18 @@ describe('Models: SleepPatternDataSet', () => {
     })
 
     describe('toJSON()', () => {
-        it('should return a JSON from SleepPatternDataSet model', () => {
-            let result = new SleepPatternDataSet().fromJSON(dataSetJSON)
-            result = result.toJSON()
-            assert(result.start_time, 'start_time must not be undefined')
-            assert(result.name, 'name must not be undefined')
-            assert.typeOf(result.name, 'string')
-            assert.propertyVal(result, 'name', dataSetJSON.name)
-            assert(result.duration, 'duration must not be undefined')
-            assert.typeOf(result.duration, 'number')
-            assert.propertyVal(result, 'duration', dataSetJSON.duration)
+        context('when the SleepPatternDataSet model is correct', () => {
+            it('should return a JSON from SleepPatternDataSet model', () => {
+                let result = new SleepPatternDataSet().fromJSON(dataSetJSON)
+                result = result.toJSON()
+                assert(result.start_time, 'start_time must not be undefined')
+                assert(result.name, 'name must not be undefined')
+                assert.typeOf(result.name, 'string')
+                assert.propertyVal(result, 'name', dataSetJSON.name)
+                assert(result.duration, 'duration must not be undefined')
+                assert.typeOf(result.duration, 'number')
+                assert.propertyVal(result, 'duration', dataSetJSON.duration)
+            })
         })
     })
 })

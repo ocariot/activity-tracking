@@ -22,7 +22,7 @@ describe('Models: StatusSuccess', () => {
         })
 
         context('when the json is undefined', () => {
-            it('should return an StatusError model with all attributes with undefined value', () => {
+            it('should return an StatusSuccess model with all attributes with undefined value', () => {
                 const result = new StatusSuccess().fromJSON(undefined)
                 assert.isUndefined(result.code)
                 assert.isUndefined(result.item)
@@ -30,7 +30,7 @@ describe('Models: StatusSuccess', () => {
         })
 
         context('when the json is a string', () => {
-            it('should transform the string in json and return StatusError model', () => {
+            it('should transform the string in json and return StatusSuccess model', () => {
                 const result = new StatusSuccess().fromJSON(JSON.stringify(statusSuccessJSON))
                 assert(result.code, 'code must not be undefined')
                 assert.typeOf(result.code, 'string')
@@ -41,13 +41,15 @@ describe('Models: StatusSuccess', () => {
     })
 
     describe('toJSON()', () => {
-        it('should return a JSON from StatusError model', () => {
-            let result = new StatusSuccess().fromJSON(statusSuccessJSON)
-            result = result.toJSON()
-            assert(result.code, 'code must not be undefined')
-            assert.typeOf(result.code, 'string')
-            assert.propertyVal(result, 'code', statusSuccessJSON.code)
-            assert(result.item, 'item must not be undefined')
+        context('when the StatusSuccess model is correct', () => {
+            it('should return a JSON from StatusSuccess model', () => {
+                let result = new StatusSuccess().fromJSON(statusSuccessJSON)
+                result = result.toJSON()
+                assert(result.code, 'code must not be undefined')
+                assert.typeOf(result.code, 'string')
+                assert.propertyVal(result, 'code', statusSuccessJSON.code)
+                assert(result.item, 'item must not be undefined')
+            })
         })
     })
 })

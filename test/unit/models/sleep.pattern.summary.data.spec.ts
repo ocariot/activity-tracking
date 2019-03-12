@@ -43,15 +43,17 @@ describe('Models: SleepPatternSummaryData', () => {
     })
 
     describe('toJSON()', () => {
-        it('should return a JSON from SleepPatternSummaryData model', () => {
-            let result = new SleepPatternSummaryData(summaryDataJSON.count, summaryDataJSON.duration).fromJSON(summaryDataJSON)
-            result = result.toJSON()
-            assert(result.count, 'count must not be undefined')
-            assert.typeOf(result.count, 'number')
-            assert.propertyVal(result, 'count', summaryDataJSON.count)
-            assert(result.duration, 'duration must not be undefined')
-            assert.typeOf(result.duration, 'number')
-            assert.propertyVal(result, 'duration', summaryDataJSON.duration)
+        context('when the SleepPatternSummaryData model is correct', () => {
+            it('should return a JSON from SleepPatternSummaryData model', () => {
+                let result = new SleepPatternSummaryData(summaryDataJSON.count, summaryDataJSON.duration).fromJSON(summaryDataJSON)
+                result = result.toJSON()
+                assert(result.count, 'count must not be undefined')
+                assert.typeOf(result.count, 'number')
+                assert.propertyVal(result, 'count', summaryDataJSON.count)
+                assert(result.duration, 'duration must not be undefined')
+                assert.typeOf(result.duration, 'number')
+                assert.propertyVal(result, 'duration', summaryDataJSON.duration)
+            })
         })
     })
 })

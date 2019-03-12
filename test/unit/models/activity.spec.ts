@@ -77,18 +77,20 @@ describe('Models: Activity', () => {
     })
 
     describe('toJSON()', () => {
-        it('should return a JSON from Activity model', () => {
-            let result = new Activity().fromJSON(activityJSON)
-            result = result.toJSON()
-            assert(result.id, 'Activity id (id of entity class) must not be undefined')
-            assert.propertyVal(result, 'id', activityJSON.id)
-            assert(result.start_time, 'start_time must not be undefined')
-            assert(result.end_time, 'end_time must not be undefined')
-            assert(result.duration, 'duration must not be undefined')
-            assert.typeOf(result.duration, 'number')
-            assert.propertyVal(result, 'duration', activityJSON.duration)
-            assert(result.child_id, 'child_id must not be undefined')
-            assert.propertyVal(result, 'child_id', activityJSON.child_id)
+        context('when the Activity model is correct', () => {
+            it('should return a JSON from Activity model', () => {
+                let result = new Activity().fromJSON(activityJSON)
+                result = result.toJSON()
+                assert(result.id, 'Activity id (id of entity class) must not be undefined')
+                assert.propertyVal(result, 'id', activityJSON.id)
+                assert(result.start_time, 'start_time must not be undefined')
+                assert(result.end_time, 'end_time must not be undefined')
+                assert(result.duration, 'duration must not be undefined')
+                assert.typeOf(result.duration, 'number')
+                assert.propertyVal(result, 'duration', activityJSON.duration)
+                assert(result.child_id, 'child_id must not be undefined')
+                assert.propertyVal(result, 'child_id', activityJSON.child_id)
+            })
         })
     })
 })

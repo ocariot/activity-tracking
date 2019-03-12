@@ -108,29 +108,31 @@ describe('Models: PhysicalActivity', () => {
     })
 
     describe('toJSON()', () => {
-        it('should return a JSON from PhysicalActivity model', () => {
-            let result = new PhysicalActivity().fromJSON(activityJSON)
-            result = result.toJSON()
-            assert(result.id, 'PhysicalActivity id (id of entity class) must not be undefined')
-            assert.propertyVal(result, 'id', activityJSON.id)
-            assert(result.start_time, 'start_time must not be undefined')
-            assert(result.end_time, 'end_time must not be undefined')
-            assert(result.duration, 'duration must not be undefined')
-            assert.typeOf(result.duration, 'number')
-            assert.propertyVal(result, 'duration', activityJSON.duration)
-            assert(result.child_id, 'child_id must not be undefined')
-            assert.propertyVal(result, 'child_id', activityJSON.child_id)
-            assert(result.name, 'name must not be undefined')
-            assert.typeOf(result.name, 'string')
-            assert.propertyVal(result, 'name', activityJSON.name)
-            assert(result.calories, 'calories must not be undefined')
-            assert.typeOf(result.calories, 'number')
-            assert.propertyVal(result, 'calories', activityJSON.calories)
-            try {
-                assert.typeOf(result.steps, 'number')
-            } catch (e) { //
-            }
-            assert(result.levels, 'levels must not be undefined')
+        context('when the PhysicalActivity model is correct', () => {
+            it('should return a JSON from PhysicalActivity model', () => {
+                let result = new PhysicalActivity().fromJSON(activityJSON)
+                result = result.toJSON()
+                assert(result.id, 'PhysicalActivity id (id of entity class) must not be undefined')
+                assert.propertyVal(result, 'id', activityJSON.id)
+                assert(result.start_time, 'start_time must not be undefined')
+                assert(result.end_time, 'end_time must not be undefined')
+                assert(result.duration, 'duration must not be undefined')
+                assert.typeOf(result.duration, 'number')
+                assert.propertyVal(result, 'duration', activityJSON.duration)
+                assert(result.child_id, 'child_id must not be undefined')
+                assert.propertyVal(result, 'child_id', activityJSON.child_id)
+                assert(result.name, 'name must not be undefined')
+                assert.typeOf(result.name, 'string')
+                assert.propertyVal(result, 'name', activityJSON.name)
+                assert(result.calories, 'calories must not be undefined')
+                assert.typeOf(result.calories, 'number')
+                assert.propertyVal(result, 'calories', activityJSON.calories)
+                try {
+                    assert.typeOf(result.steps, 'number')
+                } catch (e) { //
+                }
+                assert(result.levels, 'levels must not be undefined')
+            })
         })
     })
 })

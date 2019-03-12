@@ -36,11 +36,13 @@ describe('Models: SleepPattern', () => {
     })
 
     describe('toJSON()', () => {
-        it('should return a JSON from SleepPattern model', () => {
-            let result = new SleepPattern().fromJSON(summaryDataJSON)
-            result = result.toJSON()
-            assert(result.data_set, 'data_set must not be undefined')
-            assert(result.summary, 'summary must not be undefined')
+        context('when the SleepPattern model is correct', () => {
+            it('should return a JSON from SleepPattern model', () => {
+                let result = new SleepPattern().fromJSON(summaryDataJSON)
+                result = result.toJSON()
+                assert(result.data_set, 'data_set must not be undefined')
+                assert(result.summary, 'summary must not be undefined')
+            })
         })
     })
 })
