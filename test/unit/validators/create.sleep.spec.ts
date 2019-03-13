@@ -238,8 +238,9 @@ describe('Validators: CreateSleepValidator', () => {
                 assert.property(err, 'message')
                 assert.property(err, 'description')
                 assert.equal(err.message, 'Some (or several) duration field of sleep pattern is invalid...')
-                assert.equal(err.description, 'Sleep Pattern validation failed: The value provided has a negative value!')
+                assert.equal(err.description, 'Sleep Pattern dataset validation failed: The value provided has a negative value!')
             }
+            dataSetItemTest.duration = 60000
         })
     })
 })

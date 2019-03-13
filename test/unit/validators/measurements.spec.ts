@@ -3,8 +3,7 @@ import { Measurement, MeasurementType } from '../../../src/application/domain/mo
 import { MeasurementsValidator } from '../../../src/application/domain/validator/measurements.validator'
 
 let measurements: Array<Measurement> = [new Measurement(MeasurementType.TEMPERATURE, Math.random() * 13 + 19, '°C'),
-                                          new Measurement(MeasurementType.HUMIDITY, Math.random() * 16 + 30, '%')
-                                         ]
+                                        new Measurement(MeasurementType.HUMIDITY, Math.random() * 16 + 30, '%')]
 
 describe('Validators: MeasurementsValidator', () => {
     context('when the measurements in array has all the required parameters, and that they have valid values', () => {
@@ -26,8 +25,7 @@ describe('Validators: MeasurementsValidator', () => {
                 assert.equal(err.description, 'The measurements collection must not be empty!')
             }
             measurements = [new Measurement(MeasurementType.TEMPERATURE, Math.random() * 13 + 19, '°C'),
-                            new Measurement(MeasurementType.HUMIDITY, Math.random() * 16 + 30, '%')
-                           ]
+                            new Measurement(MeasurementType.HUMIDITY, Math.random() * 16 + 30, '%')]
         })
     })
 
@@ -43,8 +41,7 @@ describe('Validators: MeasurementsValidator', () => {
                 assert.equal(err.description, 'The types allowed are: temperature, humidity.')
             }
             measurements = [new Measurement(MeasurementType.TEMPERATURE, Math.random() * 13 + 19, '°C'),
-                            new Measurement(MeasurementType.HUMIDITY, Math.random() * 16 + 30, '%')
-                           ]
+                            new Measurement(MeasurementType.HUMIDITY, Math.random() * 16 + 30, '%')]
         })
     })
 
@@ -60,8 +57,7 @@ describe('Validators: MeasurementsValidator', () => {
                 assert.equal(err.description, 'Validation of measurements failed: measurement unit is required!')
             }
             measurements = [new Measurement(MeasurementType.TEMPERATURE, Math.random() * 13 + 19, '°C'),
-                            new Measurement(MeasurementType.HUMIDITY, Math.random() * 16 + 30, '%')
-                           ]
+                            new Measurement(MeasurementType.HUMIDITY, Math.random() * 16 + 30, '%')]
         })
     })
 
@@ -78,8 +74,7 @@ describe('Validators: MeasurementsValidator', () => {
                     ' measurement value, measurement unit is required!')
             }
             measurements = [new Measurement(MeasurementType.TEMPERATURE, Math.random() * 13 + 19, '°C'),
-                            new Measurement(MeasurementType.HUMIDITY, Math.random() * 16 + 30, '%')
-                           ]
+                            new Measurement(MeasurementType.HUMIDITY, Math.random() * 16 + 30, '%')]
         })
     })
 })
