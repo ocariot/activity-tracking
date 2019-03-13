@@ -13,7 +13,7 @@ const measurements_aux: Array<Measurement> = environment.measurements!
 const timestamp_aux: Date = environment.timestamp
 const local_aux: string = environment.location!.local
 
-describe('Validators: CreateEnvironmentValidator', () => {
+describe('Validators: CreateEnvironment', () => {
     context('when the environment has all the required parameters, and that they have valid values', () => {
         it('should return undefined representing the success of the validation', () => {
             const result = CreateEnvironmentValidator.validate(environment)

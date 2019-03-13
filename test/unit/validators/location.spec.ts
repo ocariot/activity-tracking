@@ -6,7 +6,7 @@ const location: Location = new Location()
 location.local = 'indoor'
 location.room = 'Room 201'
 
-describe('Validators: LocationValidator', () => {
+describe('Validators: Location', () => {
     context('when the location has all the required parameters, and that they have valid values', () => {
         it('should return undefined representing the success of the validation', () => {
             const result = LocationValidator.validate(location)

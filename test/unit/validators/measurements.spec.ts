@@ -5,7 +5,7 @@ import { MeasurementsValidator } from '../../../src/application/domain/validator
 let measurements: Array<Measurement> = [new Measurement(MeasurementType.TEMPERATURE, Math.random() * 13 + 19, '°C'),
                                         new Measurement(MeasurementType.HUMIDITY, Math.random() * 16 + 30, '%')]
 
-describe('Validators: MeasurementsValidator', () => {
+describe('Validators: Measurements', () => {
     context('when the measurements in array has all the required parameters, and that they have valid values', () => {
         it('should return undefined representing the success of the validation', () => {
             const result = MeasurementsValidator.validate(measurements)

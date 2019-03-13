@@ -3,7 +3,7 @@ import { DateValidator } from '../../../src/application/domain/validator/date.va
 
 let date: string = '2019-03-11'
 
-describe('Validators: DateValidator', () => {
+describe('Validators: Date', () => {
     context('when the date is valid (for the scenario of logs)', () => {
         it('should return undefined representing the success of the validation', () => {
             const result = DateValidator.validate(date)

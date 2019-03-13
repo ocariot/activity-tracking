@@ -9,7 +9,7 @@ activity.end_time = new Date('2018-12-14T13:12:37Z')
 activity.duration = 1178000
 activity.child_id = '5a62be07de34500146d9c544'
 
-describe('Validators: CreateActivityValidator', () => {
+describe('Validators: CreateActivity', () => {
     context('when the activity has all the required parameters, and that they have valid values', () => {
         it('should return undefined representing the success of the validation', () => {
             const result = CreateActivityValidator.validate(activity)

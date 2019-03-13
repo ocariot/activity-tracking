@@ -37,7 +37,7 @@ dataSet.push(dataSetItem3)
 
 sleep.pattern.data_set = dataSet
 
-describe('Validators: CreateSleepValidator', () => {
+describe('Validators: CreateSleep', () => {
     /**
      * Activity parameters
      */

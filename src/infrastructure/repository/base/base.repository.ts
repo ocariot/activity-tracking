@@ -7,7 +7,6 @@ import { ConflictException } from '../../../application/domain/exception/conflic
 import { IEntityMapper } from '../../port/entity.mapper.interface'
 import { IQuery } from '../../../application/port/query.interface'
 import { ILogger } from '../../../utils/custom.logger'
-import { Query } from '../query/query'
 
 /**
  * Base implementation of the repository.
@@ -29,13 +28,7 @@ export abstract class BaseRepository<T extends Entity, TModel> implements IRepos
         const itemNew: TModel = this.mapper.transform(item)
         return new Promise<T>((resolve, reject) => {
             this.Model.create(itemNew)
-                .then((result) => {
-                    // Required due to 'populate ()' routine.
-                    // If there is no need for 'populate ()', the return will suffice.
-                    const query = new Query()
-                    query.filters = result._id
-                    return resolve(this.findOne(query))
-                })
+                .then((result) => resolve(this.mapper.transform(result)))
                 .catch(err => reject(this.mongoDBErrorListener(err)))
         })
     }

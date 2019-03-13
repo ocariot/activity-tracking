@@ -19,7 +19,7 @@ activity.levels = [new PhysicalActivityLevel(ActivityLevelType.SEDENTARY, Math.f
     new PhysicalActivityLevel(ActivityLevelType.FAIRLY, Math.floor((Math.random() * 10) * 60000)),
     new PhysicalActivityLevel(ActivityLevelType.VERY, Math.floor((Math.random() * 10) * 60000))]
 
-describe('Validators: UpdatePhysicalActivityValidator', () => {
+describe('Validators: UpdatePhysicalActivity', () => {
     /**
      * Activity parameters
      */

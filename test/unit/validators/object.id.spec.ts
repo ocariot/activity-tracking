@@ -4,7 +4,7 @@ import { Strings } from '../../../src/utils/strings'
 
 let id: string = '5a62be07de34500146d9c544'
 
-describe('Validators: ObjectIdValidator', () => {
+describe('Validators: ObjectId', () => {
     context('when the id is correct', () => {
         it('should return undefined representing the success of the validation', () => {
             const result = ObjectIdValidator.validate(id)
