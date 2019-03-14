@@ -45,8 +45,7 @@ describe('Repositories: Base', () => {
         sinon.restore()
     })
 
-    // TODO implement test for create method
-    describe('create()', () => {
+    describe('create(item: T)', () => {
         it('should return a sleep object.', () => {
 
             sinon
@@ -74,7 +73,7 @@ describe('Repositories: Base', () => {
         })
     })
 
-    describe('find()', () => {
+    describe('find(query: IQuery)', () => {
         it('should return a list of sleep activities', () => {
 
             const resultExpected = new Array<Sleep>(defaultSleep)
@@ -136,7 +135,7 @@ describe('Repositories: Base', () => {
         })
     })
 
-    describe('findOne()', () => {
+    describe('findOne(query: IQuery)', () => {
         const customQueryMock: any = {
             toJSON: () => {
                 return {
@@ -195,7 +194,7 @@ describe('Repositories: Base', () => {
         })
     })
 
-    describe('update()', () => {
+    describe('update(item: T)', () => {
         it('should return the updated sleep', () => {
             sinon
                 .mock(modelFake)
@@ -263,7 +262,7 @@ describe('Repositories: Base', () => {
         })
     })
 
-    describe('delete()', () => {
+    describe('delete(id: string | number)', () => {
         it('should return true for confirm delete', () => {
 
             const sleepId: string = '5a62be07de34500146d9c544' // The defaultSleep id, but only the string
@@ -323,7 +322,7 @@ describe('Repositories: Base', () => {
         })
     })
 
-    describe('count()', () => {
+    describe('count(query: IQuery)', () => {
         it('should return how many sleep activities there are in the database for a query', () => {
 
             const customQueryMock: any = {

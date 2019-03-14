@@ -14,7 +14,7 @@ describe('Models: StatusError', () => {
         item: new Log('20199-03-11', 1000, LogType.STEPS, new ObjectID().toHexString())
     }
 
-    describe('fromJSON()', () => {
+    describe('fromJSON(json: any)', () => {
         context('when the json is correct', () => {
             it('should return an StatusError model', () => {
                 const result = new StatusError().fromJSON(statusErrorJSON)

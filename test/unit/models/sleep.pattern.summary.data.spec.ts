@@ -7,7 +7,7 @@ describe('Models: SleepPatternSummaryData', () => {
         duration: 100000
     }
 
-    describe('fromJSON()', () => {
+    describe('fromJSON(json: any)', () => {
         context('when the json is correct', () => {
             it('should return an SleepPatternSummaryData model', () => {
                 const result = new SleepPatternSummaryData(summaryDataJSON.count, summaryDataJSON.duration).fromJSON(summaryDataJSON)

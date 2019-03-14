@@ -7,7 +7,7 @@ describe('Models: PhysicalActivityLevel', () => {
         duration: 200
     }
 
-    describe('fromJSON()', () => {
+    describe('fromJSON(json: any)', () => {
         context('when the json is correct', () => {
             it('should return an PhysicalActivityLevel model', () => {
                 const result = new PhysicalActivityLevel().fromJSON(activityLevelJSON)

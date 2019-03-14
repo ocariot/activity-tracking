@@ -17,27 +17,24 @@ describe('Models: Environment', () => {
 
     describe('convertDatetimeString(value: string)', () => {
         context('when the parameter is correct', () => {
-            it('should normally execute the method "fromJSON', () => {
-                const result = new Environment().fromJSON(environmentJSON)
-                assert(result.convertDatetimeString(new Date().toISOString()))
+            it('should normally execute the method', () => {
+                const result = new Environment().convertDatetimeString('2018-12-14T12:52:59Z')
+                assert.instanceOf(result, Date)
             })
         })
 
         context('when the parameter is invalid', () => {
-            it('should not normally execute the method "fromJSON', () => {
-                const timestamp = environmentJSON.timestamp
+            it('should not normally execute the method', () => {
                 try {
-                    environmentJSON.timestamp = '2019'
-                    new Environment().fromJSON(environmentJSON)
-                } catch (e) {
-                    assert.instanceOf(e, ValidationException)
-                    environmentJSON.timestamp = timestamp
+                    new Environment().convertDatetimeString('2019')
+                } catch (err) {
+                    assert.instanceOf(err, ValidationException)
                 }
             })
         })
     })
 
-    describe('fromJSON()', () => {
+    describe('fromJSON(json: any)', () => {
         context('when the json is correct', () => {
             it('should return an Environment model', () => {
                 const result = new Environment().fromJSON(environmentJSON)

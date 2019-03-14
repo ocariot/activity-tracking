@@ -8,7 +8,7 @@ describe('Models: Measurement', () => {
         unit: '%'
     }
 
-    describe('fromJSON()', () => {
+    describe('fromJSON(json: any)', () => {
         context('when the json is correct', () => {
             it('should return an Measurement model', () => {
                 const result = new Measurement().fromJSON(measurementJSON)

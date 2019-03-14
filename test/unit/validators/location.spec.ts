@@ -7,38 +7,40 @@ location.local = 'indoor'
 location.room = 'Room 201'
 
 describe('Validators: Location', () => {
-    context('when the location has all the required parameters, and that they have valid values', () => {
-        it('should return undefined representing the success of the validation', () => {
-            const result = LocationValidator.validate(location)
-            assert.equal(result, undefined)
+    describe('validate(location: Location)', () => {
+        context('when the location has all the required parameters, and that they have valid values', () => {
+            it('should return undefined representing the success of the validation', () => {
+                const result = LocationValidator.validate(location)
+                assert.equal(result, undefined)
+            })
         })
-    })
 
-    context('when the location does not have all the required parameters (in this case missing local)', () => {
-        it('should throw a ValidationException', () => {
-            location.local = ''
-            try {
-                LocationValidator.validate(location)
-            } catch (err) {
-                assert.property(err, 'message')
-                assert.property(err, 'description')
-                assert.equal(err.message, 'Location are not in a format that is supported...')
-                assert.equal(err.description, 'Validation of location failed: location local is required!')
-            }
+        context('when the location does not have all the required parameters (in this case missing local)', () => {
+            it('should throw a ValidationException', () => {
+                location.local = ''
+                try {
+                    LocationValidator.validate(location)
+                } catch (err) {
+                    assert.property(err, 'message')
+                    assert.property(err, 'description')
+                    assert.equal(err.message, 'Location are not in a format that is supported...')
+                    assert.equal(err.description, 'Validation of location failed: location local is required!')
+                }
+            })
         })
-    })
 
-    context('when the location does not have any of the required parameters', () => {
-        it('should throw a ValidationException', () => {
-            location.room = ''
-            try {
-                LocationValidator.validate(location)
-            } catch (err) {
-                assert.property(err, 'message')
-                assert.property(err, 'description')
-                assert.equal(err.message, 'Location are not in a format that is supported...')
-                assert.equal(err.description, 'Validation of location failed: location local, location room is required!')
-            }
+        context('when the location does not have any of the required parameters', () => {
+            it('should throw a ValidationException', () => {
+                location.room = ''
+                try {
+                    LocationValidator.validate(location)
+                } catch (err) {
+                    assert.property(err, 'message')
+                    assert.property(err, 'description')
+                    assert.equal(err.message, 'Location are not in a format that is supported...')
+                    assert.equal(err.description, 'Validation of location failed: location local, location room is required!')
+                }
+            })
         })
     })
 })

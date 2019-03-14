@@ -16,26 +16,24 @@ describe('Models: Sleep', () => {
 
     describe('convertDatetimeString(value: string)', () => {
         context('when the parameter is correct', () => {
-            it('should normally execute the method "fromJSON"', () => {
-                new Sleep().fromJSON(sleepJSON)
+            it('should normally execute the method', () => {
+                const result = new Sleep().convertDatetimeString('2018-12-14T12:52:59Z')
+                assert.instanceOf(result, Date)
             })
         })
 
         context('when the parameter is invalid', () => {
-            it('should not normally execute the method "fromJSON"', () => {
-                const start_time = sleepJSON.start_time
+            it('should not normally execute the method', () => {
                 try {
-                    sleepJSON.start_time = '2019'
-                    new Sleep().fromJSON(sleepJSON)
-                } catch (e) {
-                    assert.instanceOf(e, ValidationException)
-                    sleepJSON.start_time = start_time
+                    new Sleep().convertDatetimeString('2019')
+                } catch (err) {
+                    assert.instanceOf(err, ValidationException)
                 }
             })
         })
     })
 
-    describe('fromJSON()', () => {
+    describe('fromJSON(json: any)', () => {
         context('when the json is correct', () => {
             it('should return an Sleep model', () => {
                 const result = new Sleep().fromJSON(sleepJSON)

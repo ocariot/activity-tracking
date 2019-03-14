@@ -9,7 +9,7 @@ describe('Models: SleepPatternSummary', () => {
         restless: new SleepPatternSummaryData(3, 20000)
     }
 
-    describe('fromJSON()', () => {
+    describe('fromJSON(json: any)', () => {
         context('when the json is correct', () => {
             it('should return an SleepPatternSummary model', () => {
                 const result = new SleepPatternSummary(summaryDataJSON.count, summaryDataJSON.duration).fromJSON(summaryDataJSON)

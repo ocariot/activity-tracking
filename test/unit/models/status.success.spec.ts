@@ -10,7 +10,7 @@ describe('Models: StatusSuccess', () => {
         item: new Log('20199-03-11', 1000, LogType.STEPS, new ObjectID().toHexString())
     }
 
-    describe('fromJSON()', () => {
+    describe('fromJSON(json: any)', () => {
         context('when the json is correct', () => {
             it('should return an StatusSuccess model', () => {
                 const result = new StatusSuccess().fromJSON(statusSuccessJSON)

@@ -8,7 +8,7 @@ describe('Models: PhysicalActivityLog', () => {
         calories: new Array<Log>()
     }
 
-    describe('fromJSON()', () => {
+    describe('fromJSON(json: any)', () => {
         context('when the json is correct', () => {
             it('should return an PhysicalActivityLog model', () => {
                 const result = new PhysicalActivityLog().fromJSON(activityLogJSON)

@@ -10,7 +10,7 @@ describe('Models: MultiStatus', () => {
         error: new Array<StatusError<Log>>()
     }
 
-    describe('fromJSON()', () => {
+    describe('fromJSON(json: any)', () => {
         context('when the json is correct', () => {
             it('should return an MultiStatus model', () => {
                 const result = new MultiStatus().fromJSON(multiStatusJSON)

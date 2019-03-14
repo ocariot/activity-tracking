@@ -10,7 +10,7 @@ describe('Models: Log', () => {
         child_id: new ObjectID()
     }
 
-    describe('fromJSON()', () => {
+    describe('fromJSON(json: any)', () => {
         context('when the json is correct', () => {
             it('should return an Log model', () => {
                 const result = new Log().fromJSON(logJSON)

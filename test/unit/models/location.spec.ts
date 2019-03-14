@@ -9,7 +9,7 @@ describe('Models: Location', () => {
         longitude: '-34.4321',
     }
 
-    describe('fromJSON()', () => {
+    describe('fromJSON(json: any)', () => {
         context('when the json is correct', () => {
             it('should return an Location model', () => {
                 const result = new Location().fromJSON(locationJSON)

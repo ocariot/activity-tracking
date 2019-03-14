@@ -20,7 +20,7 @@ describe('Repositories: Environment', () => {
         sinon.restore()
     })
 
-    describe('checkExist()', () => {
+    describe('checkExist(environment: Environment)', () => {
         context('when the environment is found', () => {
             it('should return true if exists in search by the filters bellow', () => {
                 const customQueryMock: any = {

@@ -21,7 +21,7 @@ describe('Repositories: PhysicalActivity', () => {
         sinon.restore()
     })
 
-    describe('checkExist()', () => {
+    describe('checkExist(activity: PhysicalActivity)', () => {
         context('when the physical activity is found', () => {
             it('should return true if exists in search by the filters bellow', () => {
                 const customQueryMock: any = {
@@ -146,7 +146,7 @@ describe('Repositories: PhysicalActivity', () => {
         })
     })
 
-    describe('updateByChild()', () => {
+    describe('updateByChild(activity: PhysicalActivity)', () => {
         context('when the physical activity is found and the update operation is done successfully', () => {
             it('should return the updated physical activity', () => {
 
@@ -296,7 +296,7 @@ describe('Repositories: PhysicalActivity', () => {
         })
     })
 
-    describe('removeByChild()', () => {
+    describe('removeByChild(activityId: string | number, childId: string)', () => {
         context('when the physical activity is found and the delete operation is done successfully', () => {
             it('should return true for confirm delete', () => {
 

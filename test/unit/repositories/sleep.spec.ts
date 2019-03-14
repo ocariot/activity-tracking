@@ -21,7 +21,7 @@ describe('Repositories: Sleep', () => {
         sinon.restore()
     })
 
-    describe('checkExist()', () => {
+    describe('checkExist(sleep: Sleep)', () => {
         context('when the sleep is found', () => {
             it('should return true if exists in search by the filters bellow', () => {
                 const customQueryMock: any = {
@@ -146,7 +146,7 @@ describe('Repositories: Sleep', () => {
         })
     })
 
-    describe('updateByChild()', () => {
+    describe('updateByChild(sleep: Sleep)', () => {
         context('when the sleep is found and the update operation is done successfully', () => {
             it('should return the updated sleep', () => {
 
@@ -290,7 +290,7 @@ describe('Repositories: Sleep', () => {
         })
     })
 
-    describe('removeByChild()', () => {
+    describe('removeByChild(sleepId: string, childId: string)', () => {
         context('when the sleep is found and the delete operation is done successfully', () => {
             it('should return true for confirm delete', () => {
 
