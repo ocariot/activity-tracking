@@ -3,7 +3,7 @@ import { IntegrationEvent } from '../../src/application/integration-event/event/
 import { IIntegrationEventHandler } from '../../src/application/integration-event/handler/integration.event.handler.interface'
 import { IConnectionEventBus } from '../../src/infrastructure/port/connection.event.bus.interface'
 
-export class EventBusRabbimqMock implements IEventBus {
+export class EventBusRabbitmqMock implements IEventBus {
     public connectionPub: IConnectionEventBus
     public connectionSub: IConnectionEventBus
 

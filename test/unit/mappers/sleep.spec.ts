@@ -46,121 +46,21 @@ describe('Mappers: SleepEntity', () => {
         duration: 29520000,
         child_id: '5a62be07de34500146d9c544',
         pattern: [
-        {
-            start_time: '2018-08-18T01:40:30.00Z',
-            name: 'restless',
-            duration: 60000
-        },
-        {
-            start_time: '2018-08-18T01:41:30.00Z',
-            name: 'asleep',
-            duration: 360000
-        },
-        {
-            start_time: '2018-08-18T01:47:30.00Z',
-            name: 'restless',
-            duration: 240000
-        },
-        {
-            start_time: '2018-08-18T01:51:30.00Z',
-            name: 'asleep',
-            duration: 60000
-        },
-        {
-            start_time: '2018-08-18T01:52:30.00Z',
-            name: 'restless',
-            duration: 60000
-        },
-        {
-            start_time: '2018-08-18T01:53:30.00Z',
-            name: 'asleep',
-            duration: 2100000
-        },
-        {
-            start_time: '2018-08-18T02:28:30.00Z',
-            name: 'restless',
-            duration: 240000
-        },
-        {
-            start_time: '2018-08-18T02:32:30.00Z',
-            name: 'awake',
-            duration: 180000
-        },
-        {
-            start_time: '2018-08-18T02:35:30.00Z',
-            name: 'asleep',
-            duration: 15120000
-        },
-        {
-            start_time: '2018-08-18T06:47:30.00Z',
-            name: 'restless',
-            duration: 60000
-        },
-        {
-            start_time: '2018-08-18T06:48:30.00Z',
-            name: 'asleep',
-            duration: 2580000
-        },
-        {
-            start_time: '2018-08-18T07:31:30.00Z',
-            name: 'restless',
-            duration: 120000
-        },
-        {
-            start_time: '2018-08-18T07:33:30.00Z',
-            name: 'asleep',
-            duration: 120000
-        },
-        {
-            start_time: '2018-08-18T07:35:30.00Z',
-            name: 'restless',
-            duration: 60000
-        },
-        {
-            start_time: '2018-08-18T07:36:30.00Z',
-            name: 'asleep',
-            duration: 1200000
-        },
-        {
-            start_time: '2018-08-18T07:56:30.00Z',
-            name: 'restless',
-            duration: 60000
-        },
-        {
-            start_time: '2018-08-18T07:57:30.00Z',
-            name: 'asleep',
-            duration: 2580000
-        },
-        {
-            start_time: '2018-08-18T08:40:30.00Z',
-            name: 'restless',
-            duration: 180000
-        },
-        {
-            start_time: '2018-08-18T08:43:30.00Z',
-            name: 'asleep',
-            duration: 1200000
-        },
-        {
-            start_time: '2018-08-18T09:03:30.00Z',
-            name: 'restless',
-            duration: 60000
-        },
-        {
-            start_time: '2018-08-18T09:04:30.00Z',
-            name: 'asleep',
-            duration: 1740000
-        },
-        {
-            start_time: '2018-08-18T09:03:30.00Z',
-            name: 'restless',
-            duration: 180000
-        },
-        {
-            start_time: '2018-08-18T09:36:30.00Z',
-            name: 'asleep',
-            duration: 960000
-        }
+            {
+                start_time: '2018-08-18T01:40:30.00Z',
+                name: 'restless',
+                duration: 60000
+            },
+            {
+                start_time: '2018-08-18T01:41:30.00Z',
+                name: 'asleep',
+                duration: 360000
+            },
+            {
+                start_time: '2018-08-18T01:47:30.00Z',
+                name: 'restless',
+                duration: 240000
+            }
     ]
     }
 

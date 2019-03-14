@@ -28,7 +28,24 @@ describe('Mappers: PhysicalActivityEntity', () => {
         name: 'walk',
         calories: 200,
         steps: 1000,
-        levels: activity.levels
+        levels: [
+            {
+                name: 'sedentary',
+                duration: Math.floor((Math.random() * 10) * 60000)
+            },
+            {
+                name: 'lightly',
+                duration: Math.floor((Math.random() * 10) * 60000)
+            },
+            {
+                name: 'fairly',
+                duration: Math.floor((Math.random() * 10) * 60000)
+            },
+            {
+                name: 'very',
+                duration: Math.floor((Math.random() * 10) * 60000)
+            }
+        ]
     }
 
     describe('transform(item: any)', () => {
