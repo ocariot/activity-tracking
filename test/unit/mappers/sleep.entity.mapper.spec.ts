@@ -1,42 +1,9 @@
 import { assert } from 'chai'
-import { Sleep } from '../../../src/application/domain/model/sleep'
 import { SleepEntityMapper } from '../../../src/infrastructure/entity/mapper/sleep.entity.mapper'
-import { SleepPattern, SleepPatternType } from '../../../src/application/domain/model/sleep.pattern'
-import { SleepPatternDataSet } from '../../../src/application/domain/model/sleep.pattern.data.set'
+import { SleepMock } from '../../mocks/sleep.mock'
 
 describe('Mappers: SleepEntity', () => {
-    const sleep: Sleep = new Sleep()
-    sleep.id = '5a62be07de34500146d9c544'
-    sleep.start_time = new Date('2018-08-18T01:40:30Z')
-    sleep.end_time = new Date('2018-08-18T09:52:30Z')
-    sleep.duration = 29520000
-    sleep.child_id = '5a62be07de34500146d9c544'
-    /**
-     * Create SleepPattern for sleep
-     */
-    sleep.pattern = new SleepPattern()
-    const dataSet: Array<SleepPatternDataSet> = []
-
-    const dataSetItem: SleepPatternDataSet = new SleepPatternDataSet()
-    dataSetItem.start_time = new Date(sleep.start_time)
-    dataSetItem.name = SleepPatternType.RESTLESS
-    dataSetItem.duration = Math.floor(Math.random() * 5 + 1) * 60000 // 1-5min milliseconds
-
-    const dataSetItem2: SleepPatternDataSet = new SleepPatternDataSet()
-    dataSetItem2.start_time = new Date('2018-08-18T01:45:30Z')
-    dataSetItem2.name = SleepPatternType.AWAKE
-    dataSetItem2.duration = Math.floor(Math.random() * 3 + 1) * 60000 // 1-3min in milliseconds
-
-    const dataSetItem3: SleepPatternDataSet = new SleepPatternDataSet()
-    dataSetItem3.start_time = new Date('2018-08-18T02:45:30Z')
-    dataSetItem3.name = SleepPatternType.ASLEEP
-    dataSetItem3.duration = Math.floor(Math.random() * 120 + 1) * 60000 // 1-180min in milliseconds
-
-    dataSet.push(dataSetItem)
-    dataSet.push(dataSetItem2)
-    dataSet.push(dataSetItem3)
-
-    sleep.pattern.data_set = dataSet
+    const sleep: SleepMock = new SleepMock()
 
     // Create sleep JSON
     const sleepJSON: any = {

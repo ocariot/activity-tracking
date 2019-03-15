@@ -1,13 +1,12 @@
 import { ObjectID } from 'bson'
 import { assert } from 'chai'
-import { Environment } from '../../../src/application/domain/model/environment'
 import { Measurement } from '../../../src/application/domain/model/measurement'
 import { Location } from '../../../src/application/domain/model/location'
 import { EnvironmentEntityMapper } from '../../../src/infrastructure/entity/mapper/environment.entity.mapper'
 import { EnvironmentMock } from '../../mocks/environment.mock'
 
 describe('Mappers: EnvironmentEntity', () => {
-    const environment: Environment = new EnvironmentMock()
+    const environment: EnvironmentMock = new EnvironmentMock()
 
     // Create environment JSON
     const environmentJSON: any = {

@@ -13,14 +13,14 @@ export class EventBusRabbitmqMock implements IEventBus {
     }
 
     public publish(event: IntegrationEvent<any>, routing_key: string): Promise<boolean> {
-        return Promise.resolve(true)
+        return Promise.resolve(this.connectionPub.isConnected)
     }
 
     public subscribe(
         event: IntegrationEvent<any>,
         handler: IIntegrationEventHandler<IntegrationEvent<any>>,
         routing_key: string): Promise<boolean> {
-        return Promise.resolve(true)
+        return Promise.resolve(this.connectionSub.isConnected)
     }
 
     public dispose(): Promise<void> {

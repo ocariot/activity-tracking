@@ -1,22 +1,9 @@
 import { assert } from 'chai'
-import { ActivityLevelType, PhysicalActivityLevel } from '../../../src/application/domain/model/physical.activity.level'
-import { PhysicalActivity } from '../../../src/application/domain/model/physical.activity'
 import { PhysicalActivityEntityMapper } from '../../../src/infrastructure/entity/mapper/physical.activity.entity.mapper'
+import { PhysicalActivityMock } from '../../mocks/physical.activity.mock'
 
 describe('Mappers: PhysicalActivityEntity', () => {
-    const activity: PhysicalActivity = new PhysicalActivity()
-    activity.id = '5a62be07de34500146d9c544'
-    activity.start_time = new Date('2018-08-18T01:40:30Z')
-    activity.end_time = new Date('2018-08-18T09:52:30Z')
-    activity.duration = 1178000
-    activity.child_id = '5a62be07de34500146d9c544'
-    activity.name = 'walk'
-    activity.calories = 200
-    activity.steps = 1000
-    activity.levels = [new PhysicalActivityLevel(ActivityLevelType.SEDENTARY, Math.floor((Math.random() * 10) * 60000)),
-        new PhysicalActivityLevel(ActivityLevelType.LIGHTLY, Math.floor((Math.random() * 10) * 60000)),
-        new PhysicalActivityLevel(ActivityLevelType.FAIRLY, Math.floor((Math.random() * 10) * 60000)),
-        new PhysicalActivityLevel(ActivityLevelType.VERY, Math.floor((Math.random() * 10) * 60000))]
+    const activity: PhysicalActivityMock = new PhysicalActivityMock()
 
     // Create physical activity JSON
     const activityJSON: any = {

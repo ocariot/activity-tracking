@@ -1,6 +1,5 @@
 import sinon from 'sinon'
 import { assert } from 'chai'
-import { Environment } from '../../../src/application/domain/model/environment'
 import { EnvironmentMock } from '../../mocks/environment.mock'
 import { EnvironmentRepoModel } from '../../../src/infrastructure/database/schema/environment.schema'
 import { IEnvironmentRepository } from '../../../src/application/port/environment.repository.interface'
@@ -11,7 +10,7 @@ import { CustomLoggerMock } from '../../mocks/custom.logger.mock'
 require('sinon-mongoose')
 
 describe('Repositories: Environment', () => {
-    const defaultEnvironment: Environment = new EnvironmentMock()
+    const defaultEnvironment: EnvironmentMock = new EnvironmentMock()
 
     const modelFake: any = EnvironmentRepoModel
     const repo: IEnvironmentRepository = new EnvironmentRepository(modelFake, new EntityMapperMock(), new CustomLoggerMock())

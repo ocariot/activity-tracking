@@ -12,9 +12,10 @@ export class SleepMock extends Sleep {
     private generateSleep(): Sleep {
         const sleep = new Sleep()
         sleep.id = this.generateObjectId()
-        sleep.duration = Math.floor(Math.random() * 7 + 4) * 3.6e+6 // 4-10h in milliseconds
         sleep.start_time = new Date()
-        sleep.end_time = new Date(new Date(sleep.start_time).setMilliseconds(sleep.duration))
+        sleep.end_time = new Date(new Date(sleep.start_time)
+            .setMilliseconds(Math.floor(Math.random() * 7 + 4) * 3.6e+6)) // 4-10h in milliseconds
+        sleep.duration = sleep.end_time.getTime() - sleep.start_time.getTime()
         sleep.child_id = '5a62be07de34500146d9c544'
         sleep.pattern = this.generateSleepPattern(sleep.start_time, sleep.duration)
 

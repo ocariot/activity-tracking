@@ -13,9 +13,10 @@ export class PhysicalActivityMock extends PhysicalActivity {
 
         const physicalActivity: PhysicalActivity = new PhysicalActivity()
         physicalActivity.id = this.generateObjectId()
-        physicalActivity.duration = Math.floor(Math.random() * 35 + 10) * 60000 // 10-45min in milliseconds
         physicalActivity.start_time = new Date()
-        physicalActivity.end_time = new Date(new Date(physicalActivity.start_time).setMilliseconds(physicalActivity.duration))
+        physicalActivity.end_time = new Date(new Date(physicalActivity.start_time)
+            .setMilliseconds(Math.floor(Math.random() * 35 + 10) * 60000)) // 10-45min in milliseconds
+        physicalActivity.duration = physicalActivity.end_time.getTime() - physicalActivity.start_time.getTime()
         physicalActivity.child_id = '5a62be07de34500146d9c544'
         physicalActivity.name = type
         physicalActivity.calories = Math.floor((Math.random() * 20000 + 500)) // 500-20000
