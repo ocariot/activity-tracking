@@ -16,12 +16,49 @@ import { IPhysicalActivityRepository } from '../../../src/application/port/physi
 import { PhysicalActivityRepositoryMock } from '../../mocks/physical.activity.repository.mock'
 import { ActivityRepoModel } from '../../../src/infrastructure/database/schema/activity.schema'
 import { Strings } from '../../../src/utils/strings'
+import { PhysicalActivity } from '../../../src/application/domain/model/physical.activity'
+import { ObjectID } from 'bson'
+import { ActivityLevelType } from '../../../src/application/domain/model/physical.activity.level'
+import { IPhysicalActivityService } from '../../../src/application/port/physical.activity.service.interface'
 // import { Strings } from '../../../src/utils/strings'
 
 require('sinon-mongoose')
 
 describe('Services: PhysicalActivityService', () => {
     const activity: PhysicalActivityMock = new PhysicalActivityMock()
+    let activityIncorrect: PhysicalActivity = new PhysicalActivity()
+
+    // Mock through JSON
+    const activityJSON: any = {
+        id: new ObjectID(),
+        start_time: new Date('2018-12-14T12:52:59Z').toISOString(),
+        end_time: new Date('2018-12-14T13:12:37Z').toISOString(),
+        duration: 1178000,
+        child_id: '5a62be07de34500146d9c544',
+        name: 'walk',
+        calories: 200,
+        steps: 1000,
+        levels: [
+            {
+                name: 'sedentaries',
+                duration: Math.floor((Math.random() * 10) * 60000)
+            },
+            {
+                name: ActivityLevelType.LIGHTLY,
+                duration: Math.floor((Math.random() * 10) * 60000)
+            },
+            {
+                name: ActivityLevelType.FAIRLY,
+                duration: Math.floor((Math.random() * 10) * 60000)
+            },
+            {
+                name: ActivityLevelType.VERY,
+                duration: Math.floor((Math.random() * 10) * 60000)
+            }
+        ]
+    }
+
+    // Mock activities array
     const activitiesArr: Array<PhysicalActivityMock> = new Array<PhysicalActivityMock>()
     for (let i = 0; i < 3; i++) {
         activitiesArr.push(new PhysicalActivityMock())
@@ -35,15 +72,18 @@ describe('Services: PhysicalActivityService', () => {
     const connectionRabbitmqPub: IConnectionEventBus = new ConnectionRabbitmqMock(connectionFactoryRabbitmq)
     const connectionRabbitmqSub: IConnectionEventBus = new ConnectionRabbitmqMock(connectionFactoryRabbitmq)
 
-    const activityService: PhysicalActivityService = new PhysicalActivityService(activityRepo, integrationRepo,
+    const activityService: IPhysicalActivityService = new PhysicalActivityService(activityRepo, integrationRepo,
         new EventBusRabbitmqMock(connectionRabbitmqPub, connectionRabbitmqSub), new CustomLoggerMock())
 
     afterEach(() => {
         sinon.restore()
     })
 
+    /**
+     * Method "add(activity: PhysicalActivity)"
+     */
     describe('add(activity: PhysicalActivity)', () => {
-        context('when the PhysicalActivity is correct, it still does not exist in the repository and there is a connection ' +
+        context('when the physical activity is correct, it still does not exist in the repository and there is a connection ' +
             'to the RabbitMQ', () => {
             it('should return the PhysicalActivity that was added', async () => {
                 sinon
@@ -59,7 +99,7 @@ describe('Services: PhysicalActivityService', () => {
             })
         })
 
-        context('when the PhysicalActivity is correct and does not yet exist in the repository but there is no connection ' +
+        context('when the physical activity is correct and it still does not exist in the repository but there is no connection ' +
             'to the RabbitMQ', () => {
             it('should return the PhysicalActivity that was saved', async () => {
                 connectionRabbitmqPub.isConnected = false
@@ -76,8 +116,9 @@ describe('Services: PhysicalActivityService', () => {
             })
         })
 
-        context('when the PhysicalActivity is correct but already exists in the repository', () => {
+        context('when the physical activity is correct but already exists in the repository', () => {
             it('should throw a ConflictException', async () => {
+                activity.id = '507f1f77bcf86cd799439011'            // Make mock return true
                 sinon
                     .mock(modelFake)
                     .expects('create')
@@ -92,38 +133,126 @@ describe('Services: PhysicalActivityService', () => {
             })
         })
 
-        context('when the PhysicalActivity id is invalid', () => {
+        context('when the physical activity is incorrect (missing all fields)', () => {
             it('should throw a ValidationException', async () => {
-                activity.id = '5a62be07de34500146d9c5442'               // Make activity id invalid
                 sinon
                     .mock(modelFake)
                     .expects('create')
-                    .withArgs(activity)
+                    .withArgs(activityIncorrect)
                     .rejects({ name: 'ValidationError' })
 
                 try {
-                    return await activityService.add(activity)
+                    return await activityService.add(activityIncorrect)
                 } catch (err) {
                     assert.property(err, 'message')
                     assert.property(err, 'description')
-                    assert.propertyVal(err, 'message', Strings.PHYSICAL_ACTIVITY.PARAM_ID_NOT_VALID_FORMAT)
-                    assert.propertyVal(err, 'description', Strings.ERROR_MESSAGE.UUID_NOT_VALID_FORMAT_DESC)
+                    assert.propertyVal(err, 'message', 'Required fields were not provided...')
+                    assert.propertyVal(err, 'description', 'Activity validation failed: start_time, end_time, ' +
+                        'duration, child_id is required!')
                 }
             })
         })
 
-        context('when the PhysicalActivity child_id is invalid', () => {
+        context('when the physical activity is incorrect (missing physical activity fields)', () => {
             it('should throw a ValidationException', async () => {
-                activity.id = '5a62be07de34500146d9c544'                  // Make activity id valid again
-                activity.child_id = '5a62be07de34500146d9c5442'           // Make child_id invalid
+                activityIncorrect = new PhysicalActivityMock()
+                activityIncorrect.name = ''
+                activityIncorrect.calories = undefined
                 sinon
                     .mock(modelFake)
                     .expects('create')
-                    .withArgs(activity)
+                    .withArgs(activityIncorrect)
                     .rejects({ name: 'ValidationError' })
 
                 try {
-                    return await activityService.add(activity)
+                    return await activityService.add(activityIncorrect)
+                } catch (err) {
+                    assert.property(err, 'message')
+                    assert.property(err, 'description')
+                    assert.propertyVal(err, 'message', 'Required fields were not provided...')
+                    assert.propertyVal(err, 'description', 'Physical Activity validation failed: name, calories is required!')
+                }
+            })
+        })
+
+        context('when the physical activity is incorrect (start_time with a date newer than end_time)', () => {
+            it('should throw a ValidationException', async () => {
+                activityIncorrect = new PhysicalActivityMock()
+                activityIncorrect.start_time = new Date('2018-12-15T12:52:59Z')
+                activityIncorrect.end_time = new Date('2018-12-14T13:12:37Z')
+                sinon
+                    .mock(modelFake)
+                    .expects('create')
+                    .withArgs(activityIncorrect)
+                    .rejects({ name: 'ValidationError' })
+
+                try {
+                    return await activityService.add(activityIncorrect)
+                } catch (err) {
+                    assert.property(err, 'message')
+                    assert.property(err, 'description')
+                    assert.propertyVal(err, 'message', 'Date field is invalid...')
+                    assert.propertyVal(err, 'description', 'Date validation failed: The end_time parameter can not contain ' +
+                        'a older date than that the start_time parameter!')
+                }
+            })
+        })
+
+        context('when the physical activity is incorrect (the duration is incompatible with the start_time and end_time parameters)', () => {
+            it('should throw a ValidationException', async () => {
+                activityIncorrect = new PhysicalActivityMock()
+                activityIncorrect.duration = 11780000
+                sinon
+                    .mock(modelFake)
+                    .expects('create')
+                    .withArgs(activityIncorrect)
+                    .rejects({ name: 'ValidationError' })
+
+                try {
+                    return await activityService.add(activityIncorrect)
+                } catch (err) {
+                    assert.property(err, 'message')
+                    assert.property(err, 'description')
+                    assert.propertyVal(err, 'message', 'Duration field is invalid...')
+                    assert.propertyVal(err, 'description', 'Duration validation failed: Activity duration value does not ' +
+                        'match values passed in start_time and end_time parameters!')
+                }
+            })
+        })
+
+        context('when the physical activity is incorrect (the duration is negative)', () => {
+            it('should throw a ValidationException', async () => {
+                activityIncorrect = new PhysicalActivityMock()
+                activityIncorrect.duration = -11780000
+                sinon
+                    .mock(modelFake)
+                    .expects('create')
+                    .withArgs(activityIncorrect)
+                    .rejects({ name: 'ValidationError' })
+
+                try {
+                    return await activityService.add(activityIncorrect)
+                } catch (err) {
+                    assert.property(err, 'message')
+                    assert.property(err, 'description')
+                    assert.propertyVal(err, 'message', 'Duration field is invalid...')
+                    assert.propertyVal(err, 'description', 'Activity validation failed: The value provided has a negative value!')
+                }
+            })
+        })
+
+        context('when the physical activity is incorrect (child_id is invalid)', () => {
+            it('should throw a ValidationException', async () => {
+                activityIncorrect = new PhysicalActivityMock()
+                activityIncorrect.child_id = '5a62be07de34500146d9c5442'           // Make child_id invalid
+                sinon
+                    .mock(modelFake)
+                    .expects('create')
+                    .withArgs(activityIncorrect)
+                    .rejects({ name: 'ValidationError' })
+
+                try {
+                    return await activityService.add(activityIncorrect)
                 } catch (err) {
                     assert.property(err, 'message')
                     assert.property(err, 'description')
@@ -132,8 +261,119 @@ describe('Services: PhysicalActivityService', () => {
                 }
             })
         })
+
+        context('when the physical activity is incorrect (the calories is negative)', () => {
+            it('should throw a ValidationException', async () => {
+                activityIncorrect = new PhysicalActivityMock()
+                activityIncorrect.calories = -200
+                sinon
+                    .mock(modelFake)
+                    .expects('create')
+                    .withArgs(activityIncorrect)
+                    .rejects({ name: 'ValidationError' })
+
+                try {
+                    return await activityService.add(activityIncorrect)
+                } catch (err) {
+                    assert.property(err, 'message')
+                    assert.property(err, 'description')
+                    assert.propertyVal(err, 'message', 'Calories field is invalid...')
+                    assert.propertyVal(err, 'description', 'Physical Activity validation failed: The value provided has a negative value!')
+                }
+            })
+        })
+
+        context('when the physical activity is incorrect (the steps is negative)', () => {
+            it('should throw a ValidationException', async () => {
+                activityIncorrect.calories = 200
+                activityIncorrect.steps = 1000
+                sinon
+                    .mock(modelFake)
+                    .expects('create')
+                    .withArgs(activityIncorrect)
+                    .rejects({ name: 'ValidationError' })
+
+                try {
+                    return await activityService.add(activityIncorrect)
+                } catch (err) {
+                    assert.property(err, 'message')
+                    assert.property(err, 'description')
+                    assert.propertyVal(err, 'message', 'Steps field is invalid...')
+                    assert.propertyVal(err, 'description', 'Physical Activity validation failed: The value provided has a negative value!')
+                }
+            })
+        })
+
+        context('when the physical activity is incorrect (the levels array has an item with an invalid type)', () => {
+            it('should throw a ValidationException', async () => {
+                // Mock through JSON
+                activityIncorrect = activityIncorrect.fromJSON(activityJSON)
+                sinon
+                    .mock(modelFake)
+                    .expects('create')
+                    .withArgs(activityIncorrect)
+                    .rejects({ name: 'ValidationError' })
+
+                try {
+                    return await activityService.add(activityIncorrect)
+                } catch (err) {
+                    assert.property(err, 'message')
+                    assert.property(err, 'description')
+                    assert.propertyVal(err, 'message', 'The name of level provided "sedentaries" is not supported...')
+                    assert.propertyVal(err, 'description', 'The names of the allowed levels are: sedentary, lightly, fairly, very.')
+                }
+            })
+        })
+
+        context('when the physical activity is incorrect (the levels array has an item that contains empty fields)', () => {
+            it('should throw a ValidationException', async () => {
+                activityJSON.levels[0].name = ''
+                activityJSON.levels[0].duration = undefined
+                activityIncorrect = activityIncorrect.fromJSON(activityJSON)
+                sinon
+                    .mock(modelFake)
+                    .expects('create')
+                    .withArgs(activityIncorrect)
+                    .rejects({ name: 'ValidationError' })
+
+                try {
+                    return await activityService.add(activityIncorrect)
+                } catch (err) {
+                    assert.property(err, 'message')
+                    assert.property(err, 'description')
+                    assert.propertyVal(err, 'message', 'Level are not in a format that is supported!')
+                    assert.propertyVal(err, 'description', 'Must have values ​​for the following levels: sedentary, lightly, fairly, very.')
+                }
+            })
+        })
+
+        context('when the physical activity is incorrect (the levels array has an item that contains negative duration)', () => {
+            it('should throw a ValidationException', async () => {
+                activityJSON.levels[0].name = ActivityLevelType.SEDENTARY
+                activityJSON.levels[0].duration = -(Math.floor((Math.random() * 10) * 60000))
+                activityIncorrect = activityIncorrect.fromJSON(activityJSON)
+                sinon
+                    .mock(modelFake)
+                    .expects('create')
+                    .withArgs(activityIncorrect)
+                    .rejects({ name: 'ValidationError' })
+
+                try {
+                    return await activityService.add(activityIncorrect)
+                } catch (err) {
+                    assert.property(err, 'message')
+                    assert.property(err, 'description')
+                    assert.propertyVal(err, 'message', 'Some (or several) duration field of levels array is invalid...')
+                    assert.propertyVal(err, 'description', 'Physical Activity Level validation failed: The value provided ' +
+                        'has a negative value!')
+                }
+            })
+        })
     })
 
+    /**
+     * Method getAll(query: IQuery)
+     */
     describe('getAll(query: IQuery)', () => {
         context('when there is at least one physical activity object in the database that matches the query filters', () => {
             it('should return an PhysicalActivity array', async () => {
@@ -183,6 +423,9 @@ describe('Services: PhysicalActivityService', () => {
         })
     })
 
+    /**
+     * Method getByIdAndChild(activityId: string, childId: string, query: IQuery)
+     */
     describe('getByIdAndChild(activityId: string, childId: string, query: IQuery)', () => {
         context('when there is physical activity with the received parameters', () => {
             it('should return the PhysicalActivity that was found', () => {
@@ -277,6 +520,9 @@ describe('Services: PhysicalActivityService', () => {
         })
     })
 
+    /**
+     * Method getAllByChild(childId: string, query: IQuery)
+     */
     describe('getAllByChild(childId: string, query: IQuery)', () => {
         context('when there is at least one physical activity associated with that childId', () => {
             it('should return a PhysicalActivity array', () => {
@@ -346,6 +592,9 @@ describe('Services: PhysicalActivityService', () => {
         })
     })
 
+    /**
+     * Method updateByChild(activity: PhysicalActivity)
+     */
     describe('updateByChild(activity: PhysicalActivity)', () => {
         context('when physical activity exists in the database', () => {
             it('should return the PhysicalActivity that was updated', () => {
@@ -380,17 +629,17 @@ describe('Services: PhysicalActivityService', () => {
             })
         })
 
-        context('when the PhysicalActivity id is invalid', () => {
+        context('when the physical activity is incorrect (id is invalid)', () => {
             it('should throw a ValidationException', () => {
-                activity.id = '5a62be07de34500146d9c5442'           // Make activity id invalid
+                activityIncorrect.id = '5a62be07de34500146d9c5442'           // Make activity id invalid
                 sinon
                     .mock(modelFake)
                     .expects('findOneAndUpdate')
-                    .withArgs(activity)
+                    .withArgs(activityIncorrect)
                     .rejects({ name: 'ValidationError' })
 
                 try {
-                    return activityService.updateByChild(activity)
+                    return activityService.updateByChild(activityIncorrect)
                 } catch (err) {
                     assert.property(err, 'message')
                     assert.property(err, 'description')
@@ -400,18 +649,18 @@ describe('Services: PhysicalActivityService', () => {
             })
         })
 
-        context('when the PhysicalActivity child_id is invalid', () => {
+        context('when the physical activity is incorrect (child_id is invalid)', () => {
             it('should throw a ValidationException', () => {
-                activity.id = '5a62be07de34500146d9c544'           // Make activity id valid
-                activity.child_id = '5a62be07de34500146d9c5442'           // Make activity id invalid
+                activityIncorrect.id = '5a62be07de34500146d9c544'           // Make activity id valid
+                activityIncorrect.child_id = '5a62be07de34500146d9c5442'           // Make activity child_id invalid
                 sinon
                     .mock(modelFake)
                     .expects('findOneAndUpdate')
-                    .withArgs(activity)
+                    .withArgs(activityIncorrect)
                     .rejects({ name: 'ValidationError' })
 
                 try {
-                    return activityService.updateByChild(activity)
+                    return activityService.updateByChild(activityIncorrect)
                 } catch (err) {
                     assert.property(err, 'message')
                     assert.property(err, 'description')
@@ -420,8 +669,142 @@ describe('Services: PhysicalActivityService', () => {
                 }
             })
         })
+
+        context('when the physical activity is incorrect (duration is negative)', () => {
+            it('should throw a ValidationException', () => {
+                activityIncorrect.child_id = '5a62be07de34500146d9c544'     // Make child_id valid again
+                activityIncorrect.duration = -11780000
+                sinon
+                    .mock(modelFake)
+                    .expects('findOneAndUpdate')
+                    .withArgs(activityIncorrect)
+                    .rejects({ name: 'ValidationError' })
+
+                try {
+                    return activityService.updateByChild(activityIncorrect)
+                } catch (err) {
+                    assert.property(err, 'message')
+                    assert.property(err, 'description')
+                    assert.propertyVal(err, 'message', 'Duration field is invalid...')
+                    assert.propertyVal(err, 'description', 'Physical Activity validation failed: The value provided has a negative value!')
+                }
+            })
+        })
+
+        context('when the physical activity is incorrect (calories is negative)', () => {
+            it('should throw a ValidationException', () => {
+                activityIncorrect = new PhysicalActivityMock()
+                activityIncorrect.calories = -200
+                sinon
+                    .mock(modelFake)
+                    .expects('findOneAndUpdate')
+                    .withArgs(activityIncorrect)
+                    .rejects({ name: 'ValidationError' })
+
+                try {
+                    return activityService.updateByChild(activityIncorrect)
+                } catch (err) {
+                    assert.property(err, 'message')
+                    assert.property(err, 'description')
+                    assert.propertyVal(err, 'message', 'Calories field is invalid...')
+                    assert.propertyVal(err, 'description', 'Physical Activity validation failed: The value provided has a negative value!')
+                }
+            })
+        })
+
+        context('when the physical activity is incorrect (steps is negative)', () => {
+            it('should throw a ValidationException', () => {
+                activityIncorrect = new PhysicalActivityMock()
+                activityIncorrect.calories = 200
+                activityIncorrect.steps = -1000
+                sinon
+                    .mock(modelFake)
+                    .expects('findOneAndUpdate')
+                    .withArgs(activityIncorrect)
+                    .rejects({ name: 'ValidationError' })
+
+                try {
+                    return activityService.updateByChild(activityIncorrect)
+                } catch (err) {
+                    assert.property(err, 'message')
+                    assert.property(err, 'description')
+                    assert.propertyVal(err, 'message', 'Steps field is invalid...')
+                    assert.propertyVal(err, 'description', 'Physical Activity validation failed: The value provided has a negative value!')
+                }
+            })
+        })
+
+        context('when the physical activity is incorrect (the levels array has an item with an invalid type)', () => {
+            it('should throw a ValidationException', () => {
+                activityJSON.levels[0].name = 'sedentaries'
+                activityJSON.levels[0].duration = Math.floor((Math.random() * 10) * 60000)
+                activityIncorrect = activityIncorrect.fromJSON(activityJSON)
+                sinon
+                    .mock(modelFake)
+                    .expects('findOneAndUpdate')
+                    .withArgs(activityIncorrect)
+                    .rejects({ name: 'ValidationError' })
+
+                try {
+                    return activityService.updateByChild(activityIncorrect)
+                } catch (err) {
+                    assert.property(err, 'message')
+                    assert.property(err, 'description')
+                    assert.propertyVal(err, 'message', 'The name of level provided "sedentaries" is not supported...')
+                    assert.propertyVal(err, 'description', 'The names of the allowed levels are: sedentary, lightly, fairly, very.')
+                }
+            })
+        })
+
+        context('when the physical activity is incorrect (the levels array has an item that contains empty fields)', () => {
+            it('should throw a ValidationException', () => {
+                activityJSON.levels[0].name = ''
+                activityJSON.levels[0].duration = undefined
+                activityIncorrect = activityIncorrect.fromJSON(activityJSON)
+                sinon
+                    .mock(modelFake)
+                    .expects('findOneAndUpdate')
+                    .withArgs(activityIncorrect)
+                    .rejects({ name: 'ValidationError' })
+
+                try {
+                    return activityService.updateByChild(activityIncorrect)
+                } catch (err) {
+                    assert.property(err, 'message')
+                    assert.property(err, 'description')
+                    assert.propertyVal(err, 'message', 'Level are not in a format that is supported!')
+                    assert.propertyVal(err, 'description', 'Must have values ​​for the following levels: sedentary, lightly, fairly, very.')
+                }
+            })
+        })
+
+        context('when the physical activity is incorrect (the levels array has an item that contains negative duration)', () => {
+            it('should throw a ValidationException', () => {
+                activityJSON.levels[0].name = ActivityLevelType.SEDENTARY
+                activityJSON.levels[0].duration = -(Math.floor((Math.random() * 10) * 60000))
+                activityIncorrect = activityIncorrect.fromJSON(activityJSON)
+                sinon
+                    .mock(modelFake)
+                    .expects('findOneAndUpdate')
+                    .withArgs(activityIncorrect)
+                    .rejects({ name: 'ValidationError' })
+
+                try {
+                    return activityService.updateByChild(activityIncorrect)
+                } catch (err) {
+                    assert.property(err, 'message')
+                    assert.property(err, 'description')
+                    assert.propertyVal(err, 'message', 'Some (or several) duration field of levels array is invalid...')
+                    assert.propertyVal(err, 'description', 'Physical Activity Level validation failed: The value provided ' +
+                        'has a negative value!')
+                }
+            })
+        })
     })
 
+    /**
+     * Method removeByChild(activityId: string, childId: string)
+     */
     describe('removeByChild(activityId: string, childId: string)', () => {
         context('when there is physical activity with the received parameters', () => {
             it('should return true', () => {
@@ -469,51 +852,52 @@ describe('Services: PhysicalActivityService', () => {
             })
         })
 
-        context('when the physical activity id is invalid', () => {
+        context('when the physical activity is incorrect (child_id is invalid)', () => {
             it('should throw a ValidationException', () => {
-                activity.id = '5a62be07de34500146d9c5442'       // Make activity id invalid
+                activityIncorrect.child_id = '5a62be07de34500146d9c5442'     // Make child_id invalid
                 const query: IQuery = new Query()
                 query.filters = {
-                    _id: activity.id,
-                    child_id: activity.child_id
+                    _id: activityIncorrect.id,
+                    child_id: activityIncorrect.child_id
                 }
                 sinon
                     .mock(modelFake)
                     .expects('deleteOne')
-                    .withArgs(activity.id)
+                    .withArgs(activityIncorrect.id)
                     .rejects({ name: 'ValidationError' })
 
                 try {
-                    return activityService.removeByChild(activity.id!, activity.child_id)
+                    return activityService.removeByChild(activityIncorrect.id!, activityIncorrect.child_id)
                 } catch (err) {
                     assert.property(err, 'message')
                     assert.property(err, 'description')
-                    assert.propertyVal(err, 'message', Strings.PHYSICAL_ACTIVITY.PARAM_ID_NOT_VALID_FORMAT)
+                    assert.propertyVal(err, 'message', Strings.CHILD.PARAM_ID_NOT_VALID_FORMAT)
                     assert.propertyVal(err, 'description', Strings.ERROR_MESSAGE.UUID_NOT_VALID_FORMAT_DESC)
                 }
             })
         })
 
-        context('when the physical activity child_id is invalid', () => {
+        context('when the physical activity is incorrect (id is invalid)', () => {
             it('should throw a ValidationException', () => {
-                activity.child_id = '5a62be07de34500146d9c5442'     // Make child_id invalid
+                activityIncorrect = new PhysicalActivityMock()
+                activityIncorrect.id = '5a62be07de34500146d9c5442'       // Make activity id invalid
                 const query: IQuery = new Query()
                 query.filters = {
-                    _id: activity.id,
-                    child_id: activity.child_id
+                    _id: activityIncorrect.id,
+                    child_id: activityIncorrect.child_id
                 }
                 sinon
                     .mock(modelFake)
                     .expects('deleteOne')
-                    .withArgs(activity.id)
+                    .withArgs(activityIncorrect.id)
                     .rejects({ name: 'ValidationError' })
 
                 try {
-                    return activityService.removeByChild(activity.id!, activity.child_id)
+                    return activityService.removeByChild(activityIncorrect.id!, activityIncorrect.child_id)
                 } catch (err) {
                     assert.property(err, 'message')
                     assert.property(err, 'description')
-                    assert.propertyVal(err, 'message', Strings.CHILD.PARAM_ID_NOT_VALID_FORMAT)
+                    assert.propertyVal(err, 'message', Strings.PHYSICAL_ACTIVITY.PARAM_ID_NOT_VALID_FORMAT)
                     assert.propertyVal(err, 'description', Strings.ERROR_MESSAGE.UUID_NOT_VALID_FORMAT_DESC)
                 }
             })

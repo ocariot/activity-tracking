@@ -27,7 +27,7 @@ describe('Validators: CreateActivity', () => {
                     assert.property(err, 'message')
                     assert.property(err, 'description')
                     assert.equal(err.message, 'Required fields were not provided...')
-                    assert.equal(err.description, 'Physical Activity validation failed: start_time is required!')
+                    assert.equal(err.description, 'Activity validation failed: start_time is required!')
                 }
             })
         })
@@ -43,7 +43,7 @@ describe('Validators: CreateActivity', () => {
                     assert.property(err, 'message')
                     assert.property(err, 'description')
                     assert.equal(err.message, 'Required fields were not provided...')
-                    assert.equal(err.description, 'Physical Activity validation failed: start_time, end_time, ' +
+                    assert.equal(err.description, 'Activity validation failed: start_time, end_time, ' +
                         'duration, child_id is required!')
                 }
             })
@@ -92,7 +92,7 @@ describe('Validators: CreateActivity', () => {
                     assert.property(err, 'message')
                     assert.property(err, 'description')
                     assert.equal(err.message, 'Duration field is invalid...')
-                    assert.equal(err.description, 'Physical Activity validation failed: '.concat(Strings.ERROR_MESSAGE.NEGATIVE_PARAMETER))
+                    assert.equal(err.description, 'Activity validation failed: '.concat(Strings.ERROR_MESSAGE.NEGATIVE_PARAMETER))
                 }
                 activity.duration = 1178000
             })

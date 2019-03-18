@@ -13,7 +13,7 @@ export class CreateActivityValidator {
         if (activity.duration === undefined) fields.push('duration')
         else if (activity.duration < 0) {
             throw new ValidationException('Duration field is invalid...',
-                'Physical Activity validation failed: '.concat(Strings.ERROR_MESSAGE.NEGATIVE_PARAMETER))
+                'Activity validation failed: '.concat(Strings.ERROR_MESSAGE.NEGATIVE_PARAMETER))
         }
         else {
             if (activity.start_time && activity.end_time) {
@@ -34,7 +34,7 @@ export class CreateActivityValidator {
 
         if (fields.length > 0) {
             throw new ValidationException('Required fields were not provided...',
-                'Physical Activity validation failed: '.concat(fields.join(', ')).concat(' is required!'))
+                'Activity validation failed: '.concat(fields.join(', ')).concat(' is required!'))
         }
     }
 }

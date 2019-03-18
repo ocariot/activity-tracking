@@ -29,7 +29,7 @@ describe('Validators: CreatePhysicalActivity', () => {
                     assert.property(err, 'message')
                     assert.property(err, 'description')
                     assert.equal(err.message, 'Required fields were not provided...')
-                    assert.equal(err.description, 'Physical Activity validation failed: start_time is required!')
+                    assert.equal(err.description, 'Activity validation failed: start_time is required!')
                 }
             })
         })
@@ -45,7 +45,7 @@ describe('Validators: CreatePhysicalActivity', () => {
                     assert.property(err, 'message')
                     assert.property(err, 'description')
                     assert.equal(err.message, 'Required fields were not provided...')
-                    assert.equal(err.description, 'Physical Activity validation failed: start_time, end_time, duration, ' +
+                    assert.equal(err.description, 'Activity validation failed: start_time, end_time, duration, ' +
                         'child_id is required!')
                 }
             })
@@ -94,7 +94,7 @@ describe('Validators: CreatePhysicalActivity', () => {
                     assert.property(err, 'message')
                     assert.property(err, 'description')
                     assert.equal(err.message, 'Duration field is invalid...')
-                    assert.equal(err.description, 'Physical Activity validation failed: '.concat(Strings.ERROR_MESSAGE.NEGATIVE_PARAMETER))
+                    assert.equal(err.description, 'Activity validation failed: '.concat(Strings.ERROR_MESSAGE.NEGATIVE_PARAMETER))
                 }
                 activity.duration = 1178000
             })
@@ -272,7 +272,7 @@ describe('Validators: CreatePhysicalActivity', () => {
 
         context('when the physical activity has an invalid level (there is a negative duration)', () => {
             it('should throw a ValidationException', () => {
-                if (activity.levels) activity.levels[1].duration = -100
+                if (activity.levels) activity.levels[1].duration = -60000
                 try {
                     CreatePhysicalActivityValidator.validate(activity)
                 } catch (err) {

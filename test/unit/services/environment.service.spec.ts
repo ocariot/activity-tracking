@@ -16,11 +16,14 @@ import { ConnectionFactoryRabbitmqMock } from '../../mocks/connection.factory.ra
 import { IQuery } from '../../../src/application/port/query.interface'
 import { Query } from '../../../src/infrastructure/repository/query/query'
 import { Strings } from '../../../src/utils/strings'
+import { Environment } from '../../../src/application/domain/model/environment'
+import { Measurement, MeasurementType } from '../../../src/application/domain/model/measurement'
 
 require('sinon-mongoose')
 
 describe('Services: Environment', () => {
     const environment: EnvironmentMock = new EnvironmentMock()
+    let environmentIncorrect: Environment = new Environment()
     const environmentArr: Array<EnvironmentMock> = new Array<EnvironmentMock>()
     for (let i = 0; i < 3; i++) {
         environmentArr.push(new EnvironmentMock())
@@ -41,6 +44,9 @@ describe('Services: Environment', () => {
         sinon.restore()
     })
 
+    /**
+     * Method "add(environment: Environment)"
+     */
     describe('add(environment: Environment)', () => {
         context('when the Environment is correct, it still does not exist in the repository and there is a connection ' +
             'to the RabbitMQ', () => {
@@ -77,6 +83,7 @@ describe('Services: Environment', () => {
 
         context('when the Environment is correct but already exists in the repository', () => {
             it('should throw a ConflictException', async () => {
+                environment.id = '507f1f77bcf86cd799439011'         // Make mock return true
                 sinon
                     .mock(modelFake)
                     .expects('create')
@@ -90,8 +97,133 @@ describe('Services: Environment', () => {
                     })
             })
         })
+
+        context('when the Environment is incorrect (missing fields)', () => {
+            it('should throw a ValidationException', async () => {
+                sinon
+                    .mock(modelFake)
+                    .expects('create')
+                    .withArgs(environmentIncorrect)
+                    .rejects({ name: 'ValidationError' })
+
+                return await environmentService.add(environmentIncorrect)
+                    .catch(err => {
+                        assert.property(err, 'message')
+                        assert.propertyVal(err, 'message', 'Required fields were not provided...')
+                        assert.property(err, 'description')
+                        assert.propertyVal(err, 'description', 'Validation of environment measurements failed: timestamp, ' +
+                            'institution_id, location, measurements required!')
+                    })
+            })
+        })
+
+        context('when the Environment is incorrect (the institution_id is invalid)', () => {
+            it('should throw a ValidationException', async () => {
+                environmentIncorrect = new EnvironmentMock()
+                environmentIncorrect.institution_id = '507f1f77bcf86cd7994390112'
+                sinon
+                    .mock(modelFake)
+                    .expects('create')
+                    .withArgs(environmentIncorrect)
+                    .rejects({ name: 'ValidationError' })
+
+                return await environmentService.add(environmentIncorrect)
+                    .catch(err => {
+                        assert.property(err, 'message')
+                        assert.propertyVal(err, 'message', Strings.ERROR_MESSAGE.UUID_NOT_VALID_FORMAT)
+                        assert.property(err, 'description')
+                        assert.propertyVal(err, 'description', Strings.ERROR_MESSAGE.UUID_NOT_VALID_FORMAT_DESC)
+                    })
+            })
+        })
+
+        context('when the Environment is incorrect (the location is invalid)', () => {
+            it('should throw a ValidationException', async () => {
+                environmentIncorrect.institution_id = '507f1f77bcf86cd799439011'
+                environmentIncorrect.location!.local = ''
+                environmentIncorrect.location!.room = ''
+                sinon
+                    .mock(modelFake)
+                    .expects('create')
+                    .withArgs(environmentIncorrect)
+                    .rejects({ name: 'ValidationError' })
+
+                return await environmentService.add(environmentIncorrect)
+                    .catch(err => {
+                        assert.property(err, 'message')
+                        assert.propertyVal(err, 'message', 'Location are not in a format that is supported...')
+                        assert.property(err, 'description')
+                        assert.propertyVal(err, 'description', 'Validation of location failed: location local, location room is required!')
+                    })
+            })
+        })
+
+        context('when the Environment is incorrect (the measurements array is empty)', () => {
+            it('should throw a ValidationException', async () => {
+                environmentIncorrect.location!.local = 'Indoor'
+                environmentIncorrect.location!.room = 'Room 01'
+                environmentIncorrect.measurements = new Array<Measurement>()
+                sinon
+                    .mock(modelFake)
+                    .expects('create')
+                    .withArgs(environmentIncorrect)
+                    .rejects({ name: 'ValidationError' })
+
+                return await environmentService.add(environmentIncorrect)
+                    .catch(err => {
+                        assert.property(err, 'message')
+                        assert.propertyVal(err, 'message', 'Measurement are not in a format that is supported!')
+                        assert.property(err, 'description')
+                        assert.propertyVal(err, 'description', 'The measurements collection must not be empty!')
+                    })
+            })
+        })
+
+        context('when the Environment is incorrect (the measurements array has an item with invalid type)', () => {
+            it('should throw a ValidationException', async () => {
+                environmentIncorrect.measurements = [new Measurement(MeasurementType.HUMIDITY, 34, '%'),
+                                            new Measurement('Temperatures', 40, '°C')]
+                sinon
+                    .mock(modelFake)
+                    .expects('create')
+                    .withArgs(environmentIncorrect)
+                    .rejects({ name: 'ValidationError' })
+
+                return await environmentService.add(environmentIncorrect)
+                    .catch(err => {
+                        assert.property(err, 'message')
+                        assert.propertyVal(err, 'message', 'The type of measurement provided "temperatures" is not supported...')
+                        assert.property(err, 'description')
+                        assert.propertyVal(err, 'description', 'The types allowed are: temperature, humidity.')
+                    })
+            })
+        })
+
+        context('when the Environment is incorrect (the measurements array has an item with empty fields)', () => {
+            it('should throw a ValidationException', async () => {
+                environmentIncorrect.measurements = [new Measurement(MeasurementType.HUMIDITY, 34, '%'),
+                                            new Measurement()]
+                sinon
+                    .mock(modelFake)
+                    .expects('create')
+                    .withArgs(environmentIncorrect)
+                    .rejects({ name: 'ValidationError' })
+
+                return await environmentService.add(environmentIncorrect)
+                    .catch(err => {
+                        assert.property(err, 'message')
+                        assert.propertyVal(err, 'message', 'Measurement are not in a format that is supported!')
+                        assert.property(err, 'description')
+                        assert.propertyVal(err, 'description', 'Validation of measurements failed: measurement type, ' +
+                            'measurement value, measurement unit is required!')
+                    })
+            })
+        })
     })
 
+    /**
+     * Method "getAll(query: IQuery)"
+     */
     describe('getAll(query: IQuery)', () => {
         context('when there is at least one environment object in the database that matches the query filters', () => {
             it('should return an Environment array', () => {
@@ -146,6 +278,9 @@ describe('Services: Environment', () => {
         })
     })
 
+    /**
+     * Method "remove(id: string)"
+     */
     describe('remove(id: string)', () => {
         context('when there is an environment with the id used as parameter', () => {
             it('should return true', () => {
