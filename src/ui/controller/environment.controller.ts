@@ -6,7 +6,6 @@ import { Identifier } from '../../di/identifiers'
 import { ApiExceptionManager } from '../exception/api.exception.manager'
 import { ILogger } from '../../utils/custom.logger'
 import { IEnvironmentService } from '../../application/port/environment.service.interface'
-import { ApiException } from '../exception/api.exception'
 import { Environment } from '../../application/domain/model/environment'
 import { Query } from '../../infrastructure/repository/query/query'
 
@@ -80,24 +79,12 @@ export class EnvironmentController {
     @httpDelete('/:environment_id')
     public async removeEnvironmentById(@request() req: Request, @response() res: Response): Promise<Response> {
         try {
-            const result: boolean = await this._environmentService.remove(req.params.environment_id)
-            if (!result) return res.status(HttpStatus.NOT_FOUND).send(this.getMessageEnvironmentNotFound())
+            await this._environmentService.remove(req.params.environment_id)
             return res.status(HttpStatus.NO_CONTENT).send()
         } catch (err) {
             const handlerError = ApiExceptionManager.build(err)
             return res.status(handlerError.code)
                 .send(handlerError.toJson())
         }
-    }
-
-    /**
-     * Default message when resource is not found or does not exist.
-     */
-    private getMessageEnvironmentNotFound(): object {
-        return new ApiException(
-            HttpStatus.NOT_FOUND,
-            'Measurement of environment not found!',
-            'Measurement of environment not found or already removed. A new operation for the same resource is not required!'
-        ).toJson()
     }
 }

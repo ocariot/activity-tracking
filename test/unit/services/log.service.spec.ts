@@ -83,7 +83,7 @@ describe('Services: Log', () => {
         })
 
         context('when all the logs in the array are correct and already exist in the repository', () => {
-            it('should update the value of itens in the repository and return a response of type MultiStatus<Log> with the description ' +
+            it('should update the value of items in the repository and return a response of type MultiStatus<Log> with the description ' +
                 'of success in sending each log', async () => {
                 correctLogsArr.forEach(elem => {
                     elem.date = '2018-03-10'
@@ -105,7 +105,7 @@ describe('Services: Log', () => {
         })
 
         context('when all the logs in the array are correct and some of them already exist in the repository', () => {
-            it('should update the value of the existing itens already in the repository, create the new ones, and return a ' +
+            it('should update the value of the existing items already in the repository, create the new ones, and return a ' +
                 'response of type MultiStatus<Log> with the description of success in sending each log', async () => {
                 correctLogsArr.push(LogMock.generateLog())
                 sinon
