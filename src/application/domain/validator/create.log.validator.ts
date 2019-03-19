@@ -3,6 +3,7 @@ import { Strings } from '../../../utils/strings'
 import { Log } from '../model/log'
 import { LogTypeValidator } from './log.type.validator'
 import { ObjectIdValidator } from './object.id.validator'
+import { DateValidator } from './date.validator'
 
 export class CreateLogValidator {
     public static validate(activityLog: Log): void | ValidationException {
@@ -12,6 +13,7 @@ export class CreateLogValidator {
         if (!activityLog.type) fields.push('type')
         else LogTypeValidator.validate((activityLog.type))
         if (!activityLog.date) fields.push('date')
+        else DateValidator.validate(activityLog.date)
         if (activityLog.value === undefined) fields.push('value')
         else if (activityLog.value < 0) {
             throw new ValidationException('Value field is invalid...',

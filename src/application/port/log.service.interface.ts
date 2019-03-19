@@ -30,7 +30,7 @@ export interface ILogService extends IService<Log> {
      * @return {Promise<PhysicalActivityLog>}
      * @throws {RepositoryException}
      */
-    getByChildAndDate(childId: string, dateStart: Date, dateEnd: Date, query: IQuery): Promise<PhysicalActivityLog>
+    getByChildAndDate(childId: string, dateStart: string, dateEnd: string, query: IQuery): Promise<PhysicalActivityLog>
 
     /**
      * List the physical activities logs with information on the total steps or calories of a child in a given period
@@ -43,6 +43,6 @@ export interface ILogService extends IService<Log> {
      * @return {Promise<Array<Log>>}
      * @throws {RepositoryException}
      */
-    getByChildResourceAndDate(childId: string, desiredResource: LogType, dateStart: Date,
-                              dateEnd: Date, query: IQuery): Promise<Array<Log>>
+    getByChildResourceAndDate(childId: string, desiredResource: LogType, dateStart: string,
+                              dateEnd: string, query: IQuery): Promise<Array<Log>>
 }

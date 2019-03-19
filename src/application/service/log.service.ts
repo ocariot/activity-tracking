@@ -44,34 +44,32 @@ export class LogService implements ILogService {
 
         for (const elem of activityLogs) {
             try {
-                // 1. Validate the resource.
-                LogTypeValidator.validate(elem.type)
-                // 2. Validate the object.
+                // 1. Validate the object.
                 CreateLogValidator.validate(elem)
 
-                // 3. Build a query.
+                // 2. Build a query.
                 const query: IQuery = new Query()
                 query.filters = {
                     type: elem.type,
                     date: elem.date.concat('T00:00:00')
                 }
 
-                // 4. Check if it already exists in the database.
+                // 3. Check if it already exists in the database.
                 const log = await this._logRepository.findOne(query)
 
                 if (log) { // If exists.
-                    // 5a. Update physical activity log.
+                    // 4a. Update physical activity log.
                     log.value += elem.value
                     await this._logRepository.update(log)
 
-                    // 6a. Create a StatusSuccess object for the construction of the MultiStatus response.
+                    // 5a. Create a StatusSuccess object for the construction of the MultiStatus response.
                     const statusSuccess: StatusSuccess<Log> = new StatusSuccess<Log>(HttpStatus.CREATED, elem)
                     statusSuccessArr.push(statusSuccess)
                 } else {
-                    // 5b. Create new physical activity log.
+                    // 4b. Create new physical activity log.
                     await this._logRepository.create(elem)
 
-                    // 6b. Create a StatusSuccess object for the construction of the MultiStatus response.
+                    // 5b. Create a StatusSuccess object for the construction of the MultiStatus response.
                     const statusSuccess: StatusSuccess<Log> = new StatusSuccess<Log>(HttpStatus.CREATED, elem)
                     statusSuccessArr.push(statusSuccess)
                 }
@@ -80,17 +78,17 @@ export class LogService implements ILogService {
                 if (err instanceof ValidationException) statusCode = HttpStatus.BAD_REQUEST
                 if (err instanceof ConflictException) statusCode = HttpStatus.CONFLICT
 
-                // 6c. Create a StatusError object for the construction of the MultiStatus response.
+                // 5c. Create a StatusError object for the construction of the MultiStatus response.
                 const statusError: StatusError<Log> = new StatusError<Log>(statusCode, err.message, err.description, elem)
                 statusErrorArr.push(statusError)
             }
         }
 
-        // 7. Build the MultiStatus response.
+        // 6. Build the MultiStatus response.
         multiStatus.success = statusSuccessArr
         multiStatus.error = statusErrorArr
 
-        // 8. Returns the created object.
+        // 7. Returns the created object.
         return Promise.resolve(multiStatus)
     }
 
@@ -127,7 +125,7 @@ export class LogService implements ILogService {
      * @return {Promise<PhysicalActivityLog>}
      * @throws {RepositoryException}
      */
-    public async getByChildAndDate(childId: string, dateStart: Date, dateEnd: Date, query: IQuery): Promise<PhysicalActivityLog> {
+    public async getByChildAndDate(childId: string, dateStart: string, dateEnd: string, query: IQuery): Promise<PhysicalActivityLog> {
         ObjectIdValidator.validate(childId, Strings.CHILD.PARAM_ID_NOT_VALID_FORMAT)
         DateValidator.validate(dateStart.toString())
         DateValidator.validate(dateEnd.toString())
@@ -172,19 +170,19 @@ export class LogService implements ILogService {
      * @return {Promise<Array<Log>>}
      * @throws {RepositoryException}
      */
-    public getByChildResourceAndDate(childId: string, desiredResource: LogType, dateStart: Date,
-                                     dateEnd: Date, query: IQuery): Promise<Array<Log>> {
+    public getByChildResourceAndDate(childId: string, desiredResource: LogType, dateStart: string,
+                                     dateEnd: string, query: IQuery): Promise<Array<Log>> {
         ObjectIdValidator.validate(childId, Strings.CHILD.PARAM_ID_NOT_VALID_FORMAT)
         LogTypeValidator.validate(desiredResource)
-        DateValidator.validate(dateStart.toString())
-        DateValidator.validate(dateEnd.toString())
+        DateValidator.validate(dateStart)
+        DateValidator.validate(dateEnd)
 
         query.addFilter({
             child_id: childId,
             type: desiredResource,
             $and: [
-                { date: { $lte: dateEnd.toString().concat('T00:00:00') } },
-                { date: { $gte: dateStart.toString().concat('T00:00:00') } }
+                { date: { $lte: dateEnd.concat('T00:00:00') } },
+                { date: { $gte: dateStart.concat('T00:00:00') } }
             ]
         })
 

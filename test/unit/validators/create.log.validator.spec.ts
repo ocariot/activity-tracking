@@ -68,6 +68,30 @@ describe('Validators: CreateLog', () => {
             })
         })
 
+        context('When the log has a invalid date', () => {
+            it('should throw a ValidationException', () => {
+                // Mock through JSON
+                const logJSON: any = {
+                    date: '20199-03-11',
+                    value: 1000,
+                    type: LogType.STEPS,
+                    child_id: '5a62be07de34500146d9c544',
+                }
+
+                let logTest: Log = new Log()
+                logTest = logTest.fromJSON(logJSON)
+
+                try {
+                    CreateLogValidator.validate(logTest)
+                } catch (err) {
+                    assert.property(err, 'message')
+                    assert.property(err, 'description')
+                    assert.equal(err.message, 'Date parameter: 20199-03-11, is not in valid ISO 8601 format.')
+                    assert.equal(err.description, 'Date must be in the format: yyyy-MM-dd')
+                }
+            })
+        })
+
         context('When the log has a negative value', () => {
             it('should throw a ValidationException', () => {
                 log.date = '2019-03-11'

@@ -24,8 +24,7 @@ export class LogMock {
 
     private static generateDate(): string {
         const date = new Date()
-        const dateReturn = `${date.getFullYear()}-${date.getMonth() + 1}-${date.getDate()}`
-        return dateReturn
+        return `${date.getFullYear()}-${date.getMonth() + 1}-${date.getDate()}`
     }
 
     private static generateType() {

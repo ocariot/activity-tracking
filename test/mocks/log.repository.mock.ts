@@ -17,15 +17,16 @@ export class LogRepositoryMock implements ILogRepository {
     }
 
     public find(query: any): Promise<Array<Log>> {
+        const logsArr: Array<Log> = new Array<Log>()
         const child_id: string = query.filters.child_id
-        const sleepArr: Array<Log> = new Array<Log>()
-        // Only for the test case that returns a filled array
+        // Only for the test case that returns a filled PhysicalActivityLog
         if (!(child_id === '507f1f77bcf86cd799439011')) {
-            for (let i = 0; i < 3; i++) {
-                sleepArr.push(LogMock.generateLog())
+            // Mock correct logs array
+            for (let i = 0; i < 5; i++ ) {
+                logsArr.push(LogMock.generateLog())
             }
         }
-        return Promise.resolve(sleepArr)
+        return Promise.resolve(logsArr)
     }
 
     public findOne(query: any): Promise<Log> {
