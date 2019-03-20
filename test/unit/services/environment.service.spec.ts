@@ -50,14 +50,14 @@ describe('Services: Environment', () => {
     describe('add(environment: Environment)', () => {
         context('when the Environment is correct, it still does not exist in the repository and there is a connection ' +
             'to the RabbitMQ', () => {
-            it('should return the Environment that was added', async () => {
+            it('should return the Environment that was added', () => {
                 sinon
                     .mock(modelFake)
                     .expects('create')
                     .withArgs(environment)
                     .resolves(environment)
 
-                return await environmentService.add(environment)
+                return environmentService.add(environment)
                     .then(result => {
                         assert(result, 'result must not be undefined')
                     })
@@ -66,7 +66,7 @@ describe('Services: Environment', () => {
 
         context('when the Environment is correct and does not yet exist in the repository but there is no connection ' +
             'to the RabbitMQ', () => {
-            it('should return the Environment that was saved', async () => {
+            it('should return the Environment that was saved', () => {
                 connectionRabbitmqPub.isConnected = false
                 sinon
                     .mock(modelFake)
@@ -74,7 +74,7 @@ describe('Services: Environment', () => {
                     .withArgs(environment)
                     .resolves(environment)
 
-                return await environmentService.add(environment)
+                return environmentService.add(environment)
                     .then(result => {
                         assert(result, 'result must not be undefined')
                     })
@@ -82,7 +82,7 @@ describe('Services: Environment', () => {
         })
 
         context('when the Environment is correct but already exists in the repository', () => {
-            it('should throw a ConflictException', async () => {
+            it('should throw a ConflictException', () => {
                 environment.id = '507f1f77bcf86cd799439011'         // Make mock return true
                 sinon
                     .mock(modelFake)
@@ -90,7 +90,7 @@ describe('Services: Environment', () => {
                     .withArgs(environment)
                     .rejects({ name: 'ConflictError' })
 
-                return await environmentService.add(environment)
+                return environmentService.add(environment)
                     .catch(err => {
                         assert.property(err, 'message')
                         assert.propertyVal(err, 'message', 'Measurement of environment is already registered...')
@@ -99,14 +99,14 @@ describe('Services: Environment', () => {
         })
 
         context('when the Environment is incorrect (missing fields)', () => {
-            it('should throw a ValidationException', async () => {
+            it('should throw a ValidationException', () => {
                 sinon
                     .mock(modelFake)
                     .expects('create')
                     .withArgs(environmentIncorrect)
                     .rejects({ name: 'ValidationError' })
 
-                return await environmentService.add(environmentIncorrect)
+                return environmentService.add(environmentIncorrect)
                     .catch(err => {
                         assert.property(err, 'message')
                         assert.propertyVal(err, 'message', 'Required fields were not provided...')
@@ -118,7 +118,7 @@ describe('Services: Environment', () => {
         })
 
         context('when the Environment is incorrect (the institution_id is invalid)', () => {
-            it('should throw a ValidationException', async () => {
+            it('should throw a ValidationException', () => {
                 environmentIncorrect = new EnvironmentMock()
                 environmentIncorrect.institution_id = '507f1f77bcf86cd7994390112'
                 sinon
@@ -127,7 +127,7 @@ describe('Services: Environment', () => {
                     .withArgs(environmentIncorrect)
                     .rejects({ name: 'ValidationError' })
 
-                return await environmentService.add(environmentIncorrect)
+                return environmentService.add(environmentIncorrect)
                     .catch(err => {
                         assert.property(err, 'message')
                         assert.propertyVal(err, 'message', Strings.ERROR_MESSAGE.UUID_NOT_VALID_FORMAT)
@@ -138,7 +138,7 @@ describe('Services: Environment', () => {
         })
 
         context('when the Environment is incorrect (the location is invalid)', () => {
-            it('should throw a ValidationException', async () => {
+            it('should throw a ValidationException', () => {
                 environmentIncorrect.institution_id = '507f1f77bcf86cd799439011'
                 environmentIncorrect.location!.local = ''
                 environmentIncorrect.location!.room = ''
@@ -148,7 +148,7 @@ describe('Services: Environment', () => {
                     .withArgs(environmentIncorrect)
                     .rejects({ name: 'ValidationError' })
 
-                return await environmentService.add(environmentIncorrect)
+                return environmentService.add(environmentIncorrect)
                     .catch(err => {
                         assert.property(err, 'message')
                         assert.propertyVal(err, 'message', 'Location are not in a format that is supported...')
@@ -159,7 +159,7 @@ describe('Services: Environment', () => {
         })
 
         context('when the Environment is incorrect (the measurements array is empty)', () => {
-            it('should throw a ValidationException', async () => {
+            it('should throw a ValidationException', () => {
                 environmentIncorrect.location!.local = 'Indoor'
                 environmentIncorrect.location!.room = 'Room 01'
                 environmentIncorrect.measurements = new Array<Measurement>()
@@ -169,7 +169,7 @@ describe('Services: Environment', () => {
                     .withArgs(environmentIncorrect)
                     .rejects({ name: 'ValidationError' })
 
-                return await environmentService.add(environmentIncorrect)
+                return environmentService.add(environmentIncorrect)
                     .catch(err => {
                         assert.property(err, 'message')
                         assert.propertyVal(err, 'message', 'Measurement are not in a format that is supported!')
@@ -180,7 +180,7 @@ describe('Services: Environment', () => {
         })
 
         context('when the Environment is incorrect (the measurements array has an item with invalid type)', () => {
-            it('should throw a ValidationException', async () => {
+            it('should throw a ValidationException', () => {
                 environmentIncorrect.measurements = [new Measurement(MeasurementType.HUMIDITY, 34, '%'),
                                             new Measurement('Temperatures', 40, '°C')]
                 sinon
@@ -189,7 +189,7 @@ describe('Services: Environment', () => {
                     .withArgs(environmentIncorrect)
                     .rejects({ name: 'ValidationError' })
 
-                return await environmentService.add(environmentIncorrect)
+                return environmentService.add(environmentIncorrect)
                     .catch(err => {
                         assert.property(err, 'message')
                         assert.propertyVal(err, 'message', 'The type of measurement provided "temperatures" is not supported...')
@@ -200,7 +200,7 @@ describe('Services: Environment', () => {
         })
 
         context('when the Environment is incorrect (the measurements array has an item with empty fields)', () => {
-            it('should throw a ValidationException', async () => {
+            it('should throw a ValidationException', () => {
                 environmentIncorrect.measurements = [new Measurement(MeasurementType.HUMIDITY, 34, '%'),
                                             new Measurement()]
                 sinon
@@ -209,7 +209,7 @@ describe('Services: Environment', () => {
                     .withArgs(environmentIncorrect)
                     .rejects({ name: 'ValidationError' })
 
-                return await environmentService.add(environmentIncorrect)
+                return environmentService.add(environmentIncorrect)
                     .catch(err => {
                         assert.property(err, 'message')
                         assert.propertyVal(err, 'message', 'Measurement are not in a format that is supported!')

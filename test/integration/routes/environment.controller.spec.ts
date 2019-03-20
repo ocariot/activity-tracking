@@ -9,29 +9,22 @@ import { Location } from '../../../src/application/domain/model/location'
 import { expect } from 'chai'
 import { Measurement, MeasurementType } from '../../../src/application/domain/model/measurement'
 import { EnvironmentRepoModel } from '../../../src/infrastructure/database/schema/environment.schema'
+import { Strings } from '../../../src/utils/strings'
 
 const container: Container = DI.getInstance().getContainer()
-const backgroundServices: BackgroundService = DI.getInstance().getContainer().get(Identifier.BACKGROUND_SERVICE)
+const backgroundServices: BackgroundService = container.get(Identifier.BACKGROUND_SERVICE)
 const app: App = container.get(Identifier.APP)
 const request = require('supertest')(app.getExpress())
 
-describe('Routes: Environments', () => {
+describe('Routes: environments', () => {
 
     const defaultEnvironment: Environment = new EnvironmentMock()
 
     before(async () => {
         try {
-            backgroundServices.startServices()
+            await backgroundServices.startServices()
         } catch (err) {
-            throw new Error('Failure on Environment routes test: ' + err.message)
-        }
-    })
-
-    after(async () => {
-        try {
-            backgroundServices.stopServices()
-        } catch (err) {
-            throw new Error('Failure on Environment routes test: ' + err.message)
+            throw new Error('Failure on environments routes test: ' + err.message)
         }
     })
 
@@ -123,7 +116,7 @@ describe('Routes: Environments', () => {
         })
 
         context('when a validation error occurs (institution_id is invalid)', () => {
-            it('should return status code 400 and info message about invalid parameters', () => {
+            it('should return status code 400 and info message about invalid institution_id', () => {
                 const body = {
                     institution_id: '5a62be07de34500146d9c5442',
                     location: defaultEnvironment.location,
@@ -148,7 +141,7 @@ describe('Routes: Environments', () => {
             })
         })
 
-        context('when a validation error occurs (location is invalid)', () => {
+        context('when a validation error occurs (location is invalid, missing required fields)', () => {
             it('should return status code 400 and info message about invalid parameters', () => {
                 const body = {
                     institution_id: defaultEnvironment.institution_id,
@@ -233,35 +226,7 @@ describe('Routes: Environments', () => {
                     institution_id: defaultEnvironment.institution_id,
                     location: defaultEnvironment.location,
                     measurements: [ new Measurement(MeasurementType.HUMIDITY, 34, '%'),
-                                    new Measurement()],
-                    climatized: defaultEnvironment.climatized,
-                    timestamp: defaultEnvironment.timestamp
-                }
-
-                return request
-                    .post('/environments')
-                    .send(body)
-                    .set('Content-Type', 'application/json')
-                    .expect(400)
-                    .then(err => {
-                        expect(err.body).to.have.property('code')
-                        expect(err.body.code).to.eql(400)
-                        expect(err.body).to.have.property('message')
-                        expect(err.body.message).to.eql('Measurement are not in a format that is supported!')
-                        expect(err.body).to.have.property('description')
-                        expect(err.body.description).to.eql('Validation of measurements failed: measurement type, ' +
-                            'measurement value, measurement unit is required!')
-                    })
-            })
-        })
-
-        context('when a validation error occurs (measurements array has an item that has missing required fields)', () => {
-            it('should return status code 400 and info message about invalid parameters', () => {
-                const body = {
-                    institution_id: defaultEnvironment.institution_id,
-                    location: defaultEnvironment.location,
-                    measurements: [ new Measurement(MeasurementType.HUMIDITY, 34, '%'),
-                                    new Measurement()],
+                        new Measurement()],
                     climatized: defaultEnvironment.climatized,
                     timestamp: defaultEnvironment.timestamp
                 }
@@ -292,6 +257,9 @@ describe('Routes: Environments', () => {
                     .set('Content-Type', 'application/json')
                     .expect(200)
                     .then(res => {
+                        // Check for the existence of properties only in the first element of the array
+                        // because there is a guarantee that there will be at least one object, which was
+                        // created in the case of POST route success test
                         expect(res.body).is.an.instanceOf(Array)
                         expect(res.body.length).to.not.eql(0)
                         expect(res.body[0]).to.have.property('id')
@@ -317,8 +285,26 @@ describe('Routes: Environments', () => {
             })
         })
 
+        context('when there are no environment in the database', () => {
+            it('should return status code 200 and an empty list', async () => {
+                try {
+                    await deleteAllEnvironments({})
+                } catch (err) { //
+                }
+
+                return request
+                    .get('/environments')
+                    .set('Content-Type', 'application/json')
+                    .expect(200)
+                    .then(res => {
+                        expect(res.body).is.an.instanceOf(Array)
+                        expect(res.body.length).to.eql(0)
+                    })
+            })
+        })
+
         context('when get environment using the "query-strings-parser" library', () => {
-            it('should return the result as needed in the query', async () => {
+            it('should return status code 200 and the result as needed in the query', async () => {
                 await createEnvironment({
                     institution_id: defaultEnvironment.institution_id,
                     location: {
@@ -367,7 +353,7 @@ describe('Routes: Environments', () => {
                     timestamp: defaultEnvironment.timestamp
                 })
 
-                const url = '/environments/?climatized=true&fields=institution_id,location,measurements,' +
+                const url = '/environments?climatized=true&fields=institution_id,location,measurements,' +
                     'climatized,timestamp&sort=institution_id&page=1&limit=3'
 
                 return request
@@ -400,15 +386,19 @@ describe('Routes: Environments', () => {
             })
         })
 
-        context('when there are no environment in the database', () => {
-            it('should return status code 200 and a list of environments found', async () => {
+        context('when there is an attempt to get environment using the "query-strings-parser" library but there is no ' +
+            'environment in the database', () => {
+            it('should return status code 200 and an empty list', async () => {
                 try {
-                    await deleteAllEnvironments({})
+                    deleteAllEnvironments({})
                 } catch (err) { //
                 }
 
+                const url = '/environments?climatized=true&fields=institution_id,location,measurements,' +
+                    'climatized,timestamp&sort=institution_id&page=1&limit=3'
+
                 return request
-                    .get('/environments')
+                    .get(url)
                     .set('Content-Type', 'application/json')
                     .expect(200)
                     .then(res => {
@@ -421,8 +411,8 @@ describe('Routes: Environments', () => {
 
     describe('DELETE /environments/:environment_id', () => {
         context('when the environment was deleted successfully', () => {
-            it('should return status code 204 and no content for environment', () => {
-                createEnvironment({
+            it('should return status code 204 and no content for environment', async () => {
+                const result = await createEnvironment({
                     institution_id: defaultEnvironment.institution_id,
                     location: {
                         local: (defaultEnvironment.location) ? defaultEnvironment.location.local : '',
@@ -444,66 +434,24 @@ describe('Routes: Environments', () => {
                     ],
                     climatized: true,
                     timestamp: defaultEnvironment.timestamp
-                }).then(result => {
-                    return request
-                        .delete(`/environments/${result.id}`)
-                        .set('Content-Type', 'application/json')
-                        .expect(204)
-                        .then(res => {
-                            expect(res.body).to.eql({})
-                        })
                 })
+
+                return request
+                    .delete(`/environments/${result.id}`)
+                    .set('Content-Type', 'application/json')
+                    .expect(204)
+                    .then(res => {
+                        expect(res.body).to.eql({})
+                    })
             })
         })
 
-        // context('when the environment id is invalid', () => {
-        //     it('should return status code 400 and info message about the invalid environment id', async () => {
-        //         try {
-        //             await createEnvironment({
-        //                 institution_id: defaultEnvironment.institution_id,
-        //                 location: {
-        //                     local: (defaultEnvironment.location) ? defaultEnvironment.location.local : '',
-        //                     room: (defaultEnvironment.location) ? defaultEnvironment.location.room : '',
-        //                     latitude: (defaultEnvironment.location) ? defaultEnvironment.location.latitude : '',
-        //                     longitude: (defaultEnvironment.location) ? defaultEnvironment.location.longitude : ''
-        //                 },
-        //                 measurements: [
-        //                     {
-        //                         type: MeasurementType.HUMIDITY,
-        //                         value: 34,
-        //                         unit: '%'
-        //                     },
-        //                     {
-        //                         type: MeasurementType.TEMPERATURE,
-        //                         value: 40,
-        //                         unit: '°C'
-        //                     }
-        //                 ],
-        //                 climatized: true,
-        //                 timestamp: defaultEnvironment.timestamp
-        //             })
-        //
-        //             return request
-        //                 .delete(`/environments/123`)
-        //                 .set('Content-Type', 'application/json')
-        //                 .expect(400)
-        //                 .then(err => {
-        //                     expect(err.body).to.have.property('code')
-        //                     expect(err.body.code).to.eql(400)
-        //                     expect(err.body).to.have.property('message')
-        //                     expect(err.body.message).to.eql('Measurement of environment not found!')
-        //                     expect(err.body).to.have.property('description')
-        //                     expect(err.body.description).to.eql('Measurement of environment not found or already removed. ' +
-        //                         'A new operation for the same resource is not required!')
-        //                 })
-        //         } catch (err) { //
-        //         }
-        //     })
-        // })
-
         context('when the environment is not found', () => {
-            it('should return status code 404 and no content for environment', () => {
-                deleteAllEnvironments({})
+            it('should return status code 204 and no content for environment', () => {
+                try {
+                    deleteAllEnvironments({})
+                } catch (err) { //
+                }
 
                 return request
                     .delete(`/environments/${defaultEnvironment.id}`)
@@ -511,6 +459,28 @@ describe('Routes: Environments', () => {
                     .expect(204)
                     .then(err => {
                         expect(err.body).to.eql({})
+                    })
+            })
+        })
+
+        context('when the environment id is invalid', () => {
+            it('should return status code 400 and info message about the invalid environment id', async () => {
+                try {
+                    deleteAllEnvironments({})
+                } catch (err) { //
+                }
+
+                return request
+                    .delete(`/environments/123`)
+                    .set('Content-Type', 'application/json')
+                    .expect(400)
+                    .then(err => {
+                        expect(err.body).to.have.property('code')
+                        expect(err.body.code).to.eql(400)
+                        expect(err.body).to.have.property('message')
+                        expect(err.body.message).to.eql(Strings.ENVIRONMENT.PARAM_ID_NOT_VALID_FORMAT)
+                        expect(err.body).to.have.property('description')
+                        expect(err.body.description).to.eql(Strings.ERROR_MESSAGE.UUID_NOT_VALID_FORMAT_DESC)
                     })
             })
         })
@@ -523,6 +493,6 @@ async function createEnvironment(item): Promise<any> {
 
 function deleteAllEnvironments(doc): void {
     EnvironmentRepoModel.deleteMany({}, err => {
-        // if (err) console.log('err: ' + err)
+        if (err) console.log('err: ' + err)
     })
 }

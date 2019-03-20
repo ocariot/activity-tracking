@@ -54,14 +54,14 @@ describe('Services: SleepService', () => {
     describe('add(sleep: Sleep)', () => {
         context('when the Sleep is correct, it still does not exist in the repository and there is a connection ' +
             'to the RabbitMQ', () => {
-            it('should return the Sleep that was added', async () => {
+            it('should return the Sleep that was added', () => {
                 sinon
                     .mock(modelFake)
                     .expects('create')
                     .withArgs(sleep)
                     .resolves(sleep)
 
-                return await sleepService.add(sleep)
+                return sleepService.add(sleep)
                     .then(result => {
                         assert(result, 'result must not be undefined')
                     })
@@ -70,7 +70,7 @@ describe('Services: SleepService', () => {
 
         context('when the Sleep is correct and it still does not exist in the repository but there is no connection ' +
             'to the RabbitMQ', () => {
-            it('should return the Sleep that was saved', async () => {
+            it('should return the Sleep that was saved', () => {
                 connectionRabbitmqPub.isConnected = false
                 sinon
                     .mock(modelFake)
@@ -78,7 +78,7 @@ describe('Services: SleepService', () => {
                     .withArgs(sleep)
                     .resolves(sleep)
 
-                return await sleepService.add(sleep)
+                return sleepService.add(sleep)
                     .then(result => {
                         assert(result, 'result must not be undefined')
                     })
@@ -86,7 +86,7 @@ describe('Services: SleepService', () => {
         })
 
         context('when the Sleep is correct but already exists in the repository', () => {
-            it('should throw a ConflictException', async () => {
+            it('should throw a ConflictException', () => {
                 sleep.id = '507f1f77bcf86cd799439011'
                 sinon
                     .mock(modelFake)
@@ -94,7 +94,7 @@ describe('Services: SleepService', () => {
                     .withArgs(sleep)
                     .rejects({ name: 'ConflictError' })
 
-                return await sleepService.add(sleep)
+                return sleepService.add(sleep)
                     .catch(error => {
                         assert.property(error, 'message')
                         assert.propertyVal(error, 'message', 'Sleep is already registered...')
@@ -325,7 +325,7 @@ describe('Services: SleepService', () => {
      */
     describe('getAll(query: IQuery)', () => {
         context('when there is at least one sleep object in the database that matches the query filters', () => {
-            it('should return an Sleep array', async () => {
+            it('should return an Sleep array', () => {
                 const query: IQuery = new Query()
                 query.filters = {
                     _id: sleep.id,
@@ -338,7 +338,7 @@ describe('Services: SleepService', () => {
                     .withArgs(query)
                     .resolves(sleepArr)
 
-                return await sleepService.getAll(query)
+                return sleepService.getAll(query)
                     .then(result => {
                         assert(result, 'result must not be undefined')
                         assert.isArray(result)
@@ -347,7 +347,7 @@ describe('Services: SleepService', () => {
         })
 
         context('when there is no sleep object in the database that matches the query filters', () => {
-            it('should return an empty array', async () => {
+            it('should return an empty array', () => {
                 sleep.child_id = '507f1f77bcf86cd799439011'          // Make mock return an empty array
 
                 const query: IQuery = new Query()
@@ -362,7 +362,7 @@ describe('Services: SleepService', () => {
                     .withArgs(query)
                     .resolves(new Array<SleepMock>())
 
-                return await sleepService.getAll(query)
+                return sleepService.getAll(query)
                     .then(result => {
                         assert(result, 'result must not be undefined')
                         assert.isArray(result)

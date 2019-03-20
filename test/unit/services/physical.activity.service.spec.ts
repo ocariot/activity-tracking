@@ -85,14 +85,14 @@ describe('Services: PhysicalActivityService', () => {
     describe('add(activity: PhysicalActivity)', () => {
         context('when the physical activity is correct, it still does not exist in the repository and there is a connection ' +
             'to the RabbitMQ', () => {
-            it('should return the PhysicalActivity that was added', async () => {
+            it('should return the PhysicalActivity that was added', () => {
                 sinon
                     .mock(modelFake)
                     .expects('create')
                     .withArgs(activity)
                     .resolves(activity)
 
-                return await activityService.add(activity)
+                return activityService.add(activity)
                     .then(result => {
                         assert(result, 'result must not be undefined')
                     })
@@ -101,7 +101,7 @@ describe('Services: PhysicalActivityService', () => {
 
         context('when the physical activity is correct and it still does not exist in the repository but there is no connection ' +
             'to the RabbitMQ', () => {
-            it('should return the PhysicalActivity that was saved', async () => {
+            it('should return the PhysicalActivity that was saved', () => {
                 connectionRabbitmqPub.isConnected = false
                 sinon
                     .mock(modelFake)
@@ -109,7 +109,7 @@ describe('Services: PhysicalActivityService', () => {
                     .withArgs(activity)
                     .resolves(activity)
 
-                return await activityService.add(activity)
+                return activityService.add(activity)
                     .then(result => {
                         assert(result, 'result must not be undefined')
                     })
@@ -117,7 +117,7 @@ describe('Services: PhysicalActivityService', () => {
         })
 
         context('when the physical activity is correct but already exists in the repository', () => {
-            it('should throw a ConflictException', async () => {
+            it('should throw a ConflictException', () => {
                 activity.id = '507f1f77bcf86cd799439011'            // Make mock return true
                 sinon
                     .mock(modelFake)
@@ -125,7 +125,7 @@ describe('Services: PhysicalActivityService', () => {
                     .withArgs(activity)
                     .rejects({ name: 'ConflictError' })
 
-                return await activityService.add(activity)
+                return activityService.add(activity)
                     .catch(error => {
                         assert.property(error, 'message')
                         assert.propertyVal(error, 'message', 'Physical Activity is already registered...')
@@ -198,7 +198,8 @@ describe('Services: PhysicalActivityService', () => {
             })
         })
 
-        context('when the physical activity is incorrect (the duration is incompatible with the start_time and end_time parameters)', () => {
+        context('when the physical activity is incorrect (the duration is incompatible with the start_time and end_time ' +
+            'parameters)', () => {
             it('should throw a ValidationException', async () => {
                 activityIncorrect = new PhysicalActivityMock()
                 activityIncorrect.duration = 11780000
@@ -284,7 +285,7 @@ describe('Services: PhysicalActivityService', () => {
         })
 
         context('when the physical activity is incorrect (the steps is negative)', () => {
-            it('should throw a ValidationException', async () => {
+            it('should throw a ValidationException', () => {
                 activityIncorrect.calories = 200
                 activityIncorrect.steps = 1000
                 sinon
@@ -294,7 +295,7 @@ describe('Services: PhysicalActivityService', () => {
                     .rejects({ name: 'ValidationError' })
 
                 try {
-                    return await activityService.add(activityIncorrect)
+                    return activityService.add(activityIncorrect)
                 } catch (err) {
                     assert.property(err, 'message')
                     assert.property(err, 'description')
@@ -376,7 +377,7 @@ describe('Services: PhysicalActivityService', () => {
      */
     describe('getAll(query: IQuery)', () => {
         context('when there is at least one physical activity object in the database that matches the query filters', () => {
-            it('should return an PhysicalActivity array', async () => {
+            it('should return an PhysicalActivity array', () => {
                 const query: IQuery = new Query()
                 query.filters = {
                     _id: activity.id,
@@ -389,7 +390,7 @@ describe('Services: PhysicalActivityService', () => {
                     .withArgs(query)
                     .resolves(activitiesArr)
 
-                return await activityService.getAll(query)
+                return activityService.getAll(query)
                     .then(result => {
                         assert(result, 'result must not be undefined')
                         assert.isArray(result)
@@ -398,7 +399,7 @@ describe('Services: PhysicalActivityService', () => {
         })
 
         context('when there is no physical activity object in the database that matches the query filters', () => {
-            it('should return an empty array', async () => {
+            it('should return an empty array', () => {
                 activity.child_id = '507f1f77bcf86cd799439011'          // Make mock return an empty array
 
                 const query: IQuery = new Query()
@@ -413,7 +414,7 @@ describe('Services: PhysicalActivityService', () => {
                     .withArgs(query)
                     .resolves(new Array<PhysicalActivityMock>())
 
-                return await activityService.getAll(query)
+                return activityService.getAll(query)
                     .then(result => {
                         assert(result, 'result must not be undefined')
                         assert.isArray(result)

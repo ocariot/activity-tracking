@@ -65,14 +65,14 @@ describe('Services: Log', () => {
      */
     describe('addLogs(activityLogs: Array<Log>)', () => {
         context('when all the logs in the array are correct and it still does not exist in the repository', () => {
-            it('should return a response of type MultiStatus<Log> with the description of success in sending each log', async () => {
+            it('should return a response of type MultiStatus<Log> with the description of success in sending each log',  () => {
                 sinon
                     .mock(modelFake)
                     .expects('create')
                     .withArgs(correctLogsArr)
                     .resolves(multiStatusCorrect)
 
-                return await logService.addLogs(correctLogsArr)
+                return  logService.addLogs(correctLogsArr)
                     .then(result => {
                         assert(result, 'result must not be undefined')
                         assert.property(result, 'success')
@@ -84,7 +84,7 @@ describe('Services: Log', () => {
 
         context('when all the logs in the array are correct and already exist in the repository', () => {
             it('should update the value of items in the repository and return a response of type MultiStatus<Log> with the description ' +
-                'of success in sending each log', async () => {
+                'of success in sending each log',  () => {
                 correctLogsArr.forEach(elem => {
                     elem.date = '2018-03-10'
                 })
@@ -94,7 +94,7 @@ describe('Services: Log', () => {
                     .withArgs(correctLogsArr)
                     .resolves(multiStatusCorrect)
 
-                return await logService.addLogs(correctLogsArr)
+                return  logService.addLogs(correctLogsArr)
                     .then(result => {
                         assert(result, 'result must not be undefined')
                         assert.property(result, 'success')
@@ -106,7 +106,7 @@ describe('Services: Log', () => {
 
         context('when all the logs in the array are correct and some of them already exist in the repository', () => {
             it('should update the value of the existing items already in the repository, create the new ones, and return a ' +
-                'response of type MultiStatus<Log> with the description of success in sending each log', async () => {
+                'response of type MultiStatus<Log> with the description of success in sending each log',  () => {
                 correctLogsArr.push(LogMock.generateLog())
                 sinon
                     .mock(modelFake)
@@ -114,7 +114,7 @@ describe('Services: Log', () => {
                     .withArgs(correctLogsArr)
                     .resolves(multiStatusCorrect)
 
-                return await logService.addLogs(correctLogsArr)
+                return  logService.addLogs(correctLogsArr)
                     .then(result => {
                         assert(result, 'result must not be undefined')
                         assert.property(result, 'success')
@@ -126,14 +126,14 @@ describe('Services: Log', () => {
 
         context('when some of the logs in the array are incorrect (date and type are invalid)', () => {
             it('should perform the operations of creating and updating normally for the correct logs and returning a response ' +
-                'of type MultiStatus<Log> with the description of success and error cases of each log', async () => {
+                'of type MultiStatus<Log> with the description of success and error cases of each log',  () => {
                 sinon
                     .mock(modelFake)
                     .expects('create')
                     .withArgs(mixedLogsArr)
                     .resolves(multiStatusMixed)
 
-                return await logService.addLogs(mixedLogsArr)
+                return  logService.addLogs(mixedLogsArr)
                     .then(result => {
                         assert(result, 'result must not be undefined')
                         assert.property(result, 'success')
@@ -144,7 +144,7 @@ describe('Services: Log', () => {
 
         context('when some of the logs in the array are incorrect (negative value)', () => {
             it('should perform the operations of creating and updating normally for the correct logs and returning a response ' +
-                'of type MultiStatus<Log> with the description of success and error cases of each log', async () => {
+                'of type MultiStatus<Log> with the description of success and error cases of each log',  () => {
                 incorrectLog.date = '2019-03-10'
                 incorrectLog.value = -((Math.floor(Math.random() * 10 + 1)) * 100)
                 sinon
@@ -153,7 +153,7 @@ describe('Services: Log', () => {
                     .withArgs(mixedLogsArr)
                     .resolves(multiStatusMixed)
 
-                return await logService.addLogs(mixedLogsArr)
+                return  logService.addLogs(mixedLogsArr)
                     .then(result => {
                         assert(result, 'result must not be undefined')
                         assert.property(result, 'success')
@@ -164,7 +164,7 @@ describe('Services: Log', () => {
 
         context('when some of the logs in the array are incorrect (child_id is invalid)', () => {
             it('should perform the operations of creating and updating normally for the correct logs and returning a response ' +
-                'of type MultiStatus<Log> with the description of success and error cases of each log', async () => {
+                'of type MultiStatus<Log> with the description of success and error cases of each log',  () => {
                 incorrectLog.value = ((Math.floor(Math.random() * 10 + 1)) * 100)
                 incorrectLog.child_id = '507f1f77bcf86cd7994390112'
                 sinon
@@ -173,7 +173,7 @@ describe('Services: Log', () => {
                     .withArgs(mixedLogsArr)
                     .resolves(multiStatusMixed)
 
-                return await logService.addLogs(mixedLogsArr)
+                return  logService.addLogs(mixedLogsArr)
                     .then(result => {
                         assert(result, 'result must not be undefined')
                         assert.property(result, 'success')
@@ -184,7 +184,7 @@ describe('Services: Log', () => {
 
         context('when some of the logs in the array are incorrect (missing fields)', () => {
             it('should perform the operations of creating and updating normally for the correct logs and returning a response ' +
-                'of type MultiStatus<Log> with the description of success and error cases of each log', async () => {
+                'of type MultiStatus<Log> with the description of success and error cases of each log',  () => {
                 incorrectLog.date = ''
                 incorrectLog.value = undefined!
                 incorrectLog.type = undefined!
@@ -195,7 +195,7 @@ describe('Services: Log', () => {
                     .withArgs(mixedLogsArr)
                     .resolves(multiStatusMixed)
 
-                return await logService.addLogs(mixedLogsArr)
+                return  logService.addLogs(mixedLogsArr)
                     .then(result => {
                         assert(result, 'result must not be undefined')
                         assert.property(result, 'success')
@@ -210,7 +210,7 @@ describe('Services: Log', () => {
      */
     describe('getByChildAndDate(childId: string, dateStart: Date, dateEnd: Date, query: IQuery)', () => {
         context('when the parameters are correct and there are corresponding logs with the query', () => {
-            it('should return a PhysicalActivityLog with steps and/or calories logs', async () => {
+            it('should return a PhysicalActivityLog with steps and/or calories logs',  () => {
                 const query: IQuery = new Query()
                 query.filters = {
                     child_id: correctLogsArr[0].child_id,
@@ -226,7 +226,7 @@ describe('Services: Log', () => {
                     .withArgs(query)
                     .resolves(correctLogsArr)
 
-                return await logService.getByChildAndDate(correctLogsArr[0].child_id, correctLogsArr[0].date,
+                return  logService.getByChildAndDate(correctLogsArr[0].child_id, correctLogsArr[0].date,
                     correctLogsArr[1].date, query)
                     .then(result => {
                         assert(result, 'result must not be undefined')
@@ -235,7 +235,7 @@ describe('Services: Log', () => {
         })
 
         context('when the parameters are correct but there are no corresponding logs with the query', () => {
-            it('should return an empty PhysicalActivityLog', async () => {
+            it('should return an empty PhysicalActivityLog',  () => {
                 correctLogsArr[0].child_id = '507f1f77bcf86cd799439011'
                 const query: IQuery = new Query()
                 query.filters = {
@@ -252,7 +252,7 @@ describe('Services: Log', () => {
                     .withArgs(query)
                     .resolves(correctLogsArr)
 
-                return await logService.getByChildAndDate(correctLogsArr[0].child_id, correctLogsArr[0].date,
+                return  logService.getByChildAndDate(correctLogsArr[0].child_id, correctLogsArr[0].date,
                     correctLogsArr[1].date, query)
                     .then(result => {
                         assert(result, 'result must not be undefined')
