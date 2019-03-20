@@ -27,7 +27,9 @@ describe('Routes: environments', () => {
             throw new Error('Failure on environments routes test: ' + err.message)
         }
     })
-
+    /**
+     * POST route
+     */
     describe('POST /environments', () => {
         context('when posting a new Environment with success', () => {
             it('should return status code 201 and the saved Environment', () => {
@@ -94,7 +96,7 @@ describe('Routes: environments', () => {
         })
 
         context('when a validation error occurs (missing required fields)', () => {
-            it('should return status code 400 and info message about missing parameters', () => {
+            it('should return status code 400 and info message about missing fields', () => {
                 const body = {
                 }
 
@@ -116,7 +118,7 @@ describe('Routes: environments', () => {
         })
 
         context('when a validation error occurs (institution_id is invalid)', () => {
-            it('should return status code 400 and info message about invalid institution_id', () => {
+            it('should return status code 400 and info message about the invalid institution_id', () => {
                 const body = {
                     institution_id: '5a62be07de34500146d9c5442',
                     location: defaultEnvironment.location,
@@ -142,7 +144,7 @@ describe('Routes: environments', () => {
         })
 
         context('when a validation error occurs (location is invalid, missing required fields)', () => {
-            it('should return status code 400 and info message about invalid parameters', () => {
+            it('should return status code 400 and info message about the invalid location', () => {
                 const body = {
                     institution_id: defaultEnvironment.institution_id,
                     location: new Location(),
@@ -168,7 +170,7 @@ describe('Routes: environments', () => {
         })
 
         context('when a validation error occurs (measurements array is empty)', () => {
-            it('should return status code 400 and info message about invalid parameters', () => {
+            it('should return status code 400 and info message about the invalid measurements array', () => {
                 const body = {
                     institution_id: defaultEnvironment.institution_id,
                     location: defaultEnvironment.location,
@@ -194,7 +196,7 @@ describe('Routes: environments', () => {
         })
 
         context('when a validation error occurs (measurements array has an item with invalid type)', () => {
-            it('should return status code 400 and info message about invalid parameters', () => {
+            it('should return status code 400 and info message about the invalid measurements array', () => {
                 const body = {
                     institution_id: defaultEnvironment.institution_id,
                     location: defaultEnvironment.location,
@@ -221,7 +223,7 @@ describe('Routes: environments', () => {
         })
 
         context('when a validation error occurs (measurements array has an item that has missing required fields)', () => {
-            it('should return status code 400 and info message about invalid parameters', () => {
+            it('should return status code 400 and info message about the invalid measurements array', () => {
                 const body = {
                     institution_id: defaultEnvironment.institution_id,
                     location: defaultEnvironment.location,
@@ -248,7 +250,9 @@ describe('Routes: environments', () => {
             })
         })
     })
-
+    /**
+     * GET route
+     */
     describe('GET /environments', () => {
         context('when get all environment of the database successfully', () => {
             it('should return status code 200 and a list of environments found', () => {
@@ -408,7 +412,9 @@ describe('Routes: environments', () => {
             })
         })
     })
-
+    /**
+     * DELETE route
+     */
     describe('DELETE /environments/:environment_id', () => {
         context('when the environment was deleted successfully', () => {
             it('should return status code 204 and no content for environment', async () => {

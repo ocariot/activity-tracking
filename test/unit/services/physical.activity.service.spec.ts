@@ -263,7 +263,7 @@ describe('Services: PhysicalActivityService', () => {
             })
         })
 
-        context('when the physical activity is incorrect (the calories is negative)', () => {
+        context('when the physical activity is incorrect (the calories parameter is negative)', () => {
             it('should throw a ValidationException', async () => {
                 activityIncorrect = new PhysicalActivityMock()
                 activityIncorrect.calories = -200
@@ -284,7 +284,7 @@ describe('Services: PhysicalActivityService', () => {
             })
         })
 
-        context('when the physical activity is incorrect (the steps is negative)', () => {
+        context('when the physical activity is incorrect (the steps parameter is negative)', () => {
             it('should throw a ValidationException', () => {
                 activityIncorrect.calories = 200
                 activityIncorrect.steps = 1000

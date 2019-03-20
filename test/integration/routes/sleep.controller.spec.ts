@@ -26,8 +26,10 @@ describe('Routes: users.children.sleep', () => {
             throw new Error('Failure on users.children.sleep routes test: ' + err.message)
         }
     })
-
-    describe('POST /:child_id/sleep', () => {
+    /**
+     * POST route
+     */
+    describe('POST /users/children/:child_id/sleep', () => {
         context('when posting a new Sleep with success', () => {
             it('should return status code 201 and the saved Sleep', () => {
                 const body = {
@@ -82,7 +84,7 @@ describe('Routes: users.children.sleep', () => {
         })
 
         context('when a validation error occurs (missing all required fields)', () => {
-            it('should return status code 400 and info message about missing parameters', () => {
+            it('should return status code 400 and info message about the missing fields', () => {
                 const body = {}
 
                 return request
@@ -102,7 +104,7 @@ describe('Routes: users.children.sleep', () => {
         })
 
         context('when a validation error occurs (missing required field of sleep)', () => {
-            it('should return status code 400 and info message about missing parameters', () => {
+            it('should return status code 400 and info message about the missing fields', () => {
                 const body = {
                     start_time: defaultSleep.start_time,
                     end_time: defaultSleep.end_time,
@@ -126,7 +128,7 @@ describe('Routes: users.children.sleep', () => {
         })
 
         context('when a validation error occurs (start_time with a date newer than end_time)', () => {
-            it('should return status code 400 and info message about invalid date', () => {
+            it('should return status code 400 and info message about the invalid date', () => {
                 const body = {
                     start_time: new Date(2020),
                     end_time: new Date(2019),
@@ -154,9 +156,9 @@ describe('Routes: users.children.sleep', () => {
         context('when a validation error occurs (the duration is incompatible with the start_time and end_time parameters)', () => {
             it('should return status code 400 and info message about the invalid duration', () => {
                 const body = {
-                    start_time: new Date(2020),
+                    start_time: defaultSleep.start_time,
                     end_time: defaultSleep.end_time,
-                    duration: defaultSleep.duration,
+                    duration: Math.floor(Math.random() * 180 + 1) * 60000,
                     pattern: defaultSleep.pattern
                 }
 
@@ -178,7 +180,7 @@ describe('Routes: users.children.sleep', () => {
         })
 
         context('when a validation error occurs (the duration is negative)', () => {
-            it('should return status code 400 and info message about invalid duration', () => {
+            it('should return status code 400 and info message about the invalid duration', () => {
                 const body = {
                     start_time: defaultSleep.start_time,
                     end_time: defaultSleep.end_time,
@@ -203,7 +205,7 @@ describe('Routes: users.children.sleep', () => {
         })
 
         context('when a validation error occurs (child_id is invalid)', () => {
-            it('should return status code 400 and info message about invalid child_id', () => {
+            it('should return status code 400 and info message about the invalid child_id', () => {
                 const body = {
                     start_time: defaultSleep.start_time,
                     end_time: defaultSleep.end_time,
@@ -228,7 +230,7 @@ describe('Routes: users.children.sleep', () => {
         })
 
         context('when a validation error occurs (missing data_set of pattern)', () => {
-            it('should return status code 400 and info message about invalid pattern', () => {
+            it('should return status code 400 and info message about the invalid pattern', () => {
                 const body = {
                     start_time: defaultSleep.start_time,
                     end_time: defaultSleep.end_time,
@@ -253,7 +255,7 @@ describe('Routes: users.children.sleep', () => {
         })
 
         context('when a validation error occurs (the pattern has an empty data_set array)', () => {
-            it('should return status code 400 and info message about invalid data_set array of pattern', () => {
+            it('should return status code 400 and info message about the invalid data_set array of pattern', () => {
                 const body = {
                     start_time: defaultSleep.start_time,
                     end_time: defaultSleep.end_time,
@@ -280,7 +282,7 @@ describe('Routes: users.children.sleep', () => {
         })
 
         context('when a validation error occurs (missing fields of some item from the data_set array of pattern)', () => {
-            it('should return status code 400 and info message about invalid data_set array of pattern', () => {
+            it('should return status code 400 and info message about the invalid data_set array of pattern', () => {
                 const body = {
                     start_time: defaultSleep.start_time,
                     end_time: defaultSleep.end_time,
@@ -310,7 +312,7 @@ describe('Routes: users.children.sleep', () => {
         })
 
         context('when a validation error occurs (there is a negative duration on some item from the data_set array of pattern)', () => {
-            it('should return status code 400 and info message about invalid data_set array of pattern', () => {
+            it('should return status code 400 and info message about the invalid data_set array of pattern', () => {
                 const body = {
                     start_time: defaultSleep.start_time,
                     end_time: defaultSleep.end_time,
@@ -343,7 +345,9 @@ describe('Routes: users.children.sleep', () => {
             })
         })
     })
-
+    /**
+     * Route GET all
+     */
     describe('GET /users/children/sleep', () => {
         context('when get all sleep of the database successfully', () => {
             it('should return status code 200 and a list of all sleep found', () => {
@@ -469,10 +473,12 @@ describe('Routes: users.children.sleep', () => {
             })
         })
     })
-
+    /**
+     * Route GET all sleep by child
+     */
     describe('GET /users/children/:child_id/sleep', () => {
         context('when get all sleep of a specific child of the database successfully', () => {
-            it('should return status code 200 and a list of sleep of that specific child', async () => {
+            it('should return status code 200 and a list of all sleep of that specific child', async () => {
                 try {
                     await deleteAllSleep({})
                 } catch (err) { //
@@ -545,7 +551,7 @@ describe('Routes: users.children.sleep', () => {
         })
 
         context('when the child_id is invalid', () => {
-            it('should return status code 400 and a info message about invalid child_id', async () => {
+            it('should return status code 400 and a info message about the invalid child_id', async () => {
                 try {
                     await deleteAllSleep({})
                 } catch (err) { //
@@ -672,7 +678,7 @@ describe('Routes: users.children.sleep', () => {
 
         context('when there is an attempt to get sleep of a specific child using the "query-strings-parser" library ' +
             'but the child_id is invalid', () => {
-            it('should return status code 400 and a info message about invalid child_id', async () => {
+            it('should return status code 400 and a info message about the invalid child_id', async () => {
                 try {
                     await deleteAllSleep({})
                 } catch (err) { //
@@ -720,7 +726,9 @@ describe('Routes: users.children.sleep', () => {
             })
         })
     })
-
+    /**
+     * Route GET a sleep by child
+     */
     describe('GET /users/children/:child_id/sleep/:sleep_id', () => {
         context('when get a specific sleep of a child of the database successfully', () => {
             it('should return status code 200 and that specific sleep of that child', async () => {
@@ -800,7 +808,7 @@ describe('Routes: users.children.sleep', () => {
         })
 
         context('when the child_id is invalid', () => {
-            it('should return status code 400 and a info message about invalid child_id', async () => {
+            it('should return status code 400 and a info message about the invalid child_id', async () => {
                 try {
                     await deleteAllSleep({})
                 } catch (err) { //
@@ -846,7 +854,7 @@ describe('Routes: users.children.sleep', () => {
         })
 
         context('when the sleep id is invalid', () => {
-            it('should return status code 400 and a info message about invalid sleep id', async () => {
+            it('should return status code 400 and a info message about the invalid sleep id', async () => {
                 try {
                     await deleteAllSleep({})
                 } catch (err) { //
@@ -974,7 +982,7 @@ describe('Routes: users.children.sleep', () => {
 
         context('when there is an attempt to get a specific sleep using the "query-strings-parser" library but the ' +
             'child_id is invalid', () => {
-            it('should return status code 400 and a info message about invalid child_id', async () => {
+            it('should return status code 400 and a info message about the invalid child_id', async () => {
                 try {
                     await deleteAllSleep({})
                 } catch (err) { //
@@ -1024,7 +1032,7 @@ describe('Routes: users.children.sleep', () => {
 
         context('when there is an attempt to get a specific sleep using the "query-strings-parser" library but the ' +
             'sleep id is invalid', () => {
-            it('should return status code 400 and a info message about invalid sleep id', async () => {
+            it('should return status code 400 and a info message about the invalid sleep id', async () => {
                 try {
                     await deleteAllSleep({})
                 } catch (err) { //
@@ -1072,7 +1080,9 @@ describe('Routes: users.children.sleep', () => {
             })
         })
     })
-
+    /**
+     * PATCH route
+     */
     describe('PATCH /users/children/:child_id/sleep/:sleep_id', () => {
         context('when this sleep exists in the database and is updated successfully', () => {
             it('should return status code 200 and the updated Sleep', async () => {
@@ -1113,7 +1123,7 @@ describe('Routes: users.children.sleep', () => {
         })
 
         context('when sleep does not exist in the database', () => {
-            it('should return status code 404 and a info message about duplicate items', async () => {
+            it('should return status code 404 and a info message about the error on the search', async () => {
                 try {
                     await deleteAllSleep({})
                 } catch (err) { //
@@ -1244,7 +1254,7 @@ describe('Routes: users.children.sleep', () => {
         })
 
         context('when a validation error occurs (missing data_set of pattern)', () => {
-            it('should return status code 400 and info message about invalid pattern', async () => {
+            it('should return status code 400 and info message about the invalid pattern', async () => {
                 try {
                     await deleteAllSleep({})
                 } catch (err) { //
@@ -1278,7 +1288,7 @@ describe('Routes: users.children.sleep', () => {
         })
 
         context('when a validation error occurs (the pattern has an empty data_set array)', () => {
-            it('should return status code 400 and info message about invalid data_set array of pattern', async () => {
+            it('should return status code 400 and info message about the invalid data_set array of pattern', async () => {
                 try {
                     await deleteAllSleep({})
                 } catch (err) { //
@@ -1314,7 +1324,7 @@ describe('Routes: users.children.sleep', () => {
         })
 
         context('when a validation error occurs (missing fields of some item from the data_set array of pattern)', () => {
-            it('should return status code 400 and info message about invalid data_set array of pattern', async () => {
+            it('should return status code 400 and info message about the invalid data_set array of pattern', async () => {
                 try {
                     await deleteAllSleep({})
                 } catch (err) { //
@@ -1353,7 +1363,7 @@ describe('Routes: users.children.sleep', () => {
         })
 
         context('when a validation error occurs (there is a negative duration on some item from the data_set array of pattern)', () => {
-            it('should return status code 400 and info message about invalid data_set array of pattern', async () => {
+            it('should return status code 400 and info message about the invalid data_set array of pattern', async () => {
                 try {
                     await deleteAllSleep({})
                 } catch (err) { //
@@ -1395,7 +1405,9 @@ describe('Routes: users.children.sleep', () => {
             })
         })
     })
-
+    /**
+     * DELETE route
+     */
     describe('DELETE /users/children/:child_id/sleep/:sleep_id', () => {
         context('when the sleep was deleted successfully', () => {
             it('should return status code 204 and no content for sleep', async () => {
