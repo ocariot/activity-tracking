@@ -9,6 +9,8 @@ import { Sleep } from '../../../src/application/domain/model/sleep'
 import { Strings } from '../../../src/utils/strings'
 import { SleepPattern, SleepPatternType } from '../../../src/application/domain/model/sleep.pattern'
 import { SleepRepoModel } from '../../../src/infrastructure/database/schema/sleep.schema'
+import { SleepEntityMapper } from '../../../src/infrastructure/entity/mapper/sleep.entity.mapper'
+import { ObjectID } from 'bson'
 
 const container: Container = DI.getInstance().getContainer()
 const backgroundServices: BackgroundService = container.get(Identifier.BACKGROUND_SERVICE)
@@ -18,10 +20,23 @@ const request = require('supertest')(app.getExpress())
 describe('Routes: users.children.sleep', () => {
 
     const defaultSleep: Sleep = new SleepMock()
+    const otherSleep: Sleep = new SleepMock()
+    otherSleep.child_id = '5a62be07de34500146d9c542'
 
+    // Start services
     before(async () => {
         try {
+            await deleteAllSleep()
             await backgroundServices.startServices()
+        } catch (err) {
+            throw new Error('Failure on users.children.sleep routes test: ' + err.message)
+        }
+    })
+
+    // Delete all database sleep objects
+    after(async () => {
+        try {
+            await deleteAllSleep()
         } catch (err) {
             throw new Error('Failure on users.children.sleep routes test: ' + err.message)
         }
@@ -350,7 +365,7 @@ describe('Routes: users.children.sleep', () => {
      */
     describe('GET /users/children/sleep', () => {
         context('when get all sleep of the database successfully', () => {
-            it('should return status code 200 and a list of all sleep found', () => {
+            it('should return status code 200 and a list of all sleep found', async () => {
                 return request
                     .get('/users/children/sleep')
                     .set('Content-Type', 'application/json')
@@ -378,8 +393,9 @@ describe('Routes: users.children.sleep', () => {
         context('when there are no sleep in the database', () => {
             it('should return status code 200 and an empty list', async () => {
                 try {
-                    await deleteAllSleep({})
-                } catch (err) { //
+                    await deleteAllSleep()
+                } catch (err) {
+                    console.log(err)
                 }
 
                 return request
@@ -396,8 +412,9 @@ describe('Routes: users.children.sleep', () => {
         context('when get sleep using the "query-strings-parser" library', () => {
             it('should return status code 200 and the result as needed in the query', async () => {
                 try {
-                    await deleteAllSleep({})
-                } catch (err) { //
+                    await deleteAllSleep()
+                } catch (err) {
+                    console.log(err)
                 }
 
                 await createSleep({
@@ -422,6 +439,30 @@ describe('Routes: users.children.sleep', () => {
                         }
                     ],
                     child_id: defaultSleep.child_id
+                })
+
+                await createSleep({
+                    start_time: defaultSleep.start_time,
+                    end_time: defaultSleep.end_time,
+                    duration: defaultSleep.duration,
+                    pattern: [
+                        {
+                            start_time: defaultSleep.start_time,
+                            name: SleepPatternType.RESTLESS,
+                            duration: Math.floor(Math.random() * 5 + 1) * 60000
+                        },
+                        {
+                            start_time: defaultSleep.start_time,
+                            name: SleepPatternType.ASLEEP,
+                            duration: Math.floor(Math.random() * 120 + 1) * 60000
+                        },
+                        {
+                            start_time: defaultSleep.start_time,
+                            name: SleepPatternType.AWAKE,
+                            duration: Math.floor(Math.random() * 3 + 1) * 60000
+                        }
+                    ],
+                    child_id: new ObjectID()
                 })
 
                 const url = `/users/children/sleep?child_id=${defaultSleep.child_id}&fields=start_time,end_time,
@@ -455,8 +496,9 @@ describe('Routes: users.children.sleep', () => {
             'in the database', () => {
             it('should return status code 200 and an empty list', async () => {
                 try {
-                    await deleteAllSleep({})
-                } catch (err) { //
+                    await deleteAllSleep()
+                } catch (err) {
+                    console.log(err)
                 }
 
                 const url = `/users/children/sleep?child_id=${defaultSleep.child_id}&fields=start_time,end_time,
@@ -480,8 +522,9 @@ describe('Routes: users.children.sleep', () => {
         context('when get all sleep of a specific child of the database successfully', () => {
             it('should return status code 200 and a list of all sleep of that specific child', async () => {
                 try {
-                    await deleteAllSleep({})
-                } catch (err) { //
+                    await deleteAllSleep()
+                } catch (err) {
+                    console.log(err)
                 }
 
                 await createSleep({
@@ -535,8 +578,9 @@ describe('Routes: users.children.sleep', () => {
         context('when there are no sleep associated with that specific child in the database', () => {
             it('should return status code 200 and an empty list', async () => {
                 try {
-                    await deleteAllSleep({})
-                } catch (err) { //
+                    await deleteAllSleep()
+                } catch (err) {
+                    console.log(err)
                 }
 
                 return request
@@ -553,8 +597,9 @@ describe('Routes: users.children.sleep', () => {
         context('when the child_id is invalid', () => {
             it('should return status code 400 and a info message about the invalid child_id', async () => {
                 try {
-                    await deleteAllSleep({})
-                } catch (err) { //
+                    await deleteAllSleep()
+                } catch (err) {
+                    console.log(err)
                 }
 
                 await createSleep({
@@ -599,8 +644,9 @@ describe('Routes: users.children.sleep', () => {
         context('when get sleep using the "query-strings-parser" library', () => {
             it('should return status code 200 and the result as needed in the query', async () => {
                 try {
-                    await deleteAllSleep({})
-                } catch (err) { //
+                    await deleteAllSleep()
+                } catch (err) {
+                    console.log(err)
                 }
 
                 await createSleep({
@@ -658,8 +704,9 @@ describe('Routes: users.children.sleep', () => {
             'this sleep does not exist', () => {
             it('should return status code 200 and an empty list', async () => {
                 try {
-                    await deleteAllSleep({})
-                } catch (err) { //
+                    await deleteAllSleep()
+                } catch (err) {
+                    console.log(err)
                 }
 
                 const url = `/users/children/${defaultSleep.child_id}/sleep?child_id=${defaultSleep.child_id}&fields=start_time,end_time,
@@ -680,8 +727,9 @@ describe('Routes: users.children.sleep', () => {
             'but the child_id is invalid', () => {
             it('should return status code 400 and a info message about the invalid child_id', async () => {
                 try {
-                    await deleteAllSleep({})
-                } catch (err) { //
+                    await deleteAllSleep()
+                } catch (err) {
+                    console.log(err)
                 }
 
                 await createSleep({
@@ -733,8 +781,9 @@ describe('Routes: users.children.sleep', () => {
         context('when get a specific sleep of a child of the database successfully', () => {
             it('should return status code 200 and that specific sleep of that child', async () => {
                 try {
-                    await deleteAllSleep({})
-                } catch (err) { //
+                    await deleteAllSleep()
+                } catch (err) {
+                    console.log(err)
                 }
 
                 const result = await createSleep({
@@ -784,11 +833,12 @@ describe('Routes: users.children.sleep', () => {
             })
         })
 
-        context('when there are that specific sleep associated with that child in the database', () => {
+        context('when there is no that specific sleep associated with that child in the database', () => {
             it('should return status code 404 and a info message describing that sleep was not found', async () => {
                 try {
-                    await deleteAllSleep({})
-                } catch (err) { //
+                    await deleteAllSleep()
+                } catch (err) {
+                    console.log(err)
                 }
 
                 return request
@@ -810,8 +860,9 @@ describe('Routes: users.children.sleep', () => {
         context('when the child_id is invalid', () => {
             it('should return status code 400 and a info message about the invalid child_id', async () => {
                 try {
-                    await deleteAllSleep({})
-                } catch (err) { //
+                    await deleteAllSleep()
+                } catch (err) {
+                    console.log(err)
                 }
 
                 const result = await createSleep({
@@ -856,8 +907,9 @@ describe('Routes: users.children.sleep', () => {
         context('when the sleep id is invalid', () => {
             it('should return status code 400 and a info message about the invalid sleep id', async () => {
                 try {
-                    await deleteAllSleep({})
-                } catch (err) { //
+                    await deleteAllSleep()
+                } catch (err) {
+                    console.log(err)
                 }
 
                 const result = await createSleep({
@@ -902,8 +954,9 @@ describe('Routes: users.children.sleep', () => {
         context('when get a specific sleep of a child using the "query-strings-parser" library', () => {
             it('should return status code 200 and the result as needed in the query', async () => {
                 try {
-                    await deleteAllSleep({})
-                } catch (err) { //
+                    await deleteAllSleep()
+                } catch (err) {
+                    console.log(err)
                 }
 
                 const result = await createSleep({
@@ -957,8 +1010,9 @@ describe('Routes: users.children.sleep', () => {
             'does not exist', () => {
             it('should return status code 404 and a info message describing that sleep was not found', async () => {
                 try {
-                    await deleteAllSleep({})
-                } catch (err) { //
+                    await deleteAllSleep()
+                } catch (err) {
+                    console.log(err)
                 }
 
                 const url = `/users/children/${defaultSleep.child_id}/sleep/${defaultSleep.id}?child_id=${defaultSleep.child_id}
@@ -984,8 +1038,9 @@ describe('Routes: users.children.sleep', () => {
             'child_id is invalid', () => {
             it('should return status code 400 and a info message about the invalid child_id', async () => {
                 try {
-                    await deleteAllSleep({})
-                } catch (err) { //
+                    await deleteAllSleep()
+                } catch (err) {
+                    console.log(err)
                 }
 
                 const result = await createSleep({
@@ -1034,8 +1089,9 @@ describe('Routes: users.children.sleep', () => {
             'sleep id is invalid', () => {
             it('should return status code 400 and a info message about the invalid sleep id', async () => {
                 try {
-                    await deleteAllSleep({})
-                } catch (err) { //
+                    await deleteAllSleep()
+                } catch (err) {
+                    console.log(err)
                 }
 
                 const result = await createSleep({
@@ -1087,8 +1143,9 @@ describe('Routes: users.children.sleep', () => {
         context('when this sleep exists in the database and is updated successfully', () => {
             it('should return status code 200 and the updated Sleep', async () => {
                 try {
-                    await deleteAllSleep({})
-                } catch (err) { //
+                    await deleteAllSleep()
+                } catch (err) {
+                    console.log(err)
                 }
 
                 // Sleep to be updated
@@ -1125,8 +1182,9 @@ describe('Routes: users.children.sleep', () => {
         context('when sleep does not exist in the database', () => {
             it('should return status code 404 and a info message about the error on the search', async () => {
                 try {
-                    await deleteAllSleep({})
-                } catch (err) { //
+                    await deleteAllSleep()
+                } catch (err) {
+                    console.log(err)
                 }
 
                 // Sleep to update
@@ -1157,8 +1215,9 @@ describe('Routes: users.children.sleep', () => {
         context('when the child_id is invalid', () => {
             it('should return status code 400 and a info message about the invalid child_id', async () => {
                 try {
-                    await deleteAllSleep({})
-                } catch (err) { //
+                    await deleteAllSleep()
+                } catch (err) {
+                    console.log(err)
                 }
 
                 // Sleep to be updated
@@ -1191,8 +1250,9 @@ describe('Routes: users.children.sleep', () => {
         context('when the sleep id is invalid', () => {
             it('should return status code 400 and a info message about the invalid sleep id', async () => {
                 try {
-                    await deleteAllSleep({})
-                } catch (err) { //
+                    await deleteAllSleep()
+                } catch (err) {
+                    console.log(err)
                 }
 
                 // Sleep to be updated
@@ -1225,8 +1285,9 @@ describe('Routes: users.children.sleep', () => {
         context('when a validation error occurs (the duration is negative)', () => {
             it('should return status code 400 and info message about the invalid duration', async () => {
                 try {
-                    await deleteAllSleep({})
-                } catch (err) { //
+                    await deleteAllSleep()
+                } catch (err) {
+                    console.log(err)
                 }
 
                 // Sleep to be updated
@@ -1256,8 +1317,9 @@ describe('Routes: users.children.sleep', () => {
         context('when a validation error occurs (missing data_set of pattern)', () => {
             it('should return status code 400 and info message about the invalid pattern', async () => {
                 try {
-                    await deleteAllSleep({})
-                } catch (err) { //
+                    await deleteAllSleep()
+                } catch (err) {
+                    console.log(err)
                 }
 
                 // Sleep to be updated
@@ -1290,8 +1352,9 @@ describe('Routes: users.children.sleep', () => {
         context('when a validation error occurs (the pattern has an empty data_set array)', () => {
             it('should return status code 400 and info message about the invalid data_set array of pattern', async () => {
                 try {
-                    await deleteAllSleep({})
-                } catch (err) { //
+                    await deleteAllSleep()
+                } catch (err) {
+                    console.log(err)
                 }
 
                 // Sleep to be updated
@@ -1326,8 +1389,9 @@ describe('Routes: users.children.sleep', () => {
         context('when a validation error occurs (missing fields of some item from the data_set array of pattern)', () => {
             it('should return status code 400 and info message about the invalid data_set array of pattern', async () => {
                 try {
-                    await deleteAllSleep({})
-                } catch (err) { //
+                    await deleteAllSleep()
+                } catch (err) {
+                    console.log(err)
                 }
 
                 // Sleep to be updated
@@ -1365,8 +1429,9 @@ describe('Routes: users.children.sleep', () => {
         context('when a validation error occurs (there is a negative duration on some item from the data_set array of pattern)', () => {
             it('should return status code 400 and info message about the invalid data_set array of pattern', async () => {
                 try {
-                    await deleteAllSleep({})
-                } catch (err) { //
+                    await deleteAllSleep()
+                } catch (err) {
+                    console.log(err)
                 }
 
                 // Sleep to be updated
@@ -1412,8 +1477,9 @@ describe('Routes: users.children.sleep', () => {
         context('when the sleep was deleted successfully', () => {
             it('should return status code 204 and no content for sleep', async () => {
                 try {
-                    await deleteAllSleep({})
-                } catch (err) { //
+                    await deleteAllSleep()
+                } catch (err) {
+                    console.log(err)
                 }
 
                 const result = await createSleep({
@@ -1453,8 +1519,9 @@ describe('Routes: users.children.sleep', () => {
         context('when the sleep is not found', () => {
             it('should return status code 204 and no content for sleep', async () => {
                 try {
-                    await deleteAllSleep({})
-                } catch (err) { //
+                    await deleteAllSleep()
+                } catch (err) {
+                    console.log(err)
                 }
 
                 return request
@@ -1470,8 +1537,9 @@ describe('Routes: users.children.sleep', () => {
         context('when the child_id is invalid', () => {
             it('should return status code 400 and a info message about the invalid child_id', async () => {
                 try {
-                    await deleteAllSleep({})
-                } catch (err) { //
+                    await deleteAllSleep()
+                } catch (err) {
+                    console.log(err)
                 }
 
                 const result = await createSleep({
@@ -1516,8 +1584,9 @@ describe('Routes: users.children.sleep', () => {
         context('when the sleep id is invalid', () => {
             it('should return status code 400 and a info message about the invalid sleep id', async () => {
                 try {
-                    await deleteAllSleep({})
-                } catch (err) { //
+                    await deleteAllSleep()
+                } catch (err) {
+                    console.log(err)
                 }
 
                 const result = await createSleep({
@@ -1561,10 +1630,13 @@ describe('Routes: users.children.sleep', () => {
     })
 })
 async function createSleep(item): Promise<any> {
-    return await Promise.resolve(SleepRepoModel.create(item))
+    const sleepMapper: SleepEntityMapper = new SleepEntityMapper()
+    const resultModel = sleepMapper.transform(item)
+    const resultModelEntity = sleepMapper.transform(resultModel)
+    return await Promise.resolve(SleepRepoModel.create(resultModelEntity))
 }
 
-function deleteAllSleep(doc): void {
+function deleteAllSleep(): void {
     SleepRepoModel.deleteMany({}, err => {
         if (err) console.log('err: ' + err)
     })

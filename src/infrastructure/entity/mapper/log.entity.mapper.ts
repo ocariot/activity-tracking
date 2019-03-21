@@ -19,6 +19,24 @@ export class LogEntityMapper implements IEntityMapper<Log, LogEntity> {
     public modelToModelEntity(item: Log): LogEntity {
         const result: LogEntity = new LogEntity()
 
+        /**
+         * Converts the log date to a valid format if necessary
+         */
+        const dateSplit = item.date.split('-')
+
+        let month = dateSplit[1]
+
+        let day = dateSplit[2]
+
+        // Pass the month to the valid format
+        if (month.length === 1) month = month.padStart(2, '0')
+
+        // Pass the day to the valid format
+        if (day.length === 1) day = day.padStart(2, '0')
+
+        // Creates the log date with the same or new elements (if the month or day is in '1' format instead of '01')
+        item.date = `${dateSplit[0]}-${month}-${day}`
+
         if (item.id) result.id = item.id
         if (item.date) result.date = new Date((item.date).concat('T00:00:00'))
         if (item.value !== undefined) result.value = item.value

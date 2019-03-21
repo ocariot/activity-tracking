@@ -10,6 +10,7 @@ import { expect } from 'chai'
 import { Measurement, MeasurementType } from '../../../src/application/domain/model/measurement'
 import { EnvironmentRepoModel } from '../../../src/infrastructure/database/schema/environment.schema'
 import { Strings } from '../../../src/utils/strings'
+import { EnvironmentEntityMapper } from '../../../src/infrastructure/entity/mapper/environment.entity.mapper'
 
 const container: Container = DI.getInstance().getContainer()
 const backgroundServices: BackgroundService = container.get(Identifier.BACKGROUND_SERVICE)
@@ -20,6 +21,7 @@ describe('Routes: environments', () => {
 
     const defaultEnvironment: Environment = new EnvironmentMock()
 
+    // Start services
     before(async () => {
         try {
             await backgroundServices.startServices()
@@ -255,7 +257,31 @@ describe('Routes: environments', () => {
      */
     describe('GET /environments', () => {
         context('when get all environment of the database successfully', () => {
-            it('should return status code 200 and a list of environments found', () => {
+            it('should return status code 200 and a list of environments found', async () => {
+                await createEnvironment({
+                    institution_id: defaultEnvironment.institution_id,
+                    location: {
+                        local: 'Indoor',
+                        room: 'Bloco H sala 01',
+                        latitude: '-7.2100766',
+                        longitude: '-35.9175756'
+                    },
+                    measurements: [
+                        {
+                            type: MeasurementType.TEMPERATURE,
+                            value: defaultEnvironment.measurements![0].value,
+                            unit: '°C'
+                        },
+                        {
+                            type: MeasurementType.HUMIDITY,
+                            value: defaultEnvironment.measurements![1].value,
+                            unit: '%'
+                        }
+                    ],
+                    climatized: defaultEnvironment.climatized,
+                    timestamp: new Date(2019)
+                })
+
                 return request
                     .get('/environments')
                     .set('Content-Type', 'application/json')
@@ -284,7 +310,7 @@ describe('Routes: environments', () => {
                         expect(res.body[0]).to.have.property('climatized')
                         expect(res.body[0].climatized).to.eql(defaultEnvironment.climatized)
                         expect(res.body[0]).to.have.property('timestamp')
-                        expect(res.body[0].timestamp).to.eql(defaultEnvironment.timestamp.toISOString())
+                        expect(res.body[0].timestamp).to.eql((new Date(2019)).toISOString())
                     })
             })
         })
@@ -292,8 +318,9 @@ describe('Routes: environments', () => {
         context('when there are no environment in the database', () => {
             it('should return status code 200 and an empty list', async () => {
                 try {
-                    await deleteAllEnvironments({})
-                } catch (err) { //
+                    await deleteAllEnvironments()
+                } catch (err) {
+                    console.log(err)
                 }
 
                 return request
@@ -394,8 +421,9 @@ describe('Routes: environments', () => {
             'environment in the database', () => {
             it('should return status code 200 and an empty list', async () => {
                 try {
-                    deleteAllEnvironments({})
-                } catch (err) { //
+                    deleteAllEnvironments()
+                } catch (err) {
+                    console.log(err)
                 }
 
                 const url = '/environments?climatized=true&fields=institution_id,location,measurements,' +
@@ -455,8 +483,9 @@ describe('Routes: environments', () => {
         context('when the environment is not found', () => {
             it('should return status code 204 and no content for environment', () => {
                 try {
-                    deleteAllEnvironments({})
-                } catch (err) { //
+                    deleteAllEnvironments()
+                } catch (err) {
+                    console.log(err)
                 }
 
                 return request
@@ -472,8 +501,9 @@ describe('Routes: environments', () => {
         context('when the environment id is invalid', () => {
             it('should return status code 400 and info message about the invalid environment id', async () => {
                 try {
-                    deleteAllEnvironments({})
-                } catch (err) { //
+                    deleteAllEnvironments()
+                } catch (err) {
+                    console.log(err)
                 }
 
                 return request
@@ -494,10 +524,13 @@ describe('Routes: environments', () => {
 })
 
 async function createEnvironment(item): Promise<any> {
-    return await Promise.resolve(EnvironmentRepoModel.create(item))
+    const environmentMapper: EnvironmentEntityMapper = new EnvironmentEntityMapper()
+    const resultModel = environmentMapper.transform(item)
+    const resultModelEntity = environmentMapper.transform(resultModel)
+    return await Promise.resolve(EnvironmentRepoModel.create(resultModelEntity))
 }
 
-function deleteAllEnvironments(doc): void {
+function deleteAllEnvironments(): void {
     EnvironmentRepoModel.deleteMany({}, err => {
         if (err) console.log('err: ' + err)
     })

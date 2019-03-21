@@ -50,6 +50,7 @@ export class LogService implements ILogService {
                 // 2. Build a query.
                 const query: IQuery = new Query()
                 query.filters = {
+                    child_id: elem.child_id,
                     type: elem.type,
                     date: elem.date.concat('T00:00:00')
                 }

@@ -163,7 +163,7 @@ export class ActivityController {
     }
 
     /**
-     * Add new physical activity.
+     * Add new physical activity log.
      *
      * @param {Request} req
      * @param {Response} res
