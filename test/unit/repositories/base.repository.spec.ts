@@ -46,30 +46,55 @@ describe('Repositories: Base', () => {
     })
 
     describe('create(item: T)', () => {
-        it('should return a sleep object.', () => {
+        context('when create a item with success', () => {
+            it('should return a sleep object.', () => {
 
-            sinon
-                .mock(modelFake)
-                .expects('create')
-                .chain('exec')
-                .resolves(defaultSleep)
+                sinon
+                    .mock(modelFake)
+                    .expects('create')
+                    .chain('exec')
+                    .resolves(defaultSleep)
 
-            return repo.create(defaultSleep)
-                .then(sleep => {
-                    sleep = sleep.toJSON()
-                    assert.property(sleep, 'id')
-                    assert.propertyVal(sleep, 'id', sleep.id)
-                    assert.property(sleep, 'start_time')
-                    assert.propertyVal(sleep, 'start_time', sleep.start_time)
-                    assert.property(sleep, 'end_time')
-                    assert.propertyVal(sleep, 'end_time', sleep.end_time)
-                    assert.property(sleep, 'duration')
-                    assert.propertyVal(sleep, 'duration', sleep.duration)
-                    assert.property(sleep, 'pattern')
-                    assert.propertyVal(sleep, 'pattern', sleep.pattern)
-                    assert.property(sleep, 'child_id')
-                    assert.propertyVal(sleep, 'child_id', sleep.child_id)
-                })
+                return repo.create(defaultSleep)
+                    .then(sleep => {
+                        sleep = sleep.toJSON()
+                        assert.property(sleep, 'id')
+                        assert.propertyVal(sleep, 'id', sleep.id)
+                        assert.property(sleep, 'start_time')
+                        assert.propertyVal(sleep, 'start_time', sleep.start_time)
+                        assert.property(sleep, 'end_time')
+                        assert.propertyVal(sleep, 'end_time', sleep.end_time)
+                        assert.property(sleep, 'duration')
+                        assert.propertyVal(sleep, 'duration', sleep.duration)
+                        assert.property(sleep, 'pattern')
+                        assert.propertyVal(sleep, 'pattern', sleep.pattern)
+                        assert.property(sleep, 'child_id')
+                        assert.propertyVal(sleep, 'child_id', sleep.child_id)
+                    })
+            })
+        })
+
+        context('when a database error occurs', () => {
+            it('should throw a RepositoryException', () => {
+
+                sinon
+                    .mock(modelFake)
+                    .expects('create')
+                    .chain('exec')
+                    .rejects({
+                        message: 'An internal error has occurred in the database!',
+                        description: 'Please try again later...'
+                    })
+
+                return repo.create(queryMock)
+                    .catch(err => {
+                        assert.isNotNull(err)
+                        assert.property(err, 'message')
+                        assert.propertyVal(err, 'message', 'An internal error has occurred in the database!')
+                        assert.property(err, 'description')
+                        assert.propertyVal(err, 'description', 'Please try again later...')
+                    })
+            })
         })
     })
 
@@ -133,6 +158,36 @@ describe('Repositories: Base', () => {
                     })
             })
         })
+
+        context('when a database error occurs', () => {
+            it('should throw a RepositoryException', () => {
+                sinon
+                    .mock(modelFake)
+                    .expects('find')
+                    .chain('select')
+                    .withArgs(queryMock.toJSON().fields)
+                    .chain('sort')
+                    .withArgs(queryMock.toJSON().ordination)
+                    .chain('skip')
+                    .withArgs(queryMock.toJSON().pagination.skip)
+                    .chain('limit')
+                    .withArgs(queryMock.toJSON().pagination.limit)
+                    .chain('exec')
+                    .rejects({
+                        message: 'An internal error has occurred in the database!',
+                        description: 'Please try again later...'
+                    })
+
+                return repo.find(queryMock)
+                    .catch (err => {
+                        assert.isNotNull(err)
+                        assert.property(err, 'message')
+                        assert.propertyVal(err, 'message', 'An internal error has occurred in the database!')
+                        assert.property(err, 'description')
+                        assert.propertyVal(err, 'description', 'Please try again later...')
+                    })
+            })
+        })
     })
 
     describe('findOne(query: IQuery)', () => {
@@ -189,6 +244,31 @@ describe('Repositories: Base', () => {
                 return repo.findOne(customQueryMock)
                     .then(sleep => {
                         assert.isNotObject(sleep)
+                    })
+            })
+        })
+
+        context('when a database error occurs', () => {
+            it('should throw a RepositoryException', () => {
+                sinon
+                    .mock(modelFake)
+                    .expects('findOne')
+                    .withArgs(customQueryMock.toJSON().filters)
+                    .chain('select')
+                    .withArgs(customQueryMock.toJSON().fields)
+                    .chain('exec')
+                    .rejects({
+                        message: 'An internal error has occurred in the database!',
+                        description: 'Please try again later...'
+                    })
+
+                return repo.findOne(customQueryMock)
+                    .catch (err => {
+                        assert.isNotNull(err)
+                        assert.property(err, 'message')
+                        assert.propertyVal(err, 'message', 'An internal error has occurred in the database!')
+                        assert.property(err, 'description')
+                        assert.propertyVal(err, 'description', 'Please try again later...')
                     })
             })
         })
@@ -258,7 +338,32 @@ describe('Repositories: Base', () => {
                         assert.equal(err.message, 'Some ID provided, does not have a valid format.')
                     })
             })
+        })
 
+        context('when a database error occurs', () => {
+            it('should throw a RepositoryException', () => {
+
+                defaultSleep.id = '5a62be07de34500146d9c544'
+
+                sinon
+                    .mock(modelFake)
+                    .expects('findOneAndUpdate')
+                    .withArgs({ _id: defaultSleep.id }, defaultSleep, { new: true })
+                    .chain('exec')
+                    .rejects({
+                        message: 'An internal error has occurred in the database!',
+                        description: 'Please try again later...'
+                    })
+
+                return repo.update(defaultSleep)
+                    .catch (err => {
+                        assert.isNotNull(err)
+                        assert.property(err, 'message')
+                        assert.propertyVal(err, 'message', 'An internal error has occurred in the database!')
+                        assert.property(err, 'description')
+                        assert.propertyVal(err, 'description', 'Please try again later...')
+                    })
+            })
         })
     })
 
@@ -320,6 +425,32 @@ describe('Repositories: Base', () => {
                     })
             })
         })
+
+        context('when a database occurs', () => {
+            it('should throw a RepositoryException', () => {
+
+                const id: string = '5a62be07de34500146d9c544'
+
+                sinon
+                    .mock(modelFake)
+                    .expects('findOneAndDelete')
+                    .withArgs({ _id: id })
+                    .chain('exec')
+                    .rejects({
+                        message: 'An internal error has occurred in the database!',
+                        description: 'Please try again later...'
+                    })
+
+                return repo.delete(id)
+                    .catch (err => {
+                        assert.isNotNull(err)
+                        assert.property(err, 'message')
+                        assert.propertyVal(err, 'message', 'An internal error has occurred in the database!')
+                        assert.property(err, 'description')
+                        assert.propertyVal(err, 'description', 'Please try again later...')
+                    })
+            })
+        })
     })
 
     describe('count(query: IQuery)', () => {
@@ -375,6 +506,41 @@ describe('Repositories: Base', () => {
                     .then((countSleep: number) => {
                         assert.isNumber(countSleep)
                         assert.equal(countSleep, 0)
+                    })
+            })
+        })
+
+        context('when a database occurs', () => {
+            it('should throw a RepositoryException', () => {
+
+                const customQueryMock: any = {
+                    toJSON: () => {
+                        return {
+                            fields: {},
+                            ordination: {},
+                            pagination: { page: 1, limit: 100 },
+                            filters: { type: 3 }
+                        }
+                    }
+                }
+
+                sinon
+                    .mock(modelFake)
+                    .expects('countDocuments')
+                    .withArgs(customQueryMock.toJSON().filters)
+                    .chain('exec')
+                    .rejects({
+                        message: 'An internal error has occurred in the database!',
+                        description: 'Please try again later...'
+                    })
+
+                return repo.count(customQueryMock)
+                    .catch (err => {
+                        assert.isNotNull(err)
+                        assert.property(err, 'message')
+                        assert.propertyVal(err, 'message', 'An internal error has occurred in the database!')
+                        assert.property(err, 'description')
+                        assert.propertyVal(err, 'description', 'Please try again later...')
                     })
             })
         })

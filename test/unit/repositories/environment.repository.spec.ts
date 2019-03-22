@@ -83,5 +83,48 @@ describe('Repositories: Environment', () => {
                     })
             })
         })
+
+        context('when a database error occurs', () => {
+            it('should throw a RepositoryException', async () => {
+                const customQueryMock: any = {
+                    toJSON: () => {
+                        return {
+                            fields: {},
+                            ordination: {},
+                            pagination: { page: 1, limit: 100, skip: 0 },
+                            filters: {
+                                'timestamp': defaultEnvironment.timestamp,
+                                'location.local': defaultEnvironment.location!.local,
+                                'location.room': defaultEnvironment.location!.room,
+                                'location.latitude': defaultEnvironment.location!.latitude,
+                                'location.longitude': defaultEnvironment.location!.longitude
+                            }
+                        }
+                    }
+                }
+
+                defaultEnvironment.timestamp = undefined!
+
+                sinon
+                    .mock(modelFake)
+                    .expects('findOne')
+                    .withArgs(customQueryMock.toJSON().filters)
+                    .chain('exec')
+                    .rejects({
+                        message: 'An internal error has occurred in the database!',
+                        description: 'Please try again later...'
+                    })
+
+                try {
+                    await repo.checkExist(defaultEnvironment)
+                } catch (err) {
+                    assert.isNotNull(err)
+                    assert.property(err, 'message')
+                    assert.propertyVal(err, 'message', 'An internal error has occurred in the database!')
+                    assert.property(err, 'description')
+                    assert.propertyVal(err, 'description', 'Please try again later...')
+                }
+            })
+        })
     })
 })

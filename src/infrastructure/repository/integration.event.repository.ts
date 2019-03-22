@@ -25,7 +25,7 @@ export class IntegrationEventRepository implements IIntegrationEventRepository {
     }
 
     public find(query: IQuery): Promise<Array<object>> {
-        query.addOrdination('createad_at', 'desc')
+        query.addOrdination('created_at', 'desc')
 
         const q: any = query.toJSON()
         return new Promise<Array<object>>((resolve, reject) => {

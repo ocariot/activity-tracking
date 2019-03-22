@@ -1835,7 +1835,7 @@ describe('Routes: users/children', () => {
             it('should update the value of the existing items already in the repository, create the new ones, and return a ' +
                 'response of type MultiStatus<Log> with the description of success in sending each log', async () => {
                 const newLog: Log = LogMock.generateLog()
-                newLog.date = '2019-10-12'
+                newLog.date = '2019-10-02'
                 correctLogsArr.push(newLog)
 
                 const body: any = []

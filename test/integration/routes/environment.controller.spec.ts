@@ -251,6 +251,21 @@ describe('Routes: environments', () => {
                     })
             })
         })
+
+        context('when the request body is not JSON type', () => {
+            it('should return status code 415 because the API only supports JSON body type', async () => {
+                const body = '<code></code>'
+
+                return request
+                    .post('/environments')
+                    .send(body)
+                    .set('Content-Type', 'text/xml')
+                    .expect(415)
+                    .then(err => {
+                        expect(err.text).to.not.be.empty
+                    })
+            })
+        })
     })
     /**
      * GET route

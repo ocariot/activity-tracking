@@ -81,7 +81,7 @@ describe('Repositories: PhysicalActivity', () => {
         })
 
         context('when the physical activity start_time is undefined', () => {
-            it('should return false', () => {
+            it('should throw a RepositoryException', () => {
 
                 defaultActivity.start_time = undefined
 
@@ -102,18 +102,24 @@ describe('Repositories: PhysicalActivity', () => {
                     .expects('findOne')
                     .withArgs(customQueryMock.toJSON().filters)
                     .chain('exec')
-                    .rejects({ name: 'ValidationError' })
+                    .rejects({
+                        message: 'An internal error has occurred in the database!',
+                        description: 'Please try again later...'
+                    })
 
                 return repo.checkExist(defaultActivity)
                     .catch((err: any) => {
                         assert.isNotNull(err)
-                        assert.equal(err.message, 'An internal error has occurred in the database!')
+                        assert.property(err, 'message')
+                        assert.propertyVal(err, 'message', 'An internal error has occurred in the database!')
+                        assert.property(err, 'description')
+                        assert.propertyVal(err, 'description', 'Please try again later...')
                     })
             })
         })
 
         context('when the physical activity id is undefined', () => {
-            it('should return false', () => {
+            it('should throw a RepositoryException', () => {
 
                 defaultActivity.start_time = new Date()
                 defaultActivity.id = undefined
@@ -135,12 +141,18 @@ describe('Repositories: PhysicalActivity', () => {
                     .expects('findOne')
                     .withArgs(customQueryMock.toJSON().filters)
                     .chain('exec')
-                    .rejects({ name: 'ValidationError' })
+                    .rejects({
+                        message: 'An internal error has occurred in the database!',
+                        description: 'Please try again later...'
+                    })
 
                 return repo.checkExist(defaultActivity)
                     .catch((err: any) => {
                         assert.isNotNull(err)
-                        assert.equal(err.message, 'An internal error has occurred in the database!')
+                        assert.property(err, 'message')
+                        assert.propertyVal(err, 'message', 'An internal error has occurred in the database!')
+                        assert.property(err, 'description')
+                        assert.propertyVal(err, 'description', 'Please try again later...')
                     })
             })
         })
@@ -294,6 +306,44 @@ describe('Repositories: PhysicalActivity', () => {
                     })
             })
         })
+
+        context('when a database error occurs', () => {
+            it('should throw a RepositoryException', async () => {
+                const customQueryMock: any = {
+                    toJSON: () => {
+                        return {
+                            fields: {},
+                            ordination: {},
+                            pagination: { page: 1, limit: 100, skip: 0 },
+                            filters: {  child_id: defaultActivity.child_id,
+                                _id: defaultActivity.id }
+                        }
+                    }
+                }
+
+                defaultActivity.child_id = '5a62be07de34500146d9c544'
+                defaultActivity.start_time = undefined
+
+                sinon
+                    .mock(modelFake)
+                    .expects('findOneAndUpdate')
+                    .withArgs(customQueryMock.toJSON().filters)
+                    .chain('exec')
+                    .rejects({
+                        message: 'An internal error has occurred in the database!',
+                        description: 'Please try again later...'
+                    })
+
+                return await repo.updateByChild(defaultActivity)
+                    .catch (err => {
+                        assert.isNotNull(err)
+                        assert.property(err, 'message')
+                        assert.propertyVal(err, 'message', 'An internal error has occurred in the database!')
+                        assert.property(err, 'description')
+                        assert.propertyVal(err, 'description', 'Please try again later...')
+                })
+            })
+        })
     })
 
     describe('removeByChild(activityId: string | number, childId: string)', () => {
@@ -375,6 +425,33 @@ describe('Repositories: PhysicalActivity', () => {
                     .then((isDeleted: boolean) => {
                         assert.isBoolean(isDeleted)
                         assert.isFalse(isDeleted)
+                    })
+            })
+        })
+
+        context('when a database error occurs', () => {
+            it('should throw a RepositoryException', async () => {
+
+                defaultActivity.child_id = '5a62be07de34500146d9c544'
+                defaultActivity.start_time = undefined
+
+                sinon
+                    .mock(modelFake)
+                    .expects('findOneAndDelete')
+                    .withArgs({ child_id: defaultActivity.child_id, _id: defaultActivity.id })
+                    .chain('exec')
+                    .rejects({
+                        message: 'An internal error has occurred in the database!',
+                        description: 'Please try again later...'
+                    })
+
+                return await repo.removeByChild(defaultActivity.id!, defaultActivity.child_id)
+                    .catch (err => {
+                        assert.isNotNull(err)
+                        assert.property(err, 'message')
+                        assert.propertyVal(err, 'message', 'An internal error has occurred in the database!')
+                        assert.property(err, 'description')
+                        assert.propertyVal(err, 'description', 'Please try again later...')
                     })
             })
         })
