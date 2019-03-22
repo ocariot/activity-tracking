@@ -128,8 +128,8 @@ export class LogService implements ILogService {
      */
     public async getByChildAndDate(childId: string, dateStart: string, dateEnd: string, query: IQuery): Promise<PhysicalActivityLog> {
         ObjectIdValidator.validate(childId, Strings.CHILD.PARAM_ID_NOT_VALID_FORMAT)
-        DateValidator.validate(dateStart.toString())
-        DateValidator.validate(dateEnd.toString())
+        DateValidator.validate(dateStart)
+        DateValidator.validate(dateEnd)
 
         query.addFilter({
             child_id: childId,

@@ -11,8 +11,8 @@ import { IPhysicalActivityService } from '../../application/port/physical.activi
 import { ILogger } from '../../utils/custom.logger'
 import { ILogService } from '../../application/port/log.service.interface'
 import { Log } from '../../application/domain/model/log'
-import { PhysicalActivityLog } from '../../application/domain/model/physical.activity.log'
 import { MultiStatus } from '../../application/domain/model/multi.status'
+import { PhysicalActivityLog } from '../../application/domain/model/physical.activity.log'
 
 /**
  * Controller that implements PhysicalActivity feature operations.
@@ -204,7 +204,6 @@ export class ActivityController {
         try {
             const result: PhysicalActivityLog = await this._activityLogService
                 .getByChildAndDate(req.params.child_id, req.params.date_start, req.params.date_end, new Query().fromJSON(req.query))
-            if (!result) return res.status(HttpStatus.NOT_FOUND).send(this.getMessageNotActivityLogFound())
             return res.status(HttpStatus.OK).send(result)
         } catch (err) {
             const handlerError = ApiExceptionManager.build(err)
@@ -227,7 +226,6 @@ export class ActivityController {
             const result: Array<Log> = await this._activityLogService
                 .getByChildResourceAndDate(req.params.child_id, req.params.resource, req.params.date_start, req.params.date_end,
                     new Query().fromJSON(req.query))
-            if (!result) return res.status(HttpStatus.NOT_FOUND).send(this.getMessageNotActivityLogFound())
             return res.status(HttpStatus.OK).send(result)
         } catch (err) {
             const handlerError = ApiExceptionManager.build(err)
@@ -244,14 +242,6 @@ export class ActivityController {
             HttpStatus.NOT_FOUND,
             'Physical Activity not found!',
             'Physical Activity not found or already removed. A new operation for the same resource is not required!'
-        ).toJson()
-    }
-
-    private getMessageNotActivityLogFound(): object {
-        return new ApiException(
-            HttpStatus.NOT_FOUND,
-            'Physical Activity log not found!',
-            'Physical Activity log not found. A new operation for the same resource is not required!'
         ).toJson()
     }
 }

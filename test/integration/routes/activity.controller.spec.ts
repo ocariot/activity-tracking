@@ -41,9 +41,7 @@ describe('Routes: users/children', () => {
     // Mock other incorrect log with invalid type
     const logJSON: any = {
         date: '2019-03-18',
-        value: 1000,
-        type: 'step',
-        child_id: '5a62be07de34500146d9c544',
+        value: -1000,
     }
 
     let otherLogIncorrect: Log = new Log()
@@ -54,6 +52,7 @@ describe('Routes: users/children', () => {
     before(async () => {
         try {
             await deleteAllActivity()
+            await deleteAllLogs()
             await backgroundServices.startServices()
         } catch (err) {
             throw new Error('Failure on users.children.physicalactivities routes test: ' + err.message)
@@ -116,7 +115,7 @@ describe('Routes: users/children', () => {
         })
 
         context('when a duplicate error occurs', () => {
-            it('should return status code 409 and a info message about duplicate items', () => {
+            it('should return status code 409 and an info message about duplicate items', () => {
                 const body = {
                     name: defaultActivity.name,
                     start_time: defaultActivity.start_time,
@@ -560,7 +559,9 @@ describe('Routes: users/children', () => {
                     })
             })
         })
-
+        /**
+         * query-strings-parser library test
+         */
         context('when get physical activity using the "query-strings-parser" library', () => {
             it('should return status code 200 and the result as needed in the query', async () => {
                 try {
@@ -728,7 +729,7 @@ describe('Routes: users/children', () => {
         })
 
         context('when the child_id is invalid', () => {
-            it('should return status code 400 and a info message about the invalid child_id', async () => {
+            it('should return status code 400 and an info message about the invalid child_id', async () => {
                 try {
                     await deleteAllActivity()
                 } catch (err) {
@@ -760,7 +761,9 @@ describe('Routes: users/children', () => {
                     })
             })
         })
-
+        /**
+         * query-strings-parser library test
+         */
         context('when get physical activity using the "query-strings-parser" library', () => {
             it('should return status code 200 and the result as needed in the query', async () => {
                 try {
@@ -853,7 +856,7 @@ describe('Routes: users/children', () => {
 
         context('when there is an attempt to get physical activity of a specific child using the "query-strings-parser" library ' +
             'but the child_id is invalid', () => {
-            it('should return status code 400 and a info message about the invalid child_id', async () => {
+            it('should return status code 400 and an info message about the invalid child_id', async () => {
                 try {
                     await deleteAllActivity()
                 } catch (err) {
@@ -946,7 +949,7 @@ describe('Routes: users/children', () => {
         })
 
         context('when there is no that specific physical activity associated with that child in the database', () => {
-            it('should return status code 404 and a info message describing that physical activity was not found', async () => {
+            it('should return status code 404 and an info message describing that physical activity was not found', async () => {
                 try {
                     await deleteAllActivity()
                 } catch (err) {
@@ -970,7 +973,7 @@ describe('Routes: users/children', () => {
         })
 
         context('when the child_id is invalid', () => {
-            it('should return status code 400 and a info message about the invalid child_id', async () => {
+            it('should return status code 400 and an info message about the invalid child_id', async () => {
                 try {
                     await deleteAllActivity()
                 } catch (err) {
@@ -1004,7 +1007,7 @@ describe('Routes: users/children', () => {
         })
 
         context('when the physical activity id is invalid', () => {
-            it('should return status code 400 and a info message about the invalid physical activity id', async () => {
+            it('should return status code 400 and an info message about the invalid physical activity id', async () => {
                 try {
                     await deleteAllActivity()
                 } catch (err) {
@@ -1036,7 +1039,9 @@ describe('Routes: users/children', () => {
                     })
             })
         })
-
+        /**
+         * query-strings-parser library test
+         */
         context('when get a specific physical activity of a child using the "query-strings-parser" library', () => {
             it('should return status code 200 and the result as needed in the query', async () => {
                 try {
@@ -1091,7 +1096,7 @@ describe('Routes: users/children', () => {
 
         context('when there is an attempt to get a specific physical activity using the "query-strings-parser" library ' +
             'but this physical activity does not exist', () => {
-            it('should return status code 404 and a info message describing that physical activity was not found', async () => {
+            it('should return status code 404 and an info message describing that physical activity was not found', async () => {
                 try {
                     await deleteAllActivity()
                 } catch (err) {
@@ -1136,7 +1141,7 @@ describe('Routes: users/children', () => {
 
         context('when there is an attempt to get a specific physical activity using the "query-strings-parser" library but the ' +
             'child_id is invalid', () => {
-            it('should return status code 400 and a info message about the invalid child_id', async () => {
+            it('should return status code 400 and an info message about the invalid child_id', async () => {
                 try {
                     await deleteAllActivity()
                 } catch (err) {
@@ -1174,7 +1179,7 @@ describe('Routes: users/children', () => {
 
         context('when there is an attempt to get a specific physical activity using the "query-strings-parser" library but the ' +
             'physical activity id is invalid', () => {
-            it('should return status code 400 and a info message about the invalid physical activity id', async () => {
+            it('should return status code 400 and an info message about the invalid physical activity id', async () => {
                 try {
                     await deleteAllActivity()
                 } catch (err) {
@@ -1257,7 +1262,7 @@ describe('Routes: users/children', () => {
         })
 
         context('when physical activity does not exist in the database', () => {
-            it('should return status code 404 and a info message about the error on the search', async () => {
+            it('should return status code 404 and an info message about the error on the search', async () => {
                 try {
                     await deleteAllActivity()
                 } catch (err) {
@@ -1294,7 +1299,7 @@ describe('Routes: users/children', () => {
         })
 
         context('when the child_id is invalid', () => {
-            it('should return status code 400 and a info message about the invalid child_id', async () => {
+            it('should return status code 400 and an info message about the invalid child_id', async () => {
                 try {
                     await deleteAllActivity()
                 } catch (err) {
@@ -1333,7 +1338,7 @@ describe('Routes: users/children', () => {
         })
 
         context('when the physical activity id is invalid', () => {
-            it('should return status code 400 and a info message about the invalid physical activity id', async () => {
+            it('should return status code 400 and an info message about the invalid physical activity id', async () => {
                 try {
                     await deleteAllActivity()
                 } catch (err) {
@@ -1692,7 +1697,7 @@ describe('Routes: users/children', () => {
         })
 
         context('when the child_id is invalid', () => {
-            it('should return status code 400 and a info message about the invalid child_id', async () => {
+            it('should return status code 400 and an info message about the invalid child_id', async () => {
                 try {
                     await deleteAllActivity()
                 } catch (err) {
@@ -1726,7 +1731,7 @@ describe('Routes: users/children', () => {
         })
 
         context('when the physical activity id is invalid', () => {
-            it('should return status code 400 and a info message about the invalid physical activity id', async () => {
+            it('should return status code 400 and an info message about the invalid physical activity id', async () => {
                 try {
                     await deleteAllActivity()
                 } catch (err) {
@@ -1763,7 +1768,7 @@ describe('Routes: users/children', () => {
      * POST route for Log
      */
     describe('POST /users/children/:child_id/physicalactivities/logs/:resource', () => {
-        context('when all the logs in the array are correct and it still does not exist in the repository', () => {
+        context('when all the logs in the body are correct and it still does not exist in the repository', () => {
             it('should return a response of type MultiStatus<Log> with the description of success in sending each log', async () => {
                 try {
                     await deleteAllLogs()
@@ -1788,7 +1793,673 @@ describe('Routes: users/children', () => {
                     .expect(201)
                     .then(res => {
                         expect(res.body).to.have.property('success')
+                        expect(res.body.success).is.an.instanceOf(Array)
+                        expect(res.body.success.length).to.not.eql(0)
                         expect(res.body).to.have.property('error')
+                        expect(res.body.error).is.an.instanceOf(Array)
+                        expect(res.body.error.length).to.eql(0)
+                    })
+            })
+        })
+
+        context('when all the logs in the body are correct and already exist in the repository', () => {
+            it('should update the value of items in the repository and return a response of type MultiStatus<Log> with ' +
+                'the description of success in sending each log', async () => {
+                const body: any = []
+
+                correctLogsArr.forEach(log => {
+                    const bodyElem = {
+                        date: log.date,
+                        value: log.value,
+                    }
+                    body.push(bodyElem)
+                })
+
+                return request
+                    .post(`/users/children/${defaultActivity.child_id}/physicalactivities/logs/${LogType.STEPS}`)
+                    .send(body)
+                    .set('Content-Type', 'application/json')
+                    .expect(201)
+                    .then(res => {
+                        expect(res.body).to.have.property('success')
+                        expect(res.body.success).is.an.instanceOf(Array)
+                        expect(res.body.success.length).to.not.eql(0)
+                        expect(res.body).to.have.property('error')
+                        expect(res.body.error).is.an.instanceOf(Array)
+                        expect(res.body.error.length).to.eql(0)
+                    })
+            })
+        })
+
+        context('when all the logs in the body are correct and some of them already exist in the repository', () => {
+            it('should update the value of the existing items already in the repository, create the new ones, and return a ' +
+                'response of type MultiStatus<Log> with the description of success in sending each log', async () => {
+                const newLog: Log = LogMock.generateLog()
+                newLog.date = '2019-10-12'
+                correctLogsArr.push(newLog)
+
+                const body: any = []
+
+                correctLogsArr.forEach(log => {
+                    const bodyElem = {
+                        date: log.date,
+                        value: log.value,
+                    }
+                    body.push(bodyElem)
+                })
+
+                return request
+                    .post(`/users/children/${defaultActivity.child_id}/physicalactivities/logs/${LogType.STEPS}`)
+                    .send(body)
+                    .set('Content-Type', 'application/json')
+                    .expect(201)
+                    .then(res => {
+                        expect(res.body).to.have.property('success')
+                        expect(res.body.success).is.an.instanceOf(Array)
+                        expect(res.body.success.length).to.not.eql(0)
+                        expect(res.body).to.have.property('error')
+                        expect(res.body.error).is.an.instanceOf(Array)
+                        expect(res.body.error.length).to.eql(0)
+                    })
+            })
+        })
+
+        context('when some of the logs in the body are incorrect (the date and value are invalid)', () => {
+            it('should perform the operations of creating and updating normally for the correct logs and returning a response ' +
+                'of type MultiStatus<Log> with the description of success and error cases of each log', async () => {
+                const body: any = []
+
+                mixedLogsArr.forEach(log => {
+                    const bodyElem = {
+                        date: log.date,
+                        value: log.value,
+                    }
+                    body.push(bodyElem)
+                })
+
+                return request
+                    .post(`/users/children/${defaultActivity.child_id}/physicalactivities/logs/${LogType.STEPS}`)
+                    .send(body)
+                    .set('Content-Type', 'application/json')
+                    .expect(201)
+                    .then(res => {
+                        expect(res.body).to.have.property('success')
+                        expect(res.body.success).is.an.instanceOf(Array)
+                        expect(res.body.success.length).to.not.eql(0)
+                        expect(res.body).to.have.property('error')
+                        expect(res.body.error).is.an.instanceOf(Array)
+                        expect(res.body.error.length).to.not.eql(0)
+                    })
+            })
+        })
+
+        context('when some of the logs in the body are incorrect (the child_id is invalid)', () => {
+            it('should perform the operations of creating and updating normally for the correct logs and returning a response ' +
+                'of type MultiStatus<Log> with the description of success and error cases of each log', async () => {
+                const body: any = []
+
+                correctLogsArr.forEach(log => {
+                    const bodyElem = {
+                        date: log.date,
+                        value: log.value,
+                    }
+                    body.push(bodyElem)
+                })
+
+                return request
+                    .post(`/users/children/123/physicalactivities/logs/${LogType.STEPS}`)
+                    .send(body)
+                    .set('Content-Type', 'application/json')
+                    .expect(201)
+                    .then(res => {
+                        expect(res.body).to.have.property('success')
+                        expect(res.body.success).is.an.instanceOf(Array)
+                        expect(res.body.success.length).to.eql(0)
+                        expect(res.body).to.have.property('error')
+                        expect(res.body.error).is.an.instanceOf(Array)
+                        expect(res.body.error.length).to.not.eql(0)
+                    })
+            })
+        })
+
+        context('when some of the logs in the body are incorrect (the type is invalid)', () => {
+            it('should perform the operations of creating and updating normally for the correct logs and returning a response ' +
+                'of type MultiStatus<Log> with the description of success and error cases of each log', async () => {
+                const body: any = []
+
+                correctLogsArr.forEach(log => {
+                    const bodyElem = {
+                        date: log.date,
+                        value: log.value,
+                    }
+                    body.push(bodyElem)
+                })
+
+                return request
+                    .post(`/users/children/${defaultActivity.child_id}/physicalactivities/logs/step`)
+                    .send(body)
+                    .set('Content-Type', 'application/json')
+                    .expect(201)
+                    .then(res => {
+                        expect(res.body).to.have.property('success')
+                        expect(res.body.success).is.an.instanceOf(Array)
+                        expect(res.body.success.length).to.eql(0)
+                        expect(res.body).to.have.property('error')
+                        expect(res.body.error).is.an.instanceOf(Array)
+                        expect(res.body.error.length).to.not.eql(0)
+                    })
+            })
+        })
+
+        context('when some of the logs in the array are incorrect (missing fields)', () => {
+            it('should perform the operations of creating and updating normally for the correct logs and returning a response ' +
+                'of type MultiStatus<Log> with the description of success and error cases of each log', async () => {
+                const emptyLog: Log = new Log()
+                correctLogsArr.push(emptyLog)
+
+                const body: any = []
+
+                correctLogsArr.forEach(log => {
+                    const bodyElem = {
+                        date: log.date,
+                        value: log.value,
+                    }
+                    body.push(bodyElem)
+                })
+
+                return request
+                    .post(`/users/children/${defaultActivity.child_id}/physicalactivities/logs/${LogType.CALORIES}`)
+                    .send(body)
+                    .set('Content-Type', 'application/json')
+                    .expect(201)
+                    .then(res => {
+                        expect(res.body).to.have.property('success')
+                        expect(res.body.success).is.an.instanceOf(Array)
+                        expect(res.body.success.length).to.not.eql(0)
+                        expect(res.body).to.have.property('error')
+                        expect(res.body.error).is.an.instanceOf(Array)
+                        expect(res.body.error.length).to.not.eql(0)
+                    })
+            })
+        })
+    })
+    /**
+     * GET route for Log
+     */
+    describe('GET /users/children/:child_id/physicalactivities/logs/date/:date_start/:date_end', () => {
+        context('when the parameters are correct and there are corresponding logs with the query', () => {
+            it('should return status code 200 and a PhysicalActivityLog with steps and/or calories logs', async () => {
+                const basePath = `/users/children/${defaultActivity.child_id}/physicalactivities/logs`
+                const specificPath = `/date/${correctLogsArr[0].date}/${correctLogsArr[0].date}`
+                const url = `${basePath}${specificPath}`
+
+                return request
+                    .get(url)
+                    .set('Content-Type', 'application/json')
+                    .expect(200)
+                    .then(res => {
+                        expect(res.body).to.have.property('steps')
+                        expect(res.body.steps).is.an.instanceOf(Array)
+                        expect(res.body).to.have.property('calories')
+                        expect(res.body.calories).is.an.instanceOf(Array)
+                    })
+            })
+        })
+
+        context('when the parameters are correct but there are no corresponding logs with the query', () => {
+            it('should return status code 200 and an empty PhysicalActivityLog', async () => {
+                const basePath = `/users/children/${defaultActivity.child_id}/physicalactivities/logs`
+                const specificPath = `/date/2005-10-01/2005-10-10`
+                const url = `${basePath}${specificPath}`
+
+                return request
+                    .get(url)
+                    .set('Content-Type', 'application/json')
+                    .expect(200)
+                    .then(res => {
+                        expect(res.body).to.have.property('steps')
+                        expect(res.body.steps).is.an.instanceOf(Array)
+                        expect(res.body.steps.length).to.eql(0)
+                        expect(res.body).to.have.property('calories')
+                        expect(res.body.calories).is.an.instanceOf(Array)
+                        expect(res.body.calories.length).to.eql(0)
+                    })
+            })
+        })
+
+        context('when the parameters are incorrect (child_id is invalid)', () => {
+            it('should return status code 400 and an info message about the invalid child_id', async () => {
+                const basePath = `/users/children/123/physicalactivities/logs`
+                const specificPath = `/date/${correctLogsArr[0].date}/${correctLogsArr[0].date}`
+                const url = `${basePath}${specificPath}`
+
+                return request
+                    .get(url)
+                    .set('Content-Type', 'application/json')
+                    .expect(400)
+                    .then(err => {
+                        expect(err.body).to.have.property('code')
+                        expect(err.body.code).to.eql(400)
+                        expect(err.body).to.have.property('message')
+                        expect(err.body.message).to.eql(Strings.CHILD.PARAM_ID_NOT_VALID_FORMAT)
+                        expect(err.body).to.have.property('description')
+                        expect(err.body.description).to.eql(Strings.ERROR_MESSAGE.UUID_NOT_VALID_FORMAT_DESC)
+                    })
+            })
+        })
+
+        context('when the parameters are incorrect (date_start is invalid)', () => {
+            it('should return status code 400 and an info message about the invalid date_start', async () => {
+                const basePath = `/users/children/${defaultActivity.child_id}/physicalactivities/logs`
+                const specificPath = `/date/20199-10-01/${correctLogsArr[0].date}`
+                const url = `${basePath}${specificPath}`
+
+                return request
+                    .get(url)
+                    .set('Content-Type', 'application/json')
+                    .expect(400)
+                    .then(err => {
+                        expect(err.body).to.have.property('code')
+                        expect(err.body.code).to.eql(400)
+                        expect(err.body).to.have.property('message')
+                        expect(err.body.message).to.eql('Date parameter: 20199-10-01, is not in valid ISO 8601 format.')
+                        expect(err.body).to.have.property('description')
+                        expect(err.body.description).to.eql('Date must be in the format: yyyy-MM-dd')
+                    })
+            })
+        })
+
+        context('when the parameters are incorrect (date_end is invalid)', () => {
+            it('should return status code 400 and an info message about the invalid date_end', async () => {
+                const basePath = `/users/children/${defaultActivity.child_id}/physicalactivities/logs`
+                const specificPath = `/date/${correctLogsArr[0].date}/20199-10-01`
+                const url = `${basePath}${specificPath}`
+
+                return request
+                    .get(url)
+                    .set('Content-Type', 'application/json')
+                    .expect(400)
+                    .then(err => {
+                        expect(err.body).to.have.property('code')
+                        expect(err.body.code).to.eql(400)
+                        expect(err.body).to.have.property('message')
+                        expect(err.body.message).to.eql('Date parameter: 20199-10-01, is not in valid ISO 8601 format.')
+                        expect(err.body).to.have.property('description')
+                        expect(err.body.description).to.eql('Date must be in the format: yyyy-MM-dd')
+                    })
+            })
+        })
+        /**
+         * query-strings-parser library test
+         */
+        context('when get all logs in a time interval using the "query-strings-parser" library', () => {
+            it('should return status code 200 and the result as needed in the query', async () => {
+                const basePath = `/users/children/${defaultActivity.child_id}/physicalactivities/logs`
+                const specificPath = `/date/${correctLogsArr[0].date}/${correctLogsArr[0].date}`
+                let url = `${basePath}${specificPath}?date=${correctLogsArr[0].date}&fields=date,value,type,child_id`
+                url += '&sort=date&page=1&limit=2'
+
+                return request
+                    .get(url)
+                    .set('Content-Type', 'application/json')
+                    .expect(200)
+                    .then(res => {
+                        expect(res.body).to.have.property('steps')
+                        expect(res.body.steps).is.an.instanceOf(Array)
+                        expect(res.body).to.have.property('calories')
+                        expect(res.body.calories).is.an.instanceOf(Array)
+                    })
+            })
+        })
+
+        context('when there is an attempt to get all logs in a time interval using the "query-strings-parser" library but there ' +
+                'are no corresponding logs with the query in the database', () => {
+            it('should return status code 200 and an empty PhysicalActivityLog', async () => {
+                const basePath = `/users/children/${defaultActivity.child_id}/physicalactivities/logs`
+                const specificPath = `/date/2005-10-01/2005-10-10`
+                let url = `${basePath}${specificPath}?date=${correctLogsArr[0].date}&fields=date,value,type,child_id`
+                url += '&sort=date&page=1&limit=2'
+
+                return request
+                    .get(url)
+                    .set('Content-Type', 'application/json')
+                    .expect(200)
+                    .then(res => {
+                        expect(res.body).to.have.property('steps')
+                        expect(res.body.steps).is.an.instanceOf(Array)
+                        expect(res.body.steps.length).to.eql(0)
+                        expect(res.body).to.have.property('calories')
+                        expect(res.body.calories).is.an.instanceOf(Array)
+                        expect(res.body.calories.length).to.eql(0)
+                    })
+            })
+        })
+
+        context('when there is an attempt to get all logs in a time interval using the "query-strings-parser" library ' +
+                'but the parameters are incorrect (child_id is invalid)', () => {
+            it('should return status code 400 and an info message about the invalid child_id', async () => {
+                const basePath = `/users/children/123/physicalactivities/logs`
+                const specificPath = `/date/${correctLogsArr[0].date}/${correctLogsArr[0].date}`
+                let url = `${basePath}${specificPath}?date=${correctLogsArr[0].date}&fields=date,value,type,child_id`
+                url += '&sort=date&page=1&limit=2'
+
+                return request
+                    .get(url)
+                    .set('Content-Type', 'application/json')
+                    .expect(400)
+                    .then(err => {
+                        expect(err.body).to.have.property('code')
+                        expect(err.body.code).to.eql(400)
+                        expect(err.body).to.have.property('message')
+                        expect(err.body.message).to.eql(Strings.CHILD.PARAM_ID_NOT_VALID_FORMAT)
+                        expect(err.body).to.have.property('description')
+                        expect(err.body.description).to.eql(Strings.ERROR_MESSAGE.UUID_NOT_VALID_FORMAT_DESC)
+                    })
+            })
+        })
+
+        context('when there is an attempt to get all logs in a time interval using the "query-strings-parser" library ' +
+                'but the parameters are incorrect (date_start is invalid)', () => {
+            it('should return status code 400 and an info message about the invalid date_start', async () => {
+                const basePath = `/users/children/${defaultActivity.child_id}/physicalactivities/logs`
+                const specificPath = `/date/20199-10-01/${correctLogsArr[0].date}`
+                let url = `${basePath}${specificPath}?date=${correctLogsArr[0].date}&fields=date,value,type,child_id`
+                url += '&sort=date&page=1&limit=2'
+
+                return request
+                    .get(url)
+                    .set('Content-Type', 'application/json')
+                    .expect(400)
+                    .then(err => {
+                        expect(err.body).to.have.property('code')
+                        expect(err.body.code).to.eql(400)
+                        expect(err.body).to.have.property('message')
+                        expect(err.body.message).to.eql('Date parameter: 20199-10-01, is not in valid ISO 8601 format.')
+                        expect(err.body).to.have.property('description')
+                        expect(err.body.description).to.eql('Date must be in the format: yyyy-MM-dd')
+                    })
+            })
+        })
+
+        context('when there is an attempt to get all logs in a time interval using the "query-strings-parser" library ' +
+                'but the parameters are incorrect (date_end is invalid)', () => {
+            it('should return status code 400 and an info message about the invalid date_end', async () => {
+                const basePath = `/users/children/${defaultActivity.child_id}/physicalactivities/logs`
+                const specificPath = `/date/${correctLogsArr[0].date}/20199-10-01`
+                let url = `${basePath}${specificPath}?date=${correctLogsArr[0].date}&fields=date,value,type,child_id`
+                url += '&sort=date&page=1&limit=2'
+
+                return request
+                    .get(url)
+                    .set('Content-Type', 'application/json')
+                    .expect(400)
+                    .then(err => {
+                        expect(err.body).to.have.property('code')
+                        expect(err.body.code).to.eql(400)
+                        expect(err.body).to.have.property('message')
+                        expect(err.body.message).to.eql('Date parameter: 20199-10-01, is not in valid ISO 8601 format.')
+                        expect(err.body).to.have.property('description')
+                        expect(err.body.description).to.eql('Date must be in the format: yyyy-MM-dd')
+                    })
+            })
+        })
+    })
+    /**
+     * GET route for Log by resource
+     */
+    describe('GET /users/children/:child_id/physicalactivities/logs/:resource/date/:date_start/:date_end', () => {
+        context('when the parameters are correct and there are corresponding logs with the query', () => {
+            it('should return status code 200 and an array of Logs with steps and/or calories logs', async () => {
+                const basePath = `/users/children/${defaultActivity.child_id}/physicalactivities/logs/${correctLogsArr[0].type}`
+                const specificPath = `/date/${correctLogsArr[0].date}/${correctLogsArr[0].date}`
+                const url = `${basePath}${specificPath}`
+
+                return request
+                    .get(url)
+                    .set('Content-Type', 'application/json')
+                    .expect(200)
+                    .then(res => {
+                        expect(res.body).is.an.instanceOf(Array)
+                        expect(res.body.length).to.not.eql(0)
+                    })
+            })
+        })
+
+        context('when the parameters are correct but there are no corresponding logs with the query', () => {
+            it('should return status code 200 and an empty array of logs', async () => {
+                const basePath = `/users/children/${defaultActivity.child_id}/physicalactivities/logs/${correctLogsArr[0].type}`
+                const specificPath = `/date/2005-10-01/2005-10-10`
+                const url = `${basePath}${specificPath}`
+
+                return request
+                    .get(url)
+                    .set('Content-Type', 'application/json')
+                    .expect(200)
+                    .then(res => {
+                        expect(res.body).is.an.instanceOf(Array)
+                        expect(res.body.length).to.eql(0)
+                    })
+            })
+        })
+
+        context('when the parameters are incorrect (child_id is invalid)', () => {
+            it('should return status code 400 and an info message about the invalid child_id', async () => {
+                const basePath = `/users/children/123/physicalactivities/logs/${correctLogsArr[0].type}`
+                const specificPath = `/date/${correctLogsArr[0].date}/${correctLogsArr[0].date}`
+                const url = `${basePath}${specificPath}`
+
+                return request
+                    .get(url)
+                    .set('Content-Type', 'application/json')
+                    .expect(400)
+                    .then(err => {
+                        expect(err.body).to.have.property('code')
+                        expect(err.body.code).to.eql(400)
+                        expect(err.body).to.have.property('message')
+                        expect(err.body.message).to.eql(Strings.CHILD.PARAM_ID_NOT_VALID_FORMAT)
+                        expect(err.body).to.have.property('description')
+                        expect(err.body.description).to.eql(Strings.ERROR_MESSAGE.UUID_NOT_VALID_FORMAT_DESC)
+                    })
+            })
+        })
+
+        context('when the parameters are incorrect (resource is invalid)', () => {
+            it('should return status code 400 and an info message about the invalid resource', async () => {
+                const basePath = `/users/children/${defaultActivity.child_id}/physicalactivities/logs/step`
+                const specificPath = `/date/${correctLogsArr[0].date}/${correctLogsArr[0].date}`
+                const url = `${basePath}${specificPath}`
+
+                return request
+                    .get(url)
+                    .set('Content-Type', 'application/json')
+                    .expect(400)
+                    .then(err => {
+                        expect(err.body).to.have.property('code')
+                        expect(err.body.code).to.eql(400)
+                        expect(err.body).to.have.property('message')
+                        expect(err.body.message).to.eql('The name of type provided "step" is not supported...')
+                        expect(err.body).to.have.property('description')
+                        expect(err.body.description).to.eql('The names of the allowed types are: steps, calories.')
+                    })
+            })
+        })
+
+        context('when the parameters are incorrect (date_start is invalid)', () => {
+            it('should return status code 400 and an info message about the invalid date_start', async () => {
+                const basePath = `/users/children/${defaultActivity.child_id}/physicalactivities/logs/${correctLogsArr[0].type}`
+                const specificPath = `/date/20199-10-01/${correctLogsArr[0].date}`
+                const url = `${basePath}${specificPath}`
+
+                return request
+                    .get(url)
+                    .set('Content-Type', 'application/json')
+                    .expect(400)
+                    .then(err => {
+                        expect(err.body).to.have.property('code')
+                        expect(err.body.code).to.eql(400)
+                        expect(err.body).to.have.property('message')
+                        expect(err.body.message).to.eql('Date parameter: 20199-10-01, is not in valid ISO 8601 format.')
+                        expect(err.body).to.have.property('description')
+                        expect(err.body.description).to.eql('Date must be in the format: yyyy-MM-dd')
+                    })
+            })
+        })
+
+        context('when the parameters are incorrect (date_end is invalid)', () => {
+            it('should return status code 400 and an info message about the invalid date_end', async () => {
+                const basePath = `/users/children/${defaultActivity.child_id}/physicalactivities/logs/${correctLogsArr[0].type}`
+                const specificPath = `/date/${correctLogsArr[0].date}/20199-10-01`
+                const url = `${basePath}${specificPath}`
+
+                return request
+                    .get(url)
+                    .set('Content-Type', 'application/json')
+                    .expect(400)
+                    .then(err => {
+                        expect(err.body).to.have.property('code')
+                        expect(err.body.code).to.eql(400)
+                        expect(err.body).to.have.property('message')
+                        expect(err.body.message).to.eql('Date parameter: 20199-10-01, is not in valid ISO 8601 format.')
+                        expect(err.body).to.have.property('description')
+                        expect(err.body.description).to.eql('Date must be in the format: yyyy-MM-dd')
+                    })
+            })
+        })
+        /**
+         * query-strings-parser library test
+         */
+        context('when get all logs in a time interval using the "query-strings-parser" library', () => {
+            it('should return status code 200 and the result as needed in the query', async () => {
+                const basePath = `/users/children/${defaultActivity.child_id}/physicalactivities/logs/${correctLogsArr[0].type}`
+                const specificPath = `/date/${correctLogsArr[0].date}/${correctLogsArr[0].date}`
+                let url = `${basePath}${specificPath}?date=${correctLogsArr[0].date}&fields=date,value,type,child_id`
+                url += '&sort=date&page=1&limit=2'
+
+                return request
+                    .get(url)
+                    .set('Content-Type', 'application/json')
+                    .expect(200)
+                    .then(res => {
+                        expect(res.body).is.an.instanceOf(Array)
+                        expect(res.body.length).to.not.eql(0)
+                    })
+            })
+        })
+
+        context('when there is an attempt to get all logs in a time interval using the "query-strings-parser" library but there ' +
+                'is no corresponding logs with the query in the database', () => {
+            it('should return status code 200 and an empty array of logs', async () => {
+                const basePath = `/users/children/${defaultActivity.child_id}/physicalactivities/logs/${correctLogsArr[0].type}`
+                const specificPath = `/date/2005-10-01/2005-10-10`
+                let url = `${basePath}${specificPath}?date=${correctLogsArr[0].date}&fields=date,value,type,child_id`
+                url += '&sort=date&page=1&limit=2'
+
+                return request
+                    .get(url)
+                    .set('Content-Type', 'application/json')
+                    .expect(200)
+                    .then(res => {
+                        expect(res.body).is.an.instanceOf(Array)
+                        expect(res.body.length).to.eql(0)
+                    })
+            })
+        })
+
+        context('when there is an attempt to get all logs in a time interval using the "query-strings-parser" library ' +
+                'but the parameters are incorrect (child_id is invalid)', () => {
+            it('should return status code 400 and an info message about the invalid child_id', async () => {
+                const basePath = `/users/children/123/physicalactivities/logs/${correctLogsArr[0].type}`
+                const specificPath = `/date/${correctLogsArr[0].date}/${correctLogsArr[0].date}`
+                let url = `${basePath}${specificPath}?date=${correctLogsArr[0].date}&fields=date,value,type,child_id`
+                url += '&sort=date&page=1&limit=2'
+
+                return request
+                    .get(url)
+                    .set('Content-Type', 'application/json')
+                    .expect(400)
+                    .then(err => {
+                        expect(err.body).to.have.property('code')
+                        expect(err.body.code).to.eql(400)
+                        expect(err.body).to.have.property('message')
+                        expect(err.body.message).to.eql(Strings.CHILD.PARAM_ID_NOT_VALID_FORMAT)
+                        expect(err.body).to.have.property('description')
+                        expect(err.body.description).to.eql(Strings.ERROR_MESSAGE.UUID_NOT_VALID_FORMAT_DESC)
+                    })
+            })
+        })
+
+        context('when there is an attempt to get all logs in a time interval using the "query-strings-parser" library ' +
+                'but the parameters are incorrect (resource is invalid)', () => {
+            it('should return status code 400 and an info message about the invalid resource', async () => {
+                const basePath = `/users/children/${defaultActivity.child_id}/physicalactivities/logs/calorie`
+                const specificPath = `/date/${correctLogsArr[0].date}/${correctLogsArr[0].date}`
+                let url = `${basePath}${specificPath}?date=${correctLogsArr[0].date}&fields=date,value,type,child_id`
+                url += '&sort=date&page=1&limit=2'
+
+                return request
+                    .get(url)
+                    .set('Content-Type', 'application/json')
+                    .expect(400)
+                    .then(err => {
+                        expect(err.body).to.have.property('code')
+                        expect(err.body.code).to.eql(400)
+                        expect(err.body).to.have.property('message')
+                        expect(err.body.message).to.eql('The name of type provided "calorie" is not supported...')
+                        expect(err.body).to.have.property('description')
+                        expect(err.body.description).to.eql('The names of the allowed types are: steps, calories.')
+                    })
+            })
+        })
+
+        context('when there is an attempt to get all logs in a time interval using the "query-strings-parser" library ' +
+                'but the parameters are incorrect (date_start is invalid)', () => {
+            it('should return status code 400 and an info message about the invalid date_start', async () => {
+                const basePath = `/users/children/${defaultActivity.child_id}/physicalactivities/logs/${correctLogsArr[0].type}`
+                const specificPath = `/date/20199-10-01/${correctLogsArr[0].date}`
+                let url = `${basePath}${specificPath}?date=${correctLogsArr[0].date}&fields=date,value,type,child_id`
+                url += '&sort=date&page=1&limit=2'
+
+                return request
+                    .get(url)
+                    .set('Content-Type', 'application/json')
+                    .expect(400)
+                    .then(err => {
+                        expect(err.body).to.have.property('code')
+                        expect(err.body.code).to.eql(400)
+                        expect(err.body).to.have.property('message')
+                        expect(err.body.message).to.eql('Date parameter: 20199-10-01, is not in valid ISO 8601 format.')
+                        expect(err.body).to.have.property('description')
+                        expect(err.body.description).to.eql('Date must be in the format: yyyy-MM-dd')
+                    })
+            })
+        })
+
+        context('when there is an attempt to get all logs in a time interval using the "query-strings-parser" library ' +
+                'but the parameters are incorrect (date_end is invalid)', () => {
+            it('should return status code 400 and an info message about the invalid date_end', async () => {
+                // Delete all logs for the next run to be cleaned
+                try {
+                    await deleteAllLogs()
+                } catch (err) {
+                    console.log(err)
+                }
+
+                const basePath = `/users/children/${defaultActivity.child_id}/physicalactivities/logs/${correctLogsArr[0].type}`
+                const specificPath = `/date/${correctLogsArr[0].date}/20199-10-01`
+                let url = `${basePath}${specificPath}?date=${correctLogsArr[0].date}&fields=date,value,type,child_id`
+                url += '&sort=date&page=1&limit=2'
+
+                return request
+                    .get(url)
+                    .set('Content-Type', 'application/json')
+                    .expect(400)
+                    .then(err => {
+                        expect(err.body).to.have.property('code')
+                        expect(err.body.code).to.eql(400)
+                        expect(err.body).to.have.property('message')
+                        expect(err.body.message).to.eql('Date parameter: 20199-10-01, is not in valid ISO 8601 format.')
+                        expect(err.body).to.have.property('description')
+                        expect(err.body.description).to.eql('Date must be in the format: yyyy-MM-dd')
                     })
             })
         })
@@ -1800,18 +2471,6 @@ async function createActivity(item): Promise<any> {
     const resultModel = activityMapper.transform(item)
     const resultModelEntity = activityMapper.transform(resultModel)
     return await Promise.resolve(ActivityRepoModel.create(resultModelEntity))
-}
-
-function deleteAllActivity(): void {
-    ActivityRepoModel.deleteMany({}, err => {
-        if (err) console.log(err)
-    })
-}
-
-function deleteAllLogs(): void {
-    ActivityLogRepoModel.deleteMany({}, err => {
-        if (err) console.log(err)
-    })
 }
 
 async function createActivityToBeUpdated(defaultActivity: PhysicalActivity): Promise<any> {
@@ -1828,4 +2487,16 @@ async function createActivityToBeUpdated(defaultActivity: PhysicalActivity): Pro
     })
 
     return await Promise.resolve(result)
+}
+
+function deleteAllActivity(): void {
+    ActivityRepoModel.deleteMany({}, err => {
+        if (err) console.log(err)
+    })
+}
+
+function deleteAllLogs(): void {
+    ActivityLogRepoModel.deleteMany({}, err => {
+        if (err) console.log(err)
+    })
 }

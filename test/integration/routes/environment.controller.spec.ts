@@ -74,7 +74,7 @@ describe('Routes: environments', () => {
         })
 
         context('when a duplicate error occurs', () => {
-            it('should return status code 409 and a info message about duplicate items', () => {
+            it('should return status code 409 and an info message about duplicate items', () => {
                 const body = {
                     institution_id: defaultEnvironment.institution_id,
                     location: defaultEnvironment.location,
@@ -333,7 +333,9 @@ describe('Routes: environments', () => {
                     })
             })
         })
-
+        /**
+         * query-strings-parser library test
+         */
         context('when get environment using the "query-strings-parser" library', () => {
             it('should return status code 200 and the result as needed in the query', async () => {
                 await createEnvironment({

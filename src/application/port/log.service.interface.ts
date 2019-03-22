@@ -1,8 +1,8 @@
 import { IService } from './service.interface'
 import { Log, LogType } from 'application/domain/model/log'
 import { IQuery } from './query.interface'
-import { PhysicalActivityLog } from '../domain/model/physical.activity.log'
 import { MultiStatus } from '../domain/model/multi.status'
+import { PhysicalActivityLog } from '../domain/model/physical.activity.log'
 
 /**
  * PhysicalActivityLog service interface.

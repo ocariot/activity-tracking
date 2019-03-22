@@ -76,7 +76,7 @@ describe('Routes: users.children.sleep', () => {
         })
 
         context('when a duplicate error occurs', () => {
-            it('should return status code 409 and a info message about duplicate items', () => {
+            it('should return status code 409 and an info message about duplicate items', () => {
                 const body = {
                     start_time: defaultSleep.start_time,
                     end_time: defaultSleep.end_time,
@@ -408,7 +408,9 @@ describe('Routes: users.children.sleep', () => {
                     })
             })
         })
-
+        /**
+         * query-strings-parser library test
+         */
         context('when get sleep using the "query-strings-parser" library', () => {
             it('should return status code 200 and the result as needed in the query', async () => {
                 try {
@@ -595,7 +597,7 @@ describe('Routes: users.children.sleep', () => {
         })
 
         context('when the child_id is invalid', () => {
-            it('should return status code 400 and a info message about the invalid child_id', async () => {
+            it('should return status code 400 and an info message about the invalid child_id', async () => {
                 try {
                     await deleteAllSleep()
                 } catch (err) {
@@ -640,7 +642,9 @@ describe('Routes: users.children.sleep', () => {
                     })
             })
         })
-
+        /**
+         * query-strings-parser library test
+         */
         context('when get sleep using the "query-strings-parser" library', () => {
             it('should return status code 200 and the result as needed in the query', async () => {
                 try {
@@ -725,7 +729,7 @@ describe('Routes: users.children.sleep', () => {
 
         context('when there is an attempt to get sleep of a specific child using the "query-strings-parser" library ' +
             'but the child_id is invalid', () => {
-            it('should return status code 400 and a info message about the invalid child_id', async () => {
+            it('should return status code 400 and an info message about the invalid child_id', async () => {
                 try {
                     await deleteAllSleep()
                 } catch (err) {
@@ -834,7 +838,7 @@ describe('Routes: users.children.sleep', () => {
         })
 
         context('when there is no that specific sleep associated with that child in the database', () => {
-            it('should return status code 404 and a info message describing that sleep was not found', async () => {
+            it('should return status code 404 and an info message describing that sleep was not found', async () => {
                 try {
                     await deleteAllSleep()
                 } catch (err) {
@@ -858,7 +862,7 @@ describe('Routes: users.children.sleep', () => {
         })
 
         context('when the child_id is invalid', () => {
-            it('should return status code 400 and a info message about the invalid child_id', async () => {
+            it('should return status code 400 and an info message about the invalid child_id', async () => {
                 try {
                     await deleteAllSleep()
                 } catch (err) {
@@ -905,7 +909,7 @@ describe('Routes: users.children.sleep', () => {
         })
 
         context('when the sleep id is invalid', () => {
-            it('should return status code 400 and a info message about the invalid sleep id', async () => {
+            it('should return status code 400 and an info message about the invalid sleep id', async () => {
                 try {
                     await deleteAllSleep()
                 } catch (err) {
@@ -950,7 +954,9 @@ describe('Routes: users.children.sleep', () => {
                     })
             })
         })
-
+        /**
+         * query-strings-parser library test
+         */
         context('when get a specific sleep of a child using the "query-strings-parser" library', () => {
             it('should return status code 200 and the result as needed in the query', async () => {
                 try {
@@ -1008,7 +1014,7 @@ describe('Routes: users.children.sleep', () => {
 
         context('when there is an attempt to get a specific sleep using the "query-strings-parser" library but this sleep ' +
             'does not exist', () => {
-            it('should return status code 404 and a info message describing that sleep was not found', async () => {
+            it('should return status code 404 and an info message describing that sleep was not found', async () => {
                 try {
                     await deleteAllSleep()
                 } catch (err) {
@@ -1036,7 +1042,7 @@ describe('Routes: users.children.sleep', () => {
 
         context('when there is an attempt to get a specific sleep using the "query-strings-parser" library but the ' +
             'child_id is invalid', () => {
-            it('should return status code 400 and a info message about the invalid child_id', async () => {
+            it('should return status code 400 and an info message about the invalid child_id', async () => {
                 try {
                     await deleteAllSleep()
                 } catch (err) {
@@ -1087,7 +1093,7 @@ describe('Routes: users.children.sleep', () => {
 
         context('when there is an attempt to get a specific sleep using the "query-strings-parser" library but the ' +
             'sleep id is invalid', () => {
-            it('should return status code 400 and a info message about the invalid sleep id', async () => {
+            it('should return status code 400 and an info message about the invalid sleep id', async () => {
                 try {
                     await deleteAllSleep()
                 } catch (err) {
@@ -1180,7 +1186,7 @@ describe('Routes: users.children.sleep', () => {
         })
 
         context('when sleep does not exist in the database', () => {
-            it('should return status code 404 and a info message about the error on the search', async () => {
+            it('should return status code 404 and an info message about the error on the search', async () => {
                 try {
                     await deleteAllSleep()
                 } catch (err) {
@@ -1213,7 +1219,7 @@ describe('Routes: users.children.sleep', () => {
         })
 
         context('when the child_id is invalid', () => {
-            it('should return status code 400 and a info message about the invalid child_id', async () => {
+            it('should return status code 400 and an info message about the invalid child_id', async () => {
                 try {
                     await deleteAllSleep()
                 } catch (err) {
@@ -1248,7 +1254,7 @@ describe('Routes: users.children.sleep', () => {
         })
 
         context('when the sleep id is invalid', () => {
-            it('should return status code 400 and a info message about the invalid sleep id', async () => {
+            it('should return status code 400 and an info message about the invalid sleep id', async () => {
                 try {
                     await deleteAllSleep()
                 } catch (err) {
@@ -1535,7 +1541,7 @@ describe('Routes: users.children.sleep', () => {
         })
 
         context('when the child_id is invalid', () => {
-            it('should return status code 400 and a info message about the invalid child_id', async () => {
+            it('should return status code 400 and an info message about the invalid child_id', async () => {
                 try {
                     await deleteAllSleep()
                 } catch (err) {
@@ -1582,7 +1588,7 @@ describe('Routes: users.children.sleep', () => {
         })
 
         context('when the sleep id is invalid', () => {
-            it('should return status code 400 and a info message about the invalid sleep id', async () => {
+            it('should return status code 400 and an info message about the invalid sleep id', async () => {
                 try {
                     await deleteAllSleep()
                 } catch (err) {
@@ -1636,12 +1642,6 @@ async function createSleep(item): Promise<any> {
     return await Promise.resolve(SleepRepoModel.create(resultModelEntity))
 }
 
-function deleteAllSleep(): void {
-    SleepRepoModel.deleteMany({}, err => {
-        if (err) console.log('err: ' + err)
-    })
-}
-
 async function createSleepToBeUpdated(defaultSleep: Sleep): Promise<any> {
     // Sleep to be updated
     const result =  createSleep({
@@ -1669,4 +1669,10 @@ async function createSleepToBeUpdated(defaultSleep: Sleep): Promise<any> {
     })
 
     return await Promise.resolve(result)
+}
+
+function deleteAllSleep(): void {
+    SleepRepoModel.deleteMany({}, err => {
+        if (err) console.log('err: ' + err)
+    })
 }
