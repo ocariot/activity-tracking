@@ -13,6 +13,7 @@ import { UpdateSleepValidator } from '../domain/validator/update.sleep.validator
 import { ObjectIdValidator } from '../domain/validator/object.id.validator'
 import { Strings } from '../../utils/strings'
 import { IIntegrationEventRepository } from '../port/integration.event.repository.interface'
+import { IntegrationEvent } from '../integration-event/event/integration.event'
 
 /**
  * Implementing sleep Service.
@@ -161,7 +162,7 @@ export class SleepService implements ISleepService {
      * operation at another time.
      * @param event
      */
-    private saveEvent(event: SleepSaveEvent): void {
+    private saveEvent(event: IntegrationEvent<Sleep>): void {
         const saveEvent: any = event.toJSON()
         saveEvent.__operation = 'publish'
         saveEvent.__routing_key = 'sleep.save'

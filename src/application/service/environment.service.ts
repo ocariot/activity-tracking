@@ -12,6 +12,7 @@ import { EnvironmentSaveEvent } from '../integration-event/event/environment.sav
 import { ObjectIdValidator } from '../domain/validator/object.id.validator'
 import { Strings } from '../../utils/strings'
 import { IIntegrationEventRepository } from '../port/integration.event.repository.interface'
+import { IntegrationEvent } from '../integration-event/event/integration.event'
 
 /**
  * Implementing Environment Service.
@@ -103,7 +104,7 @@ export class EnvironmentService implements IEnvironmentService {
      * operation at another time.
      * @param event
      */
-    private saveEvent(event: EnvironmentSaveEvent): void {
+    private saveEvent(event: IntegrationEvent<Environment>): void {
         const saveEvent: any = event.toJSON()
         saveEvent.__operation = 'publish'
         saveEvent.__routing_key = 'environments.save'

@@ -136,8 +136,6 @@ export class EventBusRabbitMQ implements IEventBus, IDisposable {
             await this.queue.close()
         }
         this.event_handlers.clear()
-        if (this.connectionPub.conn) await this.connectionPub.conn.close()
-        if (this.connectionSub.conn) await this.connectionSub.conn.close()
     }
 
     /**

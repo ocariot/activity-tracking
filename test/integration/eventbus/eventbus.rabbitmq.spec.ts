@@ -27,6 +27,9 @@ const pubEnvironmentTotal: number = 10
 
 describe('EVENT BUS', () => {
     before(() => eventBus.enableLogger(false))
+    afterEach(async () => {
+        await eventBus.dispose()
+    })
 
     describe('CONNECTION', () => {
         it('should return EventBusException with message without connection when publishing.', () => {
@@ -54,15 +57,18 @@ describe('EVENT BUS', () => {
 
         it('should connect successfully to publish.', async () => {
             await eventBus.connectionPub.tryConnect(1, 500)
+            expect(eventBus.connectionPub.isConnected).to.eql(true)
         })
 
         it('should connect successfully to subscribe.', async () => {
             await eventBus.connectionSub.tryConnect(1, 500)
+            expect(eventBus.connectionSub.isConnected).to.eql(true)
         })
     })
 
     describe('PUBLISH', () => {
         context('Physical Activity', () => {
+
             it('should return true for published RUN physical activity.', async () => {
                 await eventBus.connectionPub.tryConnect(1, 500)
                 return eventBus.publish(

@@ -2,7 +2,7 @@ import { ObjectID } from 'bson'
 import { assert } from 'chai'
 import { PhysicalActivity } from '../../../src/application/domain/model/physical.activity'
 import { ValidationException } from '../../../src/application/domain/exception/validation.exception'
-import { PhysicalActivityLevel } from '../../../src/application/domain/model/physical.activity.level'
+import { ActivityLevelType, PhysicalActivityLevel } from '../../../src/application/domain/model/physical.activity.level'
 
 describe('Models: PhysicalActivity', () => {
     const activityJSON: any = {
@@ -13,8 +13,11 @@ describe('Models: PhysicalActivity', () => {
         child_id: new ObjectID(),
         name: 'walk',
         calories: 250,
-        steps: '1000',
-        levels: new Array<PhysicalActivityLevel>()
+        steps: 1000,
+        levels: [new PhysicalActivityLevel(ActivityLevelType.SEDENTARY, Math.floor((Math.random() * 10) * 60000)),
+                 new PhysicalActivityLevel(ActivityLevelType.LIGHTLY, Math.floor((Math.random() * 10) * 60000)),
+                 new PhysicalActivityLevel(ActivityLevelType.FAIRLY, Math.floor((Math.random() * 10) * 60000)),
+                 new PhysicalActivityLevel(ActivityLevelType.VERY, Math.floor((Math.random() * 10) * 60000))]
     }
 
     describe('convertDatetimeString(value: string)', () => {
@@ -55,11 +58,30 @@ describe('Models: PhysicalActivity', () => {
                 assert(result.calories, 'calories must not be undefined')
                 assert.typeOf(result.calories, 'number')
                 assert.propertyVal(result, 'calories', activityJSON.calories)
-                try {
-                    assert.typeOf(result.steps, 'number')
-                } catch (e) { //
-                }
+                assert.typeOf(result.steps, 'number')
+                assert.propertyVal(result, 'steps', activityJSON.steps)
+                // PhysicalActivity levels
                 assert(result.levels, 'levels must not be undefined')
+                // Level 1
+                assert(result.levels![0].name, 'levels[0] name must not be undefined')
+                assert(result.levels![0].duration, 'levels[0] duration must not be undefined')
+                assert.propertyVal(result.levels![0], 'name', activityJSON.levels[0].name)
+                assert.propertyVal(result.levels![0], 'duration', activityJSON.levels[0].duration)
+                // Level 2
+                assert(result.levels![1].name, 'levels[1] name must not be undefined')
+                assert(result.levels![1].duration, 'levels[1] duration must not be undefined')
+                assert.propertyVal(result.levels![1], 'name', activityJSON.levels[1].name)
+                assert.propertyVal(result.levels![1], 'duration', activityJSON.levels[1].duration)
+                // Level 3
+                assert(result.levels![2].name, 'levels[2] name must not be undefined')
+                assert(result.levels![2].duration, 'levels[2] duration must not be undefined')
+                assert.propertyVal(result.levels![2], 'name', activityJSON.levels[2].name)
+                assert.propertyVal(result.levels![2], 'duration', activityJSON.levels[2].duration)
+                // Level 4
+                assert(result.levels![3].name, 'levels[3] name must not be undefined')
+                assert(result.levels![3].duration, 'levels[3] duration must not be undefined')
+                assert.propertyVal(result.levels![3], 'name', activityJSON.levels[3].name)
+                assert.propertyVal(result.levels![3], 'duration', activityJSON.levels[3].duration)
             })
         })
 
@@ -96,11 +118,30 @@ describe('Models: PhysicalActivity', () => {
                 assert(result.calories, 'calories must not be undefined')
                 assert.typeOf(result.calories, 'number')
                 assert.propertyVal(result, 'calories', activityJSON.calories)
-                try {
-                    assert.typeOf(result.steps, 'number')
-                } catch (e) { //
-                }
+                assert.typeOf(result.steps, 'number')
+                assert.propertyVal(result, 'steps', activityJSON.steps)
+                // PhysicalActivity levels
                 assert(result.levels, 'levels must not be undefined')
+                // Level 1
+                assert(result.levels![0].name, 'levels[0] name must not be undefined')
+                assert(result.levels![0].duration, 'levels[0] duration must not be undefined')
+                assert.propertyVal(result.levels![0], 'name', activityJSON.levels[0].name)
+                assert.propertyVal(result.levels![0], 'duration', activityJSON.levels[0].duration)
+                // Level 2
+                assert(result.levels![1].name, 'levels[1] name must not be undefined')
+                assert(result.levels![1].duration, 'levels[1] duration must not be undefined')
+                assert.propertyVal(result.levels![1], 'name', activityJSON.levels[1].name)
+                assert.propertyVal(result.levels![1], 'duration', activityJSON.levels[1].duration)
+                // Level 3
+                assert(result.levels![2].name, 'levels[2] name must not be undefined')
+                assert(result.levels![2].duration, 'levels[2] duration must not be undefined')
+                assert.propertyVal(result.levels![2], 'name', activityJSON.levels[2].name)
+                assert.propertyVal(result.levels![2], 'duration', activityJSON.levels[2].duration)
+                // Level 4
+                assert(result.levels![3].name, 'levels[3] name must not be undefined')
+                assert(result.levels![3].duration, 'levels[3] duration must not be undefined')
+                assert.propertyVal(result.levels![3], 'name', activityJSON.levels[3].name)
+                assert.propertyVal(result.levels![3], 'duration', activityJSON.levels[3].duration)
             })
         })
     })
@@ -125,11 +166,30 @@ describe('Models: PhysicalActivity', () => {
                 assert(result.calories, 'calories must not be undefined')
                 assert.typeOf(result.calories, 'number')
                 assert.propertyVal(result, 'calories', activityJSON.calories)
-                try {
-                    assert.typeOf(result.steps, 'number')
-                } catch (e) { //
-                }
+                assert.typeOf(result.steps, 'number')
+                assert.propertyVal(result, 'steps', activityJSON.steps)
+                // PhysicalActivity levels
                 assert(result.levels, 'levels must not be undefined')
+                // Level 1
+                assert(result.levels![0].name, 'levels[0] name must not be undefined')
+                assert(result.levels![0].duration, 'levels[0] duration must not be undefined')
+                assert.propertyVal(result.levels![0], 'name', activityJSON.levels[0].name)
+                assert.propertyVal(result.levels![0], 'duration', activityJSON.levels[0].duration)
+                // Level 2
+                assert(result.levels![1].name, 'levels[1] name must not be undefined')
+                assert(result.levels![1].duration, 'levels[1] duration must not be undefined')
+                assert.propertyVal(result.levels![1], 'name', activityJSON.levels[1].name)
+                assert.propertyVal(result.levels![1], 'duration', activityJSON.levels[1].duration)
+                // Level 3
+                assert(result.levels![2].name, 'levels[2] name must not be undefined')
+                assert(result.levels![2].duration, 'levels[2] duration must not be undefined')
+                assert.propertyVal(result.levels![2], 'name', activityJSON.levels[2].name)
+                assert.propertyVal(result.levels![2], 'duration', activityJSON.levels[2].duration)
+                // Level 4
+                assert(result.levels![3].name, 'levels[3] name must not be undefined')
+                assert(result.levels![3].duration, 'levels[3] duration must not be undefined')
+                assert.propertyVal(result.levels![3], 'name', activityJSON.levels[3].name)
+                assert.propertyVal(result.levels![3], 'duration', activityJSON.levels[3].duration)
             })
         })
     })

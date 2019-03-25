@@ -2,15 +2,16 @@ import { ObjectID } from 'bson'
 import { assert } from 'chai'
 import { ValidationException } from '../../../src/application/domain/exception/validation.exception'
 import { Environment } from '../../../src/application/domain/model/environment'
-import { Measurement } from '../../../src/application/domain/model/measurement'
+import { Measurement, MeasurementType } from '../../../src/application/domain/model/measurement'
 import { Location } from '../../../src/application/domain/model/location'
 
 describe('Models: Environment', () => {
     const environmentJSON: any = {
         id: new ObjectID(),
         institution_id: new ObjectID(),
-        location: new Location(),
-        measurements: new Array<Measurement>(),
+        location: new Location('indoor', 'room 201'),
+        measurements: [ new Measurement(MeasurementType.HUMIDITY, 34, '%'),
+                        new Measurement(MeasurementType.TEMPERATURE, 40, '°C')],
         climatized: true,
         timestamp: new Date().toISOString()
     }
@@ -43,8 +44,19 @@ describe('Models: Environment', () => {
                 assert(result.institution_id, 'institution_id must not be undefined')
                 assert.propertyVal(result, 'institution_id', environmentJSON.institution_id)
                 assert(result.location, 'location must not be undefined')
+                assert(result.location!.local, 'local must not be undefined')
+                assert.propertyVal(result.location, 'local', environmentJSON.location.local)
+                assert(result.location!.room, 'room must not be undefined')
+                assert.propertyVal(result.location, 'room', environmentJSON.location.room)
                 assert(result.measurements, 'measurements must not be undefined')
+                assert.propertyVal(result.measurements![0], 'type', environmentJSON.measurements[0].type)
+                assert.propertyVal(result.measurements![0], 'value', environmentJSON.measurements[0].value)
+                assert.propertyVal(result.measurements![0], 'unit', environmentJSON.measurements[0].unit)
+                assert.propertyVal(result.measurements![1], 'type', environmentJSON.measurements[1].type)
+                assert.propertyVal(result.measurements![1], 'value', environmentJSON.measurements[1].value)
+                assert.propertyVal(result.measurements![1], 'unit', environmentJSON.measurements[1].unit)
                 assert.typeOf(result.climatized, 'boolean')
+                assert.propertyVal(result, 'climatized', environmentJSON.climatized)
                 assert(result.timestamp, 'timestamp must not be undefined')
             })
         })
@@ -69,8 +81,19 @@ describe('Models: Environment', () => {
                 assert(result.institution_id, 'institution_id must not be undefined')
                 assert.propertyVal(result, 'institution_id', environmentJSON.institution_id.toHexString())
                 assert(result.location, 'location must not be undefined')
+                assert(result.location!.local, 'local must not be undefined')
+                assert.propertyVal(result.location, 'local', environmentJSON.location.local)
+                assert(result.location!.room, 'room must not be undefined')
+                assert.propertyVal(result.location, 'room', environmentJSON.location.room)
                 assert(result.measurements, 'measurements must not be undefined')
+                assert.propertyVal(result.measurements![0], 'type', environmentJSON.measurements[0].type)
+                assert.propertyVal(result.measurements![0], 'value', environmentJSON.measurements[0].value)
+                assert.propertyVal(result.measurements![0], 'unit', environmentJSON.measurements[0].unit)
+                assert.propertyVal(result.measurements![1], 'type', environmentJSON.measurements[1].type)
+                assert.propertyVal(result.measurements![1], 'value', environmentJSON.measurements[1].value)
+                assert.propertyVal(result.measurements![1], 'unit', environmentJSON.measurements[1].unit)
                 assert.typeOf(result.climatized, 'boolean')
+                assert.propertyVal(result, 'climatized', environmentJSON.climatized)
                 assert(result.timestamp, 'timestamp must not be undefined')
             })
         })
@@ -86,8 +109,19 @@ describe('Models: Environment', () => {
                 assert(result.institution_id, 'institution_id must not be undefined')
                 assert.propertyVal(result, 'institution_id', environmentJSON.institution_id)
                 assert(result.location, 'location must not be undefined')
+                assert(result.location!.local, 'local must not be undefined')
+                assert.propertyVal(result.location, 'local', environmentJSON.location.local)
+                assert(result.location!.room, 'room must not be undefined')
+                assert.propertyVal(result.location, 'room', environmentJSON.location.room)
                 assert(result.measurements, 'measurements must not be undefined')
+                assert.propertyVal(result.measurements![0], 'type', environmentJSON.measurements[0].type)
+                assert.propertyVal(result.measurements![0], 'value', environmentJSON.measurements[0].value)
+                assert.propertyVal(result.measurements![0], 'unit', environmentJSON.measurements[0].unit)
+                assert.propertyVal(result.measurements![1], 'type', environmentJSON.measurements[1].type)
+                assert.propertyVal(result.measurements![1], 'value', environmentJSON.measurements[1].value)
+                assert.propertyVal(result.measurements![1], 'unit', environmentJSON.measurements[1].unit)
                 assert.typeOf(result.climatized, 'boolean')
+                assert.propertyVal(result, 'climatized', environmentJSON.climatized)
                 assert(result.timestamp, 'timestamp must not be undefined')
             })
         })

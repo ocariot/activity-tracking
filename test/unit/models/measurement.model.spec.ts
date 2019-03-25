@@ -1,10 +1,10 @@
 import { assert } from 'chai'
-import { Measurement } from '../../../src/application/domain/model/measurement'
+import { Measurement, MeasurementType } from '../../../src/application/domain/model/measurement'
 
 describe('Models: Measurement', () => {
     const measurementJSON: any = {
-        type: 'humidity',
-        value: 30,
+        type: MeasurementType.HUMIDITY,
+        value: 30.05,
         unit: '%'
     }
 

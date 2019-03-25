@@ -64,7 +64,6 @@ export class App {
     private async initMiddleware(): Promise<void> {
         try {
             await this.setupHostWhitelist()
-            this.checkContentType()
             await this.setupInversifyExpress()
             this.setupSwaggerUI()
             this.setupErrorsHandler()
@@ -205,23 +204,6 @@ export class App {
             res.locals
             const errorMessage: ApiException = new ApiException(err.code, err.message, err.description)
             res.status(HttpStatus.INTERNAL_SERVER_ERROR).send(errorMessage.toJson())
-        })
-    }
-
-    private checkContentType(): void {
-        // StatusCode 415
-        this.express.use((req: Request, res: Response, next) => {
-            if (!(req.headers['content-type'] === 'application/json')) {
-                const errorMessage: ApiException = new ApiException(HttpStatus.UNSUPPORTED_MEDIA_TYPE,
-                    'Unsupported media type!', 'The only supported type is the application/json')
-                res.status(HttpStatus.UNSUPPORTED_MEDIA_TYPE).send(errorMessage.toJson())
-            }
-            // try {
-            //     console.log(req.body)
-            // } catch (err) {
-            //     res.status(HttpStatus.UNSUPPORTED_MEDIA_TYPE).status(err.toJson())
-            // }
-            next()
         })
     }
 }

@@ -13,6 +13,7 @@ import { UpdatePhysicalActivityValidator } from '../domain/validator/update.phys
 import { ObjectIdValidator } from '../domain/validator/object.id.validator'
 import { Strings } from '../../utils/strings'
 import { IIntegrationEventRepository } from '../port/integration.event.repository.interface'
+import { IntegrationEvent } from '../integration-event/event/integration.event'
 
 /**
  * Implementing physicalactivity Service.
@@ -162,7 +163,7 @@ export class PhysicalActivityService implements IPhysicalActivityService {
      * operation at another time.
      * @param event
      */
-    private saveEvent(event: PhysicalActivitySaveEvent): void {
+    private saveEvent(event: IntegrationEvent<PhysicalActivity>): void {
         const saveEvent: any = event.toJSON()
         saveEvent.__operation = 'publish'
         saveEvent.__routing_key = 'activities.save'
