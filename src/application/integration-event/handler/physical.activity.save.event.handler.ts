@@ -1,14 +1,14 @@
 import { inject } from 'inversify'
 import { Identifier } from '../../../di/identifiers'
 import { IIntegrationEventHandler } from './integration.event.handler.interface'
-import { PhysicalActivitySaveEvent } from '../event/physical.activity.save.event'
+import { PhysicalActivityEvent } from '../event/physical.activity.event'
 import { PhysicalActivity } from '../../domain/model/physical.activity'
 import { ILogger } from '../../../utils/custom.logger'
 import { IPhysicalActivityRepository } from '../../port/physical.activity.repository.interface'
 import { CreatePhysicalActivityValidator } from '../../domain/validator/create.physical.activity.validator'
 import { ConflictException } from '../../domain/exception/conflict.exception'
 
-export class PhysicalActivitySaveEventHandler implements IIntegrationEventHandler<PhysicalActivitySaveEvent> {
+export class PhysicalActivitySaveEventHandler implements IIntegrationEventHandler<PhysicalActivityEvent> {
     private count: number = 0
 
     /**
@@ -23,7 +23,7 @@ export class PhysicalActivitySaveEventHandler implements IIntegrationEventHandle
     ) {
     }
 
-    public async handle(event: PhysicalActivitySaveEvent): Promise<void> {
+    public async handle(event: PhysicalActivityEvent): Promise<void> {
         try {
             // 1. Convert json physical activity to object.
             const activity: PhysicalActivity = new PhysicalActivity().fromJSON(event.physicalactivity)

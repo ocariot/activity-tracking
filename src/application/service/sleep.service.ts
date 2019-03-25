@@ -8,7 +8,7 @@ import { Sleep } from '../domain/model/sleep'
 import { CreateSleepValidator } from '../domain/validator/create.sleep.validator'
 import { IEventBus } from '../../infrastructure/port/event.bus.interface'
 import { ILogger } from '../../utils/custom.logger'
-import { SleepSaveEvent } from '../integration-event/event/sleep.save.event'
+import { SleepEvent } from '../integration-event/event/sleep.event'
 import { UpdateSleepValidator } from '../domain/validator/update.sleep.validator'
 import { ObjectIdValidator } from '../domain/validator/object.id.validator'
 import { Strings } from '../../utils/strings'
@@ -51,7 +51,7 @@ export class SleepService implements ISleepService {
 
             // 4. If created successfully, the object is published on the message bus.
             if (sleepSaved) {
-                const event: SleepSaveEvent = new SleepSaveEvent('SleepSaveEvent', new Date(), sleepSaved)
+                const event: SleepEvent = new SleepEvent('SleepSaveEvent', new Date(), sleepSaved)
                 if (!(await this._eventBus.publish(event, 'sleep.save'))) {
                     // 5. Save Event for submission attempt later when there is connection to message channel.
                     this.saveEvent(event)
@@ -141,11 +141,35 @@ export class SleepService implements ISleepService {
      * @return {Promise<boolean>}
      * @throws {ValidationException | RepositoryException}
      */
-    public removeByChild(sleepId: string, childId: string): Promise<boolean> {
-        ObjectIdValidator.validate(childId, Strings.CHILD.PARAM_ID_NOT_VALID_FORMAT)
-        ObjectIdValidator.validate(sleepId, Strings.SLEEP.PARAM_ID_NOT_VALID_FORMAT)
+    public async removeByChild(sleepId: string, childId: string): Promise<boolean> {
+        try {
+            // 1. Validate id's
+            ObjectIdValidator.validate(childId, Strings.CHILD.PARAM_ID_NOT_VALID_FORMAT)
+            ObjectIdValidator.validate(sleepId, Strings.SLEEP.PARAM_ID_NOT_VALID_FORMAT)
 
-        return this._sleepRepository.removeByChild(sleepId, childId)
+            // 2. Create a Sleep with only two attributes, the id and child_id, to be used in publishing on the event bus
+            const sleepToBeDeleted: Sleep = new Sleep()
+            sleepToBeDeleted.id = sleepId
+            sleepToBeDeleted.child_id = childId
+
+            const wasDeleted: boolean = await this._sleepRepository.removeByChild(sleepId, childId)
+
+            // 3. If deleted successfully, the object is published on the message bus.
+            if (wasDeleted) {
+                const event: SleepEvent = new SleepEvent('SleepDeleteEvent', new Date(), sleepToBeDeleted)
+                if (!(await this._eventBus.publish(event, 'sleep.delete'))) {
+                    // 4. Save Event for submission attempt later when there is connection to message channel.
+                    this.saveEvent(event)
+                } else {
+                    this._logger.info(`Sleep with ID: ${sleepToBeDeleted.id} and child_id: ${sleepToBeDeleted.child_id} was deleted...`)
+                }
+            }
+
+            // 5. Returns true
+            return Promise.resolve(true)
+        } catch (err) {
+            return Promise.reject(err)
+        }
     }
 
     public async update(sleep: Sleep): Promise<Sleep> {

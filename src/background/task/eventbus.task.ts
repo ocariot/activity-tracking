@@ -3,13 +3,13 @@ import { Identifier } from '../../di/identifiers'
 import { IEventBus } from '../../infrastructure/port/event.bus.interface'
 import { ILogger } from '../../utils/custom.logger'
 import { DI } from '../../di/di'
-import { PhysicalActivitySaveEvent } from '../../application/integration-event/event/physical.activity.save.event'
+import { PhysicalActivityEvent } from '../../application/integration-event/event/physical.activity.event'
 import { PhysicalActivitySaveEventHandler } from '../../application/integration-event/handler/physical.activity.save.event.handler'
 import { IPhysicalActivityRepository } from '../../application/port/physical.activity.repository.interface'
-import { SleepSaveEvent } from '../../application/integration-event/event/sleep.save.event'
+import { SleepEvent } from '../../application/integration-event/event/sleep.event'
 import { SleepSaveEventHandler } from '../../application/integration-event/handler/sleep.save.event.handler'
 import { ISleepRepository } from '../../application/port/sleep.repository.interface'
-import { EnvironmentSaveEvent } from '../../application/integration-event/event/environment.save.event'
+import { EnvironmentEvent } from '../../application/integration-event/event/environment.event'
 import { EnvironmentSaveEventHandler } from '../../application/integration-event/handler/environment.save.event.handler'
 import { IEnvironmentRepository } from '../../application/port/environment.repository.interface'
 import { Query } from '../../infrastructure/repository/query/query'
@@ -62,7 +62,7 @@ export class EventBusTask {
                 /**
                  * Subscribe in event physical activity save
                  */
-                const activitySaveEvent = new PhysicalActivitySaveEvent('PhysicalActivitySaveEvent', new Date())
+                const activitySaveEvent = new PhysicalActivityEvent('PhysicalActivitySaveEvent', new Date())
                 const activityEventSaveHandler = new PhysicalActivitySaveEventHandler(
                     this._diContainer.get<IPhysicalActivityRepository>(Identifier.ACTIVITY_REPOSITORY), this._logger)
                 this._eventBus
@@ -77,7 +77,7 @@ export class EventBusTask {
                 /**
                  * Subscribe in event sleep save
                  */
-                const sleepSaveEvent = new SleepSaveEvent('SleepSaveEvent', new Date())
+                const sleepSaveEvent = new SleepEvent('SleepSaveEvent', new Date())
                 const sleepEventSaveHandler = new SleepSaveEventHandler(
                     this._diContainer.get<ISleepRepository>(Identifier.SLEEP_REPOSITORY), this._logger)
                 this._eventBus
@@ -92,7 +92,7 @@ export class EventBusTask {
                 /**
                  * Subscribe in event environment save
                  */
-                const environmentSaveEvent = new EnvironmentSaveEvent('EnvironmentSaveEvent', new Date())
+                const environmentSaveEvent = new EnvironmentEvent('EnvironmentSaveEvent', new Date())
                 const environmentSaveEventHandler = new EnvironmentSaveEventHandler(
                     this._diContainer.get<IEnvironmentRepository>(Identifier.ENVIRONMENT_REPOSITORY), this._logger)
                 this._eventBus
@@ -163,21 +163,21 @@ export class EventBusTask {
 
     private publishEvent(event: any, eventBus: IEventBus): Promise<boolean> {
         if (event.event_name === 'PhysicalActivitySaveEvent') {
-            const physicalActivitySaveEvent: PhysicalActivitySaveEvent = new PhysicalActivitySaveEvent(
+            const physicalActivitySaveEvent: PhysicalActivityEvent = new PhysicalActivityEvent(
                 event.event_name,
                 event.timestamp,
                 new PhysicalActivity().fromJSON(event.physicalactivity)
             )
             return eventBus.publish(physicalActivitySaveEvent, event.__routing_key)
         } else if (event.event_name === 'SleepSaveEvent') {
-            const sleepSaveEvent: SleepSaveEvent = new SleepSaveEvent(
+            const sleepSaveEvent: SleepEvent = new SleepEvent(
                 event.event_name,
                 event.timestamp,
                 new Sleep().fromJSON(event.sleep)
             )
             return eventBus.publish(sleepSaveEvent, event.__routing_key)
         } else if (event.event_name === 'EnvironmentSaveEvent') {
-            const environmentSaveEvent: EnvironmentSaveEvent = new EnvironmentSaveEvent(
+            const environmentSaveEvent: EnvironmentEvent = new EnvironmentEvent(
                 event.event_name,
                 event.timestamp,
                 new Environment().fromJSON(event.environment)

@@ -3,12 +3,12 @@ import { Identifier } from '../../../di/identifiers'
 import { IIntegrationEventHandler } from './integration.event.handler.interface'
 import { ILogger } from '../../../utils/custom.logger'
 import { ConflictException } from '../../domain/exception/conflict.exception'
-import { EnvironmentSaveEvent } from '../event/environment.save.event'
+import { EnvironmentEvent } from '../event/environment.event'
 import { IEnvironmentRepository } from '../../port/environment.repository.interface'
 import { CreateEnvironmentValidator } from '../../domain/validator/create.environment.validator'
 import { Environment } from '../../domain/model/environment'
 
-export class EnvironmentSaveEventHandler implements IIntegrationEventHandler<EnvironmentSaveEvent> {
+export class EnvironmentSaveEventHandler implements IIntegrationEventHandler<EnvironmentEvent> {
     private count: number = 0
 
     /**
@@ -23,7 +23,7 @@ export class EnvironmentSaveEventHandler implements IIntegrationEventHandler<Env
     ) {
     }
 
-    public async handle(event: EnvironmentSaveEvent): Promise<void> {
+    public async handle(event: EnvironmentEvent): Promise<void> {
         try {
             // 1. Convert json environment to object.
             const environment: Environment = await new Environment().fromJSON(event.environment)

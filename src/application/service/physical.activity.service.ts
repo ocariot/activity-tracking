@@ -7,7 +7,7 @@ import { CreatePhysicalActivityValidator } from '../domain/validator/create.phys
 import { ConflictException } from '../domain/exception/conflict.exception'
 import { IQuery } from '../port/query.interface'
 import { IEventBus } from '../../infrastructure/port/event.bus.interface'
-import { PhysicalActivitySaveEvent } from '../integration-event/event/physical.activity.save.event'
+import { PhysicalActivityEvent } from '../integration-event/event/physical.activity.event'
 import { ILogger } from '../../utils/custom.logger'
 import { UpdatePhysicalActivityValidator } from '../domain/validator/update.physical.activity.validator'
 import { ObjectIdValidator } from '../domain/validator/object.id.validator'
@@ -51,7 +51,7 @@ export class PhysicalActivityService implements IPhysicalActivityService {
 
             // 4. If created successfully, the object is published on the message bus.
             if (activitySaved) {
-                const event: PhysicalActivitySaveEvent = new PhysicalActivitySaveEvent('PhysicalActivitySaveEvent',
+                const event: PhysicalActivityEvent = new PhysicalActivityEvent('PhysicalActivitySaveEvent',
                     new Date(), activitySaved)
                 if (!(await this._eventBus.publish(event, 'activities.save'))) {
                     // 5. Save Event for submission attempt later when there is connection to message channel.
@@ -142,11 +142,37 @@ export class PhysicalActivityService implements IPhysicalActivityService {
      * @return {Promise<boolean>}
      * @throws {ValidationException | RepositoryException}
      */
-    public removeByChild(activityId: string, childId: string): Promise<boolean> {
-        ObjectIdValidator.validate(childId, Strings.CHILD.PARAM_ID_NOT_VALID_FORMAT)
-        ObjectIdValidator.validate(activityId, Strings.PHYSICAL_ACTIVITY.PARAM_ID_NOT_VALID_FORMAT)
+    public async removeByChild(activityId: string, childId: string): Promise<boolean> {
+        try {
+            // 1. Validate id's
+            ObjectIdValidator.validate(childId, Strings.CHILD.PARAM_ID_NOT_VALID_FORMAT)
+            ObjectIdValidator.validate(activityId, Strings.PHYSICAL_ACTIVITY.PARAM_ID_NOT_VALID_FORMAT)
 
-        return this._activityRepository.removeByChild(activityId, childId)
+            // 2. Create a PhysicalActivity with only two attributes, the id and child_id, to be used in publishing on the event bus
+            const activityToBeDeleted: PhysicalActivity = new PhysicalActivity()
+            activityToBeDeleted.id = activityId
+            activityToBeDeleted.child_id = childId
+
+            const wasDeleted: boolean = await this._activityRepository.removeByChild(activityId, childId)
+
+            // 3. If deleted successfully, the object is published on the message bus.
+            if (wasDeleted) {
+                const event: PhysicalActivityEvent = new PhysicalActivityEvent('PhysicalActivityDeleteEvent',
+                    new Date(), activityToBeDeleted)
+                if (!(await this._eventBus.publish(event, 'activities.delete'))) {
+                    // 4. Save Event for submission attempt later when there is connection to message channel.
+                    this.saveEvent(event)
+                } else {
+                    this._logger.info(`Physical Activity with ID: ${activityToBeDeleted.id}
+                        and child_id: ${activityToBeDeleted.child_id} was deleted...`)
+                }
+            }
+
+            // 5. Returns true
+            return Promise.resolve(true)
+        } catch (err) {
+            return Promise.reject(err)
+        }
     }
 
     public async update(physicalActivity: PhysicalActivity): Promise<PhysicalActivity> {

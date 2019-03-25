@@ -8,7 +8,7 @@ import { IQuery } from '../port/query.interface'
 import { CreateEnvironmentValidator } from '../domain/validator/create.environment.validator'
 import { IEventBus } from '../../infrastructure/port/event.bus.interface'
 import { ILogger } from '../../utils/custom.logger'
-import { EnvironmentSaveEvent } from '../integration-event/event/environment.save.event'
+import { EnvironmentEvent } from '../integration-event/event/environment.event'
 import { ObjectIdValidator } from '../domain/validator/object.id.validator'
 import { Strings } from '../../utils/strings'
 import { IIntegrationEventRepository } from '../port/integration.event.repository.interface'
@@ -51,7 +51,7 @@ export class EnvironmentService implements IEnvironmentService {
 
             // 4. If created successfully, the object is published on the message bus.
             if (environmentSaved) {
-                const event: EnvironmentSaveEvent = new EnvironmentSaveEvent('EnvironmentSaveEvent',
+                const event: EnvironmentEvent = new EnvironmentEvent('EnvironmentSaveEvent',
                     new Date(), environmentSaved)
                 if (!(await this._eventBus.publish(event, 'environments.save'))) {
                     // 5. Save Event for submission attempt later when there is connection to message channel.
@@ -85,9 +85,33 @@ export class EnvironmentService implements IEnvironmentService {
      * @return {Promise<boolean>}
      * @throws {ValidationException | RepositoryException}
      */
-    public remove(id: string): Promise<boolean> {
-        ObjectIdValidator.validate(id, Strings.ENVIRONMENT.PARAM_ID_NOT_VALID_FORMAT)
-        return this._environmentRepository.delete(id)
+    public async remove(id: string): Promise<boolean> {
+        try {
+            // 1. Validate id parameter
+            ObjectIdValidator.validate(id, Strings.ENVIRONMENT.PARAM_ID_NOT_VALID_FORMAT)
+
+            // 2. Create an environment with a single attribute, its id, to be used in publishing on event bus
+            const environmentToBeDeleted: Environment = new Environment()
+            environmentToBeDeleted.id = id
+
+            const wasDeleted: boolean = await this._environmentRepository.delete(id)
+
+            // 3. If deleted successfully, the object is published on the message bus.
+            if (wasDeleted) {
+                const event: EnvironmentEvent = new EnvironmentEvent('EnvironmentDeleteEvent', new Date(), environmentToBeDeleted)
+                if (!(await this._eventBus.publish(event, 'environments.delete'))) {
+                    // 4. Save Event for submission attempt later when there is connection to message channel.
+                    this.saveEvent(event)
+                } else {
+                    this._logger.info(`Measurement of environment with ID: ${environmentToBeDeleted.id} was deleted...`)
+                }
+            }
+
+            // 5. Returns true
+            return Promise.resolve(true)
+        } catch (err) {
+            return Promise.reject(err)
+        }
     }
 
     public getById(id: string, query: IQuery): Promise<Environment> {

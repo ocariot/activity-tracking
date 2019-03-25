@@ -3,12 +3,12 @@ import { DI } from '../../../src/di/di'
 import { Identifier } from '../../../src/di/identifiers'
 import { IEventBus } from '../../../src/infrastructure/port/event.bus.interface'
 import { Container } from 'inversify'
-import { PhysicalActivitySaveEvent } from '../../../src/application/integration-event/event/physical.activity.save.event'
+import { PhysicalActivityEvent } from '../../../src/application/integration-event/event/physical.activity.event'
 import { EventBusException } from '../../../src/application/domain/exception/eventbus.exception'
 import { SleepMock } from '../../mocks/sleep.mock'
 import { ActivityTypeMock, PhysicalActivityMock } from '../../mocks/physical.activity.mock'
-import { SleepSaveEvent } from '../../../src/application/integration-event/event/sleep.save.event'
-import { EnvironmentSaveEvent } from '../../../src/application/integration-event/event/environment.save.event'
+import { SleepEvent } from '../../../src/application/integration-event/event/sleep.event'
+import { EnvironmentEvent } from '../../../src/application/integration-event/event/environment.event'
 import { EnvironmentMock } from '../../mocks/environment.mock'
 import { PhysicalActivitySaveEventHandler } from '../../../src/application/integration-event/handler/physical.activity.save.event.handler'
 import { IPhysicalActivityRepository } from '../../../src/application/port/physical.activity.repository.interface'
@@ -34,7 +34,7 @@ describe('EVENT BUS', () => {
     describe('CONNECTION', () => {
         it('should return EventBusException with message without connection when publishing.', () => {
             return eventBus
-                .publish(new PhysicalActivitySaveEvent(''), '')
+                .publish(new PhysicalActivityEvent(''), '')
                 .catch((err: EventBusException) => {
                     expect(err).instanceOf(EventBusException)
                 })
@@ -43,7 +43,7 @@ describe('EVENT BUS', () => {
         it('should return EventBusException with message without connection when subscription.', () => {
             return eventBus
                 .subscribe(
-                    new PhysicalActivitySaveEvent(''),
+                    new PhysicalActivityEvent(''),
                     new PhysicalActivitySaveEventHandler(
                         container.get<IPhysicalActivityRepository>(Identifier.ACTIVITY_REPOSITORY),
                         logger
@@ -72,7 +72,7 @@ describe('EVENT BUS', () => {
             it('should return true for published RUN physical activity.', async () => {
                 await eventBus.connectionPub.tryConnect(1, 500)
                 return eventBus.publish(
-                    new PhysicalActivitySaveEvent('PhysicalActivitySaveEvent', new Date(),
+                    new PhysicalActivityEvent('PhysicalActivitySaveEvent', new Date(),
                         new PhysicalActivityMock(ActivityTypeMock.RUN)),
                     'activities.save')
                     .then((result: boolean) => {
@@ -83,7 +83,7 @@ describe('EVENT BUS', () => {
             it('should return true for published WALK physical activity.', async () => {
                 await eventBus.connectionPub.tryConnect(1, 500)
                 return eventBus.publish(
-                    new PhysicalActivitySaveEvent('PhysicalActivitySaveEvent', new Date(),
+                    new PhysicalActivityEvent('PhysicalActivitySaveEvent', new Date(),
                         new PhysicalActivityMock(ActivityTypeMock.WALK)),
                     'activities.save')
                     .then((result: boolean) => {
@@ -94,7 +94,7 @@ describe('EVENT BUS', () => {
             it('should return true for published BIKE physical activity.', async () => {
                 await eventBus.connectionPub.tryConnect(1, 500)
                 return eventBus.publish(
-                    new PhysicalActivitySaveEvent('PhysicalActivitySaveEvent', new Date(),
+                    new PhysicalActivityEvent('PhysicalActivitySaveEvent', new Date(),
                         new PhysicalActivityMock(ActivityTypeMock.BIKE)),
                     'activities.save')
                     .then((result: boolean) => {
@@ -105,7 +105,7 @@ describe('EVENT BUS', () => {
             it('should return true for published SWIM physical activity.', async () => {
                 await eventBus.connectionPub.tryConnect(1, 500)
                 return eventBus.publish(
-                    new PhysicalActivitySaveEvent('PhysicalActivitySaveEvent', new Date(),
+                    new PhysicalActivityEvent('PhysicalActivitySaveEvent', new Date(),
                         new PhysicalActivityMock(ActivityTypeMock.SWIM)),
                     'activities.save')
                     .then((result: boolean) => {
@@ -123,7 +123,7 @@ describe('EVENT BUS', () => {
 
                 for (let i = 0; i < pubPhysicalActivityTotal; i++) {
                     const result = await eventBus.publish(
-                        new PhysicalActivitySaveEvent('PhysicalActivitySaveEvent', new Date(),
+                        new PhysicalActivityEvent('PhysicalActivitySaveEvent', new Date(),
                             new PhysicalActivityMock()),
                         'activities.save')
                     expect(result).to.equal(true)
@@ -143,7 +143,7 @@ describe('EVENT BUS', () => {
 
                 for (let i = 0; i < pubSleepTotal; i++) {
                     const result = await eventBus.publish(
-                        new SleepSaveEvent('SleepSaveEvent', new Date(),
+                        new SleepEvent('SleepSaveEvent', new Date(),
                             new SleepMock()),
                         'sleep.save')
                     expect(result).to.equal(true)
@@ -163,7 +163,7 @@ describe('EVENT BUS', () => {
 
                 for (let i = 0; i < pubEnvironmentTotal; i++) {
                     const result = await eventBus.publish(
-                        new EnvironmentSaveEvent('EnvironmentSaveEvent', new Date(),
+                        new EnvironmentEvent('EnvironmentSaveEvent', new Date(),
                             new EnvironmentMock()),
                         'environments.save')
                     expect(result).to.equal(true)
@@ -178,7 +178,7 @@ describe('EVENT BUS', () => {
         it('should return true to subscribe in PhysicalActivitySaveEvent', async () => {
             await eventBus.connectionSub.tryConnect(1, 500)
 
-            const activitySaveEvent = new PhysicalActivitySaveEvent('PhysicalActivitySaveEvent', new Date())
+            const activitySaveEvent = new PhysicalActivityEvent('PhysicalActivitySaveEvent', new Date())
             const activityEventSaveHandler = new PhysicalActivitySaveEventHandler(
                 container.get<IPhysicalActivityRepository>(Identifier.ACTIVITY_REPOSITORY), logger)
             return eventBus
@@ -191,7 +191,7 @@ describe('EVENT BUS', () => {
         it('should return true to subscribe in SleepSaveEvent', async () => {
             await eventBus.connectionSub.tryConnect(1, 500)
 
-            const sleepSaveEvent = new SleepSaveEvent('SleepSaveEvent', new Date())
+            const sleepSaveEvent = new SleepEvent('SleepSaveEvent', new Date())
             const sleepEventSaveHandler = new SleepSaveEventHandler(
                 container.get<ISleepRepository>(Identifier.SLEEP_REPOSITORY), logger)
             return eventBus
@@ -204,7 +204,7 @@ describe('EVENT BUS', () => {
         it('should return true to subscribe in EnvironmentSaveEvent', async () => {
             await eventBus.connectionSub.tryConnect(1, 500)
 
-            const environmentSaveEvent = new EnvironmentSaveEvent('EnvironmentSaveEvent', new Date())
+            const environmentSaveEvent = new EnvironmentEvent('EnvironmentSaveEvent', new Date())
             const environmentSaveEventHandler = new EnvironmentSaveEventHandler(
                 container.get<IEnvironmentRepository>(Identifier.ENVIRONMENT_REPOSITORY), logger)
             return eventBus

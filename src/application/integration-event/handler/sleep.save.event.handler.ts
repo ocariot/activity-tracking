@@ -6,9 +6,9 @@ import { ConflictException } from '../../domain/exception/conflict.exception'
 import { ISleepRepository } from '../../port/sleep.repository.interface'
 import { Sleep } from '../../domain/model/sleep'
 import { CreateSleepValidator } from '../../domain/validator/create.sleep.validator'
-import { SleepSaveEvent } from '../event/sleep.save.event'
+import { SleepEvent } from '../event/sleep.event'
 
-export class SleepSaveEventHandler implements IIntegrationEventHandler<SleepSaveEvent> {
+export class SleepSaveEventHandler implements IIntegrationEventHandler<SleepEvent> {
     private count: number = 0
 
     /**
@@ -23,7 +23,7 @@ export class SleepSaveEventHandler implements IIntegrationEventHandler<SleepSave
     ) {
     }
 
-    public async handle(event: SleepSaveEvent): Promise<void> {
+    public async handle(event: SleepEvent): Promise<void> {
         try {
             // 1. Convert json sleep to object.
             const sleep: Sleep = new Sleep().fromJSON(event.sleep)

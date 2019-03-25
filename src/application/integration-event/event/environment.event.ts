@@ -1,7 +1,7 @@
 import { EventType, IntegrationEvent } from './integration.event'
 import { Environment } from '../../domain/model/environment'
 
-export class EnvironmentSaveEvent extends IntegrationEvent<Environment> {
+export class EnvironmentEvent extends IntegrationEvent<Environment> {
     constructor(public event_name: string, public timestamp?: Date, public environment?: Environment) {
         super(event_name, EventType.ENVIRONMENTS, timestamp)
     }
