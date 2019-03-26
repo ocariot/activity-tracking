@@ -639,14 +639,13 @@ describe('Services: PhysicalActivityService', () => {
                     .withArgs(activityIncorrect)
                     .rejects({ name: 'ValidationError' })
 
-                try {
-                    return activityService.updateByChild(activityIncorrect)
-                } catch (err) {
-                    assert.property(err, 'message')
-                    assert.property(err, 'description')
-                    assert.propertyVal(err, 'message', Strings.PHYSICAL_ACTIVITY.PARAM_ID_NOT_VALID_FORMAT)
-                    assert.propertyVal(err, 'description', Strings.ERROR_MESSAGE.UUID_NOT_VALID_FORMAT_DESC)
-                }
+                return activityService.updateByChild(activityIncorrect)
+                    .catch (err => {
+                        assert.property(err, 'message')
+                        assert.property(err, 'description')
+                        assert.propertyVal(err, 'message', Strings.PHYSICAL_ACTIVITY.PARAM_ID_NOT_VALID_FORMAT)
+                        assert.propertyVal(err, 'description', Strings.ERROR_MESSAGE.UUID_NOT_VALID_FORMAT_DESC)
+                    })
             })
         })
 
@@ -660,14 +659,13 @@ describe('Services: PhysicalActivityService', () => {
                     .withArgs(activityIncorrect)
                     .rejects({ name: 'ValidationError' })
 
-                try {
-                    return activityService.updateByChild(activityIncorrect)
-                } catch (err) {
-                    assert.property(err, 'message')
-                    assert.property(err, 'description')
-                    assert.propertyVal(err, 'message', Strings.CHILD.PARAM_ID_NOT_VALID_FORMAT)
-                    assert.propertyVal(err, 'description', Strings.ERROR_MESSAGE.UUID_NOT_VALID_FORMAT_DESC)
-                }
+                return activityService.updateByChild(activityIncorrect)
+                    .catch (err => {
+                        assert.property(err, 'message')
+                        assert.property(err, 'description')
+                        assert.propertyVal(err, 'message', Strings.CHILD.PARAM_ID_NOT_VALID_FORMAT)
+                        assert.propertyVal(err, 'description', Strings.ERROR_MESSAGE.UUID_NOT_VALID_FORMAT_DESC)
+                    })
             })
         })
 
@@ -681,14 +679,14 @@ describe('Services: PhysicalActivityService', () => {
                     .withArgs(activityIncorrect)
                     .rejects({ name: 'ValidationError' })
 
-                try {
-                    return activityService.updateByChild(activityIncorrect)
-                } catch (err) {
-                    assert.property(err, 'message')
-                    assert.property(err, 'description')
-                    assert.propertyVal(err, 'message', 'Duration field is invalid...')
-                    assert.propertyVal(err, 'description', 'Physical Activity validation failed: The value provided has a negative value!')
-                }
+                return activityService.updateByChild(activityIncorrect)
+                    .catch (err => {
+                        assert.property(err, 'message')
+                        assert.property(err, 'description')
+                        assert.propertyVal(err, 'message', 'Duration field is invalid...')
+                        assert.propertyVal(err, 'description', 'Physical Activity validation failed: The value provided ' +
+                            'has a negative value!')
+                    })
             })
         })
 
@@ -702,14 +700,14 @@ describe('Services: PhysicalActivityService', () => {
                     .withArgs(activityIncorrect)
                     .rejects({ name: 'ValidationError' })
 
-                try {
-                    return activityService.updateByChild(activityIncorrect)
-                } catch (err) {
-                    assert.property(err, 'message')
-                    assert.property(err, 'description')
-                    assert.propertyVal(err, 'message', 'Calories field is invalid...')
-                    assert.propertyVal(err, 'description', 'Physical Activity validation failed: The value provided has a negative value!')
-                }
+                return activityService.updateByChild(activityIncorrect)
+                    .catch (err => {
+                        assert.property(err, 'message')
+                        assert.property(err, 'description')
+                        assert.propertyVal(err, 'message', 'Calories field is invalid...')
+                        assert.propertyVal(err, 'description', 'Physical Activity validation failed: The value provided ' +
+                            'has a negative value!')
+                    })
             })
         })
 
@@ -724,14 +722,14 @@ describe('Services: PhysicalActivityService', () => {
                     .withArgs(activityIncorrect)
                     .rejects({ name: 'ValidationError' })
 
-                try {
-                    return activityService.updateByChild(activityIncorrect)
-                } catch (err) {
-                    assert.property(err, 'message')
-                    assert.property(err, 'description')
-                    assert.propertyVal(err, 'message', 'Steps field is invalid...')
-                    assert.propertyVal(err, 'description', 'Physical Activity validation failed: The value provided has a negative value!')
-                }
+                return activityService.updateByChild(activityIncorrect)
+                    .catch (err => {
+                        assert.property(err, 'message')
+                        assert.property(err, 'description')
+                        assert.propertyVal(err, 'message', 'Steps field is invalid...')
+                        assert.propertyVal(err, 'description', 'Physical Activity validation failed: The value provided ' +
+                            'has a negative value!')
+                    })
             })
         })
 
@@ -746,14 +744,13 @@ describe('Services: PhysicalActivityService', () => {
                     .withArgs(activityIncorrect)
                     .rejects({ name: 'ValidationError' })
 
-                try {
-                    return activityService.updateByChild(activityIncorrect)
-                } catch (err) {
-                    assert.property(err, 'message')
-                    assert.property(err, 'description')
-                    assert.propertyVal(err, 'message', 'The name of level provided "sedentaries" is not supported...')
-                    assert.propertyVal(err, 'description', 'The names of the allowed levels are: sedentary, lightly, fairly, very.')
-                }
+                return activityService.updateByChild(activityIncorrect)
+                    .catch (err => {
+                        assert.property(err, 'message')
+                        assert.property(err, 'description')
+                        assert.propertyVal(err, 'message', 'The name of level provided "sedentaries" is not supported...')
+                        assert.propertyVal(err, 'description', 'The names of the allowed levels are: sedentary, lightly, fairly, very.')
+                    })
             })
         })
 
@@ -768,14 +765,14 @@ describe('Services: PhysicalActivityService', () => {
                     .withArgs(activityIncorrect)
                     .rejects({ name: 'ValidationError' })
 
-                try {
-                    return activityService.updateByChild(activityIncorrect)
-                } catch (err) {
-                    assert.property(err, 'message')
-                    assert.property(err, 'description')
-                    assert.propertyVal(err, 'message', 'Level are not in a format that is supported!')
-                    assert.propertyVal(err, 'description', 'Must have values ​​for the following levels: sedentary, lightly, fairly, very.')
-                }
+                return activityService.updateByChild(activityIncorrect)
+                    .catch (err => {
+                        assert.property(err, 'message')
+                        assert.property(err, 'description')
+                        assert.propertyVal(err, 'message', 'Level are not in a format that is supported!')
+                        assert.propertyVal(err, 'description', 'Must have values ​​for the following levels: sedentary, ' +
+                            'lightly, fairly, very.')
+                    })
             })
         })
 
@@ -790,15 +787,14 @@ describe('Services: PhysicalActivityService', () => {
                     .withArgs(activityIncorrect)
                     .rejects({ name: 'ValidationError' })
 
-                try {
-                    return activityService.updateByChild(activityIncorrect)
-                } catch (err) {
-                    assert.property(err, 'message')
-                    assert.property(err, 'description')
-                    assert.propertyVal(err, 'message', 'Some (or several) duration field of levels array is invalid...')
-                    assert.propertyVal(err, 'description', 'Physical Activity Level validation failed: The value provided ' +
-                        'has a negative value!')
-                }
+                return activityService.updateByChild(activityIncorrect)
+                    .catch (err => {
+                        assert.property(err, 'message')
+                        assert.property(err, 'description')
+                        assert.propertyVal(err, 'message', 'Some (or several) duration field of levels array is invalid...')
+                        assert.propertyVal(err, 'description', 'Physical Activity Level validation failed: The value provided ' +
+                            'has a negative value!')
+                    })
             })
         })
     })
@@ -867,14 +863,13 @@ describe('Services: PhysicalActivityService', () => {
                     .withArgs(activityIncorrect.id)
                     .rejects({ name: 'ValidationError' })
 
-                try {
-                    return activityService.removeByChild(activityIncorrect.id!, activityIncorrect.child_id)
-                } catch (err) {
-                    assert.property(err, 'message')
-                    assert.property(err, 'description')
-                    assert.propertyVal(err, 'message', Strings.CHILD.PARAM_ID_NOT_VALID_FORMAT)
-                    assert.propertyVal(err, 'description', Strings.ERROR_MESSAGE.UUID_NOT_VALID_FORMAT_DESC)
-                }
+                return activityService.removeByChild(activityIncorrect.id!, activityIncorrect.child_id)
+                    .catch (err => {
+                        assert.property(err, 'message')
+                        assert.property(err, 'description')
+                        assert.propertyVal(err, 'message', Strings.CHILD.PARAM_ID_NOT_VALID_FORMAT)
+                        assert.propertyVal(err, 'description', Strings.ERROR_MESSAGE.UUID_NOT_VALID_FORMAT_DESC)
+                    })
             })
         })
 
@@ -893,14 +888,13 @@ describe('Services: PhysicalActivityService', () => {
                     .withArgs(activityIncorrect.id)
                     .rejects({ name: 'ValidationError' })
 
-                try {
-                    return activityService.removeByChild(activityIncorrect.id!, activityIncorrect.child_id)
-                } catch (err) {
-                    assert.property(err, 'message')
-                    assert.property(err, 'description')
-                    assert.propertyVal(err, 'message', Strings.PHYSICAL_ACTIVITY.PARAM_ID_NOT_VALID_FORMAT)
-                    assert.propertyVal(err, 'description', Strings.ERROR_MESSAGE.UUID_NOT_VALID_FORMAT_DESC)
-                }
+                return activityService.removeByChild(activityIncorrect.id!, activityIncorrect.child_id)
+                    .catch (err => {
+                        assert.property(err, 'message')
+                        assert.property(err, 'description')
+                        assert.propertyVal(err, 'message', Strings.PHYSICAL_ACTIVITY.PARAM_ID_NOT_VALID_FORMAT)
+                        assert.propertyVal(err, 'description', Strings.ERROR_MESSAGE.UUID_NOT_VALID_FORMAT_DESC)
+                    })
             })
         })
     })

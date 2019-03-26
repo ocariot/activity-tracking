@@ -587,14 +587,13 @@ describe('Services: SleepService', () => {
                     .withArgs(sleepIncorrect)
                     .rejects({ name: 'ValidationError' })
 
-                try {
-                    return sleepService.updateByChild(sleepIncorrect)
-                } catch (err) {
-                    assert.property(err, 'message')
-                    assert.property(err, 'description')
-                    assert.propertyVal(err, 'message', Strings.SLEEP.PARAM_ID_NOT_VALID_FORMAT)
-                    assert.propertyVal(err, 'description', Strings.ERROR_MESSAGE.UUID_NOT_VALID_FORMAT_DESC)
-                }
+                return sleepService.updateByChild(sleepIncorrect)
+                    .catch (err => {
+                        assert.property(err, 'message')
+                        assert.property(err, 'description')
+                        assert.propertyVal(err, 'message', Strings.SLEEP.PARAM_ID_NOT_VALID_FORMAT)
+                        assert.propertyVal(err, 'description', Strings.ERROR_MESSAGE.UUID_NOT_VALID_FORMAT_DESC)
+                    })
             })
         })
 
@@ -608,14 +607,13 @@ describe('Services: SleepService', () => {
                     .withArgs(sleepIncorrect)
                     .rejects({ name: 'ValidationError' })
 
-                try {
-                    return sleepService.updateByChild(sleepIncorrect)
-                } catch (err) {
-                    assert.property(err, 'message')
-                    assert.property(err, 'description')
-                    assert.propertyVal(err, 'message', Strings.CHILD.PARAM_ID_NOT_VALID_FORMAT)
-                    assert.propertyVal(err, 'description', Strings.ERROR_MESSAGE.UUID_NOT_VALID_FORMAT_DESC)
-                }
+                return sleepService.updateByChild(sleepIncorrect)
+                    .catch (err => {
+                        assert.property(err, 'message')
+                        assert.property(err, 'description')
+                        assert.propertyVal(err, 'message', Strings.CHILD.PARAM_ID_NOT_VALID_FORMAT)
+                        assert.propertyVal(err, 'description', Strings.ERROR_MESSAGE.UUID_NOT_VALID_FORMAT_DESC)
+                    })
             })
         })
 
@@ -629,14 +627,13 @@ describe('Services: SleepService', () => {
                     .withArgs(sleepIncorrect)
                     .rejects({ name: 'ValidationError' })
 
-                try {
-                    return sleepService.updateByChild(sleepIncorrect)
-                } catch (err) {
-                    assert.property(err, 'message')
-                    assert.property(err, 'description')
-                    assert.propertyVal(err, 'message', 'Duration field is invalid...')
-                    assert.propertyVal(err, 'description', 'Sleep validation failed: The value provided has a negative value!')
-                }
+                return sleepService.updateByChild(sleepIncorrect)
+                    .catch (err => {
+                        assert.property(err, 'message')
+                        assert.property(err, 'description')
+                        assert.propertyVal(err, 'message', 'Duration field is invalid...')
+                        assert.propertyVal(err, 'description', 'Sleep validation failed: The value provided has a negative value!')
+                    })
             })
         })
 
@@ -650,14 +647,13 @@ describe('Services: SleepService', () => {
                     .withArgs(sleepIncorrect)
                     .rejects({ name: 'ValidationError' })
 
-                try {
-                    return sleepService.updateByChild(sleepIncorrect)
-                } catch (err) {
-                    assert.property(err, 'message')
-                    assert.property(err, 'description')
-                    assert.propertyVal(err, 'message', 'Pattern are not in a format that is supported...')
-                    assert.propertyVal(err, 'description', 'Validation of the standard of sleep failed: data_set is required!')
-                }
+                return sleepService.updateByChild(sleepIncorrect)
+                    .catch (err => {
+                        assert.property(err, 'message')
+                        assert.property(err, 'description')
+                        assert.propertyVal(err, 'message', 'Pattern are not in a format that is supported...')
+                        assert.propertyVal(err, 'description', 'Validation of the standard of sleep failed: data_set is required!')
+                    })
             })
         })
 
@@ -670,14 +666,13 @@ describe('Services: SleepService', () => {
                     .withArgs(sleepIncorrect)
                     .rejects({ name: 'ValidationError' })
 
-                try {
-                    return sleepService.updateByChild(sleepIncorrect)
-                } catch (err) {
-                    assert.property(err, 'message')
-                    assert.property(err, 'description')
-                    assert.propertyVal(err, 'message', 'Dataset are not in a format that is supported!')
-                    assert.propertyVal(err, 'description', 'The data_set collection must not be empty!')
-                }
+                return sleepService.updateByChild(sleepIncorrect)
+                    .catch (err => {
+                        assert.property(err, 'message')
+                        assert.property(err, 'description')
+                        assert.propertyVal(err, 'message', 'Dataset are not in a format that is supported!')
+                        assert.propertyVal(err, 'description', 'The data_set collection must not be empty!')
+                    })
             })
         })
 
@@ -692,15 +687,14 @@ describe('Services: SleepService', () => {
                     .withArgs(sleepIncorrect)
                     .rejects({ name: 'ValidationError' })
 
-                try {
-                    return sleepService.updateByChild(sleepIncorrect)
-                } catch (err) {
-                    assert.property(err, 'message')
-                    assert.property(err, 'description')
-                    assert.propertyVal(err, 'message', 'Dataset are not in a format that is supported!')
-                    assert.propertyVal(err, 'description', 'Validation of the sleep pattern dataset failed: ' +
-                        'data_set start_time, data_set name, data_set duration is required!')
-                }
+                return sleepService.updateByChild(sleepIncorrect)
+                    .catch (err => {
+                        assert.property(err, 'message')
+                        assert.property(err, 'description')
+                        assert.propertyVal(err, 'message', 'Dataset are not in a format that is supported!')
+                        assert.propertyVal(err, 'description', 'Validation of the sleep pattern dataset failed: ' +
+                            'data_set start_time, data_set name, data_set duration is required!')
+                    })
             })
         })
 
@@ -717,15 +711,14 @@ describe('Services: SleepService', () => {
                     .withArgs(sleepIncorrect)
                     .rejects({ name: 'ValidationError' })
 
-                try {
-                    return sleepService.updateByChild(sleepIncorrect)
-                } catch (err) {
-                    assert.property(err, 'message')
-                    assert.property(err, 'description')
-                    assert.propertyVal(err, 'message', 'Some (or several) duration field of sleep pattern is invalid...')
-                    assert.propertyVal(err, 'description', 'Sleep Pattern dataset validation failed: The value provided ' +
-                        'has a negative value!')
-                }
+                return sleepService.updateByChild(sleepIncorrect)
+                    .catch (err => {
+                        assert.property(err, 'message')
+                        assert.property(err, 'description')
+                        assert.propertyVal(err, 'message', 'Some (or several) duration field of sleep pattern is invalid...')
+                        assert.propertyVal(err, 'description', 'Sleep Pattern dataset validation failed: The value provided ' +
+                            'has a negative value!')
+                    })
             })
         })
     })
@@ -794,14 +787,13 @@ describe('Services: SleepService', () => {
                     .withArgs(sleepIncorrect.id)
                     .rejects({ name: 'ValidationError' })
 
-                try {
-                    return sleepService.removeByChild(sleepIncorrect.id!, sleepIncorrect.child_id)
-                } catch (err) {
-                    assert.property(err, 'message')
-                    assert.property(err, 'description')
-                    assert.propertyVal(err, 'message', Strings.CHILD.PARAM_ID_NOT_VALID_FORMAT)
-                    assert.propertyVal(err, 'description', Strings.ERROR_MESSAGE.UUID_NOT_VALID_FORMAT_DESC)
-                }
+                return sleepService.removeByChild(sleepIncorrect.id!, sleepIncorrect.child_id)
+                    .catch (err => {
+                        assert.property(err, 'message')
+                        assert.property(err, 'description')
+                        assert.propertyVal(err, 'message', Strings.CHILD.PARAM_ID_NOT_VALID_FORMAT)
+                        assert.propertyVal(err, 'description', Strings.ERROR_MESSAGE.UUID_NOT_VALID_FORMAT_DESC)
+                    })
             })
         })
 
@@ -820,14 +812,13 @@ describe('Services: SleepService', () => {
                     .withArgs(sleepIncorrect.id)
                     .rejects({ name: 'ValidationError' })
 
-                try {
-                    return sleepService.removeByChild(sleepIncorrect.id!, sleepIncorrect.child_id)
-                } catch (err) {
-                    assert.property(err, 'message')
-                    assert.property(err, 'description')
-                    assert.propertyVal(err, 'message', Strings.SLEEP.PARAM_ID_NOT_VALID_FORMAT)
-                    assert.propertyVal(err, 'description', Strings.ERROR_MESSAGE.UUID_NOT_VALID_FORMAT_DESC)
-                }
+                return sleepService.removeByChild(sleepIncorrect.id!, sleepIncorrect.child_id)
+                    .catch (err => {
+                        assert.property(err, 'message')
+                        assert.property(err, 'description')
+                        assert.propertyVal(err, 'message', Strings.SLEEP.PARAM_ID_NOT_VALID_FORMAT)
+                        assert.propertyVal(err, 'description', Strings.ERROR_MESSAGE.UUID_NOT_VALID_FORMAT_DESC)
+                    })
             })
         })
     })

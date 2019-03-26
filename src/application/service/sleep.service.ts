@@ -128,9 +128,30 @@ export class SleepService implements ISleepService {
      * @return {Promise<Sleep>}
      * @throws {ValidationException | ConflictException | RepositoryException}
      */
-    public updateByChild(sleep: Sleep): Promise<Sleep> {
-        UpdateSleepValidator.validate(sleep)
-        return this._sleepRepository.updateByChild(sleep)
+    public async updateByChild(sleep: Sleep): Promise<Sleep> {
+        try {
+            // 1. Validate the object.
+            UpdateSleepValidator.validate(sleep)
+
+            // 2. Update the sleep and save it in a variable.
+            const sleepUpdated: Sleep = await this._sleepRepository.updateByChild(sleep)
+
+            // 3. If updated successfully, the object is published on the message bus.
+            if (sleepUpdated) {
+                const event: SleepEvent = new SleepEvent('SleepUpdateEvent',
+                    new Date(), sleepUpdated)
+                if (!(await this._eventBus.publish(event, 'sleep.update'))) {
+                    // 4. Save Event for submission attempt later when there is connection to message channel.
+                    this.saveEvent(event)
+                } else {
+                    this._logger.info(`Sleep with ID: ${sleepUpdated.id} was updated...`)
+                }
+            }
+            // 5. Returns the updated object.
+            return Promise.resolve(sleepUpdated)
+        } catch (err) {
+            return Promise.reject(err)
+        }
     }
 
     /**
@@ -163,10 +184,13 @@ export class SleepService implements ISleepService {
                 } else {
                     this._logger.info(`Sleep with ID: ${sleepToBeDeleted.id} and child_id: ${sleepToBeDeleted.child_id} was deleted...`)
                 }
+
+                // 5a. Returns true
+                return Promise.resolve(true)
             }
 
-            // 5. Returns true
-            return Promise.resolve(true)
+            // 5b. Returns false
+            return Promise.resolve(false)
         } catch (err) {
             return Promise.reject(err)
         }
@@ -189,7 +213,9 @@ export class SleepService implements ISleepService {
     private saveEvent(event: IntegrationEvent<Sleep>): void {
         const saveEvent: any = event.toJSON()
         saveEvent.__operation = 'publish'
-        saveEvent.__routing_key = 'sleep.save'
+        if (event.event_name === 'SleepSaveEvent') saveEvent.__routing_key = 'sleep.save'
+        if (event.event_name === 'SleepDeleteEvent') saveEvent.__routing_key = 'sleep.delete'
+        if (event.event_name === 'SleepUpdateEvent') saveEvent.__routing_key = 'sleep.update'
         this._integrationEventRepository
             .create(JSON.parse(JSON.stringify(saveEvent)))
             .then(() => {

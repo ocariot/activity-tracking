@@ -129,9 +129,30 @@ export class PhysicalActivityService implements IPhysicalActivityService {
      * @return {Promise<PhysicalActivity>}
      * @throws {ValidationException | ConflictException | RepositoryException}
      */
-    public updateByChild(activity: PhysicalActivity): Promise<PhysicalActivity> {
-        UpdatePhysicalActivityValidator.validate(activity)
-        return this._activityRepository.updateByChild(activity)
+    public async updateByChild(activity: PhysicalActivity): Promise<PhysicalActivity> {
+        try {
+            // 1. Validate the object.
+            UpdatePhysicalActivityValidator.validate(activity)
+
+            // 2. Update the activity and save it in a variable.
+            const activityUpdated: PhysicalActivity = await this._activityRepository.updateByChild(activity)
+
+            // 3. If updated successfully, the object is published on the message bus.
+            if (activityUpdated) {
+                const event: PhysicalActivityEvent = new PhysicalActivityEvent('PhysicalActivityUpdateEvent',
+                    new Date(), activityUpdated)
+                if (!(await this._eventBus.publish(event, 'activities.update'))) {
+                    // 4. Save Event for submission attempt later when there is connection to message channel.
+                    this.saveEvent(event)
+                } else {
+                    this._logger.info(`Physical Activity with ID: ${activityUpdated.id} was updated...`)
+                }
+            }
+            // 5. Returns the updated object.
+            return Promise.resolve(activityUpdated)
+        } catch (err) {
+            return Promise.reject(err)
+        }
     }
 
     /**
@@ -166,10 +187,13 @@ export class PhysicalActivityService implements IPhysicalActivityService {
                     this._logger.info(`Physical Activity with ID: ${activityToBeDeleted.id}
                         and child_id: ${activityToBeDeleted.child_id} was deleted...`)
                 }
+
+                // 5a. Returns true
+                return Promise.resolve(true)
             }
 
-            // 5. Returns true
-            return Promise.resolve(true)
+            // 5b. Returns false
+            return Promise.resolve(false)
         } catch (err) {
             return Promise.reject(err)
         }
@@ -192,7 +216,9 @@ export class PhysicalActivityService implements IPhysicalActivityService {
     private saveEvent(event: IntegrationEvent<PhysicalActivity>): void {
         const saveEvent: any = event.toJSON()
         saveEvent.__operation = 'publish'
-        saveEvent.__routing_key = 'activities.save'
+        if (event.event_name === 'PhysicalActivitySaveEvent') saveEvent.__routing_key = 'activities.save'
+        if (event.event_name === 'PhysicalActivityDeleteEvent') saveEvent.__routing_key = 'activities.delete'
+        if (event.event_name === 'PhysicalActivityUpdateEvent') saveEvent.__routing_key = 'activities.update'
         this._integrationEventRepository
             .create(JSON.parse(JSON.stringify(saveEvent)))
             .then(() => {

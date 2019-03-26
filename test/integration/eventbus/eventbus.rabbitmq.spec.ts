@@ -113,6 +113,28 @@ describe('EVENT BUS', () => {
                     })
             })
 
+            it('should return true for publish of updated of SWIM physical activity.', async () => {
+                await eventBus.connectionPub.tryConnect(1, 500)
+                return eventBus.publish(
+                    new PhysicalActivityEvent('PhysicalActivityUpdateEvent', new Date(),
+                        new PhysicalActivityMock(ActivityTypeMock.SWIM)),
+                    'activities.update')
+                    .then((result: boolean) => {
+                        expect(result).to.equal(true)
+                    })
+            })
+
+            it('should return true for publish of delete of SWIM physical activity.', async () => {
+                await eventBus.connectionPub.tryConnect(1, 500)
+                return eventBus.publish(
+                    new PhysicalActivityEvent('PhysicalActivityDeleteEvent', new Date(),
+                        new PhysicalActivityMock(ActivityTypeMock.SWIM)),
+                    'activities.delete')
+                    .then((result: boolean) => {
+                        expect(result).to.equal(true)
+                    })
+            })
+
             it(`should return true to ${pubPhysicalActivityTotal} published physical activities.`, async () => {
                 await eventBus.connectionPub.tryConnect(1, 500)
                 let count: number = 0
@@ -151,6 +173,26 @@ describe('EVENT BUS', () => {
                 }
                 expect(count).equals(pubSleepTotal)
             })
+
+            it('should return true for publish of updated of sleep.', async () => {
+                await eventBus.connectionPub.tryConnect(1, 500)
+                return eventBus.publish(
+                    new SleepEvent('SleepUpdateEvent', new Date(), new SleepMock()),
+                    'sleep.update')
+                    .then((result: boolean) => {
+                        expect(result).to.equal(true)
+                    })
+            })
+
+            it('should return true for publish of delete of sleep.', async () => {
+                await eventBus.connectionPub.tryConnect(1, 500)
+                return eventBus.publish(
+                    new SleepEvent('SleepDeleteEvent', new Date(), new SleepMock()),
+                    'sleep.delete')
+                    .then((result: boolean) => {
+                        expect(result).to.equal(true)
+                    })
+            })
         })
 
         context('Environment', () => {
@@ -171,6 +213,16 @@ describe('EVENT BUS', () => {
                 }
                 expect(count).equals(pubEnvironmentTotal)
             })
+
+            it('should return true for publish of delete of environment.', async () => {
+                await eventBus.connectionPub.tryConnect(1, 500)
+                return eventBus.publish(
+                    new EnvironmentEvent('EnvironmentDeleteEvent', new Date(), new EnvironmentMock()),
+                    'environments.delete')
+                    .then((result: boolean) => {
+                        expect(result).to.equal(true)
+                    })
+            })
         })
     })
 
@@ -179,10 +231,10 @@ describe('EVENT BUS', () => {
             await eventBus.connectionSub.tryConnect(1, 500)
 
             const activitySaveEvent = new PhysicalActivityEvent('PhysicalActivitySaveEvent', new Date())
-            const activityEventSaveHandler = new PhysicalActivitySaveEventHandler(
+            const activitySaveEventHandler = new PhysicalActivitySaveEventHandler(
                 container.get<IPhysicalActivityRepository>(Identifier.ACTIVITY_REPOSITORY), logger)
             return eventBus
-                .subscribe(activitySaveEvent, activityEventSaveHandler, 'activities.save')
+                .subscribe(activitySaveEvent, activitySaveEventHandler, 'activities.save')
                 .then(result => {
                     expect(result).to.equal(true)
                 })
@@ -192,10 +244,10 @@ describe('EVENT BUS', () => {
             await eventBus.connectionSub.tryConnect(1, 500)
 
             const sleepSaveEvent = new SleepEvent('SleepSaveEvent', new Date())
-            const sleepEventSaveHandler = new SleepSaveEventHandler(
+            const sleepSaveEventHandler = new SleepSaveEventHandler(
                 container.get<ISleepRepository>(Identifier.SLEEP_REPOSITORY), logger)
             return eventBus
-                .subscribe(sleepSaveEvent, sleepEventSaveHandler, 'sleep.save')
+                .subscribe(sleepSaveEvent, sleepSaveEventHandler, 'sleep.save')
                 .then(result => {
                     expect(result).to.equal(true)
                 })

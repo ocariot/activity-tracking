@@ -51,8 +51,8 @@ describe('Routes: users/children', () => {
     // Start services
     before(async () => {
         try {
-            await deleteAllActivity()
-            await deleteAllLogs()
+            deleteAllActivity()
+            deleteAllLogs()
             await backgroundServices.startServices()
         } catch (err) {
             throw new Error('Failure on users.children.physicalactivities routes test: ' + err.message)
@@ -62,7 +62,7 @@ describe('Routes: users/children', () => {
     // Delete all physical activity objects from the database
     after(async () => {
         try {
-            await deleteAllActivity()
+            deleteAllActivity()
         } catch (err) {
             throw new Error('Failure on users.children.physicalactivities routes test: ' + err.message)
         }

@@ -326,14 +326,13 @@ describe('Services: Environment', () => {
                     .withArgs(environment.id)
                     .resolves(false)
 
-                try {
-                    return environmentService.remove(environment.id!)
-                } catch (err) {
-                    assert.property(err, 'message')
-                    assert.property(err, 'description')
-                    assert.propertyVal(err, 'message', Strings.ENVIRONMENT.PARAM_ID_NOT_VALID_FORMAT)
-                    assert.propertyVal(err, 'description', Strings.ERROR_MESSAGE.UUID_NOT_VALID_FORMAT_DESC)
-                }
+                return environmentService.remove(environment.id!)
+                    .catch (err => {
+                        assert.property(err, 'message')
+                        assert.property(err, 'description')
+                        assert.propertyVal(err, 'message', Strings.ENVIRONMENT.PARAM_ID_NOT_VALID_FORMAT)
+                        assert.propertyVal(err, 'description', Strings.ERROR_MESSAGE.UUID_NOT_VALID_FORMAT_DESC)
+                })
             })
         })
     })

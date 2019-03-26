@@ -87,10 +87,10 @@ export class EnvironmentService implements IEnvironmentService {
      */
     public async remove(id: string): Promise<boolean> {
         try {
-            // 1. Validate id parameter
+            // 1. Validate id parameter.
             ObjectIdValidator.validate(id, Strings.ENVIRONMENT.PARAM_ID_NOT_VALID_FORMAT)
 
-            // 2. Create an environment with a single attribute, its id, to be used in publishing on event bus
+            // 2. Create an environment with a single attribute, its id, to be used in publishing on event bus.
             const environmentToBeDeleted: Environment = new Environment()
             environmentToBeDeleted.id = id
 
@@ -105,10 +105,12 @@ export class EnvironmentService implements IEnvironmentService {
                 } else {
                     this._logger.info(`Measurement of environment with ID: ${environmentToBeDeleted.id} was deleted...`)
                 }
-            }
 
-            // 5. Returns true
-            return Promise.resolve(true)
+                // 5a. Returns true.
+                return Promise.resolve(true)
+            }
+            // 5b. Returns false.
+            return Promise.resolve(false)
         } catch (err) {
             return Promise.reject(err)
         }
@@ -131,7 +133,8 @@ export class EnvironmentService implements IEnvironmentService {
     private saveEvent(event: IntegrationEvent<Environment>): void {
         const saveEvent: any = event.toJSON()
         saveEvent.__operation = 'publish'
-        saveEvent.__routing_key = 'environments.save'
+        if (event.event_name === 'EnvironmentSaveEvent') saveEvent.__routing_key = 'environments.save'
+        if (event.event_name === 'EnvironmentDeleteEvent') saveEvent.__routing_key = 'environments.delete'
         this._integrationEventRepository
             .create(JSON.parse(JSON.stringify(saveEvent)))
             .then(() => {

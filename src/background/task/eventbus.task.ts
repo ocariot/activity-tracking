@@ -63,10 +63,10 @@ export class EventBusTask {
                  * Subscribe in event physical activity save
                  */
                 const activitySaveEvent = new PhysicalActivityEvent('PhysicalActivitySaveEvent', new Date())
-                const activityEventSaveHandler = new PhysicalActivitySaveEventHandler(
+                const activitySaveEventHandler = new PhysicalActivitySaveEventHandler(
                     this._diContainer.get<IPhysicalActivityRepository>(Identifier.ACTIVITY_REPOSITORY), this._logger)
                 this._eventBus
-                    .subscribe(activitySaveEvent, activityEventSaveHandler, 'activities.save')
+                    .subscribe(activitySaveEvent, activitySaveEventHandler, 'activities.save')
                     .then((result: boolean) => {
                         if (result) this._logger.info('Subscribe in PhysicalActivitySaveEvent successful!')
                     })
@@ -78,15 +78,15 @@ export class EventBusTask {
                  * Subscribe in event sleep save
                  */
                 const sleepSaveEvent = new SleepEvent('SleepSaveEvent', new Date())
-                const sleepEventSaveHandler = new SleepSaveEventHandler(
+                const sleepSaveEventHandler = new SleepSaveEventHandler(
                     this._diContainer.get<ISleepRepository>(Identifier.SLEEP_REPOSITORY), this._logger)
                 this._eventBus
-                    .subscribe(sleepSaveEvent, sleepEventSaveHandler, 'sleep.save')
+                    .subscribe(sleepSaveEvent, sleepSaveEventHandler, 'sleep.save')
                     .then((result: boolean) => {
-                        if (result) this._logger.info('Subscribe in SleepSaveEventHandler successful!')
+                        if (result) this._logger.info('Subscribe in SleepSaveEvent successful!')
                     })
                     .catch(err => {
-                        this._logger.error(`Error in Subscribe SleepSaveEventHandler! ${err.message}`)
+                        this._logger.error(`Error in Subscribe SleepSaveEvent! ${err.message}`)
                     })
 
                 /**
@@ -128,6 +128,7 @@ export class EventBusTask {
                     this._logger)
             })
             .catch(err => {
+                console.log('err --------> ', err)
                 this._logger.error(`Error trying to get connection to Event Bus for event publishing. ${err.message}`)
             })
     }
@@ -169,6 +170,20 @@ export class EventBusTask {
                 new PhysicalActivity().fromJSON(event.physicalactivity)
             )
             return eventBus.publish(physicalActivitySaveEvent, event.__routing_key)
+        } else if (event.event_name === 'PhysicalActivityUpdateEvent') {
+            const physicalActivityUpdateEvent: PhysicalActivityEvent = new PhysicalActivityEvent(
+                event.event_name,
+                event.timestamp,
+                new PhysicalActivity().fromJSON(event.physicalactivity)
+            )
+            return eventBus.publish(physicalActivityUpdateEvent, event.__routing_key)
+        } else if (event.event_name === 'PhysicalActivityDeleteEvent') {
+            const physicalActivityDeleteEvent: PhysicalActivityEvent = new PhysicalActivityEvent(
+                event.event_name,
+                event.timestamp,
+                new PhysicalActivity().fromJSON(event.physicalactivity)
+            )
+            return eventBus.publish(physicalActivityDeleteEvent, event.__routing_key)
         } else if (event.event_name === 'SleepSaveEvent') {
             const sleepSaveEvent: SleepEvent = new SleepEvent(
                 event.event_name,
@@ -176,6 +191,20 @@ export class EventBusTask {
                 new Sleep().fromJSON(event.sleep)
             )
             return eventBus.publish(sleepSaveEvent, event.__routing_key)
+        } else if (event.event_name === 'SleepUpdateEvent') {
+            const sleepUpdateEvent: SleepEvent = new SleepEvent(
+                event.event_name,
+                event.timestamp,
+                new Sleep().fromJSON(event.sleep)
+            )
+            return eventBus.publish(sleepUpdateEvent, event.__routing_key)
+        } else if (event.event_name === 'SleepDeleteEvent') {
+            const sleepDeleteEvent: SleepEvent = new SleepEvent(
+                event.event_name,
+                event.timestamp,
+                new Sleep().fromJSON(event.sleep)
+            )
+            return eventBus.publish(sleepDeleteEvent, event.__routing_key)
         } else if (event.event_name === 'EnvironmentSaveEvent') {
             const environmentSaveEvent: EnvironmentEvent = new EnvironmentEvent(
                 event.event_name,
@@ -183,6 +212,13 @@ export class EventBusTask {
                 new Environment().fromJSON(event.environment)
             )
             return eventBus.publish(environmentSaveEvent, event.__routing_key)
+        } else if (event.event_name === 'EnvironmentDeleteEvent') {
+            const environmentDeleteEvent: EnvironmentEvent = new EnvironmentEvent(
+                event.event_name,
+                event.timestamp,
+                new Environment().fromJSON(event.environment)
+            )
+            return eventBus.publish(environmentDeleteEvent, event.__routing_key)
         }
 
         return Promise.resolve(false)
