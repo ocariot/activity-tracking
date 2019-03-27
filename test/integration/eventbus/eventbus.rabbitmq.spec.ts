@@ -1,7 +1,7 @@
 import { expect } from 'chai'
 import { DI } from '../../../src/di/di'
 import { Identifier } from '../../../src/di/identifiers'
-import { IEventBus } from '../../../src/infrastructure/port/event.bus.interface'
+// import { IEventBus } from '../../../src/infrastructure/port/event.bus.interface'
 import { Container } from 'inversify'
 import { PhysicalActivityEvent } from '../../../src/application/integration-event/event/physical.activity.event'
 import { EventBusException } from '../../../src/application/domain/exception/eventbus.exception'
@@ -17,17 +17,24 @@ import { SleepSaveEventHandler } from '../../../src/application/integration-even
 import { ISleepRepository } from '../../../src/application/port/sleep.repository.interface'
 import { EnvironmentSaveEventHandler } from '../../../src/application/integration-event/handler/environment.save.event.handler'
 import { IEnvironmentRepository } from '../../../src/application/port/environment.repository.interface'
+import { EventBusRabbitMQ } from '../../../src/infrastructure/eventbus/rabbitmq/eventbus.rabbitmq'
 
 const container: Container = DI.getInstance().getContainer()
-const eventBus: IEventBus = container.get(Identifier.RABBITMQ_EVENT_BUS)
+const eventBus: EventBusRabbitMQ = container.get(Identifier.RABBITMQ_EVENT_BUS)
 const logger: ILogger = container.get(Identifier.LOGGER)
 const pubPhysicalActivityTotal: number = 10
 const pubSleepTotal: number = 10
 const pubEnvironmentTotal: number = 10
 
 describe('EVENT BUS', () => {
-    before(() => eventBus.enableLogger(false))
+    before(() => {
+        eventBus.receive_from_yourself = true
+        eventBus.enableLogger(false)
+    })
     afterEach(async () => {
+        // await eventBus.dispose()
+    })
+    after(async () => {
         await eventBus.dispose()
     })
 
@@ -63,6 +70,49 @@ describe('EVENT BUS', () => {
         it('should connect successfully to subscribe.', async () => {
             await eventBus.connectionSub.tryConnect(1, 500)
             expect(eventBus.connectionSub.isConnected).to.eql(true)
+        })
+    })
+
+    // Uncomment the line 109 (this._logger.info (`Bus event message received!`)) from the
+    // src/infrastructure/eventbus/rabbitmq/eventbus.rabbitmq.ts file to see receiving messages
+    describe('SUBSCRIBE', () => {
+        it('should return true to subscribe in PhysicalActivitySaveEvent', async () => {
+            await eventBus.connectionSub.tryConnect(1, 500)
+
+            const activitySaveEvent = new PhysicalActivityEvent('PhysicalActivitySaveEvent', new Date())
+            const activitySaveEventHandler = new PhysicalActivitySaveEventHandler(
+                container.get<IPhysicalActivityRepository>(Identifier.ACTIVITY_REPOSITORY), logger)
+            return eventBus
+                .subscribe(activitySaveEvent, activitySaveEventHandler, 'activities.save')
+                .then(result => {
+                    expect(result).to.equal(true)
+                })
+        })
+
+        it('should return true to subscribe in SleepSaveEvent', async () => {
+            await eventBus.connectionSub.tryConnect(1, 500)
+
+            const sleepSaveEvent = new SleepEvent('SleepSaveEvent', new Date())
+            const sleepSaveEventHandler = new SleepSaveEventHandler(
+                container.get<ISleepRepository>(Identifier.SLEEP_REPOSITORY), logger)
+            return eventBus
+                .subscribe(sleepSaveEvent, sleepSaveEventHandler, 'sleep.save')
+                .then(result => {
+                    expect(result).to.equal(true)
+                })
+        })
+
+        it('should return true to subscribe in EnvironmentSaveEvent', async () => {
+            await eventBus.connectionSub.tryConnect(1, 500)
+
+            const environmentSaveEvent = new EnvironmentEvent('EnvironmentSaveEvent', new Date())
+            const environmentSaveEventHandler = new EnvironmentSaveEventHandler(
+                container.get<IEnvironmentRepository>(Identifier.ENVIRONMENT_REPOSITORY), logger)
+            return eventBus
+                .subscribe(environmentSaveEvent, environmentSaveEventHandler, 'environments.save')
+                .then(result => {
+                    expect(result).to.equal(true)
+                })
         })
     })
 
@@ -223,47 +273,6 @@ describe('EVENT BUS', () => {
                         expect(result).to.equal(true)
                     })
             })
-        })
-    })
-
-    describe('SUBSCRIBE', () => {
-        it('should return true to subscribe in PhysicalActivitySaveEvent', async () => {
-            await eventBus.connectionSub.tryConnect(1, 500)
-
-            const activitySaveEvent = new PhysicalActivityEvent('PhysicalActivitySaveEvent', new Date())
-            const activitySaveEventHandler = new PhysicalActivitySaveEventHandler(
-                container.get<IPhysicalActivityRepository>(Identifier.ACTIVITY_REPOSITORY), logger)
-            return eventBus
-                .subscribe(activitySaveEvent, activitySaveEventHandler, 'activities.save')
-                .then(result => {
-                    expect(result).to.equal(true)
-                })
-        })
-
-        it('should return true to subscribe in SleepSaveEvent', async () => {
-            await eventBus.connectionSub.tryConnect(1, 500)
-
-            const sleepSaveEvent = new SleepEvent('SleepSaveEvent', new Date())
-            const sleepSaveEventHandler = new SleepSaveEventHandler(
-                container.get<ISleepRepository>(Identifier.SLEEP_REPOSITORY), logger)
-            return eventBus
-                .subscribe(sleepSaveEvent, sleepSaveEventHandler, 'sleep.save')
-                .then(result => {
-                    expect(result).to.equal(true)
-                })
-        })
-
-        it('should return true to subscribe in EnvironmentSaveEvent', async () => {
-            await eventBus.connectionSub.tryConnect(1, 500)
-
-            const environmentSaveEvent = new EnvironmentEvent('EnvironmentSaveEvent', new Date())
-            const environmentSaveEventHandler = new EnvironmentSaveEventHandler(
-                container.get<IEnvironmentRepository>(Identifier.ENVIRONMENT_REPOSITORY), logger)
-            return eventBus
-                .subscribe(environmentSaveEvent, environmentSaveEventHandler, 'environments.save')
-                .then(result => {
-                    expect(result).to.equal(true)
-                })
         })
     })
 })

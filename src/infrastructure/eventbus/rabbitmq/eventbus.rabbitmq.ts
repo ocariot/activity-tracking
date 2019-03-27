@@ -18,6 +18,7 @@ export class EventBusRabbitMQ implements IEventBus, IDisposable {
     private event_handlers: Map<string, IIntegrationEventHandler<IntegrationEvent<any>>>
     private queue_consumer: boolean
     private queue!: Queue
+    private _receive_from_yourself: boolean = false
 
     constructor(
         @inject(Identifier.RABBITMQ_CONNECTION) public connectionPub: IConnectionEventBus,
@@ -103,7 +104,7 @@ export class EventBusRabbitMQ implements IEventBus, IDisposable {
                 .activateConsumer((message: Message) => {
                     message.ack() // acknowledge that the message has been received (and processed)
 
-                    if (message.properties.appId === Default.APP_ID) return
+                    if (message.properties.appId === Default.APP_ID && this._receive_from_yourself === false) return
 
                     // this._logger.info(`Bus event message received!`)
                     const event_name: string = message.getContent().event_name
@@ -149,5 +150,13 @@ export class EventBusRabbitMQ implements IEventBus, IDisposable {
             return
         }
         amqp.log.transports.console.level = 'none'
+    }
+
+    get receive_from_yourself(): boolean {
+        return this._receive_from_yourself
+    }
+
+    set receive_from_yourself(value: boolean) {
+        this._receive_from_yourself = value
     }
 }

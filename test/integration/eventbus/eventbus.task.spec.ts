@@ -35,7 +35,7 @@ describe('EVENT BUS TASK', () => {
     })
 
     describe('PUBLISH SAVED EVENTS', () => {
-        context('when all events are valid', () => {
+        context('when all events are valid and there is a connection with RabbitMQ', () => {
             it('should return an empty array', async () => {
                 try {
                     await createActivityIntegrationEvents()
@@ -51,7 +51,7 @@ describe('EVENT BUS TASK', () => {
 
                     await sleep(1000)
 
-                    const result: Array<any> = await integrationRepository.find(new Query())
+                    const result: Array<any> = await integrationRepository.find(new Query())    // Search in repository
                     expect(result.length).to.eql(0)
                 } catch (err) {
                     console.log(err)
@@ -60,7 +60,7 @@ describe('EVENT BUS TASK', () => {
         })
 
         context('when the event name does not match any of the expected', () => {
-            it('should return the same amount of events that were sent', async () => {
+            it('should return an array of the same size as the number of events sent', async () => {
                 const event: SleepEvent = new SleepEvent('WrongSleepSaveEvent', new Date(), new SleepMock())
                 const saveEvent: any = event.toJSON()
                 saveEvent.__operation = 'publish'
