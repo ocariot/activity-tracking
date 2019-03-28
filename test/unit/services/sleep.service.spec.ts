@@ -20,11 +20,13 @@ import { ISleepRepository } from '../../../src/application/port/sleep.repository
 import { SleepRepositoryMock } from '../../mocks/sleep.repository.mock'
 import { SleepPattern, SleepPatternType } from '../../../src/application/domain/model/sleep.pattern'
 import { SleepPatternDataSet } from '../../../src/application/domain/model/sleep.pattern.data.set'
+import { IEventBus } from '../../../src/infrastructure/port/event.bus.interface'
+import { ILogger } from '../../../src/utils/custom.logger'
 
 require('sinon-mongoose')
 
 describe('Services: SleepService', () => {
-    const sleep: SleepMock = new SleepMock()
+    const sleep: Sleep = new SleepMock()
     let sleepIncorrect: Sleep = new Sleep()
 
     // Mock sleep array
@@ -40,9 +42,10 @@ describe('Services: SleepService', () => {
     const connectionFactoryRabbitmq: IConnectionFactory = new ConnectionFactoryRabbitmqMock()
     const connectionRabbitmqPub: IConnectionEventBus = new ConnectionRabbitmqMock(connectionFactoryRabbitmq)
     const connectionRabbitmqSub: IConnectionEventBus = new ConnectionRabbitmqMock(connectionFactoryRabbitmq)
+    const eventBusRabbitmq: IEventBus = new EventBusRabbitmqMock(connectionRabbitmqPub, connectionRabbitmqSub)
+    const customLogger: ILogger = new CustomLoggerMock()
 
-    const sleepService: ISleepService = new SleepService(sleepRepo, integrationRepo,
-        new EventBusRabbitmqMock(connectionRabbitmqPub, connectionRabbitmqSub), new CustomLoggerMock())
+    const sleepService: ISleepService = new SleepService(sleepRepo, integrationRepo, eventBusRabbitmq, customLogger)
 
     afterEach(() => {
         sinon.restore()
@@ -63,7 +66,18 @@ describe('Services: SleepService', () => {
 
                 return sleepService.add(sleep)
                     .then(result => {
-                        assert(result, 'result must not be undefined')
+                        assert(result.id, 'Sleep id (id of entity class) must not be undefined')
+                        assert.propertyVal(result, 'id', sleep.id)
+                        assert(result.start_time, 'start_time must not be undefined')
+                        assert.propertyVal(result, 'start_time', sleep.start_time)
+                        assert(result.end_time, 'end_time must not be undefined')
+                        assert.propertyVal(result, 'end_time', sleep.end_time)
+                        assert(result.duration, 'duration must not be undefined')
+                        assert.typeOf(result.duration, 'number')
+                        assert.propertyVal(result, 'duration', sleep.duration)
+                        assert(result.child_id, 'child_id must not be undefined')
+                        assert.propertyVal(result, 'child_id', sleep.child_id)
+                        assert(result.pattern, 'pattern must not be undefined')
                     })
             })
         })
@@ -80,7 +94,18 @@ describe('Services: SleepService', () => {
 
                 return sleepService.add(sleep)
                     .then(result => {
-                        assert(result, 'result must not be undefined')
+                        assert(result.id, 'Sleep id (id of entity class) must not be undefined')
+                        assert.propertyVal(result, 'id', sleep.id)
+                        assert(result.start_time, 'start_time must not be undefined')
+                        assert.propertyVal(result, 'start_time', sleep.start_time)
+                        assert(result.end_time, 'end_time must not be undefined')
+                        assert.propertyVal(result, 'end_time', sleep.end_time)
+                        assert(result.duration, 'duration must not be undefined')
+                        assert.typeOf(result.duration, 'number')
+                        assert.propertyVal(result, 'duration', sleep.duration)
+                        assert(result.child_id, 'child_id must not be undefined')
+                        assert.propertyVal(result, 'child_id', sleep.child_id)
+                        assert(result.pattern, 'pattern must not be undefined')
                     })
             })
         })

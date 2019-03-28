@@ -18,13 +18,15 @@ import { Query } from '../../../src/infrastructure/repository/query/query'
 import { Strings } from '../../../src/utils/strings'
 import { Environment } from '../../../src/application/domain/model/environment'
 import { Measurement, MeasurementType } from '../../../src/application/domain/model/measurement'
+import { IEventBus } from '../../../src/infrastructure/port/event.bus.interface'
+import { ILogger } from '../../../src/utils/custom.logger'
 
 require('sinon-mongoose')
 
 describe('Services: Environment', () => {
-    const environment: EnvironmentMock = new EnvironmentMock()
+    const environment: Environment = new EnvironmentMock()
     let environmentIncorrect: Environment = new Environment()
-    const environmentArr: Array<EnvironmentMock> = new Array<EnvironmentMock>()
+    const environmentArr: Array<Environment> = new Array<EnvironmentMock>()
     for (let i = 0; i < 3; i++) {
         environmentArr.push(new EnvironmentMock())
     }
@@ -36,9 +38,11 @@ describe('Services: Environment', () => {
     const connectionFactoryRabbitmq: IConnectionFactory = new ConnectionFactoryRabbitmqMock()
     const connectionRabbitmqPub: IConnectionEventBus = new ConnectionRabbitmqMock(connectionFactoryRabbitmq)
     const connectionRabbitmqSub: IConnectionEventBus = new ConnectionRabbitmqMock(connectionFactoryRabbitmq)
+    const eventBusRabbitmq: IEventBus = new EventBusRabbitmqMock(connectionRabbitmqPub, connectionRabbitmqSub)
+    const customLogger: ILogger = new CustomLoggerMock()
 
     const environmentService: EnvironmentService = new EnvironmentService(environmentRepo, integrationRepo,
-        new EventBusRabbitmqMock(connectionRabbitmqPub, connectionRabbitmqSub), new CustomLoggerMock())
+        eventBusRabbitmq, customLogger)
 
     afterEach(() => {
         sinon.restore()
@@ -59,7 +63,15 @@ describe('Services: Environment', () => {
 
                 return environmentService.add(environment)
                     .then(result => {
-                        assert(result, 'result must not be undefined')
+                        assert(result.id, 'id must not be undefined')
+                        assert.propertyVal(result, 'id', environment.id)
+                        assert(result.institution_id, 'institution_id must not be undefined')
+                        assert.propertyVal(result, 'institution_id', environment.institution_id)
+                        assert(result.location, 'location must not be undefined')
+                        if (result.climatized) assert.propertyVal(result, 'climatized', environment.climatized)
+                        assert(result.timestamp, 'timestamp must not be undefined')
+                        assert.propertyVal(result, 'timestamp', environment.timestamp)
+                        assert(result.measurements, 'measurements must not be undefined')
                     })
             })
         })
@@ -76,7 +88,15 @@ describe('Services: Environment', () => {
 
                 return environmentService.add(environment)
                     .then(result => {
-                        assert(result, 'result must not be undefined')
+                        assert(result.id, 'id must not be undefined')
+                        assert.propertyVal(result, 'id', environment.id)
+                        assert(result.institution_id, 'institution_id must not be undefined')
+                        assert.propertyVal(result, 'institution_id', environment.institution_id)
+                        assert(result.location, 'location must not be undefined')
+                        if (result.climatized) assert.propertyVal(result, 'climatized', environment.climatized)
+                        assert(result.timestamp, 'timestamp must not be undefined')
+                        assert.propertyVal(result, 'timestamp', environment.timestamp)
+                        assert(result.measurements, 'measurements must not be undefined')
                     })
             })
         })
@@ -88,7 +108,7 @@ describe('Services: Environment', () => {
                     .mock(modelFake)
                     .expects('create')
                     .withArgs(environment)
-                    .rejects({ name: 'ConflictError' })
+                    .rejects({ message: 'Measurement of environment is already registered...' })
 
                 return environmentService.add(environment)
                     .catch(err => {
@@ -104,7 +124,9 @@ describe('Services: Environment', () => {
                     .mock(modelFake)
                     .expects('create')
                     .withArgs(environmentIncorrect)
-                    .rejects({ name: 'ValidationError' })
+                    .rejects({ message: 'Required fields were not provided...',
+                               description: 'Validation of environment measurements failed: timestamp, institution_id, ' +
+                                   'location, measurements required!' })
 
                 return environmentService.add(environmentIncorrect)
                     .catch(err => {
@@ -125,7 +147,8 @@ describe('Services: Environment', () => {
                     .mock(modelFake)
                     .expects('create')
                     .withArgs(environmentIncorrect)
-                    .rejects({ name: 'ValidationError' })
+                    .rejects({ message: Strings.ERROR_MESSAGE.UUID_NOT_VALID_FORMAT,
+                               description: Strings.ERROR_MESSAGE.UUID_NOT_VALID_FORMAT_DESC })
 
                 return environmentService.add(environmentIncorrect)
                     .catch(err => {
@@ -146,7 +169,8 @@ describe('Services: Environment', () => {
                     .mock(modelFake)
                     .expects('create')
                     .withArgs(environmentIncorrect)
-                    .rejects({ name: 'ValidationError' })
+                    .rejects({ message: 'Location are not in a format that is supported...',
+                               description: 'Validation of location failed: location local, location room is required!' })
 
                 return environmentService.add(environmentIncorrect)
                     .catch(err => {
@@ -167,7 +191,8 @@ describe('Services: Environment', () => {
                     .mock(modelFake)
                     .expects('create')
                     .withArgs(environmentIncorrect)
-                    .rejects({ name: 'ValidationError' })
+                    .rejects({ message: 'Measurement are not in a format that is supported!',
+                               description: 'The measurements collection must not be empty!' })
 
                 return environmentService.add(environmentIncorrect)
                     .catch(err => {
@@ -187,7 +212,8 @@ describe('Services: Environment', () => {
                     .mock(modelFake)
                     .expects('create')
                     .withArgs(environmentIncorrect)
-                    .rejects({ name: 'ValidationError' })
+                    .rejects({ message: 'The type of measurement provided "temperatures" is not supported...',
+                               description: 'The types allowed are: temperature, humidity.' })
 
                 return environmentService.add(environmentIncorrect)
                     .catch(err => {
@@ -207,7 +233,9 @@ describe('Services: Environment', () => {
                     .mock(modelFake)
                     .expects('create')
                     .withArgs(environmentIncorrect)
-                    .rejects({ name: 'ValidationError' })
+                    .rejects({ message: 'Measurement are not in a format that is supported!',
+                               description: 'Validation of measurements failed: measurement type, measurement value, ' +
+                                   'measurement unit is required!' })
 
                 return environmentService.add(environmentIncorrect)
                     .catch(err => {
@@ -246,6 +274,7 @@ describe('Services: Environment', () => {
                     .then(result => {
                         assert(result, 'result must not be undefined')
                         assert.isArray(result)
+                        assert.isNotEmpty(result)
                     })
             })
         })
@@ -324,7 +353,8 @@ describe('Services: Environment', () => {
                     .mock(modelFake)
                     .expects('deleteOne')
                     .withArgs(environment.id)
-                    .resolves(false)
+                    .rejects({ message: Strings.ENVIRONMENT.PARAM_ID_NOT_VALID_FORMAT,
+                               description: Strings.ERROR_MESSAGE.UUID_NOT_VALID_FORMAT_DESC })
 
                 return environmentService.remove(environment.id!)
                     .catch (err => {

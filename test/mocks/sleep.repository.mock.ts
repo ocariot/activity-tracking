@@ -23,7 +23,7 @@ export class SleepRepositoryMock implements ISleepRepository {
 
     public find(query: any): Promise<Array<Sleep>> {
         const child_id: string = query.filters.child_id
-        const sleepArr: Array<SleepMock> = new Array<SleepMock>()
+        const sleepArr: Array<Sleep> = new Array<SleepMock>()
         // Only for the test case that returns a filled array
         if (!(child_id === '507f1f77bcf86cd799439011')) {
             for (let i = 0; i < 3; i++) {

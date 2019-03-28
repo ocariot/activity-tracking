@@ -20,12 +20,14 @@ import { PhysicalActivity } from '../../../src/application/domain/model/physical
 import { ObjectID } from 'bson'
 import { ActivityLevelType } from '../../../src/application/domain/model/physical.activity.level'
 import { IPhysicalActivityService } from '../../../src/application/port/physical.activity.service.interface'
+import { IEventBus } from '../../../src/infrastructure/port/event.bus.interface'
+import { ILogger } from '../../../src/utils/custom.logger'
 // import { Strings } from '../../../src/utils/strings'
 
 require('sinon-mongoose')
 
 describe('Services: PhysicalActivityService', () => {
-    const activity: PhysicalActivityMock = new PhysicalActivityMock()
+    const activity: PhysicalActivity = new PhysicalActivityMock()
     let activityIncorrect: PhysicalActivity = new PhysicalActivity()
 
     // Mock through JSON
@@ -71,9 +73,11 @@ describe('Services: PhysicalActivityService', () => {
     const connectionFactoryRabbitmq: IConnectionFactory = new ConnectionFactoryRabbitmqMock()
     const connectionRabbitmqPub: IConnectionEventBus = new ConnectionRabbitmqMock(connectionFactoryRabbitmq)
     const connectionRabbitmqSub: IConnectionEventBus = new ConnectionRabbitmqMock(connectionFactoryRabbitmq)
+    const eventBusRabbitmq: IEventBus = new EventBusRabbitmqMock(connectionRabbitmqPub, connectionRabbitmqSub)
+    const customLogger: ILogger = new CustomLoggerMock()
 
     const activityService: IPhysicalActivityService = new PhysicalActivityService(activityRepo, integrationRepo,
-        new EventBusRabbitmqMock(connectionRabbitmqPub, connectionRabbitmqSub), new CustomLoggerMock())
+        eventBusRabbitmq, customLogger)
 
     afterEach(() => {
         sinon.restore()
@@ -94,7 +98,24 @@ describe('Services: PhysicalActivityService', () => {
 
                 return activityService.add(activity)
                     .then(result => {
-                        assert(result, 'result must not be undefined')
+                        assert(result.id, 'PhysicalActivity id (id of entity class) must not be undefined')
+                        assert.propertyVal(result, 'id', activity.id)
+                        assert(result.start_time, 'start_time must not be undefined')
+                        assert.propertyVal(result, 'start_time', activity.start_time)
+                        assert(result.end_time, 'end_time must not be undefined')
+                        assert.propertyVal(result, 'end_time', activity.end_time)
+                        assert(result.duration, 'duration must not be undefined')
+                        assert.typeOf(result.duration, 'number')
+                        assert.propertyVal(result, 'duration', activity.duration)
+                        assert(result.child_id, 'child_id must not be undefined')
+                        assert.propertyVal(result, 'child_id', activity.child_id)
+                        assert(result.name, 'name must not be undefined')
+                        assert.typeOf(result.name, 'string')
+                        assert.propertyVal(result, 'name', activity.name)
+                        assert(result.calories, 'calories must not be undefined')
+                        assert.typeOf(result.calories, 'number')
+                        assert.propertyVal(result, 'calories', activity.calories)
+                        assert.propertyVal(result, 'steps', activity.steps)
                     })
             })
         })
@@ -111,7 +132,24 @@ describe('Services: PhysicalActivityService', () => {
 
                 return activityService.add(activity)
                     .then(result => {
-                        assert(result, 'result must not be undefined')
+                        assert(result.id, 'PhysicalActivity id (id of entity class) must not be undefined')
+                        assert.propertyVal(result, 'id', activity.id)
+                        assert(result.start_time, 'start_time must not be undefined')
+                        assert.propertyVal(result, 'start_time', activity.start_time)
+                        assert(result.end_time, 'end_time must not be undefined')
+                        assert.propertyVal(result, 'end_time', activity.end_time)
+                        assert(result.duration, 'duration must not be undefined')
+                        assert.typeOf(result.duration, 'number')
+                        assert.propertyVal(result, 'duration', activity.duration)
+                        assert(result.child_id, 'child_id must not be undefined')
+                        assert.propertyVal(result, 'child_id', activity.child_id)
+                        assert(result.name, 'name must not be undefined')
+                        assert.typeOf(result.name, 'string')
+                        assert.propertyVal(result, 'name', activity.name)
+                        assert(result.calories, 'calories must not be undefined')
+                        assert.typeOf(result.calories, 'number')
+                        assert.propertyVal(result, 'calories', activity.calories)
+                        assert.propertyVal(result, 'steps', activity.steps)
                     })
             })
         })
@@ -123,7 +161,7 @@ describe('Services: PhysicalActivityService', () => {
                     .mock(modelFake)
                     .expects('create')
                     .withArgs(activity)
-                    .rejects({ name: 'ConflictError' })
+                    .rejects({ message: 'Physical Activity is already registered...' })
 
                 return activityService.add(activity)
                     .catch(error => {
@@ -139,7 +177,9 @@ describe('Services: PhysicalActivityService', () => {
                     .mock(modelFake)
                     .expects('create')
                     .withArgs(activityIncorrect)
-                    .rejects({ name: 'ValidationError' })
+                    .rejects({ message: 'Required fields were not provided...',
+                               description: 'Activity validation failed: start_time, end_time, ' +
+                                   'duration, child_id is required!' })
 
                 try {
                     return await activityService.add(activityIncorrect)
@@ -162,7 +202,8 @@ describe('Services: PhysicalActivityService', () => {
                     .mock(modelFake)
                     .expects('create')
                     .withArgs(activityIncorrect)
-                    .rejects({ name: 'ValidationError' })
+                    .rejects({ message: 'Required fields were not provided...',
+                               description: 'Physical Activity validation failed: name, calories is required!' })
 
                 try {
                     return await activityService.add(activityIncorrect)
@@ -184,7 +225,9 @@ describe('Services: PhysicalActivityService', () => {
                     .mock(modelFake)
                     .expects('create')
                     .withArgs(activityIncorrect)
-                    .rejects({ name: 'ValidationError' })
+                    .rejects({ message: 'Date field is invalid...',
+                               description: 'Date validation failed: The end_time parameter can not contain ' +
+                                   'a older date than that the start_time parameter!' })
 
                 try {
                     return await activityService.add(activityIncorrect)
@@ -207,7 +250,9 @@ describe('Services: PhysicalActivityService', () => {
                     .mock(modelFake)
                     .expects('create')
                     .withArgs(activityIncorrect)
-                    .rejects({ name: 'ValidationError' })
+                    .rejects({ message: 'Duration field is invalid...',
+                               description: 'Duration validation failed: Activity duration value does not ' +
+                                   'match values passed in start_time and end_time parameters!' })
 
                 try {
                     return await activityService.add(activityIncorrect)
@@ -229,7 +274,8 @@ describe('Services: PhysicalActivityService', () => {
                     .mock(modelFake)
                     .expects('create')
                     .withArgs(activityIncorrect)
-                    .rejects({ name: 'ValidationError' })
+                    .rejects({ message: 'Duration field is invalid...',
+                               description: 'Activity validation failed: The value provided has a negative value!' })
 
                 try {
                     return await activityService.add(activityIncorrect)
@@ -250,7 +296,8 @@ describe('Services: PhysicalActivityService', () => {
                     .mock(modelFake)
                     .expects('create')
                     .withArgs(activityIncorrect)
-                    .rejects({ name: 'ValidationError' })
+                    .rejects({ message: Strings.CHILD.PARAM_ID_NOT_VALID_FORMAT,
+                               description: Strings.ERROR_MESSAGE.UUID_NOT_VALID_FORMAT_DESC })
 
                 try {
                     return await activityService.add(activityIncorrect)
@@ -271,7 +318,8 @@ describe('Services: PhysicalActivityService', () => {
                     .mock(modelFake)
                     .expects('create')
                     .withArgs(activityIncorrect)
-                    .rejects({ name: 'ValidationError' })
+                    .rejects({ message: 'Calories field is invalid...',
+                               description: 'Physical Activity validation failed: The value provided has a negative value!' })
 
                 try {
                     return await activityService.add(activityIncorrect)
@@ -291,8 +339,8 @@ describe('Services: PhysicalActivityService', () => {
                 sinon
                     .mock(modelFake)
                     .expects('create')
-                    .withArgs(activityIncorrect)
-                    .rejects({ name: 'ValidationError' })
+                    .rejects({ message: 'Steps field is invalid...',
+                               description: 'Physical Activity validation failed: The value provided has a negative value!' })
 
                 try {
                     return activityService.add(activityIncorrect)
@@ -313,7 +361,8 @@ describe('Services: PhysicalActivityService', () => {
                     .mock(modelFake)
                     .expects('create')
                     .withArgs(activityIncorrect)
-                    .rejects({ name: 'ValidationError' })
+                    .rejects({ message: 'The name of level provided "sedentaries" is not supported...',
+                               description: 'The names of the allowed levels are: sedentary, lightly, fairly, very.' })
 
                 try {
                     return await activityService.add(activityIncorrect)
@@ -335,7 +384,8 @@ describe('Services: PhysicalActivityService', () => {
                     .mock(modelFake)
                     .expects('create')
                     .withArgs(activityIncorrect)
-                    .rejects({ name: 'ValidationError' })
+                    .rejects({ message: 'Level are not in a format that is supported!',
+                               description: 'Must have values ​​for the following levels: sedentary, lightly, fairly, very.' })
 
                 try {
                     return await activityService.add(activityIncorrect)
@@ -357,7 +407,9 @@ describe('Services: PhysicalActivityService', () => {
                     .mock(modelFake)
                     .expects('create')
                     .withArgs(activityIncorrect)
-                    .rejects({ name: 'ValidationError' })
+                    .rejects({ message: 'Some (or several) duration field of levels array is invalid...',
+                               description: 'Physical Activity Level validation failed: The value provided ' +
+                                   'has a negative value!' })
 
                 try {
                     return await activityService.add(activityIncorrect)
@@ -482,7 +534,8 @@ describe('Services: PhysicalActivityService', () => {
                     .mock(modelFake)
                     .expects('findOne')
                     .withArgs(query)
-                    .rejects({ name: 'ValidationError' })
+                    .rejects({ message: Strings.PHYSICAL_ACTIVITY.PARAM_ID_NOT_VALID_FORMAT,
+                               description: Strings.ERROR_MESSAGE.UUID_NOT_VALID_FORMAT_DESC })
 
                 try {
                     return activityService.getByIdAndChild(activity.id!, activity.child_id, query)
@@ -507,7 +560,8 @@ describe('Services: PhysicalActivityService', () => {
                     .mock(modelFake)
                     .expects('findOne')
                     .withArgs(query)
-                    .rejects({ name: 'ValidationError' })
+                    .rejects({ message: Strings.CHILD.PARAM_ID_NOT_VALID_FORMAT,
+                               description: Strings.ERROR_MESSAGE.UUID_NOT_VALID_FORMAT_DESC })
 
                 try {
                     return activityService.getByIdAndChild(activity.id!, activity.child_id, query)
@@ -579,7 +633,8 @@ describe('Services: PhysicalActivityService', () => {
                     .mock(modelFake)
                     .expects('find')
                     .withArgs(query)
-                    .rejects({ name: 'ValidationError' })
+                    .rejects({ message: Strings.CHILD.PARAM_ID_NOT_VALID_FORMAT,
+                               description: Strings.ERROR_MESSAGE.UUID_NOT_VALID_FORMAT_DESC })
 
                 try {
                     return activityService.getAllByChild(activity.child_id, query)
@@ -637,7 +692,8 @@ describe('Services: PhysicalActivityService', () => {
                     .mock(modelFake)
                     .expects('findOneAndUpdate')
                     .withArgs(activityIncorrect)
-                    .rejects({ name: 'ValidationError' })
+                    .rejects({ message: Strings.PHYSICAL_ACTIVITY.PARAM_ID_NOT_VALID_FORMAT,
+                               description: Strings.ERROR_MESSAGE.UUID_NOT_VALID_FORMAT_DESC })
 
                 return activityService.updateByChild(activityIncorrect)
                     .catch (err => {
@@ -657,7 +713,8 @@ describe('Services: PhysicalActivityService', () => {
                     .mock(modelFake)
                     .expects('findOneAndUpdate')
                     .withArgs(activityIncorrect)
-                    .rejects({ name: 'ValidationError' })
+                    .rejects({ message: Strings.CHILD.PARAM_ID_NOT_VALID_FORMAT,
+                               description: Strings.ERROR_MESSAGE.UUID_NOT_VALID_FORMAT_DESC })
 
                 return activityService.updateByChild(activityIncorrect)
                     .catch (err => {
@@ -677,7 +734,9 @@ describe('Services: PhysicalActivityService', () => {
                     .mock(modelFake)
                     .expects('findOneAndUpdate')
                     .withArgs(activityIncorrect)
-                    .rejects({ name: 'ValidationError' })
+                    .rejects({ message: 'Duration field is invalid...',
+                               description: 'Physical Activity validation failed: The value provided ' +
+                                   'has a negative value!' })
 
                 return activityService.updateByChild(activityIncorrect)
                     .catch (err => {
@@ -698,7 +757,9 @@ describe('Services: PhysicalActivityService', () => {
                     .mock(modelFake)
                     .expects('findOneAndUpdate')
                     .withArgs(activityIncorrect)
-                    .rejects({ name: 'ValidationError' })
+                    .rejects({ message: 'Calories field is invalid...',
+                               description: 'Physical Activity validation failed: The value provided ' +
+                                   'has a negative value!' })
 
                 return activityService.updateByChild(activityIncorrect)
                     .catch (err => {
@@ -720,7 +781,9 @@ describe('Services: PhysicalActivityService', () => {
                     .mock(modelFake)
                     .expects('findOneAndUpdate')
                     .withArgs(activityIncorrect)
-                    .rejects({ name: 'ValidationError' })
+                    .rejects({ message: 'Steps field is invalid...',
+                               description: 'Physical Activity validation failed: The value provided ' +
+                                   'has a negative value!' })
 
                 return activityService.updateByChild(activityIncorrect)
                     .catch (err => {
@@ -742,7 +805,8 @@ describe('Services: PhysicalActivityService', () => {
                     .mock(modelFake)
                     .expects('findOneAndUpdate')
                     .withArgs(activityIncorrect)
-                    .rejects({ name: 'ValidationError' })
+                    .rejects({ message: 'The name of level provided "sedentaries" is not supported...',
+                               description: 'The names of the allowed levels are: sedentary, lightly, fairly, very.' })
 
                 return activityService.updateByChild(activityIncorrect)
                     .catch (err => {
@@ -763,7 +827,9 @@ describe('Services: PhysicalActivityService', () => {
                     .mock(modelFake)
                     .expects('findOneAndUpdate')
                     .withArgs(activityIncorrect)
-                    .rejects({ name: 'ValidationError' })
+                    .rejects({ message: 'Level are not in a format that is supported!',
+                               description: 'Must have values ​​for the following levels: sedentary, ' +
+                                   'lightly, fairly, very.' })
 
                 return activityService.updateByChild(activityIncorrect)
                     .catch (err => {
@@ -785,7 +851,9 @@ describe('Services: PhysicalActivityService', () => {
                     .mock(modelFake)
                     .expects('findOneAndUpdate')
                     .withArgs(activityIncorrect)
-                    .rejects({ name: 'ValidationError' })
+                    .rejects({ message: 'Some (or several) duration field of levels array is invalid...',
+                               description: 'Physical Activity Level validation failed: The value provided ' +
+                                   'has a negative value!' })
 
                 return activityService.updateByChild(activityIncorrect)
                     .catch (err => {
@@ -861,7 +929,8 @@ describe('Services: PhysicalActivityService', () => {
                     .mock(modelFake)
                     .expects('deleteOne')
                     .withArgs(activityIncorrect.id)
-                    .rejects({ name: 'ValidationError' })
+                    .rejects({ message: Strings.CHILD.PARAM_ID_NOT_VALID_FORMAT,
+                               description: Strings.ERROR_MESSAGE.UUID_NOT_VALID_FORMAT_DESC })
 
                 return activityService.removeByChild(activityIncorrect.id!, activityIncorrect.child_id)
                     .catch (err => {
@@ -886,7 +955,8 @@ describe('Services: PhysicalActivityService', () => {
                     .mock(modelFake)
                     .expects('deleteOne')
                     .withArgs(activityIncorrect.id)
-                    .rejects({ name: 'ValidationError' })
+                    .rejects({ message: Strings.PHYSICAL_ACTIVITY.PARAM_ID_NOT_VALID_FORMAT,
+                               description: Strings.ERROR_MESSAGE.UUID_NOT_VALID_FORMAT_DESC })
 
                 return activityService.removeByChild(activityIncorrect.id!, activityIncorrect.child_id)
                     .catch (err => {

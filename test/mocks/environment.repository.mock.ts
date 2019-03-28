@@ -25,7 +25,7 @@ export class EnvironmentRepositoryMock implements IEnvironmentRepository {
 
     public find(query: any): Promise<Array<Environment>> {
         const timestamp: string = ((query.filters).timestamp).toISOString()
-        const environmentArr: Array<EnvironmentMock> = new Array<EnvironmentMock>()
+        const environmentArr: Array<Environment> = new Array<EnvironmentMock>()
         // Only for the test case that returns a filled array
         if (!(timestamp === '2018-03-01T03:00:00.000Z')) {
             for (let i = 0; i < 3; i++) {
@@ -36,7 +36,7 @@ export class EnvironmentRepositoryMock implements IEnvironmentRepository {
     }
 
     public findOne(query: any): Promise<Environment> {
-        const environment: EnvironmentMock = new EnvironmentMock()
+        const environment: Environment = new EnvironmentMock()
         return Promise.resolve(environment)
     }
 
