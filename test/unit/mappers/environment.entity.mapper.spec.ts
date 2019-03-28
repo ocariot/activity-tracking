@@ -35,7 +35,7 @@ describe('Mappers: EnvironmentEntity', () => {
         })
 
         context('when the parameter is a JSON', () => {
-            it('should not normally execute the method, returning a JSON as a result of the transformation', () => {
+            it('should not normally execute the method, returning an Environment as a result of the transformation', () => {
                 const result = new EnvironmentEntityMapper().transform(environmentJSON)
                 assert(result.id, 'id must not be undefined')
                 assert.propertyVal(result, 'id', environmentJSON.id)
@@ -45,6 +45,15 @@ describe('Mappers: EnvironmentEntity', () => {
                 assert(result.timestamp, 'timestamp must not be undefined')
                 assert.propertyVal(result, 'timestamp', environmentJSON.timestamp)
                 assert(result.measurements, 'measurements must not be undefined')
+            })
+        })
+
+        context('when the parameter is a undefined', () => {
+            it('should not normally execute the method, returning an empty Environment as a result of the transformation', () => {
+                const result = new EnvironmentEntityMapper().transform(undefined)
+
+                assert.isObject(result)
+                assert.propertyVal(result, 'id', undefined)
             })
         })
     })

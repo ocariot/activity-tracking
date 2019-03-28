@@ -51,7 +51,7 @@ describe('Mappers: SleepEntity', () => {
         })
 
         context('when the parameter is a JSON', () => {
-            it('should not normally execute the method, returning a JSON as a result of the transformation', () => {
+            it('should not normally execute the method, returning a Sleep as a result of the transformation', () => {
                 const result = new SleepEntityMapper().transform(sleepJSON)
                 assert(result.id, 'Sleep id (id of entity class) must not be undefined')
                 assert.propertyVal(result, 'id', sleepJSON.id)
@@ -65,6 +65,15 @@ describe('Mappers: SleepEntity', () => {
                 assert(result.child_id, 'child_id must not be undefined')
                 assert.propertyVal(result, 'child_id', sleepJSON.child_id)
                 assert(result.pattern, 'pattern must not be undefined')
+            })
+        })
+
+        context('when the parameter is a undefined', () => {
+            it('should not normally execute the method, returning an empty Sleep as a result of the transformation', () => {
+                const result = new SleepEntityMapper().transform(undefined)
+
+                assert.isObject(result)
+                assert.propertyVal(result, 'id', undefined)
             })
         })
     })

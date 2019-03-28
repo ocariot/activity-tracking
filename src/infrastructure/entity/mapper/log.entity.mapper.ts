@@ -69,6 +69,7 @@ export class LogEntityMapper implements IEntityMapper<Log, LogEntity> {
     public jsonToModel(json: any): Log {
         const result: Log = new Log()
 
+        if (!json) return result
         if (json.id !== undefined) result.id = json.id
         if (json.date !== undefined) result.date = (json.date.toLocaleString()).replace(' 00:00:00', '')
         if (json.value !== undefined) result.value = json.value

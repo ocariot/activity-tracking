@@ -66,7 +66,7 @@ describe('Mappers: PhysicalActivityEntity', () => {
         })
 
         context('when the parameter is a JSON', () => {
-            it('should not normally execute the method, returning a JSON as a result of the transformation', () => {
+            it('should not normally execute the method, returning a PhysicalActivity as a result of the transformation', () => {
                 const result = new PhysicalActivityEntityMapper().transform(activityJSON)
                 assert(result.id, 'PhysicalActivity id (id of entity class) must not be undefined')
                 assert.propertyVal(result, 'id', activityJSON.id)
@@ -91,6 +91,15 @@ describe('Mappers: PhysicalActivityEntity', () => {
                 } catch (e) { //
                 }
                 assert(result.levels, 'levels must not be undefined')
+            })
+        })
+
+        context('when the parameter is a undefined', () => {
+            it('should not normally execute the method, returning an empty PhysicalActivity as a result of the transformation', () => {
+                const result = new PhysicalActivityEntityMapper().transform(undefined)
+
+                assert.isObject(result)
+                assert.propertyVal(result, 'id', undefined)
             })
         })
     })

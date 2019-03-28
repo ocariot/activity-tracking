@@ -52,6 +52,7 @@ export class PhysicalActivityLogEntityMapper implements IEntityMapper<PhysicalAc
     public jsonToModel(json: any): PhysicalActivityLog {
         const result: PhysicalActivityLog = new PhysicalActivityLog()
 
+        if (!json) return result
         if (json.id !== undefined) result.id = json.id
         if (json.steps !== undefined && json.steps.length > 0) {
             result.steps = json.steps.map(elem => new Log().fromJSON(elem))

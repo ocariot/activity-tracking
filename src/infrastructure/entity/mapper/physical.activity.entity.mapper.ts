@@ -59,6 +59,7 @@ export class PhysicalActivityEntityMapper implements IEntityMapper<PhysicalActiv
     public jsonToModel(json: any): PhysicalActivity {
         const result: PhysicalActivity = new PhysicalActivity()
 
+        if (!json) return result
         if (json.id !== undefined) result.id = json.id
         if (json.start_time !== undefined) result.start_time = json.start_time
         if (json.end_time !== undefined) result.end_time = json.end_time

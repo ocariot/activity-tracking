@@ -33,7 +33,7 @@ describe('EVENT BUS', () => {
     })
 
     afterEach(async () => {
-        // await eventBus.dispose()
+        await eventBus.dispose()
     })
 
     after(async () => {

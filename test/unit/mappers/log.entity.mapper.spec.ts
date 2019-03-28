@@ -3,7 +3,7 @@ import { Log, LogType } from '../../../src/application/domain/model/log'
 import { LogEntityMapper } from '../../../src/infrastructure/entity/mapper/log.entity.mapper'
 
 describe('Mappers: LogEntity', () => {
-    const log: Log = new Log('2019-03-11', 1000, LogType.CALORIES, '5a62be07de34500146d9c544')
+    const log: Log = new Log('2019-03-1', 1000, LogType.CALORIES, '5a62be07de34500146d9c544')
     log.id = '5a62be07de34500146d9c544'
 
     // Create log JSON
@@ -32,7 +32,7 @@ describe('Mappers: LogEntity', () => {
         })
 
         context('when the parameter is a JSON', () => {
-            it('should not normally execute the method, returning a JSON as a result of the transformation', () => {
+            it('should not normally execute the method, returning a Log as a result of the transformation', () => {
                 const result = new LogEntityMapper().transform(logJSON)
                 assert(result.id, 'id must not be undefined')
                 assert.propertyVal(result, 'id', logJSON.id)
@@ -44,6 +44,15 @@ describe('Mappers: LogEntity', () => {
                 assert.propertyVal(result, 'type', logJSON.type)
                 assert(result.child_id, 'child_id must not be undefined')
                 assert.propertyVal(result, 'child_id', logJSON.child_id)
+            })
+        })
+
+        context('when the parameter is a undefined', () => {
+            it('should not normally execute the method, returning an empty Log as a result of the transformation', () => {
+                const result = new LogEntityMapper().transform(undefined)
+
+                assert.isObject(result)
+                assert.propertyVal(result, 'id', undefined)
             })
         })
     })
