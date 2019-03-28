@@ -152,10 +152,6 @@ export class EventBusRabbitMQ implements IEventBus, IDisposable {
         amqp.log.transports.console.level = 'none'
     }
 
-    get receive_from_yourself(): boolean {
-        return this._receive_from_yourself
-    }
-
     set receive_from_yourself(value: boolean) {
         this._receive_from_yourself = value
     }

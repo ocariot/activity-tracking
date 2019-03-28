@@ -31,9 +31,11 @@ describe('EVENT BUS', () => {
         eventBus.receive_from_yourself = true
         eventBus.enableLogger(false)
     })
+
     afterEach(async () => {
         // await eventBus.dispose()
     })
+
     after(async () => {
         await eventBus.dispose()
     })
