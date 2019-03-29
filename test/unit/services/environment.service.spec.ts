@@ -25,7 +25,7 @@ require('sinon-mongoose')
 
 describe('Services: Environment', () => {
     const environment: Environment = new EnvironmentMock()
-    let environmentIncorrect: Environment = new Environment()
+    let incorrectEnvironment: Environment = new Environment()
     const environmentArr: Array<Environment> = new Array<EnvironmentMock>()
     for (let i = 0; i < 3; i++) {
         environmentArr.push(new EnvironmentMock())
@@ -59,6 +59,7 @@ describe('Services: Environment', () => {
                     .mock(modelFake)
                     .expects('create')
                     .withArgs(environment)
+                    .chain('exec')
                     .resolves(environment)
 
                 return environmentService.add(environment)
@@ -84,6 +85,7 @@ describe('Services: Environment', () => {
                     .mock(modelFake)
                     .expects('create')
                     .withArgs(environment)
+                    .chain('exec')
                     .resolves(environment)
 
                 return environmentService.add(environment)
@@ -108,6 +110,7 @@ describe('Services: Environment', () => {
                     .mock(modelFake)
                     .expects('create')
                     .withArgs(environment)
+                    .chain('exec')
                     .rejects({ message: 'Measurement of environment is already registered...' })
 
                 return environmentService.add(environment)
@@ -123,12 +126,13 @@ describe('Services: Environment', () => {
                 sinon
                     .mock(modelFake)
                     .expects('create')
-                    .withArgs(environmentIncorrect)
+                    .withArgs(incorrectEnvironment)
+                    .chain('exec')
                     .rejects({ message: 'Required fields were not provided...',
                                description: 'Validation of environment measurements failed: timestamp, institution_id, ' +
                                    'location, measurements required!' })
 
-                return environmentService.add(environmentIncorrect)
+                return environmentService.add(incorrectEnvironment)
                     .catch(err => {
                         assert.property(err, 'message')
                         assert.propertyVal(err, 'message', 'Required fields were not provided...')
@@ -141,16 +145,17 @@ describe('Services: Environment', () => {
 
         context('when the Environment is incorrect (the institution_id is invalid)', () => {
             it('should throw a ValidationException', () => {
-                environmentIncorrect = new EnvironmentMock()
-                environmentIncorrect.institution_id = '507f1f77bcf86cd7994390112'
+                incorrectEnvironment = new EnvironmentMock()
+                incorrectEnvironment.institution_id = '507f1f77bcf86cd7994390112'
                 sinon
                     .mock(modelFake)
                     .expects('create')
-                    .withArgs(environmentIncorrect)
+                    .withArgs(incorrectEnvironment)
+                    .chain('exec')
                     .rejects({ message: Strings.ERROR_MESSAGE.UUID_NOT_VALID_FORMAT,
                                description: Strings.ERROR_MESSAGE.UUID_NOT_VALID_FORMAT_DESC })
 
-                return environmentService.add(environmentIncorrect)
+                return environmentService.add(incorrectEnvironment)
                     .catch(err => {
                         assert.property(err, 'message')
                         assert.propertyVal(err, 'message', Strings.ERROR_MESSAGE.UUID_NOT_VALID_FORMAT)
@@ -162,17 +167,18 @@ describe('Services: Environment', () => {
 
         context('when the Environment is incorrect (the location is invalid)', () => {
             it('should throw a ValidationException', () => {
-                environmentIncorrect.institution_id = '507f1f77bcf86cd799439011'
-                environmentIncorrect.location!.local = ''
-                environmentIncorrect.location!.room = ''
+                incorrectEnvironment.institution_id = '507f1f77bcf86cd799439011'
+                incorrectEnvironment.location!.local = ''
+                incorrectEnvironment.location!.room = ''
                 sinon
                     .mock(modelFake)
                     .expects('create')
-                    .withArgs(environmentIncorrect)
+                    .withArgs(incorrectEnvironment)
+                    .chain('exec')
                     .rejects({ message: 'Location are not in a format that is supported...',
                                description: 'Validation of location failed: location local, location room is required!' })
 
-                return environmentService.add(environmentIncorrect)
+                return environmentService.add(incorrectEnvironment)
                     .catch(err => {
                         assert.property(err, 'message')
                         assert.propertyVal(err, 'message', 'Location are not in a format that is supported...')
@@ -184,17 +190,18 @@ describe('Services: Environment', () => {
 
         context('when the Environment is incorrect (the measurements array is empty)', () => {
             it('should throw a ValidationException', () => {
-                environmentIncorrect.location!.local = 'Indoor'
-                environmentIncorrect.location!.room = 'Room 01'
-                environmentIncorrect.measurements = new Array<Measurement>()
+                incorrectEnvironment.location!.local = 'Indoor'
+                incorrectEnvironment.location!.room = 'Room 01'
+                incorrectEnvironment.measurements = new Array<Measurement>()
                 sinon
                     .mock(modelFake)
                     .expects('create')
-                    .withArgs(environmentIncorrect)
+                    .withArgs(incorrectEnvironment)
+                    .chain('exec')
                     .rejects({ message: 'Measurement are not in a format that is supported!',
                                description: 'The measurements collection must not be empty!' })
 
-                return environmentService.add(environmentIncorrect)
+                return environmentService.add(incorrectEnvironment)
                     .catch(err => {
                         assert.property(err, 'message')
                         assert.propertyVal(err, 'message', 'Measurement are not in a format that is supported!')
@@ -206,16 +213,17 @@ describe('Services: Environment', () => {
 
         context('when the Environment is incorrect (the measurements array has an item with invalid type)', () => {
             it('should throw a ValidationException', () => {
-                environmentIncorrect.measurements = [new Measurement(MeasurementType.HUMIDITY, 34, '%'),
+                incorrectEnvironment.measurements = [new Measurement(MeasurementType.HUMIDITY, 34, '%'),
                                             new Measurement('Temperatures', 40, '°C')]
                 sinon
                     .mock(modelFake)
                     .expects('create')
-                    .withArgs(environmentIncorrect)
+                    .withArgs(incorrectEnvironment)
+                    .chain('exec')
                     .rejects({ message: 'The type of measurement provided "temperatures" is not supported...',
                                description: 'The types allowed are: temperature, humidity.' })
 
-                return environmentService.add(environmentIncorrect)
+                return environmentService.add(incorrectEnvironment)
                     .catch(err => {
                         assert.property(err, 'message')
                         assert.propertyVal(err, 'message', 'The type of measurement provided "temperatures" is not supported...')
@@ -227,17 +235,18 @@ describe('Services: Environment', () => {
 
         context('when the Environment is incorrect (the measurements array has an item with empty fields)', () => {
             it('should throw a ValidationException', () => {
-                environmentIncorrect.measurements = [new Measurement(MeasurementType.HUMIDITY, 34, '%'),
+                incorrectEnvironment.measurements = [new Measurement(MeasurementType.HUMIDITY, 34, '%'),
                                             new Measurement()]
                 sinon
                     .mock(modelFake)
                     .expects('create')
-                    .withArgs(environmentIncorrect)
+                    .withArgs(incorrectEnvironment)
+                    .chain('exec')
                     .rejects({ message: 'Measurement are not in a format that is supported!',
                                description: 'Validation of measurements failed: measurement type, measurement value, ' +
                                    'measurement unit is required!' })
 
-                return environmentService.add(environmentIncorrect)
+                return environmentService.add(incorrectEnvironment)
                     .catch(err => {
                         assert.property(err, 'message')
                         assert.propertyVal(err, 'message', 'Measurement are not in a format that is supported!')
@@ -268,6 +277,7 @@ describe('Services: Environment', () => {
                     .mock(modelFake)
                     .expects('find')
                     .withArgs(query)
+                    .chain('exec')
                     .resolves(environmentArr)
 
                 return environmentService.getAll(query)
@@ -295,6 +305,7 @@ describe('Services: Environment', () => {
                     .mock(modelFake)
                     .expects('find')
                     .withArgs(query)
+                    .chain('exec')
                     .resolves(new Array<EnvironmentMock>())
 
                 return environmentService.getAll(query)
@@ -318,6 +329,7 @@ describe('Services: Environment', () => {
                     .mock(modelFake)
                     .expects('deleteOne')
                     .withArgs(environment.id)
+                    .chain('exec')
                     .resolves(true)
 
                 return environmentService.remove(environment.id!)
@@ -336,6 +348,7 @@ describe('Services: Environment', () => {
                     .mock(modelFake)
                     .expects('deleteOne')
                     .withArgs(environment.id)
+                    .chain('exec')
                     .resolves(false)
 
                 return environmentService.remove(environment.id!)
@@ -353,6 +366,7 @@ describe('Services: Environment', () => {
                     .mock(modelFake)
                     .expects('deleteOne')
                     .withArgs(environment.id)
+                    .chain('exec')
                     .rejects({ message: Strings.ENVIRONMENT.PARAM_ID_NOT_VALID_FORMAT,
                                description: Strings.ERROR_MESSAGE.UUID_NOT_VALID_FORMAT_DESC })
 

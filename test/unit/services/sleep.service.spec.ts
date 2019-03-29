@@ -27,7 +27,7 @@ require('sinon-mongoose')
 
 describe('Services: SleepService', () => {
     const sleep: Sleep = new SleepMock()
-    let sleepIncorrect: Sleep = new Sleep()
+    let incorrectSleep: Sleep = new Sleep()
 
     // Mock sleep array
     const sleepArr: Array<SleepMock> = new Array<SleepMock>()
@@ -62,6 +62,7 @@ describe('Services: SleepService', () => {
                     .mock(modelFake)
                     .expects('create')
                     .withArgs(sleep)
+                    .chain('exec')
                     .resolves(sleep)
 
                 return sleepService.add(sleep)
@@ -90,6 +91,7 @@ describe('Services: SleepService', () => {
                     .mock(modelFake)
                     .expects('create')
                     .withArgs(sleep)
+                    .chain('exec')
                     .resolves(sleep)
 
                 return sleepService.add(sleep)
@@ -117,7 +119,8 @@ describe('Services: SleepService', () => {
                     .mock(modelFake)
                     .expects('create')
                     .withArgs(sleep)
-                    .rejects({ name: 'ConflictError' })
+                    .chain('exec')
+                    .rejects({ message: 'Sleep is already registered...' })
 
                 return sleepService.add(sleep)
                     .catch(error => {
@@ -132,11 +135,13 @@ describe('Services: SleepService', () => {
                 sinon
                     .mock(modelFake)
                     .expects('create')
-                    .withArgs(sleepIncorrect)
-                    .rejects({ name: 'ValidationError' })
+                    .withArgs(incorrectSleep)
+                    .chain('exec')
+                    .rejects({ message: 'Required fields were not provided...',
+                               description: 'Activity validation failed: start_time, end_time, duration, child_id is required!' })
 
                 try {
-                    return await sleepService.add(sleepIncorrect)
+                    return await sleepService.add(incorrectSleep)
                 } catch (err) {
                     assert.property(err, 'message')
                     assert.property(err, 'description')
@@ -149,16 +154,18 @@ describe('Services: SleepService', () => {
 
         context('when the Sleep is incorrect (missing sleep fields)', () => {
             it('should throw a ValidationException', async () => {
-                sleepIncorrect = new SleepMock()
-                sleepIncorrect.pattern = undefined
+                incorrectSleep = new SleepMock()
+                incorrectSleep.pattern = undefined
                 sinon
                     .mock(modelFake)
                     .expects('create')
-                    .withArgs(sleepIncorrect)
-                    .rejects({ name: 'ValidationError' })
+                    .withArgs(incorrectSleep)
+                    .chain('exec')
+                    .rejects({ message: 'Required fields were not provided...',
+                               description: 'Sleep validation failed: pattern is required!' })
 
                 try {
-                    return await sleepService.add(sleepIncorrect)
+                    return await sleepService.add(incorrectSleep)
                 } catch (err) {
                     assert.property(err, 'message')
                     assert.property(err, 'description')
@@ -170,17 +177,20 @@ describe('Services: SleepService', () => {
 
         context('when the Sleep is incorrect (start_time with a date newer than end_time)', () => {
             it('should throw a ValidationException', async () => {
-                sleepIncorrect = new SleepMock()
-                sleepIncorrect.start_time = new Date('2018-12-15T12:52:59Z')
-                sleepIncorrect.end_time = new Date('2018-12-14T13:12:37Z')
+                incorrectSleep = new SleepMock()
+                incorrectSleep.start_time = new Date('2018-12-15T12:52:59Z')
+                incorrectSleep.end_time = new Date('2018-12-14T13:12:37Z')
                 sinon
                     .mock(modelFake)
                     .expects('create')
-                    .withArgs(sleepIncorrect)
-                    .rejects({ name: 'ValidationError' })
+                    .withArgs(incorrectSleep)
+                    .chain('exec')
+                    .rejects({ message: 'Date field is invalid...',
+                               description: 'Date validation failed: The end_time parameter can not contain ' +
+                                   'a older date than that the start_time parameter!' })
 
                 try {
-                    return await sleepService.add(sleepIncorrect)
+                    return await sleepService.add(incorrectSleep)
                 } catch (err) {
                     assert.property(err, 'message')
                     assert.property(err, 'description')
@@ -193,16 +203,19 @@ describe('Services: SleepService', () => {
 
         context('when the Sleep is incorrect (the duration is incompatible with the start_time and end_time parameters)', () => {
             it('should throw a ValidationException', async () => {
-                sleepIncorrect = new SleepMock()
-                sleepIncorrect.duration = 11780000
+                incorrectSleep = new SleepMock()
+                incorrectSleep.duration = 11780000
                 sinon
                     .mock(modelFake)
                     .expects('create')
-                    .withArgs(sleepIncorrect)
-                    .rejects({ name: 'ValidationError' })
+                    .withArgs(incorrectSleep)
+                    .chain('exec')
+                    .rejects({ message: 'Duration field is invalid...',
+                               description: 'Duration validation failed: Activity duration value does not ' +
+                                   'match values passed in start_time and end_time parameters!' })
 
                 try {
-                    return await sleepService.add(sleepIncorrect)
+                    return await sleepService.add(incorrectSleep)
                 } catch (err) {
                     assert.property(err, 'message')
                     assert.property(err, 'description')
@@ -215,16 +228,18 @@ describe('Services: SleepService', () => {
 
         context('when the Sleep is incorrect (the duration is negative)', () => {
             it('should throw a ValidationException', async () => {
-                sleepIncorrect = new SleepMock()
-                sleepIncorrect.duration = -11780000
+                incorrectSleep = new SleepMock()
+                incorrectSleep.duration = -11780000
                 sinon
                     .mock(modelFake)
                     .expects('create')
-                    .withArgs(sleepIncorrect)
-                    .rejects({ name: 'ValidationError' })
+                    .withArgs(incorrectSleep)
+                    .chain('exec')
+                    .rejects({ message: 'Duration field is invalid...',
+                               description: 'Activity validation failed: The value provided has a negative value!' })
 
                 try {
-                    return await sleepService.add(sleepIncorrect)
+                    return await sleepService.add(incorrectSleep)
                 } catch (err) {
                     assert.property(err, 'message')
                     assert.property(err, 'description')
@@ -236,16 +251,18 @@ describe('Services: SleepService', () => {
 
         context('when the Sleep is incorrect (child_id is invalid)', () => {
             it('should throw a ValidationException', async () => {
-                sleepIncorrect = new SleepMock()
-                sleepIncorrect.child_id = '5a62be07de34500146d9c5442'           // Make child_id invalid
+                incorrectSleep = new SleepMock()
+                incorrectSleep.child_id = '5a62be07de34500146d9c5442'           // Make child_id invalid
                 sinon
                     .mock(modelFake)
                     .expects('create')
-                    .withArgs(sleepIncorrect)
-                    .rejects({ name: 'ValidationError' })
+                    .withArgs(incorrectSleep)
+                    .chain('exec')
+                    .rejects({ message: Strings.CHILD.PARAM_ID_NOT_VALID_FORMAT,
+                               description: Strings.ERROR_MESSAGE.UUID_NOT_VALID_FORMAT_DESC })
 
                 try {
-                    return await sleepService.add(sleepIncorrect)
+                    return await sleepService.add(incorrectSleep)
                 } catch (err) {
                     assert.property(err, 'message')
                     assert.property(err, 'description')
@@ -257,16 +274,18 @@ describe('Services: SleepService', () => {
 
         context('when the Sleep is incorrect (missing data_set of pattern)', () => {
             it('should throw a ValidationException', async () => {
-                sleepIncorrect.child_id = '5a62be07de34500146d9c544'           // Make child_id valid
-                sleepIncorrect.pattern = new SleepPattern()
+                incorrectSleep.child_id = '5a62be07de34500146d9c544'           // Make child_id valid
+                incorrectSleep.pattern = new SleepPattern()
                 sinon
                     .mock(modelFake)
                     .expects('create')
-                    .withArgs(sleepIncorrect)
-                    .rejects({ name: 'ValidationError' })
+                    .withArgs(incorrectSleep)
+                    .chain('exec')
+                    .rejects({ message: 'Pattern are not in a format that is supported...',
+                               description: 'Validation of the standard of sleep failed: data_set is required!' })
 
                 try {
-                    return await sleepService.add(sleepIncorrect)
+                    return await sleepService.add(incorrectSleep)
                 } catch (err) {
                     assert.property(err, 'message')
                     assert.property(err, 'description')
@@ -278,15 +297,17 @@ describe('Services: SleepService', () => {
 
         context('when the Sleep is incorrect (the pattern has an empty data_set array)', () => {
             it('should throw a ValidationException', async () => {
-                sleepIncorrect.pattern!.data_set = new Array<SleepPatternDataSet>()
+                incorrectSleep.pattern!.data_set = new Array<SleepPatternDataSet>()
                 sinon
                     .mock(modelFake)
                     .expects('create')
-                    .withArgs(sleepIncorrect)
-                    .rejects({ name: 'ValidationError' })
+                    .withArgs(incorrectSleep)
+                    .chain('exec')
+                    .rejects({ message: 'Dataset are not in a format that is supported!',
+                               description: 'The data_set collection must not be empty!' })
 
                 try {
-                    return await sleepService.add(sleepIncorrect)
+                    return await sleepService.add(incorrectSleep)
                 } catch (err) {
                     assert.property(err, 'message')
                     assert.property(err, 'description')
@@ -300,15 +321,18 @@ describe('Services: SleepService', () => {
             it('should throw a ValidationException', async () => {
                 const dataSetItemTest: SleepPatternDataSet = new SleepPatternDataSet()
 
-                sleepIncorrect.pattern!.data_set = [dataSetItemTest]
+                incorrectSleep.pattern!.data_set = [dataSetItemTest]
                 sinon
                     .mock(modelFake)
                     .expects('create')
-                    .withArgs(sleepIncorrect)
-                    .rejects({ name: 'ValidationError' })
+                    .withArgs(incorrectSleep)
+                    .chain('exec')
+                    .rejects({ message: 'Dataset are not in a format that is supported!',
+                               description: 'Validation of the sleep pattern dataset failed: ' +
+                                   'data_set start_time, data_set name, data_set duration is required!' })
 
                 try {
-                    return await sleepService.add(sleepIncorrect)
+                    return await sleepService.add(incorrectSleep)
                 } catch (err) {
                     assert.property(err, 'message')
                     assert.property(err, 'description')
@@ -325,15 +349,18 @@ describe('Services: SleepService', () => {
                 dataSetItemTest.start_time = new Date(sleep.start_time!)
                 dataSetItemTest.name = SleepPatternType.RESTLESS
                 dataSetItemTest.duration = -(Math.floor(Math.random() * 5 + 1) * 60000)
-                sleepIncorrect.pattern!.data_set = [dataSetItemTest]
+                incorrectSleep.pattern!.data_set = [dataSetItemTest]
                 sinon
                     .mock(modelFake)
                     .expects('create')
-                    .withArgs(sleepIncorrect)
-                    .rejects({ name: 'ValidationError' })
+                    .withArgs(incorrectSleep)
+                    .chain('exec')
+                    .rejects({ message: 'Some (or several) duration field of sleep pattern is invalid...',
+                               description: 'Sleep Pattern dataset validation failed: The value provided ' +
+                                   'has a negative value!' })
 
                 try {
-                    return await sleepService.add(sleepIncorrect)
+                    return await sleepService.add(incorrectSleep)
                 } catch (err) {
                     assert.property(err, 'message')
                     assert.property(err, 'description')
@@ -361,6 +388,7 @@ describe('Services: SleepService', () => {
                     .mock(modelFake)
                     .expects('find')
                     .withArgs(query)
+                    .chain('exec')
                     .resolves(sleepArr)
 
                 return sleepService.getAll(query)
@@ -385,6 +413,7 @@ describe('Services: SleepService', () => {
                     .mock(modelFake)
                     .expects('find')
                     .withArgs(query)
+                    .chain('exec')
                     .resolves(new Array<SleepMock>())
 
                 return sleepService.getAll(query)
@@ -413,6 +442,7 @@ describe('Services: SleepService', () => {
                     .mock(modelFake)
                     .expects('findOne')
                     .withArgs(query)
+                    .chain('exec')
                     .resolves(sleep)
 
                 return sleepService.getByIdAndChild(sleep.id!, sleep.child_id, query)
@@ -434,6 +464,7 @@ describe('Services: SleepService', () => {
                     .mock(modelFake)
                     .expects('findOne')
                     .withArgs(query)
+                    .chain('exec')
                     .resolves(undefined)
 
                 return sleepService.getByIdAndChild(sleep.id!, sleep.child_id, query)
@@ -455,7 +486,9 @@ describe('Services: SleepService', () => {
                     .mock(modelFake)
                     .expects('findOne')
                     .withArgs(query)
-                    .rejects({ name: 'ValidationError' })
+                    .chain('exec')
+                    .rejects({ message: Strings.SLEEP.PARAM_ID_NOT_VALID_FORMAT,
+                               description: Strings.ERROR_MESSAGE.UUID_NOT_VALID_FORMAT_DESC })
 
                 try {
                     return sleepService.getByIdAndChild(sleep.id!, sleep.child_id, query)
@@ -480,7 +513,9 @@ describe('Services: SleepService', () => {
                     .mock(modelFake)
                     .expects('findOne')
                     .withArgs(query)
-                    .rejects({ name: 'ValidationError' })
+                    .chain('exec')
+                    .rejects({ message: Strings.CHILD.PARAM_ID_NOT_VALID_FORMAT,
+                               description: Strings.ERROR_MESSAGE.UUID_NOT_VALID_FORMAT_DESC })
 
                 try {
                     return sleepService.getByIdAndChild(sleep.id!, sleep.child_id, query)
@@ -509,6 +544,7 @@ describe('Services: SleepService', () => {
                     .mock(modelFake)
                     .expects('find')
                     .withArgs(query)
+                    .chain('exec')
                     .resolves(sleepArr)
 
                 return sleepService.getAllByChild(sleep.child_id, query)
@@ -529,6 +565,7 @@ describe('Services: SleepService', () => {
                     .mock(modelFake)
                     .expects('find')
                     .withArgs(query)
+                    .chain('exec')
                     .resolves(new Array<SleepMock>())
 
                 return sleepService.getAllByChild(sleep.child_id, query)
@@ -552,7 +589,9 @@ describe('Services: SleepService', () => {
                     .mock(modelFake)
                     .expects('find')
                     .withArgs(query)
-                    .rejects({ name: 'ValidationError' })
+                    .chain('exec')
+                    .rejects({ message: Strings.CHILD.PARAM_ID_NOT_VALID_FORMAT,
+                               description: Strings.ERROR_MESSAGE.UUID_NOT_VALID_FORMAT_DESC })
 
                 try {
                     return sleepService.getAllByChild(sleep.child_id, query)
@@ -578,6 +617,7 @@ describe('Services: SleepService', () => {
                     .mock(modelFake)
                     .expects('findOneAndUpdate')
                     .withArgs(sleep)
+                    .chain('exec')
                     .resolves(sleep)
 
                 return sleepService.updateByChild(sleep)
@@ -594,6 +634,7 @@ describe('Services: SleepService', () => {
                     .mock(modelFake)
                     .expects('findOneAndUpdate')
                     .withArgs(sleep)
+                    .chain('exec')
                     .resolves(undefined)
 
                 return sleepService.updateByChild(sleep)
@@ -605,14 +646,16 @@ describe('Services: SleepService', () => {
 
         context('when the sleep is incorrect (id is invalid)', () => {
             it('should throw a ValidationException', () => {
-                sleepIncorrect.id = '5a62be07de34500146d9c5442'           // Make sleep id invalid
+                incorrectSleep.id = '5a62be07de34500146d9c5442'           // Make sleep id invalid
                 sinon
                     .mock(modelFake)
                     .expects('findOneAndUpdate')
-                    .withArgs(sleepIncorrect)
-                    .rejects({ name: 'ValidationError' })
+                    .withArgs(incorrectSleep)
+                    .chain('exec')
+                    .rejects({ message: Strings.SLEEP.PARAM_ID_NOT_VALID_FORMAT,
+                               description: Strings.ERROR_MESSAGE.UUID_NOT_VALID_FORMAT_DESC })
 
-                return sleepService.updateByChild(sleepIncorrect)
+                return sleepService.updateByChild(incorrectSleep)
                     .catch (err => {
                         assert.property(err, 'message')
                         assert.property(err, 'description')
@@ -624,15 +667,17 @@ describe('Services: SleepService', () => {
 
         context('when the sleep is incorrect (child_id is invalid)', () => {
             it('should throw a ValidationException', () => {
-                sleepIncorrect.id = '5a62be07de34500146d9c544'           // Make sleep id valid
-                sleepIncorrect.child_id = '5a62be07de34500146d9c5442'           // Make sleep child_id invalid
+                incorrectSleep.id = '5a62be07de34500146d9c544'           // Make sleep id valid
+                incorrectSleep.child_id = '5a62be07de34500146d9c5442'           // Make sleep child_id invalid
                 sinon
                     .mock(modelFake)
                     .expects('findOneAndUpdate')
-                    .withArgs(sleepIncorrect)
-                    .rejects({ name: 'ValidationError' })
+                    .withArgs(incorrectSleep)
+                    .chain('exec')
+                    .rejects({ message: Strings.CHILD.PARAM_ID_NOT_VALID_FORMAT,
+                               description: Strings.ERROR_MESSAGE.UUID_NOT_VALID_FORMAT_DESC })
 
-                return sleepService.updateByChild(sleepIncorrect)
+                return sleepService.updateByChild(incorrectSleep)
                     .catch (err => {
                         assert.property(err, 'message')
                         assert.property(err, 'description')
@@ -644,15 +689,17 @@ describe('Services: SleepService', () => {
 
         context('when the sleep is incorrect (duration is negative)', () => {
             it('should throw a ValidationException', () => {
-                sleepIncorrect.child_id = '5a62be07de34500146d9c544'     // Make child_id valid again
-                sleepIncorrect.duration = -11780000
+                incorrectSleep.child_id = '5a62be07de34500146d9c544'     // Make child_id valid again
+                incorrectSleep.duration = -11780000
                 sinon
                     .mock(modelFake)
                     .expects('findOneAndUpdate')
-                    .withArgs(sleepIncorrect)
-                    .rejects({ name: 'ValidationError' })
+                    .withArgs(incorrectSleep)
+                    .chain('exec')
+                    .rejects({ message: 'Duration field is invalid...',
+                               description: 'Sleep validation failed: The value provided has a negative value!' })
 
-                return sleepService.updateByChild(sleepIncorrect)
+                return sleepService.updateByChild(incorrectSleep)
                     .catch (err => {
                         assert.property(err, 'message')
                         assert.property(err, 'description')
@@ -664,15 +711,17 @@ describe('Services: SleepService', () => {
 
         context('when the sleep is incorrect (missing data_set of pattern)', () => {
             it('should throw a ValidationException', () => {
-                sleepIncorrect = new SleepMock()
-                sleepIncorrect.pattern = new SleepPattern()
+                incorrectSleep = new SleepMock()
+                incorrectSleep.pattern = new SleepPattern()
                 sinon
                     .mock(modelFake)
                     .expects('findOneAndUpdate')
-                    .withArgs(sleepIncorrect)
-                    .rejects({ name: 'ValidationError' })
+                    .withArgs(incorrectSleep)
+                    .chain('exec')
+                    .rejects({ message: 'Pattern are not in a format that is supported...',
+                               description: 'Validation of the standard of sleep failed: data_set is required!' })
 
-                return sleepService.updateByChild(sleepIncorrect)
+                return sleepService.updateByChild(incorrectSleep)
                     .catch (err => {
                         assert.property(err, 'message')
                         assert.property(err, 'description')
@@ -684,14 +733,16 @@ describe('Services: SleepService', () => {
 
         context('when the sleep is incorrect (the pattern has an empty data_set array)', () => {
             it('should throw a ValidationException', () => {
-                sleepIncorrect.pattern!.data_set = new Array<SleepPatternDataSet>()
+                incorrectSleep.pattern!.data_set = new Array<SleepPatternDataSet>()
                 sinon
                     .mock(modelFake)
                     .expects('findOneAndUpdate')
-                    .withArgs(sleepIncorrect)
-                    .rejects({ name: 'ValidationError' })
+                    .withArgs(incorrectSleep)
+                    .chain('exec')
+                    .rejects({ message: 'Dataset are not in a format that is supported!',
+                               description: 'The data_set collection must not be empty!' })
 
-                return sleepService.updateByChild(sleepIncorrect)
+                return sleepService.updateByChild(incorrectSleep)
                     .catch (err => {
                         assert.property(err, 'message')
                         assert.property(err, 'description')
@@ -705,14 +756,17 @@ describe('Services: SleepService', () => {
             it('should throw a ValidationException', () => {
                 const dataSetItemTest: SleepPatternDataSet = new SleepPatternDataSet()
 
-                sleepIncorrect.pattern!.data_set = [dataSetItemTest]
+                incorrectSleep.pattern!.data_set = [dataSetItemTest]
                 sinon
                     .mock(modelFake)
                     .expects('findOneAndUpdate')
-                    .withArgs(sleepIncorrect)
-                    .rejects({ name: 'ValidationError' })
+                    .withArgs(incorrectSleep)
+                    .chain('exec')
+                    .rejects({ message: 'Dataset are not in a format that is supported!',
+                               description: 'Validation of the sleep pattern dataset failed: ' +
+                                   'data_set start_time, data_set name, data_set duration is required!' })
 
-                return sleepService.updateByChild(sleepIncorrect)
+                return sleepService.updateByChild(incorrectSleep)
                     .catch (err => {
                         assert.property(err, 'message')
                         assert.property(err, 'description')
@@ -729,14 +783,17 @@ describe('Services: SleepService', () => {
                 dataSetItemTest.start_time = new Date(sleep.start_time!)
                 dataSetItemTest.name = SleepPatternType.RESTLESS
                 dataSetItemTest.duration = -(Math.floor(Math.random() * 5 + 1) * 60000)
-                sleepIncorrect.pattern!.data_set = [dataSetItemTest]
+                incorrectSleep.pattern!.data_set = [dataSetItemTest]
                 sinon
                     .mock(modelFake)
                     .expects('findOneAndUpdate')
-                    .withArgs(sleepIncorrect)
-                    .rejects({ name: 'ValidationError' })
+                    .withArgs(incorrectSleep)
+                    .chain('exec')
+                    .rejects({ message: 'Some (or several) duration field of sleep pattern is invalid...',
+                               description: 'Sleep Pattern dataset validation failed: The value provided ' +
+                                   'has a negative value!' })
 
-                return sleepService.updateByChild(sleepIncorrect)
+                return sleepService.updateByChild(incorrectSleep)
                     .catch (err => {
                         assert.property(err, 'message')
                         assert.property(err, 'description')
@@ -756,15 +813,11 @@ describe('Services: SleepService', () => {
             it('should return true', () => {
                 sleep.id = '507f1f77bcf86cd799439011'            // Make mock return true
                 sleep.child_id = '5a62be07de34500146d9c544'     // Make child_id valid again
-                const query: IQuery = new Query()
-                query.filters = {
-                    _id: sleep.id,
-                    child_id: sleep.child_id
-                }
                 sinon
                     .mock(modelFake)
                     .expects('deleteOne')
                     .withArgs(sleep.id)
+                    .chain('exec')
                     .resolves(true)
 
                 return sleepService.removeByChild(sleep.id!, sleep.child_id)
@@ -779,15 +832,11 @@ describe('Services: SleepService', () => {
         context('when there is no sleep with the received parameters', () => {
             it('should return false', () => {
                 sleep.id = '5a62be07de34500146d9c544'            // Make mock return false
-                const query: IQuery = new Query()
-                query.filters = {
-                    _id: sleep.id,
-                    child_id: sleep.child_id
-                }
                 sinon
                     .mock(modelFake)
                     .expects('deleteOne')
                     .withArgs(sleep.id)
+                    .chain('exec')
                     .resolves(false)
 
                 return sleepService.removeByChild(sleep.id!, sleep.child_id)
@@ -800,19 +849,16 @@ describe('Services: SleepService', () => {
 
         context('when the sleep is incorrect (child_id is invalid)', () => {
             it('should throw a ValidationException', () => {
-                sleepIncorrect.child_id = '5a62be07de34500146d9c5442'     // Make child_id invalid
-                const query: IQuery = new Query()
-                query.filters = {
-                    _id: sleepIncorrect.id,
-                    child_id: sleepIncorrect.child_id
-                }
+                incorrectSleep.child_id = '5a62be07de34500146d9c5442'     // Make child_id invalid
                 sinon
                     .mock(modelFake)
                     .expects('deleteOne')
-                    .withArgs(sleepIncorrect.id)
-                    .rejects({ name: 'ValidationError' })
+                    .withArgs(incorrectSleep.id)
+                    .chain('exec')
+                    .rejects({ message: Strings.CHILD.PARAM_ID_NOT_VALID_FORMAT,
+                               description: Strings.ERROR_MESSAGE.UUID_NOT_VALID_FORMAT_DESC })
 
-                return sleepService.removeByChild(sleepIncorrect.id!, sleepIncorrect.child_id)
+                return sleepService.removeByChild(incorrectSleep.id!, incorrectSleep.child_id)
                     .catch (err => {
                         assert.property(err, 'message')
                         assert.property(err, 'description')
@@ -824,20 +870,17 @@ describe('Services: SleepService', () => {
 
         context('when the sleep is incorrect (id is invalid)', () => {
             it('should throw a ValidationException', () => {
-                sleepIncorrect = new SleepMock()
-                sleepIncorrect.id = '5a62be07de34500146d9c5442'       // Make sleep id invalid
-                const query: IQuery = new Query()
-                query.filters = {
-                    _id: sleepIncorrect.id,
-                    child_id: sleepIncorrect.child_id
-                }
+                incorrectSleep = new SleepMock()
+                incorrectSleep.id = '5a62be07de34500146d9c5442'       // Make sleep id invalid
                 sinon
                     .mock(modelFake)
                     .expects('deleteOne')
-                    .withArgs(sleepIncorrect.id)
-                    .rejects({ name: 'ValidationError' })
+                    .withArgs(incorrectSleep.id)
+                    .chain('exec')
+                    .rejects({ message: Strings.SLEEP.PARAM_ID_NOT_VALID_FORMAT,
+                               description: Strings.ERROR_MESSAGE.UUID_NOT_VALID_FORMAT_DESC })
 
-                return sleepService.removeByChild(sleepIncorrect.id!, sleepIncorrect.child_id)
+                return sleepService.removeByChild(incorrectSleep.id!, incorrectSleep.child_id)
                     .catch (err => {
                         assert.property(err, 'message')
                         assert.property(err, 'description')

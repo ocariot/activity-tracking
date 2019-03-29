@@ -70,6 +70,7 @@ describe('Services: Log', () => {
                     .mock(modelFake)
                     .expects('create')
                     .withArgs(correctLogsArr)
+                    .chain('exec')
                     .resolves(multiStatusCorrect)
 
                 return  logService.addLogs(correctLogsArr)
@@ -92,6 +93,7 @@ describe('Services: Log', () => {
                     .mock(modelFake)
                     .expects('create')
                     .withArgs(correctLogsArr)
+                    .chain('exec')
                     .resolves(multiStatusCorrect)
 
                 return  logService.addLogs(correctLogsArr)
@@ -112,6 +114,7 @@ describe('Services: Log', () => {
                     .mock(modelFake)
                     .expects('create')
                     .withArgs(correctLogsArr)
+                    .chain('exec')
                     .resolves(multiStatusCorrect)
 
                 return  logService.addLogs(correctLogsArr)
@@ -131,6 +134,7 @@ describe('Services: Log', () => {
                     .mock(modelFake)
                     .expects('create')
                     .withArgs(mixedLogsArr)
+                    .chain('exec')
                     .resolves(multiStatusMixed)
 
                 return  logService.addLogs(mixedLogsArr)
@@ -151,6 +155,7 @@ describe('Services: Log', () => {
                     .mock(modelFake)
                     .expects('create')
                     .withArgs(mixedLogsArr)
+                    .chain('exec')
                     .resolves(multiStatusMixed)
 
                 return  logService.addLogs(mixedLogsArr)
@@ -171,6 +176,7 @@ describe('Services: Log', () => {
                     .mock(modelFake)
                     .expects('create')
                     .withArgs(mixedLogsArr)
+                    .chain('exec')
                     .resolves(multiStatusMixed)
 
                 return  logService.addLogs(mixedLogsArr)
@@ -193,6 +199,7 @@ describe('Services: Log', () => {
                     .mock(modelFake)
                     .expects('create')
                     .withArgs(mixedLogsArr)
+                    .chain('exec')
                     .resolves(multiStatusMixed)
 
                 return  logService.addLogs(mixedLogsArr)
@@ -224,6 +231,7 @@ describe('Services: Log', () => {
                     .mock(modelFake)
                     .expects('find')
                     .withArgs(query)
+                    .chain('exec')
                     .resolves(correctLogsArr)
 
                 return  logService.getByChildAndDate(correctLogsArr[0].child_id, correctLogsArr[0].date,
@@ -250,6 +258,7 @@ describe('Services: Log', () => {
                     .mock(modelFake)
                     .expects('find')
                     .withArgs(query)
+                    .chain('exec')
                     .resolves(correctLogsArr)
 
                 return  logService.getByChildAndDate(correctLogsArr[0].child_id, correctLogsArr[0].date,
@@ -278,7 +287,9 @@ describe('Services: Log', () => {
                     .mock(modelFake)
                     .expects('find')
                     .withArgs(query)
-                    .resolves(correctLogsArr)
+                    .chain('exec')
+                    .rejects({ message: Strings.CHILD.PARAM_ID_NOT_VALID_FORMAT,
+                               description: Strings.ERROR_MESSAGE.UUID_NOT_VALID_FORMAT_DESC })
 
                 try {
                     return await logService.getByChildAndDate(correctLogsArr[0].child_id, correctLogsArr[0].date,
@@ -309,7 +320,9 @@ describe('Services: Log', () => {
                     .mock(modelFake)
                     .expects('find')
                     .withArgs(query)
-                    .resolves(correctLogsArr)
+                    .chain('exec')
+                    .rejects({ message: 'Date parameter: 20199-03-18, is not in valid ISO 8601 format.',
+                               description: 'Date must be in the format: yyyy-MM-dd' })
 
                 try {
                     return await logService.getByChildAndDate(correctLogsArr[0].child_id, correctLogsArr[0].date,
@@ -341,7 +354,9 @@ describe('Services: Log', () => {
                     .mock(modelFake)
                     .expects('find')
                     .withArgs(query)
-                    .resolves(correctLogsArr)
+                    .chain('exec')
+                    .rejects({ message: 'Date parameter: 20199-03-18, is not in valid ISO 8601 format.',
+                               description: 'Date must be in the format: yyyy-MM-dd' })
 
                 try {
                     return await logService.getByChildAndDate(correctLogsArr[0].child_id, correctLogsArr[0].date,
@@ -378,6 +393,7 @@ describe('Services: Log', () => {
                     .mock(modelFake)
                     .expects('find')
                     .withArgs(query)
+                    .chain('exec')
                     .resolves(correctLogsArr)
 
                 return logService.getByChildResourceAndDate(correctLogsArr[0].child_id, correctLogsArr[0].type,
@@ -404,6 +420,7 @@ describe('Services: Log', () => {
                     .mock(modelFake)
                     .expects('find')
                     .withArgs(query)
+                    .chain('exec')
                     .resolves(correctLogsArr)
 
                 return logService.getByChildResourceAndDate(correctLogsArr[0].child_id, correctLogsArr[0].type,
@@ -432,7 +449,9 @@ describe('Services: Log', () => {
                     .mock(modelFake)
                     .expects('find')
                     .withArgs(query)
-                    .resolves(correctLogsArr)
+                    .chain('exec')
+                    .rejects({ message: Strings.CHILD.PARAM_ID_NOT_VALID_FORMAT,
+                               description: Strings.ERROR_MESSAGE.UUID_NOT_VALID_FORMAT_DESC })
 
                 try {
                     return logService.getByChildResourceAndDate(correctLogsArr[0].child_id, correctLogsArr[0].type,
@@ -462,7 +481,9 @@ describe('Services: Log', () => {
                     .mock(modelFake)
                     .expects('find')
                     .withArgs(query)
-                    .resolves(correctLogsArr)
+                    .chain('exec')
+                    .rejects({ message: 'The name of type provided "step" is not supported...',
+                               description: 'The names of the allowed types are: steps, calories.' })
 
                 try {
                     return logService.getByChildResourceAndDate(correctLogsArr[0].child_id, otherLogIncorrect.type,
@@ -492,7 +513,9 @@ describe('Services: Log', () => {
                     .mock(modelFake)
                     .expects('find')
                     .withArgs(query)
-                    .resolves(correctLogsArr)
+                    .chain('exec')
+                    .rejects({ message: 'Date parameter: 20199-03-18, is not in valid ISO 8601 format.',
+                               description: 'Date must be in the format: yyyy-MM-dd' })
 
                 try {
                     return logService.getByChildResourceAndDate(correctLogsArr[0].child_id, correctLogsArr[0].type,
@@ -523,7 +546,9 @@ describe('Services: Log', () => {
                     .mock(modelFake)
                     .expects('find')
                     .withArgs(query)
-                    .resolves(correctLogsArr)
+                    .chain('exec')
+                    .rejects({ message: 'Date parameter: 20199-03-18, is not in valid ISO 8601 format.',
+                               description: 'Date must be in the format: yyyy-MM-dd' })
 
                 try {
                     return logService.getByChildResourceAndDate(correctLogsArr[0].child_id, correctLogsArr[0].type,
