@@ -677,6 +677,7 @@ describe('Services: PhysicalActivityService', () => {
     describe('updateByChild(activity: PhysicalActivity)', () => {
         context('when physical activity exists in the database', () => {
             it('should return the PhysicalActivity that was updated', () => {
+                connectionRabbitmqPub.isConnected = true
                 activity.id = '507f1f77bcf86cd799439011'            // Make mock return an activity
                 activity.child_id = '5a62be07de34500146d9c544'      // Make child_id valid again
                 sinon
@@ -706,6 +707,25 @@ describe('Services: PhysicalActivityService', () => {
                 return activityService.updateByChild(activity)
                     .then(result => {
                         assert.isUndefined(result)
+                    })
+            })
+        })
+
+        context('when physical activity exists in the database but there is no connection to the RabbitMQ', () => {
+            it('should return the PhysicalActivity that was updated and save the event that will report the update', () => {
+                connectionRabbitmqPub.isConnected = false
+                activity.id = '507f1f77bcf86cd799439011'            // Make mock return an activity
+                activity.child_id = '5a62be07de34500146d9c544'      // Make child_id valid again
+                sinon
+                    .mock(modelFake)
+                    .expects('findOneAndUpdate')
+                    .withArgs(activity)
+                    .chain('exec')
+                    .resolves(activity)
+
+                return activityService.updateByChild(activity)
+                    .then(result => {
+                        assert(result, 'result must not be undefined')
                     })
             })
         })
@@ -906,6 +926,7 @@ describe('Services: PhysicalActivityService', () => {
     describe('removeByChild(activityId: string, childId: string)', () => {
         context('when there is physical activity with the received parameters', () => {
             it('should return true', () => {
+                connectionRabbitmqPub.isConnected = true
                 activity.id = '507f1f77bcf86cd799439011'            // Make mock return true
                 activity.child_id = '5a62be07de34500146d9c544'     // Make child_id valid again
                 sinon
@@ -938,6 +959,27 @@ describe('Services: PhysicalActivityService', () => {
                     .then(result => {
                         assert.isBoolean(result)
                         assert.equal(result, false)
+                    })
+            })
+        })
+
+        context('when there is physical activity with the received parameters but the connection to the RabbitMQ', () => {
+            it('should return true and save the event that will report the removal of the resource', () => {
+                connectionRabbitmqPub.isConnected = false
+                activity.id = '507f1f77bcf86cd799439011'            // Make mock return true
+                activity.child_id = '5a62be07de34500146d9c544'     // Make child_id valid again
+                sinon
+                    .mock(modelFake)
+                    .expects('deleteOne')
+                    .withArgs(activity.id)
+                    .chain('exec')
+                    .resolves(true)
+
+                return activityService.removeByChild(activity.id!, activity.child_id)
+                    .then(result => {
+                        assert(result, 'result must not be undefined')
+                        assert.isBoolean(result)
+                        assert.equal(result, true)
                     })
             })
         })

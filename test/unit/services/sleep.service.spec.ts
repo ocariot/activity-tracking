@@ -611,6 +611,7 @@ describe('Services: SleepService', () => {
     describe('updateByChild(sleep: Sleep)', () => {
         context('when sleep exists in the database', () => {
             it('should return the Sleep that was updated', () => {
+                connectionRabbitmqPub.isConnected = true
                 sleep.id = '507f1f77bcf86cd799439011'            // Make mock return a sleep
                 sleep.child_id = '5a62be07de34500146d9c544'      // Make child_id valid again
                 sinon
@@ -640,6 +641,25 @@ describe('Services: SleepService', () => {
                 return sleepService.updateByChild(sleep)
                     .then(result => {
                         assert.isUndefined(result)
+                    })
+            })
+        })
+
+        context('when sleep exists in the database but there is no connection to the RabbitMQ', () => {
+            it('should return the Sleep that was updated and save the event that will report the update', () => {
+                connectionRabbitmqPub.isConnected = false
+                sleep.id = '507f1f77bcf86cd799439011'            // Make mock return a sleep
+                sleep.child_id = '5a62be07de34500146d9c544'      // Make child_id valid again
+                sinon
+                    .mock(modelFake)
+                    .expects('findOneAndUpdate')
+                    .withArgs(sleep)
+                    .chain('exec')
+                    .resolves(sleep)
+
+                return sleepService.updateByChild(sleep)
+                    .then(result => {
+                        assert(result, 'result must not be undefined')
                     })
             })
         })
@@ -811,6 +831,7 @@ describe('Services: SleepService', () => {
     describe('removeByChild(sleepId: string, childId: string)', () => {
         context('when there is sleep with the received parameters', () => {
             it('should return true', () => {
+                connectionRabbitmqPub.isConnected = true
                 sleep.id = '507f1f77bcf86cd799439011'            // Make mock return true
                 sleep.child_id = '5a62be07de34500146d9c544'     // Make child_id valid again
                 sinon
@@ -843,6 +864,27 @@ describe('Services: SleepService', () => {
                     .then(result => {
                         assert.isBoolean(result)
                         assert.equal(result, false)
+                    })
+            })
+        })
+
+        context('when there is sleep with the received parameters but there is no connection to the RabbitMQ', () => {
+            it('should return true and save the event that will report the removal of the resource', () => {
+                connectionRabbitmqPub.isConnected = false
+                sleep.id = '507f1f77bcf86cd799439011'            // Make mock return true
+                sleep.child_id = '5a62be07de34500146d9c544'     // Make child_id valid again
+                sinon
+                    .mock(modelFake)
+                    .expects('deleteOne')
+                    .withArgs(sleep.id)
+                    .chain('exec')
+                    .resolves(true)
+
+                return sleepService.removeByChild(sleep.id!, sleep.child_id)
+                    .then(result => {
+                        assert(result, 'result must not be undefined')
+                        assert.isBoolean(result)
+                        assert.equal(result, true)
                     })
             })
         })

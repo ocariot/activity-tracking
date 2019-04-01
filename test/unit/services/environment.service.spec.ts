@@ -324,6 +324,7 @@ describe('Services: Environment', () => {
     describe('remove(id: string)', () => {
         context('when there is an environment with the id used as parameter', () => {
             it('should return true', () => {
+                connectionRabbitmqPub.isConnected = true
                 environment.id = '507f1f77bcf86cd799439011'
                 sinon
                     .mock(modelFake)
@@ -355,6 +356,26 @@ describe('Services: Environment', () => {
                     .then(result => {
                         assert.isBoolean(result)
                         assert.equal(result, false)
+                    })
+            })
+        })
+
+        context('when there is an environment with the id used as parameter but there is no connection to the RabbitMQ', () => {
+            it('should return true and save the event that will report the removal of the resource', () => {
+                connectionRabbitmqPub.isConnected = false
+                environment.id = '507f1f77bcf86cd799439011'
+                sinon
+                    .mock(modelFake)
+                    .expects('deleteOne')
+                    .withArgs(environment.id)
+                    .chain('exec')
+                    .resolves(true)
+
+                return environmentService.remove(environment.id!)
+                    .then(result => {
+                        assert(result, 'result must not be undefined')
+                        assert.isBoolean(result)
+                        assert.equal(result, true)
                     })
             })
         })
