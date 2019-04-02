@@ -1,5 +1,6 @@
 import { assert } from 'chai'
 import { Query } from '../../../src/infrastructure/repository/query/query'
+import { IQuery } from '../../../src/application/port/query.interface'
 
 describe('Repositories: Query', () => {
     const queryJSON: any = {
@@ -9,7 +10,7 @@ describe('Repositories: Query', () => {
         filters: { id: '5a62be07de34500146d9c544' }
     }
 
-    let query: Query = new Query()
+    let query: IQuery = new Query()
     query.fields = ['id', 'child_id']
     query.filters = { id: '5a62be07de34500146d9c544'}
 
