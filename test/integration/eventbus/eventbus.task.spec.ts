@@ -86,6 +86,33 @@ describe('EVENT BUS TASK', () => {
             })
         })
 
+        context('when there is some wrong parameter in the event', () => {
+            it('should throw an Exception', async () => {
+                const event: SleepEvent = new SleepEvent('SleepSaveEvent', new Date(), new SleepMock())
+                const saveEvent: any = event.toJSON()
+                saveEvent.__operation = 'publish'
+                saveEvent.__routing_key = 'sleep.save'
+
+                try {
+                    await integrationRepository
+                        .create(JSON.stringify(saveEvent))          // Mock throw an exception (not parse the JSON)
+
+                    eventBusTask.run()
+
+                    // Wait for 1000 milliseconds
+                    const sleep = (milliseconds) => {
+                        return new Promise(resolve => setTimeout(resolve, milliseconds))
+                    }
+                    await sleep(1000)
+
+                    const result: Array<any> = await integrationRepository.find(new Query())
+                    expect(result.length).to.eql(1)
+                } catch (err) {
+                    expect(err).to.have.property('message')
+                }
+            })
+        })
+
         // Before running this test, the connection to the RabbitMQ must be dropped manually
         // context('when there is no connection to RabbitMQ', () => {
         //     it('should return a non-empty array', async () => {
