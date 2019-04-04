@@ -22,13 +22,10 @@ describe('Mappers: EnvironmentEntity', () => {
         context('when the parameter is of type Environment', () => {
             it('should normally execute the method, returning an EnvironmentEntity as a result of the transformation', () => {
                 const result = new EnvironmentEntityMapper().transform(environment)
-                assert(result.id, 'id must not be undefined')
                 assert.propertyVal(result, 'id', environment.id)
-                assert(result.institution_id, 'institution_id must not be undefined')
                 assert.propertyVal(result, 'institution_id', environment.institution_id)
                 assert(result.location, 'location must not be undefined')
                 if (result.climatized) assert.propertyVal(result, 'climatized', environment.climatized)
-                assert(result.timestamp, 'timestamp must not be undefined')
                 assert.propertyVal(result, 'timestamp', environment.timestamp)
                 assert(result.measurements, 'measurements must not be undefined')
             })
@@ -37,12 +34,9 @@ describe('Mappers: EnvironmentEntity', () => {
         context('when the parameter is a JSON', () => {
             it('should not normally execute the method, returning an Environment as a result of the transformation', () => {
                 const result = new EnvironmentEntityMapper().transform(environmentJSON)
-                assert(result.id, 'id must not be undefined')
                 assert.propertyVal(result, 'id', environmentJSON.id)
-                assert(result.institution_id, 'institution_id must not be undefined')
                 assert.propertyVal(result, 'institution_id', environmentJSON.institution_id)
                 assert(result.location, 'location must not be undefined')
-                assert(result.timestamp, 'timestamp must not be undefined')
                 assert.propertyVal(result, 'timestamp', environmentJSON.timestamp)
                 assert(result.measurements, 'measurements must not be undefined')
             })

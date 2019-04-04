@@ -20,8 +20,6 @@ describe('Validators: Measurements', () => {
                 try {
                     MeasurementsValidator.validate(measurements)
                 } catch (err) {
-                    assert.property(err, 'message')
-                    assert.property(err, 'description')
                     assert.equal(err.message, 'Measurement are not in a format that is supported!')
                     assert.equal(err.description, 'The measurements collection must not be empty!')
                 }
@@ -36,8 +34,6 @@ describe('Validators: Measurements', () => {
                 try {
                     MeasurementsValidator.validate(measurements)
                 } catch (err) {
-                    assert.property(err, 'message')
-                    assert.property(err, 'description')
                     assert.equal(err.message, 'The type of measurement provided "temperatures" is not supported...')
                     assert.equal(err.description, 'The types allowed are: temperature, humidity.')
                 }
@@ -52,8 +48,6 @@ describe('Validators: Measurements', () => {
                 try {
                     MeasurementsValidator.validate(measurements)
                 } catch (err) {
-                    assert.property(err, 'message')
-                    assert.property(err, 'description')
                     assert.equal(err.message, 'Measurement are not in a format that is supported!')
                     assert.equal(err.description, 'Validation of measurements failed: measurement unit is required!')
                 }
@@ -68,8 +62,6 @@ describe('Validators: Measurements', () => {
                 try {
                     MeasurementsValidator.validate(measurements)
                 } catch (err) {
-                    assert.property(err, 'message')
-                    assert.property(err, 'description')
                     assert.equal(err.message, 'Measurement are not in a format that is supported!')
                     assert.equal(err.description, 'Validation of measurements failed: measurement type,' +
                         ' measurement value, measurement unit is required!')

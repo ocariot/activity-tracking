@@ -13,10 +13,8 @@ describe('Models: Location', () => {
         context('when the json is correct', () => {
             it('should return an Location model', () => {
                 const result = new Location().fromJSON(locationJSON)
-                assert(result.local, 'local must not be undefined')
                 assert.typeOf(result.local, 'string')
                 assert.propertyVal(result, 'local', locationJSON.local)
-                assert(result.room, 'room must not be undefined')
                 assert.typeOf(result.room, 'string')
                 assert.propertyVal(result, 'room', locationJSON.room)
                 assert.typeOf(result.latitude, 'string')
@@ -39,10 +37,8 @@ describe('Models: Location', () => {
         context('when the json is a string', () => {
             it('should transform the string in json and return Location model', () => {
                 const result = new Location().fromJSON(JSON.stringify(locationJSON))
-                assert(result.local, 'local must not be undefined')
                 assert.typeOf(result.local, 'string')
                 assert.propertyVal(result, 'local', locationJSON.local)
-                assert(result.room, 'room must not be undefined')
                 assert.typeOf(result.room, 'string')
                 assert.propertyVal(result, 'room', locationJSON.room)
                 assert.typeOf(result.latitude, 'string')
@@ -58,10 +54,8 @@ describe('Models: Location', () => {
             it('should return a JSON from Location model', () => {
                 let result = new Location().fromJSON(locationJSON)
                 result = result.toJSON()
-                assert(result.local, 'local must not be undefined')
                 assert.typeOf(result.local, 'string')
                 assert.propertyVal(result, 'local', locationJSON.local)
-                assert(result.room, 'room must not be undefined')
                 assert.typeOf(result.room, 'string')
                 assert.propertyVal(result, 'room', locationJSON.room)
                 assert.typeOf(result.latitude, 'string')

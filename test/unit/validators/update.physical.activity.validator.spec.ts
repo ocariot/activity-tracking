@@ -26,8 +26,6 @@ describe('Validators: UpdatePhysicalActivity', () => {
                 try {
                     UpdatePhysicalActivityValidator.validate(activity)
                 } catch (err) {
-                    assert.property(err, 'message')
-                    assert.property(err, 'description')
                     assert.equal(err.message, 'Parameter {child_id} is not in valid format!')
                     assert.equal(err.description, Strings.ERROR_MESSAGE.UUID_NOT_VALID_FORMAT_DESC)
                 }
@@ -41,8 +39,6 @@ describe('Validators: UpdatePhysicalActivity', () => {
                 try {
                     UpdatePhysicalActivityValidator.validate(activity)
                 } catch (err) {
-                    assert.property(err, 'message')
-                    assert.property(err, 'description')
                     assert.equal(err.message, 'Parameter {physicalactivity_id} is not in valid format!')
                     assert.equal(err.description, Strings.ERROR_MESSAGE.UUID_NOT_VALID_FORMAT_DESC)
                 }
@@ -56,8 +52,6 @@ describe('Validators: UpdatePhysicalActivity', () => {
                 try {
                     UpdatePhysicalActivityValidator.validate(activity)
                 } catch (err) {
-                    assert.property(err, 'message')
-                    assert.property(err, 'description')
                     assert.equal(err.message, 'Duration field is invalid...')
                     assert.equal(err.description, 'Physical Activity validation failed: '.concat(Strings.ERROR_MESSAGE.NEGATIVE_PARAMETER))
                 }
@@ -73,8 +67,6 @@ describe('Validators: UpdatePhysicalActivity', () => {
                 try {
                     UpdatePhysicalActivityValidator.validate(activity)
                 } catch (err) {
-                    assert.property(err, 'message')
-                    assert.property(err, 'description')
                     assert.equal(err.message, 'Calories field is invalid...')
                     assert.equal(err.description, 'Physical Activity validation failed: The value provided has a negative value!')
                 }
@@ -88,8 +80,6 @@ describe('Validators: UpdatePhysicalActivity', () => {
                 try {
                     UpdatePhysicalActivityValidator.validate(activity)
                 } catch (err) {
-                    assert.property(err, 'message')
-                    assert.property(err, 'description')
                     assert.equal(err.message, 'Steps field is invalid...')
                     assert.equal(err.description, 'Physical Activity validation failed: The value provided has a negative value!')
                 }
@@ -135,8 +125,6 @@ describe('Validators: UpdatePhysicalActivity', () => {
                 try {
                     UpdatePhysicalActivityValidator.validate(activityTest)
                 } catch (err) {
-                    assert.property(err, 'message')
-                    assert.property(err, 'description')
                     assert.equal(err.message, 'The name of level provided "sedentaries" is not supported...')
                     assert.equal(err.description, 'The names of the allowed levels are: sedentary, lightly, fairly, very.')
                 }
@@ -181,8 +169,6 @@ describe('Validators: UpdatePhysicalActivity', () => {
                 try {
                     UpdatePhysicalActivityValidator.validate(activityTest)
                 } catch (err) {
-                    assert.property(err, 'message')
-                    assert.property(err, 'description')
                     assert.equal(err.message, 'Level are not in a format that is supported!')
                     assert.equal(err.description, 'Must have values ​​for the following levels: sedentary, lightly, fairly, very.')
                 }
@@ -195,8 +181,6 @@ describe('Validators: UpdatePhysicalActivity', () => {
                 try {
                     UpdatePhysicalActivityValidator.validate(activity)
                 } catch (err) {
-                    assert.property(err, 'message')
-                    assert.property(err, 'description')
                     assert.equal(err.message, 'Some (or several) duration field of levels array is invalid...')
                     assert.equal(err.description, 'Physical Activity Level validation failed: The value provided has a negative value!')
                 }

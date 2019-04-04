@@ -6,18 +6,18 @@ import { PhysicalActivityEvent } from '../../../src/application/integration-even
 describe('IntegrationEvents: PhysicalActivityEvent', () => {
     describe('toJSON()', () => {
         context('when the activity is valid', () => {
-            it('should return the sleep save event', () => {
+            it('should return the activity save event', () => {
                 const activity: PhysicalActivity = new PhysicalActivityMock()
 
-                const result = new PhysicalActivityEvent('SleepSaveEvent', new Date(), activity).toJSON()
-                assert.property(result, 'event_name')
+                const result = new PhysicalActivityEvent('PhysicalActivitySaveEvent', new Date(), activity).toJSON()
+                assert.propertyVal(result, 'event_name', 'PhysicalActivitySaveEvent')
                 assert.property(result, 'timestamp')
                 assert.property(result, 'physicalactivity')
             })
 
             context('when the activity is undefined', () => {
                 it('should return empty object', () => {
-                    const result = new PhysicalActivityEvent('SleepSaveEvent', new Date(), undefined).toJSON()
+                    const result = new PhysicalActivityEvent('PhysicalActivitySaveEvent', new Date(), undefined).toJSON()
                     assert.isObject(result)
                     assert.isEmpty(result)
                 })

@@ -14,8 +14,8 @@ describe('Models: MultiStatus', () => {
         context('when the json is correct', () => {
             it('should return an MultiStatus model', () => {
                 const result = new MultiStatus().fromJSON(multiStatusJSON)
-                assert(result.success, 'success must not be undefined')
-                assert(result.error, 'error must not be undefined')
+                assert.deepPropertyVal(result, 'success', multiStatusJSON.success)
+                assert.deepPropertyVal(result, 'error', multiStatusJSON.error)
             })
         })
 
@@ -30,8 +30,8 @@ describe('Models: MultiStatus', () => {
         context('when the json is a string', () => {
             it('should transform the string in json and return MultiStatus model', () => {
                 const result = new MultiStatus().fromJSON(JSON.stringify(multiStatusJSON))
-                assert(result.success, 'success must not be undefined')
-                assert(result.error, 'error must not be undefined')
+                assert.deepPropertyVal(result, 'success', multiStatusJSON.success)
+                assert.deepPropertyVal(result, 'error', multiStatusJSON.error)
             })
         })
     })
@@ -41,8 +41,8 @@ describe('Models: MultiStatus', () => {
             it('should return a JSON from MultiStatus model', () => {
                 let result = new MultiStatus().fromJSON(multiStatusJSON)
                 result = result.toJSON()
-                assert(result.success, 'success must not be undefined')
-                assert(result.error, 'error must not be undefined')
+                assert.deepPropertyVal(result, 'success', multiStatusJSON.success)
+                assert.deepPropertyVal(result, 'error', multiStatusJSON.error)
             })
         })
     })

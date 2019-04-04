@@ -18,7 +18,7 @@ export class EnvironmentMock extends Environment {
         environment.measurements = this.generateMeasurements()
         environment.location = new Location().fromJSON({
             local: 'Indoor',
-            room: 'Bloco H sala 01',
+            room: 'room 01',
             latitude: -7.2100766,
             longitude: -35.9175756
         })

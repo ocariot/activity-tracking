@@ -28,8 +28,6 @@ describe('Validators: LogType', () => {
                 try {
                     LogTypeValidator.validate(log.type)
                 } catch (err) {
-                    assert.property(err, 'message')
-                    assert.property(err, 'description')
                     assert.equal(err.message, 'The name of type provided "step" is not supported...')
                     assert.equal(err.description, 'The names of the allowed types are: steps, calories.')
                 }

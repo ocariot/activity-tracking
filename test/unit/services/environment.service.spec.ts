@@ -64,15 +64,12 @@ describe('Services: Environment', () => {
 
                 return environmentService.add(environment)
                     .then(result => {
-                        assert(result.id, 'id must not be undefined')
                         assert.propertyVal(result, 'id', environment.id)
-                        assert(result.institution_id, 'institution_id must not be undefined')
                         assert.propertyVal(result, 'institution_id', environment.institution_id)
-                        assert(result.location, 'location must not be undefined')
+                        assert.propertyVal(result, 'location', environment.location)
                         if (result.climatized) assert.propertyVal(result, 'climatized', environment.climatized)
-                        assert(result.timestamp, 'timestamp must not be undefined')
                         assert.propertyVal(result, 'timestamp', environment.timestamp)
-                        assert(result.measurements, 'measurements must not be undefined')
+                        assert.propertyVal(result, 'measurements', environment.measurements)
                     })
             })
         })
@@ -90,15 +87,12 @@ describe('Services: Environment', () => {
 
                 return environmentService.add(environment)
                     .then(result => {
-                        assert(result.id, 'id must not be undefined')
                         assert.propertyVal(result, 'id', environment.id)
-                        assert(result.institution_id, 'institution_id must not be undefined')
                         assert.propertyVal(result, 'institution_id', environment.institution_id)
-                        assert(result.location, 'location must not be undefined')
+                        assert.propertyVal(result, 'location', environment.location)
                         if (result.climatized) assert.propertyVal(result, 'climatized', environment.climatized)
-                        assert(result.timestamp, 'timestamp must not be undefined')
                         assert.propertyVal(result, 'timestamp', environment.timestamp)
-                        assert(result.measurements, 'measurements must not be undefined')
+                        assert.propertyVal(result, 'measurements', environment.measurements)
                     })
             })
         })
@@ -115,7 +109,6 @@ describe('Services: Environment', () => {
 
                 return environmentService.add(environment)
                     .catch(err => {
-                        assert.property(err, 'message')
                         assert.propertyVal(err, 'message', 'Measurement of environment is already registered...')
                     })
             })
@@ -134,9 +127,7 @@ describe('Services: Environment', () => {
 
                 return environmentService.add(incorrectEnvironment)
                     .catch(err => {
-                        assert.property(err, 'message')
                         assert.propertyVal(err, 'message', 'Required fields were not provided...')
-                        assert.property(err, 'description')
                         assert.propertyVal(err, 'description', 'Validation of environment measurements failed: timestamp, ' +
                             'institution_id, location, measurements required!')
                     })
@@ -157,9 +148,7 @@ describe('Services: Environment', () => {
 
                 return environmentService.add(incorrectEnvironment)
                     .catch(err => {
-                        assert.property(err, 'message')
                         assert.propertyVal(err, 'message', Strings.ERROR_MESSAGE.UUID_NOT_VALID_FORMAT)
-                        assert.property(err, 'description')
                         assert.propertyVal(err, 'description', Strings.ERROR_MESSAGE.UUID_NOT_VALID_FORMAT_DESC)
                     })
             })
@@ -180,9 +169,7 @@ describe('Services: Environment', () => {
 
                 return environmentService.add(incorrectEnvironment)
                     .catch(err => {
-                        assert.property(err, 'message')
                         assert.propertyVal(err, 'message', 'Location are not in a format that is supported...')
-                        assert.property(err, 'description')
                         assert.propertyVal(err, 'description', 'Validation of location failed: location local, location room is required!')
                     })
             })
@@ -203,9 +190,7 @@ describe('Services: Environment', () => {
 
                 return environmentService.add(incorrectEnvironment)
                     .catch(err => {
-                        assert.property(err, 'message')
                         assert.propertyVal(err, 'message', 'Measurement are not in a format that is supported!')
-                        assert.property(err, 'description')
                         assert.propertyVal(err, 'description', 'The measurements collection must not be empty!')
                     })
             })
@@ -225,9 +210,7 @@ describe('Services: Environment', () => {
 
                 return environmentService.add(incorrectEnvironment)
                     .catch(err => {
-                        assert.property(err, 'message')
                         assert.propertyVal(err, 'message', 'The type of measurement provided "temperatures" is not supported...')
-                        assert.property(err, 'description')
                         assert.propertyVal(err, 'description', 'The types allowed are: temperature, humidity.')
                     })
             })
@@ -248,9 +231,7 @@ describe('Services: Environment', () => {
 
                 return environmentService.add(incorrectEnvironment)
                     .catch(err => {
-                        assert.property(err, 'message')
                         assert.propertyVal(err, 'message', 'Measurement are not in a format that is supported!')
-                        assert.property(err, 'description')
                         assert.propertyVal(err, 'description', 'Validation of measurements failed: measurement type, ' +
                             'measurement value, measurement unit is required!')
                     })
@@ -282,7 +263,6 @@ describe('Services: Environment', () => {
 
                 return environmentService.getAll(query)
                     .then(result => {
-                        assert(result, 'result must not be undefined')
                         assert.isArray(result)
                         assert.isNotEmpty(result)
                     })
@@ -310,7 +290,6 @@ describe('Services: Environment', () => {
 
                 return environmentService.getAll(query)
                     .then(result => {
-                        assert(result, 'result must not be undefined')
                         assert.isArray(result)
                         assert.isEmpty(result)
                     })
@@ -335,8 +314,6 @@ describe('Services: Environment', () => {
 
                 return environmentService.remove(environment.id!)
                     .then(result => {
-                        assert(result, 'result must not be undefined')
-                        assert.isBoolean(result)
                         assert.equal(result, true)
                     })
             })
@@ -354,7 +331,6 @@ describe('Services: Environment', () => {
 
                 return environmentService.remove(environment.id!)
                     .then(result => {
-                        assert.isBoolean(result)
                         assert.equal(result, false)
                     })
             })
@@ -373,8 +349,6 @@ describe('Services: Environment', () => {
 
                 return environmentService.remove(environment.id!)
                     .then(result => {
-                        assert(result, 'result must not be undefined')
-                        assert.isBoolean(result)
                         assert.equal(result, true)
                     })
             })
@@ -393,8 +367,6 @@ describe('Services: Environment', () => {
 
                 return environmentService.remove(environment.id!)
                     .catch (err => {
-                        assert.property(err, 'message')
-                        assert.property(err, 'description')
                         assert.propertyVal(err, 'message', Strings.ENVIRONMENT.PARAM_ID_NOT_VALID_FORMAT)
                         assert.propertyVal(err, 'description', Strings.ERROR_MESSAGE.UUID_NOT_VALID_FORMAT_DESC)
                 })

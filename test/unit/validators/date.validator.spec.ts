@@ -18,8 +18,6 @@ describe('Validators: Date', () => {
                 try {
                     DateValidator.validate(date)
                 } catch (err) {
-                    assert.property(err, 'message')
-                    assert.property(err, 'description')
                     assert.equal(err.message, 'Date parameter: 20199-03-11, is not in valid ISO 8601 format.')
                     assert.equal(err.description, 'Date must be in the format: yyyy-MM-dd')
                 }

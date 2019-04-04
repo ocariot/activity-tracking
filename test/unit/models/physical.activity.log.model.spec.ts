@@ -12,8 +12,8 @@ describe('Models: PhysicalActivityLog', () => {
         context('when the json is correct', () => {
             it('should return an PhysicalActivityLog model', () => {
                 const result = new PhysicalActivityLog().fromJSON(activityLogJSON)
-                assert(result.steps, 'steps must not be undefined')
-                assert(result.calories, 'calories must not be undefined')
+                assert.deepPropertyVal(result, 'steps', activityLogJSON.steps)
+                assert.deepPropertyVal(result, 'calories', activityLogJSON.calories)
             })
         })
 
@@ -28,8 +28,8 @@ describe('Models: PhysicalActivityLog', () => {
         context('when the json is a string', () => {
             it('should transform the string in json and return PhysicalActivityLog model', () => {
                 const result = new PhysicalActivityLog().fromJSON(JSON.stringify(activityLogJSON))
-                assert(result.steps, 'steps must not be undefined')
-                assert(result.calories, 'calories must not be undefined')
+                assert.deepPropertyVal(result, 'steps', activityLogJSON.steps)
+                assert.deepPropertyVal(result, 'calories', activityLogJSON.calories)
             })
         })
     })
@@ -39,8 +39,8 @@ describe('Models: PhysicalActivityLog', () => {
             it('should return a JSON from PhysicalActivityLog model', () => {
                 let result = new PhysicalActivityLog().fromJSON(activityLogJSON)
                 result = result.toJSON()
-                assert(result.steps, 'steps must not be undefined')
-                assert(result.calories, 'calories must not be undefined')
+                assert.deepPropertyVal(result, 'steps', activityLogJSON.steps)
+                assert.deepPropertyVal(result, 'calories', activityLogJSON.calories)
             })
         })
     })

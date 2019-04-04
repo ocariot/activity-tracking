@@ -25,7 +25,6 @@ describe('Mappers: PhysicalActivityLogEntity', () => {
         context('when the parameter is of type PhysicalActivityLog', () => {
             it('should normally execute the method, returning a PhysicalActivityLogEntity as a result of the transformation', () => {
                 const result = new PhysicalActivityLogEntityMapper().transform(activityLog)
-                assert(result.id, 'PhysicalActivityLog id (id of entity class) must not be undefined')
                 assert.propertyVal(result, 'id', activityLog.id)
                 assert(result.steps, 'steps must not be undefined')
                 assert(result.calories, 'calories must not be undefined')
@@ -35,11 +34,8 @@ describe('Mappers: PhysicalActivityLogEntity', () => {
         context('when the parameter is a JSON', () => {
             it('should not normally execute the method, returning a PhysicalActivityLog as a result of the transformation', () => {
                 const result = new PhysicalActivityEntityMapper().transform(activityLogJSON)
-                assert(result.id, 'PhysicalActivityLog id (id of entity class) must not be undefined')
                 assert.propertyVal(result, 'id', activityLogJSON.id)
-                assert(result.steps, 'steps must not be undefined')
                 assert.propertyVal(result, 'steps', activityLogJSON.steps)
-                assert(result.calories, 'calories must not be undefined')
                 assert.propertyVal(result, 'calories', activityLogJSON.calories)
             })
         })

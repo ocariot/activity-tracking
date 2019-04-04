@@ -23,8 +23,6 @@ describe('Validators: PhysicalActivityLevels', () => {
                 try {
                     PhysicalActivityLevelsValidator.validate(levels)
                 } catch (err) {
-                    assert.property(err, 'message')
-                    assert.property(err, 'description')
                     assert.equal(err.message, 'Level are not in a format that is supported!')
                     assert.equal(err.description, 'Must have values ​​for the following levels: sedentary, lightly, fairly, very.')
                 }
@@ -49,8 +47,6 @@ describe('Validators: PhysicalActivityLevels', () => {
                 try {
                     PhysicalActivityLevelsValidator.validate(levels)
                 } catch (err) {
-                    assert.property(err, 'message')
-                    assert.property(err, 'description')
                     assert.equal(err.message, 'The name of level provided "lightlys" is not supported...')
                     assert.equal(err.description, 'The names of the allowed levels are: sedentary, lightly, fairly, very.')
                 }
@@ -72,8 +68,6 @@ describe('Validators: PhysicalActivityLevels', () => {
                 try {
                     PhysicalActivityLevelsValidator.validate(levels)
                 } catch (err) {
-                    assert.property(err, 'message')
-                    assert.property(err, 'description')
                     assert.equal(err.message, 'Level are not in a format that is supported!')
                     assert.equal(err.description, 'Must have values ​​for the following levels: sedentary, lightly, fairly, very.')
                 }
@@ -87,8 +81,6 @@ describe('Validators: PhysicalActivityLevels', () => {
                 try {
                     PhysicalActivityLevelsValidator.validate(levels)
                 } catch (err) {
-                    assert.property(err, 'message')
-                    assert.property(err, 'description')
                     assert.equal(err.message, 'Level are not in a format that is supported...')
                     assert.equal(err.description, 'Validation of physical activity levels failed:  level duration is required!')
                 }
@@ -110,8 +102,6 @@ describe('Validators: PhysicalActivityLevels', () => {
                 try {
                     PhysicalActivityLevelsValidator.validate(levels)
                 } catch (err) {
-                    assert.property(err, 'message')
-                    assert.property(err, 'description')
                     assert.equal(err.message, 'Level are not in a format that is supported!')
                     assert.equal(err.description, 'Must have values ​​for the following levels: sedentary, lightly, fairly, very.')
                 }
@@ -125,8 +115,6 @@ describe('Validators: PhysicalActivityLevels', () => {
                 try {
                     PhysicalActivityLevelsValidator.validate(levels)
                 } catch (err) {
-                    assert.property(err, 'message')
-                    assert.property(err, 'description')
                     assert.equal(err.message, 'Some (or several) duration field of levels array is invalid...')
                     assert.equal(err.description, 'Physical Activity Level validation failed: The value provided has a negative value!')
                 }

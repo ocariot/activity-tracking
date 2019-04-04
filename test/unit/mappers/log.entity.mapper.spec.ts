@@ -19,14 +19,10 @@ describe('Mappers: LogEntity', () => {
         context('when the parameter is of type Log', () => {
             it('should normally execute the method, returning a LogEntity as a result of the transformation', () => {
                 const result = new LogEntityMapper().transform(log)
-                assert(result.id, 'id must not be undefined')
                 assert.propertyVal(result, 'id', log.id)
                 assert(result.date, 'date must not be undefined')
-                assert(result.value, 'value must not be undefined')
                 assert.propertyVal(result, 'value', log.value)
-                assert(result.type, 'type must not be undefined')
                 assert.propertyVal(result, 'type', log.type)
-                assert(result.child_id, 'child_id must not be undefined')
                 assert.propertyVal(result, 'child_id', log.child_id)
             })
         })
@@ -34,15 +30,10 @@ describe('Mappers: LogEntity', () => {
         context('when the parameter is a JSON', () => {
             it('should not normally execute the method, returning a Log as a result of the transformation', () => {
                 const result = new LogEntityMapper().transform(logJSON)
-                assert(result.id, 'id must not be undefined')
                 assert.propertyVal(result, 'id', logJSON.id)
-                assert(result.date, 'date must not be undefined')
                 assert.propertyVal(result, 'date', logJSON.date)
-                assert(result.value, 'value must not be undefined')
                 assert.propertyVal(result, 'value', logJSON.value)
-                assert(result.type, 'type must not be undefined')
                 assert.propertyVal(result, 'type', logJSON.type)
-                assert(result.child_id, 'child_id must not be undefined')
                 assert.propertyVal(result, 'child_id', logJSON.child_id)
             })
         })

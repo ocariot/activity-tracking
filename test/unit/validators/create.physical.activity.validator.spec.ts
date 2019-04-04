@@ -26,8 +26,6 @@ describe('Validators: CreatePhysicalActivity', () => {
                 try {
                     CreatePhysicalActivityValidator.validate(activity)
                 } catch (err) {
-                    assert.property(err, 'message')
-                    assert.property(err, 'description')
                     assert.equal(err.message, 'Required fields were not provided...')
                     assert.equal(err.description, 'Activity validation failed: start_time is required!')
                 }
@@ -42,8 +40,6 @@ describe('Validators: CreatePhysicalActivity', () => {
                 try {
                     CreatePhysicalActivityValidator.validate(activity)
                 } catch (err) {
-                    assert.property(err, 'message')
-                    assert.property(err, 'description')
                     assert.equal(err.message, 'Required fields were not provided...')
                     assert.equal(err.description, 'Activity validation failed: start_time, end_time, duration, ' +
                         'child_id is required!')
@@ -60,8 +56,6 @@ describe('Validators: CreatePhysicalActivity', () => {
                 try {
                     CreatePhysicalActivityValidator.validate(activity)
                 } catch (err) {
-                    assert.property(err, 'message')
-                    assert.property(err, 'description')
                     assert.equal(err.message, 'Date field is invalid...')
                     assert.equal(err.description, 'Date validation failed: The end_time parameter can not contain a older date ' +
                         'than that the start_time parameter!')
@@ -76,8 +70,6 @@ describe('Validators: CreatePhysicalActivity', () => {
                 try {
                     CreatePhysicalActivityValidator.validate(activity)
                 } catch (err) {
-                    assert.property(err, 'message')
-                    assert.property(err, 'description')
                     assert.equal(err.message, 'Duration field is invalid...')
                     assert.equal(err.description, 'Duration validation failed: Activity duration value does not match values ' +
                         'passed in start_time and end_time parameters!')
@@ -91,8 +83,6 @@ describe('Validators: CreatePhysicalActivity', () => {
                 try {
                     CreatePhysicalActivityValidator.validate(activity)
                 } catch (err) {
-                    assert.property(err, 'message')
-                    assert.property(err, 'description')
                     assert.equal(err.message, 'Duration field is invalid...')
                     assert.equal(err.description, 'Activity validation failed: '.concat(Strings.ERROR_MESSAGE.NEGATIVE_PARAMETER))
                 }
@@ -106,8 +96,6 @@ describe('Validators: CreatePhysicalActivity', () => {
                 try {
                     CreatePhysicalActivityValidator.validate(activity)
                 } catch (err) {
-                    assert.property(err, 'message')
-                    assert.property(err, 'description')
                     assert.equal(err.message, 'Parameter {child_id} is not in valid format!')
                     assert.equal(err.description, Strings.ERROR_MESSAGE.UUID_NOT_VALID_FORMAT_DESC)
                 }
@@ -124,8 +112,6 @@ describe('Validators: CreatePhysicalActivity', () => {
                 try {
                     CreatePhysicalActivityValidator.validate(activity)
                 } catch (err) {
-                    assert.property(err, 'message')
-                    assert.property(err, 'description')
                     assert.equal(err.message, 'Required fields were not provided...')
                     assert.equal(err.description, 'Physical Activity validation failed: name is required!')
                 }
@@ -139,8 +125,6 @@ describe('Validators: CreatePhysicalActivity', () => {
                 try {
                     CreatePhysicalActivityValidator.validate(activity)
                 } catch (err) {
-                    assert.property(err, 'message')
-                    assert.property(err, 'description')
                     assert.equal(err.message, 'Required fields were not provided...')
                     assert.equal(err.description, 'Physical Activity validation failed: calories is required!')
                 }
@@ -154,8 +138,6 @@ describe('Validators: CreatePhysicalActivity', () => {
                 try {
                     CreatePhysicalActivityValidator.validate(activity)
                 } catch (err) {
-                    assert.property(err, 'message')
-                    assert.property(err, 'description')
                     assert.equal(err.message, 'Calories field is invalid...')
                     assert.equal(err.description, 'Physical Activity validation failed: The value provided has a negative value!')
                 }
@@ -169,8 +151,6 @@ describe('Validators: CreatePhysicalActivity', () => {
                 try {
                     CreatePhysicalActivityValidator.validate(activity)
                 } catch (err) {
-                    assert.property(err, 'message')
-                    assert.property(err, 'description')
                     assert.equal(err.message, 'Steps field is invalid...')
                     assert.equal(err.description, 'Physical Activity validation failed: The value provided has a negative value!')
                 }
@@ -216,8 +196,6 @@ describe('Validators: CreatePhysicalActivity', () => {
                 try {
                     CreatePhysicalActivityValidator.validate(activityTest)
                 } catch (err) {
-                    assert.property(err, 'message')
-                    assert.property(err, 'description')
                     assert.equal(err.message, 'The name of level provided "sedentaries" is not supported...')
                     assert.equal(err.description, 'The names of the allowed levels are: sedentary, lightly, fairly, very.')
                 }
@@ -262,8 +240,6 @@ describe('Validators: CreatePhysicalActivity', () => {
                 try {
                     CreatePhysicalActivityValidator.validate(activityTest)
                 } catch (err) {
-                    assert.property(err, 'message')
-                    assert.property(err, 'description')
                     assert.equal(err.message, 'Level are not in a format that is supported!')
                     assert.equal(err.description, 'Must have values ​​for the following levels: sedentary, lightly, fairly, very.')
                 }
@@ -276,8 +252,6 @@ describe('Validators: CreatePhysicalActivity', () => {
                 try {
                     CreatePhysicalActivityValidator.validate(activity)
                 } catch (err) {
-                    assert.property(err, 'message')
-                    assert.property(err, 'description')
                     assert.equal(err.message, 'Some (or several) duration field of levels array is invalid...')
                     assert.equal(err.description, 'Physical Activity Level validation failed: The value provided has a negative value!')
                 }

@@ -39,21 +39,14 @@ describe('Mappers: PhysicalActivityEntity', () => {
         context('when the parameter is of type PhysicalActivity', () => {
             it('should normally execute the method, returning a PhysicalActivityEntity as a result of the transformation', () => {
                 const result = new PhysicalActivityEntityMapper().transform(activity)
-                assert(result.id, 'PhysicalActivity id (id of entity class) must not be undefined')
                 assert.propertyVal(result, 'id', activity.id)
-                assert(result.start_time, 'start_time must not be undefined')
                 assert.propertyVal(result, 'start_time', activity.start_time)
-                assert(result.end_time, 'end_time must not be undefined')
                 assert.propertyVal(result, 'end_time', activity.end_time)
-                assert(result.duration, 'duration must not be undefined')
                 assert.typeOf(result.duration, 'number')
                 assert.propertyVal(result, 'duration', activity.duration)
-                assert(result.child_id, 'child_id must not be undefined')
                 assert.propertyVal(result, 'child_id', activity.child_id)
-                assert(result.name, 'name must not be undefined')
                 assert.typeOf(result.name, 'string')
                 assert.propertyVal(result, 'name', activity.name)
-                assert(result.calories, 'calories must not be undefined')
                 assert.typeOf(result.calories, 'number')
                 assert.propertyVal(result, 'calories', activity.calories)
                 try {
@@ -68,21 +61,14 @@ describe('Mappers: PhysicalActivityEntity', () => {
         context('when the parameter is a JSON', () => {
             it('should not normally execute the method, returning a PhysicalActivity as a result of the transformation', () => {
                 const result = new PhysicalActivityEntityMapper().transform(activityJSON)
-                assert(result.id, 'PhysicalActivity id (id of entity class) must not be undefined')
                 assert.propertyVal(result, 'id', activityJSON.id)
-                assert(result.start_time, 'start_time must not be undefined')
                 assert.propertyVal(result, 'start_time', activityJSON.start_time)
-                assert(result.end_time, 'end_time must not be undefined')
                 assert.propertyVal(result, 'end_time', activityJSON.end_time)
-                assert(result.duration, 'duration must not be undefined')
                 assert.typeOf(result.duration, 'number')
                 assert.propertyVal(result, 'duration', activityJSON.duration)
-                assert(result.child_id, 'child_id must not be undefined')
                 assert.propertyVal(result, 'child_id', activityJSON.child_id)
-                assert(result.name, 'name must not be undefined')
                 assert.typeOf(result.name, 'string')
                 assert.propertyVal(result, 'name', activityJSON.name)
-                assert(result.calories, 'calories must not be undefined')
                 assert.typeOf(result.calories, 'number')
                 assert.propertyVal(result, 'calories', activityJSON.calories)
                 try {

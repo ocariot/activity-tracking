@@ -12,11 +12,9 @@ describe('Models: SleepPatternDataSet', () => {
         context('when the json is correct', () => {
             it('should return an SleepPatternDataSet model', () => {
                 const result = new SleepPatternDataSet().fromJSON(dataSetJSON)
-                assert(result.start_time, 'start_time must not be undefined')
-                assert(result.name, 'name must not be undefined')
+                assert.equal(result.start_time.toISOString(), dataSetJSON.start_time)
                 assert.typeOf(result.name, 'string')
                 assert.propertyVal(result, 'name', dataSetJSON.name)
-                assert(result.duration, 'duration must not be undefined')
                 assert.typeOf(result.duration, 'number')
                 assert.propertyVal(result, 'duration', dataSetJSON.duration)
             })
@@ -34,11 +32,9 @@ describe('Models: SleepPatternDataSet', () => {
         context('when the json is a string', () => {
             it('should transform the string in json and return SleepPatternDataSet model', () => {
                 const result = new SleepPatternDataSet().fromJSON(JSON.stringify(dataSetJSON))
-                assert(result.start_time, 'start_time must not be undefined')
-                assert(result.name, 'name must not be undefined')
+                assert.equal(result.start_time.toISOString(), dataSetJSON.start_time)
                 assert.typeOf(result.name, 'string')
                 assert.propertyVal(result, 'name', dataSetJSON.name)
-                assert(result.duration, 'duration must not be undefined')
                 assert.typeOf(result.duration, 'number')
                 assert.propertyVal(result, 'duration', dataSetJSON.duration)
             })
@@ -51,10 +47,8 @@ describe('Models: SleepPatternDataSet', () => {
                 let result = new SleepPatternDataSet().fromJSON(dataSetJSON)
                 result = result.toJSON()
                 assert(result.start_time, 'start_time must not be undefined')
-                assert(result.name, 'name must not be undefined')
                 assert.typeOf(result.name, 'string')
                 assert.propertyVal(result, 'name', dataSetJSON.name)
-                assert(result.duration, 'duration must not be undefined')
                 assert.typeOf(result.duration, 'number')
                 assert.propertyVal(result, 'duration', dataSetJSON.duration)
             })

@@ -21,8 +21,6 @@ describe('Validators: Location', () => {
                 try {
                     LocationValidator.validate(location)
                 } catch (err) {
-                    assert.property(err, 'message')
-                    assert.property(err, 'description')
                     assert.equal(err.message, 'Location are not in a format that is supported...')
                     assert.equal(err.description, 'Validation of location failed: location local is required!')
                 }
@@ -35,8 +33,6 @@ describe('Validators: Location', () => {
                 try {
                     LocationValidator.validate(location)
                 } catch (err) {
-                    assert.property(err, 'message')
-                    assert.property(err, 'description')
                     assert.equal(err.message, 'Location are not in a format that is supported...')
                     assert.equal(err.description, 'Validation of location failed: location local, location room is required!')
                 }

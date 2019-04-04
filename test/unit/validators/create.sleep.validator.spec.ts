@@ -25,8 +25,6 @@ describe('Validators: CreateSleep', () => {
                 try {
                     CreateSleepValidator.validate(sleep)
                 } catch (err) {
-                    assert.property(err, 'message')
-                    assert.property(err, 'description')
                     assert.equal(err.message, 'Required fields were not provided...')
                     assert.equal(err.description, 'Activity validation failed: start_time is required!')
                 }
@@ -41,8 +39,6 @@ describe('Validators: CreateSleep', () => {
                 try {
                     CreateSleepValidator.validate(sleep)
                 } catch (err) {
-                    assert.property(err, 'message')
-                    assert.property(err, 'description')
                     assert.equal(err.message, 'Required fields were not provided...')
                     assert.equal(err.description, 'Activity validation failed: start_time, end_time, duration, ' +
                         'child_id is required!')
@@ -59,8 +55,6 @@ describe('Validators: CreateSleep', () => {
                 try {
                     CreateSleepValidator.validate(sleep)
                 } catch (err) {
-                    assert.property(err, 'message')
-                    assert.property(err, 'description')
                     assert.equal(err.message, 'Date field is invalid...')
                     assert.equal(err.description, 'Date validation failed: The end_time parameter can not contain a older date ' +
                         'than that the start_time parameter!')
@@ -75,8 +69,6 @@ describe('Validators: CreateSleep', () => {
                 try {
                     CreateSleepValidator.validate(sleep)
                 } catch (err) {
-                    assert.property(err, 'message')
-                    assert.property(err, 'description')
                     assert.equal(err.message, 'Duration field is invalid...')
                     assert.equal(err.description, 'Duration validation failed: Activity duration value does not match values ' +
                         'passed in start_time and end_time parameters!')
@@ -90,8 +82,6 @@ describe('Validators: CreateSleep', () => {
                 try {
                     CreateSleepValidator.validate(sleep)
                 } catch (err) {
-                    assert.property(err, 'message')
-                    assert.property(err, 'description')
                     assert.equal(err.message, 'Duration field is invalid...')
                     assert.equal(err.description, 'Activity validation failed: '.concat(Strings.ERROR_MESSAGE.NEGATIVE_PARAMETER))
                 }
@@ -105,8 +95,6 @@ describe('Validators: CreateSleep', () => {
                 try {
                     CreateSleepValidator.validate(sleep)
                 } catch (err) {
-                    assert.property(err, 'message')
-                    assert.property(err, 'description')
                     assert.equal(err.message, 'Parameter {child_id} is not in valid format!')
                     assert.equal(err.description, Strings.ERROR_MESSAGE.UUID_NOT_VALID_FORMAT_DESC)
                 }
@@ -123,8 +111,6 @@ describe('Validators: CreateSleep', () => {
                 try {
                     CreateSleepValidator.validate(sleep)
                 } catch (err) {
-                    assert.property(err, 'message')
-                    assert.property(err, 'description')
                     assert.equal(err.message, 'Required fields were not provided...')
                     assert.equal(err.description, 'Sleep validation failed: pattern is required!')
                 }
@@ -137,8 +123,6 @@ describe('Validators: CreateSleep', () => {
                 try {
                     CreateSleepValidator.validate(sleep)
                 } catch (err) {
-                    assert.property(err, 'message')
-                    assert.property(err, 'description')
                     assert.equal(err.message, 'Pattern are not in a format that is supported...')
                     assert.equal(err.description, 'Validation of the standard of sleep failed: data_set is required!')
                 }
@@ -151,8 +135,6 @@ describe('Validators: CreateSleep', () => {
                 try {
                     CreateSleepValidator.validate(sleep)
                 } catch (err) {
-                    assert.property(err, 'message')
-                    assert.property(err, 'description')
                     assert.equal(err.message, 'Dataset are not in a format that is supported!')
                     assert.equal(err.description, 'The data_set collection must not be empty!')
                 }
@@ -170,8 +152,6 @@ describe('Validators: CreateSleep', () => {
                     try {
                         CreateSleepValidator.validate(sleep)
                     } catch (err) {
-                        assert.property(err, 'message')
-                        assert.property(err, 'description')
                         assert.equal(err.message, 'Dataset are not in a format that is supported!')
                         assert.equal(err.description, 'Validation of the sleep pattern dataset failed: data_set start_time is required!')
                     }
@@ -187,8 +167,6 @@ describe('Validators: CreateSleep', () => {
                     try {
                         CreateSleepValidator.validate(sleep)
                     } catch (err) {
-                        assert.property(err, 'message')
-                        assert.property(err, 'description')
                         assert.equal(err.message, 'Dataset are not in a format that is supported!')
                         assert.equal(err.description, 'Validation of the sleep pattern dataset failed: data_set start_time, ' +
                             'data_set name, data_set duration is required!')
@@ -208,8 +186,6 @@ describe('Validators: CreateSleep', () => {
                     try {
                         CreateSleepValidator.validate(sleep)
                     } catch (err) {
-                        assert.property(err, 'message')
-                        assert.property(err, 'description')
                         assert.equal(err.message, 'Some (or several) duration field of sleep pattern is invalid...')
                         assert.equal(err.description, 'Sleep Pattern dataset validation failed: The value provided has a negative value!')
                     }

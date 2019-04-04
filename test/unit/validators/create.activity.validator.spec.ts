@@ -24,8 +24,6 @@ describe('Validators: CreateActivity', () => {
                 try {
                     CreateActivityValidator.validate(activity)
                 } catch (err) {
-                    assert.property(err, 'message')
-                    assert.property(err, 'description')
                     assert.equal(err.message, 'Required fields were not provided...')
                     assert.equal(err.description, 'Activity validation failed: start_time is required!')
                 }
@@ -40,8 +38,6 @@ describe('Validators: CreateActivity', () => {
                 try {
                     CreateActivityValidator.validate(activity)
                 } catch (err) {
-                    assert.property(err, 'message')
-                    assert.property(err, 'description')
                     assert.equal(err.message, 'Required fields were not provided...')
                     assert.equal(err.description, 'Activity validation failed: start_time, end_time, ' +
                         'duration, child_id is required!')
@@ -58,8 +54,6 @@ describe('Validators: CreateActivity', () => {
                 try {
                     CreateActivityValidator.validate(activity)
                 } catch (err) {
-                    assert.property(err, 'message')
-                    assert.property(err, 'description')
                     assert.equal(err.message, 'Date field is invalid...')
                     assert.equal(err.description, 'Date validation failed: The end_time parameter can not contain a older date ' +
                         'than that the start_time parameter!')
@@ -74,8 +68,6 @@ describe('Validators: CreateActivity', () => {
                 try {
                     CreateActivityValidator.validate(activity)
                 } catch (err) {
-                    assert.property(err, 'message')
-                    assert.property(err, 'description')
                     assert.equal(err.message, 'Duration field is invalid...')
                     assert.equal(err.description, 'Duration validation failed: Activity duration value does not match values ' +
                         'passed in start_time and end_time parameters!')
@@ -89,8 +81,6 @@ describe('Validators: CreateActivity', () => {
                 try {
                     CreateActivityValidator.validate(activity)
                 } catch (err) {
-                    assert.property(err, 'message')
-                    assert.property(err, 'description')
                     assert.equal(err.message, 'Duration field is invalid...')
                     assert.equal(err.description, 'Activity validation failed: '.concat(Strings.ERROR_MESSAGE.NEGATIVE_PARAMETER))
                 }
@@ -104,8 +94,6 @@ describe('Validators: CreateActivity', () => {
                 try {
                     CreateActivityValidator.validate(activity)
                 } catch (err) {
-                    assert.property(err, 'message')
-                    assert.property(err, 'description')
                     assert.equal(err.message, 'Parameter {child_id} is not in valid format!')
                     assert.equal(err.description, Strings.ERROR_MESSAGE.UUID_NOT_VALID_FORMAT_DESC)
                 }

@@ -98,24 +98,18 @@ describe('Services: PhysicalActivityService', () => {
 
                 return activityService.add(activity)
                     .then(result => {
-                        assert(result.id, 'PhysicalActivity id (id of entity class) must not be undefined')
                         assert.propertyVal(result, 'id', activity.id)
-                        assert(result.start_time, 'start_time must not be undefined')
                         assert.propertyVal(result, 'start_time', activity.start_time)
-                        assert(result.end_time, 'end_time must not be undefined')
                         assert.propertyVal(result, 'end_time', activity.end_time)
-                        assert(result.duration, 'duration must not be undefined')
                         assert.typeOf(result.duration, 'number')
                         assert.propertyVal(result, 'duration', activity.duration)
-                        assert(result.child_id, 'child_id must not be undefined')
                         assert.propertyVal(result, 'child_id', activity.child_id)
-                        assert(result.name, 'name must not be undefined')
                         assert.typeOf(result.name, 'string')
                         assert.propertyVal(result, 'name', activity.name)
-                        assert(result.calories, 'calories must not be undefined')
                         assert.typeOf(result.calories, 'number')
                         assert.propertyVal(result, 'calories', activity.calories)
                         assert.propertyVal(result, 'steps', activity.steps)
+                        assert.propertyVal(result, 'levels', activity.levels)
                     })
             })
         })
@@ -133,24 +127,18 @@ describe('Services: PhysicalActivityService', () => {
 
                 return activityService.add(activity)
                     .then(result => {
-                        assert(result.id, 'PhysicalActivity id (id of entity class) must not be undefined')
                         assert.propertyVal(result, 'id', activity.id)
-                        assert(result.start_time, 'start_time must not be undefined')
                         assert.propertyVal(result, 'start_time', activity.start_time)
-                        assert(result.end_time, 'end_time must not be undefined')
                         assert.propertyVal(result, 'end_time', activity.end_time)
-                        assert(result.duration, 'duration must not be undefined')
                         assert.typeOf(result.duration, 'number')
                         assert.propertyVal(result, 'duration', activity.duration)
-                        assert(result.child_id, 'child_id must not be undefined')
                         assert.propertyVal(result, 'child_id', activity.child_id)
-                        assert(result.name, 'name must not be undefined')
                         assert.typeOf(result.name, 'string')
                         assert.propertyVal(result, 'name', activity.name)
-                        assert(result.calories, 'calories must not be undefined')
                         assert.typeOf(result.calories, 'number')
                         assert.propertyVal(result, 'calories', activity.calories)
                         assert.propertyVal(result, 'steps', activity.steps)
+                        assert.propertyVal(result, 'levels', activity.levels)
                     })
             })
         })
@@ -167,7 +155,6 @@ describe('Services: PhysicalActivityService', () => {
 
                 return activityService.add(activity)
                     .catch(error => {
-                        assert.property(error, 'message')
                         assert.propertyVal(error, 'message', 'Physical Activity is already registered...')
                     })
             })
@@ -187,8 +174,6 @@ describe('Services: PhysicalActivityService', () => {
                 try {
                     return await activityService.add(incorrectActivity)
                 } catch (err) {
-                    assert.property(err, 'message')
-                    assert.property(err, 'description')
                     assert.propertyVal(err, 'message', 'Required fields were not provided...')
                     assert.propertyVal(err, 'description', 'Activity validation failed: start_time, end_time, ' +
                         'duration, child_id is required!')
@@ -212,8 +197,6 @@ describe('Services: PhysicalActivityService', () => {
                 try {
                     return await activityService.add(incorrectActivity)
                 } catch (err) {
-                    assert.property(err, 'message')
-                    assert.property(err, 'description')
                     assert.propertyVal(err, 'message', 'Required fields were not provided...')
                     assert.propertyVal(err, 'description', 'Physical Activity validation failed: name, calories is required!')
                 }
@@ -237,8 +220,6 @@ describe('Services: PhysicalActivityService', () => {
                 try {
                     return await activityService.add(incorrectActivity)
                 } catch (err) {
-                    assert.property(err, 'message')
-                    assert.property(err, 'description')
                     assert.propertyVal(err, 'message', 'Date field is invalid...')
                     assert.propertyVal(err, 'description', 'Date validation failed: The end_time parameter can not contain ' +
                         'a older date than that the start_time parameter!')
@@ -263,8 +244,6 @@ describe('Services: PhysicalActivityService', () => {
                 try {
                     return await activityService.add(incorrectActivity)
                 } catch (err) {
-                    assert.property(err, 'message')
-                    assert.property(err, 'description')
                     assert.propertyVal(err, 'message', 'Duration field is invalid...')
                     assert.propertyVal(err, 'description', 'Duration validation failed: Activity duration value does not ' +
                         'match values passed in start_time and end_time parameters!')
@@ -287,8 +266,6 @@ describe('Services: PhysicalActivityService', () => {
                 try {
                     return await activityService.add(incorrectActivity)
                 } catch (err) {
-                    assert.property(err, 'message')
-                    assert.property(err, 'description')
                     assert.propertyVal(err, 'message', 'Duration field is invalid...')
                     assert.propertyVal(err, 'description', 'Activity validation failed: The value provided has a negative value!')
                 }
@@ -310,8 +287,6 @@ describe('Services: PhysicalActivityService', () => {
                 try {
                     return await activityService.add(incorrectActivity)
                 } catch (err) {
-                    assert.property(err, 'message')
-                    assert.property(err, 'description')
                     assert.propertyVal(err, 'message', Strings.CHILD.PARAM_ID_NOT_VALID_FORMAT)
                     assert.propertyVal(err, 'description', Strings.ERROR_MESSAGE.UUID_NOT_VALID_FORMAT_DESC)
                 }
@@ -333,8 +308,6 @@ describe('Services: PhysicalActivityService', () => {
                 try {
                     return await activityService.add(incorrectActivity)
                 } catch (err) {
-                    assert.property(err, 'message')
-                    assert.property(err, 'description')
                     assert.propertyVal(err, 'message', 'Calories field is invalid...')
                     assert.propertyVal(err, 'description', 'Physical Activity validation failed: The value provided has a negative value!')
                 }
@@ -356,8 +329,6 @@ describe('Services: PhysicalActivityService', () => {
                 try {
                     return activityService.add(incorrectActivity)
                 } catch (err) {
-                    assert.property(err, 'message')
-                    assert.property(err, 'description')
                     assert.propertyVal(err, 'message', 'Steps field is invalid...')
                     assert.propertyVal(err, 'description', 'Physical Activity validation failed: The value provided has a negative value!')
                 }
@@ -379,8 +350,6 @@ describe('Services: PhysicalActivityService', () => {
                 try {
                     return await activityService.add(incorrectActivity)
                 } catch (err) {
-                    assert.property(err, 'message')
-                    assert.property(err, 'description')
                     assert.propertyVal(err, 'message', 'The name of level provided "sedentaries" is not supported...')
                     assert.propertyVal(err, 'description', 'The names of the allowed levels are: sedentary, lightly, fairly, very.')
                 }
@@ -403,8 +372,6 @@ describe('Services: PhysicalActivityService', () => {
                 try {
                     return await activityService.add(incorrectActivity)
                 } catch (err) {
-                    assert.property(err, 'message')
-                    assert.property(err, 'description')
                     assert.propertyVal(err, 'message', 'Level are not in a format that is supported!')
                     assert.propertyVal(err, 'description', 'Must have values ​​for the following levels: sedentary, lightly, fairly, very.')
                 }
@@ -428,8 +395,6 @@ describe('Services: PhysicalActivityService', () => {
                 try {
                     return await activityService.add(incorrectActivity)
                 } catch (err) {
-                    assert.property(err, 'message')
-                    assert.property(err, 'description')
                     assert.propertyVal(err, 'message', 'Some (or several) duration field of levels array is invalid...')
                     assert.propertyVal(err, 'description', 'Physical Activity Level validation failed: The value provided ' +
                         'has a negative value!')
@@ -459,8 +424,8 @@ describe('Services: PhysicalActivityService', () => {
 
                 return activityService.getAll(query)
                     .then(result => {
-                        assert(result, 'result must not be undefined')
                         assert.isArray(result)
+                        assert.isNotEmpty(result)
                     })
             })
         })
@@ -484,7 +449,6 @@ describe('Services: PhysicalActivityService', () => {
 
                 return activityService.getAll(query)
                     .then(result => {
-                        assert(result, 'result must not be undefined')
                         assert.isArray(result)
                         assert.isEmpty(result)
                     })
@@ -559,8 +523,6 @@ describe('Services: PhysicalActivityService', () => {
                 try {
                     return activityService.getByIdAndChild(activity.id!, activity.child_id, query)
                 } catch (err) {
-                    assert.property(err, 'message')
-                    assert.property(err, 'description')
                     assert.propertyVal(err, 'message', Strings.PHYSICAL_ACTIVITY.PARAM_ID_NOT_VALID_FORMAT)
                     assert.propertyVal(err, 'description', Strings.ERROR_MESSAGE.UUID_NOT_VALID_FORMAT_DESC)
                 }
@@ -586,8 +548,6 @@ describe('Services: PhysicalActivityService', () => {
                 try {
                     return activityService.getByIdAndChild(activity.id!, activity.child_id, query)
                 } catch (err) {
-                    assert.property(err, 'message')
-                    assert.property(err, 'description')
                     assert.propertyVal(err, 'message', Strings.CHILD.PARAM_ID_NOT_VALID_FORMAT)
                     assert.propertyVal(err, 'description', Strings.ERROR_MESSAGE.UUID_NOT_VALID_FORMAT_DESC)
                 }
@@ -615,7 +575,8 @@ describe('Services: PhysicalActivityService', () => {
 
                 return activityService.getAllByChild(activity.child_id, query)
                     .then(result => {
-                        assert(result, 'result must not be undefined')
+                        assert.isArray(result)
+                        assert.isNotEmpty(result)
                     })
             })
         })
@@ -636,7 +597,6 @@ describe('Services: PhysicalActivityService', () => {
 
                 return activityService.getAllByChild(activity.child_id, query)
                     .then(result => {
-                        assert(result, 'result must not be undefined')
                         assert.isArray(result)
                         assert.isEmpty(result)
                     })
@@ -662,8 +622,6 @@ describe('Services: PhysicalActivityService', () => {
                 try {
                     return activityService.getAllByChild(activity.child_id, query)
                 } catch (err) {
-                    assert.property(err, 'message')
-                    assert.property(err, 'description')
                     assert.propertyVal(err, 'message', Strings.CHILD.PARAM_ID_NOT_VALID_FORMAT)
                     assert.propertyVal(err, 'description', Strings.ERROR_MESSAGE.UUID_NOT_VALID_FORMAT_DESC)
                 }
@@ -689,7 +647,18 @@ describe('Services: PhysicalActivityService', () => {
 
                 return activityService.updateByChild(activity)
                     .then(result => {
-                        assert(result, 'result must not be undefined')
+                        assert.propertyVal(result, 'id', activity.id)
+                        assert.propertyVal(result, 'start_time', activity.start_time)
+                        assert.propertyVal(result, 'end_time', activity.end_time)
+                        assert.typeOf(result.duration, 'number')
+                        assert.propertyVal(result, 'duration', activity.duration)
+                        assert.propertyVal(result, 'child_id', activity.child_id)
+                        assert.typeOf(result.name, 'string')
+                        assert.propertyVal(result, 'name', activity.name)
+                        assert.typeOf(result.calories, 'number')
+                        assert.propertyVal(result, 'calories', activity.calories)
+                        assert.propertyVal(result, 'steps', activity.steps)
+                        assert.propertyVal(result, 'levels', activity.levels)
                     })
             })
         })
@@ -725,7 +694,18 @@ describe('Services: PhysicalActivityService', () => {
 
                 return activityService.updateByChild(activity)
                     .then(result => {
-                        assert(result, 'result must not be undefined')
+                        assert.propertyVal(result, 'id', activity.id)
+                        assert.propertyVal(result, 'start_time', activity.start_time)
+                        assert.propertyVal(result, 'end_time', activity.end_time)
+                        assert.typeOf(result.duration, 'number')
+                        assert.propertyVal(result, 'duration', activity.duration)
+                        assert.propertyVal(result, 'child_id', activity.child_id)
+                        assert.typeOf(result.name, 'string')
+                        assert.propertyVal(result, 'name', activity.name)
+                        assert.typeOf(result.calories, 'number')
+                        assert.propertyVal(result, 'calories', activity.calories)
+                        assert.propertyVal(result, 'steps', activity.steps)
+                        assert.propertyVal(result, 'levels', activity.levels)
                     })
             })
         })
@@ -743,8 +723,6 @@ describe('Services: PhysicalActivityService', () => {
 
                 return activityService.updateByChild(incorrectActivity)
                     .catch (err => {
-                        assert.property(err, 'message')
-                        assert.property(err, 'description')
                         assert.propertyVal(err, 'message', Strings.PHYSICAL_ACTIVITY.PARAM_ID_NOT_VALID_FORMAT)
                         assert.propertyVal(err, 'description', Strings.ERROR_MESSAGE.UUID_NOT_VALID_FORMAT_DESC)
                     })
@@ -765,8 +743,6 @@ describe('Services: PhysicalActivityService', () => {
 
                 return activityService.updateByChild(incorrectActivity)
                     .catch (err => {
-                        assert.property(err, 'message')
-                        assert.property(err, 'description')
                         assert.propertyVal(err, 'message', Strings.CHILD.PARAM_ID_NOT_VALID_FORMAT)
                         assert.propertyVal(err, 'description', Strings.ERROR_MESSAGE.UUID_NOT_VALID_FORMAT_DESC)
                     })
@@ -788,8 +764,6 @@ describe('Services: PhysicalActivityService', () => {
 
                 return activityService.updateByChild(incorrectActivity)
                     .catch (err => {
-                        assert.property(err, 'message')
-                        assert.property(err, 'description')
                         assert.propertyVal(err, 'message', 'Duration field is invalid...')
                         assert.propertyVal(err, 'description', 'Physical Activity validation failed: The value provided ' +
                             'has a negative value!')
@@ -812,8 +786,6 @@ describe('Services: PhysicalActivityService', () => {
 
                 return activityService.updateByChild(incorrectActivity)
                     .catch (err => {
-                        assert.property(err, 'message')
-                        assert.property(err, 'description')
                         assert.propertyVal(err, 'message', 'Calories field is invalid...')
                         assert.propertyVal(err, 'description', 'Physical Activity validation failed: The value provided ' +
                             'has a negative value!')
@@ -837,8 +809,6 @@ describe('Services: PhysicalActivityService', () => {
 
                 return activityService.updateByChild(incorrectActivity)
                     .catch (err => {
-                        assert.property(err, 'message')
-                        assert.property(err, 'description')
                         assert.propertyVal(err, 'message', 'Steps field is invalid...')
                         assert.propertyVal(err, 'description', 'Physical Activity validation failed: The value provided ' +
                             'has a negative value!')
@@ -861,8 +831,6 @@ describe('Services: PhysicalActivityService', () => {
 
                 return activityService.updateByChild(incorrectActivity)
                     .catch (err => {
-                        assert.property(err, 'message')
-                        assert.property(err, 'description')
                         assert.propertyVal(err, 'message', 'The name of level provided "sedentaries" is not supported...')
                         assert.propertyVal(err, 'description', 'The names of the allowed levels are: sedentary, lightly, fairly, very.')
                     })
@@ -885,8 +853,6 @@ describe('Services: PhysicalActivityService', () => {
 
                 return activityService.updateByChild(incorrectActivity)
                     .catch (err => {
-                        assert.property(err, 'message')
-                        assert.property(err, 'description')
                         assert.propertyVal(err, 'message', 'Level are not in a format that is supported!')
                         assert.propertyVal(err, 'description', 'Must have values ​​for the following levels: sedentary, ' +
                             'lightly, fairly, very.')
@@ -910,8 +876,6 @@ describe('Services: PhysicalActivityService', () => {
 
                 return activityService.updateByChild(incorrectActivity)
                     .catch (err => {
-                        assert.property(err, 'message')
-                        assert.property(err, 'description')
                         assert.propertyVal(err, 'message', 'Some (or several) duration field of levels array is invalid...')
                         assert.propertyVal(err, 'description', 'Physical Activity Level validation failed: The value provided ' +
                             'has a negative value!')
@@ -938,8 +902,6 @@ describe('Services: PhysicalActivityService', () => {
 
                 return activityService.removeByChild(activity.id!, activity.child_id)
                     .then(result => {
-                        assert(result, 'result must not be undefined')
-                        assert.isBoolean(result)
                         assert.equal(result, true)
                     })
             })
@@ -957,7 +919,6 @@ describe('Services: PhysicalActivityService', () => {
 
                 return activityService.removeByChild(activity.id!, activity.child_id)
                     .then(result => {
-                        assert.isBoolean(result)
                         assert.equal(result, false)
                     })
             })
@@ -977,8 +938,6 @@ describe('Services: PhysicalActivityService', () => {
 
                 return activityService.removeByChild(activity.id!, activity.child_id)
                     .then(result => {
-                        assert(result, 'result must not be undefined')
-                        assert.isBoolean(result)
                         assert.equal(result, true)
                     })
             })
@@ -997,8 +956,6 @@ describe('Services: PhysicalActivityService', () => {
 
                 return activityService.removeByChild(incorrectActivity.id!, incorrectActivity.child_id)
                     .catch (err => {
-                        assert.property(err, 'message')
-                        assert.property(err, 'description')
                         assert.propertyVal(err, 'message', Strings.CHILD.PARAM_ID_NOT_VALID_FORMAT)
                         assert.propertyVal(err, 'description', Strings.ERROR_MESSAGE.UUID_NOT_VALID_FORMAT_DESC)
                     })
@@ -1019,8 +976,6 @@ describe('Services: PhysicalActivityService', () => {
 
                 return activityService.removeByChild(incorrectActivity.id!, incorrectActivity.child_id)
                     .catch (err => {
-                        assert.property(err, 'message')
-                        assert.property(err, 'description')
                         assert.propertyVal(err, 'message', Strings.PHYSICAL_ACTIVITY.PARAM_ID_NOT_VALID_FORMAT)
                         assert.propertyVal(err, 'description', Strings.ERROR_MESSAGE.UUID_NOT_VALID_FORMAT_DESC)
                     })

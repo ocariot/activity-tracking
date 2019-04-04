@@ -60,7 +60,8 @@ describe('Routes: users.children.sleep', () => {
                     .set('Content-Type', 'application/json')
                     .expect(201)
                     .then(res => {
-                        expect(res.body).to.have.property('id')
+                        defaultSleep.id = res.body.id
+                        expect(res.body.id).to.eql(defaultSleep.id)
                         expect(res.body).to.have.property('start_time')
                         expect(res.body.start_time).to.eql(defaultSleep.start_time!.toISOString())
                         expect(res.body).to.have.property('end_time')
@@ -70,7 +71,6 @@ describe('Routes: users.children.sleep', () => {
                         expect(res.body).to.have.property('pattern')
                         expect(res.body).to.have.property('child_id')
                         expect(res.body.child_id).to.eql(defaultSleep.child_id)
-                        defaultSleep.id = res.body.id
                     })
             })
         })
@@ -90,9 +90,7 @@ describe('Routes: users.children.sleep', () => {
                     .set('Content-Type', 'application/json')
                     .expect(409)
                     .then(err => {
-                        expect(err.body).to.have.property('code')
                         expect(err.body.code).to.eql(409)
-                        expect(err.body).to.have.property('message')
                         expect(err.body.message).to.eql('Sleep is already registered...')
                     })
             })
@@ -108,11 +106,8 @@ describe('Routes: users.children.sleep', () => {
                     .set('Content-Type', 'application/json')
                     .expect(400)
                     .then(err => {
-                        expect(err.body).to.have.property('code')
                         expect(err.body.code).to.eql(400)
-                        expect(err.body).to.have.property('message')
                         expect(err.body.message).to.eql('Required fields were not provided...')
-                        expect(err.body).to.have.property('description')
                         expect(err.body.description).to.eql('Activity validation failed: start_time, end_time, duration is required!')
                     })
             })
@@ -132,11 +127,8 @@ describe('Routes: users.children.sleep', () => {
                     .set('Content-Type', 'application/json')
                     .expect(400)
                     .then(err => {
-                        expect(err.body).to.have.property('code')
                         expect(err.body.code).to.eql(400)
-                        expect(err.body).to.have.property('message')
                         expect(err.body.message).to.eql('Required fields were not provided...')
-                        expect(err.body).to.have.property('description')
                         expect(err.body.description).to.eql('Sleep validation failed: pattern is required!')
                     })
             })
@@ -157,11 +149,8 @@ describe('Routes: users.children.sleep', () => {
                     .set('Content-Type', 'application/json')
                     .expect(400)
                     .then(err => {
-                        expect(err.body).to.have.property('code')
                         expect(err.body.code).to.eql(400)
-                        expect(err.body).to.have.property('message')
                         expect(err.body.message).to.eql('Date field is invalid...')
-                        expect(err.body).to.have.property('description')
                         expect(err.body.description).to.eql('Date validation failed: The end_time parameter can not ' +
                             'contain a older date than that the start_time parameter!')
                     })
@@ -183,11 +172,8 @@ describe('Routes: users.children.sleep', () => {
                     .set('Content-Type', 'application/json')
                     .expect(400)
                     .then(err => {
-                        expect(err.body).to.have.property('code')
                         expect(err.body.code).to.eql(400)
-                        expect(err.body).to.have.property('message')
                         expect(err.body.message).to.eql('Duration field is invalid...')
-                        expect(err.body).to.have.property('description')
                         expect(err.body.description).to.eql('Duration validation failed: Activity duration value does ' +
                             'not match values passed in start_time and end_time parameters!')
                     })
@@ -209,11 +195,8 @@ describe('Routes: users.children.sleep', () => {
                     .set('Content-Type', 'application/json')
                     .expect(400)
                     .then(err => {
-                        expect(err.body).to.have.property('code')
                         expect(err.body.code).to.eql(400)
-                        expect(err.body).to.have.property('message')
                         expect(err.body.message).to.eql('Duration field is invalid...')
-                        expect(err.body).to.have.property('description')
                         expect(err.body.description).to.eql('Activity validation failed: The value provided has a negative value!')
                     })
             })
@@ -234,11 +217,8 @@ describe('Routes: users.children.sleep', () => {
                     .set('Content-Type', 'application/json')
                     .expect(400)
                     .then(err => {
-                        expect(err.body).to.have.property('code')
                         expect(err.body.code).to.eql(400)
-                        expect(err.body).to.have.property('message')
                         expect(err.body.message).to.eql(Strings.CHILD.PARAM_ID_NOT_VALID_FORMAT)
-                        expect(err.body).to.have.property('description')
                         expect(err.body.description).to.eql(Strings.ERROR_MESSAGE.UUID_NOT_VALID_FORMAT_DESC)
                     })
             })
@@ -259,11 +239,8 @@ describe('Routes: users.children.sleep', () => {
                     .set('Content-Type', 'application/json')
                     .expect(400)
                     .then(err => {
-                        expect(err.body).to.have.property('code')
                         expect(err.body.code).to.eql(400)
-                        expect(err.body).to.have.property('message')
                         expect(err.body.message).to.eql('Pattern are not in a format that is supported...')
-                        expect(err.body).to.have.property('description')
                         expect(err.body.description).to.eql('Validation of the standard of sleep failed: data_set is required!')
                     })
             })
@@ -286,11 +263,8 @@ describe('Routes: users.children.sleep', () => {
                     .set('Content-Type', 'application/json')
                     .expect(400)
                     .then(err => {
-                        expect(err.body).to.have.property('code')
                         expect(err.body.code).to.eql(400)
-                        expect(err.body).to.have.property('message')
                         expect(err.body.message).to.eql('Dataset are not in a format that is supported!')
-                        expect(err.body).to.have.property('description')
                         expect(err.body.description).to.eql('The data_set collection must not be empty!')
                     })
             })
@@ -315,11 +289,8 @@ describe('Routes: users.children.sleep', () => {
                     .set('Content-Type', 'application/json')
                     .expect(400)
                     .then(err => {
-                        expect(err.body).to.have.property('code')
                         expect(err.body.code).to.eql(400)
-                        expect(err.body).to.have.property('message')
                         expect(err.body.message).to.eql('Dataset are not in a format that is supported!')
-                        expect(err.body).to.have.property('description')
                         expect(err.body.description).to.eql('Validation of the sleep pattern dataset failed: data_set ' +
                             'start_time, data_set name, data_set duration is required!')
                     })
@@ -349,11 +320,8 @@ describe('Routes: users.children.sleep', () => {
                     .set('Content-Type', 'application/json')
                     .expect(400)
                     .then(err => {
-                        expect(err.body).to.have.property('code')
                         expect(err.body.code).to.eql(400)
-                        expect(err.body).to.have.property('message')
                         expect(err.body.message).to.eql('Some (or several) duration field of sleep pattern is invalid...')
-                        expect(err.body).to.have.property('description')
                         expect(err.body.description).to.eql('Sleep Pattern dataset validation failed: The value provided ' +
                             'has a negative value!')
                     })
@@ -371,20 +339,17 @@ describe('Routes: users.children.sleep', () => {
                     .set('Content-Type', 'application/json')
                     .expect(200)
                     .then(res => {
+                        defaultSleep.id = res.body[0].id
+                        expect(res.body).is.an.instanceOf(Array)
+                        expect(res.body.length).to.not.eql(0)
                         // Check for the existence of properties only in the first element of the array
                         // because there is a guarantee that there will be at least one object, which was
                         // created in the case of POST route success test
-                        expect(res.body).is.an.instanceOf(Array)
-                        expect(res.body.length).to.not.eql(0)
-                        expect(res.body[0]).to.have.property('id')
-                        expect(res.body[0]).to.have.property('start_time')
+                        expect(res.body[0].id).to.eql(defaultSleep.id)
                         expect(res.body[0].start_time).to.eql(defaultSleep.start_time!.toISOString())
-                        expect(res.body[0]).to.have.property('end_time')
                         expect(res.body[0].end_time).to.eql(defaultSleep.end_time!.toISOString())
-                        expect(res.body[0]).to.have.property('duration')
                         expect(res.body[0].duration).to.eql(defaultSleep.duration)
                         expect(res.body[0]).to.have.property('pattern')
-                        expect(res.body[0]).to.have.property('child_id')
                         expect(res.body[0].child_id).to.eql(defaultSleep.child_id)
                     })
             })
@@ -475,20 +440,17 @@ describe('Routes: users.children.sleep', () => {
                     .set('Content-Type', 'application/json')
                     .expect(200)
                     .then(res => {
+                        defaultSleep.id = res.body[0].id
                         expect(res.body).is.an.instanceOf(Array)
                         expect(res.body.length).to.not.eql(0)
                         // Check for the existence of properties only in the first element of the array
                         // because there is a guarantee that there will be at least one object with the property
                         // 'climatized' = true (the only query filter)
-                        expect(res.body[0]).to.have.property('id')
-                        expect(res.body[0]).to.have.property('start_time')
+                        expect(res.body[0].id).to.eql(defaultSleep.id)
                         expect(res.body[0].start_time).to.eql(defaultSleep.start_time!.toISOString())
-                        expect(res.body[0]).to.have.property('end_time')
                         expect(res.body[0].end_time).to.eql(defaultSleep.end_time!.toISOString())
-                        expect(res.body[0]).to.have.property('duration')
                         expect(res.body[0].duration).to.eql(defaultSleep.duration)
                         expect(res.body[0]).to.have.property('pattern')
-                        expect(res.body[0]).to.have.property('child_id')
                         expect(res.body[0].child_id).to.eql(defaultSleep.child_id)
                     })
             })
@@ -558,20 +520,17 @@ describe('Routes: users.children.sleep', () => {
                     .set('Content-Type', 'application/json')
                     .expect(200)
                     .then(res => {
+                        defaultSleep.id = res.body[0].id
+                        expect(res.body).is.an.instanceOf(Array)
+                        expect(res.body.length).to.not.eql(0)
                         // Check for the existence of properties only in the first element of the array
                         // because there is a guarantee that there will be at least one object, which was
                         // created in the case of POST route success test
-                        expect(res.body).is.an.instanceOf(Array)
-                        expect(res.body.length).to.not.eql(0)
-                        expect(res.body[0]).to.have.property('id')
-                        expect(res.body[0]).to.have.property('start_time')
+                        expect(res.body[0].id).to.eql(defaultSleep.id)
                         expect(res.body[0].start_time).to.eql(defaultSleep.start_time!.toISOString())
-                        expect(res.body[0]).to.have.property('end_time')
                         expect(res.body[0].end_time).to.eql(defaultSleep.end_time!.toISOString())
-                        expect(res.body[0]).to.have.property('duration')
                         expect(res.body[0].duration).to.eql(defaultSleep.duration)
                         expect(res.body[0]).to.have.property('pattern')
-                        expect(res.body[0]).to.have.property('child_id')
                         expect(res.body[0].child_id).to.eql(defaultSleep.child_id)
                     })
             })
@@ -633,11 +592,8 @@ describe('Routes: users.children.sleep', () => {
                     .set('Content-Type', 'application/json')
                     .expect(400)
                     .then(err => {
-                        expect(err.body).to.have.property('code')
                         expect(err.body.code).to.eql(400)
-                        expect(err.body).to.have.property('message')
                         expect(err.body.message).to.eql(Strings.CHILD.PARAM_ID_NOT_VALID_FORMAT)
-                        expect(err.body).to.have.property('description')
                         expect(err.body.description).to.eql(Strings.ERROR_MESSAGE.UUID_NOT_VALID_FORMAT_DESC)
                     })
             })
@@ -685,20 +641,17 @@ describe('Routes: users.children.sleep', () => {
                     .set('Content-Type', 'application/json')
                     .expect(200)
                     .then(res => {
+                        defaultSleep.id = res.body[0].id
                         expect(res.body).is.an.instanceOf(Array)
                         expect(res.body.length).to.not.eql(0)
                         // Check for the existence of properties only in the first element of the array
                         // because there is a guarantee that there will be at least one object with the property
                         // 'climatized' = true (the only query filter)
-                        expect(res.body[0]).to.have.property('id')
-                        expect(res.body[0]).to.have.property('start_time')
+                        expect(res.body[0].id).to.eql(defaultSleep.id)
                         expect(res.body[0].start_time).to.eql(defaultSleep.start_time!.toISOString())
-                        expect(res.body[0]).to.have.property('end_time')
                         expect(res.body[0].end_time).to.eql(defaultSleep.end_time!.toISOString())
-                        expect(res.body[0]).to.have.property('duration')
                         expect(res.body[0].duration).to.eql(defaultSleep.duration)
                         expect(res.body[0]).to.have.property('pattern')
-                        expect(res.body[0]).to.have.property('child_id')
                         expect(res.body[0].child_id).to.eql(defaultSleep.child_id)
                     })
             })
@@ -768,11 +721,8 @@ describe('Routes: users.children.sleep', () => {
                     .set('Content-Type', 'application/json')
                     .expect(400)
                     .then(err => {
-                        expect(err.body).to.have.property('code')
                         expect(err.body.code).to.eql(400)
-                        expect(err.body).to.have.property('message')
                         expect(err.body.message).to.eql(Strings.CHILD.PARAM_ID_NOT_VALID_FORMAT)
-                        expect(err.body).to.have.property('description')
                         expect(err.body.description).to.eql(Strings.ERROR_MESSAGE.UUID_NOT_VALID_FORMAT_DESC)
                     })
             })
@@ -822,16 +772,11 @@ describe('Routes: users.children.sleep', () => {
                         // Check for the existence of properties only in the first element of the array
                         // because there is a guarantee that there will be at least one object, which was
                         // created in the case of POST route success test
-                        expect(res.body).to.have.property('id')
                         expect(res.body.id).to.eql(result.id)
-                        expect(res.body).to.have.property('start_time')
                         expect(res.body.start_time).to.eql(result.start_time!.toISOString())
-                        expect(res.body).to.have.property('end_time')
                         expect(res.body.end_time).to.eql(result.end_time!.toISOString())
-                        expect(res.body).to.have.property('duration')
                         expect(res.body.duration).to.eql(result.duration)
                         expect(res.body).to.have.property('pattern')
-                        expect(res.body).to.have.property('child_id')
                         expect(res.body.child_id).to.eql(result.child_id.toString())
                     })
             })
@@ -850,11 +795,8 @@ describe('Routes: users.children.sleep', () => {
                     .set('Content-Type', 'application/json')
                     .expect(404)
                     .then(err => {
-                        expect(err.body).to.have.property('code')
                         expect(err.body.code).to.eql(404)
-                        expect(err.body).to.have.property('message')
                         expect(err.body.message).to.eql('Sleep not found!')
-                        expect(err.body).to.have.property('description')
                         expect(err.body.description).to.eql('Sleep not found or already removed. A new operation for ' +
                             'the same resource is not required!')
                     })
@@ -898,11 +840,8 @@ describe('Routes: users.children.sleep', () => {
                     .set('Content-Type', 'application/json')
                     .expect(400)
                     .then(err => {
-                        expect(err.body).to.have.property('code')
                         expect(err.body.code).to.eql(400)
-                        expect(err.body).to.have.property('message')
                         expect(err.body.message).to.eql(Strings.CHILD.PARAM_ID_NOT_VALID_FORMAT)
-                        expect(err.body).to.have.property('description')
                         expect(err.body.description).to.eql(Strings.ERROR_MESSAGE.UUID_NOT_VALID_FORMAT_DESC)
                     })
             })
@@ -945,11 +884,8 @@ describe('Routes: users.children.sleep', () => {
                     .set('Content-Type', 'application/json')
                     .expect(400)
                     .then(err => {
-                        expect(err.body).to.have.property('code')
                         expect(err.body.code).to.eql(400)
-                        expect(err.body).to.have.property('message')
                         expect(err.body.message).to.eql(Strings.SLEEP.PARAM_ID_NOT_VALID_FORMAT)
-                        expect(err.body).to.have.property('description')
                         expect(err.body.description).to.eql(Strings.ERROR_MESSAGE.UUID_NOT_VALID_FORMAT_DESC)
                     })
             })
@@ -997,16 +933,11 @@ describe('Routes: users.children.sleep', () => {
                     .set('Content-Type', 'application/json')
                     .expect(200)
                     .then(res => {
-                        expect(res.body).to.have.property('id')
                         expect(res.body.id).to.eql(result.id)
-                        expect(res.body).to.have.property('start_time')
                         expect(res.body.start_time).to.eql(result.start_time!.toISOString())
-                        expect(res.body).to.have.property('end_time')
                         expect(res.body.end_time).to.eql(result.end_time!.toISOString())
-                        expect(res.body).to.have.property('duration')
                         expect(res.body.duration).to.eql(result.duration)
                         expect(res.body).to.have.property('pattern')
-                        expect(res.body).to.have.property('child_id')
                         expect(res.body.child_id).to.eql(result.child_id.toString())
                     })
             })
@@ -1029,11 +960,8 @@ describe('Routes: users.children.sleep', () => {
                     .set('Content-Type', 'application/json')
                     .expect(404)
                     .then(err => {
-                        expect(err.body).to.have.property('code')
                         expect(err.body.code).to.eql(404)
-                        expect(err.body).to.have.property('message')
                         expect(err.body.message).to.eql('Sleep not found!')
-                        expect(err.body).to.have.property('description')
                         expect(err.body.description).to.eql('Sleep not found or already removed. A new operation for ' +
                             'the same resource is not required!')
                     })
@@ -1081,11 +1009,8 @@ describe('Routes: users.children.sleep', () => {
                     .set('Content-Type', 'application/json')
                     .expect(400)
                     .then(err => {
-                        expect(err.body).to.have.property('code')
                         expect(err.body.code).to.eql(400)
-                        expect(err.body).to.have.property('message')
                         expect(err.body.message).to.eql(Strings.CHILD.PARAM_ID_NOT_VALID_FORMAT)
-                        expect(err.body).to.have.property('description')
                         expect(err.body.description).to.eql(Strings.ERROR_MESSAGE.UUID_NOT_VALID_FORMAT_DESC)
                     })
             })
@@ -1132,11 +1057,8 @@ describe('Routes: users.children.sleep', () => {
                     .set('Content-Type', 'application/json')
                     .expect(400)
                     .then(err => {
-                        expect(err.body).to.have.property('code')
                         expect(err.body.code).to.eql(400)
-                        expect(err.body).to.have.property('message')
                         expect(err.body.message).to.eql(Strings.SLEEP.PARAM_ID_NOT_VALID_FORMAT)
-                        expect(err.body).to.have.property('description')
                         expect(err.body.description).to.eql(Strings.ERROR_MESSAGE.UUID_NOT_VALID_FORMAT_DESC)
                     })
             })
@@ -1171,15 +1093,12 @@ describe('Routes: users.children.sleep', () => {
                     .set('Content-Type', 'application/json')
                     .expect(200)
                     .then(res => {
-                        expect(res.body).to.have.property('id')
-                        expect(res.body).to.have.property('start_time')
+                        defaultSleep.id = res.body.id
+                        expect(res.body.id).to.eql(defaultSleep.id)
                         expect(res.body.start_time).to.eql(defaultSleep.start_time!.toISOString())
-                        expect(res.body).to.have.property('end_time')
                         expect(res.body.end_time).to.eql(defaultSleep.end_time!.toISOString())
-                        expect(res.body).to.have.property('duration')
                         expect(res.body.duration).to.eql(defaultSleep.duration)
                         expect(res.body).to.have.property('pattern')
-                        expect(res.body).to.have.property('child_id')
                         expect(res.body.child_id).to.eql(defaultSleep.child_id)
                     })
             })
@@ -1207,11 +1126,8 @@ describe('Routes: users.children.sleep', () => {
                     .set('Content-Type', 'application/json')
                     .expect(404)
                     .then(err => {
-                        expect(err.body).to.have.property('code')
                         expect(err.body.code).to.eql(404)
-                        expect(err.body).to.have.property('message')
                         expect(err.body.message).to.eql('Sleep not found!')
-                        expect(err.body).to.have.property('description')
                         expect(err.body.description).to.eql('Sleep not found or already removed. A new operation for ' +
                             'the same resource is not required!')
                     })
@@ -1243,11 +1159,8 @@ describe('Routes: users.children.sleep', () => {
                     .set('Content-Type', 'application/json')
                     .expect(400)
                     .then(err => {
-                        expect(err.body).to.have.property('code')
                         expect(err.body.code).to.eql(400)
-                        expect(err.body).to.have.property('message')
                         expect(err.body.message).to.eql(Strings.CHILD.PARAM_ID_NOT_VALID_FORMAT)
-                        expect(err.body).to.have.property('description')
                         expect(err.body.description).to.eql(Strings.ERROR_MESSAGE.UUID_NOT_VALID_FORMAT_DESC)
                     })
             })
@@ -1278,11 +1191,8 @@ describe('Routes: users.children.sleep', () => {
                     .set('Content-Type', 'application/json')
                     .expect(400)
                     .then(err => {
-                        expect(err.body).to.have.property('code')
                         expect(err.body.code).to.eql(400)
-                        expect(err.body).to.have.property('message')
                         expect(err.body.message).to.eql(Strings.SLEEP.PARAM_ID_NOT_VALID_FORMAT)
-                        expect(err.body).to.have.property('description')
                         expect(err.body.description).to.eql(Strings.ERROR_MESSAGE.UUID_NOT_VALID_FORMAT_DESC)
                     })
             })
@@ -1310,11 +1220,8 @@ describe('Routes: users.children.sleep', () => {
                     .set('Content-Type', 'application/json')
                     .expect(400)
                     .then(err => {
-                        expect(err.body).to.have.property('code')
                         expect(err.body.code).to.eql(400)
-                        expect(err.body).to.have.property('message')
                         expect(err.body.message).to.eql('Duration field is invalid...')
-                        expect(err.body).to.have.property('description')
                         expect(err.body.description).to.eql('Sleep validation failed: The value provided has a negative value!')
                     })
             })
@@ -1345,11 +1252,8 @@ describe('Routes: users.children.sleep', () => {
                     .set('Content-Type', 'application/json')
                     .expect(400)
                     .then(err => {
-                        expect(err.body).to.have.property('code')
                         expect(err.body.code).to.eql(400)
-                        expect(err.body).to.have.property('message')
                         expect(err.body.message).to.eql('Pattern are not in a format that is supported...')
-                        expect(err.body).to.have.property('description')
                         expect(err.body.description).to.eql('Validation of the standard of sleep failed: data_set is required!')
                     })
             })
@@ -1382,11 +1286,8 @@ describe('Routes: users.children.sleep', () => {
                     .set('Content-Type', 'application/json')
                     .expect(400)
                     .then(err => {
-                        expect(err.body).to.have.property('code')
                         expect(err.body.code).to.eql(400)
-                        expect(err.body).to.have.property('message')
                         expect(err.body.message).to.eql('Dataset are not in a format that is supported!')
-                        expect(err.body).to.have.property('description')
                         expect(err.body.description).to.eql('The data_set collection must not be empty!')
                     })
             })
@@ -1421,11 +1322,8 @@ describe('Routes: users.children.sleep', () => {
                     .set('Content-Type', 'application/json')
                     .expect(400)
                     .then(err => {
-                        expect(err.body).to.have.property('code')
                         expect(err.body.code).to.eql(400)
-                        expect(err.body).to.have.property('message')
                         expect(err.body.message).to.eql('Dataset are not in a format that is supported!')
-                        expect(err.body).to.have.property('description')
                         expect(err.body.description).to.eql('Validation of the sleep pattern dataset failed: data_set ' +
                             'start_time, data_set name, data_set duration is required!')
                     })
@@ -1465,11 +1363,8 @@ describe('Routes: users.children.sleep', () => {
                     .set('Content-Type', 'application/json')
                     .expect(400)
                     .then(err => {
-                        expect(err.body).to.have.property('code')
                         expect(err.body.code).to.eql(400)
-                        expect(err.body).to.have.property('message')
                         expect(err.body.message).to.eql('Some (or several) duration field of sleep pattern is invalid...')
-                        expect(err.body).to.have.property('description')
                         expect(err.body.description).to.eql('Sleep Pattern dataset validation failed: The value provided ' +
                             'has a negative value!')
                     })
@@ -1577,11 +1472,8 @@ describe('Routes: users.children.sleep', () => {
                     .set('Content-Type', 'application/json')
                     .expect(400)
                     .then(err => {
-                        expect(err.body).to.have.property('code')
                         expect(err.body.code).to.eql(400)
-                        expect(err.body).to.have.property('message')
                         expect(err.body.message).to.eql(Strings.CHILD.PARAM_ID_NOT_VALID_FORMAT)
-                        expect(err.body).to.have.property('description')
                         expect(err.body.description).to.eql(Strings.ERROR_MESSAGE.UUID_NOT_VALID_FORMAT_DESC)
                     })
             })
@@ -1624,11 +1516,8 @@ describe('Routes: users.children.sleep', () => {
                     .set('Content-Type', 'application/json')
                     .expect(400)
                     .then(err => {
-                        expect(err.body).to.have.property('code')
                         expect(err.body.code).to.eql(400)
-                        expect(err.body).to.have.property('message')
                         expect(err.body.message).to.eql(Strings.SLEEP.PARAM_ID_NOT_VALID_FORMAT)
-                        expect(err.body).to.have.property('description')
                         expect(err.body.description).to.eql(Strings.ERROR_MESSAGE.UUID_NOT_VALID_FORMAT_DESC)
                     })
             })

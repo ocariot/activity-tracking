@@ -49,26 +49,21 @@ describe('Routes: environments', () => {
                     .set('Content-Type', 'application/json')
                     .expect(201)
                     .then(res => {
-                        expect(res.body).to.have.property('id')
-                        expect(res.body).to.have.property('institution_id')
+                        defaultEnvironment.id = res.body.id
+                        expect(res.body.id).to.eql(defaultEnvironment.id)
                         expect(res.body.institution_id).to.eql(defaultEnvironment.institution_id)
-                        expect(res.body).to.have.property('location')
                         expect(res.body.location.local).to.eql(defaultEnvironment.location!.local)
                         expect(res.body.location.room).to.eql(defaultEnvironment.location!.room)
                         expect(res.body.location.latitude).to.eql(defaultEnvironment.location!.latitude)
                         expect(res.body.location.longitude).to.eql(defaultEnvironment.location!.longitude)
-                        expect(res.body).to.have.property('measurements')
                         expect(res.body.measurements[0].type).to.eql(defaultEnvironment.measurements![0].type)
                         expect(res.body.measurements[0].value).to.eql(defaultEnvironment.measurements![0].value)
                         expect(res.body.measurements[0].unit).to.eql(defaultEnvironment.measurements![0].unit)
                         expect(res.body.measurements[1].type).to.eql(defaultEnvironment.measurements![1].type)
                         expect(res.body.measurements[1].value).to.eql(defaultEnvironment.measurements![1].value)
                         expect(res.body.measurements[1].unit).to.eql(defaultEnvironment.measurements![1].unit)
-                        expect(res.body).to.have.property('climatized')
                         expect(res.body.climatized).to.eql(defaultEnvironment.climatized)
-                        expect(res.body).to.have.property('timestamp')
                         expect(res.body.timestamp).to.eql(defaultEnvironment.timestamp.toISOString())
-                        defaultEnvironment.id = res.body.id
                     })
             })
         })
@@ -89,9 +84,7 @@ describe('Routes: environments', () => {
                     .set('Content-Type', 'application/json')
                     .expect(409)
                     .then(err => {
-                        expect(err.body).to.have.property('code')
                         expect(err.body.code).to.eql(409)
-                        expect(err.body).to.have.property('message')
                         expect(err.body.message).to.eql('Measurement of environment is already registered...')
                     })
             })
@@ -108,11 +101,8 @@ describe('Routes: environments', () => {
                     .set('Content-Type', 'application/json')
                     .expect(400)
                     .then(err => {
-                        expect(err.body).to.have.property('code')
                         expect(err.body.code).to.eql(400)
-                        expect(err.body).to.have.property('message')
                         expect(err.body.message).to.eql('Required fields were not provided...')
-                        expect(err.body).to.have.property('description')
                         expect(err.body.description).to.eql('Validation of environment measurements failed: timestamp, ' +
                             'institution_id, location, measurements required!')
                     })
@@ -135,11 +125,8 @@ describe('Routes: environments', () => {
                     .set('Content-Type', 'application/json')
                     .expect(400)
                     .then(err => {
-                        expect(err.body).to.have.property('code')
                         expect(err.body.code).to.eql(400)
-                        expect(err.body).to.have.property('message')
                         expect(err.body.message).to.eql('Some ID provided, does not have a valid format!')
-                        expect(err.body).to.have.property('description')
                         expect(err.body.description).to.eql('A 24-byte hex ID similar to this: 507f191e810c19729de860ea, is expected.')
                     })
             })
@@ -161,11 +148,8 @@ describe('Routes: environments', () => {
                     .set('Content-Type', 'application/json')
                     .expect(400)
                     .then(err => {
-                        expect(err.body).to.have.property('code')
                         expect(err.body.code).to.eql(400)
-                        expect(err.body).to.have.property('message')
                         expect(err.body.message).to.eql('Location are not in a format that is supported...')
-                        expect(err.body).to.have.property('description')
                         expect(err.body.description).to.eql('Validation of location failed: location local, location room is required!')
                     })
             })
@@ -187,11 +171,8 @@ describe('Routes: environments', () => {
                     .set('Content-Type', 'application/json')
                     .expect(400)
                     .then(err => {
-                        expect(err.body).to.have.property('code')
                         expect(err.body.code).to.eql(400)
-                        expect(err.body).to.have.property('message')
                         expect(err.body.message).to.eql('Measurement are not in a format that is supported!')
-                        expect(err.body).to.have.property('description')
                         expect(err.body.description).to.eql('The measurements collection must not be empty!')
                     })
             })
@@ -214,11 +195,8 @@ describe('Routes: environments', () => {
                     .set('Content-Type', 'application/json')
                     .expect(400)
                     .then(err => {
-                        expect(err.body).to.have.property('code')
                         expect(err.body.code).to.eql(400)
-                        expect(err.body).to.have.property('message')
                         expect(err.body.message).to.eql('The type of measurement provided "temperatures" is not supported...')
-                        expect(err.body).to.have.property('description')
                         expect(err.body.description).to.eql('The types allowed are: temperature, humidity.')
                     })
             })
@@ -241,11 +219,8 @@ describe('Routes: environments', () => {
                     .set('Content-Type', 'application/json')
                     .expect(400)
                     .then(err => {
-                        expect(err.body).to.have.property('code')
                         expect(err.body.code).to.eql(400)
-                        expect(err.body).to.have.property('message')
                         expect(err.body.message).to.eql('Measurement are not in a format that is supported!')
-                        expect(err.body).to.have.property('description')
                         expect(err.body.description).to.eql('Validation of measurements failed: measurement type, ' +
                             'measurement value, measurement unit is required!')
                     })
@@ -262,7 +237,7 @@ describe('Routes: environments', () => {
                     institution_id: defaultEnvironment.institution_id,
                     location: {
                         local: 'Indoor',
-                        room: 'Bloco H sala 01',
+                        room: 'room 01',
                         latitude: '-7.2100766',
                         longitude: '-35.9175756'
                     },
@@ -287,29 +262,25 @@ describe('Routes: environments', () => {
                     .set('Content-Type', 'application/json')
                     .expect(200)
                     .then(res => {
+                        defaultEnvironment.id = res.body[0].id
+                        expect(res.body).is.an.instanceOf(Array)
+                        expect(res.body.length).to.not.eql(0)
                         // Check for the existence of properties only in the first element of the array
                         // because there is a guarantee that there will be at least one object, which was
                         // created in the case of POST route success test
-                        expect(res.body).is.an.instanceOf(Array)
-                        expect(res.body.length).to.not.eql(0)
-                        expect(res.body[0]).to.have.property('id')
-                        expect(res.body[0]).to.have.property('institution_id')
+                        expect(res.body[0].id).to.eql(defaultEnvironment.id)
                         expect(res.body[0].institution_id).to.eql(defaultEnvironment.institution_id)
-                        expect(res.body[0]).to.have.property('location')
                         expect(res.body[0].location.local).to.eql(defaultEnvironment.location!.local)
                         expect(res.body[0].location.room).to.eql(defaultEnvironment.location!.room)
                         expect(res.body[0].location.latitude).to.eql(defaultEnvironment.location!.latitude)
                         expect(res.body[0].location.longitude).to.eql(defaultEnvironment.location!.longitude)
-                        expect(res.body[0]).to.have.property('measurements')
                         expect(res.body[0].measurements[0].type).to.eql(defaultEnvironment.measurements![0].type)
                         expect(res.body[0].measurements[0].value).to.eql(defaultEnvironment.measurements![0].value)
                         expect(res.body[0].measurements[0].unit).to.eql(defaultEnvironment.measurements![0].unit)
                         expect(res.body[0].measurements[1].type).to.eql(defaultEnvironment.measurements![1].type)
                         expect(res.body[0].measurements[1].value).to.eql(defaultEnvironment.measurements![1].value)
                         expect(res.body[0].measurements[1].unit).to.eql(defaultEnvironment.measurements![1].unit)
-                        expect(res.body[0]).to.have.property('climatized')
                         expect(res.body[0].climatized).to.eql(defaultEnvironment.climatized)
-                        expect(res.body[0]).to.have.property('timestamp')
                         expect(res.body[0].timestamp).to.eql((new Date(2019)).toISOString())
                     })
             })
@@ -341,21 +312,21 @@ describe('Routes: environments', () => {
                 await createEnvironment({
                     institution_id: defaultEnvironment.institution_id,
                     location: {
-                        local: 'indoor',
+                        local: 'Indoor',
                         room: 'room 01',
-                        latitude: '7.54534798',
-                        longitude: '34.54323217'
+                        latitude: '-7.2100766',
+                        longitude: '-35.9175756'
                     },
                     measurements: [
                         {
-                            type: MeasurementType.HUMIDITY,
+                            type: MeasurementType.TEMPERATURE,
                             value: 34,
-                            unit: '%'
+                            unit: '°C'
                         },
                         {
-                            type: MeasurementType.TEMPERATURE,
+                            type: MeasurementType.HUMIDITY,
                             value: 40,
-                            unit: '°C'
+                            unit: '%'
                         }
                     ],
                     climatized: true,
@@ -394,25 +365,24 @@ describe('Routes: environments', () => {
                     .set('Content-Type', 'application/json')
                     .expect(200)
                     .then(res => {
+                        defaultEnvironment.id = res.body[0].id
                         expect(res.body).is.an.instanceOf(Array)
                         expect(res.body.length).to.not.eql(0)
                         // Check for the existence of properties only in the first element of the array
                         // because there is a guarantee that there will be at least one object with the property
                         // 'climatized' = true (the only query filter)
-                        expect(res.body[0]).to.have.property('id')
-                        expect(res.body[0]).to.have.property('institution_id')
-                        expect(res.body[0]).to.have.property('location')
-                        expect(res.body[0].location).to.have.property('local')
-                        expect(res.body[0].location).to.have.property('room')
-                        expect(res.body[0].location).to.have.property('latitude')
-                        expect(res.body[0].location).to.have.property('longitude')
-                        expect(res.body[0]).to.have.property('measurements')
-                        expect(res.body[0].measurements[0]).to.have.property('type')
+                        expect(res.body[0].id).to.eql(defaultEnvironment.id)
+                        expect(res.body[0].institution_id).to.eql(defaultEnvironment.institution_id)
+                        expect(res.body[0].location.local).to.eql(defaultEnvironment.location!.local)
+                        expect(res.body[0].location.room).to.eql(defaultEnvironment.location!.room)
+                        expect(res.body[0].location.latitude).to.eql(defaultEnvironment.location!.latitude)
+                        expect(res.body[0].location.longitude).to.eql(defaultEnvironment.location!.longitude)
+                        expect(res.body[0].measurements[0].type).to.eql(defaultEnvironment.measurements![0].type)
                         expect(res.body[0].measurements[0]).to.have.property('value')
-                        expect(res.body[0].measurements[0]).to.have.property('unit')
-                        expect(res.body[0].measurements[1]).to.have.property('type')
+                        expect(res.body[0].measurements[0].unit).to.eql(defaultEnvironment.measurements![0].unit)
+                        expect(res.body[0].measurements[1].type).to.eql(defaultEnvironment.measurements![1].type)
                         expect(res.body[0].measurements[1]).to.have.property('value')
-                        expect(res.body[0].measurements[1]).to.have.property('unit')
+                        expect(res.body[0].measurements[1].unit).to.eql(defaultEnvironment.measurements![1].unit)
                         expect(res.body[0]).to.have.property('climatized')
                         expect(res.body[0]).to.have.property('timestamp')
                     })
@@ -513,11 +483,8 @@ describe('Routes: environments', () => {
                     .set('Content-Type', 'application/json')
                     .expect(400)
                     .then(err => {
-                        expect(err.body).to.have.property('code')
                         expect(err.body.code).to.eql(400)
-                        expect(err.body).to.have.property('message')
                         expect(err.body.message).to.eql(Strings.ENVIRONMENT.PARAM_ID_NOT_VALID_FORMAT)
-                        expect(err.body).to.have.property('description')
                         expect(err.body.description).to.eql(Strings.ERROR_MESSAGE.UUID_NOT_VALID_FORMAT_DESC)
                     })
             })

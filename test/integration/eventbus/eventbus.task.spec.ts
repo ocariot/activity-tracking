@@ -30,10 +30,6 @@ describe('EVENT BUS TASK', () => {
         await eventBusTask.stop()
     })
 
-    after(() => {
-        deleteAllIntegrationEvents()
-    })
-
     describe('PUBLISH SAVED EVENTS', () => {
         context('when all events are valid and there is a connection with RabbitMQ', () => {
             it('should return an empty array', async () => {

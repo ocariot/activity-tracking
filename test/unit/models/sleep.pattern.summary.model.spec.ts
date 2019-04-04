@@ -13,9 +13,9 @@ describe('Models: SleepPatternSummary', () => {
         context('when the json is correct', () => {
             it('should return an SleepPatternSummary model', () => {
                 const result = new SleepPatternSummary(summaryDataJSON.count, summaryDataJSON.duration).fromJSON(summaryDataJSON)
-                assert(result.awake, 'awake must not be undefined')
-                assert(result.asleep, 'asleep must not be undefined')
-                assert(result.restless, 'restless must not be undefined')
+                assert.deepPropertyVal(result, 'awake', summaryDataJSON.awake)
+                assert.deepPropertyVal(result, 'asleep', summaryDataJSON.asleep)
+                assert.deepPropertyVal(result, 'restless', summaryDataJSON.restless)
             })
         })
 
@@ -31,9 +31,9 @@ describe('Models: SleepPatternSummary', () => {
         context('when the json is a string', () => {
             it('should transform the string in json and return SleepPatternSummary model', () => {
                 const result = new SleepPatternSummary().fromJSON(JSON.stringify(summaryDataJSON))
-                assert(result.awake, 'awake must not be undefined')
-                assert(result.asleep, 'asleep must not be undefined')
-                assert(result.restless, 'restless must not be undefined')
+                assert.deepPropertyVal(result, 'awake', summaryDataJSON.awake)
+                assert.deepPropertyVal(result, 'asleep', summaryDataJSON.asleep)
+                assert.deepPropertyVal(result, 'restless', summaryDataJSON.restless)
             })
         })
     })
@@ -43,9 +43,9 @@ describe('Models: SleepPatternSummary', () => {
             it('should return a JSON from SleepPatternSummary model', () => {
                 let result = new SleepPatternSummary().fromJSON(summaryDataJSON)
                 result = result.toJSON()
-                assert(result.awake, 'awake must not be undefined')
-                assert(result.asleep, 'asleep must not be undefined')
-                assert(result.restless, 'restless must not be undefined')
+                assert.deepPropertyVal(result, 'awake', summaryDataJSON.awake)
+                assert.deepPropertyVal(result, 'asleep', summaryDataJSON.asleep)
+                assert.deepPropertyVal(result, 'restless', summaryDataJSON.restless)
             })
         })
     })

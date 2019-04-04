@@ -18,6 +18,13 @@ describe('Repositories: Query', () => {
         context('when the ordination has already been instantiated', () => {
             it('should normally execute the method', () => {
                 query.addOrdination('id', 'asc')
+
+                const ordinationMap = new Map()
+
+                ordinationMap.set('created_at', 'desc')
+                ordinationMap.set('id', 'asc')
+
+                assert.deepEqual(query.ordination, ordinationMap)
             })
         })
 
@@ -25,6 +32,12 @@ describe('Repositories: Query', () => {
             it('should normally execute the method"', () => {
                 query.ordination = undefined!
                 query.addOrdination('id', 'asc')
+
+                const ordinationMap = new Map()
+
+                ordinationMap.set('id', 'asc')
+
+                assert.deepEqual(query.ordination, ordinationMap)
             })
         })
     })
@@ -35,12 +48,16 @@ describe('Repositories: Query', () => {
                 query.addFilter({
                     child_id: '5a62be07de34500146d9c544'
                 })
+
+                assert.deepEqual(query.filters, { id: '5a62be07de34500146d9c544', child_id: '5a62be07de34500146d9c544' })
             })
         })
 
         context('when the parameter is undefined', () => {
             it('should normally execute the method"', () => {
                 query.addFilter(undefined!)
+
+                assert.deepEqual(query.filters, { id: '5a62be07de34500146d9c544', child_id: '5a62be07de34500146d9c544' })
             })
         })
     })

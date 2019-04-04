@@ -10,7 +10,7 @@ describe('IntegrationEvents: SleepEvent', () => {
                 const sleep: Sleep = new SleepMock()
 
                 const result = new SleepEvent('SleepSaveEvent', new Date(), sleep).toJSON()
-                assert.property(result, 'event_name')
+                assert.propertyVal(result, 'event_name', 'SleepSaveEvent')
                 assert.property(result, 'timestamp')
                 assert.property(result, 'sleep')
             })

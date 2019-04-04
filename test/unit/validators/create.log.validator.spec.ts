@@ -20,8 +20,6 @@ describe('Validators: CreateLog', () => {
                 try {
                     CreateLogValidator.validate(log)
                 } catch (err) {
-                    assert.property(err, 'message')
-                    assert.property(err, 'description')
                     assert.equal(err.message, 'Required fields were not provided...')
                     assert.equal(err.description, 'Physical Activity log validation failed: type is required!')
                 }
@@ -36,8 +34,6 @@ describe('Validators: CreateLog', () => {
                 try {
                     CreateLogValidator.validate(log)
                 } catch (err) {
-                    assert.property(err, 'message')
-                    assert.property(err, 'description')
                     assert.equal(err.message, 'Required fields were not provided...')
                     assert.equal(err.description, 'Physical Activity log validation failed: type, date, value, child_id is required!')
                 }
@@ -60,8 +56,6 @@ describe('Validators: CreateLog', () => {
                 try {
                     CreateLogValidator.validate(logTest)
                 } catch (err) {
-                    assert.property(err, 'message')
-                    assert.property(err, 'description')
                     assert.equal(err.message, 'The name of type provided "step" is not supported...')
                     assert.equal(err.description, 'The names of the allowed types are: steps, calories.')
                 }
@@ -84,8 +78,6 @@ describe('Validators: CreateLog', () => {
                 try {
                     CreateLogValidator.validate(logTest)
                 } catch (err) {
-                    assert.property(err, 'message')
-                    assert.property(err, 'description')
                     assert.equal(err.message, 'Date parameter: 20199-03-11, is not in valid ISO 8601 format.')
                     assert.equal(err.description, 'Date must be in the format: yyyy-MM-dd')
                 }
@@ -101,8 +93,6 @@ describe('Validators: CreateLog', () => {
                 try {
                     CreateLogValidator.validate(log)
                 } catch (err) {
-                    assert.property(err, 'message')
-                    assert.property(err, 'description')
                     assert.equal(err.message, 'Value field is invalid...')
                     assert.equal(err.description, 'Physical Activity log validation failed: The value provided has a negative value!')
                 }
@@ -116,8 +106,6 @@ describe('Validators: CreateLog', () => {
                 try {
                     CreateLogValidator.validate(log)
                 } catch (err) {
-                    assert.property(err, 'message')
-                    assert.property(err, 'description')
                     assert.equal(err.message, 'Parameter {child_id} is not in valid format!')
                     assert.equal(err.description, Strings.ERROR_MESSAGE.UUID_NOT_VALID_FORMAT_DESC)
                 }

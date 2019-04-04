@@ -75,7 +75,6 @@ describe('Services: Log', () => {
 
                 return  logService.addLogs(correctLogsArr)
                     .then(result => {
-                        assert(result, 'result must not be undefined')
                         assert.property(result, 'success')
                         assert.property(result, 'error')
                         assert.isEmpty(result.error)
@@ -98,7 +97,6 @@ describe('Services: Log', () => {
 
                 return  logService.addLogs(correctLogsArr)
                     .then(result => {
-                        assert(result, 'result must not be undefined')
                         assert.property(result, 'success')
                         assert.property(result, 'error')
                         assert.isEmpty(result.error)
@@ -119,7 +117,6 @@ describe('Services: Log', () => {
 
                 return  logService.addLogs(correctLogsArr)
                     .then(result => {
-                        assert(result, 'result must not be undefined')
                         assert.property(result, 'success')
                         assert.property(result, 'error')
                         assert.isEmpty(result.error)
@@ -139,7 +136,6 @@ describe('Services: Log', () => {
 
                 return  logService.addLogs(mixedLogsArr)
                     .then(result => {
-                        assert(result, 'result must not be undefined')
                         assert.property(result, 'success')
                         assert.property(result, 'error')
                     })
@@ -160,7 +156,6 @@ describe('Services: Log', () => {
 
                 return  logService.addLogs(mixedLogsArr)
                     .then(result => {
-                        assert(result, 'result must not be undefined')
                         assert.property(result, 'success')
                         assert.property(result, 'error')
                     })
@@ -181,7 +176,6 @@ describe('Services: Log', () => {
 
                 return  logService.addLogs(mixedLogsArr)
                     .then(result => {
-                        assert(result, 'result must not be undefined')
                         assert.property(result, 'success')
                         assert.property(result, 'error')
                     })
@@ -204,7 +198,6 @@ describe('Services: Log', () => {
 
                 return  logService.addLogs(mixedLogsArr)
                     .then(result => {
-                        assert(result, 'result must not be undefined')
                         assert.property(result, 'success')
                         assert.property(result, 'error')
                     })
@@ -237,7 +230,8 @@ describe('Services: Log', () => {
                 return  logService.getByChildAndDate(correctLogsArr[0].child_id, correctLogsArr[0].date,
                     correctLogsArr[1].date, query)
                     .then(result => {
-                        assert(result, 'result must not be undefined')
+                        assert.property(result, 'steps')
+                        assert.property(result, 'calories')
                     })
             })
         })
@@ -264,7 +258,6 @@ describe('Services: Log', () => {
                 return  logService.getByChildAndDate(correctLogsArr[0].child_id, correctLogsArr[0].date,
                     correctLogsArr[1].date, query)
                     .then(result => {
-                        assert(result, 'result must not be undefined')
                         assert.isEmpty(result.steps)
                         assert.isEmpty(result.calories)
                     })
@@ -295,8 +288,6 @@ describe('Services: Log', () => {
                     return await logService.getByChildAndDate(correctLogsArr[0].child_id, correctLogsArr[0].date,
                         correctLogsArr[1].date, query)
                 } catch (err) {
-                    assert.property(err, 'message')
-                    assert.property(err, 'description')
                     assert.propertyVal(err, 'message', Strings.CHILD.PARAM_ID_NOT_VALID_FORMAT)
                     assert.propertyVal(err, 'description', Strings.ERROR_MESSAGE.UUID_NOT_VALID_FORMAT_DESC)
                 }
@@ -328,8 +319,6 @@ describe('Services: Log', () => {
                     return await logService.getByChildAndDate(correctLogsArr[0].child_id, correctLogsArr[0].date,
                         correctLogsArr[1].date, query)
                 } catch (err) {
-                    assert.property(err, 'message')
-                    assert.property(err, 'description')
                     assert.propertyVal(err, 'message', 'Date parameter: 20199-03-18, is not in valid ISO 8601 format.')
                     assert.propertyVal(err, 'description', 'Date must be in the format: yyyy-MM-dd')
                 }
@@ -362,8 +351,6 @@ describe('Services: Log', () => {
                     return await logService.getByChildAndDate(correctLogsArr[0].child_id, correctLogsArr[0].date,
                         correctLogsArr[1].date, query)
                 } catch (err) {
-                    assert.property(err, 'message')
-                    assert.property(err, 'description')
                     assert.propertyVal(err, 'message', 'Date parameter: 20199-03-18, is not in valid ISO 8601 format.')
                     assert.propertyVal(err, 'description', 'Date must be in the format: yyyy-MM-dd')
                 }
@@ -378,6 +365,7 @@ describe('Services: Log', () => {
         'query: IQuery)', () => {
         context('when the parameters are correct and there are corresponding logs with the query', () => {
             it('should return the logs array', () => {
+                correctLogsArr[0].child_id = '507f1f77bcf86cd799439012'
                 correctLogsArr[1] = LogMock.generateLog()
                 const query: IQuery = new Query()
                 query.filters = {
@@ -400,6 +388,8 @@ describe('Services: Log', () => {
                     correctLogsArr[0].date, correctLogsArr[1].date, query)
                     .then(result => {
                         assert(result, 'result must not be undefined')
+                        assert.isArray(result)
+                        assert.isNotEmpty(result)
                     })
             })
         })
@@ -457,8 +447,6 @@ describe('Services: Log', () => {
                     return logService.getByChildResourceAndDate(correctLogsArr[0].child_id, correctLogsArr[0].type,
                         correctLogsArr[0].date, correctLogsArr[1].date, query)
                 } catch (err) {
-                    assert.property(err, 'message')
-                    assert.property(err, 'description')
                     assert.propertyVal(err, 'message', Strings.CHILD.PARAM_ID_NOT_VALID_FORMAT)
                     assert.propertyVal(err, 'description', Strings.ERROR_MESSAGE.UUID_NOT_VALID_FORMAT_DESC)
                 }
@@ -489,8 +477,6 @@ describe('Services: Log', () => {
                     return logService.getByChildResourceAndDate(correctLogsArr[0].child_id, otherLogIncorrect.type,
                         correctLogsArr[0].date, correctLogsArr[1].date, query)
                 } catch (err) {
-                    assert.property(err, 'message')
-                    assert.property(err, 'description')
                     assert.propertyVal(err, 'message', 'The name of type provided "step" is not supported...')
                     assert.propertyVal(err, 'description', 'The names of the allowed types are: steps, calories.')
                 }
@@ -521,8 +507,6 @@ describe('Services: Log', () => {
                     return logService.getByChildResourceAndDate(correctLogsArr[0].child_id, correctLogsArr[0].type,
                         correctLogsArr[0].date, correctLogsArr[1].date, query)
                 } catch (err) {
-                    assert.property(err, 'message')
-                    assert.property(err, 'description')
                     assert.propertyVal(err, 'message', 'Date parameter: 20199-03-18, is not in valid ISO 8601 format.')
                     assert.propertyVal(err, 'description', 'Date must be in the format: yyyy-MM-dd')
                 }
@@ -554,8 +538,6 @@ describe('Services: Log', () => {
                     return logService.getByChildResourceAndDate(correctLogsArr[0].child_id, correctLogsArr[0].type,
                         correctLogsArr[0].date, correctLogsArr[1].date, query)
                 } catch (err) {
-                    assert.property(err, 'message')
-                    assert.property(err, 'description')
                     assert.propertyVal(err, 'message', 'Date parameter: 20199-03-18, is not in valid ISO 8601 format.')
                     assert.propertyVal(err, 'description', 'Date must be in the format: yyyy-MM-dd')
                 }

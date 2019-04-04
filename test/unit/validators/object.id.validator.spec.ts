@@ -19,8 +19,6 @@ describe('Validators: ObjectId', () => {
                 try {
                     ObjectIdValidator.validate(id)
                 } catch (err) {
-                    assert.property(err, 'message')
-                    assert.property(err, 'description')
                     assert.equal(err.message, Strings.ERROR_MESSAGE.UUID_NOT_VALID_FORMAT)
                     assert.equal(err.description, Strings.ERROR_MESSAGE.UUID_NOT_VALID_FORMAT_DESC)
                 }

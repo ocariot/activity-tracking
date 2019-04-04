@@ -10,7 +10,7 @@ describe('IntegrationEvents: EnvironmentEvent', () => {
                 const environment: Environment = new EnvironmentMock()
 
                 const result = new EnvironmentEvent('EnvironmentSaveEvent', new Date(), environment).toJSON()
-                assert.property(result, 'event_name')
+                assert.propertyVal(result, 'event_name', 'EnvironmentSaveEvent')
                 assert.property(result, 'timestamp')
                 assert.property(result, 'environment')
             })

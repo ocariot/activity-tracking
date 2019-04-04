@@ -1,7 +1,6 @@
 import { expect } from 'chai'
 import { DI } from '../../../src/di/di'
 import { Identifier } from '../../../src/di/identifiers'
-// import { IEventBus } from '../../../src/infrastructure/port/event.bus.interface'
 import { Container } from 'inversify'
 import { PhysicalActivityEvent } from '../../../src/application/integration-event/event/physical.activity.event'
 import { EventBusException } from '../../../src/application/domain/exception/eventbus.exception'

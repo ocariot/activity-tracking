@@ -42,8 +42,6 @@ describe('Validators: SleepPattern', () => {
                 try {
                     SleepPatternValidator.validate(sleepPattern)
                 } catch (err) {
-                    assert.property(err, 'message')
-                    assert.property(err, 'description')
                     assert.equal(err.message, 'Pattern are not in a format that is supported...')
                     assert.equal(err.description, 'Validation of the standard of sleep failed: data_set is required!')
                 }
@@ -58,8 +56,6 @@ describe('Validators: SleepPattern', () => {
                 try {
                     SleepPatternValidator.validate(sleepPattern)
                 } catch (err) {
-                    assert.property(err, 'message')
-                    assert.property(err, 'description')
                     assert.equal(err.message, 'Dataset are not in a format that is supported!')
                     assert.equal(err.description, 'The data_set collection must not be empty!')
                 }
@@ -76,8 +72,6 @@ describe('Validators: SleepPattern', () => {
                 try {
                     SleepPatternValidator.validate(sleepPattern)
                 } catch (err) {
-                    assert.property(err, 'message')
-                    assert.property(err, 'description')
                     assert.equal(err.message, 'The sleep pattern name provided "restlesss" is not supported...')
                     assert.equal(err.description, 'The names of the allowed patterns are: awake, asleep, restless.')
                 }
@@ -91,8 +85,6 @@ describe('Validators: SleepPattern', () => {
                 try {
                     SleepPatternValidator.validate(sleepPattern)
                 } catch (err) {
-                    assert.property(err, 'message')
-                    assert.property(err, 'description')
                     assert.equal(err.message, 'Dataset are not in a format that is supported!')
                     assert.equal(err.description, 'Validation of the sleep pattern dataset failed: data_set start_time is required!')
                 }
@@ -108,8 +100,6 @@ describe('Validators: SleepPattern', () => {
                 try {
                     SleepPatternValidator.validate(sleepPattern)
                 } catch (err) {
-                    assert.property(err, 'message')
-                    assert.property(err, 'description')
                     assert.equal(err.message, 'Dataset are not in a format that is supported!')
                     assert.equal(err.description, 'Validation of the sleep pattern dataset failed: data_set start_time, ' +
                         'data_set name, data_set duration is required!')
@@ -126,8 +116,6 @@ describe('Validators: SleepPattern', () => {
                 try {
                     SleepPatternValidator.validate(sleepPattern)
                 } catch (err) {
-                    assert.property(err, 'message')
-                    assert.property(err, 'description')
                     assert.equal(err.message, 'Some (or several) duration field of sleep pattern is invalid...')
                     assert.equal(err.description, 'Sleep Pattern dataset validation failed: The value provided has a negative value!')
                 }
