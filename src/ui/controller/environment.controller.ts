@@ -8,6 +8,7 @@ import { ILogger } from '../../utils/custom.logger'
 import { IEnvironmentService } from '../../application/port/environment.service.interface'
 import { Environment } from '../../application/domain/model/environment'
 import { Query } from '../../infrastructure/repository/query/query'
+import { MultiStatus } from '../../application/domain/model/multi.status'
 
 /**
  * Controller that implements Environment feature operations.
@@ -39,6 +40,17 @@ export class EnvironmentController {
     @httpPost('/')
     public async addEnvironment(@request() req: Request, @response() res: Response) {
         try {
+            // Multiple items of Environment
+            if (req.body instanceof Array) {
+                const environmentsArr: Array<Environment> = req.body.map(item => {
+                    return new Environment().fromJSON(item)
+                })
+
+                const resultMultiStatus: MultiStatus<Environment> = await this._environmentService.add(environmentsArr)
+                return res.status(HttpStatus.CREATED).send(resultMultiStatus)
+            }
+
+            // Only one item
             const environment: Environment = new Environment().fromJSON(req.body)
             const result: Environment = await this._environmentService.add(environment)
             return res.status(HttpStatus.CREATED).send(result)

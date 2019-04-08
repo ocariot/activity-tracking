@@ -48,8 +48,9 @@ describe('Services: Log', () => {
     /**
      * Mock MultiStatus responses
      */
-    const multiStatusCorrect: MultiStatus<Log> = MultiStatusMock.generateMultiStatus(correctLogsArr) // MultiStatus totally correct
-    const multiStatusMixed: MultiStatus<Log> = MultiStatusMock.generateMultiStatus(mixedLogsArr) // Mixed MultiStatus
+    const multiStatusMock: MultiStatusMock<Log> = new MultiStatusMock<Log>()
+    const multiStatusCorrect: MultiStatus<Log> = multiStatusMock.generateMultiStatus(correctLogsArr) // MultiStatus totally correct
+    const multiStatusMixed: MultiStatus<Log> = multiStatusMock.generateMultiStatus(mixedLogsArr) // Mixed MultiStatus
 
     const modelFake = ActivityLogRepoModel
     const logRepo: ILogRepository = new LogRepositoryMock()
@@ -75,8 +76,13 @@ describe('Services: Log', () => {
 
                 return  logService.addLogs(correctLogsArr)
                     .then(result => {
-                        assert.property(result, 'success')
-                        assert.property(result, 'error')
+                        for (let i = 0; i < result.toJSON().success.length; i++) {
+                            assert.propertyVal(result.toJSON().success[i].item, 'id', correctLogsArr[i].id)
+                            assert.propertyVal(result.toJSON().success[i].item, 'date', correctLogsArr[i].date)
+                            assert.propertyVal(result.toJSON().success[i].item, 'value', correctLogsArr[i].value)
+                            assert.propertyVal(result.toJSON().success[i].item, 'type', correctLogsArr[i].type)
+                            assert.propertyVal(result.toJSON().success[i].item, 'child_id', correctLogsArr[i].child_id)
+                        }
                         assert.isEmpty(result.error)
                     })
             })
@@ -97,8 +103,13 @@ describe('Services: Log', () => {
 
                 return  logService.addLogs(correctLogsArr)
                     .then(result => {
-                        assert.property(result, 'success')
-                        assert.property(result, 'error')
+                        for (let i = 0; i < result.toJSON().success.length; i++) {
+                            assert.propertyVal(result.toJSON().success[i].item, 'id', correctLogsArr[i].id)
+                            assert.propertyVal(result.toJSON().success[i].item, 'date', correctLogsArr[i].date)
+                            assert.propertyVal(result.toJSON().success[i].item, 'value', correctLogsArr[i].value)
+                            assert.propertyVal(result.toJSON().success[i].item, 'type', correctLogsArr[i].type)
+                            assert.propertyVal(result.toJSON().success[i].item, 'child_id', correctLogsArr[i].child_id)
+                        }
                         assert.isEmpty(result.error)
                     })
             })
@@ -117,8 +128,13 @@ describe('Services: Log', () => {
 
                 return  logService.addLogs(correctLogsArr)
                     .then(result => {
-                        assert.property(result, 'success')
-                        assert.property(result, 'error')
+                        for (let i = 0; i < result.toJSON().success.length; i++) {
+                            assert.propertyVal(result.toJSON().success[i].item, 'id', correctLogsArr[i].id)
+                            assert.propertyVal(result.toJSON().success[i].item, 'date', correctLogsArr[i].date)
+                            assert.propertyVal(result.toJSON().success[i].item, 'value', correctLogsArr[i].value)
+                            assert.propertyVal(result.toJSON().success[i].item, 'type', correctLogsArr[i].type)
+                            assert.propertyVal(result.toJSON().success[i].item, 'child_id', correctLogsArr[i].child_id)
+                        }
                         assert.isEmpty(result.error)
                     })
             })

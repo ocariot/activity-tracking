@@ -20,16 +20,39 @@ import { Environment } from '../../../src/application/domain/model/environment'
 import { Measurement, MeasurementType } from '../../../src/application/domain/model/measurement'
 import { IEventBus } from '../../../src/infrastructure/port/event.bus.interface'
 import { ILogger } from '../../../src/utils/custom.logger'
+import { MultiStatus } from '../../../src/application/domain/model/multi.status'
+import { MultiStatusMock } from '../../mocks/multi.status.mock'
 
 require('sinon-mongoose')
 
 describe('Services: Environment', () => {
+    // Environment Mock
     const environment: Environment = new EnvironmentMock()
-    let incorrectEnvironment: Environment = new Environment()
-    const environmentArr: Array<Environment> = new Array<EnvironmentMock>()
+    let incorrectEnvironment: Environment = new Environment()       // For incorrect operations
+    // For GET route
+    const environmentsArrGet: Array<Environment> = new Array<EnvironmentMock>()
     for (let i = 0; i < 3; i++) {
-        environmentArr.push(new EnvironmentMock())
+        environmentsArrGet.push(new EnvironmentMock())
     }
+    // For POST route
+    const correctEnvironmentsArr: Array<Environment> = new Array<EnvironmentMock>()
+    for (let i = 0; i < 3; i++) {
+        correctEnvironmentsArr.push(new EnvironmentMock())
+    }
+
+    const mixedEnvironmentsArr: Array<Environment> = new Array<EnvironmentMock>()
+    for (let i = 0; i < 3; i++) {
+        mixedEnvironmentsArr.push(new EnvironmentMock())
+    }
+    mixedEnvironmentsArr[1].timestamp = undefined!
+
+    /**
+     * Mock MultiStatus responses
+     */
+    // MultiStatus totally correct
+    const multiStatusMock: MultiStatusMock<Environment> = new MultiStatusMock<Environment>()
+    const multiStatusCorrect: MultiStatus<Environment> = multiStatusMock.generateMultiStatus(correctEnvironmentsArr)
+    // const multiStatusMixed: MultiStatus<Environment> = multiStatusMock.generateMultiStatus(mixedEnvironmentsArr)    // Mixed MultiStatus
 
     const modelFake: any = EnvironmentRepoModel
     const environmentRepo: IEnvironmentRepository = new EnvironmentRepositoryMock()
@@ -44,14 +67,23 @@ describe('Services: Environment', () => {
     const environmentService: EnvironmentService = new EnvironmentService(environmentRepo, integrationRepo,
         eventBusRabbitmq, customLogger)
 
+    before(async () => {
+        try {
+            await connectionRabbitmqPub.tryConnect(0, 500)
+            await connectionRabbitmqSub.tryConnect(0, 500)
+        } catch (err) {
+            throw new Error('Failure on EnvironmentService unit test: ' + err.message)
+        }
+    })
+
     afterEach(() => {
         sinon.restore()
     })
 
     /**
-     * Method "add(environment: Environment)"
+     * Method "add(environment: Environment | Array<Environment>)" with Environment argument
      */
-    describe('add(environment: Environment)', () => {
+    describe('add(environment: Environment | Array<Environment>)', () => {
         context('when the Environment is correct, it still does not exist in the repository and there is a connection ' +
             'to the RabbitMQ', () => {
             it('should return the Environment that was added', () => {
@@ -67,7 +99,7 @@ describe('Services: Environment', () => {
                         assert.propertyVal(result, 'id', environment.id)
                         assert.propertyVal(result, 'institution_id', environment.institution_id)
                         assert.propertyVal(result, 'location', environment.location)
-                        if (result.climatized) assert.propertyVal(result, 'climatized', environment.climatized)
+                        if (result.toJSON().climatized) assert.propertyVal(result, 'climatized', environment.climatized)
                         assert.propertyVal(result, 'timestamp', environment.timestamp)
                         assert.propertyVal(result, 'measurements', environment.measurements)
                     })
@@ -90,7 +122,7 @@ describe('Services: Environment', () => {
                         assert.propertyVal(result, 'id', environment.id)
                         assert.propertyVal(result, 'institution_id', environment.institution_id)
                         assert.propertyVal(result, 'location', environment.location)
-                        if (result.climatized) assert.propertyVal(result, 'climatized', environment.climatized)
+                        if (result.toJSON().climatized) assert.propertyVal(result, 'climatized', environment.climatized)
                         assert.propertyVal(result, 'timestamp', environment.timestamp)
                         assert.propertyVal(result, 'measurements', environment.measurements)
                     })
@@ -99,6 +131,7 @@ describe('Services: Environment', () => {
 
         context('when the Environment is correct but already exists in the repository', () => {
             it('should throw a ConflictException', () => {
+                connectionRabbitmqPub.isConnected = true
                 environment.id = '507f1f77bcf86cd799439011'         // Make mock return true
                 sinon
                     .mock(modelFake)
@@ -238,6 +271,36 @@ describe('Services: Environment', () => {
             })
         })
     })
+    /**
+     * Method "add(environment: Environment | Array<Environment>)" with Array<Environment> argument
+     */
+    describe('add(environment: Environment | Array<Environment>)', () => {
+        context('when the Environment is correct, it still does not exist in the repository and there is a connection ' +
+            'to the RabbitMQ', () => {
+            it('should return the Environment that was added', () => {
+                sinon
+                    .mock(modelFake)
+                    .expects('create')
+                    .withArgs(correctEnvironmentsArr)
+                    .chain('exec')
+                    .resolves(multiStatusCorrect)
+
+                return environmentService.add(correctEnvironmentsArr)
+                    .then(result => {
+                        for (let i = 0; i < result.toJSON().success.length; i++) {
+                            assert.propertyVal(result.toJSON().success[i].item, 'id', correctEnvironmentsArr[i].id)
+                            assert.propertyVal(result.toJSON().success[i].item, 'institution_id', correctEnvironmentsArr[i].institution_id)
+                            assert.propertyVal(result.toJSON().success[i].item, 'location', correctEnvironmentsArr[i].location)
+                            if (result.toJSON().success[i].item.climatized)
+                                assert.propertyVal(result.toJSON().success[i].item, 'climatized', correctEnvironmentsArr[i].climatized)
+                            assert.propertyVal(result.toJSON().success[i].item, 'timestamp', correctEnvironmentsArr[i].timestamp)
+                            assert.propertyVal(result.toJSON().success[i].item, 'measurements', correctEnvironmentsArr[i].measurements)
+                        }
+                        assert.isEmpty(result.toJSON().error)
+                    })
+            })
+        })
+    })
 
     /**
      * Method "getAll(query: IQuery)"
@@ -259,7 +322,7 @@ describe('Services: Environment', () => {
                     .expects('find')
                     .withArgs(query)
                     .chain('exec')
-                    .resolves(environmentArr)
+                    .resolves(environmentsArrGet)
 
                 return environmentService.getAll(query)
                     .then(result => {
@@ -303,7 +366,6 @@ describe('Services: Environment', () => {
     describe('remove(id: string)', () => {
         context('when there is an environment with the id used as parameter', () => {
             it('should return true', () => {
-                connectionRabbitmqPub.isConnected = true
                 environment.id = '507f1f77bcf86cd799439011'
                 sinon
                     .mock(modelFake)

@@ -78,6 +78,15 @@ describe('Services: PhysicalActivityService', () => {
     const activityService: IPhysicalActivityService = new PhysicalActivityService(activityRepo, integrationRepo,
         eventBusRabbitmq, customLogger)
 
+    before(async () => {
+        try {
+            await connectionRabbitmqPub.tryConnect(0, 500)
+            await connectionRabbitmqSub.tryConnect(0, 500)
+        } catch (err) {
+            throw new Error('Failure on PhysicalActivityService unit test: ' + err.message)
+        }
+    })
+
     afterEach(() => {
         sinon.restore()
     })

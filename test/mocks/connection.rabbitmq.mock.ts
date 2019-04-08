@@ -13,7 +13,9 @@ export class ConnectionRabbitmqMock implements IConnectionEventBus {
     }
 
     set isConnected(value: boolean) {
-        if (this._connection) this._connection.isConnected = value
+        if (this._connection) {
+            this._connection.isConnected = value
+        }
     }
 
     get conn(): any {

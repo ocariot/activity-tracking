@@ -1,3 +1,4 @@
+import HttpStatus from 'http-status-codes'
 import { inject, injectable } from 'inversify'
 import { Identifier } from '../../di/identifiers'
 import { ConflictException } from '../domain/exception/conflict.exception'
@@ -13,6 +14,10 @@ import { ObjectIdValidator } from '../domain/validator/object.id.validator'
 import { Strings } from '../../utils/strings'
 import { IIntegrationEventRepository } from '../port/integration.event.repository.interface'
 import { IntegrationEvent } from '../integration-event/event/integration.event'
+import { MultiStatus } from '../domain/model/multi.status'
+import { StatusSuccess } from '../domain/model/status.success'
+import { StatusError } from '../domain/model/status.error'
+import { ValidationException } from '../domain/exception/validation.exception'
 
 /**
  * Implementing Environment Service.
@@ -30,41 +35,117 @@ export class EnvironmentService implements IEnvironmentService {
     }
 
     /**
-     * Adds a new Environment.
-     * Before adding, it is checked whether the environment already exists.
+     * Adds a new Environment or a list of Environments.
      *
-     * @param {Environment} environment
-     * @returns {(Promise<Environment>)}
+     * @param {Environment | Array<Environment>} environment
+     * @returns {(Promise<Environment | MultiStatus<Environment>>)}
      * @throws {ConflictException | RepositoryException} If a data conflict occurs, as an existing environment.
      */
-    public async add(environment: Environment): Promise<Environment> {
+    public async add(environment: Environment | Array<Environment>): Promise<Environment | MultiStatus<Environment>> {
         try {
-            // 1. Validate the object.
-            CreateEnvironmentValidator.validate(environment)
-
-            // 2. Checks if environment already exists.
-            const environmentExist = await this._environmentRepository.checkExist(environment)
-            if (environmentExist) throw new ConflictException('Measurement of environment is already registered...')
-
-            // 3. Create new environment register.
-            const environmentSaved: Environment = await this._environmentRepository.create(environment)
-
-            // 4. If created successfully, the object is published on the message bus.
-            if (environmentSaved) {
-                const event: EnvironmentEvent = new EnvironmentEvent('EnvironmentSaveEvent',
-                    new Date(), environmentSaved)
-                if (!(await this._eventBus.publish(event, 'environments.save'))) {
-                    // 5. Save Event for submission attempt later when there is connection to message channel.
-                    this.saveEvent(event)
-                } else {
-                    this._logger.info(`Measurement of environment with ID: ${environmentSaved.id} published on event bus...`)
-                }
+            // Multiple items of Environment
+            if (environment instanceof Array) {
+                return await this.addMultipleEnvs(environment)
             }
-            // 6. Returns the created object.
-            return Promise.resolve(environmentSaved)
+            // Only one item
+            return await this.addEnvironment(environment)
         } catch (err) {
             return Promise.reject(err)
         }
+    }
+
+    /**
+     * Adds the data of multiple items of Environment.
+     * Before adding, it is checked whether each of the environments already exists.
+     *
+     * @param environment
+     * @return {Promise<MultiStatus<Environment>>}
+     * @throws {ConflictException}
+     */
+    private async addMultipleEnvs(environment: Array<Environment>): Promise<MultiStatus<Environment>> {
+        const multiStatus: MultiStatus<Environment> = new MultiStatus<Environment>()
+        const statusSuccessArr: Array<StatusSuccess<Environment>> = new Array<StatusSuccess<Environment>>()
+        const statusErrorArr: Array<StatusError<Environment>> = new Array<StatusError<Environment>>()
+
+        for (const elem of environment) {
+            try {
+                // 1. Validate the object.
+                CreateEnvironmentValidator.validate(elem)
+
+                // 2. Checks if environment already exists.
+                const envItemExist = await this._environmentRepository.checkExist(elem)
+                if (envItemExist) throw new ConflictException('Measurement of environment is already registered...')
+
+                // 3. Create new environment register.
+                const envItemSaved: Environment = await this._environmentRepository.create(elem)
+
+                // 4. If created successfully, the object is published on the message bus.
+                if (envItemSaved) {
+                    const event: EnvironmentEvent = new EnvironmentEvent('EnvironmentSaveEvent',
+                        new Date(), envItemSaved)
+                    if (!(await this._eventBus.publish(event, 'environments.save'))) {
+                        // 5. Save Event for submission attempt later when there is connection to message channel.
+                        this.saveEvent(event)
+                    } else {
+                        this._logger.info(`Measurement of environment with ID: ${envItemSaved.id} published on event bus...`)
+                    }
+                }
+
+                // 6a. Create a StatusSuccess object for the construction of the MultiStatus response.
+                const statusSuccess: StatusSuccess<Environment> = new StatusSuccess<Environment>(HttpStatus.CREATED, elem)
+                statusSuccessArr.push(statusSuccess)
+            } catch (err) {
+                let statusCode: number = HttpStatus.INTERNAL_SERVER_ERROR
+                if (err instanceof ValidationException) statusCode = HttpStatus.BAD_REQUEST
+                if (err instanceof ConflictException) statusCode = HttpStatus.CONFLICT
+
+                // 6b. Create a StatusError object for the construction of the MultiStatus response.
+                const statusError: StatusError<Environment> = new StatusError<Environment>(statusCode, err.message,
+                    err.description, elem)
+                statusErrorArr.push(statusError)
+            }
+        }
+
+        // 6. Build the MultiStatus response.
+        multiStatus.success = statusSuccessArr
+        multiStatus.error = statusErrorArr
+
+        // 7. Returns the created object.
+        return Promise.resolve(multiStatus)
+    }
+
+    /**
+     * Adds the data of one item of Environment.
+     * Before adding, it is checked whether the environment already exists.
+     *
+     * @param environment
+     * @return {Promise<Environment>}
+     * @throws {ConflictException}
+     */
+    private async addEnvironment(environment: Environment): Promise<Environment> {
+        // 1. Validate the object.
+        CreateEnvironmentValidator.validate(environment)
+
+        // 2. Checks if environment already exists.
+        const environmentExist = await this._environmentRepository.checkExist(environment)
+        if (environmentExist) throw new ConflictException('Measurement of environment is already registered...')
+
+        // 3. Create new environment register.
+        const environmentSaved: Environment = await this._environmentRepository.create(environment)
+
+        // 4. If created successfully, the object is published on the message bus.
+        if (environmentSaved) {
+            const event: EnvironmentEvent = new EnvironmentEvent('EnvironmentSaveEvent',
+                new Date(), environmentSaved)
+            if (!(await this._eventBus.publish(event, 'environments.save'))) {
+                // 5. Save Event for submission attempt later when there is connection to message channel.
+                this.saveEvent(event)
+            } else {
+                this._logger.info(`Measurement of environment with ID: ${environmentSaved.id} published on event bus...`)
+            }
+        }
+        // 6. Returns the created object.
+        return Promise.resolve(environmentSaved)
     }
 
     /**
@@ -145,5 +226,7 @@ export class EnvironmentService implements IEnvironmentService {
                 this._logger.error(`There was an error trying to save the name event: ${event.event_name}.`
                     .concat(`Error: ${err.message}. Event: ${JSON.stringify(saveEvent)}`))
             })
+
+        console.log('salvou evento')
     }
 }
