@@ -21,13 +21,21 @@ const mongoDBConnection: IConnectionDB = container.get(Identifier.MONGODB_CONNEC
 
 describe('EVENT BUS TASK', () => {
     before(async () => {
-        await mongoDBConnection.tryConnect(0, 500)
-        deleteAllIntegrationEvents()
+        try {
+            await mongoDBConnection.tryConnect(0, 500)
+            deleteAllIntegrationEvents()
+        } catch (err) {
+            throw new Error('Failure on EventBusTask test: ' + err.message)
+        }
     })
 
     afterEach(async () => {
-        deleteAllIntegrationEvents()
-        await eventBusTask.stop()
+        try {
+            deleteAllIntegrationEvents()
+            await eventBusTask.stop()
+        } catch (err) {
+            throw new Error('Failure on EventBusTask test: ' + err.message)
+        }
     })
 
     describe('PUBLISH SAVED EVENTS', () => {
@@ -50,7 +58,7 @@ describe('EVENT BUS TASK', () => {
                     const result: Array<any> = await integrationRepository.find(new Query())    // Search in repository
                     expect(result.length).to.eql(0)
                 } catch (err) {
-                    console.log(err)
+                    throw new Error('Failure on EventBusTask test: ' + err.message)
                 }
             })
         })
@@ -76,7 +84,7 @@ describe('EVENT BUS TASK', () => {
                     const result: Array<any> = await integrationRepository.find(new Query())
                     expect(result.length).to.eql(1)
                 } catch (err) {
-                    console.log(err)
+                    throw new Error('Failure on EventBusTask test: ' + err.message)
                 }
             })
         })
@@ -128,7 +136,7 @@ describe('EVENT BUS TASK', () => {
         //             const result: Array<any> = await integrationRepository.find(new Query())
         //             expect(result.length).to.eql(8)
         //         } catch (err) {
-        //             console.log(err)
+        //             throw new Error('Failure on EventBusTask test: ' + err.message)
         //         }
         //     })
         // })
@@ -175,6 +183,7 @@ async function createSleepIntegrationEvents(): Promise<any> {
     saveEvent.__operation = 'publish'
     saveEvent.__routing_key = 'sleep.update'
     await integrationRepository.create(JSON.parse(JSON.stringify(saveEvent)))
+
     // Delete
     event = new SleepEvent('SleepDeleteEvent', new Date(), new SleepMock())
     saveEvent = event.toJSON()
@@ -186,12 +195,14 @@ async function createSleepIntegrationEvents(): Promise<any> {
 }
 
 async function createEnvironmentIntegrationEvents(): Promise<any> {
+    // Save
     let event: EnvironmentEvent = new EnvironmentEvent('EnvironmentSaveEvent', new Date(), new EnvironmentMock())
     let saveEvent: any = event.toJSON()
     saveEvent.__operation = 'publish'
     saveEvent.__routing_key = 'environments.save'
     await integrationRepository.create(JSON.parse(JSON.stringify(saveEvent)))
 
+    // Delete
     event = new EnvironmentEvent('EnvironmentDeleteEvent', new Date(), new EnvironmentMock())
     saveEvent = event.toJSON()
     saveEvent.__operation = 'publish'

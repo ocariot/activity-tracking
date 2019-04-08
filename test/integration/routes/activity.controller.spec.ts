@@ -454,16 +454,20 @@ describe('Routes: users/children', () => {
     describe('GET /users/children/physicalactivities', () => {
         context('when get all physical activities of the database successfully', () => {
             it('should return status code 200 and a list of all physical activity found', async () => {
-                await createActivity({
-                    name: otherActivity.name,
-                    start_time: otherActivity.start_time,
-                    end_time: otherActivity.end_time,
-                    duration: otherActivity.duration,
-                    calories: otherActivity.calories,
-                    steps: otherActivity.steps ? otherActivity.steps : undefined,
-                    levels: otherActivity.levels ? otherActivity.levels : undefined,
-                    child_id: otherActivity.child_id
-                })
+                try {
+                    await createActivity({
+                        name: otherActivity.name,
+                        start_time: otherActivity.start_time,
+                        end_time: otherActivity.end_time,
+                        duration: otherActivity.duration,
+                        calories: otherActivity.calories,
+                        steps: otherActivity.steps ? otherActivity.steps : undefined,
+                        levels: otherActivity.levels ? otherActivity.levels : undefined,
+                        child_id: otherActivity.child_id
+                    })
+                } catch (err) {
+                    throw new Error('Failure on users.children.physicalactivities routes test: ' + err.message)
+                }
 
                 return request
                     .get('/users/children/physicalactivities')
@@ -498,7 +502,7 @@ describe('Routes: users/children', () => {
                 try {
                     await deleteAllActivity()
                 } catch (err) {
-                    console.log(err)
+                    throw new Error('Failure on users.children.physicalactivities routes test: ' + err.message)
                 }
 
                 return request
@@ -518,31 +522,31 @@ describe('Routes: users/children', () => {
             it('should return status code 200 and the result as needed in the query', async () => {
                 try {
                     await deleteAllActivity()
+
+                    await createActivity({
+                        name: defaultActivity.name,
+                        start_time: defaultActivity.start_time,
+                        end_time: defaultActivity.end_time,
+                        duration: defaultActivity.duration,
+                        calories: defaultActivity.calories,
+                        steps: defaultActivity.steps ? defaultActivity.steps : undefined,
+                        levels: defaultActivity.levels ? defaultActivity.levels : undefined,
+                        child_id: defaultActivity.child_id
+                    })
+
+                    await createActivity({
+                        name: defaultActivity.name,
+                        start_time: defaultActivity.start_time,
+                        end_time: defaultActivity.end_time,
+                        duration: defaultActivity.duration,
+                        calories: defaultActivity.calories,
+                        steps: defaultActivity.steps ? defaultActivity.steps : undefined,
+                        levels: defaultActivity.levels ? defaultActivity.levels : undefined,
+                        child_id: new ObjectID()
+                    })
                 } catch (err) {
-                    console.log(err)
+                    throw new Error('Failure on users.children.physicalactivities routes test: ' + err.message)
                 }
-
-                await createActivity({
-                    name: defaultActivity.name,
-                    start_time: defaultActivity.start_time,
-                    end_time: defaultActivity.end_time,
-                    duration: defaultActivity.duration,
-                    calories: defaultActivity.calories,
-                    steps: defaultActivity.steps ? defaultActivity.steps : undefined,
-                    levels: defaultActivity.levels ? defaultActivity.levels : undefined,
-                    child_id: defaultActivity.child_id
-                })
-
-                await createActivity({
-                    name: defaultActivity.name,
-                    start_time: defaultActivity.start_time,
-                    end_time: defaultActivity.end_time,
-                    duration: defaultActivity.duration,
-                    calories: defaultActivity.calories,
-                    steps: defaultActivity.steps ? defaultActivity.steps : undefined,
-                    levels: defaultActivity.levels ? defaultActivity.levels : undefined,
-                    child_id: new ObjectID()
-                })
 
                 const url = `/users/children/physicalactivities?child_id=${defaultActivity.child_id}&fields=name,
                     start_time,end_time,duration,calories,steps,levels,child_id&sort=child_id&page=1&limit=3`
@@ -581,7 +585,7 @@ describe('Routes: users/children', () => {
                 try {
                     await deleteAllActivity()
                 } catch (err) {
-                    console.log(err)
+                    throw new Error('Failure on users.children.physicalactivities routes test: ' + err.message)
                 }
 
                 const url = `/users/children/physicalactivities?child_id=${defaultActivity.child_id}&fields=name,
@@ -606,20 +610,20 @@ describe('Routes: users/children', () => {
             it('should return status code 200 and a list of all physical activity of that specific child', async () => {
                 try {
                     await deleteAllActivity()
-                } catch (err) {
-                    console.log(err)
-                }
 
-                await createActivity({
-                    name: defaultActivity.name,
-                    start_time: defaultActivity.start_time,
-                    end_time: defaultActivity.end_time,
-                    duration: defaultActivity.duration,
-                    calories: defaultActivity.calories,
-                    steps: defaultActivity.steps ? defaultActivity.steps : undefined,
-                    levels: defaultActivity.levels ? defaultActivity.levels : undefined,
-                    child_id: defaultActivity.child_id
-                })
+                    await createActivity({
+                        name: defaultActivity.name,
+                        start_time: defaultActivity.start_time,
+                        end_time: defaultActivity.end_time,
+                        duration: defaultActivity.duration,
+                        calories: defaultActivity.calories,
+                        steps: defaultActivity.steps ? defaultActivity.steps : undefined,
+                        levels: defaultActivity.levels ? defaultActivity.levels : undefined,
+                        child_id: defaultActivity.child_id
+                    })
+                } catch (err) {
+                    throw new Error('Failure on users.children.physicalactivities routes test: ' + err.message)
+                }
 
                 return request
                     .get(`/users/children/${defaultActivity.child_id}/physicalactivities`)
@@ -654,7 +658,7 @@ describe('Routes: users/children', () => {
                 try {
                     await deleteAllActivity()
                 } catch (err) {
-                    console.log(err)
+                    throw new Error('Failure on users.children.physicalactivities routes test: ' + err.message)
                 }
 
                 return request
@@ -672,20 +676,20 @@ describe('Routes: users/children', () => {
             it('should return status code 400 and an info message about the invalid child_id', async () => {
                 try {
                     await deleteAllActivity()
-                } catch (err) {
-                    console.log(err)
-                }
 
-                await createActivity({
-                    name: defaultActivity.name,
-                    start_time: defaultActivity.start_time,
-                    end_time: defaultActivity.end_time,
-                    duration: defaultActivity.duration,
-                    calories: defaultActivity.calories,
-                    steps: defaultActivity.steps ? defaultActivity.steps : undefined,
-                    levels: defaultActivity.levels ? defaultActivity.levels : undefined,
-                    child_id: defaultActivity.child_id
-                })
+                    await createActivity({
+                        name: defaultActivity.name,
+                        start_time: defaultActivity.start_time,
+                        end_time: defaultActivity.end_time,
+                        duration: defaultActivity.duration,
+                        calories: defaultActivity.calories,
+                        steps: defaultActivity.steps ? defaultActivity.steps : undefined,
+                        levels: defaultActivity.levels ? defaultActivity.levels : undefined,
+                        child_id: defaultActivity.child_id
+                    })
+                } catch (err) {
+                    throw new Error('Failure on users.children.physicalactivities routes test: ' + err.message)
+                }
 
                 return request
                     .get(`/users/children/123/physicalactivities`)
@@ -705,31 +709,31 @@ describe('Routes: users/children', () => {
             it('should return status code 200 and the result as needed in the query', async () => {
                 try {
                     await deleteAllActivity()
+
+                    await createActivity({
+                        name: defaultActivity.name,
+                        start_time: defaultActivity.start_time,
+                        end_time: defaultActivity.end_time,
+                        duration: defaultActivity.duration,
+                        calories: defaultActivity.calories,
+                        steps: defaultActivity.steps ? defaultActivity.steps : undefined,
+                        levels: defaultActivity.levels ? defaultActivity.levels : undefined,
+                        child_id: defaultActivity.child_id
+                    })
+
+                    await createActivity({
+                        name: defaultActivity.name,
+                        start_time: defaultActivity.start_time,
+                        end_time: defaultActivity.end_time,
+                        duration: defaultActivity.duration,
+                        calories: defaultActivity.calories,
+                        steps: defaultActivity.steps ? defaultActivity.steps : undefined,
+                        levels: defaultActivity.levels ? defaultActivity.levels : undefined,
+                        child_id: new ObjectID()
+                    })
                 } catch (err) {
-                    console.log(err)
+                    throw new Error('Failure on users.children.physicalactivities routes test: ' + err.message)
                 }
-
-                await createActivity({
-                    name: defaultActivity.name,
-                    start_time: defaultActivity.start_time,
-                    end_time: defaultActivity.end_time,
-                    duration: defaultActivity.duration,
-                    calories: defaultActivity.calories,
-                    steps: defaultActivity.steps ? defaultActivity.steps : undefined,
-                    levels: defaultActivity.levels ? defaultActivity.levels : undefined,
-                    child_id: defaultActivity.child_id
-                })
-
-                await createActivity({
-                    name: defaultActivity.name,
-                    start_time: defaultActivity.start_time,
-                    end_time: defaultActivity.end_time,
-                    duration: defaultActivity.duration,
-                    calories: defaultActivity.calories,
-                    steps: defaultActivity.steps ? defaultActivity.steps : undefined,
-                    levels: defaultActivity.levels ? defaultActivity.levels : undefined,
-                    child_id: new ObjectID()
-                })
 
                 const url = `/users/children/${defaultActivity.child_id}/physicalactivities?child_id=${defaultActivity.child_id}
                     &fields=name,start_time,end_time,duration,calories,steps,levels,child_id&sort=child_id&page=1&limit=3`
@@ -768,7 +772,7 @@ describe('Routes: users/children', () => {
                 try {
                     await deleteAllActivity()
                 } catch (err) {
-                    console.log(err)
+                    throw new Error('Failure on users.children.physicalactivities routes test: ' + err.message)
                 }
 
                 const url = `/users/children/${defaultActivity.child_id}/physicalactivities?child_id=${defaultActivity.child_id}
@@ -790,20 +794,20 @@ describe('Routes: users/children', () => {
             it('should return status code 400 and an info message about the invalid child_id', async () => {
                 try {
                     await deleteAllActivity()
-                } catch (err) {
-                    console.log(err)
-                }
 
-                await createActivity({
-                    name: defaultActivity.name,
-                    start_time: defaultActivity.start_time,
-                    end_time: defaultActivity.end_time,
-                    duration: defaultActivity.duration,
-                    calories: defaultActivity.calories,
-                    steps: defaultActivity.steps ? defaultActivity.steps : undefined,
-                    levels: defaultActivity.levels ? defaultActivity.levels : undefined,
-                    child_id: defaultActivity.child_id
-                })
+                    await createActivity({
+                        name: defaultActivity.name,
+                        start_time: defaultActivity.start_time,
+                        end_time: defaultActivity.end_time,
+                        duration: defaultActivity.duration,
+                        calories: defaultActivity.calories,
+                        steps: defaultActivity.steps ? defaultActivity.steps : undefined,
+                        levels: defaultActivity.levels ? defaultActivity.levels : undefined,
+                        child_id: defaultActivity.child_id
+                    })
+                } catch (err) {
+                    throw new Error('Failure on users.children.physicalactivities routes test: ' + err.message)
+                }
 
                 const url = `/users/children/123/physicalactivities?child_id=${defaultActivity.child_id}&fields=start_time,end_time,
                     &fields=name,start_time,end_time,duration,calories,steps,levels,child_id&sort=child_id&page=1&limit=3`
@@ -826,22 +830,24 @@ describe('Routes: users/children', () => {
     describe('GET /users/children/:child_id/physicalactivities/:physicalactivity_id', () => {
         context('when get a specific physical activity of a child of the database successfully', () => {
             it('should return status code 200 and the specific physical activity of that child', async () => {
+                let result
+
                 try {
                     await deleteAllActivity()
-                } catch (err) {
-                    console.log(err)
-                }
 
-                const result = await createActivity({
-                    name: defaultActivity.name,
-                    start_time: defaultActivity.start_time,
-                    end_time: defaultActivity.end_time,
-                    duration: defaultActivity.duration,
-                    calories: defaultActivity.calories,
-                    steps: defaultActivity.steps ? defaultActivity.steps : undefined,
-                    levels: defaultActivity.levels ? defaultActivity.levels : undefined,
-                    child_id: defaultActivity.child_id
-                })
+                    result = await createActivity({
+                        name: defaultActivity.name,
+                        start_time: defaultActivity.start_time,
+                        end_time: defaultActivity.end_time,
+                        duration: defaultActivity.duration,
+                        calories: defaultActivity.calories,
+                        steps: defaultActivity.steps ? defaultActivity.steps : undefined,
+                        levels: defaultActivity.levels ? defaultActivity.levels : undefined,
+                        child_id: defaultActivity.child_id
+                    })
+                } catch (err) {
+                    throw new Error('Failure on users.children.physicalactivities routes test: ' + err.message)
+                }
 
                 return request
                     .get(`/users/children/${result.child_id}/physicalactivities/${result.id}`)
@@ -873,7 +879,7 @@ describe('Routes: users/children', () => {
                 try {
                     await deleteAllActivity()
                 } catch (err) {
-                    console.log(err)
+                    throw new Error('Failure on users.children.physicalactivities routes test: ' + err.message)
                 }
 
                 return request
@@ -891,22 +897,24 @@ describe('Routes: users/children', () => {
 
         context('when the child_id is invalid', () => {
             it('should return status code 400 and an info message about the invalid child_id', async () => {
+                let result
+
                 try {
                     await deleteAllActivity()
-                } catch (err) {
-                    console.log(err)
-                }
 
-                const result = await createActivity({
-                    name: defaultActivity.name,
-                    start_time: defaultActivity.start_time,
-                    end_time: defaultActivity.end_time,
-                    duration: defaultActivity.duration,
-                    calories: defaultActivity.calories,
-                    steps: defaultActivity.steps ? defaultActivity.steps : undefined,
-                    levels: defaultActivity.levels ? defaultActivity.levels : undefined,
-                    child_id: defaultActivity.child_id
-                })
+                    result = await createActivity({
+                        name: defaultActivity.name,
+                        start_time: defaultActivity.start_time,
+                        end_time: defaultActivity.end_time,
+                        duration: defaultActivity.duration,
+                        calories: defaultActivity.calories,
+                        steps: defaultActivity.steps ? defaultActivity.steps : undefined,
+                        levels: defaultActivity.levels ? defaultActivity.levels : undefined,
+                        child_id: defaultActivity.child_id
+                    })
+                } catch (err) {
+                    throw new Error('Failure on users.children.physicalactivities routes test: ' + err.message)
+                }
 
                 return request
                     .get(`/users/children/123/physicalactivities/${result.id}`)
@@ -922,22 +930,24 @@ describe('Routes: users/children', () => {
 
         context('when the physical activity id is invalid', () => {
             it('should return status code 400 and an info message about the invalid physical activity id', async () => {
+                let result
+
                 try {
                     await deleteAllActivity()
-                } catch (err) {
-                    console.log(err)
-                }
 
-                const result = await createActivity({
-                    name: defaultActivity.name,
-                    start_time: defaultActivity.start_time,
-                    end_time: defaultActivity.end_time,
-                    duration: defaultActivity.duration,
-                    calories: defaultActivity.calories,
-                    steps: defaultActivity.steps ? defaultActivity.steps : undefined,
-                    levels: defaultActivity.levels ? defaultActivity.levels : undefined,
-                    child_id: defaultActivity.child_id
-                })
+                    result = await createActivity({
+                        name: defaultActivity.name,
+                        start_time: defaultActivity.start_time,
+                        end_time: defaultActivity.end_time,
+                        duration: defaultActivity.duration,
+                        calories: defaultActivity.calories,
+                        steps: defaultActivity.steps ? defaultActivity.steps : undefined,
+                        levels: defaultActivity.levels ? defaultActivity.levels : undefined,
+                        child_id: defaultActivity.child_id
+                    })
+                } catch (err) {
+                    throw new Error('Failure on users.children.physicalactivities routes test: ' + err.message)
+                }
 
                 return request
                     .get(`/users/children/${result.child_id}/physicalactivities/123`)
@@ -955,22 +965,24 @@ describe('Routes: users/children', () => {
          */
         context('when get a specific physical activity of a child using the "query-strings-parser" library', () => {
             it('should return status code 200 and the result as needed in the query', async () => {
+                let result
+
                 try {
                     await deleteAllActivity()
-                } catch (err) {
-                    console.log(err)
-                }
 
-                const result = await createActivity({
-                    name: defaultActivity.name,
-                    start_time: defaultActivity.start_time,
-                    end_time: defaultActivity.end_time,
-                    duration: defaultActivity.duration,
-                    calories: defaultActivity.calories,
-                    steps: defaultActivity.steps ? defaultActivity.steps : undefined,
-                    levels: defaultActivity.levels ? defaultActivity.levels : undefined,
-                    child_id: defaultActivity.child_id
-                })
+                    result = await createActivity({
+                        name: defaultActivity.name,
+                        start_time: defaultActivity.start_time,
+                        end_time: defaultActivity.end_time,
+                        duration: defaultActivity.duration,
+                        calories: defaultActivity.calories,
+                        steps: defaultActivity.steps ? defaultActivity.steps : undefined,
+                        levels: defaultActivity.levels ? defaultActivity.levels : undefined,
+                        child_id: defaultActivity.child_id
+                    })
+                } catch (err) {
+                    throw new Error('Failure on users.children.physicalactivities routes test: ' + err.message)
+                }
 
                 const url = `/users/children/${result.child_id}/physicalactivities/${result.id}?child_id=${result.child_id}
                     &fields=name,start_time,end_time,duration,calories,steps,levels,child_id&sort=child_id&page=1&limit=3`
@@ -1000,27 +1012,25 @@ describe('Routes: users/children', () => {
         context('when there is an attempt to get a specific physical activity using the "query-strings-parser" library ' +
             'but this physical activity does not exist', () => {
             it('should return status code 404 and an info message describing that physical activity was not found', async () => {
-                try {
-                    await deleteAllActivity()
-                } catch (err) {
-                    console.log(err)
-                }
-
-                const result = await createActivity({
-                    name: defaultActivity.name,
-                    start_time: defaultActivity.start_time,
-                    end_time: defaultActivity.end_time,
-                    duration: defaultActivity.duration,
-                    calories: defaultActivity.calories,
-                    steps: defaultActivity.steps ? defaultActivity.steps : undefined,
-                    levels: defaultActivity.levels ? defaultActivity.levels : undefined,
-                    child_id: defaultActivity.child_id
-                })
+                let result
 
                 try {
                     await deleteAllActivity()
+
+                    result = await createActivity({
+                        name: defaultActivity.name,
+                        start_time: defaultActivity.start_time,
+                        end_time: defaultActivity.end_time,
+                        duration: defaultActivity.duration,
+                        calories: defaultActivity.calories,
+                        steps: defaultActivity.steps ? defaultActivity.steps : undefined,
+                        levels: defaultActivity.levels ? defaultActivity.levels : undefined,
+                        child_id: defaultActivity.child_id
+                    })
+
+                    await deleteAllActivity()
                 } catch (err) {
-                    console.log(err)
+                    throw new Error('Failure on users.children.physicalactivities routes test: ' + err.message)
                 }
 
                 const url = `/users/children/${result.child_id}/physicalactivities/${result.id}?child_id=${result.child_id}
@@ -1042,22 +1052,24 @@ describe('Routes: users/children', () => {
         context('when there is an attempt to get a specific physical activity using the "query-strings-parser" library but the ' +
             'child_id is invalid', () => {
             it('should return status code 400 and an info message about the invalid child_id', async () => {
+                let result
+
                 try {
                     await deleteAllActivity()
-                } catch (err) {
-                    console.log(err)
-                }
 
-                const result = await createActivity({
-                    name: defaultActivity.name,
-                    start_time: defaultActivity.start_time,
-                    end_time: defaultActivity.end_time,
-                    duration: defaultActivity.duration,
-                    calories: defaultActivity.calories,
-                    steps: defaultActivity.steps ? defaultActivity.steps : undefined,
-                    levels: defaultActivity.levels ? defaultActivity.levels : undefined,
-                    child_id: defaultActivity.child_id
-                })
+                    result = await createActivity({
+                        name: defaultActivity.name,
+                        start_time: defaultActivity.start_time,
+                        end_time: defaultActivity.end_time,
+                        duration: defaultActivity.duration,
+                        calories: defaultActivity.calories,
+                        steps: defaultActivity.steps ? defaultActivity.steps : undefined,
+                        levels: defaultActivity.levels ? defaultActivity.levels : undefined,
+                        child_id: defaultActivity.child_id
+                    })
+                } catch (err) {
+                    throw new Error('Failure on users.children.physicalactivities routes test: ' + err.message)
+                }
 
                 const url = `/users/children/123/physicalactivities/${result.id}?child_id=${result.child_id}&fields=name,
                     start_time,end_time,duration,calories,steps,levels,child_id&sort=child_id&page=1&limit=3`
@@ -1077,22 +1089,24 @@ describe('Routes: users/children', () => {
         context('when there is an attempt to get a specific physical activity using the "query-strings-parser" library but the ' +
             'physical activity id is invalid', () => {
             it('should return status code 400 and an info message about the invalid physical activity id', async () => {
+                let result
+
                 try {
                     await deleteAllActivity()
-                } catch (err) {
-                    console.log(err)
-                }
 
-                const result = await createActivity({
-                    name: defaultActivity.name,
-                    start_time: defaultActivity.start_time,
-                    end_time: defaultActivity.end_time,
-                    duration: defaultActivity.duration,
-                    calories: defaultActivity.calories,
-                    steps: defaultActivity.steps ? defaultActivity.steps : undefined,
-                    levels: defaultActivity.levels ? defaultActivity.levels : undefined,
-                    child_id: defaultActivity.child_id
-                })
+                    result = await createActivity({
+                        name: defaultActivity.name,
+                        start_time: defaultActivity.start_time,
+                        end_time: defaultActivity.end_time,
+                        duration: defaultActivity.duration,
+                        calories: defaultActivity.calories,
+                        steps: defaultActivity.steps ? defaultActivity.steps : undefined,
+                        levels: defaultActivity.levels ? defaultActivity.levels : undefined,
+                        child_id: defaultActivity.child_id
+                    })
+                } catch (err) {
+                    throw new Error('Failure on users.children.physicalactivities routes test: ' + err.message)
+                }
 
                 const url = `/users/children/${result.child_id}/physicalactivities/123?child_id=${result.child_id}
                     &fields=name,start_time,end_time,duration,calories,steps,levels,child_id&sort=child_id&page=1&limit=3`
@@ -1115,14 +1129,16 @@ describe('Routes: users/children', () => {
     describe('PATCH /users/children/:child_id/physicalactivities/:physicalactivity_id', () => {
         context('when this physical activity exists in the database and is updated successfully', () => {
             it('should return status code 200 and the updated physical activity', async () => {
+                let result
+
                 try {
                     await deleteAllActivity()
-                } catch (err) {
-                    console.log(err)
-                }
 
-                // physical activity to be updated
-                const result = await createActivityToBeUpdated(defaultActivity)
+                    // physical activity to be updated
+                    result = await createActivityToBeUpdated(defaultActivity)
+                } catch (err) {
+                    throw new Error('Failure on users.children.physicalactivities routes test: ' + err.message)
+                }
 
                 // physical activity to update
                 const body = {
@@ -1157,7 +1173,7 @@ describe('Routes: users/children', () => {
                 try {
                     await deleteAllActivity()
                 } catch (err) {
-                    console.log(err)
+                    throw new Error('Failure on users.children.physicalactivities routes test: ' + err.message)
                 }
 
                 // physical activity to update
@@ -1188,14 +1204,16 @@ describe('Routes: users/children', () => {
 
         context('when the child_id is invalid', () => {
             it('should return status code 400 and an info message about the invalid child_id', async () => {
+                let result
+
                 try {
                     await deleteAllActivity()
-                } catch (err) {
-                    console.log(err)
-                }
 
-                // physical activity to be updated
-                const result = await createActivityToBeUpdated(defaultActivity)
+                    // physical activity to be updated
+                    result = await createActivityToBeUpdated(defaultActivity)
+                } catch (err) {
+                    throw new Error('Failure on users.children.physicalactivities routes test: ' + err.message)
+                }
 
                 // physical activity to update
                 const body = {
@@ -1224,14 +1242,16 @@ describe('Routes: users/children', () => {
 
         context('when the physical activity id is invalid', () => {
             it('should return status code 400 and an info message about the invalid physical activity id', async () => {
+                let result
+
                 try {
                     await deleteAllActivity()
-                } catch (err) {
-                    console.log(err)
-                }
 
-                // physical activity to be updated
-                const result = await createActivityToBeUpdated(defaultActivity)
+                    // physical activity to be updated
+                    result = await createActivityToBeUpdated(defaultActivity)
+                } catch (err) {
+                    throw new Error('Failure on users.children.physicalactivities routes test: ' + err.message)
+                }
 
                 // physical activity to update
                 const body = {
@@ -1260,14 +1280,16 @@ describe('Routes: users/children', () => {
 
         context('when a validation error occurs (the duration is negative)', () => {
             it('should return status code 400 and info message about the invalid duration', async () => {
+                let result
+
                 try {
                     await deleteAllActivity()
-                } catch (err) {
-                    console.log(err)
-                }
 
-                // physical activity to be updated
-                const result = await createActivityToBeUpdated(defaultActivity)
+                    // physical activity to be updated
+                    result = await createActivityToBeUpdated(defaultActivity)
+                } catch (err) {
+                    throw new Error('Failure on users.children.physicalactivities routes test: ' + err.message)
+                }
 
                 // physical activity to update
                 const body = {
@@ -1290,14 +1312,16 @@ describe('Routes: users/children', () => {
 
         context('when a validation error occurs (the calories parameter is negative)', () => {
             it('should return status code 400 and info message about the invalid calories parameter', async () => {
+                let result
+
                 try {
                     await deleteAllActivity()
-                } catch (err) {
-                    console.log(err)
-                }
 
-                // physical activity to be updated
-                const result = await createActivityToBeUpdated(defaultActivity)
+                    // physical activity to be updated
+                    result = await createActivityToBeUpdated(defaultActivity)
+                } catch (err) {
+                    throw new Error('Failure on users.children.physicalactivities routes test: ' + err.message)
+                }
 
                 // physical activity to update
                 const body = {
@@ -1320,14 +1344,16 @@ describe('Routes: users/children', () => {
 
         context('when a validation error occurs (the steps parameter is negative)', () => {
             it('should return status code 400 and info message about the invalid steps parameter', async () => {
+                let result
+
                 try {
                     await deleteAllActivity()
-                } catch (err) {
-                    console.log(err)
-                }
 
-                // physical activity to be updated
-                const result = await createActivityToBeUpdated(defaultActivity)
+                    // physical activity to be updated
+                    result = await createActivityToBeUpdated(defaultActivity)
+                } catch (err) {
+                    throw new Error('Failure on users.children.physicalactivities routes test: ' + err.message)
+                }
 
                 // physical activity to update
                 const body = {
@@ -1350,14 +1376,16 @@ describe('Routes: users/children', () => {
 
         context('when a validation error occurs (the levels array has an item with an invalid type)', () => {
             it('should return status code 400 and info message about the invalid levels array', async () => {
+                let result
+
                 try {
                     await deleteAllActivity()
-                } catch (err) {
-                    console.log(err)
-                }
 
-                // physical activity to be updated
-                const result = await createActivityToBeUpdated(defaultActivity)
+                    // physical activity to be updated
+                    result = await createActivityToBeUpdated(defaultActivity)
+                } catch (err) {
+                    throw new Error('Failure on users.children.physicalactivities routes test: ' + err.message)
+                }
 
                 // physical activity to update
                 const body = {
@@ -1403,14 +1431,16 @@ describe('Routes: users/children', () => {
 
         context('when a validation error occurs (the levels array has an item that contains empty fields)', () => {
             it('should return status code 400 and info message about the invalid levels array', async () => {
+                let result
+
                 try {
                     await deleteAllActivity()
-                } catch (err) {
-                    console.log(err)
-                }
 
-                // physical activity to be updated
-                const result = await createActivityToBeUpdated(defaultActivity)
+                    // physical activity to be updated
+                    result = await createActivityToBeUpdated(defaultActivity)
+                } catch (err) {
+                    throw new Error('Failure on users.children.physicalactivities routes test: ' + err.message)
+                }
 
                 // physical activity to update
                 const body = {
@@ -1457,14 +1487,16 @@ describe('Routes: users/children', () => {
 
         context('when a validation error occurs (the levels array has an item that contains negative duration)', () => {
             it('should return status code 400 and info message about the invalid levels array', async () => {
+                let result
+
                 try {
                     await deleteAllActivity()
-                } catch (err) {
-                    console.log(err)
-                }
 
-                // physical activity to be updated
-                const result = await createActivityToBeUpdated(defaultActivity)
+                    // physical activity to be updated
+                    result = await createActivityToBeUpdated(defaultActivity)
+                } catch (err) {
+                    throw new Error('Failure on users.children.physicalactivities routes test: ' + err.message)
+                }
 
                 // physical activity to update
                 const body = {
@@ -1515,22 +1547,24 @@ describe('Routes: users/children', () => {
     describe('DELETE /users/children/:child_id/physicalactivities/:physicalactivity_id', () => {
         context('when the physical activity was deleted successfully', () => {
             it('should return status code 204 and no content for physical activity', async () => {
+                let result
+
                 try {
                     await deleteAllActivity()
-                } catch (err) {
-                    console.log(err)
-                }
 
-                const result = await createActivity({
-                    name: defaultActivity.name,
-                    start_time: defaultActivity.start_time,
-                    end_time: defaultActivity.end_time,
-                    duration: defaultActivity.duration,
-                    calories: defaultActivity.calories,
-                    steps: defaultActivity.steps ? defaultActivity.steps : undefined,
-                    levels: defaultActivity.levels ? defaultActivity.levels : undefined,
-                    child_id: defaultActivity.child_id
-                })
+                    result = await createActivity({
+                        name: defaultActivity.name,
+                        start_time: defaultActivity.start_time,
+                        end_time: defaultActivity.end_time,
+                        duration: defaultActivity.duration,
+                        calories: defaultActivity.calories,
+                        steps: defaultActivity.steps ? defaultActivity.steps : undefined,
+                        levels: defaultActivity.levels ? defaultActivity.levels : undefined,
+                        child_id: defaultActivity.child_id
+                    })
+                } catch (err) {
+                    throw new Error('Failure on users.children.physicalactivities routes test: ' + err.message)
+                }
 
                 return request
                     .delete(`/users/children/${result.child_id}/physicalactivities/${result.id}`)
@@ -1547,7 +1581,7 @@ describe('Routes: users/children', () => {
                 try {
                     await deleteAllActivity()
                 } catch (err) {
-                    console.log(err)
+                    throw new Error('Failure on users.children.physicalactivities routes test: ' + err.message)
                 }
 
                 return request
@@ -1562,22 +1596,24 @@ describe('Routes: users/children', () => {
 
         context('when the child_id is invalid', () => {
             it('should return status code 400 and an info message about the invalid child_id', async () => {
+                let result
+
                 try {
                     await deleteAllActivity()
-                } catch (err) {
-                    console.log(err)
-                }
 
-                const result = await createActivity({
-                    name: defaultActivity.name,
-                    start_time: defaultActivity.start_time,
-                    end_time: defaultActivity.end_time,
-                    duration: defaultActivity.duration,
-                    calories: defaultActivity.calories,
-                    steps: defaultActivity.steps ? defaultActivity.steps : undefined,
-                    levels: defaultActivity.levels ? defaultActivity.levels : undefined,
-                    child_id: defaultActivity.child_id
-                })
+                    result = await createActivity({
+                        name: defaultActivity.name,
+                        start_time: defaultActivity.start_time,
+                        end_time: defaultActivity.end_time,
+                        duration: defaultActivity.duration,
+                        calories: defaultActivity.calories,
+                        steps: defaultActivity.steps ? defaultActivity.steps : undefined,
+                        levels: defaultActivity.levels ? defaultActivity.levels : undefined,
+                        child_id: defaultActivity.child_id
+                    })
+                } catch (err) {
+                    throw new Error('Failure on users.children.physicalactivities routes test: ' + err.message)
+                }
 
                 return request
                     .delete(`/users/children/123/physicalactivities/${result.id}`)
@@ -1593,22 +1629,24 @@ describe('Routes: users/children', () => {
 
         context('when the physical activity id is invalid', () => {
             it('should return status code 400 and an info message about the invalid physical activity id', async () => {
+                let result
+
                 try {
                     await deleteAllActivity()
-                } catch (err) {
-                    console.log(err)
-                }
 
-                const result = await createActivity({
-                    name: defaultActivity.name,
-                    start_time: defaultActivity.start_time,
-                    end_time: defaultActivity.end_time,
-                    duration: defaultActivity.duration,
-                    calories: defaultActivity.calories,
-                    steps: defaultActivity.steps ? defaultActivity.steps : undefined,
-                    levels: defaultActivity.levels ? defaultActivity.levels : undefined,
-                    child_id: defaultActivity.child_id
-                })
+                    result = await createActivity({
+                        name: defaultActivity.name,
+                        start_time: defaultActivity.start_time,
+                        end_time: defaultActivity.end_time,
+                        duration: defaultActivity.duration,
+                        calories: defaultActivity.calories,
+                        steps: defaultActivity.steps ? defaultActivity.steps : undefined,
+                        levels: defaultActivity.levels ? defaultActivity.levels : undefined,
+                        child_id: defaultActivity.child_id
+                    })
+                } catch (err) {
+                    throw new Error('Failure on users.children.physicalactivities routes test: ' + err.message)
+                }
 
                 return request
                     .delete(`/users/children/${result.child_id}/physicalactivities/123`)
@@ -1631,7 +1669,7 @@ describe('Routes: users/children', () => {
                 try {
                     await deleteAllLogs()
                 } catch (err) {
-                    console.log(err)
+                    throw new Error('Failure on users.children.physicalactivities routes test: ' + err.message)
                 }
 
                 const body: any = []
@@ -2238,7 +2276,7 @@ describe('Routes: users/children', () => {
                 try {
                     await deleteAllLogs()
                 } catch (err) {
-                    console.log(err)
+                    throw new Error('Failure on users.children.physicalactivities routes test: ' + err.message)
                 }
 
                 const basePath = `/users/children/${defaultActivity.child_id}/physicalactivities/logs/${correctLogsArr[0].type}`

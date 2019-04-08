@@ -32,11 +32,11 @@ describe('EVENT BUS', () => {
     })
 
     afterEach(async () => {
-        await eventBus.dispose()
-    })
-
-    after(async () => {
-        await eventBus.dispose()
+        try {
+            await eventBus.dispose()
+        } catch (err) {
+            throw new Error('Failure on EventBus test: ' + err.message)
+        }
     })
 
     describe('CONNECTION', () => {
@@ -64,12 +64,22 @@ describe('EVENT BUS', () => {
         })
 
         it('should connect successfully to publish.', async () => {
-            await eventBus.connectionPub.tryConnect(1, 500)
+            try {
+                await eventBus.connectionPub.tryConnect(1, 500)
+            } catch (err) {
+                throw new Error('Failure on EventBus test: ' + err.message)
+            }
+
             expect(eventBus.connectionPub.isConnected).to.eql(true)
         })
 
         it('should connect successfully to subscribe.', async () => {
-            await eventBus.connectionSub.tryConnect(1, 500)
+            try {
+                await eventBus.connectionSub.tryConnect(1, 500)
+            } catch (err) {
+                throw new Error('Failure on EventBus test: ' + err.message)
+            }
+
             expect(eventBus.connectionSub.isConnected).to.eql(true)
         })
     })
@@ -78,42 +88,54 @@ describe('EVENT BUS', () => {
     // src/infrastructure/eventbus/rabbitmq/eventbus.rabbitmq.ts file to see receiving messages
     describe('SUBSCRIBE', () => {
         it('should return true to subscribe in PhysicalActivitySaveEvent', async () => {
-            await eventBus.connectionSub.tryConnect(1, 500)
+            try {
+                await eventBus.connectionSub.tryConnect(1, 500)
 
-            const activitySaveEvent = new PhysicalActivityEvent('PhysicalActivitySaveEvent', new Date())
-            const activitySaveEventHandler = new PhysicalActivitySaveEventHandler(
-                container.get<IPhysicalActivityRepository>(Identifier.ACTIVITY_REPOSITORY), logger)
-            return eventBus
-                .subscribe(activitySaveEvent, activitySaveEventHandler, 'activities.save')
-                .then(result => {
-                    expect(result).to.equal(true)
-                })
+                const activitySaveEvent = new PhysicalActivityEvent('PhysicalActivitySaveEvent', new Date())
+                const activitySaveEventHandler = new PhysicalActivitySaveEventHandler(
+                    container.get<IPhysicalActivityRepository>(Identifier.ACTIVITY_REPOSITORY), logger)
+                return eventBus
+                    .subscribe(activitySaveEvent, activitySaveEventHandler, 'activities.save')
+                    .then(result => {
+                        expect(result).to.equal(true)
+                    })
+            } catch (err) {
+                throw new Error('Failure on EventBus test: ' + err.message)
+            }
         })
 
         it('should return true to subscribe in SleepSaveEvent', async () => {
-            await eventBus.connectionSub.tryConnect(1, 500)
+            try {
+                await eventBus.connectionSub.tryConnect(1, 500)
 
-            const sleepSaveEvent = new SleepEvent('SleepSaveEvent', new Date())
-            const sleepSaveEventHandler = new SleepSaveEventHandler(
-                container.get<ISleepRepository>(Identifier.SLEEP_REPOSITORY), logger)
-            return eventBus
-                .subscribe(sleepSaveEvent, sleepSaveEventHandler, 'sleep.save')
-                .then(result => {
-                    expect(result).to.equal(true)
-                })
+                const sleepSaveEvent = new SleepEvent('SleepSaveEvent', new Date())
+                const sleepSaveEventHandler = new SleepSaveEventHandler(
+                    container.get<ISleepRepository>(Identifier.SLEEP_REPOSITORY), logger)
+                return eventBus
+                    .subscribe(sleepSaveEvent, sleepSaveEventHandler, 'sleep.save')
+                    .then(result => {
+                        expect(result).to.equal(true)
+                    })
+            } catch (err) {
+                throw new Error('Failure on EventBus test: ' + err.message)
+            }
         })
 
         it('should return true to subscribe in EnvironmentSaveEvent', async () => {
-            await eventBus.connectionSub.tryConnect(1, 500)
+            try {
+                await eventBus.connectionSub.tryConnect(1, 500)
 
-            const environmentSaveEvent = new EnvironmentEvent('EnvironmentSaveEvent', new Date())
-            const environmentSaveEventHandler = new EnvironmentSaveEventHandler(
-                container.get<IEnvironmentRepository>(Identifier.ENVIRONMENT_REPOSITORY), logger)
-            return eventBus
-                .subscribe(environmentSaveEvent, environmentSaveEventHandler, 'environments.save')
-                .then(result => {
-                    expect(result).to.equal(true)
-                })
+                const environmentSaveEvent = new EnvironmentEvent('EnvironmentSaveEvent', new Date())
+                const environmentSaveEventHandler = new EnvironmentSaveEventHandler(
+                    container.get<IEnvironmentRepository>(Identifier.ENVIRONMENT_REPOSITORY), logger)
+                return eventBus
+                    .subscribe(environmentSaveEvent, environmentSaveEventHandler, 'environments.save')
+                    .then(result => {
+                        expect(result).to.equal(true)
+                    })
+            } catch (err) {
+                throw new Error('Failure on EventBus test: ' + err.message)
+            }
         })
     })
 
@@ -121,158 +143,214 @@ describe('EVENT BUS', () => {
         context('Physical Activity', () => {
 
             it('should return true for published RUN physical activity.', async () => {
-                await eventBus.connectionPub.tryConnect(1, 500)
-                return eventBus.publish(
-                    new PhysicalActivityEvent('PhysicalActivitySaveEvent', new Date(),
-                        new PhysicalActivityMock(ActivityTypeMock.RUN)),
-                    'activities.save')
-                    .then((result: boolean) => {
-                        expect(result).to.equal(true)
-                    })
+                try {
+                    await eventBus.connectionPub.tryConnect(1, 500)
+
+                    return eventBus.publish(
+                        new PhysicalActivityEvent('PhysicalActivitySaveEvent', new Date(),
+                            new PhysicalActivityMock(ActivityTypeMock.RUN)),
+                        'activities.save')
+                        .then((result: boolean) => {
+                            expect(result).to.equal(true)
+                        })
+                } catch (err) {
+                    throw new Error('Failure on EventBus test: ' + err.message)
+                }
             })
 
             it('should return true for published WALK physical activity.', async () => {
-                await eventBus.connectionPub.tryConnect(1, 500)
-                return eventBus.publish(
-                    new PhysicalActivityEvent('PhysicalActivitySaveEvent', new Date(),
-                        new PhysicalActivityMock(ActivityTypeMock.WALK)),
-                    'activities.save')
-                    .then((result: boolean) => {
-                        expect(result).to.equal(true)
-                    })
+                try {
+                    await eventBus.connectionPub.tryConnect(1, 500)
+                    return eventBus.publish(
+                        new PhysicalActivityEvent('PhysicalActivitySaveEvent', new Date(),
+                            new PhysicalActivityMock(ActivityTypeMock.WALK)),
+                        'activities.save')
+                        .then((result: boolean) => {
+                            expect(result).to.equal(true)
+                        })
+                } catch (err) {
+                    throw new Error('Failure on EventBus test: ' + err.message)
+                }
             })
 
             it('should return true for published BIKE physical activity.', async () => {
-                await eventBus.connectionPub.tryConnect(1, 500)
-                return eventBus.publish(
-                    new PhysicalActivityEvent('PhysicalActivitySaveEvent', new Date(),
-                        new PhysicalActivityMock(ActivityTypeMock.BIKE)),
-                    'activities.save')
-                    .then((result: boolean) => {
-                        expect(result).to.equal(true)
-                    })
+                try {
+                    await eventBus.connectionPub.tryConnect(1, 500)
+
+                    return eventBus.publish(
+                        new PhysicalActivityEvent('PhysicalActivitySaveEvent', new Date(),
+                            new PhysicalActivityMock(ActivityTypeMock.BIKE)),
+                        'activities.save')
+                        .then((result: boolean) => {
+                            expect(result).to.equal(true)
+                        })
+                } catch (err) {
+                    throw new Error('Failure on EventBus test: ' + err.message)
+                }
             })
 
             it('should return true for published SWIM physical activity.', async () => {
-                await eventBus.connectionPub.tryConnect(1, 500)
-                return eventBus.publish(
-                    new PhysicalActivityEvent('PhysicalActivitySaveEvent', new Date(),
-                        new PhysicalActivityMock(ActivityTypeMock.SWIM)),
-                    'activities.save')
-                    .then((result: boolean) => {
-                        expect(result).to.equal(true)
-                    })
+                try {
+                    await eventBus.connectionPub.tryConnect(1, 500)
+
+                    return eventBus.publish(
+                        new PhysicalActivityEvent('PhysicalActivitySaveEvent', new Date(),
+                            new PhysicalActivityMock(ActivityTypeMock.SWIM)),
+                        'activities.save')
+                        .then((result: boolean) => {
+                            expect(result).to.equal(true)
+                        })
+                } catch (err) {
+                    throw new Error('Failure on EventBus test: ' + err.message)
+                }
             })
 
             it('should return true for publish of updated of SWIM physical activity.', async () => {
-                await eventBus.connectionPub.tryConnect(1, 500)
-                return eventBus.publish(
-                    new PhysicalActivityEvent('PhysicalActivityUpdateEvent', new Date(),
-                        new PhysicalActivityMock(ActivityTypeMock.SWIM)),
-                    'activities.update')
-                    .then((result: boolean) => {
-                        expect(result).to.equal(true)
-                    })
+                try {
+                    await eventBus.connectionPub.tryConnect(1, 500)
+
+                    return eventBus.publish(
+                        new PhysicalActivityEvent('PhysicalActivityUpdateEvent', new Date(),
+                            new PhysicalActivityMock(ActivityTypeMock.SWIM)),
+                        'activities.update')
+                        .then((result: boolean) => {
+                            expect(result).to.equal(true)
+                        })
+                } catch (err) {
+                    throw new Error('Failure on EventBus test: ' + err.message)
+                }
             })
 
             it('should return true for publish of delete of SWIM physical activity.', async () => {
-                await eventBus.connectionPub.tryConnect(1, 500)
-                return eventBus.publish(
-                    new PhysicalActivityEvent('PhysicalActivityDeleteEvent', new Date(),
-                        new PhysicalActivityMock(ActivityTypeMock.SWIM)),
-                    'activities.delete')
-                    .then((result: boolean) => {
-                        expect(result).to.equal(true)
-                    })
+                try {
+                    await eventBus.connectionPub.tryConnect(1, 500)
+
+                    return eventBus.publish(
+                        new PhysicalActivityEvent('PhysicalActivityDeleteEvent', new Date(),
+                            new PhysicalActivityMock(ActivityTypeMock.SWIM)),
+                        'activities.delete')
+                        .then((result: boolean) => {
+                            expect(result).to.equal(true)
+                        })
+                } catch (err) {
+                    throw new Error('Failure on EventBus test: ' + err.message)
+                }
             })
 
             it(`should return true to ${pubPhysicalActivityTotal} published physical activities.`, async () => {
-                await eventBus.connectionPub.tryConnect(1, 500)
-                let count: number = 0
+                try {
+                    await eventBus.connectionPub.tryConnect(1, 500)
+                    let count: number = 0
 
-                // Save in file
-                // require('fs').writeFileSync('./physical.activity.data.json',
-                //     JSON.stringify(new PhysicalActivityMock().toJSON()), 'utf-8')
+                    // Save in file
+                    // require('fs').writeFileSync('./physical.activity.data.json',
+                    //     JSON.stringify(new PhysicalActivityMock().toJSON()), 'utf-8')
 
-                for (let i = 0; i < pubPhysicalActivityTotal; i++) {
-                    const result = await eventBus.publish(
-                        new PhysicalActivityEvent('PhysicalActivitySaveEvent', new Date(),
-                            new PhysicalActivityMock()),
-                        'activities.save')
-                    expect(result).to.equal(true)
-                    count++
+                    for (let i = 0; i < pubPhysicalActivityTotal; i++) {
+                        const result = await eventBus.publish(
+                            new PhysicalActivityEvent('PhysicalActivitySaveEvent', new Date(),
+                                new PhysicalActivityMock()),
+                            'activities.save')
+                        expect(result).to.equal(true)
+                        count++
+                    }
+                    expect(count).equals(pubPhysicalActivityTotal)
+                } catch (err) {
+                    throw new Error('Failure on EventBus test: ' + err.message)
                 }
-                expect(count).equals(pubPhysicalActivityTotal)
             })
         })
 
         context('Sleep', () => {
             it(`should return true to ${pubSleepTotal} published sleep records.`, async () => {
-                await eventBus.connectionPub.tryConnect(1, 500)
-                let count: number = 0
+                try {
+                    await eventBus.connectionPub.tryConnect(1, 500)
+                    let count: number = 0
 
-                // Save in file
-                // require('fs').writeFileSync('./sleep.data.json', JSON.stringify(new SleepMock().toJSON()), 'utf-8')
+                    // Save in file
+                    // require('fs').writeFileSync('./sleep.data.json', JSON.stringify(new SleepMock().toJSON()), 'utf-8')
 
-                for (let i = 0; i < pubSleepTotal; i++) {
-                    const result = await eventBus.publish(
-                        new SleepEvent('SleepSaveEvent', new Date(),
-                            new SleepMock()),
-                        'sleep.save')
-                    expect(result).to.equal(true)
-                    count++
+                    for (let i = 0; i < pubSleepTotal; i++) {
+                        const result = await eventBus.publish(
+                            new SleepEvent('SleepSaveEvent', new Date(),
+                                new SleepMock()),
+                            'sleep.save')
+                        expect(result).to.equal(true)
+                        count++
+                    }
+                    expect(count).equals(pubSleepTotal)
+                } catch (err) {
+                    throw new Error('Failure on EventBus test: ' + err.message)
                 }
-                expect(count).equals(pubSleepTotal)
             })
 
             it('should return true for publish of updated of sleep.', async () => {
-                await eventBus.connectionPub.tryConnect(1, 500)
-                return eventBus.publish(
-                    new SleepEvent('SleepUpdateEvent', new Date(), new SleepMock()),
-                    'sleep.update')
-                    .then((result: boolean) => {
-                        expect(result).to.equal(true)
-                    })
+                try {
+                    await eventBus.connectionPub.tryConnect(1, 500)
+
+                    return eventBus.publish(
+                        new SleepEvent('SleepUpdateEvent', new Date(), new SleepMock()),
+                        'sleep.update')
+                        .then((result: boolean) => {
+                            expect(result).to.equal(true)
+                        })
+                } catch (err) {
+                    throw new Error('Failure on EventBus test: ' + err.message)
+                }
             })
 
             it('should return true for publish of delete of sleep.', async () => {
-                await eventBus.connectionPub.tryConnect(1, 500)
-                return eventBus.publish(
-                    new SleepEvent('SleepDeleteEvent', new Date(), new SleepMock()),
-                    'sleep.delete')
-                    .then((result: boolean) => {
-                        expect(result).to.equal(true)
-                    })
+                try {
+                    await eventBus.connectionPub.tryConnect(1, 500)
+
+                    return eventBus.publish(
+                        new SleepEvent('SleepDeleteEvent', new Date(), new SleepMock()),
+                        'sleep.delete')
+                        .then((result: boolean) => {
+                            expect(result).to.equal(true)
+                        })
+                } catch (err) {
+                    throw new Error('Failure on EventBus test: ' + err.message)
+                }
             })
         })
 
         context('Environment', () => {
             it(`should return true to ${pubEnvironmentTotal} published environments.`, async () => {
-                await eventBus.connectionPub.tryConnect(1, 500)
-                let count: number = 0
+                try {
+                    await eventBus.connectionPub.tryConnect(1, 500)
+                    let count: number = 0
 
-                // Save in file
-                // require('fs').writeFileSync('./sleep.data.json', JSON.stringify(new EnvironmentMock().toJSON()), 'utf-8')
+                    // Save in file
+                    // require('fs').writeFileSync('./sleep.data.json', JSON.stringify(new EnvironmentMock().toJSON()), 'utf-8')
 
-                for (let i = 0; i < pubEnvironmentTotal; i++) {
-                    const result = await eventBus.publish(
-                        new EnvironmentEvent('EnvironmentSaveEvent', new Date(),
-                            new EnvironmentMock()),
-                        'environments.save')
-                    expect(result).to.equal(true)
-                    count++
+                    for (let i = 0; i < pubEnvironmentTotal; i++) {
+                        const result = await eventBus.publish(
+                            new EnvironmentEvent('EnvironmentSaveEvent', new Date(),
+                                new EnvironmentMock()),
+                            'environments.save')
+                        expect(result).to.equal(true)
+                        count++
+                    }
+                    expect(count).equals(pubEnvironmentTotal)
+                } catch (err) {
+                    throw new Error('Failure on EventBus test: ' + err.message)
                 }
-                expect(count).equals(pubEnvironmentTotal)
             })
 
             it('should return true for publish of delete of environment.', async () => {
-                await eventBus.connectionPub.tryConnect(1, 500)
-                return eventBus.publish(
-                    new EnvironmentEvent('EnvironmentDeleteEvent', new Date(), new EnvironmentMock()),
-                    'environments.delete')
-                    .then((result: boolean) => {
-                        expect(result).to.equal(true)
-                    })
+                try {
+                    await eventBus.connectionPub.tryConnect(1, 500)
+
+                    return eventBus.publish(
+                        new EnvironmentEvent('EnvironmentDeleteEvent', new Date(), new EnvironmentMock()),
+                        'environments.delete')
+                        .then((result: boolean) => {
+                            expect(result).to.equal(true)
+                        })
+                } catch (err) {
+                    throw new Error('Failure on EventBus test: ' + err.message)
+                }
             })
         })
     })

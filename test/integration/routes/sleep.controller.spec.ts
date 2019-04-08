@@ -360,7 +360,7 @@ describe('Routes: users.children.sleep', () => {
                 try {
                     await deleteAllSleep()
                 } catch (err) {
-                    console.log(err)
+                    throw new Error('Failure on users.children.sleep routes test: ' + err.message)
                 }
 
                 return request
@@ -380,57 +380,57 @@ describe('Routes: users.children.sleep', () => {
             it('should return status code 200 and the result as needed in the query', async () => {
                 try {
                     await deleteAllSleep()
+
+                    await createSleep({
+                        start_time: defaultSleep.start_time,
+                        end_time: defaultSleep.end_time,
+                        duration: defaultSleep.duration,
+                        pattern: [
+                            {
+                                start_time: defaultSleep.start_time,
+                                name: SleepPatternType.RESTLESS,
+                                duration: Math.floor(Math.random() * 5 + 1) * 60000
+                            },
+                            {
+                                start_time: defaultSleep.start_time,
+                                name: SleepPatternType.ASLEEP,
+                                duration: Math.floor(Math.random() * 120 + 1) * 60000
+                            },
+                            {
+                                start_time: defaultSleep.start_time,
+                                name: SleepPatternType.AWAKE,
+                                duration: Math.floor(Math.random() * 3 + 1) * 60000
+                            }
+                        ],
+                        child_id: defaultSleep.child_id
+                    })
+
+                    await createSleep({
+                        start_time: defaultSleep.start_time,
+                        end_time: defaultSleep.end_time,
+                        duration: defaultSleep.duration,
+                        pattern: [
+                            {
+                                start_time: defaultSleep.start_time,
+                                name: SleepPatternType.RESTLESS,
+                                duration: Math.floor(Math.random() * 5 + 1) * 60000
+                            },
+                            {
+                                start_time: defaultSleep.start_time,
+                                name: SleepPatternType.ASLEEP,
+                                duration: Math.floor(Math.random() * 120 + 1) * 60000
+                            },
+                            {
+                                start_time: defaultSleep.start_time,
+                                name: SleepPatternType.AWAKE,
+                                duration: Math.floor(Math.random() * 3 + 1) * 60000
+                            }
+                        ],
+                        child_id: new ObjectID()
+                    })
                 } catch (err) {
-                    console.log(err)
+                    throw new Error('Failure on users.children.sleep routes test: ' + err.message)
                 }
-
-                await createSleep({
-                    start_time: defaultSleep.start_time,
-                    end_time: defaultSleep.end_time,
-                    duration: defaultSleep.duration,
-                    pattern: [
-                        {
-                            start_time: defaultSleep.start_time,
-                            name: SleepPatternType.RESTLESS,
-                            duration: Math.floor(Math.random() * 5 + 1) * 60000
-                        },
-                        {
-                            start_time: defaultSleep.start_time,
-                            name: SleepPatternType.ASLEEP,
-                            duration: Math.floor(Math.random() * 120 + 1) * 60000
-                        },
-                        {
-                            start_time: defaultSleep.start_time,
-                            name: SleepPatternType.AWAKE,
-                            duration: Math.floor(Math.random() * 3 + 1) * 60000
-                        }
-                    ],
-                    child_id: defaultSleep.child_id
-                })
-
-                await createSleep({
-                    start_time: defaultSleep.start_time,
-                    end_time: defaultSleep.end_time,
-                    duration: defaultSleep.duration,
-                    pattern: [
-                        {
-                            start_time: defaultSleep.start_time,
-                            name: SleepPatternType.RESTLESS,
-                            duration: Math.floor(Math.random() * 5 + 1) * 60000
-                        },
-                        {
-                            start_time: defaultSleep.start_time,
-                            name: SleepPatternType.ASLEEP,
-                            duration: Math.floor(Math.random() * 120 + 1) * 60000
-                        },
-                        {
-                            start_time: defaultSleep.start_time,
-                            name: SleepPatternType.AWAKE,
-                            duration: Math.floor(Math.random() * 3 + 1) * 60000
-                        }
-                    ],
-                    child_id: new ObjectID()
-                })
 
                 const url = `/users/children/sleep?child_id=${defaultSleep.child_id}&fields=start_time,end_time,
                     duration,pattern,child_id&sort=child_id&page=1&limit=3`
@@ -462,7 +462,7 @@ describe('Routes: users.children.sleep', () => {
                 try {
                     await deleteAllSleep()
                 } catch (err) {
-                    console.log(err)
+                    throw new Error('Failure on users.children.sleep routes test: ' + err.message)
                 }
 
                 const url = `/users/children/sleep?child_id=${defaultSleep.child_id}&fields=start_time,end_time,
@@ -487,33 +487,33 @@ describe('Routes: users.children.sleep', () => {
             it('should return status code 200 and a list of all sleep of that specific child', async () => {
                 try {
                     await deleteAllSleep()
-                } catch (err) {
-                    console.log(err)
-                }
 
-                await createSleep({
-                    start_time: defaultSleep.start_time,
-                    end_time: defaultSleep.end_time,
-                    duration: defaultSleep.duration,
-                    pattern: [
-                        {
-                            start_time: defaultSleep.start_time,
-                            name: SleepPatternType.RESTLESS,
-                            duration: Math.floor(Math.random() * 5 + 1) * 60000
-                        },
-                        {
-                            start_time: defaultSleep.start_time,
-                            name: SleepPatternType.ASLEEP,
-                            duration: Math.floor(Math.random() * 120 + 1) * 60000
-                        },
-                        {
-                            start_time: defaultSleep.start_time,
-                            name: SleepPatternType.AWAKE,
-                            duration: Math.floor(Math.random() * 3 + 1) * 60000
-                        }
-                    ],
-                    child_id: defaultSleep.child_id
-                })
+                    await createSleep({
+                        start_time: defaultSleep.start_time,
+                        end_time: defaultSleep.end_time,
+                        duration: defaultSleep.duration,
+                        pattern: [
+                            {
+                                start_time: defaultSleep.start_time,
+                                name: SleepPatternType.RESTLESS,
+                                duration: Math.floor(Math.random() * 5 + 1) * 60000
+                            },
+                            {
+                                start_time: defaultSleep.start_time,
+                                name: SleepPatternType.ASLEEP,
+                                duration: Math.floor(Math.random() * 120 + 1) * 60000
+                            },
+                            {
+                                start_time: defaultSleep.start_time,
+                                name: SleepPatternType.AWAKE,
+                                duration: Math.floor(Math.random() * 3 + 1) * 60000
+                            }
+                        ],
+                        child_id: defaultSleep.child_id
+                    })
+                } catch (err) {
+                    throw new Error('Failure on users.children.sleep routes test: ' + err.message)
+                }
 
                 return request
                     .get(`/users/children/${defaultSleep.child_id}/sleep`)
@@ -541,7 +541,7 @@ describe('Routes: users.children.sleep', () => {
                 try {
                     await deleteAllSleep()
                 } catch (err) {
-                    console.log(err)
+                    throw new Error('Failure on users.children.sleep routes test: ' + err.message)
                 }
 
                 return request
@@ -559,33 +559,33 @@ describe('Routes: users.children.sleep', () => {
             it('should return status code 400 and an info message about the invalid child_id', async () => {
                 try {
                     await deleteAllSleep()
-                } catch (err) {
-                    console.log(err)
-                }
 
-                await createSleep({
-                    start_time: defaultSleep.start_time,
-                    end_time: defaultSleep.end_time,
-                    duration: defaultSleep.duration,
-                    pattern: [
-                        {
-                            start_time: defaultSleep.start_time,
-                            name: SleepPatternType.RESTLESS,
-                            duration: Math.floor(Math.random() * 5 + 1) * 60000
-                        },
-                        {
-                            start_time: defaultSleep.start_time,
-                            name: SleepPatternType.ASLEEP,
-                            duration: Math.floor(Math.random() * 120 + 1) * 60000
-                        },
-                        {
-                            start_time: defaultSleep.start_time,
-                            name: SleepPatternType.AWAKE,
-                            duration: Math.floor(Math.random() * 3 + 1) * 60000
-                        }
-                    ],
-                    child_id: defaultSleep.child_id
-                })
+                    await createSleep({
+                        start_time: defaultSleep.start_time,
+                        end_time: defaultSleep.end_time,
+                        duration: defaultSleep.duration,
+                        pattern: [
+                            {
+                                start_time: defaultSleep.start_time,
+                                name: SleepPatternType.RESTLESS,
+                                duration: Math.floor(Math.random() * 5 + 1) * 60000
+                            },
+                            {
+                                start_time: defaultSleep.start_time,
+                                name: SleepPatternType.ASLEEP,
+                                duration: Math.floor(Math.random() * 120 + 1) * 60000
+                            },
+                            {
+                                start_time: defaultSleep.start_time,
+                                name: SleepPatternType.AWAKE,
+                                duration: Math.floor(Math.random() * 3 + 1) * 60000
+                            }
+                        ],
+                        child_id: defaultSleep.child_id
+                    })
+                } catch (err) {
+                    throw new Error('Failure on users.children.sleep routes test: ' + err.message)
+                }
 
                 return request
                     .get(`/users/children/123/sleep`)
@@ -605,33 +605,33 @@ describe('Routes: users.children.sleep', () => {
             it('should return status code 200 and the result as needed in the query', async () => {
                 try {
                     await deleteAllSleep()
-                } catch (err) {
-                    console.log(err)
-                }
 
-                await createSleep({
-                    start_time: defaultSleep.start_time,
-                    end_time: defaultSleep.end_time,
-                    duration: defaultSleep.duration,
-                    pattern: [
-                        {
-                            start_time: defaultSleep.start_time,
-                            name: SleepPatternType.RESTLESS,
-                            duration: Math.floor(Math.random() * 5 + 1) * 60000
-                        },
-                        {
-                            start_time: defaultSleep.start_time,
-                            name: SleepPatternType.ASLEEP,
-                            duration: Math.floor(Math.random() * 120 + 1) * 60000
-                        },
-                        {
-                            start_time: defaultSleep.start_time,
-                            name: SleepPatternType.AWAKE,
-                            duration: Math.floor(Math.random() * 3 + 1) * 60000
-                        }
-                    ],
-                    child_id: defaultSleep.child_id
-                })
+                    await createSleep({
+                        start_time: defaultSleep.start_time,
+                        end_time: defaultSleep.end_time,
+                        duration: defaultSleep.duration,
+                        pattern: [
+                            {
+                                start_time: defaultSleep.start_time,
+                                name: SleepPatternType.RESTLESS,
+                                duration: Math.floor(Math.random() * 5 + 1) * 60000
+                            },
+                            {
+                                start_time: defaultSleep.start_time,
+                                name: SleepPatternType.ASLEEP,
+                                duration: Math.floor(Math.random() * 120 + 1) * 60000
+                            },
+                            {
+                                start_time: defaultSleep.start_time,
+                                name: SleepPatternType.AWAKE,
+                                duration: Math.floor(Math.random() * 3 + 1) * 60000
+                            }
+                        ],
+                        child_id: defaultSleep.child_id
+                    })
+                } catch (err) {
+                    throw new Error('Failure on users.children.sleep routes test: ' + err.message)
+                }
 
                 const url = `/users/children/${defaultSleep.child_id}/sleep?child_id=${defaultSleep.child_id}&fields=start_time,end_time,
                     duration,pattern,child_id&sort=child_id&page=1&limit=3`
@@ -663,7 +663,7 @@ describe('Routes: users.children.sleep', () => {
                 try {
                     await deleteAllSleep()
                 } catch (err) {
-                    console.log(err)
+                    throw new Error('Failure on users.children.sleep routes test: ' + err.message)
                 }
 
                 const url = `/users/children/${defaultSleep.child_id}/sleep?child_id=${defaultSleep.child_id}&fields=start_time,end_time,
@@ -685,33 +685,33 @@ describe('Routes: users.children.sleep', () => {
             it('should return status code 400 and an info message about the invalid child_id', async () => {
                 try {
                     await deleteAllSleep()
-                } catch (err) {
-                    console.log(err)
-                }
 
-                await createSleep({
-                    start_time: defaultSleep.start_time,
-                    end_time: defaultSleep.end_time,
-                    duration: defaultSleep.duration,
-                    pattern: [
-                        {
-                            start_time: defaultSleep.start_time,
-                            name: SleepPatternType.RESTLESS,
-                            duration: Math.floor(Math.random() * 5 + 1) * 60000
-                        },
-                        {
-                            start_time: defaultSleep.start_time,
-                            name: SleepPatternType.ASLEEP,
-                            duration: Math.floor(Math.random() * 120 + 1) * 60000
-                        },
-                        {
-                            start_time: defaultSleep.start_time,
-                            name: SleepPatternType.AWAKE,
-                            duration: Math.floor(Math.random() * 3 + 1) * 60000
-                        }
-                    ],
-                    child_id: defaultSleep.child_id
-                })
+                    await createSleep({
+                        start_time: defaultSleep.start_time,
+                        end_time: defaultSleep.end_time,
+                        duration: defaultSleep.duration,
+                        pattern: [
+                            {
+                                start_time: defaultSleep.start_time,
+                                name: SleepPatternType.RESTLESS,
+                                duration: Math.floor(Math.random() * 5 + 1) * 60000
+                            },
+                            {
+                                start_time: defaultSleep.start_time,
+                                name: SleepPatternType.ASLEEP,
+                                duration: Math.floor(Math.random() * 120 + 1) * 60000
+                            },
+                            {
+                                start_time: defaultSleep.start_time,
+                                name: SleepPatternType.AWAKE,
+                                duration: Math.floor(Math.random() * 3 + 1) * 60000
+                            }
+                        ],
+                        child_id: defaultSleep.child_id
+                    })
+                } catch (err) {
+                    throw new Error('Failure on users.children.sleep routes test: ' + err.message)
+                }
 
                 const url = `/users/children/123/sleep?child_id=${defaultSleep.child_id}&fields=start_time,end_time,
                     duration,pattern,child_id&sort=child_id&page=1&limit=3`
@@ -734,35 +734,37 @@ describe('Routes: users.children.sleep', () => {
     describe('GET /users/children/:child_id/sleep/:sleep_id', () => {
         context('when get a specific sleep of a child of the database successfully', () => {
             it('should return status code 200 and that specific sleep of that child', async () => {
+                let result
+
                 try {
                     await deleteAllSleep()
-                } catch (err) {
-                    console.log(err)
-                }
 
-                const result = await createSleep({
-                    start_time: defaultSleep.start_time,
-                    end_time: defaultSleep.end_time,
-                    duration: defaultSleep.duration,
-                    pattern: [
-                        {
-                            start_time: defaultSleep.start_time,
-                            name: SleepPatternType.RESTLESS,
-                            duration: Math.floor(Math.random() * 5 + 1) * 60000
-                        },
-                        {
-                            start_time: defaultSleep.start_time,
-                            name: SleepPatternType.ASLEEP,
-                            duration: Math.floor(Math.random() * 120 + 1) * 60000
-                        },
-                        {
-                            start_time: defaultSleep.start_time,
-                            name: SleepPatternType.AWAKE,
-                            duration: Math.floor(Math.random() * 3 + 1) * 60000
-                        }
-                    ],
-                    child_id: defaultSleep.child_id
-                })
+                    result = await createSleep({
+                        start_time: defaultSleep.start_time,
+                        end_time: defaultSleep.end_time,
+                        duration: defaultSleep.duration,
+                        pattern: [
+                            {
+                                start_time: defaultSleep.start_time,
+                                name: SleepPatternType.RESTLESS,
+                                duration: Math.floor(Math.random() * 5 + 1) * 60000
+                            },
+                            {
+                                start_time: defaultSleep.start_time,
+                                name: SleepPatternType.ASLEEP,
+                                duration: Math.floor(Math.random() * 120 + 1) * 60000
+                            },
+                            {
+                                start_time: defaultSleep.start_time,
+                                name: SleepPatternType.AWAKE,
+                                duration: Math.floor(Math.random() * 3 + 1) * 60000
+                            }
+                        ],
+                        child_id: defaultSleep.child_id
+                    })
+                } catch (err) {
+                    throw new Error('Failure on users.children.sleep routes test: ' + err.message)
+                }
 
                 return request
                     .get(`/users/children/${result.child_id}/sleep/${result.id}`)
@@ -787,7 +789,7 @@ describe('Routes: users.children.sleep', () => {
                 try {
                     await deleteAllSleep()
                 } catch (err) {
-                    console.log(err)
+                    throw new Error('Failure on users.children.sleep routes test: ' + err.message)
                 }
 
                 return request
@@ -805,35 +807,37 @@ describe('Routes: users.children.sleep', () => {
 
         context('when the child_id is invalid', () => {
             it('should return status code 400 and an info message about the invalid child_id', async () => {
+                let result
+
                 try {
                     await deleteAllSleep()
-                } catch (err) {
-                    console.log(err)
-                }
 
-                const result = await createSleep({
-                    start_time: defaultSleep.start_time,
-                    end_time: defaultSleep.end_time,
-                    duration: defaultSleep.duration,
-                    pattern: [
-                        {
-                            start_time: defaultSleep.start_time,
-                            name: SleepPatternType.RESTLESS,
-                            duration: Math.floor(Math.random() * 5 + 1) * 60000
-                        },
-                        {
-                            start_time: defaultSleep.start_time,
-                            name: SleepPatternType.ASLEEP,
-                            duration: Math.floor(Math.random() * 120 + 1) * 60000
-                        },
-                        {
-                            start_time: defaultSleep.start_time,
-                            name: SleepPatternType.AWAKE,
-                            duration: Math.floor(Math.random() * 3 + 1) * 60000
-                        }
-                    ],
-                    child_id: defaultSleep.child_id
-                })
+                    result = await createSleep({
+                        start_time: defaultSleep.start_time,
+                        end_time: defaultSleep.end_time,
+                        duration: defaultSleep.duration,
+                        pattern: [
+                            {
+                                start_time: defaultSleep.start_time,
+                                name: SleepPatternType.RESTLESS,
+                                duration: Math.floor(Math.random() * 5 + 1) * 60000
+                            },
+                            {
+                                start_time: defaultSleep.start_time,
+                                name: SleepPatternType.ASLEEP,
+                                duration: Math.floor(Math.random() * 120 + 1) * 60000
+                            },
+                            {
+                                start_time: defaultSleep.start_time,
+                                name: SleepPatternType.AWAKE,
+                                duration: Math.floor(Math.random() * 3 + 1) * 60000
+                            }
+                        ],
+                        child_id: defaultSleep.child_id
+                    })
+                } catch (err) {
+                    throw new Error('Failure on users.children.sleep routes test: ' + err.message)
+                }
 
                 return request
                     .get(`/users/children/123/sleep/${result.id}`)
@@ -849,35 +853,37 @@ describe('Routes: users.children.sleep', () => {
 
         context('when the sleep id is invalid', () => {
             it('should return status code 400 and an info message about the invalid sleep id', async () => {
+                let result
+
                 try {
                     await deleteAllSleep()
-                } catch (err) {
-                    console.log(err)
-                }
 
-                const result = await createSleep({
-                    start_time: defaultSleep.start_time,
-                    end_time: defaultSleep.end_time,
-                    duration: defaultSleep.duration,
-                    pattern: [
-                        {
-                            start_time: defaultSleep.start_time,
-                            name: SleepPatternType.RESTLESS,
-                            duration: Math.floor(Math.random() * 5 + 1) * 60000
-                        },
-                        {
-                            start_time: defaultSleep.start_time,
-                            name: SleepPatternType.ASLEEP,
-                            duration: Math.floor(Math.random() * 120 + 1) * 60000
-                        },
-                        {
-                            start_time: defaultSleep.start_time,
-                            name: SleepPatternType.AWAKE,
-                            duration: Math.floor(Math.random() * 3 + 1) * 60000
-                        }
-                    ],
-                    child_id: defaultSleep.child_id
-                })
+                    result = await createSleep({
+                        start_time: defaultSleep.start_time,
+                        end_time: defaultSleep.end_time,
+                        duration: defaultSleep.duration,
+                        pattern: [
+                            {
+                                start_time: defaultSleep.start_time,
+                                name: SleepPatternType.RESTLESS,
+                                duration: Math.floor(Math.random() * 5 + 1) * 60000
+                            },
+                            {
+                                start_time: defaultSleep.start_time,
+                                name: SleepPatternType.ASLEEP,
+                                duration: Math.floor(Math.random() * 120 + 1) * 60000
+                            },
+                            {
+                                start_time: defaultSleep.start_time,
+                                name: SleepPatternType.AWAKE,
+                                duration: Math.floor(Math.random() * 3 + 1) * 60000
+                            }
+                        ],
+                        child_id: defaultSleep.child_id
+                    })
+                } catch (err) {
+                    throw new Error('Failure on users.children.sleep routes test: ' + err.message)
+                }
 
                 return request
                     .get(`/users/children/${result.child_id}/sleep/123`)
@@ -895,35 +901,37 @@ describe('Routes: users.children.sleep', () => {
          */
         context('when get a specific sleep of a child using the "query-strings-parser" library', () => {
             it('should return status code 200 and the result as needed in the query', async () => {
+                let result
+
                 try {
                     await deleteAllSleep()
-                } catch (err) {
-                    console.log(err)
-                }
 
-                const result = await createSleep({
-                    start_time: defaultSleep.start_time,
-                    end_time: defaultSleep.end_time,
-                    duration: defaultSleep.duration,
-                    pattern: [
-                        {
-                            start_time: defaultSleep.start_time,
-                            name: SleepPatternType.RESTLESS,
-                            duration: Math.floor(Math.random() * 5 + 1) * 60000
-                        },
-                        {
-                            start_time: defaultSleep.start_time,
-                            name: SleepPatternType.ASLEEP,
-                            duration: Math.floor(Math.random() * 120 + 1) * 60000
-                        },
-                        {
-                            start_time: defaultSleep.start_time,
-                            name: SleepPatternType.AWAKE,
-                            duration: Math.floor(Math.random() * 3 + 1) * 60000
-                        }
-                    ],
-                    child_id: defaultSleep.child_id
-                })
+                    result = await createSleep({
+                        start_time: defaultSleep.start_time,
+                        end_time: defaultSleep.end_time,
+                        duration: defaultSleep.duration,
+                        pattern: [
+                            {
+                                start_time: defaultSleep.start_time,
+                                name: SleepPatternType.RESTLESS,
+                                duration: Math.floor(Math.random() * 5 + 1) * 60000
+                            },
+                            {
+                                start_time: defaultSleep.start_time,
+                                name: SleepPatternType.ASLEEP,
+                                duration: Math.floor(Math.random() * 120 + 1) * 60000
+                            },
+                            {
+                                start_time: defaultSleep.start_time,
+                                name: SleepPatternType.AWAKE,
+                                duration: Math.floor(Math.random() * 3 + 1) * 60000
+                            }
+                        ],
+                        child_id: defaultSleep.child_id
+                    })
+                } catch (err) {
+                    throw new Error('Failure on users.children.sleep routes test: ' + err.message)
+                }
 
                 const url = `/users/children/${result.child_id}/sleep/${result.id}?child_id=${result.child_id}&fields=start_time,end_time,
                     duration,pattern,child_id&sort=child_id&page=1&limit=3`
@@ -949,7 +957,7 @@ describe('Routes: users.children.sleep', () => {
                 try {
                     await deleteAllSleep()
                 } catch (err) {
-                    console.log(err)
+                    throw new Error('Failure on users.children.sleep routes test: ' + err.message)
                 }
 
                 const url = `/users/children/${defaultSleep.child_id}/sleep/${defaultSleep.id}?child_id=${defaultSleep.child_id}
@@ -971,35 +979,37 @@ describe('Routes: users.children.sleep', () => {
         context('when there is an attempt to get a specific sleep using the "query-strings-parser" library but the ' +
             'child_id is invalid', () => {
             it('should return status code 400 and an info message about the invalid child_id', async () => {
+                let result
+
                 try {
                     await deleteAllSleep()
-                } catch (err) {
-                    console.log(err)
-                }
 
-                const result = await createSleep({
-                    start_time: defaultSleep.start_time,
-                    end_time: defaultSleep.end_time,
-                    duration: defaultSleep.duration,
-                    pattern: [
-                        {
-                            start_time: defaultSleep.start_time,
-                            name: SleepPatternType.RESTLESS,
-                            duration: Math.floor(Math.random() * 5 + 1) * 60000
-                        },
-                        {
-                            start_time: defaultSleep.start_time,
-                            name: SleepPatternType.ASLEEP,
-                            duration: Math.floor(Math.random() * 120 + 1) * 60000
-                        },
-                        {
-                            start_time: defaultSleep.start_time,
-                            name: SleepPatternType.AWAKE,
-                            duration: Math.floor(Math.random() * 3 + 1) * 60000
-                        }
-                    ],
-                    child_id: defaultSleep.child_id
-                })
+                    result = await createSleep({
+                        start_time: defaultSleep.start_time,
+                        end_time: defaultSleep.end_time,
+                        duration: defaultSleep.duration,
+                        pattern: [
+                            {
+                                start_time: defaultSleep.start_time,
+                                name: SleepPatternType.RESTLESS,
+                                duration: Math.floor(Math.random() * 5 + 1) * 60000
+                            },
+                            {
+                                start_time: defaultSleep.start_time,
+                                name: SleepPatternType.ASLEEP,
+                                duration: Math.floor(Math.random() * 120 + 1) * 60000
+                            },
+                            {
+                                start_time: defaultSleep.start_time,
+                                name: SleepPatternType.AWAKE,
+                                duration: Math.floor(Math.random() * 3 + 1) * 60000
+                            }
+                        ],
+                        child_id: defaultSleep.child_id
+                    })
+                } catch (err) {
+                    throw new Error('Failure on users.children.sleep routes test: ' + err.message)
+                }
 
                 const url = `/users/children/123/sleep/${result.id}?child_id=${result.child_id}&fields=start_time,end_time,
                     duration,pattern,child_id&sort=child_id&page=1&limit=3`
@@ -1019,35 +1029,37 @@ describe('Routes: users.children.sleep', () => {
         context('when there is an attempt to get a specific sleep using the "query-strings-parser" library but the ' +
             'sleep id is invalid', () => {
             it('should return status code 400 and an info message about the invalid sleep id', async () => {
+                let result
+
                 try {
                     await deleteAllSleep()
-                } catch (err) {
-                    console.log(err)
-                }
 
-                const result = await createSleep({
-                    start_time: defaultSleep.start_time,
-                    end_time: defaultSleep.end_time,
-                    duration: defaultSleep.duration,
-                    pattern: [
-                        {
-                            start_time: defaultSleep.start_time,
-                            name: SleepPatternType.RESTLESS,
-                            duration: Math.floor(Math.random() * 5 + 1) * 60000
-                        },
-                        {
-                            start_time: defaultSleep.start_time,
-                            name: SleepPatternType.ASLEEP,
-                            duration: Math.floor(Math.random() * 120 + 1) * 60000
-                        },
-                        {
-                            start_time: defaultSleep.start_time,
-                            name: SleepPatternType.AWAKE,
-                            duration: Math.floor(Math.random() * 3 + 1) * 60000
-                        }
-                    ],
-                    child_id: defaultSleep.child_id
-                })
+                    result = await createSleep({
+                        start_time: defaultSleep.start_time,
+                        end_time: defaultSleep.end_time,
+                        duration: defaultSleep.duration,
+                        pattern: [
+                            {
+                                start_time: defaultSleep.start_time,
+                                name: SleepPatternType.RESTLESS,
+                                duration: Math.floor(Math.random() * 5 + 1) * 60000
+                            },
+                            {
+                                start_time: defaultSleep.start_time,
+                                name: SleepPatternType.ASLEEP,
+                                duration: Math.floor(Math.random() * 120 + 1) * 60000
+                            },
+                            {
+                                start_time: defaultSleep.start_time,
+                                name: SleepPatternType.AWAKE,
+                                duration: Math.floor(Math.random() * 3 + 1) * 60000
+                            }
+                        ],
+                        child_id: defaultSleep.child_id
+                    })
+                } catch (err) {
+                    throw new Error('Failure on users.children.sleep routes test: ' + err.message)
+                }
 
                 const url = `/users/children/${result.child_id}/sleep/123?child_id=${result.child_id}&fields=start_time,end_time,
                     duration,pattern,child_id&sort=child_id&page=1&limit=3`
@@ -1070,14 +1082,16 @@ describe('Routes: users.children.sleep', () => {
     describe('PATCH /users/children/:child_id/sleep/:sleep_id', () => {
         context('when this sleep exists in the database and is updated successfully', () => {
             it('should return status code 200 and the updated Sleep', async () => {
+                let result
+
                 try {
                     await deleteAllSleep()
-                } catch (err) {
-                    console.log(err)
-                }
 
-                // Sleep to be updated
-                const result = await createSleepToBeUpdated(defaultSleep)
+                    // Sleep to be updated
+                    result = await createSleepToBeUpdated(defaultSleep)
+                } catch (err) {
+                    throw new Error('Failure on users.children.sleep routes test: ' + err.message)
+                }
 
                 // Sleep to update
                 const body = {
@@ -1109,7 +1123,7 @@ describe('Routes: users.children.sleep', () => {
                 try {
                     await deleteAllSleep()
                 } catch (err) {
-                    console.log(err)
+                    throw new Error('Failure on users.children.sleep routes test: ' + err.message)
                 }
 
                 // Sleep to update
@@ -1136,14 +1150,16 @@ describe('Routes: users.children.sleep', () => {
 
         context('when the child_id is invalid', () => {
             it('should return status code 400 and an info message about the invalid child_id', async () => {
+                let result
+
                 try {
                     await deleteAllSleep()
-                } catch (err) {
-                    console.log(err)
-                }
 
-                // Sleep to be updated
-                const result = await createSleepToBeUpdated(defaultSleep)
+                    // Sleep to be updated
+                    result = await createSleepToBeUpdated(defaultSleep)
+                } catch (err) {
+                    throw new Error('Failure on users.children.sleep routes test: ' + err.message)
+                }
 
                 // Sleep to update
                 const body = {
@@ -1168,14 +1184,16 @@ describe('Routes: users.children.sleep', () => {
 
         context('when the sleep id is invalid', () => {
             it('should return status code 400 and an info message about the invalid sleep id', async () => {
+                let result
+
                 try {
                     await deleteAllSleep()
-                } catch (err) {
-                    console.log(err)
-                }
 
-                // Sleep to be updated
-                const result = await createSleepToBeUpdated(defaultSleep)
+                    // Sleep to be updated
+                    result = await createSleepToBeUpdated(defaultSleep)
+                } catch (err) {
+                    throw new Error('Failure on users.children.sleep routes test: ' + err.message)
+                }
 
                 // Sleep to update
                 const body = {
@@ -1200,14 +1218,16 @@ describe('Routes: users.children.sleep', () => {
 
         context('when a validation error occurs (the duration is negative)', () => {
             it('should return status code 400 and info message about the invalid duration', async () => {
+                let result
+
                 try {
                     await deleteAllSleep()
-                } catch (err) {
-                    console.log(err)
-                }
 
-                // Sleep to be updated
-                const result = await createSleepToBeUpdated(defaultSleep)
+                    // Sleep to be updated
+                    result = await createSleepToBeUpdated(defaultSleep)
+                } catch (err) {
+                    throw new Error('Failure on users.children.sleep routes test: ' + err.message)
+                }
 
                 // Sleep to update
                 const body = {
@@ -1229,14 +1249,16 @@ describe('Routes: users.children.sleep', () => {
 
         context('when a validation error occurs (missing data_set of pattern)', () => {
             it('should return status code 400 and info message about the invalid pattern', async () => {
+                let result
+
                 try {
                     await deleteAllSleep()
-                } catch (err) {
-                    console.log(err)
-                }
 
-                // Sleep to be updated
-                const result = await createSleepToBeUpdated(defaultSleep)
+                    // Sleep to be updated
+                    result = await createSleepToBeUpdated(defaultSleep)
+                } catch (err) {
+                    throw new Error('Failure on users.children.sleep routes test: ' + err.message)
+                }
 
                 // Sleep to update
                 const body = {
@@ -1261,14 +1283,16 @@ describe('Routes: users.children.sleep', () => {
 
         context('when a validation error occurs (the pattern has an empty data_set array)', () => {
             it('should return status code 400 and info message about the invalid data_set array of pattern', async () => {
+                let result
+
                 try {
                     await deleteAllSleep()
-                } catch (err) {
-                    console.log(err)
-                }
 
-                // Sleep to be updated
-                const result = await createSleepToBeUpdated(defaultSleep)
+                    // Sleep to be updated
+                    result = await createSleepToBeUpdated(defaultSleep)
+                } catch (err) {
+                    throw new Error('Failure on users.children.sleep routes test: ' + err.message)
+                }
 
                 // Sleep to update
                 const body = {
@@ -1295,14 +1319,16 @@ describe('Routes: users.children.sleep', () => {
 
         context('when a validation error occurs (missing fields of some item from the data_set array of pattern)', () => {
             it('should return status code 400 and info message about the invalid data_set array of pattern', async () => {
+                let result
+
                 try {
                     await deleteAllSleep()
-                } catch (err) {
-                    console.log(err)
-                }
 
-                // Sleep to be updated
-                const result = await createSleepToBeUpdated(defaultSleep)
+                    // Sleep to be updated
+                    result = await createSleepToBeUpdated(defaultSleep)
+                } catch (err) {
+                    throw new Error('Failure on users.children.sleep routes test: ' + err.message)
+                }
 
                 // Sleep to update
                 const body = {
@@ -1332,14 +1358,16 @@ describe('Routes: users.children.sleep', () => {
 
         context('when a validation error occurs (there is a negative duration on some item from the data_set array of pattern)', () => {
             it('should return status code 400 and info message about the invalid data_set array of pattern', async () => {
+                let result
+
                 try {
                     await deleteAllSleep()
-                } catch (err) {
-                    console.log(err)
-                }
 
-                // Sleep to be updated
-                const result = await createSleepToBeUpdated(defaultSleep)
+                    // Sleep to be updated
+                    result = await createSleepToBeUpdated(defaultSleep)
+                } catch (err) {
+                    throw new Error('Failure on users.children.sleep routes test: ' + err.message)
+                }
 
                 // Sleep to update
                 const body = {
@@ -1377,35 +1405,37 @@ describe('Routes: users.children.sleep', () => {
     describe('DELETE /users/children/:child_id/sleep/:sleep_id', () => {
         context('when the sleep was deleted successfully', () => {
             it('should return status code 204 and no content for sleep', async () => {
+                let result
+
                 try {
                     await deleteAllSleep()
-                } catch (err) {
-                    console.log(err)
-                }
 
-                const result = await createSleep({
-                    start_time: defaultSleep.start_time,
-                    end_time: defaultSleep.end_time,
-                    duration: defaultSleep.duration,
-                    pattern: [
-                        {
-                            start_time: defaultSleep.start_time,
-                            name: SleepPatternType.RESTLESS,
-                            duration: Math.floor(Math.random() * 5 + 1) * 60000
-                        },
-                        {
-                            start_time: defaultSleep.start_time,
-                            name: SleepPatternType.ASLEEP,
-                            duration: Math.floor(Math.random() * 120 + 1) * 60000
-                        },
-                        {
-                            start_time: defaultSleep.start_time,
-                            name: SleepPatternType.AWAKE,
-                            duration: Math.floor(Math.random() * 3 + 1) * 60000
-                        }
-                    ],
-                    child_id: defaultSleep.child_id
-                })
+                    result = await createSleep({
+                        start_time: defaultSleep.start_time,
+                        end_time: defaultSleep.end_time,
+                        duration: defaultSleep.duration,
+                        pattern: [
+                            {
+                                start_time: defaultSleep.start_time,
+                                name: SleepPatternType.RESTLESS,
+                                duration: Math.floor(Math.random() * 5 + 1) * 60000
+                            },
+                            {
+                                start_time: defaultSleep.start_time,
+                                name: SleepPatternType.ASLEEP,
+                                duration: Math.floor(Math.random() * 120 + 1) * 60000
+                            },
+                            {
+                                start_time: defaultSleep.start_time,
+                                name: SleepPatternType.AWAKE,
+                                duration: Math.floor(Math.random() * 3 + 1) * 60000
+                            }
+                        ],
+                        child_id: defaultSleep.child_id
+                    })
+                } catch (err) {
+                    throw new Error('Failure on users.children.sleep routes test: ' + err.message)
+                }
 
                 return request
                     .delete(`/users/children/${result.child_id}/sleep/${result.id}`)
@@ -1422,7 +1452,7 @@ describe('Routes: users.children.sleep', () => {
                 try {
                     await deleteAllSleep()
                 } catch (err) {
-                    console.log(err)
+                    throw new Error('Failure on users.children.sleep routes test: ' + err.message)
                 }
 
                 return request
@@ -1437,35 +1467,37 @@ describe('Routes: users.children.sleep', () => {
 
         context('when the child_id is invalid', () => {
             it('should return status code 400 and an info message about the invalid child_id', async () => {
+                let result
+
                 try {
                     await deleteAllSleep()
-                } catch (err) {
-                    console.log(err)
-                }
 
-                const result = await createSleep({
-                    start_time: defaultSleep.start_time,
-                    end_time: defaultSleep.end_time,
-                    duration: defaultSleep.duration,
-                    pattern: [
-                        {
-                            start_time: defaultSleep.start_time,
-                            name: SleepPatternType.RESTLESS,
-                            duration: Math.floor(Math.random() * 5 + 1) * 60000
-                        },
-                        {
-                            start_time: defaultSleep.start_time,
-                            name: SleepPatternType.ASLEEP,
-                            duration: Math.floor(Math.random() * 120 + 1) * 60000
-                        },
-                        {
-                            start_time: defaultSleep.start_time,
-                            name: SleepPatternType.AWAKE,
-                            duration: Math.floor(Math.random() * 3 + 1) * 60000
-                        }
-                    ],
-                    child_id: defaultSleep.child_id
-                })
+                    result = await createSleep({
+                        start_time: defaultSleep.start_time,
+                        end_time: defaultSleep.end_time,
+                        duration: defaultSleep.duration,
+                        pattern: [
+                            {
+                                start_time: defaultSleep.start_time,
+                                name: SleepPatternType.RESTLESS,
+                                duration: Math.floor(Math.random() * 5 + 1) * 60000
+                            },
+                            {
+                                start_time: defaultSleep.start_time,
+                                name: SleepPatternType.ASLEEP,
+                                duration: Math.floor(Math.random() * 120 + 1) * 60000
+                            },
+                            {
+                                start_time: defaultSleep.start_time,
+                                name: SleepPatternType.AWAKE,
+                                duration: Math.floor(Math.random() * 3 + 1) * 60000
+                            }
+                        ],
+                        child_id: defaultSleep.child_id
+                    })
+                } catch (err) {
+                    throw new Error('Failure on users.children.sleep routes test: ' + err.message)
+                }
 
                 return request
                     .delete(`/users/children/123/sleep/${result.id}`)
@@ -1481,35 +1513,37 @@ describe('Routes: users.children.sleep', () => {
 
         context('when the sleep id is invalid', () => {
             it('should return status code 400 and an info message about the invalid sleep id', async () => {
+                let result
+
                 try {
                     await deleteAllSleep()
-                } catch (err) {
-                    console.log(err)
-                }
 
-                const result = await createSleep({
-                    start_time: defaultSleep.start_time,
-                    end_time: defaultSleep.end_time,
-                    duration: defaultSleep.duration,
-                    pattern: [
-                        {
-                            start_time: defaultSleep.start_time,
-                            name: SleepPatternType.RESTLESS,
-                            duration: Math.floor(Math.random() * 5 + 1) * 60000
-                        },
-                        {
-                            start_time: defaultSleep.start_time,
-                            name: SleepPatternType.ASLEEP,
-                            duration: Math.floor(Math.random() * 120 + 1) * 60000
-                        },
-                        {
-                            start_time: defaultSleep.start_time,
-                            name: SleepPatternType.AWAKE,
-                            duration: Math.floor(Math.random() * 3 + 1) * 60000
-                        }
-                    ],
-                    child_id: defaultSleep.child_id
-                })
+                    result = await createSleep({
+                        start_time: defaultSleep.start_time,
+                        end_time: defaultSleep.end_time,
+                        duration: defaultSleep.duration,
+                        pattern: [
+                            {
+                                start_time: defaultSleep.start_time,
+                                name: SleepPatternType.RESTLESS,
+                                duration: Math.floor(Math.random() * 5 + 1) * 60000
+                            },
+                            {
+                                start_time: defaultSleep.start_time,
+                                name: SleepPatternType.ASLEEP,
+                                duration: Math.floor(Math.random() * 120 + 1) * 60000
+                            },
+                            {
+                                start_time: defaultSleep.start_time,
+                                name: SleepPatternType.AWAKE,
+                                duration: Math.floor(Math.random() * 3 + 1) * 60000
+                            }
+                        ],
+                        child_id: defaultSleep.child_id
+                    })
+                } catch (err) {
+                    throw new Error('Failure on users.children.sleep routes test: ' + err.message)
+                }
 
                 return request
                     .delete(`/users/children/${result.child_id}/sleep/123`)

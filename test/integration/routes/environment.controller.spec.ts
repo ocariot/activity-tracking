@@ -233,29 +233,33 @@ describe('Routes: environments', () => {
     describe('GET /environments', () => {
         context('when get all environment of the database successfully', () => {
             it('should return status code 200 and a list of environments found', async () => {
-                await createEnvironment({
-                    institution_id: defaultEnvironment.institution_id,
-                    location: {
-                        local: 'Indoor',
-                        room: 'room 01',
-                        latitude: '-7.2100766',
-                        longitude: '-35.9175756'
-                    },
-                    measurements: [
-                        {
-                            type: MeasurementType.TEMPERATURE,
-                            value: defaultEnvironment.measurements![0].value,
-                            unit: '°C'
+                try {
+                    await createEnvironment({
+                        institution_id: defaultEnvironment.institution_id,
+                        location: {
+                            local: 'Indoor',
+                            room: 'room 01',
+                            latitude: '-7.2100766',
+                            longitude: '-35.9175756'
                         },
-                        {
-                            type: MeasurementType.HUMIDITY,
-                            value: defaultEnvironment.measurements![1].value,
-                            unit: '%'
-                        }
-                    ],
-                    climatized: defaultEnvironment.climatized,
-                    timestamp: new Date(2019)
-                })
+                        measurements: [
+                            {
+                                type: MeasurementType.TEMPERATURE,
+                                value: defaultEnvironment.measurements![0].value,
+                                unit: '°C'
+                            },
+                            {
+                                type: MeasurementType.HUMIDITY,
+                                value: defaultEnvironment.measurements![1].value,
+                                unit: '%'
+                            }
+                        ],
+                        climatized: defaultEnvironment.climatized,
+                        timestamp: new Date(2019)
+                    })
+                } catch (err) {
+                    throw new Error('Failure on environments routes test: ' + err.message)
+                }
 
                 return request
                     .get('/environments')
@@ -291,7 +295,7 @@ describe('Routes: environments', () => {
                 try {
                     await deleteAllEnvironments()
                 } catch (err) {
-                    console.log(err)
+                    throw new Error('Failure on environments routes test: ' + err.message)
                 }
 
                 return request
@@ -309,53 +313,57 @@ describe('Routes: environments', () => {
          */
         context('when get environment using the "query-strings-parser" library', () => {
             it('should return status code 200 and the result as needed in the query', async () => {
-                await createEnvironment({
-                    institution_id: defaultEnvironment.institution_id,
-                    location: {
-                        local: 'Indoor',
-                        room: 'room 01',
-                        latitude: '-7.2100766',
-                        longitude: '-35.9175756'
-                    },
-                    measurements: [
-                        {
-                            type: MeasurementType.TEMPERATURE,
-                            value: 34,
-                            unit: '°C'
+                try {
+                    await createEnvironment({
+                        institution_id: defaultEnvironment.institution_id,
+                        location: {
+                            local: 'Indoor',
+                            room: 'room 01',
+                            latitude: '-7.2100766',
+                            longitude: '-35.9175756'
                         },
-                        {
-                            type: MeasurementType.HUMIDITY,
-                            value: 40,
-                            unit: '%'
-                        }
-                    ],
-                    climatized: true,
-                    timestamp: defaultEnvironment.timestamp
-                })
+                        measurements: [
+                            {
+                                type: MeasurementType.TEMPERATURE,
+                                value: 34,
+                                unit: '°C'
+                            },
+                            {
+                                type: MeasurementType.HUMIDITY,
+                                value: 40,
+                                unit: '%'
+                            }
+                        ],
+                        climatized: true,
+                        timestamp: defaultEnvironment.timestamp
+                    })
 
-                await createEnvironment({
-                    institution_id: defaultEnvironment.institution_id,
-                    location: {
-                        local: 'indoor',
-                        room: 'room 01',
-                        latitude: '34.54323217',
-                        longitude: '7.54534798'
-                    },
-                    measurements: [
-                        {
-                            type: MeasurementType.HUMIDITY,
-                            value: 32,
-                            unit: '%'
+                    await createEnvironment({
+                        institution_id: defaultEnvironment.institution_id,
+                        location: {
+                            local: 'indoor',
+                            room: 'room 01',
+                            latitude: '34.54323217',
+                            longitude: '7.54534798'
                         },
-                        {
-                            type: MeasurementType.TEMPERATURE,
-                            value: 38,
-                            unit: '°C'
-                        }
-                    ],
-                    climatized: false,
-                    timestamp: defaultEnvironment.timestamp
-                })
+                        measurements: [
+                            {
+                                type: MeasurementType.HUMIDITY,
+                                value: 32,
+                                unit: '%'
+                            },
+                            {
+                                type: MeasurementType.TEMPERATURE,
+                                value: 38,
+                                unit: '°C'
+                            }
+                        ],
+                        climatized: false,
+                        timestamp: defaultEnvironment.timestamp
+                    })
+                } catch (err) {
+                    throw new Error('Failure on environments routes test: ' + err.message)
+                }
 
                 const url = '/environments?climatized=true&fields=institution_id,location,measurements,' +
                     'climatized,timestamp&sort=institution_id&page=1&limit=3'
@@ -395,7 +403,7 @@ describe('Routes: environments', () => {
                 try {
                     deleteAllEnvironments()
                 } catch (err) {
-                    console.log(err)
+                    throw new Error('Failure on environments routes test: ' + err.message)
                 }
 
                 const url = '/environments?climatized=true&fields=institution_id,location,measurements,' +
@@ -418,29 +426,35 @@ describe('Routes: environments', () => {
     describe('DELETE /environments/:environment_id', () => {
         context('when the environment was deleted successfully', () => {
             it('should return status code 204 and no content for environment', async () => {
-                const result = await createEnvironment({
-                    institution_id: defaultEnvironment.institution_id,
-                    location: {
-                        local: (defaultEnvironment.location) ? defaultEnvironment.location.local : '',
-                        room: (defaultEnvironment.location) ? defaultEnvironment.location.room : '',
-                        latitude: (defaultEnvironment.location) ? defaultEnvironment.location.latitude : '',
-                        longitude: (defaultEnvironment.location) ? defaultEnvironment.location.longitude : ''
-                    },
-                    measurements: [
-                        {
-                            type: MeasurementType.HUMIDITY,
-                            value: 34,
-                            unit: '%'
+                let result
+
+                try {
+                    result = await createEnvironment({
+                        institution_id: defaultEnvironment.institution_id,
+                        location: {
+                            local: (defaultEnvironment.location) ? defaultEnvironment.location.local : '',
+                            room: (defaultEnvironment.location) ? defaultEnvironment.location.room : '',
+                            latitude: (defaultEnvironment.location) ? defaultEnvironment.location.latitude : '',
+                            longitude: (defaultEnvironment.location) ? defaultEnvironment.location.longitude : ''
                         },
-                        {
-                            type: MeasurementType.TEMPERATURE,
-                            value: 40,
-                            unit: '°C'
-                        }
-                    ],
-                    climatized: true,
-                    timestamp: defaultEnvironment.timestamp
-                })
+                        measurements: [
+                            {
+                                type: MeasurementType.HUMIDITY,
+                                value: 34,
+                                unit: '%'
+                            },
+                            {
+                                type: MeasurementType.TEMPERATURE,
+                                value: 40,
+                                unit: '°C'
+                            }
+                        ],
+                        climatized: true,
+                        timestamp: defaultEnvironment.timestamp
+                    })
+                } catch (err) {
+                    throw new Error('Failure on environments routes test: ' + err.message)
+                }
 
                 return request
                     .delete(`/environments/${result.id}`)
@@ -457,7 +471,7 @@ describe('Routes: environments', () => {
                 try {
                     deleteAllEnvironments()
                 } catch (err) {
-                    console.log(err)
+                    throw new Error('Failure on environments routes test: ' + err.message)
                 }
 
                 return request
@@ -475,7 +489,7 @@ describe('Routes: environments', () => {
                 try {
                     deleteAllEnvironments()
                 } catch (err) {
-                    console.log(err)
+                    throw new Error('Failure on environments routes test: ' + err.message)
                 }
 
                 return request
