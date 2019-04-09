@@ -58,7 +58,7 @@ export class ActivityController {
     }
 
     /**
-     * Add new physical physicalactivity.
+     * Add new physical physicalactivity or multiple new physical activities.
      *
      * @param {Request} req
      * @param {Response} res
@@ -66,6 +66,19 @@ export class ActivityController {
     @httpPost('/:child_id/physicalactivities')
     public async saveActivity(@request() req: Request, @response() res: Response) {
         try {
+            // Multiple items of PhysicalActivity
+            if (req.body instanceof Array) {
+                const activitiesArr: Array<PhysicalActivity> = req.body.map(item => {
+                    const activityItem: PhysicalActivity = new PhysicalActivity().fromJSON(item)
+                    activityItem.child_id = req.params.child_id
+                    return activityItem
+                })
+
+                const resultMultiStatus: MultiStatus<PhysicalActivity> = await this._activityService.add(activitiesArr)
+                return res.status(HttpStatus.CREATED).send(resultMultiStatus)
+            }
+
+            // Only one item
             const physicalActivity: PhysicalActivity = new PhysicalActivity().fromJSON(req.body)
             physicalActivity.child_id = req.params.child_id
 

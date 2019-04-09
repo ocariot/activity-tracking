@@ -8,8 +8,9 @@ import { ConflictException } from '../../src/application/domain/exception/confli
 import { Environment } from '../../src/application/domain/model/environment'
 import { Log } from '../../src/application/domain/model/log'
 import { CreateEnvironmentValidator } from '../../src/application/domain/validator/create.environment.validator'
+import { PhysicalActivity } from '../../src/application/domain/model/physical.activity'
 
-export class MultiStatusMock<T> extends MultiStatus<Log | Environment> {
+export class MultiStatusMock<T> extends MultiStatus<Log | Environment | PhysicalActivity> {
 
     public generateMultiStatus(itemsArr: Array<T>): MultiStatus<T> {
         const multiStatus: MultiStatus<T> = new MultiStatus<T>()

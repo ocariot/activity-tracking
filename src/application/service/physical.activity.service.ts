@@ -1,3 +1,4 @@
+import HttpStatus from 'http-status-codes'
 import { inject, injectable } from 'inversify'
 import { Identifier } from '../../di/identifiers'
 import { IPhysicalActivityService } from '../port/physical.activity.service.interface'
@@ -14,6 +15,10 @@ import { ObjectIdValidator } from '../domain/validator/object.id.validator'
 import { Strings } from '../../utils/strings'
 import { IIntegrationEventRepository } from '../port/integration.event.repository.interface'
 import { IntegrationEvent } from '../integration-event/event/integration.event'
+import { MultiStatus } from '../domain/model/multi.status'
+import { StatusSuccess } from '../domain/model/status.success'
+import { StatusError } from '../domain/model/status.error'
+import { ValidationException } from '../domain/exception/validation.exception'
 
 /**
  * Implementing physicalactivity Service.
@@ -30,14 +35,94 @@ export class PhysicalActivityService implements IPhysicalActivityService {
     }
 
     /**
-     * Adds a new physicalactivity.
-     * Before adding, it is checked whether the physicalactivity already exists.
+     * Adds a new PhysicalActivity or a list of PhysicalActivity.
      *
-     * @param {PhysicalActivity} activity
-     * @returns {(Promise<PhysicalActivity>)}
+     * @param {PhysicalActivity | Array<PhysicalActivity>} activity
+     * @returns {(Promise<PhysicalActivity | MultiStatus<PhysicalActivity>)}
      * @throws {ConflictException | RepositoryException} If a data conflict occurs, as an existing physicalactivity.
      */
-    public async add(activity: PhysicalActivity): Promise<PhysicalActivity> {
+    public async add(activity: PhysicalActivity | Array<PhysicalActivity>): Promise<PhysicalActivity | MultiStatus<PhysicalActivity>> {
+        try {
+            // Multiple items of PhysicalActivity
+            if (activity instanceof Array) {
+                return await this.addMultipleActivities(activity)
+            }
+            // Only one item
+            return await this.addActivity(activity)
+        } catch (err) {
+            return Promise.reject(err)
+        }
+    }
+
+    /**
+     * Adds the data of multiple items of PhysicalActivity.
+     * Before adding, it is checked whether each of the activities already exists.
+     *
+     * @param environment
+     * @return {Promise<MultiStatus<Environment>>}
+     * @throws {ValidationException | ConflictException | RepositoryException}
+     */
+    private async addMultipleActivities(activity: Array<PhysicalActivity>): Promise<MultiStatus<PhysicalActivity>> {
+        const multiStatus: MultiStatus<PhysicalActivity> = new MultiStatus<PhysicalActivity>()
+        const statusSuccessArr: Array<StatusSuccess<PhysicalActivity>> = new Array<StatusSuccess<PhysicalActivity>>()
+        const statusErrorArr: Array<StatusError<PhysicalActivity>> = new Array<StatusError<PhysicalActivity>>()
+
+        for (const elem of activity) {
+            try {
+                // 1. Validate the object.
+                CreatePhysicalActivityValidator.validate(elem)
+
+                // 2. Checks if physical activity already exists.
+                const activityExist = await this._activityRepository.checkExist(elem)
+                if (activityExist) throw new ConflictException('Physical Activity is already registered...')
+
+                // 3. Create new physical activity register.
+                const activitySaved: PhysicalActivity = await this._activityRepository.create(elem)
+
+                // 4. If created successfully, the object is published on the message bus.
+                if (activitySaved) {
+                    const event: PhysicalActivityEvent = new PhysicalActivityEvent('PhysicalActivitySaveEvent',
+                        new Date(), activitySaved)
+                    if (!(await this._eventBus.publish(event, 'activities.save'))) {
+                        // 5. Save Event for submission attempt later when there is connection to message channel.
+                        this.saveEvent(event)
+                    } else {
+                        this._logger.info(`Physical Activity with ID: ${activitySaved.id} published on event bus...`)
+                    }
+                }
+
+                // 6a. Create a StatusSuccess object for the construction of the MultiStatus response.
+                const statusSuccess: StatusSuccess<PhysicalActivity> = new StatusSuccess<PhysicalActivity>(HttpStatus.CREATED, elem)
+                statusSuccessArr.push(statusSuccess)
+            } catch (err) {
+                let statusCode: number = HttpStatus.INTERNAL_SERVER_ERROR
+                if (err instanceof ValidationException) statusCode = HttpStatus.BAD_REQUEST
+                if (err instanceof ConflictException) statusCode = HttpStatus.CONFLICT
+
+                // 6b. Create a StatusError object for the construction of the MultiStatus response.
+                const statusError: StatusError<PhysicalActivity> = new StatusError<PhysicalActivity>(statusCode, err.message,
+                    err.description, elem)
+                statusErrorArr.push(statusError)
+            }
+        }
+
+        // 7. Build the MultiStatus response.
+        multiStatus.success = statusSuccessArr
+        multiStatus.error = statusErrorArr
+
+        // 8. Returns the created MultiStatus object.
+        return Promise.resolve(multiStatus)
+    }
+
+    /**
+     * Adds the data of one item of PhysicalActivity.
+     * Before adding, it is checked whether the activity already exists.
+     *
+     * @param activity PhysicalActivity
+     * @return {Promise<Activity>}
+     * @throws {ValidationException | ConflictException | RepositoryException}
+     */
+    private async addActivity(activity: PhysicalActivity): Promise<PhysicalActivity> {
         try {
             // 1. Validate the object.
             CreatePhysicalActivityValidator.validate(activity)

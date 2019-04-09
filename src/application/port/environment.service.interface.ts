@@ -8,11 +8,11 @@ import { Environment } from '../domain/model/environment'
  */
 export interface IEnvironmentService extends IService<Environment> {
     /**
-     * Add a new item.
+     * Add a new Environment or a list of Environments.
      *
-     * @param item T to insert.
-     * @return {Promise<T>}
+     * @param environment Environment | Array<Environment> to insert.
+     * @return {Promise<Environment | any>}
      * @throws {ValidationException | ConflictException | RepositoryException}
      */
-    add(item: Environment | Array<Environment>): Promise<Environment | any>
+    add(environment: Environment | Array<Environment>): Promise<Environment | any>
 }

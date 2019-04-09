@@ -60,7 +60,7 @@ export class EnvironmentService implements IEnvironmentService {
      *
      * @param environment
      * @return {Promise<MultiStatus<Environment>>}
-     * @throws {ConflictException}
+     * @throws {ValidationException | ConflictException | RepositoryException}
      */
     private async addMultipleEnvs(environment: Array<Environment>): Promise<MultiStatus<Environment>> {
         const multiStatus: MultiStatus<Environment> = new MultiStatus<Environment>()
@@ -106,11 +106,11 @@ export class EnvironmentService implements IEnvironmentService {
             }
         }
 
-        // 6. Build the MultiStatus response.
+        // 7. Build the MultiStatus response.
         multiStatus.success = statusSuccessArr
         multiStatus.error = statusErrorArr
 
-        // 7. Returns the created object.
+        // 8. Returns the created MultiStatus object.
         return Promise.resolve(multiStatus)
     }
 
@@ -120,7 +120,7 @@ export class EnvironmentService implements IEnvironmentService {
      *
      * @param environment
      * @return {Promise<Environment>}
-     * @throws {ConflictException}
+     * @throws {ValidationException | ConflictException | RepositoryException}
      */
     private async addEnvironment(environment: Environment): Promise<Environment> {
         try {

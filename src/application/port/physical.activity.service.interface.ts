@@ -9,6 +9,14 @@ import { IQuery } from './query.interface'
  */
 export interface IPhysicalActivityService extends IService<PhysicalActivity> {
     /**
+     * Add a new PhysicalActivity or a list of PhysicalActivity.
+     *
+     * @param physicalActivity PhysicalActivity | Array<PhysicalActivity> to insert.
+     * @return {Promise<PhysicalActivity | any>}
+     * @throws {ValidationException | ConflictException | RepositoryException}
+     */
+    add(physicalActivity: PhysicalActivity | Array<PhysicalActivity>): Promise<PhysicalActivity | any>
+    /**
      * List the activities of a child.
      *
      * @param childId Child ID.

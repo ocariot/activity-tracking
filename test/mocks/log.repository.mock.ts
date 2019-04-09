@@ -32,7 +32,7 @@ export class LogRepositoryMock implements ILogRepository {
     public findOne(query: any): Promise<Log> {
         const date: string = query.filters.date
         if (date === '2018-03-10T00:00:00') {
-            return Promise.resolve(new LogMock())
+            return Promise.resolve(new LogMock(query.filters.type))
         }
         return Promise.resolve(undefined!)
     }

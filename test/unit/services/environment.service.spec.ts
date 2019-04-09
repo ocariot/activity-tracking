@@ -48,16 +48,21 @@ describe('Services: Environment', () => {
 
     // Incorrect environments
     const incorrectEnv1: Environment = new Environment()        // Without required fields
+
     const incorrectEnv2: Environment = new EnvironmentMock()   // Institution id invalid
     incorrectEnv2.institution_id = '5c6dd16ea1a67d0034e6108bc'
+
     const incorrectEnv3: Environment = new EnvironmentMock()   // location invalid
     incorrectEnv3.location!.local = ''
     incorrectEnv3.location!.room = ''
+
     const incorrectEnv4: Environment = new EnvironmentMock()   // Measurement invalid (empty array)
     incorrectEnv4.measurements = new Array<Measurement>()
+
     const incorrectEnv5: Environment = new EnvironmentMock()   // Measurement invalid (type)
     incorrectEnv5.measurements = [new Measurement(MeasurementType.HUMIDITY, 34, '%'),
                                   new Measurement('Temperatures', 40, '°C')]
+
     const incorrectEnv6: Environment = new EnvironmentMock()   // Measurement invalid (missing fields)
     incorrectEnv6.measurements = [new Measurement(MeasurementType.HUMIDITY, 34, '%'),
                                   new Measurement()]
@@ -79,8 +84,8 @@ describe('Services: Environment', () => {
     /**
      * Mock MultiStatus responses
      */
-    // MultiStatus totally correct
     const multiStatusMock: MultiStatusMock<Environment> = new MultiStatusMock<Environment>()
+    // MultiStatus totally correct
     const multiStatusCorrect: MultiStatus<Environment> = multiStatusMock.generateMultiStatus(correctEnvironmentsArr)
     const multiStatusMixed: MultiStatus<Environment> = multiStatusMock.generateMultiStatus(mixedEnvironmentsArr)    // Mixed MultiStatus
     // MultiStatus totally incorrect
@@ -341,7 +346,7 @@ describe('Services: Environment', () => {
 
         context('when all the Environments are correct, they still do not exist in the repository but there is no a connection ' +
             'to the RabbitMQ', () => {
-            it('should save each environment for submission after to the bus and return a response of type MultiStatus<Environment> ' +
+            it('should save each environment for submit after to the bus and return a response of type MultiStatus<Environment> ' +
                 'with the description of success in each one of them', () => {
                 connectionRabbitmqPub.isConnected = false
                 sinon
@@ -373,9 +378,11 @@ describe('Services: Environment', () => {
         context('when all the Environments are correct but already exists in the repository', () => {
             it('should return a response of type MultiStatus<Environment> with the description of conflict in each one of them', () => {
                 connectionRabbitmqPub.isConnected = true
+
                 correctEnvironmentsArr.forEach(elem => {
                     elem.id = '507f1f77bcf86cd799439011'
                 })
+
                 sinon
                     .mock(modelFake)
                     .expects('create')
