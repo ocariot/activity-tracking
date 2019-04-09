@@ -60,6 +60,7 @@ export class Log extends Entity implements IJSONSerializable, IJSONDeserializabl
             json = JSON.parse(json)
         }
 
+        if (json.id !== undefined) super.id = json.id
         if (json.type !== undefined) this.type = json.type
         if (json.date !== undefined) this.date = json.date
         if (json.value !== undefined) this.value = json.value

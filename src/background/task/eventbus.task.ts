@@ -128,7 +128,6 @@ export class EventBusTask {
                     this._logger)
             })
             .catch(err => {
-                console.log('err --------> ', err)
                 this._logger.error(`Error trying to get connection to Event Bus for event publishing. ${err.message}`)
             })
     }

@@ -1,28 +1,26 @@
 import { Log, LogType } from '../../src/application/domain/model/log'
 
-export class LogMock {
+export class LogMock extends Log {
 
-    public static generateLogsArray(): Array<Log> {
-        const logsArr: Array<Log> = new Array<Log>()
-        for (let i = 0; i < 5; i++) {
-            logsArr.push(this.generateLog())
-        }
-
-        return logsArr
+    constructor(type?: LogType) {
+        super()
+        super.fromJSON(this.generateLog(type))
     }
 
-    public static generateLog(): Log {
+    private generateLog(type?: LogType): Log {
+        if (!type) type = this.generateType()
+
         const log: Log = new Log()
-        log.id = '5a62be07de34500146d9c544'
+        log.id = this.generateObjectId()
         log.date = this.generateDate()
         log.value = Math.floor(Math.random() * 10 + 1) * 100
-        log.type = this.generateType()
+        log.type = type
         log.child_id = this.generateObjectId()
 
         return log
     }
 
-    private static generateObjectId(): string {
+    private generateObjectId(): string {
         const chars = 'abcdef0123456789'
         let randS = ''
         for (let i = 0; i < 24; i++) {
@@ -31,7 +29,7 @@ export class LogMock {
         return randS
     }
 
-    private static generateDate(): string {
+    private generateDate(): string {
         const date = new Date()
 
         const month = date.getMonth() + 1
@@ -49,7 +47,7 @@ export class LogMock {
         return `${date.getFullYear()}-${monthString}-${dayString}`
     }
 
-    private static generateType() {
+    private generateType(): LogType {
         let logType
         switch (Math.floor((Math.random() * 2 + 1))) { // 1 or 2
             case 1:
@@ -58,6 +56,8 @@ export class LogMock {
             case 2:
                 logType = LogType.CALORIES
                 return logType
+            default:
+                return LogType.STEPS
         }
     }
 }

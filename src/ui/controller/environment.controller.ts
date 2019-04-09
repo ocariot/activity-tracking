@@ -32,7 +32,7 @@ export class EnvironmentController {
     }
 
     /**
-     * Add new environment measurement.
+     * Add new environment measurement or multiple new environment measurements.
      *
      * @param {Request} req
      * @param {Response} res

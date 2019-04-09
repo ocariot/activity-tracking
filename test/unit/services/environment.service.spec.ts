@@ -1,3 +1,4 @@
+import HttpStatus from 'http-status-codes'
 import sinon from 'sinon'
 import { assert } from 'chai'
 import { EnvironmentMock } from '../../mocks/environment.mock'
@@ -29,22 +30,51 @@ describe('Services: Environment', () => {
     // Environment Mock
     const environment: Environment = new EnvironmentMock()
     let incorrectEnvironment: Environment = new Environment()       // For incorrect operations
+
     // For GET route
     const environmentsArrGet: Array<Environment> = new Array<EnvironmentMock>()
     for (let i = 0; i < 3; i++) {
         environmentsArrGet.push(new EnvironmentMock())
     }
-    // For POST route
+
+    /**
+     * For POST route
+     */
+    // Array with correct environments
     const correctEnvironmentsArr: Array<Environment> = new Array<EnvironmentMock>()
     for (let i = 0; i < 3; i++) {
         correctEnvironmentsArr.push(new EnvironmentMock())
     }
 
+    // Incorrect environments
+    const incorrectEnv1: Environment = new Environment()        // Without required fields
+    const incorrectEnv2: Environment = new EnvironmentMock()   // Institution id invalid
+    incorrectEnv2.institution_id = '5c6dd16ea1a67d0034e6108bc'
+    const incorrectEnv3: Environment = new EnvironmentMock()   // location invalid
+    incorrectEnv3.location!.local = ''
+    incorrectEnv3.location!.room = ''
+    const incorrectEnv4: Environment = new EnvironmentMock()   // Measurement invalid (empty array)
+    incorrectEnv4.measurements = new Array<Measurement>()
+    const incorrectEnv5: Environment = new EnvironmentMock()   // Measurement invalid (type)
+    incorrectEnv5.measurements = [new Measurement(MeasurementType.HUMIDITY, 34, '%'),
+                                  new Measurement('Temperatures', 40, '°C')]
+    const incorrectEnv6: Environment = new EnvironmentMock()   // Measurement invalid (missing fields)
+    incorrectEnv6.measurements = [new Measurement(MeasurementType.HUMIDITY, 34, '%'),
+                                  new Measurement()]
+
+    // Array with correct and incorrect environments
     const mixedEnvironmentsArr: Array<Environment> = new Array<EnvironmentMock>()
-    for (let i = 0; i < 3; i++) {
-        mixedEnvironmentsArr.push(new EnvironmentMock())
-    }
-    mixedEnvironmentsArr[1].timestamp = undefined!
+    mixedEnvironmentsArr.push(new EnvironmentMock())
+    mixedEnvironmentsArr.push(incorrectEnv1)
+
+    // Array with only incorrect environments
+    const incorrectEnvironmentsArr: Array<Environment> = new Array<EnvironmentMock>()
+    incorrectEnvironmentsArr.push(incorrectEnv1)
+    incorrectEnvironmentsArr.push(incorrectEnv2)
+    incorrectEnvironmentsArr.push(incorrectEnv3)
+    incorrectEnvironmentsArr.push(incorrectEnv4)
+    incorrectEnvironmentsArr.push(incorrectEnv5)
+    incorrectEnvironmentsArr.push(incorrectEnv6)
 
     /**
      * Mock MultiStatus responses
@@ -52,7 +82,9 @@ describe('Services: Environment', () => {
     // MultiStatus totally correct
     const multiStatusMock: MultiStatusMock<Environment> = new MultiStatusMock<Environment>()
     const multiStatusCorrect: MultiStatus<Environment> = multiStatusMock.generateMultiStatus(correctEnvironmentsArr)
-    // const multiStatusMixed: MultiStatus<Environment> = multiStatusMock.generateMultiStatus(mixedEnvironmentsArr)    // Mixed MultiStatus
+    const multiStatusMixed: MultiStatus<Environment> = multiStatusMock.generateMultiStatus(mixedEnvironmentsArr)    // Mixed MultiStatus
+    // MultiStatus totally incorrect
+    const multiStatusIncorrect: MultiStatus<Environment> = multiStatusMock.generateMultiStatus(incorrectEnvironmentsArr)
 
     const modelFake: any = EnvironmentRepoModel
     const environmentRepo: IEnvironmentRepository = new EnvironmentRepositoryMock()
@@ -83,7 +115,7 @@ describe('Services: Environment', () => {
     /**
      * Method "add(environment: Environment | Array<Environment>)" with Environment argument
      */
-    describe('add(environment: Environment | Array<Environment>)', () => {
+    describe('add(environment: Environment | Array<Environment>) with Environment argument', () => {
         context('when the Environment is correct, it still does not exist in the repository and there is a connection ' +
             'to the RabbitMQ', () => {
             it('should return the Environment that was added', () => {
@@ -95,11 +127,12 @@ describe('Services: Environment', () => {
                     .resolves(environment)
 
                 return environmentService.add(environment)
-                    .then(result => {
+                    .then((result: Environment | MultiStatus<Environment>) => {
+                        result = result as Environment
                         assert.propertyVal(result, 'id', environment.id)
                         assert.propertyVal(result, 'institution_id', environment.institution_id)
                         assert.propertyVal(result, 'location', environment.location)
-                        if (result.toJSON().climatized) assert.propertyVal(result, 'climatized', environment.climatized)
+                        if (result.climatized) assert.propertyVal(result, 'climatized', environment.climatized)
                         assert.propertyVal(result, 'timestamp', environment.timestamp)
                         assert.propertyVal(result, 'measurements', environment.measurements)
                     })
@@ -118,11 +151,12 @@ describe('Services: Environment', () => {
                     .resolves(environment)
 
                 return environmentService.add(environment)
-                    .then(result => {
+                    .then((result: Environment | MultiStatus<Environment>) => {
+                        result = result as Environment
                         assert.propertyVal(result, 'id', environment.id)
                         assert.propertyVal(result, 'institution_id', environment.institution_id)
                         assert.propertyVal(result, 'location', environment.location)
-                        if (result.toJSON().climatized) assert.propertyVal(result, 'climatized', environment.climatized)
+                        if (result.climatized) assert.propertyVal(result, 'climatized', environment.climatized)
                         assert.propertyVal(result, 'timestamp', environment.timestamp)
                         assert.propertyVal(result, 'measurements', environment.measurements)
                     })
@@ -274,10 +308,11 @@ describe('Services: Environment', () => {
     /**
      * Method "add(environment: Environment | Array<Environment>)" with Array<Environment> argument
      */
-    describe('add(environment: Environment | Array<Environment>)', () => {
-        context('when the Environment is correct, it still does not exist in the repository and there is a connection ' +
+    describe('add(environment: Environment | Array<Environment>) with Array<Environment> argument', () => {
+        context('when all the Environments are correct, they still do not exist in the repository and there is a connection ' +
             'to the RabbitMQ', () => {
-            it('should return the Environment that was added', () => {
+            it('should create each environment and return a response of type MultiStatus<Environment> with the description of success' +
+                ' in sending each one of them', () => {
                 sinon
                     .mock(modelFake)
                     .expects('create')
@@ -286,17 +321,161 @@ describe('Services: Environment', () => {
                     .resolves(multiStatusCorrect)
 
                 return environmentService.add(correctEnvironmentsArr)
-                    .then(result => {
-                        for (let i = 0; i < result.toJSON().success.length; i++) {
-                            assert.propertyVal(result.toJSON().success[i].item, 'id', correctEnvironmentsArr[i].id)
-                            assert.propertyVal(result.toJSON().success[i].item, 'institution_id', correctEnvironmentsArr[i].institution_id)
-                            assert.propertyVal(result.toJSON().success[i].item, 'location', correctEnvironmentsArr[i].location)
-                            if (result.toJSON().success[i].item.climatized)
-                                assert.propertyVal(result.toJSON().success[i].item, 'climatized', correctEnvironmentsArr[i].climatized)
-                            assert.propertyVal(result.toJSON().success[i].item, 'timestamp', correctEnvironmentsArr[i].timestamp)
-                            assert.propertyVal(result.toJSON().success[i].item, 'measurements', correctEnvironmentsArr[i].measurements)
+                    .then((result: Environment | MultiStatus<Environment>) => {
+                        result = result as MultiStatus<Environment>
+                        for (let i = 0; i < result.success.length; i++) {
+                            assert.propertyVal(result.success[i], 'code', HttpStatus.CREATED)
+                            assert.propertyVal(result.success[i].item, 'id', correctEnvironmentsArr[i].id)
+                            assert.propertyVal(result.success[i].item, 'institution_id', correctEnvironmentsArr[i].institution_id)
+                            assert.propertyVal(result.success[i].item, 'location', correctEnvironmentsArr[i].location)
+                            if (result.success[i].item.climatized)
+                                assert.propertyVal(result.success[i].item, 'climatized', correctEnvironmentsArr[i].climatized)
+                            assert.propertyVal(result.success[i].item, 'timestamp', correctEnvironmentsArr[i].timestamp)
+                            assert.propertyVal(result.success[i].item, 'measurements', correctEnvironmentsArr[i].measurements)
                         }
-                        assert.isEmpty(result.toJSON().error)
+
+                        assert.isEmpty(result.error)
+                    })
+            })
+        })
+
+        context('when all the Environments are correct, they still do not exist in the repository but there is no a connection ' +
+            'to the RabbitMQ', () => {
+            it('should save each environment for submission after to the bus and return a response of type MultiStatus<Environment> ' +
+                'with the description of success in each one of them', () => {
+                connectionRabbitmqPub.isConnected = false
+                sinon
+                    .mock(modelFake)
+                    .expects('create')
+                    .withArgs(correctEnvironmentsArr)
+                    .chain('exec')
+                    .resolves(multiStatusCorrect)
+
+                return environmentService.add(correctEnvironmentsArr)
+                    .then((result: Environment | MultiStatus<Environment>) => {
+                        result = result as MultiStatus<Environment>
+                        for (let i = 0; i < result.success.length; i++) {
+                            assert.propertyVal(result.success[i], 'code', HttpStatus.CREATED)
+                            assert.propertyVal(result.success[i].item, 'id', correctEnvironmentsArr[i].id)
+                            assert.propertyVal(result.success[i].item, 'institution_id', correctEnvironmentsArr[i].institution_id)
+                            assert.propertyVal(result.success[i].item, 'location', correctEnvironmentsArr[i].location)
+                            if (result.success[i].item.climatized)
+                                assert.propertyVal(result.success[i].item, 'climatized', correctEnvironmentsArr[i].climatized)
+                            assert.propertyVal(result.success[i].item, 'timestamp', correctEnvironmentsArr[i].timestamp)
+                            assert.propertyVal(result.success[i].item, 'measurements', correctEnvironmentsArr[i].measurements)
+                        }
+
+                        assert.isEmpty(result.error)
+                    })
+            })
+        })
+
+        context('when all the Environments are correct but already exists in the repository', () => {
+            it('should return a response of type MultiStatus<Environment> with the description of conflict in each one of them', () => {
+                connectionRabbitmqPub.isConnected = true
+                correctEnvironmentsArr.forEach(elem => {
+                    elem.id = '507f1f77bcf86cd799439011'
+                })
+                sinon
+                    .mock(modelFake)
+                    .expects('create')
+                    .withArgs(correctEnvironmentsArr)
+                    .chain('exec')
+                    .resolves(multiStatusCorrect)
+
+                return environmentService.add(correctEnvironmentsArr)
+                    .then((result: Environment | MultiStatus<Environment>) => {
+                        result = result as MultiStatus<Environment>
+                        for (let i = 0; i < result.error.length; i++) {
+                            assert.propertyVal(result.error[i], 'code', HttpStatus.CONFLICT)
+                            assert.propertyVal(result.error[i], 'message', 'Measurement of environment is already registered...')
+                            assert.propertyVal(result.error[i].item, 'id', correctEnvironmentsArr[i].id)
+                            assert.propertyVal(result.error[i].item, 'institution_id', correctEnvironmentsArr[i].institution_id)
+                            assert.propertyVal(result.error[i].item, 'location', correctEnvironmentsArr[i].location)
+                            if (result.error[i].item.climatized)
+                                assert.propertyVal(result.error[i].item, 'climatized', correctEnvironmentsArr[i].climatized)
+                            assert.propertyVal(result.error[i].item, 'timestamp', correctEnvironmentsArr[i].timestamp)
+                            assert.propertyVal(result.error[i].item, 'measurements', correctEnvironmentsArr[i].measurements)
+                        }
+
+                        assert.isEmpty(result.success)
+                    })
+            })
+        })
+
+        context('when there are correct and incorrect Enviroments', () => {
+            it('should return a response of type MultiStatus<Environment> with the description of success and error in each ' +
+                'one of them', () => {
+                sinon
+                    .mock(modelFake)
+                    .expects('create')
+                    .withArgs(mixedEnvironmentsArr)
+                    .chain('exec')
+                    .resolves(multiStatusMixed)
+
+                return environmentService.add(mixedEnvironmentsArr)
+                    .then((result: Environment | MultiStatus<Environment>) => {
+                        result = result as MultiStatus<Environment>
+
+                        assert.propertyVal(result.success[0], 'code', HttpStatus.CREATED)
+                        assert.propertyVal(result.success[0].item, 'id', mixedEnvironmentsArr[0].id)
+                        assert.propertyVal(result.success[0].item, 'institution_id', mixedEnvironmentsArr[0].institution_id)
+                        assert.propertyVal(result.success[0].item, 'location', mixedEnvironmentsArr[0].location)
+                        if (result.success[0].item.climatized)
+                            assert.propertyVal(result.success[0].item, 'climatized', mixedEnvironmentsArr[0].climatized)
+                        assert.propertyVal(result.success[0].item, 'timestamp', mixedEnvironmentsArr[0].timestamp)
+                        assert.propertyVal(result.success[0].item, 'measurements', mixedEnvironmentsArr[0].measurements)
+
+                        assert.propertyVal(result.error[0], 'code', HttpStatus.BAD_REQUEST)
+                        assert.propertyVal(result.error[0], 'message', 'Required fields were not provided...')
+                        assert.propertyVal(result.error[0], 'description', 'Validation of environment measurements failed: timestamp, ' +
+                            'institution_id, location, measurements required!')
+                    })
+            })
+        })
+
+        context('when all the Environments are incorrect', () => {
+            it('should return a response of type MultiStatus<Environment> with the description of error in each one of them', () => {
+                sinon
+                    .mock(modelFake)
+                    .expects('create')
+                    .withArgs(incorrectEnvironmentsArr)
+                    .chain('exec')
+                    .resolves(multiStatusIncorrect)
+
+                return environmentService.add(incorrectEnvironmentsArr)
+                    .then((result: Environment | MultiStatus<Environment>) => {
+                        result = result as MultiStatus<Environment>
+
+                        assert.propertyVal(result.error[0], 'message', 'Required fields were not provided...')
+                        assert.propertyVal(result.error[0], 'description', 'Validation of environment measurements failed: timestamp, ' +
+                            'institution_id, location, measurements required!')
+                        assert.propertyVal(result.error[1], 'message', Strings.ERROR_MESSAGE.UUID_NOT_VALID_FORMAT)
+                        assert.propertyVal(result.error[1], 'description', Strings.ERROR_MESSAGE.UUID_NOT_VALID_FORMAT_DESC)
+                        assert.propertyVal(result.error[2], 'message', 'Location are not in a format that is supported...')
+                        assert.propertyVal(result.error[2], 'description', 'Validation of location failed: location local, location ' +
+                            'room is required!')
+                        assert.propertyVal(result.error[3], 'message', 'Measurement are not in a format that is supported!')
+                        assert.propertyVal(result.error[3], 'description', 'The measurements collection must not be empty!')
+                        assert.propertyVal(result.error[4], 'message', 'The type of measurement provided "temperatures" is not ' +
+                            'supported...')
+                        assert.propertyVal(result.error[4], 'description', 'The types allowed are: temperature, humidity.')
+                        assert.propertyVal(result.error[5], 'message', 'Measurement are not in a format that is supported!')
+                        assert.propertyVal(result.error[5], 'description', 'Validation of measurements failed: measurement type, ' +
+                            'measurement value, measurement unit is required!')
+
+                        for (let i = 0; i < result.error.length; i++) {
+                            assert.propertyVal(result.error[i], 'code', HttpStatus.BAD_REQUEST)
+                            assert.propertyVal(result.error[i].item, 'id', incorrectEnvironmentsArr[i].id)
+                            assert.propertyVal(result.error[i].item, 'institution_id', incorrectEnvironmentsArr[i].institution_id)
+                            assert.propertyVal(result.error[i].item, 'location', incorrectEnvironmentsArr[i].location)
+                            if (result.error[i].item.climatized)
+                                assert.propertyVal(result.error[i].item, 'climatized', incorrectEnvironmentsArr[i].climatized)
+                            assert.propertyVal(result.error[i].item, 'timestamp', incorrectEnvironmentsArr[i].timestamp)
+                            assert.propertyVal(result.error[i].item, 'measurements', incorrectEnvironmentsArr[i].measurements)
+                        }
+
+                        assert.isEmpty(result.success)
                     })
             })
         })

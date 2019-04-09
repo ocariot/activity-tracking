@@ -123,29 +123,34 @@ export class EnvironmentService implements IEnvironmentService {
      * @throws {ConflictException}
      */
     private async addEnvironment(environment: Environment): Promise<Environment> {
-        // 1. Validate the object.
-        CreateEnvironmentValidator.validate(environment)
+        try {
+            // 1. Validate the object.
+            CreateEnvironmentValidator.validate(environment)
 
-        // 2. Checks if environment already exists.
-        const environmentExist = await this._environmentRepository.checkExist(environment)
-        if (environmentExist) throw new ConflictException('Measurement of environment is already registered...')
+            // 2. Checks if environment already exists.
+            const environmentExist = await this._environmentRepository.checkExist(environment)
+            if (environmentExist) throw new ConflictException('Measurement of environment is already registered...')
 
-        // 3. Create new environment register.
-        const environmentSaved: Environment = await this._environmentRepository.create(environment)
+            // 3. Create new environment register.
+            const environmentSaved: Environment = await this._environmentRepository.create(environment)
 
-        // 4. If created successfully, the object is published on the message bus.
-        if (environmentSaved) {
-            const event: EnvironmentEvent = new EnvironmentEvent('EnvironmentSaveEvent',
-                new Date(), environmentSaved)
-            if (!(await this._eventBus.publish(event, 'environments.save'))) {
-                // 5. Save Event for submission attempt later when there is connection to message channel.
-                this.saveEvent(event)
-            } else {
-                this._logger.info(`Measurement of environment with ID: ${environmentSaved.id} published on event bus...`)
+            // 4. If created successfully, the object is published on the message bus.
+            if (environmentSaved) {
+                const event: EnvironmentEvent = new EnvironmentEvent('EnvironmentSaveEvent',
+                    new Date(), environmentSaved)
+                if (!(await this._eventBus.publish(event, 'environments.save'))) {
+                    // 5. Save Event for submission attempt later when there is connection to message channel.
+                    this.saveEvent(event)
+                } else {
+                    this._logger.info(`Measurement of environment with ID: ${environmentSaved.id} published on event bus...`)
+                }
             }
+
+            // 6. Returns the created object.
+            return Promise.resolve(environmentSaved)
+        } catch (err) {
+            return Promise.reject(err)
         }
-        // 6. Returns the created object.
-        return Promise.resolve(environmentSaved)
     }
 
     /**
@@ -226,7 +231,5 @@ export class EnvironmentService implements IEnvironmentService {
                 this._logger.error(`There was an error trying to save the name event: ${event.event_name}.`
                     .concat(`Error: ${err.message}. Event: ${JSON.stringify(saveEvent)}`))
             })
-
-        console.log('salvou evento')
     }
 }

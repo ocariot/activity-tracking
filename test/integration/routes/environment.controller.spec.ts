@@ -1,3 +1,4 @@
+import HttpStatus from 'http-status-codes'
 import { Container } from 'inversify'
 import { DI } from '../../../src/di/di'
 import { Identifier } from '../../../src/di/identifiers'
@@ -21,6 +22,45 @@ describe('Routes: environments', () => {
 
     const defaultEnvironment: Environment = new EnvironmentMock()
 
+    /**
+     * For POST route with multiple environments
+     */
+    // Array with correct environments
+    const correctEnvironmentsArr: Array<Environment> = new Array<EnvironmentMock>()
+    for (let i = 0; i < 3; i++) {
+        correctEnvironmentsArr.push(new EnvironmentMock())
+    }
+
+    // Incorrect environments
+    const incorrectEnv1: Environment = new Environment()        // Without required fields
+    const incorrectEnv2: Environment = new EnvironmentMock()   // Institution id invalid
+    incorrectEnv2.institution_id = '5c6dd16ea1a67d0034e6108bc'
+    const incorrectEnv3: Environment = new EnvironmentMock()   // location invalid
+    incorrectEnv3.location!.local = ''
+    incorrectEnv3.location!.room = ''
+    const incorrectEnv4: Environment = new EnvironmentMock()   // Measurement invalid (empty array)
+    incorrectEnv4.measurements = new Array<Measurement>()
+    const incorrectEnv5: Environment = new EnvironmentMock()   // Measurement invalid (type)
+    incorrectEnv5.measurements = [new Measurement(MeasurementType.HUMIDITY, 34, '%'),
+        new Measurement('Temperatures', 40, '°C')]
+    const incorrectEnv6: Environment = new EnvironmentMock()   // Measurement invalid (missing fields)
+    incorrectEnv6.measurements = [new Measurement(MeasurementType.HUMIDITY, 34, '%'),
+        new Measurement()]
+
+    // Array with correct and incorrect environments
+    const mixedEnvironmentsArr: Array<Environment> = new Array<EnvironmentMock>()
+    mixedEnvironmentsArr.push(new EnvironmentMock())
+    mixedEnvironmentsArr.push(incorrectEnv1)
+
+    // Array with only incorrect environments
+    const incorrectEnvironmentsArr: Array<Environment> = new Array<EnvironmentMock>()
+    incorrectEnvironmentsArr.push(incorrectEnv1)
+    incorrectEnvironmentsArr.push(incorrectEnv2)
+    incorrectEnvironmentsArr.push(incorrectEnv3)
+    incorrectEnvironmentsArr.push(incorrectEnv4)
+    incorrectEnvironmentsArr.push(incorrectEnv5)
+    incorrectEnvironmentsArr.push(incorrectEnv6)
+
     // Start services
     before(async () => {
         try {
@@ -30,9 +70,9 @@ describe('Routes: environments', () => {
         }
     })
     /**
-     * POST route
+     * POST route with only one environment in the body
      */
-    describe('POST /environments', () => {
+    describe('POST /environments with only one environment in the body', () => {
         context('when posting a new Environment with success', () => {
             it('should return status code 201 and the saved Environment', () => {
                 const body = {
@@ -228,6 +268,203 @@ describe('Routes: environments', () => {
         })
     })
     /**
+     * POST route with an environment array in the body
+     */
+    describe('POST /environments with an environment array in the body', () => {
+        context('when all the environments are correct', () => {
+            it('should return status code 201, create each environment and return a response of type MultiStatus<Environment> ' +
+                'with the description of success in sending each one of them', () => {
+                try {
+                    deleteAllEnvironments()
+                } catch (err) {
+                    throw new Error('Failure on environments routes test: ' + err.message)
+                }
+
+                const body: any = []
+
+                correctEnvironmentsArr.forEach(environment => {
+                    const bodyElem = {
+                        id: environment.id,
+                        institution_id: environment.institution_id,
+                        location: environment.location,
+                        measurements: environment.measurements,
+                        climatized: environment.climatized,
+                        timestamp: environment.timestamp
+                    }
+                    body.push(bodyElem)
+                })
+
+                return request
+                    .post('/environments')
+                    .send(body)
+                    .set('Content-Type', 'application/json')
+                    .expect(201)
+                    .then(res => {
+                        for (let i = 0; i < res.body.success.length; i++) {
+                            expect(res.body.success[i].code).to.eql(HttpStatus.CREATED)
+                            expect(res.body.success[i].item.id).to.eql(correctEnvironmentsArr[i].id)
+                            expect(res.body.success[i].item.institution_id).to.eql(correctEnvironmentsArr[i].institution_id)
+                            expect(res.body.success[i].item.location).to.not.be.empty
+                            if (res.body.success[i].item.climatized)
+                                expect(res.body.success[i].item.climatized).to.eql(correctEnvironmentsArr[i].climatized)
+                            expect(res.body.success[i].item.timestamp).to.eql(correctEnvironmentsArr[i].timestamp.toISOString())
+                            expect(res.body.success[i].item.measurements).to.not.be.empty
+                        }
+
+                        expect(res.body.error.length).to.eql(0)
+                    })
+            })
+        })
+
+        context('when all the environments are correct but already exists in the repository', () => {
+            it('should return status code 201 and return a response of type MultiStatus<Environment> ' +
+                'with the description of conflict in sending each one of them', () => {
+                const body: any = []
+
+                correctEnvironmentsArr.forEach(environment => {
+                    const bodyElem = {
+                        id: environment.id,
+                        institution_id: environment.institution_id,
+                        location: environment.location,
+                        measurements: environment.measurements,
+                        climatized: environment.climatized,
+                        timestamp: environment.timestamp
+                    }
+                    body.push(bodyElem)
+                })
+
+                return request
+                    .post('/environments')
+                    .send(body)
+                    .set('Content-Type', 'application/json')
+                    .expect(201)
+                    .then(res => {
+                        for (let i = 0; i < res.body.error.length; i++) {
+                            expect(res.body.error[i].code).to.eql(HttpStatus.CONFLICT)
+                            expect(res.body.error[i].message).to.eql('Measurement of environment is already registered...')
+                            expect(res.body.error[i].item.id).to.eql(correctEnvironmentsArr[i].id)
+                            expect(res.body.error[i].item.institution_id).to.eql(correctEnvironmentsArr[i].institution_id)
+                            expect(res.body.error[i].item.location).to.not.be.empty
+                            if (res.body.error[i].item.climatized)
+                                expect(res.body.error[i].item.climatized).to.eql(correctEnvironmentsArr[i].climatized)
+                            expect(res.body.error[i].item.timestamp).to.eql(correctEnvironmentsArr[i].timestamp.toISOString())
+                            expect(res.body.error[i].item.measurements).to.not.be.empty
+                        }
+
+                        expect(res.body.success.length).to.eql(0)
+                    })
+            })
+        })
+
+        context('when there is correct and incorrect environments', () => {
+            it('should return status code 201 and return a response of type MultiStatus<Environment> with the description of ' +
+                'success and error in each one of them', () => {
+                try {
+                    deleteAllEnvironments()
+                } catch (err) {
+                    throw new Error('Failure on environments routes test: ' + err.message)
+                }
+
+                const body: any = []
+
+                mixedEnvironmentsArr.forEach(environment => {
+                    const bodyElem = {
+                        id: environment.id,
+                        institution_id: environment.institution_id,
+                        location: environment.location,
+                        measurements: environment.measurements,
+                        climatized: environment.climatized,
+                        timestamp: environment.timestamp
+                    }
+                    body.push(bodyElem)
+                })
+
+                return request
+                    .post('/environments')
+                    .send(body)
+                    .set('Content-Type', 'application/json')
+                    .expect(201)
+                    .then(res => {
+                        expect(res.body.success[0].code).to.eql(HttpStatus.CREATED)
+                        expect(res.body.success[0].item.id).to.eql(mixedEnvironmentsArr[0].id)
+                        expect(res.body.success[0].item.institution_id).to.eql(mixedEnvironmentsArr[0].institution_id)
+                        expect(res.body.success[0].item.location).to.not.be.empty
+                        if (res.body.success[0].item.climatized)
+                            expect(res.body.success[0].item.climatized).to.eql(mixedEnvironmentsArr[0].climatized)
+                        expect(res.body.success[0].item.timestamp).to.eql(mixedEnvironmentsArr[0].timestamp.toISOString())
+                        expect(res.body.success[0].item.measurements).to.not.be.empty
+
+                        expect(res.body.error[0].code).to.eql(HttpStatus.BAD_REQUEST)
+                        expect(res.body.error[0].message).to.eql('Required fields were not provided...')
+                        expect(res.body.error[0].description).to.eql('Validation of environment measurements failed: timestamp, ' +
+                            'institution_id, location, measurements required!')
+                    })
+            })
+        })
+
+        context('when all the environments are incorrect', () => {
+            it('should return status code 201 and return a response of type MultiStatus<Environment> with the description of ' +
+                'error in each one of them', () => {
+                try {
+                    deleteAllEnvironments()
+                } catch (err) {
+                    throw new Error('Failure on environments routes test: ' + err.message)
+                }
+
+                const body: any = []
+
+                incorrectEnvironmentsArr.forEach(environment => {
+                    const bodyElem = {
+                        id: environment.id,
+                        institution_id: environment.institution_id,
+                        location: environment.location,
+                        measurements: environment.measurements,
+                        climatized: environment.climatized,
+                        timestamp: environment.timestamp
+                    }
+                    body.push(bodyElem)
+                })
+
+                return request
+                    .post('/environments')
+                    .send(body)
+                    .set('Content-Type', 'application/json')
+                    .expect(201)
+                    .then(res => {
+                        expect(res.body.error[0].message).to.eql('Required fields were not provided...')
+                        expect(res.body.error[0].description).to.eql('Validation of environment measurements failed: timestamp, ' +
+                            'institution_id, location, measurements required!')
+                        expect(res.body.error[1].message).to.eql(Strings.ERROR_MESSAGE.UUID_NOT_VALID_FORMAT)
+                        expect(res.body.error[1].description).to.eql(Strings.ERROR_MESSAGE.UUID_NOT_VALID_FORMAT_DESC)
+                        expect(res.body.error[2].message).to.eql('Location are not in a format that is supported...')
+                        expect(res.body.error[2].description).to.eql('Validation of location failed: location local, location ' +
+                            'room is required!')
+                        expect(res.body.error[3].message).to.eql('Measurement are not in a format that is supported!')
+                        expect(res.body.error[3].description).to.eql('The measurements collection must not be empty!')
+                        expect(res.body.error[4].message).to.eql('The type of measurement provided "temperatures" is not supported...')
+                        expect(res.body.error[4].description).to.eql('The types allowed are: temperature, humidity.')
+                        expect(res.body.error[5].message).to.eql('Measurement are not in a format that is supported!')
+                        expect(res.body.error[5].description).to.eql('Validation of measurements failed: measurement type, measurement ' +
+                            'value, measurement unit is required!')
+
+                        for (let i = 0; i < res.body.error.length; i++) {
+                            expect(res.body.error[i].code).to.eql(HttpStatus.BAD_REQUEST)
+                            expect(res.body.error[i].item.id).to.eql(incorrectEnvironmentsArr[i].id)
+                            expect(res.body.error[i].item.institution_id).to.eql(incorrectEnvironmentsArr[i].institution_id)
+                            if (i !== 0) expect(res.body.error[i].item.location).to.not.be.empty
+                            if (res.body.error[i].item.climatized)
+                                expect(res.body.error[i].item.climatized).to.eql(incorrectEnvironmentsArr[i].climatized)
+                            if (i !== 0) expect(res.body.error[i].item.timestamp)
+                                .to.eql(incorrectEnvironmentsArr[i].timestamp.toISOString())
+                            if (i !== 0 && i !== 3) expect(res.body.error[i].item.measurements).to.not.be.empty
+                        }
+
+                        expect(res.body.success.length).to.eql(0)
+                    })
+            })
+        })
+    })
+    /**
      * GET route
      */
     describe('GET /environments', () => {
@@ -239,8 +476,8 @@ describe('Routes: environments', () => {
                         location: {
                             local: 'Indoor',
                             room: 'room 01',
-                            latitude: '-7.2100766',
-                            longitude: '-35.9175756'
+                            latitude: defaultEnvironment.location!.latitude,
+                            longitude: defaultEnvironment.location!.longitude
                         },
                         measurements: [
                             {
@@ -293,7 +530,7 @@ describe('Routes: environments', () => {
         context('when there are no environment in the database', () => {
             it('should return status code 200 and an empty list', async () => {
                 try {
-                    await deleteAllEnvironments()
+                    deleteAllEnvironments()
                 } catch (err) {
                     throw new Error('Failure on environments routes test: ' + err.message)
                 }
@@ -319,8 +556,8 @@ describe('Routes: environments', () => {
                         location: {
                             local: 'Indoor',
                             room: 'room 01',
-                            latitude: '-7.2100766',
-                            longitude: '-35.9175756'
+                            latitude: defaultEnvironment.location!.latitude,
+                            longitude: defaultEnvironment.location!.longitude
                         },
                         measurements: [
                             {

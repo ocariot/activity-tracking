@@ -12,15 +12,15 @@ export class EnvironmentMock extends Environment {
     private generateEnvironment(): Environment {
         const environment: Environment = new Environment()
         environment.id = this.generateObjectId()
-        environment.institution_id = `5c6dd16ea1a67d0034e6108b`
+        environment.institution_id = this.generateObjectId()
         environment.timestamp = new Date()
         environment.climatized = (Math.random() >= 0.5)
         environment.measurements = this.generateMeasurements()
         environment.location = new Location().fromJSON({
             local: 'Indoor',
             room: 'room 01',
-            latitude: -7.2100766,
-            longitude: -35.9175756
+            latitude: Math.random() * 90,
+            longitude:  Math.random() * 180
         })
 
         return environment

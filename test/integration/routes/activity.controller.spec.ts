@@ -1,3 +1,4 @@
+import HttpStatus from 'http-status-codes'
 import { Container } from 'inversify'
 import { DI } from '../../../src/di/di'
 import { Identifier } from '../../../src/di/identifiers'
@@ -28,15 +29,21 @@ describe('Routes: users/children', () => {
     otherActivity.child_id = '5a62be07de34500146d9c542'
 
     // Mock objects for Log routes
-    const correctLogsArr: Array<Log> = LogMock.generateLogsArray()
+    const correctLogsArr: Array<Log> = new Array<Log>()
+    for (let i = 0; i < 5; i ++) {
+        correctLogsArr.push(new LogMock())
+    }
 
     // Mock correct and incorrect logs array
-    const mixedLogsArr: Array<Log> = LogMock.generateLogsArray()
+    const mixedLogsArr: Array<Log> = new Array<Log>()
+    for (let i = 0; i < 3; i ++) {
+        mixedLogsArr.push(new LogMock())
+    }
 
     // Incorrect log (invalid date)
     const incorrectLog = new Log('20199-03-08', 250, LogType.CALORIES, '5a62be07de34500146d9c544')
     incorrectLog.id = '507f1f77bcf86cd799439011'
-    mixedLogsArr[1] = incorrectLog
+    mixedLogsArr.push(incorrectLog)
 
     // Mock other incorrect log with invalid type
     const logJSON: any = {
@@ -500,7 +507,7 @@ describe('Routes: users/children', () => {
         context('when there is no physical activity in the database', () => {
             it('should return status code 200 and an empty list', async () => {
                 try {
-                    await deleteAllActivity()
+                    deleteAllActivity()
                 } catch (err) {
                     throw new Error('Failure on users.children.physicalactivities routes test: ' + err.message)
                 }
@@ -521,7 +528,7 @@ describe('Routes: users/children', () => {
         context('when get physical activity using the "query-strings-parser" library', () => {
             it('should return status code 200 and the result as needed in the query', async () => {
                 try {
-                    await deleteAllActivity()
+                    deleteAllActivity()
 
                     await createActivity({
                         name: defaultActivity.name,
@@ -583,7 +590,7 @@ describe('Routes: users/children', () => {
             'is no physical activity in the database', () => {
             it('should return status code 200 and an empty list', async () => {
                 try {
-                    await deleteAllActivity()
+                    deleteAllActivity()
                 } catch (err) {
                     throw new Error('Failure on users.children.physicalactivities routes test: ' + err.message)
                 }
@@ -609,7 +616,7 @@ describe('Routes: users/children', () => {
         context('when get all physical activity of a specific child of the database successfully', () => {
             it('should return status code 200 and a list of all physical activity of that specific child', async () => {
                 try {
-                    await deleteAllActivity()
+                    deleteAllActivity()
 
                     await createActivity({
                         name: defaultActivity.name,
@@ -656,7 +663,7 @@ describe('Routes: users/children', () => {
         context('when there are no physical activity associated with that specific child in the database', () => {
             it('should return status code 200 and an empty list', async () => {
                 try {
-                    await deleteAllActivity()
+                    deleteAllActivity()
                 } catch (err) {
                     throw new Error('Failure on users.children.physicalactivities routes test: ' + err.message)
                 }
@@ -675,7 +682,7 @@ describe('Routes: users/children', () => {
         context('when the child_id is invalid', () => {
             it('should return status code 400 and an info message about the invalid child_id', async () => {
                 try {
-                    await deleteAllActivity()
+                    deleteAllActivity()
 
                     await createActivity({
                         name: defaultActivity.name,
@@ -708,7 +715,7 @@ describe('Routes: users/children', () => {
         context('when get physical activity using the "query-strings-parser" library', () => {
             it('should return status code 200 and the result as needed in the query', async () => {
                 try {
-                    await deleteAllActivity()
+                    deleteAllActivity()
 
                     await createActivity({
                         name: defaultActivity.name,
@@ -770,7 +777,7 @@ describe('Routes: users/children', () => {
             'this physical activity does not exist', () => {
             it('should return status code 200 and an empty list', async () => {
                 try {
-                    await deleteAllActivity()
+                    deleteAllActivity()
                 } catch (err) {
                     throw new Error('Failure on users.children.physicalactivities routes test: ' + err.message)
                 }
@@ -793,7 +800,7 @@ describe('Routes: users/children', () => {
             'but the child_id is invalid', () => {
             it('should return status code 400 and an info message about the invalid child_id', async () => {
                 try {
-                    await deleteAllActivity()
+                    deleteAllActivity()
 
                     await createActivity({
                         name: defaultActivity.name,
@@ -833,7 +840,7 @@ describe('Routes: users/children', () => {
                 let result
 
                 try {
-                    await deleteAllActivity()
+                    deleteAllActivity()
 
                     result = await createActivity({
                         name: defaultActivity.name,
@@ -877,7 +884,7 @@ describe('Routes: users/children', () => {
         context('when there is no that specific physical activity associated with that child in the database', () => {
             it('should return status code 404 and an info message describing that physical activity was not found', async () => {
                 try {
-                    await deleteAllActivity()
+                    deleteAllActivity()
                 } catch (err) {
                     throw new Error('Failure on users.children.physicalactivities routes test: ' + err.message)
                 }
@@ -900,7 +907,7 @@ describe('Routes: users/children', () => {
                 let result
 
                 try {
-                    await deleteAllActivity()
+                    deleteAllActivity()
 
                     result = await createActivity({
                         name: defaultActivity.name,
@@ -933,7 +940,7 @@ describe('Routes: users/children', () => {
                 let result
 
                 try {
-                    await deleteAllActivity()
+                    deleteAllActivity()
 
                     result = await createActivity({
                         name: defaultActivity.name,
@@ -968,7 +975,7 @@ describe('Routes: users/children', () => {
                 let result
 
                 try {
-                    await deleteAllActivity()
+                    deleteAllActivity()
 
                     result = await createActivity({
                         name: defaultActivity.name,
@@ -1015,7 +1022,7 @@ describe('Routes: users/children', () => {
                 let result
 
                 try {
-                    await deleteAllActivity()
+                    deleteAllActivity()
 
                     result = await createActivity({
                         name: defaultActivity.name,
@@ -1028,7 +1035,7 @@ describe('Routes: users/children', () => {
                         child_id: defaultActivity.child_id
                     })
 
-                    await deleteAllActivity()
+                    deleteAllActivity()
                 } catch (err) {
                     throw new Error('Failure on users.children.physicalactivities routes test: ' + err.message)
                 }
@@ -1055,7 +1062,7 @@ describe('Routes: users/children', () => {
                 let result
 
                 try {
-                    await deleteAllActivity()
+                    deleteAllActivity()
 
                     result = await createActivity({
                         name: defaultActivity.name,
@@ -1092,7 +1099,7 @@ describe('Routes: users/children', () => {
                 let result
 
                 try {
-                    await deleteAllActivity()
+                    deleteAllActivity()
 
                     result = await createActivity({
                         name: defaultActivity.name,
@@ -1132,7 +1139,7 @@ describe('Routes: users/children', () => {
                 let result
 
                 try {
-                    await deleteAllActivity()
+                    deleteAllActivity()
 
                     // physical activity to be updated
                     result = await createActivityToBeUpdated(defaultActivity)
@@ -1171,7 +1178,7 @@ describe('Routes: users/children', () => {
         context('when physical activity does not exist in the database', () => {
             it('should return status code 404 and an info message about the error on the search', async () => {
                 try {
-                    await deleteAllActivity()
+                    deleteAllActivity()
                 } catch (err) {
                     throw new Error('Failure on users.children.physicalactivities routes test: ' + err.message)
                 }
@@ -1207,7 +1214,7 @@ describe('Routes: users/children', () => {
                 let result
 
                 try {
-                    await deleteAllActivity()
+                    deleteAllActivity()
 
                     // physical activity to be updated
                     result = await createActivityToBeUpdated(defaultActivity)
@@ -1245,7 +1252,7 @@ describe('Routes: users/children', () => {
                 let result
 
                 try {
-                    await deleteAllActivity()
+                    deleteAllActivity()
 
                     // physical activity to be updated
                     result = await createActivityToBeUpdated(defaultActivity)
@@ -1283,7 +1290,7 @@ describe('Routes: users/children', () => {
                 let result
 
                 try {
-                    await deleteAllActivity()
+                    deleteAllActivity()
 
                     // physical activity to be updated
                     result = await createActivityToBeUpdated(defaultActivity)
@@ -1315,7 +1322,7 @@ describe('Routes: users/children', () => {
                 let result
 
                 try {
-                    await deleteAllActivity()
+                    deleteAllActivity()
 
                     // physical activity to be updated
                     result = await createActivityToBeUpdated(defaultActivity)
@@ -1347,7 +1354,7 @@ describe('Routes: users/children', () => {
                 let result
 
                 try {
-                    await deleteAllActivity()
+                    deleteAllActivity()
 
                     // physical activity to be updated
                     result = await createActivityToBeUpdated(defaultActivity)
@@ -1379,7 +1386,7 @@ describe('Routes: users/children', () => {
                 let result
 
                 try {
-                    await deleteAllActivity()
+                    deleteAllActivity()
 
                     // physical activity to be updated
                     result = await createActivityToBeUpdated(defaultActivity)
@@ -1434,7 +1441,7 @@ describe('Routes: users/children', () => {
                 let result
 
                 try {
-                    await deleteAllActivity()
+                    deleteAllActivity()
 
                     // physical activity to be updated
                     result = await createActivityToBeUpdated(defaultActivity)
@@ -1490,7 +1497,7 @@ describe('Routes: users/children', () => {
                 let result
 
                 try {
-                    await deleteAllActivity()
+                    deleteAllActivity()
 
                     // physical activity to be updated
                     result = await createActivityToBeUpdated(defaultActivity)
@@ -1550,7 +1557,7 @@ describe('Routes: users/children', () => {
                 let result
 
                 try {
-                    await deleteAllActivity()
+                    deleteAllActivity()
 
                     result = await createActivity({
                         name: defaultActivity.name,
@@ -1579,7 +1586,7 @@ describe('Routes: users/children', () => {
         context('when the physical activity is not found', () => {
             it('should return status code 204 and no content for physical activity', async () => {
                 try {
-                    await deleteAllActivity()
+                    deleteAllActivity()
                 } catch (err) {
                     throw new Error('Failure on users.children.physicalactivities routes test: ' + err.message)
                 }
@@ -1599,7 +1606,7 @@ describe('Routes: users/children', () => {
                 let result
 
                 try {
-                    await deleteAllActivity()
+                    deleteAllActivity()
 
                     result = await createActivity({
                         name: defaultActivity.name,
@@ -1632,7 +1639,7 @@ describe('Routes: users/children', () => {
                 let result
 
                 try {
-                    await deleteAllActivity()
+                    deleteAllActivity()
 
                     result = await createActivity({
                         name: defaultActivity.name,
@@ -1665,9 +1672,10 @@ describe('Routes: users/children', () => {
      */
     describe('POST /users/children/:child_id/physicalactivities/logs/:resource', () => {
         context('when all the logs in the body are correct and it still does not exist in the repository', () => {
-            it('should return a response of type MultiStatus<Log> with the description of success in sending each log', async () => {
+            it('should return status code 201 and a response of type MultiStatus<Log> with the description of success in ' +
+                'sending each log', async () => {
                 try {
-                    await deleteAllLogs()
+                    deleteAllLogs()
                 } catch (err) {
                     throw new Error('Failure on users.children.physicalactivities routes test: ' + err.message)
                 }
@@ -1689,7 +1697,11 @@ describe('Routes: users/children', () => {
                     .expect(201)
                     .then(res => {
                         expect(res.body.success).is.an.instanceOf(Array)
-                        expect(res.body.success.length).to.not.eql(0)
+                        for (let i = 0; i < res.body.success.length; i++) {
+                            expect(res.body.success[i].code).to.eql(HttpStatus.CREATED)
+                            expect(res.body.success[i].item.date).to.eql(correctLogsArr[i].date)
+                            expect(res.body.success[i].item.value).to.eql(correctLogsArr[i].value)
+                        }
                         expect(res.body.error).is.an.instanceOf(Array)
                         expect(res.body.error.length).to.eql(0)
                     })
@@ -1697,8 +1709,8 @@ describe('Routes: users/children', () => {
         })
 
         context('when all the logs in the body are correct and already exist in the repository', () => {
-            it('should update the value of items in the repository and return a response of type MultiStatus<Log> with ' +
-                'the description of success in sending each log', async () => {
+            it('should return status code 201, update the value of items in the repository and return a response of type ' +
+                'MultiStatus<Log> with the description of success in sending each log', async () => {
                 const body: any = []
 
                 correctLogsArr.forEach(log => {
@@ -1716,7 +1728,11 @@ describe('Routes: users/children', () => {
                     .expect(201)
                     .then(res => {
                         expect(res.body.success).is.an.instanceOf(Array)
-                        expect(res.body.success.length).to.not.eql(0)
+                        for (let i = 0; i < res.body.success.length; i++) {
+                            expect(res.body.success[i].code).to.eql(HttpStatus.CREATED)
+                            expect(res.body.success[i].item.date).to.eql(correctLogsArr[i].date)
+                            expect(res.body.success[i].item.value).to.eql(correctLogsArr[i].value)
+                        }
                         expect(res.body.error).is.an.instanceOf(Array)
                         expect(res.body.error.length).to.eql(0)
                     })
@@ -1724,9 +1740,9 @@ describe('Routes: users/children', () => {
         })
 
         context('when all the logs in the body are correct and some of them already exist in the repository', () => {
-            it('should update the value of the existing items already in the repository, create the new ones, and return a ' +
-                'response of type MultiStatus<Log> with the description of success in sending each log', async () => {
-                const newLog: Log = LogMock.generateLog()
+            it('should return status code 201, update the value of the existing items already in the repository, create the new ones, ' +
+                'and return a response of type MultiStatus<Log> with the description of success in sending each log', async () => {
+                const newLog: Log = new LogMock()
                 newLog.date = '2019-10-02'
                 correctLogsArr.push(newLog)
 
@@ -1747,7 +1763,11 @@ describe('Routes: users/children', () => {
                     .expect(201)
                     .then(res => {
                         expect(res.body.success).is.an.instanceOf(Array)
-                        expect(res.body.success.length).to.not.eql(0)
+                        for (let i = 0; i < res.body.success.length; i++) {
+                            expect(res.body.success[i].code).to.eql(HttpStatus.CREATED)
+                            expect(res.body.success[i].item.date).to.eql(correctLogsArr[i].date)
+                            expect(res.body.success[i].item.value).to.eql(correctLogsArr[i].value)
+                        }
                         expect(res.body.error).is.an.instanceOf(Array)
                         expect(res.body.error.length).to.eql(0)
                     })
@@ -1755,8 +1775,9 @@ describe('Routes: users/children', () => {
         })
 
         context('when some of the logs in the body are incorrect (the date and value are invalid)', () => {
-            it('should perform the operations of creating and updating normally for the correct logs and returning a response ' +
-                'of type MultiStatus<Log> with the description of success and error cases of each log', async () => {
+            it('should return status code 201, perform the operations of creating and updating normally for the correct logs ' +
+                'and returning a response of type MultiStatus<Log> with the description of success and error cases of each log',
+                async () => {
                 const body: any = []
 
                 mixedLogsArr.forEach(log => {
@@ -1774,16 +1795,33 @@ describe('Routes: users/children', () => {
                     .expect(201)
                     .then(res => {
                         expect(res.body.success).is.an.instanceOf(Array)
-                        expect(res.body.success.length).to.not.eql(0)
+                        for (let i = 0; i < res.body.success.length; i++) {
+                            expect(res.body.success[i].code).to.eql(HttpStatus.CREATED)
+                            expect(res.body.success[i].item.date).to.eql(mixedLogsArr[i].date)
+                            expect(res.body.success[i].item.value).to.eql(mixedLogsArr[i].value)
+                        }
+
                         expect(res.body.error).is.an.instanceOf(Array)
-                        expect(res.body.error.length).to.not.eql(0)
+
+                        expect(res.body.error[0].message).to.eql('Date parameter: 20199-03-08, is not in valid ISO 8601 format.')
+                        expect(res.body.error[0].description).to.eql('Date must be in the format: yyyy-MM-dd')
+                        expect(res.body.error[1].message).to.eql('Value field is invalid...')
+                        expect(res.body.error[1].description).to.eql('Physical Activity log validation failed: The value ' +
+                            'provided has a negative value!')
+
+                        for (let i = 0; i < res.body.error.length; i++) {
+                            expect(res.body.error[i].code).to.eql(HttpStatus.BAD_REQUEST)
+                            expect(res.body.error[i].item.date).to.eql(mixedLogsArr[i + 3].date)
+                            expect(res.body.error[i].item.value).to.eql(mixedLogsArr[i + 3].value)
+                        }
                     })
             })
         })
 
         context('when some of the logs in the body are incorrect (the child_id is invalid)', () => {
-            it('should perform the operations of creating and updating normally for the correct logs and returning a response ' +
-                'of type MultiStatus<Log> with the description of success and error cases of each log', async () => {
+            it('should return status code 201, perform the operations of creating and updating normally for the correct logs ' +
+                'and returning a response of type MultiStatus<Log> with the description of success and error cases of each log',
+                async () => {
                 const body: any = []
 
                 correctLogsArr.forEach(log => {
@@ -1802,15 +1840,21 @@ describe('Routes: users/children', () => {
                     .then(res => {
                         expect(res.body.success).is.an.instanceOf(Array)
                         expect(res.body.success.length).to.eql(0)
-                        expect(res.body.error).is.an.instanceOf(Array)
-                        expect(res.body.error.length).to.not.eql(0)
+                        for (let i = 0; i < res.body.error.length; i++) {
+                            expect(res.body.error[i].code).to.eql(HttpStatus.BAD_REQUEST)
+                            expect(res.body.error[i].message).to.eql(Strings.CHILD.PARAM_ID_NOT_VALID_FORMAT)
+                            expect(res.body.error[i].description).to.eql(Strings.ERROR_MESSAGE.UUID_NOT_VALID_FORMAT_DESC)
+                            expect(res.body.error[i].item.date).to.eql(correctLogsArr[i].date)
+                            expect(res.body.error[i].item.value).to.eql(correctLogsArr[i].value)
+                        }
                     })
             })
         })
 
         context('when some of the logs in the body are incorrect (the type is invalid)', () => {
-            it('should perform the operations of creating and updating normally for the correct logs and returning a response ' +
-                'of type MultiStatus<Log> with the description of success and error cases of each log', async () => {
+            it('should return status code 201, perform the operations of creating and updating normally for the correct logs ' +
+                'and returning a response of type MultiStatus<Log> with the description of success and error cases of each log',
+                async () => {
                 const body: any = []
 
                 correctLogsArr.forEach(log => {
@@ -1829,15 +1873,21 @@ describe('Routes: users/children', () => {
                     .then(res => {
                         expect(res.body.success).is.an.instanceOf(Array)
                         expect(res.body.success.length).to.eql(0)
-                        expect(res.body.error).is.an.instanceOf(Array)
-                        expect(res.body.error.length).to.not.eql(0)
+                        for (let i = 0; i < res.body.error.length; i++) {
+                            expect(res.body.error[i].code).to.eql(HttpStatus.BAD_REQUEST)
+                            expect(res.body.error[i].message).to.eql('The name of type provided "step" is not supported...')
+                            expect(res.body.error[i].description).to.eql('The names of the allowed types are: steps, calories.')
+                            expect(res.body.error[i].item.date).to.eql(correctLogsArr[i].date)
+                            expect(res.body.error[i].item.value).to.eql(correctLogsArr[i].value)
+                        }
                     })
             })
         })
 
         context('when some of the logs in the array are incorrect (missing fields)', () => {
-            it('should perform the operations of creating and updating normally for the correct logs and returning a response ' +
-                'of type MultiStatus<Log> with the description of success and error cases of each log', async () => {
+            it('should return status code 201, perform the operations of creating and updating normally for the correct logs ' +
+                'and returning a response of type MultiStatus<Log> with the description of success and error cases of each log',
+                async () => {
                 const emptyLog: Log = new Log()
                 correctLogsArr.push(emptyLog)
 
@@ -1858,9 +1908,15 @@ describe('Routes: users/children', () => {
                     .expect(201)
                     .then(res => {
                         expect(res.body.success).is.an.instanceOf(Array)
-                        expect(res.body.success.length).to.not.eql(0)
+                        for (let i = 0; i < res.body.success.length; i++) {
+                            expect(res.body.success[i].code).to.eql(HttpStatus.CREATED)
+                            expect(res.body.success[i].item.date).to.eql(correctLogsArr[i].date)
+                            expect(res.body.success[i].item.value).to.eql(correctLogsArr[i].value)
+                        }
                         expect(res.body.error).is.an.instanceOf(Array)
-                        expect(res.body.error.length).to.not.eql(0)
+                        expect(res.body.error[0].code).to.eql(HttpStatus.BAD_REQUEST)
+                        expect(res.body.error[0].message).to.eql('Required fields were not provided...')
+                        expect(res.body.error[0].description).to.eql('Physical Activity log validation failed: date, value is required!')
                     })
             })
         })
@@ -2274,7 +2330,7 @@ describe('Routes: users/children', () => {
             it('should return status code 400 and an info message about the invalid date_end', async () => {
                 // Delete all logs for the next run to be cleaned
                 try {
-                    await deleteAllLogs()
+                    deleteAllLogs()
                 } catch (err) {
                     throw new Error('Failure on users.children.physicalactivities routes test: ' + err.message)
                 }

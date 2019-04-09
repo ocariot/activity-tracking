@@ -23,7 +23,7 @@ export class LogRepositoryMock implements ILogRepository {
         if (!(child_id === '507f1f77bcf86cd799439011')) {
             // Mock correct logs array
             for (let i = 0; i < 5; i++ ) {
-                logsArr.push(LogMock.generateLog())
+                logsArr.push(new LogMock(query.filters.type))
             }
         }
         return Promise.resolve(logsArr)
@@ -32,7 +32,7 @@ export class LogRepositoryMock implements ILogRepository {
     public findOne(query: any): Promise<Log> {
         const date: string = query.filters.date
         if (date === '2018-03-10T00:00:00') {
-            return Promise.resolve(LogMock.generateLog())
+            return Promise.resolve(new LogMock())
         }
         return Promise.resolve(undefined!)
     }
