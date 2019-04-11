@@ -6,20 +6,17 @@ export class SleepMock extends Sleep {
 
     constructor() {
         super()
-        super.fromJSON(JSON.stringify(this.generateSleep()))
+        this.generateSleep()
     }
 
-    private generateSleep(): Sleep {
-        const sleep = new Sleep()
-        sleep.id = this.generateObjectId()
-        sleep.start_time = new Date()
-        sleep.end_time = new Date(new Date(sleep.start_time)
+    private generateSleep(): void {
+        super.id = this.generateObjectId()
+        super.start_time = new Date()
+        super.end_time = new Date(new Date(super.start_time)
             .setMilliseconds(Math.floor(Math.random() * 7 + 4) * 3.6e+6)) // 4-10h in milliseconds
-        sleep.duration = sleep.end_time.getTime() - sleep.start_time.getTime()
-        sleep.child_id = '5a62be07de34500146d9c544'
-        sleep.pattern = this.generateSleepPattern(sleep.start_time, sleep.duration)
-
-        return sleep
+        super.duration = super.end_time.getTime() - super.start_time.getTime()
+        super.child_id = '5a62be07de34500146d9c544'
+        super.pattern = this.generateSleepPattern(super.start_time, super.duration)
     }
 
     private generateSleepPattern(start_time: Date, duration: number): SleepPattern {

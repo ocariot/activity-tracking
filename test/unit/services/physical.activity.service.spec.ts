@@ -77,7 +77,7 @@ describe('Services: PhysicalActivityService', () => {
         correctActivitiesArr.push(new PhysicalActivityMock())
     }
 
-    // Incorrect environments
+    // Incorrect activities
     const incorrectActivity1: PhysicalActivity = new PhysicalActivity()        // Without all required fields
 
     const incorrectActivity2: PhysicalActivity = new PhysicalActivityMock()    // Without PhysicalActivity fields
@@ -118,12 +118,12 @@ describe('Services: PhysicalActivityService', () => {
     incorrectActivityJSON.levels[0].duration = -(Math.floor((Math.random() * 10) * 60000))
     incorrectActivity11 = incorrectActivity11.fromJSON(incorrectActivityJSON)
 
-    // Array with correct and incorrect environments
+    // Array with correct and incorrect activities
     const mixedActivitiesArr: Array<PhysicalActivity> = new Array<PhysicalActivityMock>()
     mixedActivitiesArr.push(new PhysicalActivityMock())
     mixedActivitiesArr.push(incorrectActivity1)
 
-    // Array with only incorrect environments
+    // Array with only incorrect activities
     const incorrectActivitiesArr: Array<PhysicalActivity> = new Array<PhysicalActivityMock>()
     incorrectActivitiesArr.push(incorrectActivity1)
     incorrectActivitiesArr.push(incorrectActivity2)
@@ -140,13 +140,12 @@ describe('Services: PhysicalActivityService', () => {
     /**
      * Mock MultiStatus responses
      */
-    const multiStatusMock: MultiStatusMock<PhysicalActivity> = new MultiStatusMock<PhysicalActivity>()
     // MultiStatus totally correct
-    const multiStatusCorrect: MultiStatus<PhysicalActivity> = multiStatusMock.generateMultiStatus(correctActivitiesArr)
+    const multiStatusCorrect: MultiStatus<PhysicalActivity> = new MultiStatusMock<PhysicalActivity>(correctActivitiesArr)
     // Mixed MultiStatus
-    const multiStatusMixed: MultiStatus<PhysicalActivity> = multiStatusMock.generateMultiStatus(mixedActivitiesArr)
+    const multiStatusMixed: MultiStatus<PhysicalActivity> = new MultiStatusMock<PhysicalActivity>(mixedActivitiesArr)
     // MultiStatus totally incorrect
-    const multiStatusIncorrect: MultiStatus<PhysicalActivity> = multiStatusMock.generateMultiStatus(incorrectActivitiesArr)
+    const multiStatusIncorrect: MultiStatus<PhysicalActivity> = new MultiStatusMock<PhysicalActivity>(incorrectActivitiesArr)
 
     const modelFake: any = ActivityRepoModel
     const activityRepo: IPhysicalActivityRepository = new PhysicalActivityRepositoryMock()
@@ -239,6 +238,7 @@ describe('Services: PhysicalActivityService', () => {
 
         context('when the physical activity is correct but already exists in the repository', () => {
             it('should throw a ConflictException', () => {
+                connectionRabbitmqPub.isConnected = true
                 activity.id = '507f1f77bcf86cd799439011'            // Make mock return true
                 sinon
                     .mock(modelFake)
@@ -540,8 +540,8 @@ describe('Services: PhysicalActivityService', () => {
 
         context('when all the activities are correct, they still do not exist in the repository but there is no a connection ' +
             'to the RabbitMQ', () => {
-            it('should save each PhysicalActivity for submit after to the bus and return a response of type ' +
-                'MultiStatus<PhysicalActivity> with the description of success in sending each one of them', () => {
+            it('should save each PhysicalActivity for submission attempt later to the bus and return a response of type ' +
+                'MultiStatus<PhysicalActivity> with the description of success in each one of them', () => {
                 connectionRabbitmqPub.isConnected = false
 
                 sinon
@@ -589,7 +589,7 @@ describe('Services: PhysicalActivityService', () => {
                     .expects('create')
                     .withArgs(correctActivitiesArr)
                     .chain('exec')
-                    .resolves(multiStatusCorrect)
+                    .resolves(multiStatusIncorrect)
 
                 return activityService.add(correctActivitiesArr)
                     .then((result: PhysicalActivity | MultiStatus<PhysicalActivity>) => {
@@ -618,7 +618,7 @@ describe('Services: PhysicalActivityService', () => {
 
         context('when there are correct and incorrect activities and there is a connection to the RabbitMQ', () => {
             it('should create each correct PhysicalActivity and return a response of type MultiStatus<PhysicalActivity> with ' +
-                'the description of success and error in sending each one of them', () => {
+                'the description of success and error in each one of them', () => {
                 sinon
                     .mock(modelFake)
                     .expects('create')
@@ -653,7 +653,7 @@ describe('Services: PhysicalActivityService', () => {
         })
 
         context('when all the activities are incorrect', () => {
-            it('should return a response of type MultiStatus<PhysicalActivity> with the description of error in sending each one of ' +
+            it('should return a response of type MultiStatus<PhysicalActivity> with the description of error in each one of ' +
                 'them', () => {
                 sinon
                     .mock(modelFake)
@@ -1241,7 +1241,7 @@ describe('Services: PhysicalActivityService', () => {
             })
         })
 
-        context('when there is physical activity with the received parameters but the connection to the RabbitMQ', () => {
+        context('when there is physical activity with the received parameters but there is no connection to the RabbitMQ', () => {
             it('should return true and save the event that will report the removal of the resource', () => {
                 connectionRabbitmqPub.isConnected = false
                 activity.id = '507f1f77bcf86cd799439011'            // Make mock return true
@@ -1262,6 +1262,7 @@ describe('Services: PhysicalActivityService', () => {
 
         context('when the physical activity is incorrect (child_id is invalid)', () => {
             it('should throw a ValidationException', () => {
+                connectionRabbitmqPub.isConnected = true
                 incorrectActivity.child_id = '5a62be07de34500146d9c5442'     // Make child_id invalid
                 sinon
                     .mock(modelFake)

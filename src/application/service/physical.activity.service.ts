@@ -39,7 +39,7 @@ export class PhysicalActivityService implements IPhysicalActivityService {
      *
      * @param {PhysicalActivity | Array<PhysicalActivity>} activity
      * @returns {(Promise<PhysicalActivity | MultiStatus<PhysicalActivity>)}
-     * @throws {ConflictException | RepositoryException} If a data conflict occurs, as an existing physicalactivity.
+     * @throws {ValidationException | ConflictException | RepositoryException}
      */
     public async add(activity: PhysicalActivity | Array<PhysicalActivity>): Promise<PhysicalActivity | MultiStatus<PhysicalActivity>> {
         try {
@@ -58,8 +58,8 @@ export class PhysicalActivityService implements IPhysicalActivityService {
      * Adds the data of multiple items of PhysicalActivity.
      * Before adding, it is checked whether each of the activities already exists.
      *
-     * @param environment
-     * @return {Promise<MultiStatus<Environment>>}
+     * @param activity
+     * @return {Promise<MultiStatus<PhysicalActivity>>}
      * @throws {ValidationException | ConflictException | RepositoryException}
      */
     private async addMultipleActivities(activity: Array<PhysicalActivity>): Promise<MultiStatus<PhysicalActivity>> {
@@ -77,17 +77,17 @@ export class PhysicalActivityService implements IPhysicalActivityService {
                 if (activityExist) throw new ConflictException('Physical Activity is already registered...')
 
                 // 3. Create new physical activity register.
-                const activitySaved: PhysicalActivity = await this._activityRepository.create(elem)
+                const activityItemSaved: PhysicalActivity = await this._activityRepository.create(elem)
 
                 // 4. If created successfully, the object is published on the message bus.
-                if (activitySaved) {
+                if (activityItemSaved) {
                     const event: PhysicalActivityEvent = new PhysicalActivityEvent('PhysicalActivitySaveEvent',
-                        new Date(), activitySaved)
+                        new Date(), activityItemSaved)
                     if (!(await this._eventBus.publish(event, 'activities.save'))) {
                         // 5. Save Event for submission attempt later when there is connection to message channel.
                         this.saveEvent(event)
                     } else {
-                        this._logger.info(`Physical Activity with ID: ${activitySaved.id} published on event bus...`)
+                        this._logger.info(`Physical Activity with ID: ${activityItemSaved.id} published on event bus...`)
                     }
                 }
 
@@ -145,6 +145,7 @@ export class PhysicalActivityService implements IPhysicalActivityService {
                     this._logger.info(`Physical Activity with ID: ${activitySaved.id} published on event bus...`)
                 }
             }
+
             // 6. Returns the created object.
             return Promise.resolve(activitySaved)
         } catch (err) {

@@ -6,24 +6,21 @@ export class EnvironmentMock extends Environment {
 
     constructor() {
         super()
-        super.fromJSON(JSON.stringify(this.generateEnvironment()))
+        this.generateEnvironment()
     }
 
-    private generateEnvironment(): Environment {
-        const environment: Environment = new Environment()
-        environment.id = this.generateObjectId()
-        environment.institution_id = this.generateObjectId()
-        environment.timestamp = new Date()
-        environment.climatized = (Math.random() >= 0.5)
-        environment.measurements = this.generateMeasurements()
-        environment.location = new Location().fromJSON({
+    private generateEnvironment(): void {
+        super.id = this.generateObjectId()
+        super.institution_id = this.generateObjectId()
+        super.timestamp = new Date()
+        super.climatized = (Math.random() >= 0.5)
+        super.measurements = this.generateMeasurements()
+        super.location = new Location().fromJSON({
             local: 'Indoor',
             room: 'room 01',
             latitude: Math.random() * 90,
             longitude:  Math.random() * 180
         })
-
-        return environment
     }
 
     private generateMeasurements(): Array<Measurement> {

@@ -271,7 +271,7 @@ describe('Routes: environments', () => {
      * POST route with an environment array in the body
      */
     describe('POST /environments with an environment array in the body', () => {
-        context('when all the environments are correct', () => {
+        context('when all the environments are correct and still do not exist in the repository', () => {
             it('should return status code 201, create each environment and return a response of type MultiStatus<Environment> ' +
                 'with the description of success in sending each one of them', () => {
                 try {
@@ -317,8 +317,8 @@ describe('Routes: environments', () => {
         })
 
         context('when all the environments are correct but already exists in the repository', () => {
-            it('should return status code 201 and return a response of type MultiStatus<Environment> ' +
-                'with the description of conflict in sending each one of them', () => {
+            it('should return status code 201 and return a response of type MultiStatus<Environment> with the description ' +
+                'of conflict in sending each one of them', () => {
                 const body: any = []
 
                 correctEnvironmentsArr.forEach(environment => {
@@ -356,7 +356,7 @@ describe('Routes: environments', () => {
             })
         })
 
-        context('when there is correct and incorrect environments', () => {
+        context('when there is correct and incorrect environments in the body', () => {
             it('should return status code 201 and return a response of type MultiStatus<Environment> with the description of ' +
                 'success and error in each one of them', () => {
                 try {
@@ -385,6 +385,7 @@ describe('Routes: environments', () => {
                     .set('Content-Type', 'application/json')
                     .expect(201)
                     .then(res => {
+                        // Success item
                         expect(res.body.success[0].code).to.eql(HttpStatus.CREATED)
                         expect(res.body.success[0].item.id).to.eql(mixedEnvironmentsArr[0].id)
                         expect(res.body.success[0].item.institution_id).to.eql(mixedEnvironmentsArr[0].institution_id)
@@ -394,6 +395,7 @@ describe('Routes: environments', () => {
                         expect(res.body.success[0].item.timestamp).to.eql(mixedEnvironmentsArr[0].timestamp.toISOString())
                         expect(res.body.success[0].item.measurements).to.not.be.empty
 
+                        // Error item
                         expect(res.body.error[0].code).to.eql(HttpStatus.BAD_REQUEST)
                         expect(res.body.error[0].message).to.eql('Required fields were not provided...')
                         expect(res.body.error[0].description).to.eql('Validation of environment measurements failed: timestamp, ' +
@@ -402,7 +404,7 @@ describe('Routes: environments', () => {
             })
         })
 
-        context('when all the environments are incorrect', () => {
+        context('when all the environments of the body are incorrect', () => {
             it('should return status code 201 and return a response of type MultiStatus<Environment> with the description of ' +
                 'error in each one of them', () => {
                 try {

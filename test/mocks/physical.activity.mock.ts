@@ -5,31 +5,29 @@ export class PhysicalActivityMock extends PhysicalActivity {
 
     constructor(type?: ActivityTypeMock) {
         super()
-        super.fromJSON(JSON.stringify(this.generatePhysicalActivity(type)))
+        this.generatePhysicalActivity(type)
     }
 
-    private generatePhysicalActivity(type?: ActivityTypeMock): PhysicalActivity {
+    private generatePhysicalActivity(type?: ActivityTypeMock): void {
         if (!type) type = this.chooseType()
 
-        const physicalActivity: PhysicalActivity = new PhysicalActivity()
-        physicalActivity.id = this.generateObjectId()
-        physicalActivity.start_time = new Date()
-        physicalActivity.end_time = new Date(new Date(physicalActivity.start_time)
+        super.id = this.generateObjectId()
+        super.start_time = new Date(1560826800000 + Math.floor((Math.random() * 1000)))
+        super.end_time = new Date(new Date(super.start_time)
             .setMilliseconds(Math.floor(Math.random() * 35 + 10) * 60000)) // 10-45min in milliseconds
-        physicalActivity.duration = physicalActivity.end_time.getTime() - physicalActivity.start_time.getTime()
-        physicalActivity.child_id = '5a62be07de34500146d9c544'
-        physicalActivity.name = type
-        physicalActivity.calories = Math.floor((Math.random() * 20000 + 500)) // 500-20000
+        super.duration = super.end_time.getTime() - super.start_time.getTime()
+        super.child_id = '5a62be07de34500146d9c544'
+        super.name = type
+        super.calories = Math.floor((Math.random() * 20000 + 500)) // 500-20000
 
         if (type === ActivityTypeMock.WALK || type === ActivityTypeMock.RUN) {
-            physicalActivity.steps = Math.floor((Math.random() * 20000 + 100)) // 100-15000
+            super.steps = Math.floor((Math.random() * 20000 + 100)) // 100-15000
         }
 
         // Create levels or not, true creates false not
         if (Math.random() >= 0.5) { // true or false random
-            physicalActivity.levels = this.generatePhysicalActivityLevels()
+            super.levels = this.generatePhysicalActivityLevels()
         }
-        return physicalActivity
     }
 
     private generatePhysicalActivityLevels(): Array<PhysicalActivityLevel> {

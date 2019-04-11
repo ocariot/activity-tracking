@@ -55,10 +55,9 @@ describe('Services: Log', () => {
     /**
      * Mock MultiStatus responses
      */
-    const multiStatusMock: MultiStatusMock<Log> = new MultiStatusMock<Log>()
-    const multiStatusCorrect: MultiStatus<Log> = multiStatusMock.generateMultiStatus(correctLogsArr) // MultiStatus totally correct
-    const multiStatusMixed: MultiStatus<Log> = multiStatusMock.generateMultiStatus(mixedLogsArr) // Mixed MultiStatus
-    const multiStatusIncorrect: MultiStatus<Log> = multiStatusMock.generateMultiStatus(incorrectLogsArr) // Mixed MultiStatus
+    const multiStatusCorrect: MultiStatus<Log> = new MultiStatusMock<Log>(correctLogsArr) // MultiStatus totally correct
+    const multiStatusMixed: MultiStatus<Log> = new MultiStatusMock<Log>(mixedLogsArr) // Mixed MultiStatus
+    const multiStatusIncorrect: MultiStatus<Log> = new MultiStatusMock<Log>(incorrectLogsArr) // Mixed MultiStatus
 
     const modelFake = ActivityLogRepoModel
     const logRepo: ILogRepository = new LogRepositoryMock()

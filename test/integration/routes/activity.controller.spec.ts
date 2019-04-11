@@ -28,7 +28,9 @@ describe('Routes: users/children', () => {
     const otherActivity: PhysicalActivity = new PhysicalActivityMock()
     otherActivity.child_id = '5a62be07de34500146d9c542'
 
-    // Mock objects for Log routes
+    /**
+     * Mock objects for Log routes
+     */
     const correctLogsArr: Array<Log> = new Array<Log>()
     for (let i = 0; i < 5; i ++) {
         correctLogsArr.push(new LogMock())
@@ -55,6 +57,101 @@ describe('Routes: users/children', () => {
     otherLogIncorrect = otherLogIncorrect.fromJSON(logJSON)
     mixedLogsArr.push(otherLogIncorrect)
 
+    /**
+     * Mock objects For POST route with multiple activities
+     */
+    // Mock through JSON
+    const incorrectActivityJSON: any = {
+            id: new ObjectID(),
+            start_time: new Date('2018-12-14T12:52:59Z').toISOString(),
+            end_time: new Date('2018-12-14T13:12:37Z').toISOString(),
+            duration: 1178000,
+            child_id: '5a62be07de34500146d9c544',
+            name: 'walk',
+            calories: 200,
+            steps: 1000,
+            levels: [
+                {
+                    name: 'sedentaries',
+                    duration: Math.floor((Math.random() * 10) * 60000)
+                },
+                {
+                    name: ActivityLevelType.LIGHTLY,
+                    duration: Math.floor((Math.random() * 10) * 60000)
+                },
+                {
+                    name: ActivityLevelType.FAIRLY,
+                    duration: Math.floor((Math.random() * 10) * 60000)
+                },
+                {
+                    name: ActivityLevelType.VERY,
+                    duration: Math.floor((Math.random() * 10) * 60000)
+                }
+            ]
+        }
+
+    // Array with correct activities
+    const correctActivitiesArr: Array<PhysicalActivity> = new Array<PhysicalActivityMock>()
+    for (let i = 0; i < 3; i++) {
+        correctActivitiesArr.push(new PhysicalActivityMock())
+    }
+
+    // Incorrect activities
+    const incorrectActivity1: PhysicalActivity = new PhysicalActivity()        // Without all required fields
+
+    const incorrectActivity2: PhysicalActivity = new PhysicalActivityMock()    // Without PhysicalActivity fields
+    incorrectActivity2.name = ''
+    incorrectActivity2.calories = undefined
+
+    const incorrectActivity3: PhysicalActivity = new PhysicalActivityMock()    // start_time with a date newer than end_time
+    incorrectActivity3.start_time = new Date('2018-12-15T12:52:59Z')
+    incorrectActivity3.end_time = new Date('2018-12-14T13:12:37Z')
+
+    // The duration is incompatible with the start_time and end_time parameters
+    const incorrectActivity4: PhysicalActivity = new PhysicalActivityMock()
+    incorrectActivity4.duration = 11780000
+
+    const incorrectActivity5: PhysicalActivity = new PhysicalActivityMock()    // The duration is negative
+    incorrectActivity5.duration = -11780000
+
+    const incorrectActivity6: PhysicalActivity = new PhysicalActivityMock()    // The calories parameter is negative
+    incorrectActivity6.calories = -200
+
+    const incorrectActivity7: PhysicalActivity = new PhysicalActivityMock()    // The steps parameter is negative
+    incorrectActivity7.steps = -1000
+
+    let incorrectActivity8: PhysicalActivity = new PhysicalActivityMock()    // The levels array has an item with an invalid type
+    incorrectActivity8 = incorrectActivity8.fromJSON(incorrectActivityJSON)
+
+    let incorrectActivity9: PhysicalActivity = new PhysicalActivityMock()    // The levels array has an item that contains empty fields
+    incorrectActivityJSON.levels[0].name = ''
+    incorrectActivityJSON.levels[0].duration = undefined
+    incorrectActivity9 = incorrectActivity9.fromJSON(incorrectActivityJSON)
+
+    // The levels array has an item that contains negative duration
+    let incorrectActivity10: PhysicalActivity = new PhysicalActivityMock()
+    incorrectActivityJSON.levels[0].name = ActivityLevelType.SEDENTARY
+    incorrectActivityJSON.levels[0].duration = -(Math.floor((Math.random() * 10) * 60000))
+    incorrectActivity10 = incorrectActivity10.fromJSON(incorrectActivityJSON)
+
+    // Array with correct and incorrect activities
+    const mixedActivitiesArr: Array<PhysicalActivity> = new Array<PhysicalActivityMock>()
+    mixedActivitiesArr.push(new PhysicalActivityMock())
+    mixedActivitiesArr.push(incorrectActivity1)
+
+    // Array with only incorrect activities
+    const incorrectActivitiesArr: Array<PhysicalActivity> = new Array<PhysicalActivityMock>()
+    incorrectActivitiesArr.push(incorrectActivity1)
+    incorrectActivitiesArr.push(incorrectActivity2)
+    incorrectActivitiesArr.push(incorrectActivity3)
+    incorrectActivitiesArr.push(incorrectActivity4)
+    incorrectActivitiesArr.push(incorrectActivity5)
+    incorrectActivitiesArr.push(incorrectActivity6)
+    incorrectActivitiesArr.push(incorrectActivity7)
+    incorrectActivitiesArr.push(incorrectActivity8)
+    incorrectActivitiesArr.push(incorrectActivity9)
+    incorrectActivitiesArr.push(incorrectActivity10)
+
     // Start services
     before(async () => {
         try {
@@ -75,9 +172,9 @@ describe('Routes: users/children', () => {
         }
     })
     /**
-     * POST route for PhysicalActivity
+     * POST route to PhysicalActivity with only one item of this type in the body
      */
-    describe('POST /users/children/:child_id/physicalactivities', () => {
+    describe('POST /users/children/:child_id/physicalactivities with only one PhysicalActivity in the body', () => {
         context('when posting a new PhysicalActivity with success', () => {
             it('should return status code 201 and the saved PhysicalActivity', () => {
                 const body = {
@@ -103,7 +200,7 @@ describe('Routes: users/children', () => {
                         expect(res.body.end_time).to.eql(defaultActivity.end_time!.toISOString())
                         expect(res.body.duration).to.eql(defaultActivity.duration)
                         expect(res.body.calories).to.eql(defaultActivity.calories)
-                        if (defaultActivity.steps) {
+                        if (res.body.steps) {
                             expect(res.body.steps).to.eql(defaultActivity.steps)
                         }
                         if (defaultActivity.levels) {
@@ -456,6 +553,238 @@ describe('Routes: users/children', () => {
         })
     })
     /**
+     * POST route to PhysicalActivity with an array of such items in the body
+     */
+    describe('POST /users/children/:child_id/physicalactivities with an array of PhysicalActivity in the body', () => {
+        context('when all the activities are correct and still do not exist in the repository', () => {
+            it('should return status code 201, create each PhysicalActivity and return a response of type ' +
+                'MultiStatus<PhysicalActivity> with the description of success in sending each one of them', () => {
+                try {
+                    deleteAllActivity()
+                } catch (err) {
+                    throw new Error('Failure on users.children.physicalactivities routes test: ' + err.message)
+                }
+
+                const body: any = []
+
+                correctActivitiesArr.forEach(activity => {
+                    const bodyElem = {
+                        name: activity.name,
+                        start_time: activity.start_time,
+                        end_time: activity.end_time,
+                        duration: activity.duration,
+                        calories: activity.calories,
+                        steps: activity.steps ? activity.steps : undefined,
+                        levels: activity.levels ? activity.levels : undefined
+                    }
+                    body.push(bodyElem)
+                })
+
+                return request
+                    .post(`/users/children/${defaultActivity.child_id}/physicalactivities`)
+                    .send(body)
+                    .set('Content-Type', 'application/json')
+                    .expect(201)
+                    .then(res => {
+                        for (let i = 0; i < res.body.success.length; i++) {
+                            expect(res.body.success[i].code).to.eql(HttpStatus.CREATED)
+                            expect(res.body.success[i].item.name).to.eql(correctActivitiesArr[i].name)
+                            expect(res.body.success[i].item.start_time).to.eql(correctActivitiesArr[i].start_time!.toISOString())
+                            expect(res.body.success[i].item.end_time).to.eql(correctActivitiesArr[i].end_time!.toISOString())
+                            expect(res.body.success[i].item.duration).to.eql(correctActivitiesArr[i].duration)
+                            expect(res.body.success[i].item.calories).to.eql(correctActivitiesArr[i].calories)
+                            if (res.body.success[i].item.steps) {
+                                expect(res.body.success[i].item.steps).to.eql(correctActivitiesArr[i].steps)
+                            }
+                            if (correctActivitiesArr[i].levels) {
+                                expect(res.body.success[i].item).to.have.property('levels')
+                            }
+                            expect(res.body.success[i].item.child_id).to.eql(correctActivitiesArr[i].child_id)
+                        }
+
+                        expect(res.body.error.length).to.eql(0)
+                    })
+            })
+        })
+
+        context('when all the activities are correct but already exists in the repository', () => {
+            it('should return status code 201 and return a response of type MultiStatus<PhysicalActivity> with the ' +
+                'description of conflict in sending each one of them', () => {
+                const body: any = []
+
+                correctActivitiesArr.forEach(activity => {
+                    const bodyElem = {
+                        name: activity.name,
+                        start_time: activity.start_time,
+                        end_time: activity.end_time,
+                        duration: activity.duration,
+                        calories: activity.calories,
+                        steps: activity.steps ? activity.steps : undefined,
+                        levels: activity.levels ? activity.levels : undefined
+                    }
+                    body.push(bodyElem)
+                })
+
+                return request
+                    .post(`/users/children/${defaultActivity.child_id}/physicalactivities`)
+                    .send(body)
+                    .set('Content-Type', 'application/json')
+                    .expect(201)
+                    .then(res => {
+                        for (let i = 0; i < res.body.error.length; i++) {
+                            expect(res.body.error[i].code).to.eql(HttpStatus.CONFLICT)
+                            expect(res.body.error[i].message).to.eql('Physical Activity is already registered...')
+                            expect(res.body.error[i].item.name).to.eql(correctActivitiesArr[i].name)
+                            expect(res.body.error[i].item.start_time).to.eql(correctActivitiesArr[i].start_time!.toISOString())
+                            expect(res.body.error[i].item.end_time).to.eql(correctActivitiesArr[i].end_time!.toISOString())
+                            expect(res.body.error[i].item.duration).to.eql(correctActivitiesArr[i].duration)
+                            expect(res.body.error[i].item.calories).to.eql(correctActivitiesArr[i].calories)
+                            if (res.body.error[i].item.steps) {
+                                expect(res.body.error[i].item.steps).to.eql(correctActivitiesArr[i].steps)
+                            }
+                            if (correctActivitiesArr[i].levels) {
+                                expect(res.body.error[i].item).to.have.property('levels')
+                            }
+                            expect(res.body.error[i].item.child_id).to.eql(correctActivitiesArr[i].child_id)
+                        }
+
+                        expect(res.body.success.length).to.eql(0)
+                    })
+            })
+        })
+
+        context('when there are correct and incorrect activities in the body', () => {
+            it('should return status code 201 and return a response of type MultiStatus<PhysicalActivity> with the ' +
+                'description of success and error in each one of them', () => {
+                try {
+                    deleteAllActivity()
+                } catch (err) {
+                    throw new Error('Failure on users.children.physicalactivities routes test: ' + err.message)
+                }
+
+                const body: any = []
+
+                mixedActivitiesArr.forEach(activity => {
+                    const bodyElem = {
+                        name: activity.name,
+                        start_time: activity.start_time,
+                        end_time: activity.end_time,
+                        duration: activity.duration,
+                        calories: activity.calories,
+                        steps: activity.steps ? activity.steps : undefined,
+                        levels: activity.levels ? activity.levels : undefined
+                    }
+                    body.push(bodyElem)
+                })
+
+                return request
+                    .post(`/users/children/${defaultActivity.child_id}/physicalactivities`)
+                    .send(body)
+                    .set('Content-Type', 'application/json')
+                    .expect(201)
+                    .then(res => {
+                        // Success item
+                        expect(res.body.success[0].code).to.eql(HttpStatus.CREATED)
+                        expect(res.body.success[0].item.name).to.eql(mixedActivitiesArr[0].name)
+                        expect(res.body.success[0].item.start_time).to.eql(mixedActivitiesArr[0].start_time!.toISOString())
+                        expect(res.body.success[0].item.end_time).to.eql(mixedActivitiesArr[0].end_time!.toISOString())
+                        expect(res.body.success[0].item.duration).to.eql(mixedActivitiesArr[0].duration)
+                        expect(res.body.success[0].item.calories).to.eql(mixedActivitiesArr[0].calories)
+                        if (res.body.success[0].item.steps) {
+                            expect(res.body.success[0].item.steps).to.eql(mixedActivitiesArr[0].steps)
+                        }
+                        if (mixedActivitiesArr[0].levels) {
+                            expect(res.body.success[0].item).to.have.property('levels')
+                        }
+                        expect(res.body.success[0].item.child_id).to.eql(mixedActivitiesArr[0].child_id)
+
+                        // Error item
+                        expect(res.body.error[0].code).to.eql(HttpStatus.BAD_REQUEST)
+                        expect(res.body.error[0].message).to.eql('Required fields were not provided...')
+                        expect(res.body.error[0].description).to.eql('Activity validation failed: start_time, end_time, ' +
+                            'duration is required!')
+                    })
+            })
+        })
+
+        context('when all the activities are incorrect', () => {
+            it('should return status code 201 and return a response of type MultiStatus<PhysicalActivity> with the ' +
+                'description of error in each one of them', () => {
+                const body: any = []
+
+                incorrectActivitiesArr.forEach(activity => {
+                    const bodyElem = {
+                        name: activity.name,
+                        start_time: activity.start_time,
+                        end_time: activity.end_time,
+                        duration: activity.duration,
+                        calories: activity.calories,
+                        steps: activity.steps ? activity.steps : undefined,
+                        levels: activity.levels ? activity.levels : undefined,
+                    }
+                    body.push(bodyElem)
+                })
+
+                return request
+                    .post(`/users/children/${defaultActivity.child_id}/physicalactivities`)
+                    .send(body)
+                    .set('Content-Type', 'application/json')
+                    .expect(201)
+                    .then(res => {
+                        expect(res.body.error[0].message).to.eql('Required fields were not provided...')
+                        expect(res.body.error[0].description).to.eql('Activity validation failed: start_time, end_time, ' +
+                            'duration is required!')
+                        expect(res.body.error[1].message).to.eql('Required fields were not provided...')
+                        expect(res.body.error[1].description).to.eql('Physical Activity validation failed: name, calories is required!')
+                        expect(res.body.error[2].message).to.eql('Date field is invalid...')
+                        expect(res.body.error[2].description).to.eql('Date validation failed: The end_time parameter can not contain ' +
+                            'a older date than that the start_time parameter!')
+                        expect(res.body.error[3].message).to.eql('Duration field is invalid...')
+                        expect(res.body.error[3].description).to.eql('Duration validation failed: Activity duration value does not ' +
+                            'match values passed in start_time and end_time parameters!')
+                        expect(res.body.error[4].message).to.eql('Duration field is invalid...')
+                        expect(res.body.error[4].description).to.eql('Activity validation failed: The value provided has a negative value!')
+                        expect(res.body.error[5].message).to.eql('Calories field is invalid...')
+                        expect(res.body.error[5].description).to.eql('Physical Activity validation failed: The value provided has a ' +
+                            'negative value!')
+                        expect(res.body.error[6].message).to.eql('Steps field is invalid...')
+                        expect(res.body.error[6].description).to.eql('Physical Activity validation failed: The value provided has a ' +
+                            'negative value!')
+                        expect(res.body.error[7].message).to.eql('The name of level provided "sedentaries" is not supported...')
+                        expect(res.body.error[7].description).to.eql('The names of the allowed levels are: sedentary, lightly, fairly, ' +
+                            'very.')
+                        expect(res.body.error[8].message).to.eql('Level are not in a format that is supported!')
+                        expect(res.body.error[8].description).to.eql('Must have values ​​for the following levels: sedentary, lightly, ' +
+                            'fairly, very.')
+                        expect(res.body.error[9].message).to.eql('Some (or several) duration field of levels array is invalid...')
+                        expect(res.body.error[9].description).to.eql('Physical Activity Level validation failed: The value provided has ' +
+                            'a negative value!')
+
+                        for (let i = 0; i < res.body.error.length; i++) {
+                            expect(res.body.error[i].code).to.eql(HttpStatus.BAD_REQUEST)
+                            expect(res.body.error[i].item.name).to.eql(incorrectActivitiesArr[i].name)
+                            if (i !== 0)
+                                expect(res.body.error[i].item.start_time).to.eql(incorrectActivitiesArr[i].start_time!.toISOString())
+                            if (i !== 0)
+                                expect(res.body.error[i].item.end_time).to.eql(incorrectActivitiesArr[i].end_time!.toISOString())
+                            expect(res.body.error[i].item.duration).to.eql(incorrectActivitiesArr[i].duration)
+                            expect(res.body.error[i].item.calories).to.eql(incorrectActivitiesArr[i].calories)
+                            if (res.body.error[i].item.steps) {
+                                expect(res.body.error[i].item.steps).to.eql(incorrectActivitiesArr[i].steps)
+                            }
+                            if (incorrectActivitiesArr[i].levels) {
+                                expect(res.body.error[i].item).to.have.property('levels')
+                            }
+                            if (i !== 0)
+                                expect(res.body.error[i].item.child_id).to.eql(incorrectActivitiesArr[i].child_id)
+                        }
+
+                        expect(res.body.success.length).to.eql(0)
+                    })
+            })
+        })
+    })
+    /**
      * Route GET all for PhysicalActivity
      */
     describe('GET /users/children/physicalactivities', () => {
@@ -575,7 +904,7 @@ describe('Routes: users/children', () => {
                         expect(res.body[0].end_time).to.eql(defaultActivity.end_time!.toISOString())
                         expect(res.body[0].duration).to.eql(defaultActivity.duration)
                         expect(res.body[0].calories).to.eql(defaultActivity.calories)
-                        if (defaultActivity.steps) {
+                        if (res.body[0].steps) {
                             expect(res.body[0].steps).to.eql(defaultActivity.steps)
                         }
                         if (defaultActivity.levels) {
@@ -649,7 +978,7 @@ describe('Routes: users/children', () => {
                         expect(res.body[0].end_time).to.eql(defaultActivity.end_time!.toISOString())
                         expect(res.body[0].duration).to.eql(defaultActivity.duration)
                         expect(res.body[0].calories).to.eql(defaultActivity.calories)
-                        if (defaultActivity.steps) {
+                        if (res.body[0].steps) {
                             expect(res.body[0].steps).to.eql(defaultActivity.steps)
                         }
                         if (defaultActivity.levels) {
@@ -762,7 +1091,7 @@ describe('Routes: users/children', () => {
                         expect(res.body[0].end_time).to.eql(defaultActivity.end_time!.toISOString())
                         expect(res.body[0].duration).to.eql(defaultActivity.duration)
                         expect(res.body[0].calories).to.eql(defaultActivity.calories)
-                        if (defaultActivity.steps) {
+                        if (res.body[0].steps) {
                             expect(res.body[0].steps).to.eql(defaultActivity.steps)
                         }
                         if (defaultActivity.levels) {
@@ -870,7 +1199,7 @@ describe('Routes: users/children', () => {
                         expect(res.body.end_time).to.eql(defaultActivity.end_time!.toISOString())
                         expect(res.body.duration).to.eql(defaultActivity.duration)
                         expect(res.body.calories).to.eql(defaultActivity.calories)
-                        if (defaultActivity.steps) {
+                        if (res.body.steps) {
                             expect(res.body.steps).to.eql(defaultActivity.steps)
                         }
                         if (defaultActivity.levels) {
@@ -1005,7 +1334,7 @@ describe('Routes: users/children', () => {
                         expect(res.body.end_time).to.eql(defaultActivity.end_time!.toISOString())
                         expect(res.body.duration).to.eql(defaultActivity.duration)
                         expect(res.body.calories).to.eql(defaultActivity.calories)
-                        if (defaultActivity.steps) {
+                        if (res.body.steps) {
                             expect(res.body.steps).to.eql(defaultActivity.steps)
                         }
                         if (defaultActivity.levels) {
@@ -1698,7 +2027,7 @@ describe('Routes: users/children', () => {
                     .then(res => {
                         expect(res.body.success).is.an.instanceOf(Array)
                         for (let i = 0; i < res.body.success.length; i++) {
-                            expect(res.body.success[i].code).to.eql(HttpStatus.CREATED)
+                            expect(res.body.success[0].code).to.eql(HttpStatus.CREATED)
                             expect(res.body.success[i].item.date).to.eql(correctLogsArr[i].date)
                             expect(res.body.success[i].item.value).to.eql(correctLogsArr[i].value)
                         }

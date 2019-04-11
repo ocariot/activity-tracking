@@ -4,20 +4,17 @@ export class LogMock extends Log {
 
     constructor(type?: LogType) {
         super()
-        super.fromJSON(this.generateLog(type))
+        this.generateLog(type)
     }
 
-    private generateLog(type?: LogType): Log {
+    private generateLog(type?: LogType): void {
         if (!type) type = this.generateType()
 
-        const log: Log = new Log()
-        log.id = this.generateObjectId()
-        log.date = this.generateDate()
-        log.value = Math.floor(Math.random() * 10 + 1) * 100
-        log.type = type
-        log.child_id = this.generateObjectId()
-
-        return log
+        super.id = this.generateObjectId()
+        super.date = this.generateDate()
+        super.value = Math.floor(Math.random() * 10 + 1) * 100
+        super.type = type
+        super.child_id = this.generateObjectId()
     }
 
     private generateObjectId(): string {

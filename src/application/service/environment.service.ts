@@ -39,7 +39,7 @@ export class EnvironmentService implements IEnvironmentService {
      *
      * @param {Environment | Array<Environment>} environment
      * @returns {(Promise<Environment | MultiStatus<Environment>>)}
-     * @throws {ConflictException | RepositoryException} If a data conflict occurs, as an existing environment.
+     * @throws {ValidationException | ConflictException | RepositoryException}
      */
     public async add(environment: Environment | Array<Environment>): Promise<Environment | MultiStatus<Environment>> {
         try {

@@ -84,12 +84,11 @@ describe('Services: Environment', () => {
     /**
      * Mock MultiStatus responses
      */
-    const multiStatusMock: MultiStatusMock<Environment> = new MultiStatusMock<Environment>()
     // MultiStatus totally correct
-    const multiStatusCorrect: MultiStatus<Environment> = multiStatusMock.generateMultiStatus(correctEnvironmentsArr)
-    const multiStatusMixed: MultiStatus<Environment> = multiStatusMock.generateMultiStatus(mixedEnvironmentsArr)    // Mixed MultiStatus
+    const multiStatusCorrect: MultiStatus<Environment> = new MultiStatusMock<Environment>(correctEnvironmentsArr)
+    const multiStatusMixed: MultiStatus<Environment> = new MultiStatusMock<Environment>(mixedEnvironmentsArr)    // Mixed MultiStatus
     // MultiStatus totally incorrect
-    const multiStatusIncorrect: MultiStatus<Environment> = multiStatusMock.generateMultiStatus(incorrectEnvironmentsArr)
+    const multiStatusIncorrect: MultiStatus<Environment> = new MultiStatusMock<Environment>(incorrectEnvironmentsArr)
 
     const modelFake: any = EnvironmentRepoModel
     const environmentRepo: IEnvironmentRepository = new EnvironmentRepositoryMock()
@@ -346,8 +345,8 @@ describe('Services: Environment', () => {
 
         context('when all the Environments are correct, they still do not exist in the repository but there is no a connection ' +
             'to the RabbitMQ', () => {
-            it('should save each environment for submit after to the bus and return a response of type MultiStatus<Environment> ' +
-                'with the description of success in each one of them', () => {
+            it('should save each environment for submission attempt later to the bus and return a response of type ' +
+                'MultiStatus<Environment> with the description of success in each one of them', () => {
                 connectionRabbitmqPub.isConnected = false
                 sinon
                     .mock(modelFake)
@@ -388,7 +387,7 @@ describe('Services: Environment', () => {
                     .expects('create')
                     .withArgs(correctEnvironmentsArr)
                     .chain('exec')
-                    .resolves(multiStatusCorrect)
+                    .resolves(multiStatusIncorrect)
 
                 return environmentService.add(correctEnvironmentsArr)
                     .then((result: Environment | MultiStatus<Environment>) => {
@@ -410,9 +409,9 @@ describe('Services: Environment', () => {
             })
         })
 
-        context('when there are correct and incorrect Enviroments', () => {
-            it('should return a response of type MultiStatus<Environment> with the description of success and error in each ' +
-                'one of them', () => {
+        context('when there are correct and incorrect Enviroments and there is a connection to the RabbitMQ', () => {
+            it('should create each correct Environmnet and return a response of type MultiStatus<Environment> with the ' +
+                'description of success and error in each one of them', () => {
                 sinon
                     .mock(modelFake)
                     .expects('create')
@@ -604,6 +603,7 @@ describe('Services: Environment', () => {
 
         context('when the environment id is invalid', () => {
             it('should throw a ValidationException', () => {
+                connectionRabbitmqPub.isConnected = true
                 environment.id = '5c6dd16ea1a67d0034e6108b2'
                 sinon
                     .mock(modelFake)
