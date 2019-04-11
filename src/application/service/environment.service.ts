@@ -47,6 +47,7 @@ export class EnvironmentService implements IEnvironmentService {
             if (environment instanceof Array) {
                 return await this.addMultipleEnvs(environment)
             }
+
             // Only one item
             return await this.addEnvironment(environment)
         } catch (err) {

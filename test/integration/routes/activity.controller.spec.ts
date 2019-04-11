@@ -58,7 +58,7 @@ describe('Routes: users/children', () => {
     mixedLogsArr.push(otherLogIncorrect)
 
     /**
-     * Mock objects For POST route with multiple activities
+     * Mock objects for POST route with multiple activities
      */
     // Mock through JSON
     const incorrectActivityJSON: any = {
@@ -710,6 +710,12 @@ describe('Routes: users/children', () => {
         context('when all the activities are incorrect', () => {
             it('should return status code 201 and return a response of type MultiStatus<PhysicalActivity> with the ' +
                 'description of error in each one of them', () => {
+                try {
+                    deleteAllActivity()
+                } catch (err) {
+                    throw new Error('Failure on users.children.physicalactivities routes test: ' + err.message)
+                }
+
                 const body: any = []
 
                 incorrectActivitiesArr.forEach(activity => {

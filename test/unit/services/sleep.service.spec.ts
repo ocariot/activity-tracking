@@ -1,3 +1,4 @@
+import HttpStatus from 'http-status-codes'
 import sinon from 'sinon'
 import { assert } from 'chai'
 import { CustomLoggerMock } from '../../mocks/custom.logger.mock'
@@ -22,6 +23,8 @@ import { SleepPattern, SleepPatternType } from '../../../src/application/domain/
 import { SleepPatternDataSet } from '../../../src/application/domain/model/sleep.pattern.data.set'
 import { IEventBus } from '../../../src/infrastructure/port/event.bus.interface'
 import { ILogger } from '../../../src/utils/custom.logger'
+import { MultiStatus } from '../../../src/application/domain/model/multi.status'
+import { MultiStatusMock } from '../../mocks/multi.status.mock'
 
 require('sinon-mongoose')
 
@@ -29,11 +32,85 @@ describe('Services: SleepService', () => {
     const sleep: Sleep = new SleepMock()
     let incorrectSleep: Sleep = new Sleep()
 
-    // Mock sleep array
+    // For GET route
     const sleepArr: Array<SleepMock> = new Array<SleepMock>()
     for (let i = 0; i < 3; i++) {
         sleepArr.push(new SleepMock())
     }
+
+    /**
+     * For POST route with multiple sleep objects
+     */
+    // Array with correct sleep objects
+    const correctSleepArr: Array<Sleep> = new Array<SleepMock>()
+    for (let i = 0; i < 3; i++) {
+        correctSleepArr.push(new SleepMock())
+    }
+
+    // Incorrect sleep objects
+    const incorrectSleep1: Sleep = new Sleep()        // Without all required fields
+
+    const incorrectSleep2: Sleep = new SleepMock()    // Without Sleep fields
+    incorrectSleep2.pattern = undefined
+
+    const incorrectSleep3: Sleep = new SleepMock()    // start_time with a date newer than end_time
+    incorrectSleep3.start_time = new Date('2018-12-15T12:52:59Z')
+    incorrectSleep3.end_time = new Date('2018-12-14T13:12:37Z')
+
+    // The duration is incompatible with the start_time and end_time parameters
+    const incorrectSleep4: Sleep = new SleepMock()
+    incorrectSleep4.duration = 11780000
+
+    const incorrectSleep5: Sleep = new SleepMock()    // The duration is negative
+    incorrectSleep5.duration = -11780000
+
+    const incorrectSleep6: Sleep = new SleepMock()    // child_id is invalid
+    incorrectSleep6.child_id = '5a62be07de34500146d9c5442'
+
+    const incorrectSleep7: Sleep = new SleepMock()    // Missing data_set of pattern
+    incorrectSleep7.pattern = new SleepPattern()
+
+    const incorrectSleep8: Sleep = new SleepMock()    // The pattern has an empty data_set array
+    incorrectSleep8.pattern!.data_set = new Array<SleepPatternDataSet>()
+
+    const incorrectSleep9: Sleep = new SleepMock()    // Missing fields of some item from the data_set array of pattern
+    const dataSetItemSleep9: SleepPatternDataSet = new SleepPatternDataSet()
+    incorrectSleep9.pattern!.data_set = [dataSetItemSleep9]
+
+    const incorrectSleep10: Sleep = new SleepMock()    // There is a negative duration on some item from the data_set array of pattern
+    const dataSetItemSleep10: SleepPatternDataSet = new SleepPatternDataSet()
+    dataSetItemSleep10.start_time = new Date(sleep.start_time!)
+    dataSetItemSleep10.name = SleepPatternType.RESTLESS
+    dataSetItemSleep10.duration = -(Math.floor(Math.random() * 5 + 1) * 60000)
+    incorrectSleep10.pattern!.data_set = [dataSetItemSleep10]
+
+    // Array with correct and incorrect sleep objects
+    const mixedSleepArr: Array<Sleep> = new Array<SleepMock>()
+    mixedSleepArr.push(new SleepMock())
+    mixedSleepArr.push(incorrectSleep1)
+
+    // Array with only incorrect sleep objects
+    const incorrectSleepArr: Array<Sleep> = new Array<SleepMock>()
+    incorrectSleepArr.push(incorrectSleep1)
+    incorrectSleepArr.push(incorrectSleep2)
+    incorrectSleepArr.push(incorrectSleep3)
+    incorrectSleepArr.push(incorrectSleep4)
+    incorrectSleepArr.push(incorrectSleep5)
+    incorrectSleepArr.push(incorrectSleep6)
+    incorrectSleepArr.push(incorrectSleep7)
+    incorrectSleepArr.push(incorrectSleep8)
+    incorrectSleepArr.push(incorrectSleep9)
+    incorrectSleepArr.push(incorrectSleep10)
+
+    /**
+     * Mock MultiStatus responses
+     */
+    // MultiStatus totally correct
+    const multiStatusCorrect: MultiStatus<Sleep> = new MultiStatusMock<Sleep>(correctSleepArr)
+    // Mixed MultiStatus
+    const multiStatusMixed: MultiStatus<Sleep> = new MultiStatusMock<Sleep>(mixedSleepArr)
+    // MultiStatus totally incorrect
+    const multiStatusIncorrect: MultiStatus<Sleep> = new MultiStatusMock<Sleep>(incorrectSleepArr)
 
     const modelFake: any = SleepRepoModel
     const sleepRepo: ISleepRepository = new SleepRepositoryMock()
@@ -61,9 +138,9 @@ describe('Services: SleepService', () => {
     })
 
     /**
-     * Method: add(sleep: Sleep)
+     * Method: add(sleep: Sleep | Array<Sleep>) with Sleep argument)
      */
-    describe('add(sleep: Sleep)', () => {
+    describe('add(sleep: Sleep | Array<Sleep>) with Sleep argument)', () => {
         context('when the Sleep is correct, it still does not exist in the repository and there is a connection ' +
             'to the RabbitMQ', () => {
             it('should return the Sleep that was added', () => {
@@ -75,7 +152,8 @@ describe('Services: SleepService', () => {
                     .resolves(sleep)
 
                 return sleepService.add(sleep)
-                    .then(result => {
+                    .then((result: Sleep | Array<Sleep>) => {
+                        result = result as Sleep
                         assert.propertyVal(result, 'id', sleep.id)
                         assert.propertyVal(result, 'start_time', sleep.start_time)
                         assert.propertyVal(result, 'end_time', sleep.end_time)
@@ -99,7 +177,8 @@ describe('Services: SleepService', () => {
                     .resolves(sleep)
 
                 return sleepService.add(sleep)
-                    .then(result => {
+                    .then((result: Sleep | Array<Sleep>) => {
+                        result = result as Sleep
                         assert.propertyVal(result, 'id', sleep.id)
                         assert.propertyVal(result, 'start_time', sleep.start_time)
                         assert.propertyVal(result, 'end_time', sleep.end_time)
@@ -113,6 +192,7 @@ describe('Services: SleepService', () => {
 
         context('when the Sleep is correct but already exists in the repository', () => {
             it('should throw a ConflictException', () => {
+                connectionRabbitmqPub.isConnected = true
                 sleep.id = '507f1f77bcf86cd799439011'
                 sinon
                     .mock(modelFake)
@@ -351,6 +431,200 @@ describe('Services: SleepService', () => {
     })
 
     /**
+     * Method "add(sleep: Sleep | Array<Sleep>)" with Array<Sleep> argument
+     */
+    describe('add(sleep: Sleep | Array<Sleep>) with Array<Sleep> argument', () => {
+        context('when all the sleep objects of the array are correct, they still do not exist in the repository and there is ' +
+            'a connection to the RabbitMQ', () => {
+            it('should create each Sleep and return a response of type MultiStatus<Sleep> with the description ' +
+                'of success in sending each one of them', () => {
+                sinon
+                    .mock(modelFake)
+                    .expects('create')
+                    .withArgs(correctSleepArr)
+                    .chain('exec')
+                    .resolves(multiStatusCorrect)
+
+                return sleepService.add(correctSleepArr)
+                    .then((result: Sleep | MultiStatus<Sleep>) => {
+                        result = result as MultiStatus<Sleep>
+
+                        for (let i = 0; i < result.success.length; i++) {
+                            assert.propertyVal(result.success[i], 'code', HttpStatus.CREATED)
+                            assert.propertyVal(result.success[i].item, 'id', correctSleepArr[i].id)
+                            assert.propertyVal(result.success[i].item, 'start_time', correctSleepArr[i].start_time)
+                            assert.propertyVal(result.success[i].item, 'end_time', correctSleepArr[i].end_time)
+                            assert.typeOf(result.success[i].item.duration, 'number')
+                            assert.propertyVal(result.success[i].item, 'duration', correctSleepArr[i].duration)
+                            assert.propertyVal(result.success[i].item, 'child_id', correctSleepArr[i].child_id)
+                            assert.propertyVal(result.success[i].item, 'pattern', correctSleepArr[i].pattern)
+                        }
+
+                        assert.isEmpty(result.error)
+                    })
+            })
+        })
+
+        context('when all the sleep objects of the array are correct, they still do not exist in the repository but there is no ' +
+            'a connection to the RabbitMQ', () => {
+            it('should save each Sleep for submission attempt later to the bus and return a response of type ' +
+                'MultiStatus<Sleep> with the description of success in each one of them', () => {
+                connectionRabbitmqPub.isConnected = false
+
+                sinon
+                    .mock(modelFake)
+                    .expects('create')
+                    .withArgs(correctSleepArr)
+                    .chain('exec')
+                    .resolves(multiStatusCorrect)
+
+                return sleepService.add(correctSleepArr)
+                    .then((result: Sleep | MultiStatus<Sleep>) => {
+                        result = result as MultiStatus<Sleep>
+
+                        for (let i = 0; i < result.success.length; i++) {
+                            assert.propertyVal(result.success[i], 'code', HttpStatus.CREATED)
+                            assert.propertyVal(result.success[i].item, 'id', correctSleepArr[i].id)
+                            assert.propertyVal(result.success[i].item, 'start_time', correctSleepArr[i].start_time)
+                            assert.propertyVal(result.success[i].item, 'end_time', correctSleepArr[i].end_time)
+                            assert.typeOf(result.success[i].item.duration, 'number')
+                            assert.propertyVal(result.success[i].item, 'duration', correctSleepArr[i].duration)
+                            assert.propertyVal(result.success[i].item, 'child_id', correctSleepArr[i].child_id)
+                            assert.propertyVal(result.success[i].item, 'pattern', correctSleepArr[i].pattern)
+                        }
+
+                        assert.isEmpty(result.error)
+                    })
+            })
+        })
+
+        context('when all the sleep objects of the array are correct but already exists in the repository', () => {
+            it('should return a response of type MultiStatus<Sleep> with the description of conflict in each one of ' +
+                'them', () => {
+                connectionRabbitmqPub.isConnected = true
+
+                correctSleepArr.forEach(elem => {
+                    elem.id = '507f1f77bcf86cd799439011'
+                })
+
+                sinon
+                    .mock(modelFake)
+                    .expects('create')
+                    .withArgs(correctSleepArr)
+                    .chain('exec')
+                    .resolves(multiStatusIncorrect)
+
+                return sleepService.add(correctSleepArr)
+                    .then((result: Sleep | MultiStatus<Sleep>) => {
+                        result = result as MultiStatus<Sleep>
+
+                        for (let i = 0; i < result.error.length; i++) {
+                            assert.propertyVal(result.error[i], 'code', HttpStatus.CONFLICT)
+                            assert.propertyVal(result.error[i], 'message', 'Sleep is already registered...')
+                            assert.propertyVal(result.error[i].item, 'id', correctSleepArr[i].id)
+                            assert.propertyVal(result.error[i].item, 'start_time', correctSleepArr[i].start_time)
+                            assert.propertyVal(result.error[i].item, 'end_time', correctSleepArr[i].end_time)
+                            assert.typeOf(result.error[i].item.duration, 'number')
+                            assert.propertyVal(result.error[i].item, 'duration', correctSleepArr[i].duration)
+                            assert.propertyVal(result.error[i].item, 'child_id', correctSleepArr[i].child_id)
+                            assert.propertyVal(result.error[i].item, 'pattern', correctSleepArr[i].pattern)
+                        }
+
+                        assert.isEmpty(result.success)
+                    })
+            })
+        })
+
+        context('when there are correct and incorrect sleep objects in the array and there is a connection to the RabbitMQ', () => {
+            it('should create each correct Sleep and return a response of type MultiStatus<Sleep> with the description of success ' +
+                'and error in each one of them', () => {
+                sinon
+                    .mock(modelFake)
+                    .expects('create')
+                    .withArgs(mixedSleepArr)
+                    .chain('exec')
+                    .resolves(multiStatusMixed)
+
+                return sleepService.add(mixedSleepArr)
+                    .then((result: Sleep | MultiStatus<Sleep>) => {
+                        result = result as MultiStatus<Sleep>
+
+                        assert.propertyVal(result.success[0], 'code', HttpStatus.CREATED)
+                        assert.propertyVal(result.success[0].item, 'id', mixedSleepArr[0].id)
+                        assert.propertyVal(result.success[0].item, 'start_time', mixedSleepArr[0].start_time)
+                        assert.propertyVal(result.success[0].item, 'end_time', mixedSleepArr[0].end_time)
+                        assert.typeOf(result.success[0].item.duration, 'number')
+                        assert.propertyVal(result.success[0].item, 'duration', mixedSleepArr[0].duration)
+                        assert.propertyVal(result.success[0].item, 'child_id', mixedSleepArr[0].child_id)
+                        assert.propertyVal(result.success[0].item, 'pattern', mixedSleepArr[0].pattern)
+
+                        assert.propertyVal(result.error[0], 'code', HttpStatus.BAD_REQUEST)
+                        assert.propertyVal(result.error[0], 'message', 'Required fields were not provided...')
+                        assert.propertyVal(result.error[0], 'description', 'Activity validation failed: start_time, end_time, ' +
+                            'duration, child_id is required!')
+                    })
+            })
+        })
+
+        context('when all the sleep objects of the array are incorrect', () => {
+            it('should return a response of type MultiStatus<Sleep> with the description of error in each one of them', () => {
+                sinon
+                    .mock(modelFake)
+                    .expects('create')
+                    .withArgs(incorrectSleepArr)
+                    .chain('exec')
+                    .resolves(multiStatusIncorrect)
+
+                return sleepService.add(incorrectSleepArr)
+                    .then((result: Sleep | MultiStatus<Sleep>) => {
+                        result = result as MultiStatus<Sleep>
+
+                        assert.propertyVal(result.error[0], 'message', 'Required fields were not provided...')
+                        assert.propertyVal(result.error[0], 'description', 'Activity validation failed: start_time, end_time, ' +
+                            'duration, child_id is required!')
+                        assert.propertyVal(result.error[1], 'message', 'Required fields were not provided...')
+                        assert.propertyVal(result.error[1], 'description', 'Sleep validation failed: pattern is required!')
+                        assert.propertyVal(result.error[2], 'message', 'Date field is invalid...')
+                        assert.propertyVal(result.error[2], 'description', 'Date validation failed: The end_time parameter can not ' +
+                            'contain a older date than that the start_time parameter!')
+                        assert.propertyVal(result.error[3], 'message', 'Duration field is invalid...')
+                        assert.propertyVal(result.error[3], 'description', 'Duration validation failed: Activity duration value does ' +
+                            'not match values passed in start_time and end_time parameters!')
+                        assert.propertyVal(result.error[4], 'message', 'Duration field is invalid...')
+                        assert.propertyVal(result.error[4], 'description', 'Activity validation failed: The value provided has a ' +
+                            'negative value!')
+                        assert.propertyVal(result.error[5], 'message', Strings.CHILD.PARAM_ID_NOT_VALID_FORMAT)
+                        assert.propertyVal(result.error[5], 'description', Strings.ERROR_MESSAGE.UUID_NOT_VALID_FORMAT_DESC)
+                        assert.propertyVal(result.error[6], 'message', 'Pattern are not in a format that is supported...')
+                        assert.propertyVal(result.error[6], 'description', 'Validation of the standard of sleep failed: data_set is ' +
+                            'required!')
+                        assert.propertyVal(result.error[7], 'message', 'Dataset are not in a format that is supported!')
+                        assert.propertyVal(result.error[7], 'description', 'The data_set collection must not be empty!')
+                        assert.propertyVal(result.error[8], 'message', 'Dataset are not in a format that is supported!')
+                        assert.propertyVal(result.error[8], 'description', 'Validation of the sleep pattern dataset failed: ' +
+                            'data_set start_time, data_set name, data_set duration is required!')
+                        assert.propertyVal(result.error[9], 'message', 'Some (or several) duration field of sleep pattern is invalid...')
+                        assert.propertyVal(result.error[9], 'description', 'Sleep Pattern dataset validation failed: The value provided ' +
+                            'has a negative value!')
+
+                        for (let i = 0; i < result.error.length; i++) {
+                            assert.propertyVal(result.error[i], 'code', HttpStatus.BAD_REQUEST)
+                            if (i !== 0) assert.propertyVal(result.error[i].item, 'id', incorrectSleepArr[i].id)
+                            if (i !== 0) assert.propertyVal(result.error[i].item, 'start_time', incorrectSleepArr[i].start_time)
+                            if (i !== 0) assert.propertyVal(result.error[i].item, 'end_time', incorrectSleepArr[i].end_time)
+                            if (i !== 0) assert.typeOf(result.error[i].item.duration, 'number')
+                            if (i !== 0) assert.propertyVal(result.error[i].item, 'duration', incorrectSleepArr[i].duration)
+                            if (i !== 0) assert.propertyVal(result.error[i].item, 'child_id', incorrectSleepArr[i].child_id)
+                            if (i !== 0) assert.propertyVal(result.error[i].item, 'pattern', incorrectSleepArr[i].pattern)
+                        }
+
+                        assert.isEmpty(result.success)
+                    })
+            })
+        })
+    })
+
+    /**
      * Method: getAll(query: IQuery)
      */
     describe('getAll(query: IQuery)', () => {
@@ -581,7 +855,6 @@ describe('Services: SleepService', () => {
     describe('updateByChild(sleep: Sleep)', () => {
         context('when sleep exists in the database', () => {
             it('should return the Sleep that was updated', () => {
-                connectionRabbitmqPub.isConnected = true
                 sleep.id = '507f1f77bcf86cd799439011'            // Make mock return a sleep
                 sleep.child_id = '5a62be07de34500146d9c544'      // Make child_id valid again
                 sinon
@@ -648,6 +921,7 @@ describe('Services: SleepService', () => {
 
         context('when the sleep is incorrect (id is invalid)', () => {
             it('should throw a ValidationException', () => {
+                connectionRabbitmqPub.isConnected = true
                 incorrectSleep.id = '5a62be07de34500146d9c5442'           // Make sleep id invalid
                 sinon
                     .mock(modelFake)
@@ -799,7 +1073,6 @@ describe('Services: SleepService', () => {
     describe('removeByChild(sleepId: string, childId: string)', () => {
         context('when there is sleep with the received parameters', () => {
             it('should return true', () => {
-                connectionRabbitmqPub.isConnected = true
                 sleep.id = '507f1f77bcf86cd799439011'            // Make mock return true
                 sleep.child_id = '5a62be07de34500146d9c544'     // Make child_id valid again
                 sinon
@@ -854,6 +1127,7 @@ describe('Services: SleepService', () => {
 
         context('when the sleep is incorrect (child_id is invalid)', () => {
             it('should throw a ValidationException', () => {
+                connectionRabbitmqPub.isConnected = true
                 incorrectSleep.child_id = '5a62be07de34500146d9c5442'     // Make child_id invalid
                 sinon
                     .mock(modelFake)

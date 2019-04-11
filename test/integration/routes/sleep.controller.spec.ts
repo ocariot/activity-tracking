@@ -1,3 +1,4 @@
+import HttpStatus from 'http-status-codes'
 import { Container } from 'inversify'
 import { DI } from '../../../src/di/di'
 import { Identifier } from '../../../src/di/identifiers'
@@ -11,6 +12,7 @@ import { SleepPattern, SleepPatternType } from '../../../src/application/domain/
 import { SleepRepoModel } from '../../../src/infrastructure/database/schema/sleep.schema'
 import { SleepEntityMapper } from '../../../src/infrastructure/entity/mapper/sleep.entity.mapper'
 import { ObjectID } from 'bson'
+import { SleepPatternDataSet } from '../../../src/application/domain/model/sleep.pattern.data.set'
 
 const container: Container = DI.getInstance().getContainer()
 const backgroundServices: BackgroundService = container.get(Identifier.BACKGROUND_SERVICE)
@@ -22,6 +24,66 @@ describe('Routes: users.children.sleep', () => {
     const defaultSleep: Sleep = new SleepMock()
     const otherSleep: Sleep = new SleepMock()
     otherSleep.child_id = '5a62be07de34500146d9c542'
+
+    /**
+     * Mock objects for POST route with multiple sleep objects
+     */
+    // Array with correct sleep objects
+    const correctSleepArr: Array<Sleep> = new Array<SleepMock>()
+    for (let i = 0; i < 3; i++) {
+        correctSleepArr.push(new SleepMock())
+    }
+
+    // Incorrect sleep objects
+    const incorrectSleep1: Sleep = new Sleep()        // Without all required fields
+
+    const incorrectSleep2: Sleep = new SleepMock()    // Without Sleep fields
+    incorrectSleep2.pattern = undefined
+
+    const incorrectSleep3: Sleep = new SleepMock()    // start_time with a date newer than end_time
+    incorrectSleep3.start_time = new Date('2018-12-15T12:52:59Z')
+    incorrectSleep3.end_time = new Date('2018-12-14T13:12:37Z')
+
+    // The duration is incompatible with the start_time and end_time parameters
+    const incorrectSleep4: Sleep = new SleepMock()
+    incorrectSleep4.duration = 11780000
+
+    const incorrectSleep5: Sleep = new SleepMock()    // The duration is negative
+    incorrectSleep5.duration = -11780000
+
+    const incorrectSleep6: Sleep = new SleepMock()    // Missing data_set of pattern
+    incorrectSleep6.pattern = new SleepPattern()
+
+    const incorrectSleep7: Sleep = new SleepMock()    // The pattern has an empty data_set array
+    incorrectSleep7.pattern!.data_set = new Array<SleepPatternDataSet>()
+
+    const incorrectSleep8: Sleep = new SleepMock()    // Missing fields of some item from the data_set array of pattern
+    const dataSetItemSleep8: SleepPatternDataSet = new SleepPatternDataSet()
+    incorrectSleep8.pattern!.data_set = [dataSetItemSleep8]
+
+    const incorrectSleep9: Sleep = new SleepMock()    // There is a negative duration on some item from the data_set array of pattern
+    const dataSetItemSleep9: SleepPatternDataSet = new SleepPatternDataSet()
+    dataSetItemSleep9.start_time = new Date(defaultSleep.start_time!)
+    dataSetItemSleep9.name = SleepPatternType.RESTLESS
+    dataSetItemSleep9.duration = -(Math.floor(Math.random() * 5 + 1) * 60000)
+    incorrectSleep9.pattern!.data_set = [dataSetItemSleep9]
+
+    // Array with correct and incorrect sleep objects
+    const mixedSleepArr: Array<Sleep> = new Array<SleepMock>()
+    mixedSleepArr.push(new SleepMock())
+    mixedSleepArr.push(incorrectSleep1)
+
+    // Array with only incorrect sleep objects
+    const incorrectSleepArr: Array<Sleep> = new Array<SleepMock>()
+    incorrectSleepArr.push(incorrectSleep1)
+    incorrectSleepArr.push(incorrectSleep2)
+    incorrectSleepArr.push(incorrectSleep3)
+    incorrectSleepArr.push(incorrectSleep4)
+    incorrectSleepArr.push(incorrectSleep5)
+    incorrectSleepArr.push(incorrectSleep6)
+    incorrectSleepArr.push(incorrectSleep7)
+    incorrectSleepArr.push(incorrectSleep8)
+    incorrectSleepArr.push(incorrectSleep9)
 
     // Start services
     before(async () => {
@@ -42,9 +104,9 @@ describe('Routes: users.children.sleep', () => {
         }
     })
     /**
-     * POST route
+     * POST route with only one Sleep in the body
      */
-    describe('POST /users/children/:child_id/sleep', () => {
+    describe('POST /users/children/:child_id/sleep with only one Sleep in the body', () => {
         context('when posting a new Sleep with success', () => {
             it('should return status code 201 and the saved Sleep', () => {
                 const body = {
@@ -329,11 +391,229 @@ describe('Routes: users.children.sleep', () => {
         })
     })
     /**
+     * POST route with a Sleep array in the body
+     */
+    describe('POST /users/children/:child_id/sleep with a Sleep array in the body', () => {
+        context('when all the sleep objects are correct and still do not exist in the repository', () => {
+            it('should return status code 201, create each Sleep and return a response of type MultiStatus<Sleep> ' +
+                'with the description of success in sending each one of them', () => {
+                try {
+                    deleteAllSleep()
+                } catch (err) {
+                    throw new Error('Failure on users.children.sleep routes test: ' + err.message)
+                }
+
+                const body: any = []
+
+                correctSleepArr.forEach(sleep => {
+                    const bodyElem = {
+                        start_time: sleep.start_time,
+                        end_time: sleep.end_time,
+                        duration: sleep.duration,
+                        pattern: sleep.pattern
+                    }
+                    body.push(bodyElem)
+                })
+
+                return request
+                    .post(`/users/children/${defaultSleep.child_id}/sleep`)
+                    .send(body)
+                    .set('Content-Type', 'application/json')
+                    .expect(201)
+                    .then(res => {
+                        for (let i = 0; i < res.body.success.length; i++) {
+                            expect(res.body.success[i].code).to.eql(HttpStatus.CREATED)
+                            expect(res.body.success[i].item.start_time).to.eql(correctSleepArr[i].start_time!.toISOString())
+                            expect(res.body.success[i].item.end_time).to.eql(correctSleepArr[i].end_time!.toISOString())
+                            expect(res.body.success[i].item.duration).to.eql(correctSleepArr[i].duration)
+                            expect(res.body.success[i].item).to.have.property('pattern')
+                            expect(res.body.success[i].item.child_id).to.eql(correctSleepArr[i].child_id)
+                        }
+
+                        expect(res.body.error.length).to.eql(0)
+                    })
+            })
+        })
+
+        context('when all the activities are correct but already exists in the repository', () => {
+            it('should return status code 201 and return a response of type MultiStatus<Sleep> with the ' +
+                'description of conflict in sending each one of them', () => {
+                const body: any = []
+
+                correctSleepArr.forEach(sleep => {
+                    const bodyElem = {
+                        start_time: sleep.start_time,
+                        end_time: sleep.end_time,
+                        duration: sleep.duration,
+                        pattern: sleep.pattern
+                    }
+                    body.push(bodyElem)
+                })
+
+                return request
+                    .post(`/users/children/${defaultSleep.child_id}/sleep`)
+                    .send(body)
+                    .set('Content-Type', 'application/json')
+                    .expect(201)
+                    .then(res => {
+                        for (let i = 0; i < res.body.error.length; i++) {
+                            expect(res.body.error[i].code).to.eql(HttpStatus.CONFLICT)
+                            expect(res.body.error[i].message).to.eql('Sleep is already registered...')
+                            expect(res.body.error[i].item.start_time).to.eql(correctSleepArr[i].start_time!.toISOString())
+                            expect(res.body.error[i].item.end_time).to.eql(correctSleepArr[i].end_time!.toISOString())
+                            expect(res.body.error[i].item.duration).to.eql(correctSleepArr[i].duration)
+                            expect(res.body.error[i].item).to.have.property('pattern')
+                            expect(res.body.error[i].item.child_id).to.eql(correctSleepArr[i].child_id)
+                        }
+
+                        expect(res.body.success.length).to.eql(0)
+                    })
+            })
+        })
+
+        context('when there are correct and incorrect activities in the body', () => {
+            it('should return status code 201 and return a response of type MultiStatus<Sleep> with the ' +
+                'description of success and error in each one of them', () => {
+                try {
+                    deleteAllSleep()
+                } catch (err) {
+                    throw new Error('Failure on users.children.sleep routes test: ' + err.message)
+                }
+
+                const body: any = []
+
+                mixedSleepArr.forEach(sleep => {
+                    const bodyElem = {
+                        start_time: sleep.start_time,
+                        end_time: sleep.end_time,
+                        duration: sleep.duration,
+                        pattern: sleep.pattern
+                    }
+                    body.push(bodyElem)
+                })
+
+                return request
+                    .post(`/users/children/${defaultSleep.child_id}/sleep`)
+                    .send(body)
+                    .set('Content-Type', 'application/json')
+                    .expect(201)
+                    .then(res => {
+                        // Success item
+                        expect(res.body.success[0].code).to.eql(HttpStatus.CREATED)
+                        expect(res.body.success[0].item.start_time).to.eql(mixedSleepArr[0].start_time!.toISOString())
+                        expect(res.body.success[0].item.end_time).to.eql(mixedSleepArr[0].end_time!.toISOString())
+                        expect(res.body.success[0].item.duration).to.eql(mixedSleepArr[0].duration)
+                        expect(res.body.success[0].item).to.have.property('pattern')
+                        expect(res.body.success[0].item.child_id).to.eql(mixedSleepArr[0].child_id)
+
+                        // Error item
+                        expect(res.body.error[0].code).to.eql(HttpStatus.BAD_REQUEST)
+                        expect(res.body.error[0].message).to.eql('Required fields were not provided...')
+                        expect(res.body.error[0].description).to.eql('Activity validation failed: start_time, end_time, ' +
+                            'duration is required!')
+                    })
+            })
+        })
+
+        context('when all the activities are incorrect', () => {
+            it('should return status code 201 and return a response of type MultiStatus<Sleep> with the ' +
+                'description of error in each one of them', () => {
+                try {
+                    deleteAllSleep()
+                } catch (err) {
+                    throw new Error('Failure on users.children.sleep routes test: ' + err.message)
+                }
+
+                const body: any = []
+
+                incorrectSleepArr.forEach(sleep => {
+                    const bodyElem = {
+                        start_time: sleep.start_time,
+                        end_time: sleep.end_time,
+                        duration: sleep.duration,
+                        pattern: sleep.pattern
+                    }
+                    body.push(bodyElem)
+                })
+
+                return request
+                    .post(`/users/children/${defaultSleep.child_id}/sleep`)
+                    .send(body)
+                    .set('Content-Type', 'application/json')
+                    .expect(201)
+                    .then(res => {
+                        expect(res.body.error[0].message).to.eql('Required fields were not provided...')
+                        expect(res.body.error[0].description).to.eql('Activity validation failed: start_time, end_time, ' +
+                            'duration is required!')
+                        expect(res.body.error[1].message).to.eql('Required fields were not provided...')
+                        expect(res.body.error[1].description).to.eql('Sleep validation failed: pattern is required!')
+                        expect(res.body.error[2].message).to.eql('Date field is invalid...')
+                        expect(res.body.error[2].description).to.eql('Date validation failed: The end_time parameter can not contain ' +
+                            'a older date than that the start_time parameter!')
+                        expect(res.body.error[3].message).to.eql('Duration field is invalid...')
+                        expect(res.body.error[3].description).to.eql('Duration validation failed: Activity duration value does not ' +
+                            'match values passed in start_time and end_time parameters!')
+                        expect(res.body.error[4].message).to.eql('Duration field is invalid...')
+                        expect(res.body.error[4].description).to.eql('Activity validation failed: The value provided has a negative value!')
+                        expect(res.body.error[5].message).to.eql('Pattern are not in a format that is supported...')
+                        expect(res.body.error[5].description).to.eql('Validation of the standard of sleep failed: data_set is required!')
+                        expect(res.body.error[6].message).to.eql('Dataset are not in a format that is supported!')
+                        expect(res.body.error[6].description).to.eql('The data_set collection must not be empty!')
+                        expect(res.body.error[7].message).to.eql('Dataset are not in a format that is supported!')
+                        expect(res.body.error[7].description).to.eql('Validation of the sleep pattern dataset failed: ' +
+                            'data_set start_time, data_set name, data_set duration is required!')
+                        expect(res.body.error[8].message).to.eql('Some (or several) duration field of sleep pattern is invalid...')
+                        expect(res.body.error[8].description).to.eql('Sleep Pattern dataset validation failed: The value provided ' +
+                            'has a negative value!')
+
+                        for (let i = 0; i < res.body.error.length; i++) {
+                            expect(res.body.error[i].code).to.eql(HttpStatus.BAD_REQUEST)
+                            if (i !== 0)
+                                expect(res.body.error[i].item.start_time).to.eql(incorrectSleepArr[i].start_time!.toISOString())
+                            if (i !== 0)
+                                expect(res.body.error[i].item.end_time).to.eql(incorrectSleepArr[i].end_time!.toISOString())
+                            expect(res.body.error[i].item.duration).to.eql(incorrectSleepArr[i].duration)
+                            if (i !== 0 && i !== 1)
+                                expect(res.body.error[i].item).to.have.property('pattern')
+                            if (i !== 0)
+                                expect(res.body.error[i].item.child_id).to.eql(incorrectSleepArr[i].child_id)
+                        }
+
+                        expect(res.body.success.length).to.eql(0)
+                    })
+            })
+        })
+    })
+    /**
      * Route GET all
      */
     describe('GET /users/children/sleep', () => {
         context('when get all sleep of the database successfully', () => {
             it('should return status code 200 and a list of all sleep found', async () => {
+                await createSleep({
+                    start_time: defaultSleep.start_time,
+                    end_time: defaultSleep.end_time,
+                    duration: defaultSleep.duration,
+                    pattern: [
+                        {
+                            start_time: defaultSleep.start_time,
+                            name: SleepPatternType.RESTLESS,
+                            duration: Math.floor(Math.random() * 5 + 1) * 60000
+                        },
+                        {
+                            start_time: defaultSleep.start_time,
+                            name: SleepPatternType.ASLEEP,
+                            duration: Math.floor(Math.random() * 120 + 1) * 60000
+                        },
+                        {
+                            start_time: defaultSleep.start_time,
+                            name: SleepPatternType.AWAKE,
+                            duration: Math.floor(Math.random() * 3 + 1) * 60000
+                        }
+                    ],
+                    child_id: defaultSleep.child_id
+                })
+
                 return request
                     .get('/users/children/sleep')
                     .set('Content-Type', 'application/json')

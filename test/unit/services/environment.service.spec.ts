@@ -38,7 +38,7 @@ describe('Services: Environment', () => {
     }
 
     /**
-     * For POST route
+     * For POST route with multiple environments
      */
     // Array with correct environments
     const correctEnvironmentsArr: Array<Environment> = new Array<EnvironmentMock>()
@@ -309,12 +309,13 @@ describe('Services: Environment', () => {
             })
         })
     })
+
     /**
      * Method "add(environment: Environment | Array<Environment>)" with Array<Environment> argument
      */
     describe('add(environment: Environment | Array<Environment>) with Array<Environment> argument', () => {
-        context('when all the Environments are correct, they still do not exist in the repository and there is a connection ' +
-            'to the RabbitMQ', () => {
+        context('when all the Environments of the array are correct, they still do not exist in the repository and there is ' +
+            'a connection to the RabbitMQ', () => {
             it('should create each environment and return a response of type MultiStatus<Environment> with the description of success' +
                 ' in sending each one of them', () => {
                 sinon
@@ -327,6 +328,7 @@ describe('Services: Environment', () => {
                 return environmentService.add(correctEnvironmentsArr)
                     .then((result: Environment | MultiStatus<Environment>) => {
                         result = result as MultiStatus<Environment>
+
                         for (let i = 0; i < result.success.length; i++) {
                             assert.propertyVal(result.success[i], 'code', HttpStatus.CREATED)
                             assert.propertyVal(result.success[i].item, 'id', correctEnvironmentsArr[i].id)
@@ -343,8 +345,8 @@ describe('Services: Environment', () => {
             })
         })
 
-        context('when all the Environments are correct, they still do not exist in the repository but there is no a connection ' +
-            'to the RabbitMQ', () => {
+        context('when all the Environments of the array are correct, they still do not exist in the repository but there is no ' +
+            'a connection to the RabbitMQ', () => {
             it('should save each environment for submission attempt later to the bus and return a response of type ' +
                 'MultiStatus<Environment> with the description of success in each one of them', () => {
                 connectionRabbitmqPub.isConnected = false
@@ -358,6 +360,7 @@ describe('Services: Environment', () => {
                 return environmentService.add(correctEnvironmentsArr)
                     .then((result: Environment | MultiStatus<Environment>) => {
                         result = result as MultiStatus<Environment>
+
                         for (let i = 0; i < result.success.length; i++) {
                             assert.propertyVal(result.success[i], 'code', HttpStatus.CREATED)
                             assert.propertyVal(result.success[i].item, 'id', correctEnvironmentsArr[i].id)
@@ -374,7 +377,7 @@ describe('Services: Environment', () => {
             })
         })
 
-        context('when all the Environments are correct but already exists in the repository', () => {
+        context('when all the Environments of the array are correct but already exists in the repository', () => {
             it('should return a response of type MultiStatus<Environment> with the description of conflict in each one of them', () => {
                 connectionRabbitmqPub.isConnected = true
 
@@ -392,6 +395,7 @@ describe('Services: Environment', () => {
                 return environmentService.add(correctEnvironmentsArr)
                     .then((result: Environment | MultiStatus<Environment>) => {
                         result = result as MultiStatus<Environment>
+
                         for (let i = 0; i < result.error.length; i++) {
                             assert.propertyVal(result.error[i], 'code', HttpStatus.CONFLICT)
                             assert.propertyVal(result.error[i], 'message', 'Measurement of environment is already registered...')
@@ -409,8 +413,8 @@ describe('Services: Environment', () => {
             })
         })
 
-        context('when there are correct and incorrect Enviroments and there is a connection to the RabbitMQ', () => {
-            it('should create each correct Environmnet and return a response of type MultiStatus<Environment> with the ' +
+        context('when there are correct and incorrect Enviroments in the array and there is a connection to the RabbitMQ', () => {
+            it('should create each correct Environment and return a response of type MultiStatus<Environment> with the ' +
                 'description of success and error in each one of them', () => {
                 sinon
                     .mock(modelFake)
@@ -440,7 +444,7 @@ describe('Services: Environment', () => {
             })
         })
 
-        context('when all the Environments are incorrect', () => {
+        context('when all the Environments of the array are incorrect', () => {
             it('should return a response of type MultiStatus<Environment> with the description of error in each one of them', () => {
                 sinon
                     .mock(modelFake)

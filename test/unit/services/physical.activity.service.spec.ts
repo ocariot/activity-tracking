@@ -69,7 +69,7 @@ describe('Services: PhysicalActivityService', () => {
     }
 
     /**
-     * For POST route
+     * For POST route with multiple activities
      */
     // Array with correct activities
     const correctActivitiesArr: Array<PhysicalActivity> = new Array<PhysicalActivityMock>()
@@ -499,12 +499,13 @@ describe('Services: PhysicalActivityService', () => {
             })
         })
     })
+
     /**
      * Method "add(activity: PhysicalActivity | Array<PhysicalActivity>)" with Array<PhysicalActivity> argument
      */
     describe('add(activity: PhysicalActivity | Array<PhysicalActivity>) with Array<PhysicalActivity> argument', () => {
-        context('when all the activities are correct, they still do not exist in the repository and there is a connection ' +
-            'to the RabbitMQ', () => {
+        context('when all the activities of the array are correct, they still do not exist in the repository and there is ' +
+            'a connection to the RabbitMQ', () => {
             it('should create each PhysicalActivity and return a response of type MultiStatus<PhysicalActivity> with the description ' +
                 'of success in sending each one of them', () => {
                 sinon
@@ -517,6 +518,7 @@ describe('Services: PhysicalActivityService', () => {
                 return activityService.add(correctActivitiesArr)
                     .then((result: PhysicalActivity | MultiStatus<PhysicalActivity>) => {
                         result = result as MultiStatus<PhysicalActivity>
+
                         for (let i = 0; i < result.success.length; i++) {
                             assert.propertyVal(result.success[i], 'code', HttpStatus.CREATED)
                             assert.propertyVal(result.success[i].item, 'id', correctActivitiesArr[i].id)
@@ -538,8 +540,8 @@ describe('Services: PhysicalActivityService', () => {
             })
         })
 
-        context('when all the activities are correct, they still do not exist in the repository but there is no a connection ' +
-            'to the RabbitMQ', () => {
+        context('when all the activities of the array are correct, they still do not exist in the repository but there is no ' +
+            'a connection to the RabbitMQ', () => {
             it('should save each PhysicalActivity for submission attempt later to the bus and return a response of type ' +
                 'MultiStatus<PhysicalActivity> with the description of success in each one of them', () => {
                 connectionRabbitmqPub.isConnected = false
@@ -554,6 +556,7 @@ describe('Services: PhysicalActivityService', () => {
                 return activityService.add(correctActivitiesArr)
                     .then((result: PhysicalActivity | MultiStatus<PhysicalActivity>) => {
                         result = result as MultiStatus<PhysicalActivity>
+
                         for (let i = 0; i < result.success.length; i++) {
                             assert.propertyVal(result.success[i], 'code', HttpStatus.CREATED)
                             assert.propertyVal(result.success[i].item, 'id', correctActivitiesArr[i].id)
@@ -575,7 +578,7 @@ describe('Services: PhysicalActivityService', () => {
             })
         })
 
-        context('when all the activities are correct but already exists in the repository', () => {
+        context('when all the activities of the array are correct but already exists in the repository', () => {
             it('should return a response of type MultiStatus<PhysicalActivity> with the description of conflict in each one of ' +
                 'them', () => {
                 connectionRabbitmqPub.isConnected = true
@@ -594,6 +597,7 @@ describe('Services: PhysicalActivityService', () => {
                 return activityService.add(correctActivitiesArr)
                     .then((result: PhysicalActivity | MultiStatus<PhysicalActivity>) => {
                         result = result as MultiStatus<PhysicalActivity>
+
                         for (let i = 0; i < result.error.length; i++) {
                             assert.propertyVal(result.error[i], 'code', HttpStatus.CONFLICT)
                             assert.propertyVal(result.error[i], 'message', 'Physical Activity is already registered...')
@@ -616,7 +620,7 @@ describe('Services: PhysicalActivityService', () => {
             })
         })
 
-        context('when there are correct and incorrect activities and there is a connection to the RabbitMQ', () => {
+        context('when there are correct and incorrect activities in the array and there is a connection to the RabbitMQ', () => {
             it('should create each correct PhysicalActivity and return a response of type MultiStatus<PhysicalActivity> with ' +
                 'the description of success and error in each one of them', () => {
                 sinon
@@ -652,7 +656,7 @@ describe('Services: PhysicalActivityService', () => {
             })
         })
 
-        context('when all the activities are incorrect', () => {
+        context('when all the activities of the array are incorrect', () => {
             it('should return a response of type MultiStatus<PhysicalActivity> with the description of error in each one of ' +
                 'them', () => {
                 sinon
@@ -720,6 +724,7 @@ describe('Services: PhysicalActivityService', () => {
             })
         })
     })
+
     /**
      * Method getAll(query: IQuery)
      */
@@ -952,7 +957,6 @@ describe('Services: PhysicalActivityService', () => {
     describe('updateByChild(activity: PhysicalActivity)', () => {
         context('when physical activity exists in the database', () => {
             it('should return the PhysicalActivity that was updated', () => {
-                connectionRabbitmqPub.isConnected = true
                 activity.id = '507f1f77bcf86cd799439011'            // Make mock return an activity
                 activity.child_id = '5a62be07de34500146d9c544'      // Make child_id valid again
                 sinon
@@ -1029,6 +1033,7 @@ describe('Services: PhysicalActivityService', () => {
 
         context('when the physical activity is incorrect (id is invalid)', () => {
             it('should throw a ValidationException', () => {
+                connectionRabbitmqPub.isConnected = true
                 incorrectActivity.id = '5a62be07de34500146d9c5442'           // Make activity id invalid
                 sinon
                     .mock(modelFake)
@@ -1207,7 +1212,6 @@ describe('Services: PhysicalActivityService', () => {
     describe('removeByChild(activityId: string, childId: string)', () => {
         context('when there is physical activity with the received parameters', () => {
             it('should return true', () => {
-                connectionRabbitmqPub.isConnected = true
                 activity.id = '507f1f77bcf86cd799439011'            // Make mock return true
                 activity.child_id = '5a62be07de34500146d9c544'     // Make child_id valid again
                 sinon

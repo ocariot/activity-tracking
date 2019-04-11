@@ -9,6 +9,14 @@ import { Sleep } from '../domain/model/sleep'
  */
 export interface ISleepService extends IService<Sleep> {
     /**
+     * Add a new Sleep or a list of Sleep.
+     *
+     * @param sleep Sleep | Array<Sleep> to insert.
+     * @return {Promise<Sleep | any>}
+     * @throws {ValidationException | ConflictException | RepositoryException}
+     */
+    add(sleep: Sleep | Array<Sleep>): Promise<Sleep | any>
+    /**
      * List the sleep of a child.
      *
      * @param childId Child ID.

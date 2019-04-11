@@ -11,7 +11,7 @@ export class SleepMock extends Sleep {
 
     private generateSleep(): void {
         super.id = this.generateObjectId()
-        super.start_time = new Date()
+        super.start_time = new Date(1560826800000 + Math.floor((Math.random() * 1000)))
         super.end_time = new Date(new Date(super.start_time)
             .setMilliseconds(Math.floor(Math.random() * 7 + 4) * 3.6e+6)) // 4-10h in milliseconds
         super.duration = super.end_time.getTime() - super.start_time.getTime()

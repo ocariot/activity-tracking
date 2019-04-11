@@ -9,6 +9,7 @@ import { ILogger } from '../../utils/custom.logger'
 import { ISleepService } from '../../application/port/sleep.service.interface'
 import { Query } from '../../infrastructure/repository/query/query'
 import { Sleep } from '../../application/domain/model/sleep'
+import { MultiStatus } from '../../application/domain/model/multi.status'
 
 /**
  * Controller that implements Sleep feature operations.
@@ -52,7 +53,7 @@ export class SleepController {
     }
 
     /**
-     * Add new sleep.
+     * Add new sleep or multiple new sleep objects.
      *
      * @param {Request} req
      * @param {Response} res
@@ -60,6 +61,19 @@ export class SleepController {
     @httpPost('/:child_id/sleep')
     public async saveSleep(@request() req: Request, @response() res: Response) {
         try {
+            // Multiple items of Sleep
+            if (req.body instanceof Array) {
+                const sleepArr: Array<Sleep> = req.body.map(item => {
+                    const sleepItem: Sleep = new Sleep().fromJSON(item)
+                    sleepItem.child_id = req.params.child_id
+                    return sleepItem
+                })
+
+                const resultMultiStatus: MultiStatus<Sleep> = await this._sleepService.add(sleepArr)
+                return res.status(HttpStatus.CREATED).send(resultMultiStatus)
+            }
+
+            // Only one item
             const sleepSave: Sleep = new Sleep().fromJSON(req.body)
             sleepSave.child_id = req.params.child_id
 

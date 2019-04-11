@@ -23,7 +23,7 @@ describe('Routes: environments', () => {
     const defaultEnvironment: Environment = new EnvironmentMock()
 
     /**
-     * For POST route with multiple environments
+     * Mock objects for POST route with multiple environments
      */
     // Array with correct environments
     const correctEnvironmentsArr: Array<Environment> = new Array<EnvironmentMock>()
@@ -70,9 +70,9 @@ describe('Routes: environments', () => {
         }
     })
     /**
-     * POST route with only one environment in the body
+     * POST route with only one Environment in the body
      */
-    describe('POST /environments with only one environment in the body', () => {
+    describe('POST /environments with only one Environment in the body', () => {
         context('when posting a new Environment with success', () => {
             it('should return status code 201 and the saved Environment', () => {
                 const body = {

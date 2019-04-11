@@ -47,6 +47,7 @@ export class PhysicalActivityService implements IPhysicalActivityService {
             if (activity instanceof Array) {
                 return await this.addMultipleActivities(activity)
             }
+
             // Only one item
             return await this.addActivity(activity)
         } catch (err) {
