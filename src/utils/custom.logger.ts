@@ -1,23 +1,19 @@
 import fs from 'fs'
 import { injectable } from 'inversify'
 import { Default } from './default'
-import { Logger } from 'winston'
-
-const winston = require('winston')
-require('winston-daily-rotate-file')
+import { createLogger, format, Logger, transports } from 'winston'
+import DailyRotateFile from 'winston-daily-rotate-file'
 
 @injectable()
 export class CustomLogger implements ILogger {
     private readonly _logger: Logger
-    private readonly _env: string = (process.env.NODE_ENV || Default.NODE_ENV) === 'development' ? 'debug' : 'info'
     private readonly _logDir = process.env.LOG_DIR || Default.LOG_DIR
+    private _options: any = {}
 
     constructor() {
         if (!fs.existsSync(this._logDir)) fs.mkdirSync(this._logDir) // create directory if it does not exist
+        this.initOptions() // initialize options logger
         this._logger = this.internalCreateLogger()
-
-        // If we're not in production then log to the `console`
-        this.addTransportDevelopment()
     }
 
     get logger(): Logger {
@@ -25,39 +21,55 @@ export class CustomLogger implements ILogger {
     }
 
     private internalCreateLogger(): Logger {
-        return winston.createLogger({
-            // change level if in dev environment versus production
-            level: this._env,
-            format: winston.format.combine(
-                winston.format.timestamp(),
-                winston.format.json(info => `${info.timestamp} ${info.level}: ${info.message}  ${info.level}`)
+        return createLogger({
+            level: 'silly', // Used by transports that do not have this configuration defined
+            silent: false,
+            format: format.combine(
+                format.timestamp(),
+                format.json()
             ),
-            transports: [
-                new winston.transports.DailyRotateFile({
-                    handleExceptions: true,
-                    filename: `${this._logDir}/%DATE%-results.log`,
-                    datePattern: 'YYYY-MM-DD',
-                    maxSize: '20m',
-                    maxFiles: '15d'
-                })
-            ],
+            transports: [new transports.Console(this._options), this.createTransportDailyRotateFile()],
             exitOnError: false
         })
     }
 
-    private addTransportDevelopment(): void {
-        if (this._env === 'debug') {
-            this.addTransport(new winston.transports.Console({
-                level: 'debug',
-                handleExceptions: true,
-                format: winston.format.combine(
-                    winston.format.colorize(),
-                    winston.format.printf(
-                        info => `${info.timestamp} ${info.level}: ${info.message}`
-                    )
+    private initOptions(): void {
+        this._options = {
+            handleExceptions: true,
+            format: format.combine(
+                format.colorize(),
+                format.splat(),
+                format.timestamp(),
+                format.printf(
+                    info => `${info.timestamp} ${info.level}: ${info.message}`
                 )
-            }))
+            )
         }
+
+        switch ((process.env.NODE_ENV || Default.NODE_ENV)) {
+            case 'production':
+                this._options.level = 'warning'
+                this._options.silent = false
+                break
+            case 'test':
+                this._options.level = 'none'
+                this._options.silent = true
+                break
+            default: // development or other
+                this._options.level = 'debug'
+                this._options.silent = false
+                break
+        }
+    }
+
+    private createTransportDailyRotateFile(): any {
+        return new DailyRotateFile({
+            handleExceptions: true,
+            filename: `${this._logDir}/%DATE%-results.log`,
+            datePattern: 'YYYY-MM-DD',
+            maxSize: '20m',
+            maxFiles: '15d'
+        })
     }
 
     public addTransport(transport: any): Logger {

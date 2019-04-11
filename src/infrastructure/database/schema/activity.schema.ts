@@ -57,4 +57,4 @@ const physicalActivitySchema = new Mongoose.Schema({
     }
 )
 physicalActivitySchema.index({ child_id: 1, start_time: 1 }, { unique: true }) // define index at schema level
-export const ActivityRepoModel = Mongoose.model<IPhysicalActivityModel>('PhysicalActivity', physicalActivitySchema)
+export const ActivityRepoModel = Mongoose.model<IPhysicalActivityModel>('PhysicalActivities', physicalActivitySchema)

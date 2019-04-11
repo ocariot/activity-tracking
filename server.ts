@@ -30,6 +30,7 @@ const https_options = {
     key: readFileSync(process.env.PRIVATE_KEY_CERT_PATH || Default.PRIVATE_KEY_CERT_PATH),
     cert: readFileSync(process.env.CERT_PATH || Default.CERT_PATH)
 }
+console.log(process.env.CERT_PATH || Default.CERT_PATH)
 
 /**
  * Initializes HTTP server and redirects accesses to HTTPS.
