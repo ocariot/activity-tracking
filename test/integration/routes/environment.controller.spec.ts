@@ -272,14 +272,16 @@ describe('Routes: environments', () => {
      */
     describe('POST /environments with an environment array in the body', () => {
         context('when all the environments are correct and still do not exist in the repository', () => {
-            it('should return status code 201, create each environment and return a response of type MultiStatus<Environment> ' +
-                'with the description of success in sending each one of them', () => {
+            before(() => {
                 try {
                     deleteAllEnvironments()
                 } catch (err) {
                     throw new Error('Failure on environments routes test: ' + err.message)
                 }
+            })
 
+            it('should return status code 201, create each environment and return a response of type MultiStatus<Environment> ' +
+                'with the description of success in sending each one of them', () => {
                 const body: any = []
 
                 correctEnvironmentsArr.forEach(environment => {
@@ -357,14 +359,16 @@ describe('Routes: environments', () => {
         })
 
         context('when there is correct and incorrect environments in the body', () => {
-            it('should return status code 201 and return a response of type MultiStatus<Environment> with the description of ' +
-                'success and error in each one of them', () => {
+            before(() => {
                 try {
                     deleteAllEnvironments()
                 } catch (err) {
                     throw new Error('Failure on environments routes test: ' + err.message)
                 }
+            })
 
+            it('should return status code 201 and return a response of type MultiStatus<Environment> with the description of ' +
+                'success and error in each one of them', () => {
                 const body: any = []
 
                 mixedEnvironmentsArr.forEach(environment => {
@@ -405,14 +409,16 @@ describe('Routes: environments', () => {
         })
 
         context('when all the environments of the body are incorrect', () => {
-            it('should return status code 201 and return a response of type MultiStatus<Environment> with the description of ' +
-                'error in each one of them', () => {
+            before(() => {
                 try {
                     deleteAllEnvironments()
                 } catch (err) {
                     throw new Error('Failure on environments routes test: ' + err.message)
                 }
+            })
 
+            it('should return status code 201 and return a response of type MultiStatus<Environment> with the description of ' +
+                'error in each one of them', () => {
                 const body: any = []
 
                 incorrectEnvironmentsArr.forEach(environment => {
@@ -530,13 +536,15 @@ describe('Routes: environments', () => {
         })
 
         context('when there are no environment in the database', () => {
-            it('should return status code 200 and an empty list', async () => {
+            before(() => {
                 try {
                     deleteAllEnvironments()
                 } catch (err) {
                     throw new Error('Failure on environments routes test: ' + err.message)
                 }
+            })
 
+            it('should return status code 200 and an empty list', async () => {
                 return request
                     .get('/environments')
                     .set('Content-Type', 'application/json')
@@ -638,13 +646,15 @@ describe('Routes: environments', () => {
 
         context('when there is an attempt to get environment using the "query-strings-parser" library but there is no ' +
             'environment in the database', () => {
-            it('should return status code 200 and an empty list', async () => {
+            before(() => {
                 try {
                     deleteAllEnvironments()
                 } catch (err) {
                     throw new Error('Failure on environments routes test: ' + err.message)
                 }
+            })
 
+            it('should return status code 200 and an empty list', async () => {
                 const url = '/environments?climatized=true&fields=institution_id,location,measurements,' +
                     'climatized,timestamp&sort=institution_id&page=1&limit=3'
 
@@ -706,13 +716,15 @@ describe('Routes: environments', () => {
         })
 
         context('when the environment is not found', () => {
-            it('should return status code 204 and no content for environment', () => {
+            before(() => {
                 try {
                     deleteAllEnvironments()
                 } catch (err) {
                     throw new Error('Failure on environments routes test: ' + err.message)
                 }
+            })
 
+            it('should return status code 204 and no content for environment', () => {
                 return request
                     .delete(`/environments/${defaultEnvironment.id}`)
                     .set('Content-Type', 'application/json')
@@ -724,13 +736,15 @@ describe('Routes: environments', () => {
         })
 
         context('when the environment id is invalid', () => {
-            it('should return status code 400 and info message about the invalid environment id', async () => {
+            before(() => {
                 try {
                     deleteAllEnvironments()
                 } catch (err) {
                     throw new Error('Failure on environments routes test: ' + err.message)
                 }
+            })
 
+            it('should return status code 400 and info message about the invalid environment id', async () => {
                 return request
                     .delete(`/environments/123`)
                     .set('Content-Type', 'application/json')

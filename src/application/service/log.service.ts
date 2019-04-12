@@ -8,7 +8,6 @@ import { Log, LogType } from '../domain/model/log'
 import { ILogRepository } from '../port/log.repository.interface'
 import { CreateLogValidator } from '../domain/validator/create.log.validator'
 import { DateValidator } from '../domain/validator/date.validator'
-import { Query } from '../../infrastructure/repository/query/query'
 import { PhysicalActivityLog } from '../domain/model/physical.activity.log'
 import { MultiStatus } from '../domain/model/multi.status'
 import { StatusSuccess } from '../domain/model/status.success'
@@ -47,30 +46,22 @@ export class LogService implements ILogService {
                 // 1. Validate the object.
                 CreateLogValidator.validate(elem)
 
-                // 2. Build a query.
-                const query: IQuery = new Query()
-                query.filters = {
-                    child_id: elem.child_id,
-                    type: elem.type,
-                    date: elem.date.concat('T00:00:00')
-                }
-
-                // 3. Check if it already exists in the database.
-                const log = await this._logRepository.findOne(query)
+                // 2. Check if it already exists in the database.
+                const log = await this._logRepository.findOneByChild(elem.child_id, elem.type, elem.date)
 
                 if (log) { // If exists.
-                    // 4a. Update physical activity log.
+                    // 3a. Update physical activity log.
                     log.value += elem.value
                     await this._logRepository.update(log)
 
-                    // 5a. Create a StatusSuccess object for the construction of the MultiStatus response.
+                    // 4a. Creates a StatusSuccess object for the construction of the MultiStatus response.
                     const statusSuccess: StatusSuccess<Log> = new StatusSuccess<Log>(HttpStatus.CREATED, elem)
                     statusSuccessArr.push(statusSuccess)
                 } else {
-                    // 4b. Create new physical activity log.
+                    // 3b. Creates new physical activity log.
                     await this._logRepository.create(elem)
 
-                    // 5b. Create a StatusSuccess object for the construction of the MultiStatus response.
+                    // 4b. Creates a StatusSuccess object for the construction of the MultiStatus response.
                     const statusSuccess: StatusSuccess<Log> = new StatusSuccess<Log>(HttpStatus.CREATED, elem)
                     statusSuccessArr.push(statusSuccess)
                 }
@@ -79,17 +70,17 @@ export class LogService implements ILogService {
                 if (err instanceof ValidationException) statusCode = HttpStatus.BAD_REQUEST
                 if (err instanceof ConflictException) statusCode = HttpStatus.CONFLICT
 
-                // 5c. Create a StatusError object for the construction of the MultiStatus response.
+                // 4c. Creates a StatusError object for the construction of the MultiStatus response.
                 const statusError: StatusError<Log> = new StatusError<Log>(statusCode, err.message, err.description, elem)
                 statusErrorArr.push(statusError)
             }
         }
 
-        // 6. Build the MultiStatus response.
+        // 5. Build the MultiStatus response.
         multiStatus.success = statusSuccessArr
         multiStatus.error = statusErrorArr
 
-        // 7. Returns the created object.
+        // 6. Returns the created object.
         return Promise.resolve(multiStatus)
     }
 
@@ -140,7 +131,7 @@ export class LogService implements ILogService {
         })
 
         try {
-            // Create a PhysicalActivityLog object with all the resources listed with arrays.
+            // Creates a PhysicalActivityLog object with all the resources listed with arrays.
             const physical: PhysicalActivityLog = new PhysicalActivityLog()
             const stepsArr: Array<Log> = new Array<Log>()
             const caloriesArr: Array<Log> = new Array<Log>()

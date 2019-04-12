@@ -24,7 +24,7 @@ export class SleepRepository extends BaseRepository<Sleep, SleepEntity> implemen
     }
 
     /**
-     * Checks if an sleep already has a registration.
+     * Checks if a sleep already has a registration.
      * What differs from one sleep to another is the start date and associated child.
      *
      * @param sleep

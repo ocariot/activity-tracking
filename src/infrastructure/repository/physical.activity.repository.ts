@@ -25,7 +25,7 @@ export class PhysicalActivityRepository extends BaseRepository<PhysicalActivity,
     }
 
     /**
-     * Checks if an physicalactivity already has a registration.
+     * Checks if a physicalactivity already has a registration.
      * What differs from one physicalactivity to another is the start date and associated child.
      *
      * @param activity

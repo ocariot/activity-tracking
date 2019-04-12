@@ -23,7 +23,14 @@ export class LogEntityMapper implements IEntityMapper<Log, LogEntity> {
          * Converts the log date to a valid format if necessary
          */
         if (item.date) {
-            const dateSplit = item.date.split('-')
+            let dateSplit: Array<string>
+
+            if (item.date.indexOf('-') > -1) {
+                dateSplit = item.date.split('-')
+            }
+            else {
+                dateSplit = item.date.split('/')
+            }
 
             let month = dateSplit[1]
 
