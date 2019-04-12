@@ -38,13 +38,14 @@ export class LogRepository extends BaseRepository<Log, LogEntity>
             type: logType,
             date: dateLog.concat('T00:00:00')
         }
+
         return new Promise<Log>((resolve, reject) => {
             this.Model.findOne(query.filters)
                 .select(query.fields)
                 .exec()
                 .then((result: Log) => {
                     if (!result) return resolve(undefined)
-                    return resolve(this.mapper.transform(result))
+                    return resolve(this.logMapper.transform(result))
                 })
                 .catch(err => reject(this.mongoDBErrorListener(err)))
         })

@@ -9,7 +9,7 @@ describe('Mappers: LogEntity', () => {
     // Create log JSON
     const logJSON: any = {
         id: '5a62be07de34500146d9c544',
-        date: '2019-03-11',
+        date: new Date('2019-03-11'),
         value: 1000,
         type: LogType.CALORIES,
         child_id: '5a62be07de34500146d9c544'
@@ -31,7 +31,7 @@ describe('Mappers: LogEntity', () => {
             it('should not normally execute the method, returning a Log as a result of the transformation', () => {
                 const result = new LogEntityMapper().transform(logJSON)
                 assert.propertyVal(result, 'id', logJSON.id)
-                assert.propertyVal(result, 'date', logJSON.date)
+                assert.propertyVal(result, 'date', (logJSON.date.toISOString()).substring(0, (logJSON.date.toISOString()).indexOf('T')))
                 assert.propertyVal(result, 'value', logJSON.value)
                 assert.propertyVal(result, 'type', logJSON.type)
                 assert.propertyVal(result, 'child_id', logJSON.child_id)

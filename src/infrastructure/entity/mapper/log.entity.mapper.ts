@@ -25,12 +25,8 @@ export class LogEntityMapper implements IEntityMapper<Log, LogEntity> {
         if (item.date) {
             let dateSplit: Array<string>
 
-            if (item.date.indexOf('-') > -1) {
-                dateSplit = item.date.split('-')
-            }
-            else {
-                dateSplit = item.date.split('/')
-            }
+            if (item.date.indexOf('-') > -1) dateSplit = item.date.split('-')
+            else dateSplit = item.date.split('/')
 
             let month = dateSplit[1]
 
@@ -78,7 +74,7 @@ export class LogEntityMapper implements IEntityMapper<Log, LogEntity> {
 
         if (!json) return result
         if (json.id !== undefined) result.id = json.id
-        if (json.date !== undefined) result.date = (json.date.toLocaleString()).replace(' 00:00:00', '')
+        if (json.date !== undefined) result.date = (json.date.toISOString()).substring(0, (json.date.toISOString()).indexOf('T'))
         if (json.value !== undefined) result.value = json.value
         if (json.type !== undefined) result.type = json.type
         if (json.child_id !== undefined) result.child_id = json.child_id
