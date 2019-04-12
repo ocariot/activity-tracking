@@ -435,7 +435,7 @@ describe('Routes: users.children.sleep', () => {
             })
         })
 
-        context('when all the activities are correct but already exists in the repository', () => {
+        context('when all the sleep objects are correct but already exists in the repository', () => {
             it('should return status code 201 and return a response of type MultiStatus<Sleep> with the ' +
                 'description of conflict in sending each one of them', () => {
                 const body: any = []
@@ -471,7 +471,7 @@ describe('Routes: users.children.sleep', () => {
             })
         })
 
-        context('when there are correct and incorrect activities in the body', () => {
+        context('when there are correct and incorrect sleep objects in the body', () => {
             it('should return status code 201 and return a response of type MultiStatus<Sleep> with the ' +
                 'description of success and error in each one of them', () => {
                 try {
@@ -515,7 +515,7 @@ describe('Routes: users.children.sleep', () => {
             })
         })
 
-        context('when all the activities are incorrect', () => {
+        context('when all the sleep objects are incorrect', () => {
             it('should return status code 201 and return a response of type MultiStatus<Sleep> with the ' +
                 'description of error in each one of them', () => {
                 try {
