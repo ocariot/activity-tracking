@@ -21,6 +21,7 @@ export class LogRepository extends BaseRepository<Log, LogEntity>
     ) {
         super(logModel, logMapper, logger)
     }
+
     /**
      * Retrieves a log according to the parameters.
      *

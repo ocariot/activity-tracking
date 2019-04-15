@@ -2240,8 +2240,44 @@ describe('Routes: users/children', () => {
             })
         })
 
+        context('when all the logs in the body are correct and have the same date', () => {
+            it('should return status code 201, create or update (if already exists) the first element, update its value ' +
+                'with the value of the next logs and return a response of type MultiStatus<Log> with the description of success ' +
+                'in sending each log', async () => {
+                const body: any = []
+
+                correctLogsArr.forEach(log => {
+                    log.date = '2019-04-15'
+                })
+
+                correctLogsArr.forEach(log => {
+                    const bodyElem = {
+                        date: log.date,
+                        value: log.value,
+                    }
+                    body.push(bodyElem)
+                })
+
+                return request
+                    .post(`/users/children/${defaultActivity.child_id}/physicalactivities/logs/${LogType.STEPS}`)
+                    .send(body)
+                    .set('Content-Type', 'application/json')
+                    .expect(201)
+                    .then(res => {
+                        expect(res.body.success).is.an.instanceOf(Array)
+                        for (let i = 0; i < res.body.success.length; i++) {
+                            expect(res.body.success[i].code).to.eql(HttpStatus.CREATED)
+                            expect(res.body.success[i].item.date).to.eql(correctLogsArr[i].date)
+                            expect(res.body.success[i].item.value).to.eql(correctLogsArr[i].value)
+                        }
+                        expect(res.body.error).is.an.instanceOf(Array)
+                        expect(res.body.error.length).to.eql(0)
+                    })
+            })
+        })
+
         context('when all the logs in the body are correct and some of them already exist in the repository', () => {
-            it('should return status code 201, update the value of the existing items already in the repository, create the new ones, ' +
+            it('should return status code 201, update the value of the items already in the repository, create the new ones, ' +
                 'and return a response of type MultiStatus<Log> with the description of success in sending each log', async () => {
                 const newLog: Log = new LogMock()
                 newLog.date = '2019-10-02'

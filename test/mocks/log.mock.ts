@@ -27,7 +27,11 @@ export class LogMock extends Log {
     }
 
     private generateDate(): string {
-        const date = new Date()
+        const dateStart = new Date(2018, 4, 15)
+        const dateEnd = new Date()
+        const randomDateMilliseconds = dateEnd.getTime() + Math.floor(Math.random() * (dateEnd.getTime() - dateStart.getTime()))
+
+        const date = new Date(randomDateMilliseconds)
 
         const month = date.getMonth() + 1
         let monthString = month.toString()

@@ -20,7 +20,7 @@ describe('Mappers: LogEntity', () => {
             it('should normally execute the method, returning a LogEntity as a result of the transformation', () => {
                 const result = new LogEntityMapper().transform(log)
                 assert.propertyVal(result, 'id', log.id)
-                assert(result.date, 'date must not be undefined')
+                assert.equal((result.date.toISOString()).substring(0, (result.date.toISOString()).indexOf('T')), log.date)
                 assert.propertyVal(result, 'value', log.value)
                 assert.propertyVal(result, 'type', log.type)
                 assert.propertyVal(result, 'child_id', log.child_id)
