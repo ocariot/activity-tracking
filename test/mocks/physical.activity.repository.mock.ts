@@ -56,4 +56,8 @@ export class PhysicalActivityRepositoryMock implements IPhysicalActivityReposito
             return Promise.resolve(activity)
         return Promise.resolve(undefined!)
     }
+
+    public removeAllActivitiesFromChild(childId: string): Promise<boolean> {
+        return Promise.resolve(true)
+    }
 }

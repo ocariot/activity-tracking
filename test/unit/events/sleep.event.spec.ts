@@ -12,15 +12,19 @@ describe('IntegrationEvents: SleepEvent', () => {
                 const result = new SleepEvent('SleepSaveEvent', new Date(), sleep).toJSON()
                 assert.propertyVal(result, 'event_name', 'SleepSaveEvent')
                 assert.property(result, 'timestamp')
-                assert.property(result, 'sleep')
+                assert.propertyVal(result.sleep, 'id', sleep.id)
+                assert.propertyVal(result.sleep, 'start_time', sleep.start_time!.toISOString())
+                assert.propertyVal(result.sleep, 'end_time', sleep.end_time!.toISOString())
+                assert.propertyVal(result.sleep, 'duration', sleep.duration)
+                assert.propertyVal(result.sleep, 'child_id', sleep.child_id)
+                assert.property(result.sleep, 'pattern')
             })
+        })
 
-            context('when the sleep is undefined', () => {
-                it('should return empty object', () => {
-                    const result = new SleepEvent('SleepSaveEvent', new Date(), undefined).toJSON()
-                    assert.isObject(result)
-                    assert.isEmpty(result)
-                })
+        context('when the sleep is undefined', () => {
+            it('should return empty object', () => {
+                const result = new SleepEvent('SleepSaveEvent', new Date(), undefined).toJSON()
+                assert.isEmpty(result)
             })
         })
     })

@@ -164,46 +164,8 @@ describe('Repositories: Sleep', () => {
         })
 
         context('when the sleep id is invalid', () => {
-            it('should return undefined representing that there is an invalid parameter', () => {
+            it('should throw a RepositoryException', () => {
                 defaultSleep.id = '5b4b'
-
-                sinon
-                    .mock(modelFake)
-                    .expects('findOneAndUpdate')
-                    .withArgs(customQueryMock.toJSON().filters)
-                    .chain('exec')
-                    .resolves(undefined)
-
-                return repo.updateByChild(defaultSleep)
-                    .then((result: any) => {
-                        assert.isUndefined(result)
-                    })
-            })
-        })
-
-        context('when the sleep child_id is invalid', () => {
-            it('should return undefined representing that there is an invalid parameter', () => {
-                defaultSleep.id = `${new ObjectID()}`
-                defaultSleep.child_id = '5b4b'
-
-                sinon
-                    .mock(modelFake)
-                    .expects('findOneAndUpdate')
-                    .withArgs(customQueryMock.toJSON().filters)
-                    .chain('exec')
-                    .resolves(undefined)
-
-                return repo.updateByChild(defaultSleep)
-                    .then((result: any) => {
-                        assert.isUndefined(result)
-                    })
-            })
-        })
-
-        context('when a database error occurs', () => {
-            it('should return a empty list', async () => {
-                defaultSleep.child_id = '5a62be07de34500146d9c544'
-                defaultSleep.start_time = undefined
 
                 sinon
                     .mock(modelFake)
@@ -213,7 +175,28 @@ describe('Repositories: Sleep', () => {
                     .rejects({ message: 'An internal error has occurred in the database!',
                                description: 'Please try again later...' })
 
-                return await repo.updateByChild(defaultSleep)
+                return repo.updateByChild(defaultSleep)
+                    .catch (err => {
+                        assert.propertyVal(err, 'message', 'An internal error has occurred in the database!')
+                        assert.propertyVal(err, 'description', 'Please try again later...')
+                    })
+            })
+        })
+
+        context('when the sleep child_id is invalid', () => {
+            it('should throw a RepositoryException', () => {
+                defaultSleep.id = `${new ObjectID()}`
+                defaultSleep.child_id = '5b4b'
+
+                sinon
+                    .mock(modelFake)
+                    .expects('findOneAndUpdate')
+                    .withArgs(customQueryMock.toJSON().filters)
+                    .chain('exec')
+                    .rejects({ message: 'An internal error has occurred in the database!',
+                               description: 'Please try again later...' })
+
+                return repo.updateByChild(defaultSleep)
                     .catch (err => {
                         assert.propertyVal(err, 'message', 'An internal error has occurred in the database!')
                         assert.propertyVal(err, 'description', 'Please try again later...')
@@ -261,46 +244,8 @@ describe('Repositories: Sleep', () => {
         })
 
         context('when the sleep id is invalid', () => {
-            it('should return false for confirm that there is an invalid parameter', () => {
+            it('should throw a RepositoryException', () => {
                 defaultSleep.id = '1a2b3c'
-
-                sinon
-                    .mock(modelFake)
-                    .expects('findOneAndDelete')
-                    .withArgs({ child_id: defaultSleep.child_id, _id: defaultSleep.id })
-                    .chain('exec')
-                    .resolves(false)
-
-                return repo.removeByChild(defaultSleep.id, defaultSleep.child_id)
-                    .then((isDeleted: boolean) => {
-                        assert.isFalse(isDeleted)
-                    })
-            })
-        })
-
-        context('when the sleep child_id is invalid', () => {
-            it('should return false for confirm that there is an invalid parameter', () => {
-                defaultSleep.id = `${new ObjectID()}`
-                defaultSleep.child_id = '1a2b3c'
-
-                sinon
-                    .mock(modelFake)
-                    .expects('findOneAndDelete')
-                    .withArgs({ child_id: defaultSleep.child_id, _id: defaultSleep.id })
-                    .chain('exec')
-                    .resolves(false)
-
-                return repo.removeByChild(defaultSleep.id!, defaultSleep.child_id)
-                    .then((isDeleted: boolean) => {
-                        assert.isFalse(isDeleted)
-                    })
-            })
-        })
-
-        context('when a database error occurs', () => {
-            it('should return a empty list', async () => {
-                defaultSleep.child_id = '5a62be07de34500146d9c544'
-                defaultSleep.start_time = undefined
 
                 sinon
                     .mock(modelFake)
@@ -310,7 +255,86 @@ describe('Repositories: Sleep', () => {
                     .rejects({ message: 'An internal error has occurred in the database!',
                                description: 'Please try again later...' })
 
-                return await repo.removeByChild(defaultSleep.id!, defaultSleep.child_id)
+                return repo.removeByChild(defaultSleep.id, defaultSleep.child_id)
+                    .catch (err => {
+                        assert.propertyVal(err, 'message', 'An internal error has occurred in the database!')
+                        assert.propertyVal(err, 'description', 'Please try again later...')
+                    })
+            })
+        })
+
+        context('when the sleep child_id is invalid', () => {
+            it('should throw a RepositoryException', () => {
+                defaultSleep.id = `${new ObjectID()}`
+                defaultSleep.child_id = '1a2b3c'
+
+                sinon
+                    .mock(modelFake)
+                    .expects('findOneAndDelete')
+                    .withArgs({ child_id: defaultSleep.child_id, _id: defaultSleep.id })
+                    .chain('exec')
+                    .rejects({ message: 'An internal error has occurred in the database!',
+                               description: 'Please try again later...' })
+
+                return repo.removeByChild(defaultSleep.id!, defaultSleep.child_id)
+                    .catch (err => {
+                        assert.propertyVal(err, 'message', 'An internal error has occurred in the database!')
+                        assert.propertyVal(err, 'description', 'Please try again later...')
+                    })
+            })
+        })
+    })
+
+    describe('removeAllSleepFromChild(childId: string)', () => {
+        context('when there is at least one sleep and the delete operation is done successfully', () => {
+            it('should return true for confirm delete', () => {
+                defaultSleep.child_id = '5a62be07de34500146d9c544'
+
+                sinon
+                    .mock(modelFake)
+                    .expects('deleteMany')
+                    .withArgs({ child_id: defaultSleep.child_id })
+                    .chain('exec')
+                    .resolves(true)
+
+                return repo.removeAllSleepFromChild(defaultSleep.child_id)
+                    .then((isDeleted: boolean) => {
+                        assert.isTrue(isDeleted)
+                    })
+            })
+        })
+
+        context('when there is no sleep', () => {
+            it('should return false', () => {
+                const randomChildId: any = new ObjectID()
+
+                sinon
+                    .mock(modelFake)
+                    .expects('deleteMany')
+                    .withArgs({ child_id: randomChildId })
+                    .chain('exec')
+                    .resolves(false)
+
+                return repo.removeAllSleepFromChild(randomChildId)
+                    .then((isDeleted: boolean) => {
+                        assert.isFalse(isDeleted)
+                    })
+            })
+        })
+
+        context('when the sleep child_id is invalid', () => {
+            it('should throw a RepositoryException', () => {
+                defaultSleep.child_id = '1a2b3c'
+
+                sinon
+                    .mock(modelFake)
+                    .expects('deleteMany')
+                    .withArgs({ child_id: defaultSleep.child_id })
+                    .chain('exec')
+                    .rejects({ message: 'An internal error has occurred in the database!',
+                               description: 'Please try again later...' })
+
+                return repo.removeAllSleepFromChild(defaultSleep.child_id)
                     .catch (err => {
                         assert.propertyVal(err, 'message', 'An internal error has occurred in the database!')
                         assert.propertyVal(err, 'description', 'Please try again later...')

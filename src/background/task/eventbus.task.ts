@@ -18,6 +18,8 @@ import { PhysicalActivity } from '../../application/domain/model/physical.activi
 import { Sleep } from '../../application/domain/model/sleep'
 import { Environment } from '../../application/domain/model/environment'
 import { IntegrationEvent } from '../../application/integration-event/event/integration.event'
+import { UserEvent } from '../../application/integration-event/event/user.event'
+import { UserDeleteEventHandler } from '../../application/integration-event/handler/user.delete.event.handler'
 
 @injectable()
 export class EventBusTask {
@@ -102,6 +104,22 @@ export class EventBusTask {
                     })
                     .catch(err => {
                         this._logger.error(`Error in Subscribe EnvironmentSaveEvent! ${err.message}`)
+                    })
+
+                /**
+                 * Subscribe in event user delete
+                 */
+                const userDeleteEvent = new UserEvent('UserDeleteEvent', new Date())
+                const userDeleteEventHandler = new UserDeleteEventHandler(
+                    this._diContainer.get<IPhysicalActivityRepository>(Identifier.ACTIVITY_REPOSITORY),
+                    this._diContainer.get<ISleepRepository>(Identifier.SLEEP_REPOSITORY), this._logger)
+                this._eventBus
+                    .subscribe(userDeleteEvent, userDeleteEventHandler, 'users.delete')
+                    .then((result: boolean) => {
+                        if (result) this._logger.info('Subscribe in UserDeleteEvent successful!')
+                    })
+                    .catch(err => {
+                        this._logger.error(`Error in Subscribe UserDeleteEvent! ${err.message}`)
                     })
             })
             .catch(err => {

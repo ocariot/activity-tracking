@@ -206,27 +206,6 @@ describe('Repositories: PhysicalActivity', () => {
                     })
             })
         })
-
-        context('when a database error occurs', () => {
-            it('should throw a RepositoryException', async () => {
-                defaultActivity.child_id = '5a62be07de34500146d9c544'
-                defaultActivity.start_time = undefined
-
-                sinon
-                    .mock(modelFake)
-                    .expects('findOneAndUpdate')
-                    .withArgs(customQueryMock.toJSON().filters)
-                    .chain('exec')
-                    .rejects({ message: 'An internal error has occurred in the database!',
-                               description: 'Please try again later...' })
-
-                return await repo.updateByChild(defaultActivity)
-                    .catch (err => {
-                        assert.propertyVal(err, 'message', 'An internal error has occurred in the database!')
-                        assert.propertyVal(err, 'description', 'Please try again later...')
-                })
-            })
-        })
     })
 
     describe('removeByChild(activityId: string | number, childId: string)', () => {
@@ -268,46 +247,8 @@ describe('Repositories: PhysicalActivity', () => {
         })
 
         context('when the physical activity id is invalid', () => {
-            it('should return false for confirm that there is an invalid parameter', () => {
+            it('should throw a RepositoryException', () => {
                 defaultActivity.id = '1a2b3c'
-
-                sinon
-                    .mock(modelFake)
-                    .expects('findOneAndDelete')
-                    .withArgs({ child_id: defaultActivity.child_id, _id: defaultActivity.id })
-                    .chain('exec')
-                    .resolves(false)
-
-                return repo.removeByChild(defaultActivity.id, defaultActivity.child_id)
-                    .then((isDeleted: boolean) => {
-                        assert.isFalse(isDeleted)
-                    })
-            })
-        })
-
-        context('when the physical activity child_id is invalid', () => {
-            it('should return false for confirm that there is an invalid parameter', () => {
-                defaultActivity.id = `${new ObjectID()}`
-                defaultActivity.child_id = '1a2b3c'
-
-                sinon
-                    .mock(modelFake)
-                    .expects('findOneAndDelete')
-                    .withArgs({ child_id: defaultActivity.child_id, _id: defaultActivity.id })
-                    .chain('exec')
-                    .resolves(false)
-
-                return repo.removeByChild(defaultActivity.id!, defaultActivity.child_id)
-                    .then((isDeleted: boolean) => {
-                        assert.isFalse(isDeleted)
-                    })
-            })
-        })
-
-        context('when a database error occurs', () => {
-            it('should throw a RepositoryException', async () => {
-                defaultActivity.child_id = '5a62be07de34500146d9c544'
-                defaultActivity.start_time = undefined
 
                 sinon
                     .mock(modelFake)
@@ -317,7 +258,86 @@ describe('Repositories: PhysicalActivity', () => {
                     .rejects({ message: 'An internal error has occurred in the database!',
                                description: 'Please try again later...' })
 
-                return await repo.removeByChild(defaultActivity.id!, defaultActivity.child_id)
+                return repo.removeByChild(defaultActivity.id, defaultActivity.child_id)
+                    .catch (err => {
+                        assert.propertyVal(err, 'message', 'An internal error has occurred in the database!')
+                        assert.propertyVal(err, 'description', 'Please try again later...')
+                    })
+            })
+        })
+
+        context('when the physical activity child_id is invalid', () => {
+            it('should throw a RepositoryException', () => {
+                defaultActivity.id = `${new ObjectID()}`
+                defaultActivity.child_id = '1a2b3c'
+
+                sinon
+                    .mock(modelFake)
+                    .expects('findOneAndDelete')
+                    .withArgs({ child_id: defaultActivity.child_id, _id: defaultActivity.id })
+                    .chain('exec')
+                    .rejects({ message: 'An internal error has occurred in the database!',
+                               description: 'Please try again later...' })
+
+                return repo.removeByChild(defaultActivity.id!, defaultActivity.child_id)
+                    .catch (err => {
+                        assert.propertyVal(err, 'message', 'An internal error has occurred in the database!')
+                        assert.propertyVal(err, 'description', 'Please try again later...')
+                    })
+            })
+        })
+    })
+
+    describe('removeAllActivitiesFromChild(childId: string)', () => {
+        context('when there is at least one physical activity and the delete operation is done successfully', () => {
+            it('should return true for confirm delete', () => {
+                defaultActivity.start_time = new Date()
+
+                sinon
+                    .mock(modelFake)
+                    .expects('deleteMany')
+                    .withArgs({ child_id: defaultActivity.child_id })
+                    .chain('exec')
+                    .resolves(true)
+
+                return repo.removeAllActivitiesFromChild(defaultActivity.child_id)
+                    .then((isDeleted: boolean) => {
+                        assert.isTrue(isDeleted)
+                    })
+            })
+        })
+
+        context('when there is no physical activity', () => {
+            it('should return false', () => {
+                const randomChildId: any = new ObjectID()
+
+                sinon
+                    .mock(modelFake)
+                    .expects('deleteMany')
+                    .withArgs({ child_id: randomChildId })
+                    .chain('exec')
+                    .resolves(false)
+
+                return repo.removeAllActivitiesFromChild(randomChildId)
+                    .then((isDeleted: boolean) => {
+                        assert.isFalse(isDeleted)
+                    })
+            })
+        })
+
+        context('when the child_id parameter is invalid', () => {
+            it('should throw a RepositoryException', () => {
+                defaultActivity.child_id = '1a2b3c'
+
+                sinon
+                    .mock(modelFake)
+                    .expects('deleteMany')
+                    .withArgs({ child_id: defaultActivity.child_id })
+                    .chain('exec')
+                    .rejects({ message: 'An internal error has occurred in the database!',
+                               description: 'Please try again later...' })
+
+                return repo.removeAllActivitiesFromChild(defaultActivity.child_id)
                     .catch (err => {
                         assert.propertyVal(err, 'message', 'An internal error has occurred in the database!')
                         assert.propertyVal(err, 'description', 'Please try again later...')

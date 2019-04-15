@@ -37,4 +37,13 @@ export interface ISleepRepository extends IRepository<Sleep> {
      * @throws {ValidationException | RepositoryException}
      */
     checkExist(sleep: Sleep): Promise<boolean>
+
+    /**
+     * Removes all sleep objects associated with the childId received.
+     *
+     * @param childId Child id associated with sleep objects.
+     * @return {Promise<boolean>}
+     * @throws {ValidationException | RepositoryException}
+     */
+    removeAllSleepFromChild(childId: string): Promise<boolean>
 }

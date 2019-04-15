@@ -56,4 +56,8 @@ export class SleepRepositoryMock implements ISleepRepository {
             return Promise.resolve(sleep)
         return Promise.resolve(undefined!)
     }
+
+    public removeAllSleepFromChild(childId: string): Promise<boolean> {
+        return Promise.resolve(true)
+    }
 }

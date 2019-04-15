@@ -37,4 +37,13 @@ export interface IPhysicalActivityRepository extends IRepository<PhysicalActivit
      * @throws {ValidationException | RepositoryException}
      */
     checkExist(activity: PhysicalActivity): Promise<boolean>
+
+    /**
+     * Removes all physical activities associated with the childId received.
+     *
+     * @param childId Child id associated with physical activities.
+     * @return {Promise<boolean>}
+     * @throws {ValidationException | RepositoryException}
+     */
+    removeAllActivitiesFromChild(childId: string): Promise<boolean>
 }

@@ -7,6 +7,7 @@ import { ISleepRepository } from '../../application/port/sleep.repository.interf
 import { Sleep } from '../../application/domain/model/sleep'
 import { SleepEntity } from '../entity/sleep.entity'
 import { IEntityMapper } from '../port/entity.mapper.interface'
+import { IQuery } from '../../application/port/query.interface'
 
 /**
  * Implementation of the sleep repository.
@@ -83,6 +84,29 @@ export class SleepRepository extends BaseRepository<Sleep, SleepEntity> implemen
                     resolve(true)
                 })
                 .catch(err => reject(super.mongoDBErrorListener(err)))
+        })
+    }
+
+    /**
+     * Removes all sleep objects associated with the childId received.
+     *
+     * @param childId Child id associated with sleep objects.
+     * @return {Promise<boolean>}
+     * @throws {ValidationException | RepositoryException}
+     */
+    public async removeAllSleepFromChild(childId: string): Promise<boolean> {
+        // Creates the query with the received parameter
+        const query: IQuery = new Query()
+        query.filters = { child_id: childId }
+
+        return new Promise<boolean>((resolve, reject) => {
+            this.Model.deleteMany(query.filters)
+                .exec()
+                .then(result => {
+                    if (!result) return resolve(false)
+                    return resolve(true)
+                })
+                .catch(err => reject(this.mongoDBErrorListener(err)))
         })
     }
 }

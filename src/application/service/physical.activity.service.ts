@@ -259,7 +259,6 @@ export class PhysicalActivityService implements IPhysicalActivityService {
             // 2. Create a PhysicalActivity with only two attributes, the id and child_id, to be used in publishing on the event bus
             const activityToBeDeleted: PhysicalActivity = new PhysicalActivity()
             activityToBeDeleted.id = activityId
-            activityToBeDeleted.child_id = childId
 
             const wasDeleted: boolean = await this._activityRepository.removeByChild(activityId, childId)
 
@@ -271,8 +270,7 @@ export class PhysicalActivityService implements IPhysicalActivityService {
                     // 4. Save Event for submission attempt later when there is connection to message channel.
                     this.saveEvent(event)
                 } else {
-                    this._logger.info(`Physical Activity with ID: ${activityToBeDeleted.id}
-                        and child_id: ${activityToBeDeleted.child_id} was deleted...`)
+                    this._logger.info(`Physical Activity with ID: ${activityToBeDeleted.id} was deleted...`)
                 }
 
                 // 5a. Returns true

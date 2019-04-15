@@ -82,7 +82,7 @@ export abstract class BaseRepository<T extends Entity, TModel> implements IRepos
                 .exec()
                 .then((result: TModel) => {
                     if (!result) return resolve(false)
-                    resolve(true)
+                    return resolve(true)
                 })
                 .catch(err => reject(this.mongoDBErrorListener(err)))
         })

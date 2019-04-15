@@ -257,7 +257,6 @@ export class SleepService implements ISleepService {
             // 2. Create a Sleep with only two attributes, the id and child_id, to be used in publishing on the event bus
             const sleepToBeDeleted: Sleep = new Sleep()
             sleepToBeDeleted.id = sleepId
-            sleepToBeDeleted.child_id = childId
 
             const wasDeleted: boolean = await this._sleepRepository.removeByChild(sleepId, childId)
 
@@ -268,7 +267,7 @@ export class SleepService implements ISleepService {
                     // 4. Save Event for submission attempt later when there is connection to message channel.
                     this.saveEvent(event)
                 } else {
-                    this._logger.info(`Sleep with ID: ${sleepToBeDeleted.id} and child_id: ${sleepToBeDeleted.child_id} was deleted...`)
+                    this._logger.info(`Sleep with ID: ${sleepToBeDeleted.id} was deleted...`)
                 }
 
                 // 5a. Returns true
