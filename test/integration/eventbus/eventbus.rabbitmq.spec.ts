@@ -17,6 +17,10 @@ import { ISleepRepository } from '../../../src/application/port/sleep.repository
 import { EnvironmentSaveEventHandler } from '../../../src/application/integration-event/handler/environment.save.event.handler'
 import { IEnvironmentRepository } from '../../../src/application/port/environment.repository.interface'
 import { EventBusRabbitMQ } from '../../../src/infrastructure/eventbus/rabbitmq/eventbus.rabbitmq'
+import { UserEvent } from '../../../src/application/integration-event/event/user.event'
+import { UserDeleteEventHandler } from '../../../src/application/integration-event/handler/user.delete.event.handler'
+import { InstitutionEvent } from '../../../src/application/integration-event/event/institution.event'
+import { InstitutionDeleteEventHandler } from '../../../src/application/integration-event/handler/institution.delete.event.handler'
 
 const container: Container = DI.getInstance().getContainer()
 const eventBus: EventBusRabbitMQ = container.get(Identifier.RABBITMQ_EVENT_BUS)
@@ -130,6 +134,41 @@ describe('EVENT BUS', () => {
                     container.get<IEnvironmentRepository>(Identifier.ENVIRONMENT_REPOSITORY), logger)
                 return eventBus
                     .subscribe(environmentSaveEvent, environmentSaveEventHandler, 'environments.save')
+                    .then(result => {
+                        expect(result).to.equal(true)
+                    })
+            } catch (err) {
+                throw new Error('Failure on EventBus test: ' + err.message)
+            }
+        })
+
+        it('should return true to subscribe in UserDeleteEvent', async () => {
+            try {
+                await eventBus.connectionSub.tryConnect(1, 500)
+
+                const userDeleteEvent = new UserEvent('UserDeleteEvent', new Date())
+                const userDeleteEventHandler = new UserDeleteEventHandler(
+                    container.get<IPhysicalActivityRepository>(Identifier.ACTIVITY_REPOSITORY),
+                    container.get<ISleepRepository>(Identifier.SLEEP_REPOSITORY), logger)
+                return eventBus
+                    .subscribe(userDeleteEvent, userDeleteEventHandler, 'users.delete')
+                    .then(result => {
+                        expect(result).to.equal(true)
+                    })
+            } catch (err) {
+                throw new Error('Failure on EventBus test: ' + err.message)
+            }
+        })
+
+        it('should return true to subscribe in InstitutionDeleteEvent', async () => {
+            try {
+                await eventBus.connectionSub.tryConnect(1, 500)
+
+                const institutionDeleteEvent = new InstitutionEvent('InstitutionDeleteEvent', new Date())
+                const institutionDeleteEventHandler = new InstitutionDeleteEventHandler(
+                    container.get<IEnvironmentRepository>(Identifier.ENVIRONMENT_REPOSITORY), logger)
+                return eventBus
+                    .subscribe(institutionDeleteEvent, institutionDeleteEventHandler, 'institutions.delete')
                     .then(result => {
                         expect(result).to.equal(true)
                     })

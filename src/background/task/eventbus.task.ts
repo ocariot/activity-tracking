@@ -20,6 +20,8 @@ import { Environment } from '../../application/domain/model/environment'
 import { IntegrationEvent } from '../../application/integration-event/event/integration.event'
 import { UserEvent } from '../../application/integration-event/event/user.event'
 import { UserDeleteEventHandler } from '../../application/integration-event/handler/user.delete.event.handler'
+import { InstitutionEvent } from '../../application/integration-event/event/institution.event'
+import { InstitutionDeleteEventHandler } from '../../application/integration-event/handler/institution.delete.event.handler'
 
 @injectable()
 export class EventBusTask {
@@ -120,6 +122,21 @@ export class EventBusTask {
                     })
                     .catch(err => {
                         this._logger.error(`Error in Subscribe UserDeleteEvent! ${err.message}`)
+                    })
+
+                /**
+                 * Subscribe in event institution delete
+                 */
+                const institutionDeleteEvent = new InstitutionEvent('InstitutionDeleteEvent', new Date())
+                const institutionDeleteEventHandler = new InstitutionDeleteEventHandler(
+                    this._diContainer.get<IEnvironmentRepository>(Identifier.ENVIRONMENT_REPOSITORY), this._logger)
+                this._eventBus
+                    .subscribe(institutionDeleteEvent, institutionDeleteEventHandler, 'institutions.delete')
+                    .then((result: boolean) => {
+                        if (result) this._logger.info('Subscribe in InstitutionDeleteEvent successful!')
+                    })
+                    .catch(err => {
+                        this._logger.error(`Error in Subscribe InstitutionDeleteEvent! ${err.message}`)
                     })
             })
             .catch(err => {

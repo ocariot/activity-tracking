@@ -256,7 +256,7 @@ export class PhysicalActivityService implements IPhysicalActivityService {
             ObjectIdValidator.validate(childId, Strings.CHILD.PARAM_ID_NOT_VALID_FORMAT)
             ObjectIdValidator.validate(activityId, Strings.PHYSICAL_ACTIVITY.PARAM_ID_NOT_VALID_FORMAT)
 
-            // 2. Create a PhysicalActivity with only two attributes, the id and child_id, to be used in publishing on the event bus
+            // 2. Create a PhysicalActivity with only one attribute, the id to be used in publishing on the event bus
             const activityToBeDeleted: PhysicalActivity = new PhysicalActivity()
             activityToBeDeleted.id = activityId
 

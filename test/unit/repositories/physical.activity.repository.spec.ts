@@ -221,8 +221,8 @@ describe('Repositories: PhysicalActivity', () => {
                     .resolves(true)
 
                 return repo.removeByChild(defaultActivity.id!, defaultActivity.child_id)
-                    .then((isDeleted: boolean) => {
-                        assert.isTrue(isDeleted)
+                    .then((result: boolean) => {
+                        assert.isTrue(result)
                     })
             })
         })
@@ -240,8 +240,8 @@ describe('Repositories: PhysicalActivity', () => {
                     .resolves(false)
 
                 return repo.removeByChild(randomId, randomChildId)
-                    .then((isDeleted: boolean) => {
-                        assert.isFalse(isDeleted)
+                    .then((result: boolean) => {
+                        assert.isFalse(result)
                     })
             })
         })
@@ -291,8 +291,6 @@ describe('Repositories: PhysicalActivity', () => {
     describe('removeAllActivitiesFromChild(childId: string)', () => {
         context('when there is at least one physical activity and the delete operation is done successfully', () => {
             it('should return true for confirm delete', () => {
-                defaultActivity.start_time = new Date()
-
                 sinon
                     .mock(modelFake)
                     .expects('deleteMany')
@@ -301,8 +299,8 @@ describe('Repositories: PhysicalActivity', () => {
                     .resolves(true)
 
                 return repo.removeAllActivitiesFromChild(defaultActivity.child_id)
-                    .then((isDeleted: boolean) => {
-                        assert.isTrue(isDeleted)
+                    .then((result: boolean) => {
+                        assert.isTrue(result)
                     })
             })
         })
@@ -319,8 +317,8 @@ describe('Repositories: PhysicalActivity', () => {
                     .resolves(false)
 
                 return repo.removeAllActivitiesFromChild(randomChildId)
-                    .then((isDeleted: boolean) => {
-                        assert.isFalse(isDeleted)
+                    .then((result: boolean) => {
+                        assert.isFalse(result)
                     })
             })
         })

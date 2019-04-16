@@ -18,4 +18,13 @@ export interface IEnvironmentRepository extends IRepository<Environment> {
      * @throws {ValidationException | RepositoryException}
      */
     checkExist(environment: Environment): Promise<boolean>
+
+    /**
+     * Removes all environments associated with the institutionID received.
+     *
+     * @param institutionID Institution id associated with environments.
+     * @return {Promise<boolean>}
+     * @throws {ValidationException | RepositoryException}
+     */
+    removeAllEnvironmentsFromInstitution(institutionID: string): Promise<boolean>
 }

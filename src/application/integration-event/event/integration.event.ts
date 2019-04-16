@@ -18,5 +18,6 @@ export enum EventType {
     PHYSICAL_ACTIVITIES = 'physicalactivities',
     SLEEP = 'sleep',
     ENVIRONMENTS = 'environments',
-    USERS = 'users'
+    USERS = 'users',
+    INSTITUTIONS = 'institutions'
 }

@@ -7,6 +7,7 @@ import { IEnvironmentRepository } from '../../application/port/environment.repos
 import { Environment } from '../../application/domain/model/environment'
 import { EnvironmentEntity } from '../entity/environment.entity'
 import { IEntityMapper } from '../port/entity.mapper.interface'
+import { IQuery } from '../../application/port/query.interface'
 
 /**
  * Implementation of the environment repository.
@@ -49,6 +50,28 @@ export class EnvironmentRepository extends BaseRepository<Environment, Environme
                     return resolve(false)
                 })
                 .catch(err => reject(super.mongoDBErrorListener(err)))
+        })
+    }
+
+    /**
+     * Removes all environments associated with the institutionID received.
+     *
+     * @param institutionID Institution id associated with environments.
+     * @return {Promise<boolean>}
+     * @throws {ValidationException | RepositoryException}
+     */
+    public async removeAllEnvironmentsFromInstitution(institutionID: string): Promise<boolean> {
+        // Creates the query with the received parameter
+        const query: IQuery = new Query()
+        query.filters = { institution_id: institutionID }
+
+        return new Promise<boolean>((resolve, reject) => {
+            this.Model.deleteMany(query.filters)
+                .then(result => {
+                    if (!result) return resolve(false)
+                    return resolve(true)
+                })
+                .catch(err => reject(this.mongoDBErrorListener(err)))
         })
     }
 }

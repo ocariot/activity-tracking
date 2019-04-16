@@ -44,4 +44,8 @@ export class EnvironmentRepositoryMock implements IEnvironmentRepository {
         return Promise.resolve(item)
     }
 
+    public removeAllEnvironmentsFromInstitution(institutionID: string): Promise<boolean> {
+        return Promise.resolve(true)
+    }
+
 }

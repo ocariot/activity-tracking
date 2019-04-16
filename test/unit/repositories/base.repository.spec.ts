@@ -324,8 +324,8 @@ describe('Repositories: Base', () => {
                 .resolves(true)
 
             return repo.delete(sleepId)
-                .then((isDeleted: boolean) => {
-                    assert.isTrue(isDeleted)
+                .then((result: boolean) => {
+                    assert.isTrue(result)
                 })
         })
 
@@ -342,8 +342,8 @@ describe('Repositories: Base', () => {
                     .resolves(false)
 
                 return repo.delete(randomId)
-                    .then((isDeleted: boolean) => {
-                        assert.isFalse(isDeleted)
+                    .then((result: boolean) => {
+                        assert.isFalse(result)
                     })
             })
         })

@@ -106,7 +106,6 @@ export class PhysicalActivityRepository extends BaseRepository<PhysicalActivity,
 
         return new Promise<boolean>((resolve, reject) => {
             this.Model.deleteMany(query.filters)
-                .exec()
                 .then(result => {
                     if (!result) return resolve(false)
                     return resolve(true)

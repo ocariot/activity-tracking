@@ -8,8 +8,6 @@ import { ISleepRepository } from '../../port/sleep.repository.interface'
 import { ObjectIdValidator } from '../../domain/validator/object.id.validator'
 
 export class UserDeleteEventHandler implements IIntegrationEventHandler<UserEvent> {
-    private count: number = 0
-
     /**
      * Creates an instance of UserDeleteEventHandler.
      *
@@ -39,7 +37,7 @@ export class UserDeleteEventHandler implements IIntegrationEventHandler<UserEven
             await this._sleepRepository.removeAllSleepFromChild(childId)
 
             // 2. If got here, it's because the action was successful.
-            this._logger.info(`Action for event ${event.event_name} successfully held! TOTAL: ${++this.count}`)
+            this._logger.info(`Action for event ${event.event_name} successfully held!`)
         } catch (err) {
             this._logger.warn(`An error occurred while attempting `
                 .concat(`perform the operation with the ${event.event_name} name event. ${err.message}`)

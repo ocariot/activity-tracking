@@ -218,8 +218,8 @@ describe('Repositories: Sleep', () => {
                     .resolves(true)
 
                 return repo.removeByChild(defaultSleep.id!, defaultSleep.child_id)
-                    .then((isDeleted: boolean) => {
-                        assert.isTrue(isDeleted)
+                    .then((result: boolean) => {
+                        assert.isTrue(result)
                     })
             })
         })
@@ -237,8 +237,8 @@ describe('Repositories: Sleep', () => {
                     .resolves(false)
 
                 return repo.removeByChild(randomId, randomChildId)
-                    .then((isDeleted: boolean) => {
-                        assert.isFalse(isDeleted)
+                    .then((result: boolean) => {
+                        assert.isFalse(result)
                     })
             })
         })
@@ -298,8 +298,8 @@ describe('Repositories: Sleep', () => {
                     .resolves(true)
 
                 return repo.removeAllSleepFromChild(defaultSleep.child_id)
-                    .then((isDeleted: boolean) => {
-                        assert.isTrue(isDeleted)
+                    .then((result: boolean) => {
+                        assert.isTrue(result)
                     })
             })
         })
@@ -316,8 +316,8 @@ describe('Repositories: Sleep', () => {
                     .resolves(false)
 
                 return repo.removeAllSleepFromChild(randomChildId)
-                    .then((isDeleted: boolean) => {
-                        assert.isFalse(isDeleted)
+                    .then((result: boolean) => {
+                        assert.isFalse(result)
                     })
             })
         })

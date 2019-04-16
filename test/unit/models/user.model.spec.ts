@@ -16,7 +16,7 @@ describe('Models: User', () => {
         })
 
         context('when the json is undefined', () => {
-            it('should return an User model with all attributes with undefined value', () => {
+            it('should return an User model with id with undefined value', () => {
                 const result = new User().fromJSON(undefined)
                 assert.isUndefined(result.id)
             })
