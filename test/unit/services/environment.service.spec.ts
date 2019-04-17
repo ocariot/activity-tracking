@@ -167,6 +167,30 @@ describe('Services: Environment', () => {
             })
         })
 
+        context('when the Environment is correct and does not yet exist in the repository, there is no connection ' +
+            'to the RabbitMQ but the event could not be saved', () => {
+            it('should return the environment because the current implementation does not throw an exception, it just prints a log', () => {
+                environment.id = '507f1f77bcf86cd799439012'         // Make mock throw an error in IntegrationEventRepository
+                sinon
+                    .mock(modelFake)
+                    .expects('create')
+                    .withArgs(environment)
+                    .chain('exec')
+                    .resolves(environment)
+
+                return environmentService.add(environment)
+                    .then((result: Environment | MultiStatus<Environment>) => {
+                        result = result as Environment
+                        assert.propertyVal(result, 'id', environment.id)
+                        assert.propertyVal(result, 'institution_id', environment.institution_id)
+                        assert.propertyVal(result, 'location', environment.location)
+                        if (result.climatized) assert.propertyVal(result, 'climatized', environment.climatized)
+                        assert.propertyVal(result, 'timestamp', environment.timestamp)
+                        assert.propertyVal(result, 'measurements', environment.measurements)
+                    })
+            })
+        })
+
         context('when the Environment is correct but already exists in the repository', () => {
             it('should throw a ConflictException', () => {
                 connectionRabbitmqPub.isConnected = true
@@ -350,6 +374,40 @@ describe('Services: Environment', () => {
             it('should save each environment for submission attempt later to the bus and return a response of type ' +
                 'MultiStatus<Environment> with the description of success in each one of them', () => {
                 connectionRabbitmqPub.isConnected = false
+                sinon
+                    .mock(modelFake)
+                    .expects('create')
+                    .withArgs(correctEnvironmentsArr)
+                    .chain('exec')
+                    .resolves(multiStatusCorrect)
+
+                return environmentService.add(correctEnvironmentsArr)
+                    .then((result: Environment | MultiStatus<Environment>) => {
+                        result = result as MultiStatus<Environment>
+
+                        for (let i = 0; i < result.success.length; i++) {
+                            assert.propertyVal(result.success[i], 'code', HttpStatus.CREATED)
+                            assert.propertyVal(result.success[i].item, 'id', correctEnvironmentsArr[i].id)
+                            assert.propertyVal(result.success[i].item, 'institution_id', correctEnvironmentsArr[i].institution_id)
+                            assert.propertyVal(result.success[i].item, 'location', correctEnvironmentsArr[i].location)
+                            if (result.success[i].item.climatized)
+                                assert.propertyVal(result.success[i].item, 'climatized', correctEnvironmentsArr[i].climatized)
+                            assert.propertyVal(result.success[i].item, 'timestamp', correctEnvironmentsArr[i].timestamp)
+                            assert.propertyVal(result.success[i].item, 'measurements', correctEnvironmentsArr[i].measurements)
+                        }
+
+                        assert.isEmpty(result.error)
+                    })
+            })
+        })
+
+        context('when all the Environments of the array are correct, they still do not exist in the repository, there is no ' +
+            'a connection to the RabbitMQ but the events could not be saved', () => {
+            it('should return a response of type MultiStatus<Environment> with the description of success in each one of them ' +
+                'because the current implementation does not throw an exception, it just prints a log', () => {
+                correctEnvironmentsArr.forEach(elem => {
+                    elem.id = '507f1f77bcf86cd799439012'                // Make mock throw an error in IntegrationEventRepository
+                })
                 sinon
                     .mock(modelFake)
                     .expects('create')

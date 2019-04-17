@@ -6,6 +6,7 @@ import { IEnvironmentRepository } from '../../../src/application/port/environmen
 import { EnvironmentRepository } from '../../../src/infrastructure/repository/environment.repository'
 import { EntityMapperMock } from '../../mocks/entity.mapper.mock'
 import { CustomLoggerMock } from '../../mocks/custom.logger.mock'
+import { ObjectID } from 'bson'
 
 require('sinon-mongoose')
 
@@ -85,6 +86,60 @@ describe('Repositories: Environment', () => {
                     assert.propertyVal(err, 'message', 'An internal error has occurred in the database!')
                     assert.propertyVal(err, 'description', 'Please try again later...')
                 }
+            })
+        })
+    })
+
+    describe('removeAllEnvironmentsFromInstitution(institutionID: string)', () => {
+        context('when there is at least one environment associated with that institutionID and the delete operation is ' +
+            'done successfully', () => {
+            it('should return true for confirm delete', () => {
+                sinon
+                    .mock(modelFake)
+                    .expects('deleteMany')
+                    .withArgs({ institution_id: defaultEnvironment.institution_id })
+                    .resolves(true)
+
+                return repo.removeAllEnvironmentsFromInstitution(defaultEnvironment.institution_id!)
+                    .then((result: boolean) => {
+                        assert.isTrue(result)
+                    })
+            })
+        })
+
+        context('when there is no environment associated with that institutionID', () => {
+            it('should return false', () => {
+                const randomInstitutionId: any = new ObjectID()
+
+                sinon
+                    .mock(modelFake)
+                    .expects('deleteMany')
+                    .withArgs({ institution_id: randomInstitutionId })
+                    .resolves(false)
+
+                return repo.removeAllEnvironmentsFromInstitution(randomInstitutionId)
+                    .then((result: boolean) => {
+                        assert.isFalse(result)
+                    })
+            })
+        })
+
+        context('when the institution_id parameter is invalid', () => {
+            it('should throw a RepositoryException', () => {
+                defaultEnvironment.institution_id = '1a2b3c'
+
+                sinon
+                    .mock(modelFake)
+                    .expects('deleteMany')
+                    .withArgs({ institution_id: defaultEnvironment.institution_id })
+                    .rejects({ message: 'An internal error has occurred in the database!',
+                               description: 'Please try again later...' })
+
+                return repo.removeAllEnvironmentsFromInstitution(defaultEnvironment.institution_id)
+                    .catch (err => {
+                        assert.propertyVal(err, 'message', 'An internal error has occurred in the database!')
+                        assert.propertyVal(err, 'description', 'Please try again later...')
+                    })
             })
         })
     })

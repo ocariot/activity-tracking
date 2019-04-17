@@ -286,7 +286,7 @@ describe('Repositories: Sleep', () => {
     })
 
     describe('removeAllSleepFromChild(childId: string)', () => {
-        context('when there is at least one sleep and the delete operation is done successfully', () => {
+        context('when there is at least one sleep associated with that childId and the delete operation is done successfully', () => {
             it('should return true for confirm delete', () => {
                 defaultSleep.child_id = '5a62be07de34500146d9c544'
 
@@ -294,7 +294,6 @@ describe('Repositories: Sleep', () => {
                     .mock(modelFake)
                     .expects('deleteMany')
                     .withArgs({ child_id: defaultSleep.child_id })
-                    .chain('exec')
                     .resolves(true)
 
                 return repo.removeAllSleepFromChild(defaultSleep.child_id)
@@ -304,7 +303,7 @@ describe('Repositories: Sleep', () => {
             })
         })
 
-        context('when there is no sleep', () => {
+        context('when there is no sleep associated with that childId', () => {
             it('should return false', () => {
                 const randomChildId: any = new ObjectID()
 
@@ -312,7 +311,6 @@ describe('Repositories: Sleep', () => {
                     .mock(modelFake)
                     .expects('deleteMany')
                     .withArgs({ child_id: randomChildId })
-                    .chain('exec')
                     .resolves(false)
 
                 return repo.removeAllSleepFromChild(randomChildId)
@@ -322,7 +320,7 @@ describe('Repositories: Sleep', () => {
             })
         })
 
-        context('when the sleep child_id is invalid', () => {
+        context('when the child_id parameter is invalid', () => {
             it('should throw a RepositoryException', () => {
                 defaultSleep.child_id = '1a2b3c'
 
@@ -330,7 +328,6 @@ describe('Repositories: Sleep', () => {
                     .mock(modelFake)
                     .expects('deleteMany')
                     .withArgs({ child_id: defaultSleep.child_id })
-                    .chain('exec')
                     .rejects({ message: 'An internal error has occurred in the database!',
                                description: 'Please try again later...' })
 

@@ -190,6 +190,31 @@ describe('Services: SleepService', () => {
             })
         })
 
+        context('when the Sleep is correct and it still does not exist in the repository, there is no connection ' +
+            'to the RabbitMQ but the event could not be saved', () => {
+            it('should return the Sleep because the current implementation does not throw an exception, it just prints a log', () => {
+                sleep.id = '507f1f77bcf86cd799439012'           // Make mock throw an error in IntegrationEventRepository
+                sinon
+                    .mock(modelFake)
+                    .expects('create')
+                    .withArgs(sleep)
+                    .chain('exec')
+                    .resolves(sleep)
+
+                return sleepService.add(sleep)
+                    .then((result: Sleep | Array<Sleep>) => {
+                        result = result as Sleep
+                        assert.propertyVal(result, 'id', sleep.id)
+                        assert.propertyVal(result, 'start_time', sleep.start_time)
+                        assert.propertyVal(result, 'end_time', sleep.end_time)
+                        assert.typeOf(result.duration, 'number')
+                        assert.propertyVal(result, 'duration', sleep.duration)
+                        assert.propertyVal(result, 'child_id', sleep.child_id)
+                        assert.propertyVal(result, 'pattern', sleep.pattern)
+                    })
+            })
+        })
+
         context('when the Sleep is correct but already exists in the repository', () => {
             it('should throw a ConflictException', () => {
                 connectionRabbitmqPub.isConnected = true
@@ -470,6 +495,41 @@ describe('Services: SleepService', () => {
             it('should save each Sleep for submission attempt later to the bus and return a response of type ' +
                 'MultiStatus<Sleep> with the description of success in each one of them', () => {
                 connectionRabbitmqPub.isConnected = false
+
+                sinon
+                    .mock(modelFake)
+                    .expects('create')
+                    .withArgs(correctSleepArr)
+                    .chain('exec')
+                    .resolves(multiStatusCorrect)
+
+                return sleepService.add(correctSleepArr)
+                    .then((result: Sleep | MultiStatus<Sleep>) => {
+                        result = result as MultiStatus<Sleep>
+
+                        for (let i = 0; i < result.success.length; i++) {
+                            assert.propertyVal(result.success[i], 'code', HttpStatus.CREATED)
+                            assert.propertyVal(result.success[i].item, 'id', correctSleepArr[i].id)
+                            assert.propertyVal(result.success[i].item, 'start_time', correctSleepArr[i].start_time)
+                            assert.propertyVal(result.success[i].item, 'end_time', correctSleepArr[i].end_time)
+                            assert.typeOf(result.success[i].item.duration, 'number')
+                            assert.propertyVal(result.success[i].item, 'duration', correctSleepArr[i].duration)
+                            assert.propertyVal(result.success[i].item, 'child_id', correctSleepArr[i].child_id)
+                            assert.propertyVal(result.success[i].item, 'pattern', correctSleepArr[i].pattern)
+                        }
+
+                        assert.isEmpty(result.error)
+                    })
+            })
+        })
+
+        context('when all the sleep objects of the array are correct, they still do not exist in the repository, there is no ' +
+            'a connection to the RabbitMQ but the events could not be saved', () => {
+            it('should return a response of type MultiStatus<Sleep> with the description of success in each one of them ' +
+                'because the current implementation does not throw an exception, it just prints a log', () => {
+                correctSleepArr.forEach(elem => {
+                    elem.id = '507f1f77bcf86cd799439012'            // Make mock throw an error in IntegrationEventRepository
+                })
 
                 sinon
                     .mock(modelFake)

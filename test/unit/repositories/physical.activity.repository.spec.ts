@@ -289,13 +289,13 @@ describe('Repositories: PhysicalActivity', () => {
     })
 
     describe('removeAllActivitiesFromChild(childId: string)', () => {
-        context('when there is at least one physical activity and the delete operation is done successfully', () => {
+        context('when there is at least one physical activity associated with that childID and the delete operation is ' +
+            'done successfully', () => {
             it('should return true for confirm delete', () => {
                 sinon
                     .mock(modelFake)
                     .expects('deleteMany')
                     .withArgs({ child_id: defaultActivity.child_id })
-                    .chain('exec')
                     .resolves(true)
 
                 return repo.removeAllActivitiesFromChild(defaultActivity.child_id)
@@ -305,7 +305,7 @@ describe('Repositories: PhysicalActivity', () => {
             })
         })
 
-        context('when there is no physical activity', () => {
+        context('when there is no physical activity associated with that childId', () => {
             it('should return false', () => {
                 const randomChildId: any = new ObjectID()
 
@@ -313,7 +313,6 @@ describe('Repositories: PhysicalActivity', () => {
                     .mock(modelFake)
                     .expects('deleteMany')
                     .withArgs({ child_id: randomChildId })
-                    .chain('exec')
                     .resolves(false)
 
                 return repo.removeAllActivitiesFromChild(randomChildId)
@@ -331,7 +330,6 @@ describe('Repositories: PhysicalActivity', () => {
                     .mock(modelFake)
                     .expects('deleteMany')
                     .withArgs({ child_id: defaultActivity.child_id })
-                    .chain('exec')
                     .rejects({ message: 'An internal error has occurred in the database!',
                                description: 'Please try again later...' })
 

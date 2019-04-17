@@ -236,6 +236,37 @@ describe('Services: PhysicalActivityService', () => {
             })
         })
 
+        context('when the physical activity is correct and it still does not exist in the repository but there is no connection ' +
+            'to the RabbitMQ', () => {
+            it('should return the physical activity because the current implementation does not throw an exception, ' +
+                'it just prints a log', () => {
+                activity.id = '507f1f77bcf86cd799439012'            // Make mock throw an error in IntegrationEventRepository
+                sinon
+                    .mock(modelFake)
+                    .expects('create')
+                    .withArgs(activity)
+                    .chain('exec')
+                    .resolves(activity)
+
+                return activityService.add(activity)
+                    .then((result: PhysicalActivity | MultiStatus<PhysicalActivity>) => {
+                        result = result as PhysicalActivity
+                        assert.propertyVal(result, 'id', activity.id)
+                        assert.propertyVal(result, 'start_time', activity.start_time)
+                        assert.propertyVal(result, 'end_time', activity.end_time)
+                        assert.typeOf(result.duration, 'number')
+                        assert.propertyVal(result, 'duration', activity.duration)
+                        assert.propertyVal(result, 'child_id', activity.child_id)
+                        assert.typeOf(result.name, 'string')
+                        assert.propertyVal(result, 'name', activity.name)
+                        assert.typeOf(result.calories, 'number')
+                        assert.propertyVal(result, 'calories', activity.calories)
+                        assert.propertyVal(result, 'steps', activity.steps)
+                        assert.propertyVal(result, 'levels', activity.levels)
+                    })
+            })
+        })
+
         context('when the physical activity is correct but already exists in the repository', () => {
             it('should throw a ConflictException', () => {
                 connectionRabbitmqPub.isConnected = true
@@ -545,6 +576,46 @@ describe('Services: PhysicalActivityService', () => {
             it('should save each PhysicalActivity for submission attempt later to the bus and return a response of type ' +
                 'MultiStatus<PhysicalActivity> with the description of success in each one of them', () => {
                 connectionRabbitmqPub.isConnected = false
+
+                sinon
+                    .mock(modelFake)
+                    .expects('create')
+                    .withArgs(correctActivitiesArr)
+                    .chain('exec')
+                    .resolves(multiStatusCorrect)
+
+                return activityService.add(correctActivitiesArr)
+                    .then((result: PhysicalActivity | MultiStatus<PhysicalActivity>) => {
+                        result = result as MultiStatus<PhysicalActivity>
+
+                        for (let i = 0; i < result.success.length; i++) {
+                            assert.propertyVal(result.success[i], 'code', HttpStatus.CREATED)
+                            assert.propertyVal(result.success[i].item, 'id', correctActivitiesArr[i].id)
+                            assert.propertyVal(result.success[i].item, 'start_time', correctActivitiesArr[i].start_time)
+                            assert.propertyVal(result.success[i].item, 'end_time', correctActivitiesArr[i].end_time)
+                            assert.typeOf(result.success[i].item.duration, 'number')
+                            assert.propertyVal(result.success[i].item, 'duration', correctActivitiesArr[i].duration)
+                            assert.propertyVal(result.success[i].item, 'child_id', correctActivitiesArr[i].child_id)
+                            assert.typeOf(result.success[i].item.name, 'string')
+                            assert.propertyVal(result.success[i].item, 'name', correctActivitiesArr[i].name)
+                            assert.typeOf(result.success[i].item.calories, 'number')
+                            assert.propertyVal(result.success[i].item, 'calories', correctActivitiesArr[i].calories)
+                            assert.propertyVal(result.success[i].item, 'steps', correctActivitiesArr[i].steps)
+                            assert.propertyVal(result.success[i].item, 'levels', correctActivitiesArr[i].levels)
+                        }
+
+                        assert.isEmpty(result.error)
+                    })
+            })
+        })
+
+        context('when all the activities of the array are correct, they still do not exist in the repository, there is no ' +
+            'a connection to the RabbitMQ but the events could not be saved', () => {
+            it('should return a response of type MultiStatus<PhysicalActivity> with the description of success in each one of them ' +
+                'because the current implementation does not throw an exception, it just prints a log', () => {
+                correctActivitiesArr.forEach(elem => {
+                    elem.id = '507f1f77bcf86cd799439012'            // Make mock throw an error in IntegrationEventRepository
+                })
 
                 sinon
                     .mock(modelFake)
