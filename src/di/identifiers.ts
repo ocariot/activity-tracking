@@ -20,7 +20,6 @@ export abstract class Identifier {
 
     // Repositories
     public static readonly ACTIVITY_REPOSITORY: any = Symbol.for('PhysicalActivityRepository')
-    public static readonly ACTIVITY_LOG_REPOSITORY: any = Symbol.for('PhysicalActivityLogRepository')
     public static readonly LOG_REPOSITORY: any = Symbol.for('LogRepository')
     public static readonly SLEEP_REPOSITORY: any = Symbol.for('SleepRepository')
     public static readonly ENVIRONMENT_REPOSITORY: any = Symbol.for('EnvironmentRepository')
