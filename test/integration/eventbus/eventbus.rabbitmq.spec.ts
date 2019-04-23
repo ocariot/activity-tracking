@@ -47,6 +47,9 @@ describe('EVENT BUS', () => {
         it('should return EventBusException with message without connection when publishing.', () => {
             return eventBus
                 .publish(new PhysicalActivityEvent(''), '')
+                .then((result: boolean) => {
+                    expect(result).to.eql(false)
+                })
                 .catch((err: EventBusException) => {
                     expect(err).instanceOf(EventBusException)
                 })
@@ -62,6 +65,9 @@ describe('EVENT BUS', () => {
                     ),
                     ''
                 )
+                .then((result: boolean) => {
+                    expect(result).to.eql(false)
+                })
                 .catch(err => {
                     expect(err).instanceOf(EventBusException)
                 })
