@@ -15,6 +15,10 @@ export class CreateLogValidator {
         if (!activityLog.date) fields.push('date')
         else DateValidator.validate(activityLog.date)
         if (activityLog.value === undefined) fields.push('value')
+        if (typeof activityLog.value === 'string') {
+            throw new ValidationException('Value field is invalid...',
+                'Physical Activity log validation failed: The value received is not a number')
+        }
         else if (activityLog.value < 0) {
             throw new ValidationException('Value field is invalid...',
                 'Physical Activity log validation failed: '.concat(Strings.ERROR_MESSAGE.NEGATIVE_PARAMETER))

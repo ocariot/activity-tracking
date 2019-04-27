@@ -2413,7 +2413,8 @@ describe('Routes: users/children', () => {
                         for (let i = 0; i < res.body.error.length; i++) {
                             expect(res.body.error[i].code).to.eql(HttpStatus.BAD_REQUEST)
                             expect(res.body.error[i].message).to.eql('The name of type provided "step" is not supported...')
-                            expect(res.body.error[i].description).to.eql('The names of the allowed types are: steps, calories.')
+                            expect(res.body.error[i].description).to.eql('The names of the allowed types are: steps, calories, ' +
+                                'activeMinutes.')
                             expect(res.body.error[i].item.date).to.eql(correctLogsArr[i].date)
                             expect(res.body.error[i].item.value).to.eql(correctLogsArr[i].value)
                         }
@@ -2659,7 +2660,7 @@ describe('Routes: users/children', () => {
     describe('GET /users/children/:child_id/physicalactivities/logs/:resource/date/:date_start/:date_end', () => {
         context('when the parameters are correct and there are corresponding logs with the query', () => {
             it('should return status code 200 and an array of Logs with steps and/or calories logs', async () => {
-                const basePath = `/users/children/${defaultActivity.child_id}/physicalactivities/logs/${correctLogsArr[0].type}`
+                const basePath = `/users/children/${defaultActivity.child_id}/physicalactivities/logs/${LogType.CALORIES}`
                 const specificPath = `/date/${correctLogsArr[0].date}/${correctLogsArr[0].date}`
                 const url = `${basePath}${specificPath}`
 
@@ -2722,7 +2723,7 @@ describe('Routes: users/children', () => {
                     .then(err => {
                         expect(err.body.code).to.eql(400)
                         expect(err.body.message).to.eql('The name of type provided "step" is not supported...')
-                        expect(err.body.description).to.eql('The names of the allowed types are: steps, calories.')
+                        expect(err.body.description).to.eql('The names of the allowed types are: steps, calories, activeMinutes.')
                     })
             })
         })
@@ -2767,7 +2768,7 @@ describe('Routes: users/children', () => {
          */
         context('when get all logs in a time interval using the "query-strings-parser" library', () => {
             it('should return status code 200 and the result as needed in the query', async () => {
-                const basePath = `/users/children/${defaultActivity.child_id}/physicalactivities/logs/${correctLogsArr[0].type}`
+                const basePath = `/users/children/${defaultActivity.child_id}/physicalactivities/logs/${LogType.CALORIES}`
                 const specificPath = `/date/${correctLogsArr[0].date}/${correctLogsArr[0].date}`
                 let url = `${basePath}${specificPath}?date=${correctLogsArr[0].date}&fields=date,value,type,child_id`
                 url += '&sort=date&page=1&limit=2'
@@ -2837,7 +2838,7 @@ describe('Routes: users/children', () => {
                     .then(err => {
                         expect(err.body.code).to.eql(400)
                         expect(err.body.message).to.eql('The name of type provided "calorie" is not supported...')
-                        expect(err.body.description).to.eql('The names of the allowed types are: steps, calories.')
+                        expect(err.body.description).to.eql('The names of the allowed types are: steps, calories, activeMinutes.')
                     })
             })
         })

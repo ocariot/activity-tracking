@@ -51,7 +51,7 @@ export class LogService implements ILogService {
 
                 if (log) { // If exists.
                     // 3a. Update physical activity log.
-                    log.value += elem.value
+                    log.value = elem.value
                     await this._logRepository.update(log)
 
                     // 4a. Creates a StatusSuccess object for the construction of the MultiStatus response.
@@ -135,15 +135,18 @@ export class LogService implements ILogService {
             const physical: PhysicalActivityLog = new PhysicalActivityLog()
             const stepsArr: Array<Log> = new Array<Log>()
             const caloriesArr: Array<Log> = new Array<Log>()
+            const activeMinutesArr: Array<Log> = new Array<Log>()
 
             const logs: Array<Log> = await this._logRepository.find(query)
             logs.forEach(item => {
-                if (item.type === 'steps') stepsArr.push(item)
-                else if (item.type === 'calories') caloriesArr.push(item)
+                if (item.type === LogType.STEPS) stepsArr.push(item)
+                else if (item.type === LogType.CALORIES) caloriesArr.push(item)
+                else if (item.type === LogType.ACTIVE_MINUTES) activeMinutesArr.push(item)
             })
 
             physical.steps = stepsArr
             physical.calories = caloriesArr
+            physical.activeMinutes = activeMinutesArr
 
             return Promise.resolve(physical)
         } catch (err) {
