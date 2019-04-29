@@ -30,9 +30,9 @@ export class PhysicalActivityLogEntityMapper implements IEntityMapper<PhysicalAc
             result.calories = item.calories.map((elem: Log) => elem.toJSON())
         } else result.calories = []
 
-        if (item.activeMinutes !== undefined && item.activeMinutes.length > 0) {
-            result.activeMinutes = item.activeMinutes.map((elem: Log) => elem.toJSON())
-        } else result.activeMinutes = []
+        if (item.active_minutes !== undefined && item.active_minutes.length > 0) {
+            result.active_minutes = item.active_minutes.map((elem: Log) => elem.toJSON())
+        } else result.active_minutes = []
 
         return result
     }
@@ -66,8 +66,8 @@ export class PhysicalActivityLogEntityMapper implements IEntityMapper<PhysicalAc
         if (json.calories !== undefined && json.calories.length > 0) {
             result.calories = json.calories.map(elem => new Log().fromJSON(elem))
         }
-        if (json.activeMinutes !== undefined && json.activeMinutes.length > 0) {
-            result.activeMinutes = json.activeMinutes.map(elem => new Log().fromJSON(elem))
+        if (json.active_minutes !== undefined && json.active_minutes.length > 0) {
+            result.active_minutes = json.active_minutes.map(elem => new Log().fromJSON(elem))
         }
 
         return result

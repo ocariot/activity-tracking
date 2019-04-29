@@ -146,7 +146,7 @@ export class LogService implements ILogService {
 
             physical.steps = stepsArr
             physical.calories = caloriesArr
-            physical.activeMinutes = activeMinutesArr
+            physical.active_minutes = activeMinutesArr
 
             return Promise.resolve(physical)
         } catch (err) {

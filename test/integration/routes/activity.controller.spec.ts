@@ -2414,7 +2414,7 @@ describe('Routes: users/children', () => {
                             expect(res.body.error[i].code).to.eql(HttpStatus.BAD_REQUEST)
                             expect(res.body.error[i].message).to.eql('The name of type provided "step" is not supported...')
                             expect(res.body.error[i].description).to.eql('The names of the allowed types are: steps, calories, ' +
-                                'activeMinutes.')
+                                'active_minutes.')
                             expect(res.body.error[i].item.date).to.eql(correctLogsArr[i].date)
                             expect(res.body.error[i].item.value).to.eql(correctLogsArr[i].value)
                         }
@@ -2723,7 +2723,7 @@ describe('Routes: users/children', () => {
                     .then(err => {
                         expect(err.body.code).to.eql(400)
                         expect(err.body.message).to.eql('The name of type provided "step" is not supported...')
-                        expect(err.body.description).to.eql('The names of the allowed types are: steps, calories, activeMinutes.')
+                        expect(err.body.description).to.eql('The names of the allowed types are: steps, calories, active_minutes.')
                     })
             })
         })
@@ -2838,7 +2838,7 @@ describe('Routes: users/children', () => {
                     .then(err => {
                         expect(err.body.code).to.eql(400)
                         expect(err.body.message).to.eql('The name of type provided "calorie" is not supported...')
-                        expect(err.body.description).to.eql('The names of the allowed types are: steps, calories, activeMinutes.')
+                        expect(err.body.description).to.eql('The names of the allowed types are: steps, calories, active_minutes.')
                     })
             })
         })

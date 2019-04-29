@@ -12,7 +12,7 @@ import { Entity } from './entity'
 export class PhysicalActivityLog extends Entity implements IJSONSerializable, IJSONDeserializable<PhysicalActivityLog> {
     private _steps!: Array<Log> // Logs of steps by a child
     private _calories!: Array<Log> // Logs of calories by a child
-    private _activeMinutes!: Array<Log> // Logs of active minutes of a child
+    private _active_minutes!: Array<Log> // Logs of active minutes of a child
 
     constructor() {
         super()
@@ -34,12 +34,12 @@ export class PhysicalActivityLog extends Entity implements IJSONSerializable, IJ
         this._calories = value
     }
 
-    get activeMinutes(): Array<Log> {
-        return this._activeMinutes
+    get active_minutes(): Array<Log> {
+        return this._active_minutes
     }
 
-    set activeMinutes(value: Array<Log>) {
-        this._activeMinutes = value
+    set active_minutes(value: Array<Log>) {
+        this._active_minutes = value
     }
 
     public fromJSON(json: any): PhysicalActivityLog {
@@ -56,8 +56,8 @@ export class PhysicalActivityLog extends Entity implements IJSONSerializable, IJ
             this._calories = json.calories.map(calories => new Log().fromJSON(calories))
         }
 
-        if (json.activeMinutes !== undefined && json.activeMinutes instanceof Array) {
-            this._activeMinutes = json.activeMinutes.map(activeMinutes => new Log().fromJSON(activeMinutes))
+        if (json.active_minutes !== undefined && json.active_minutes instanceof Array) {
+            this._active_minutes = json.active_minutes.map(activeMinutes => new Log().fromJSON(activeMinutes))
         }
 
         return this
@@ -67,7 +67,7 @@ export class PhysicalActivityLog extends Entity implements IJSONSerializable, IJ
         return {
             steps: this._steps ? this._steps.map(item => item.toJSON()) : this._steps,
             calories: this._calories ? this._calories.map(item => item.toJSON()) : this._calories,
-            activeMinutes: this._activeMinutes ? this._activeMinutes.map(item => item.toJSON()) : this._activeMinutes
+            active_minutes: this._active_minutes ? this._active_minutes.map(item => item.toJSON()) : this._active_minutes
         }
     }
 }
