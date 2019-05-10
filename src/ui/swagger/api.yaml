@@ -1,0 +1,1944 @@
+openapi: 3.0.0
+info:
+  version: v1
+  title: Activity Tracking Service
+  description: >-
+    This is the RESTful API documentation of the microservice for physical
+    activity, sleep and environmental measurements _(temperature and humidity)_.
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+
+servers:
+  - description: SwaggerHub API Auto Mocking
+    url: https://virtserver.swaggerhub.com/nutes.ocariot/tracking-service/v1
+  - description: Tracking Local Server
+    url: https://localhost:3001
+tags:
+  - name: users.children.physicalactivities
+    description: Operations for the Child PhysicalActivity resource.
+  - name: users.children.physicalactivities.logs
+    description: Log operations related to Child physical activities.
+  - name: users.children.sleep
+    description: Operations for the Child Sleep resource.
+  - name: environments
+    description: Operations for the Environment Measurements feature.
+
+paths:
+  # users.children.physicalactivities
+  /users/children/physicalactivities:
+    get:
+      security:
+        - JWTAuth: []
+      tags:
+        - users.children.physicalactivities
+      summary: Retrieve physical activity list of all children.
+      operationId: getAllPhysicalActivities
+      description: Retrieve physical activity list of all children. Useful for clients with administrator privileges. The query supports Field Selection, Paging and Sorting.
+      parameters:
+        - $ref: '#/components/parameters/fieldsParam'
+        - $ref: '#/components/parameters/pageParam'
+        - $ref: '#/components/parameters/limitParam'
+        - $ref: '#/components/parameters/sortParam'
+      responses:
+        '200':
+          description: Successful requisition.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/PhysicalActivity'
+        '401':
+          description: Authentication failed due to invalid authentication credentials.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '403':
+          description: User does not have permission to get activities.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: >-
+            Specified resource does not exist. Usually when the URI is incorrect
+            or the resource is not found, or even no longer exists.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '406':
+          description: >-
+            The server is not implementing the media type requested by the
+            client for the application response. Only application/json is
+            currently accepted.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '429':
+          description: The rate limit for requests exceeded.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: >-
+            An internal server error occurred. Although the client appears to
+            provide a correct request, the server encountered an unexpected
+            condition that prevented it from responding to the request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /users/children/{child_id}/physicalactivities:
+    post:
+      security:
+        - JWTAuth: []
+      tags:
+        - users.children.physicalactivities
+      summary: Register physical activities.
+      operationId: saveActivity
+      description: Register a new physical activity and associate it to a Child.
+      parameters:
+        - in: path
+          name: child_id
+          required: true
+          description: Id of Child.
+          example: 5a62be07d6f33400146c9b61
+          schema:
+            type: string
+      responses:
+        '201':
+          description: Physical Activity saved sucessfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PhysicalActivity'
+        '207':
+          description: Successful request, however, can have several status codes for the case of a list of submitted resources.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MultiStatus'
+        '400':
+          description: >-
+            Request can not be met, syntactically incorrect or violates the
+            schema. Normally it occurs due to validation issues, such as fields
+            that are expected in the request body and not passed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Authentication failed due to invalid authentication credentials.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '403':
+          description: User does not have permission to register activities.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: >-
+            Specified resource does not exist. Usually when the URI is incorrect
+            or the resource is not found, or even no longer exists.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '406':
+          description: >-
+            The server is not implementing the media type requested by the
+            client for the application response. Only application/json is
+            currently accepted.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '415':
+          description: >-
+            The server does not support the requested payload format. Only
+            application / json is accepted.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '429':
+          description: The rate limit for requests exceeded.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: >-
+            An internal server error occurred. Although the client appears to
+            provide a correct request, the server encountered an unexpected
+            condition that prevented it from responding to the request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+      requestBody:
+        required: true
+        description: Activity to be insert
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PhysicalActivity'
+    get:
+      security:
+        - JWTAuth: []
+      tags:
+        - users.children.physicalactivities
+      summary: Recovers physical activities of the child.
+      operationId: getAllPhysicalActivitiesOfChild
+      description: Returns list with physical activities associated with a child. The query supports Field Selection, Paging and Sorting.
+      parameters:
+        - in: path
+          name: child_id
+          required: true
+          description: Id of Child.
+          example: 5a62be07d6f33400146c9b61
+          schema:
+            type: string
+        - $ref: '#/components/parameters/fieldsParam'
+        - $ref: '#/components/parameters/pageParam'
+        - $ref: '#/components/parameters/limitParam'
+        - $ref: '#/components/parameters/sortParam'
+      responses:
+        '200':
+          description: Successful requisition.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/PhysicalActivity'
+        '401':
+          description: Authentication failed due to invalid authentication credentials.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '403':
+          description: User does not have permission to get activities.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: >-
+            Specified resource does not exist. Usually when the URI is incorrect
+            or the resource is not found, or even no longer exists.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '406':
+          description: >-
+            The server is not implementing the media type requested by the
+            client for the application response. Only application/json is
+            currently accepted.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '429':
+          description: The rate limit for requests exceeded.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: >-
+            An internal server error occurred. Although the client appears to
+            provide a correct request, the server encountered an unexpected
+            condition that prevented it from responding to the request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /users/children/{child_id}/physicalactivities/{physicalactivity_id}:
+    get:
+      security:
+        - JWTAuth: []
+      tags:
+        - users.children.physicalactivities
+      summary: Recover physical activity data.
+      operationId: getPhysicalActivityById
+      description: Recover the physical activities data associated with a Child. The query support fields selection.
+      parameters:
+        - in: path
+          name: child_id
+          required: true
+          description: Id of Child.
+          example: 5a62be07d6f33400146c9b61
+          schema:
+            type: string
+        - in: path
+          name: physicalactivity_id
+          required: true
+          description: Id of physical activities.
+          example: 5c5277b8004ce629c1eef323
+          schema:
+            type: string
+        - $ref: '#/components/parameters/fieldsParam'
+      responses:
+        '200':
+          description: Successful requisition.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PhysicalActivity'
+        '401':
+          description: Authentication failed due to invalid authentication credentials.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '403':
+          description: User does not have permission to get activities.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: >-
+            Specified resource does not exist. Usually when the URI is incorrect
+            or the resource is not found, or even no longer exists.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '406':
+          description: >-
+            The server is not implementing the media type requested by the
+            client for the application response. Only application/json is
+            currently accepted.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '429':
+          description: The rate limit for requests exceeded.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: >-
+            An internal server error occurred. Although the client appears to
+            provide a correct request, the server encountered an unexpected
+            condition that prevented it from responding to the request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    patch:
+      security:
+        - JWTAuth: []
+      tags:
+        - users.children.physicalactivities
+      summary: Update physical activities data.
+      description: Update the physical activities data.
+      operationId: updatePhysicalActivityOfChild
+      parameters:
+        - in: path
+          name: child_id
+          required: true
+          description: Id of user.
+          example: 5a62be07d6f33400146c9b61
+          schema:
+            type: string
+        - in: path
+          name: physicalactivity_id
+          required: true
+          description: Id of physical activities.
+          example: 5c5277b8004ce629c1eef323
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Updated activity data.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PhysicalActivity'
+        '401':
+          description: Authentication failed due to invalid authentication credentials.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '403':
+          description: User does not have permission to update activity data.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: >-
+            Specified resource does not exist. Usually when the URI is incorrect
+            or the resource is not found, or even no longer exists.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '406':
+          description: >-
+            The server is not implementing the media type requested by the client
+            for the application response. Only application/json is currently
+            accepted.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '409':
+          description: ->
+            Conflicts have probably occurred with data that can not be duplicated.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '415':
+          description: >-
+            The server does not support the requested payload format. Only
+            application/json is accepted.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '429':
+          description: The rate limit for requests exceeded.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: >-
+            An internal server error occurred. Although the client appears to
+            provide a correct request, the server encountered an unexpected
+            condition that prevented it from responding to the request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PhysicalActivity'
+        description: Data of the activity to be updated.
+        required: true
+    delete:
+      security:
+        - JWTAuth: []
+      tags:
+        - users.children.physicalactivities
+      summary: Delete physical activity data.
+      description: Delete the physical activity data.
+      operationId: deletePhysicalActivityOfChild
+      parameters:
+        - in: path
+          name: child_id
+          required: true
+          description: Id of user.
+          example: 5a62be07d6f33400146c9b61
+          schema:
+            type: string
+        - in: path
+          name: physicalactivity_id
+          required: true
+          description: Id of physical activity.
+          example: 5c5277b8004ce629c1eef323
+          schema:
+            type: string
+      responses:
+        '204':
+          description: Operation performed successfully. There is no data to be returned.
+        '401':
+          description: Authentication failed due to invalid authentication credentials.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '403':
+          description: User does not have permission to delete activities.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: >-
+            Specified resource does not exist. Usually when the URI is incorrect
+            or the resource is not found, or even no longer exists.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '406':
+          description: >-
+            The server is not implementing the media type requested by the
+            client for the application response. Only application/json is
+            currently accepted.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '429':
+          description: The rate limit for requests exceeded.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: >-
+            An internal server error occurred. Although the client appears to
+            provide a correct request, the server encountered an unexpected
+            condition that prevented it from responding to the request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  # users.children.physicalactivities.logs
+  /users/children/{child_id}/physicalactivities/logs/date/{date_start}/{date_end}:
+    get:
+      security:
+        - JWTAuth: []
+      tags:
+        - users.children.physicalactivities.logs
+      summary: Recover the logs.
+      operationId: getLogs
+      description: Recover log with information on the total steps and calories in a given period.
+      parameters:
+        - in: path
+          name: child_id
+          required: true
+          description: Id of user.
+          example: '5a62be07d6f33400146c9b61'
+          schema:
+            type: string
+        - in: path
+          name: date_start
+          required: true
+          description: The start date of the range in the format yyyy-MM-dd or today.
+          example: '2018-11-23'
+          schema:
+            type: string
+        - in: path
+          name: date_end
+          required: true
+          description: The end date of the range in the format yyyy-MM-dd or today.
+          example: '2018-11-27'
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successful requisition.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  steps:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        date:
+                          type: string
+                        value:
+                          type: number
+                    example:
+                      - date: '2018-11-23'
+                        value: 14100
+                      - date: '2018-11-24'
+                        value: 15687
+                      - date: '2018-11-25'
+                        value: 0
+                      - date: '2018-11-26'
+                        value: 2901
+                      - date: '2018-11-27'
+                        value: 8561
+                  calories:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        date:
+                          type: string
+                        value:
+                          type: number
+                    example:
+                      - date: '2018-11-23'
+                        alue:  15000
+                      - date: '2018-11-24'
+                        value: 18159
+                      - date: '2018-11-25'
+                        value: 0
+                      - date: '2018-11-26'
+                        value: 1680
+                      - date: '2018-11-27'
+                        value: 8451
+
+        '401':
+          description: Authentication failed due to invalid authentication credentials.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '403':
+          description: The user does not have permission to access the resource.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: >-
+            Specified resource does not exist. Usually when the URI is incorrect
+            or the resource is not found, or even no longer exists.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '406':
+          description: >-
+            The server is not implementing the media type requested by the
+            client for the application response. Only application/json is
+            currently accepted.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '429':
+          description: The rate limit for requests exceeded.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: >-
+            An internal server error occurred. Although the client appears to
+            provide a correct request, the server encountered an unexpected
+            condition that prevented it from responding to the request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /users/children/{child_id}/physicalactivities/logs/{resource}/date/{date_start}/{date_end}:
+    get:
+      security:
+        - JWTAuth: []
+      tags:
+        - users.children.physicalactivities.logs
+      summary: Recover the logs.
+      operationId: getLogByResource
+      description: Recover log with information on total steps or calories in a given period.
+      parameters:
+        - in: path
+          name: child_id
+          required: true
+          description: Id of Child.
+          example: '5a62be07d6f33400146c9b61'
+          schema:
+            type: string
+        - in: path
+          name: resource
+          required: true
+          description: Name of resource.
+          example: 'steps'
+          schema:
+            type: string
+            enum: ['steps', 'calories']
+        - in: path
+          name: date_start
+          required: true
+          description: The start date of the range in the format yyyy-MM-dd or today.
+          example: '2018-11-23'
+          schema:
+            type: string
+        - in: path
+          name: date_end
+          required: true
+          description: The end date of the range in the format yyyy-MM-dd or today.
+          example: '2018-11-27'
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successful requisition.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    date:
+                      type: string
+                    value:
+                      type: number
+                example:
+                  - date: '2018-11-23'
+                    value: 14100
+                  - date: '2018-11-24'
+                    value: 15687
+                  - date: '2018-11-25'
+                    value: 0
+                  - date: '2018-11-26'
+                    value: 2901
+                  - date: '2018-11-27'
+                    value: 8561
+        '401':
+          description: Authentication failed due to invalid authentication credentials.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '403':
+          description: The user does not have permission to access the resource.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: >-
+            Specified resource does not exist. Usually when the URI is incorrect
+            or the resource is not found, or even no longer exists.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '406':
+          description: >-
+            The server is not implementing the media type requested by the
+            client for the application response. Only application/json is
+            currently accepted.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '429':
+          description: The rate limit for requests exceeded.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: >-
+            An internal server error occurred. Although the client appears to
+            provide a correct request, the server encountered an unexpected
+            condition that prevented it from responding to the request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  # users.children.sleep
+  /users/children/sleep:
+    get:
+      security:
+        - JWTAuth: []
+      tags:
+        - users.children.sleep
+      summary: Retrieve the sleep record of all children.
+      operationId: getAllSleep
+      description: Retrieve the sleep record of all children. Useful for clients with administrator privileges. The query supports Field Selection, Paging and Sorting.
+      parameters:
+        - $ref: '#/components/parameters/fieldsParam'
+        - $ref: '#/components/parameters/pageParam'
+        - $ref: '#/components/parameters/limitParam'
+        - $ref: '#/components/parameters/sortParam'
+      responses:
+        '200':
+          description: Successful requisition.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Sleep'
+        '401':
+          description: Authentication failed due to invalid authentication credentials.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '403':
+          description: User does not have permission to get sleep.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: >-
+            Specified resource does not exist. Usually when the URI is incorrect
+            or the resource is not found, or even no longer exists.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '406':
+          description: >-
+            The server is not implementing the media type requested by the
+            client for the application response. Only application/json is
+            currently accepted.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '429':
+          description: The rate limit for requests exceeded.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: >-
+            An internal server error occurred. Although the client appears to
+            provide a correct request, the server encountered an unexpected
+            condition that prevented it from responding to the request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /users/children/{child_id}/sleep:
+    post:
+      security:
+        - JWTAuth: []
+      tags:
+        - users.children.sleep
+      summary: Register sleep.
+      operationId: saveSleep
+      description: Register a new sleep and associate it to a child.
+      parameters:
+        - in: path
+          name: child_id
+          required: true
+          description: Id of child.
+          example: 5a62be07d6f33400146c9b61
+          schema:
+            type: string
+      responses:
+        '201':
+          description: Sleep saved successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Sleep'
+        '207':
+          description: Successful request, however, can have several status codes for the case of a list of submitted resources.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MultiStatus'
+        '400':
+          description: >-
+            Request can not be met, syntactically incorrect or violates the
+            schema. Normally it occurs due to validation issues, such as fields
+            that are expected in the request body and not passed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Authentication failed due to invalid authentication credentials.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '403':
+          description: User does not have permission to register sleep.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: >-
+            Specified resource does not exist. Usually when the URI is incorrect
+            or the resource is not found, or even no longer exists.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '406':
+          description: >-
+            The server is not implementing the media type requested by the
+            client for the application response. Only application/json is
+            currently accepted.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '415':
+          description: >-
+            The server does not support the requested payload format. Only
+            application / json is accepted.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '429':
+          description: The rate limit for requests exceeded.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: >-
+            An internal server error occurred. Although the client appears to
+            provide a correct request, the server encountered an unexpected
+            condition that prevented it from responding to the request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+      requestBody:
+        description: Activity to be insert
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Sleep'
+    get:
+      security:
+        - JWTAuth: []
+      tags:
+        - users.children.sleep
+      summary: Retrieve sleep record of child.
+      operationId: getAllSleepOfChild
+      description: Returns list with sleep record. The query supports Field Selection, Paging and Sorting.
+      parameters:
+        - in: path
+          name: child_id
+          required: true
+          description: Id of child.
+          example: 5a62be07d6f33400146c9b61
+          schema:
+            type: string
+        - $ref: '#/components/parameters/fieldsParam'
+        - $ref: '#/components/parameters/pageParam'
+        - $ref: '#/components/parameters/limitParam'
+        - $ref: '#/components/parameters/sortParam'
+      responses:
+        '200':
+          description: Successful requisition.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Sleep'
+        '401':
+          description: Authentication failed due to invalid authentication credentials.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '403':
+          description: User does not have permission to get sleep.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: >-
+            Specified resource does not exist. Usually when the URI is incorrect
+            or the resource is not found, or even no longer exists.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '406':
+          description: >-
+            The server is not implementing the media type requested by the
+            client for the application response. Only application/json is
+            currently accepted.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '429':
+          description: The rate limit for requests exceeded.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: >-
+            An internal server error occurred. Although the client appears to
+            provide a correct request, the server encountered an unexpected
+            condition that prevented it from responding to the request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /users/children/{child_id}/sleep/{sleep_id}:
+    get:
+      security:
+        - JWTAuth: []
+      tags:
+        - users.children.sleep
+      summary: Retrieve sleep data.
+      operationId: getSleepById
+      description: Retrieve the sleep data associated with an child. The query supports field selection.
+      parameters:
+        - in: path
+          name: child_id
+          required: true
+          description: Id of child.
+          example: 5a62be07d6f33400146c9b61
+          schema:
+            type: string
+        - in: path
+          name: sleep_id
+          required: true
+          description: Id of sleep.
+          example: 3bc1274329fb282470e45004
+          schema:
+            type: string
+        - $ref: '#/components/parameters/fieldsParam'
+      responses:
+        '200':
+          description: Successful requisition.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Sleep'
+        '401':
+          description: Authentication failed due to invalid authentication credentials.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '403':
+          description: User does not have permission to get sleep.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: >-
+            Specified resource does not exist. Usually when the URI is incorrect
+            or the resource is not found, or even no longer exists.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '406':
+          description: >-
+            The server is not implementing the media type requested by the
+            client for the application response. Only application/json is
+            currently accepted.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '429':
+          description: The rate limit for requests exceeded.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: >-
+            An internal server error occurred. Although the client appears to
+            provide a correct request, the server encountered an unexpected
+            condition that prevented it from responding to the request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    patch:
+      security:
+        - JWTAuth: []
+      tags:
+        - users.children.sleep
+      summary: Update sleep data.
+      description: Update the sleep data.
+      operationId: updateSleepOfChild
+      parameters:
+        - in: path
+          name: child_id
+          required: true
+          description: Id of child.
+          example: 5a62be07d6f33400146c9b61
+          schema:
+            type: string
+        - in: path
+          name: sleep_id
+          required: true
+          description: Id of sleep.
+          example: 3bc1274329fb282470e45004
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Updated sleep data.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Sleep'
+        '401':
+          description: Authentication failed due to invalid authentication credentials.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '403':
+          description: User does not have permission to update sleep data.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: >-
+            Specified resource does not exist. Usually when the URI is incorrect
+            or the resource is not found, or even no longer exists.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '406':
+          description: >-
+            The server is not implementing the media type requested by the client
+            for the application response. Only application/json is currently
+            accepted.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '409':
+          description: ->
+            Conflicts have probably occurred with data that can not be duplicated.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '415':
+          description: >-
+            The server does not support the requested payload format. Only
+            application/json is accepted.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '429':
+          description: The rate limit for requests exceeded.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: >-
+            An internal server error occurred. Although the client appears to
+            provide a correct request, the server encountered an unexpected
+            condition that prevented it from responding to the request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Sleep'
+        description: Data of the sleep to be updated.
+        required: true
+    delete:
+      security:
+        - JWTAuth: []
+      tags:
+        - users.children.sleep
+      summary: Delete sleep data.
+      description: Delete the sleep data.
+      operationId: deleteSleepOfChild
+      parameters:
+        - in: path
+          name: child_id
+          required: true
+          description: Id of child.
+          example: 5a62be07d6f33400146c9b61
+          schema:
+            type: string
+        - in: path
+          name: sleep_id
+          required: true
+          description: Id of sleep.
+          example: 3bc1274329fb282470e45004
+          schema:
+            type: string
+      responses:
+        '204':
+          description: Operation performed successfully. There is no data to be returned.
+        '401':
+          description: Authentication failed due to invalid authentication credentials.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '403':
+          description: User does not have permission to delete sleep.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: >-
+            Specified resource does not exist. Usually when the URI is incorrect
+            or the resource is not found, or even no longer exists.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '406':
+          description: >-
+            The server is not implementing the media type requested by the
+            client for the application response. Only application/json is
+            currently accepted.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '429':
+          description: The rate limit for requests exceeded.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: >-
+            An internal server error occurred. Although the client appears to
+            provide a correct request, the server encountered an unexpected
+            condition that prevented it from responding to the request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  # environments
+  /environments:
+    post:
+      security:
+        - JWTAuth: []
+      tags:
+        - environments
+      summary: Register the environment measurement data.
+      operationId: saveEnvironment
+      description: Register the environment measurement data.
+      responses:
+        '201':
+          description: Environment saved successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Environment'
+        '207':
+          description: Successful request, however, can have several status codes for the case of a list of submitted resources.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MultiStatus'
+        '400':
+          description: >-
+            Request can not be met, syntactically incorrect or violates the
+            schema. Normally it occurs due to validation issues, such as fields
+            that are expected in the request body and not passed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Authentication failed due to invalid authentication credentials.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '403':
+          description: The user does not have permission to access the resource.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: >-
+            Specified resource does not exist. Usually when the URI is incorrect
+            or the resource is not found, or even no longer exists.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '406':
+          description: >-
+            The server is not implementing the media type requested by the
+            client for the application response. Only application/json is
+            currently accepted.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '415':
+          description: >-
+            The server does not support the requested payload format. Only
+            application / json is accepted.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '429':
+          description: The rate limit for requests exceeded.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: >-
+            An internal server error occurred. Although the client appears to
+            provide a correct request, the server encountered an unexpected
+            condition that prevented it from responding to the request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+      requestBody:
+        description: Measure of environment to be insert.
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Environment'
+    get:
+      security:
+        - JWTAuth: []
+      tags:
+        - environments
+      summary: Retrieve environment measurements.
+      operationId: getAllEnvironments
+      description: Returns list with record of environment measurements. The query supports Field Selection, Paging and Sorting.
+      parameters:
+        - $ref: '#/components/parameters/fieldsParam'
+        - $ref: '#/components/parameters/pageParam'
+        - $ref: '#/components/parameters/limitParam'
+        - $ref: '#/components/parameters/sortParam'
+      responses:
+        '200':
+          description: Successful requisition.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Environment'
+        '401':
+          description: Authentication failed due to invalid authentication credentials.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '403':
+          description: The user does not have permission to access the resource.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: >-
+            Specified resource does not exist. Usually when the URI is incorrect
+            or the resource is not found, or even no longer exists.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '406':
+          description: >-
+            The server is not implementing the media type requested by the
+            client for the application response. Only application/json is
+            currently accepted.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '429':
+          description: The rate limit for requests exceeded.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: >-
+            An internal server error occurred. Although the client appears to
+            provide a correct request, the server encountered an unexpected
+            condition that prevented it from responding to the request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /environments/{environment_id}:
+    delete:
+      security:
+        - JWTAuth: []
+      tags:
+        - environments
+      summary: Delete measurement environment.
+      description: Delete environment measurement data.
+      operationId: removeEnvironmentById
+      parameters:
+        - in: path
+          name: environment_id
+          required: true
+          description: Environment measurement id.
+          example: 5bfc5c29d6adac2a10d22b03
+          schema:
+            type: string
+      responses:
+        '204':
+          description: Operation performed successfully. There is no data to be returned.
+        '401':
+          description: Authentication failed due to invalid authentication credentials.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '403':
+          description: User does not have permission to delete environmental measurement.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: >-
+            Specified resource does not exist. Usually when the URI is incorrect
+            or the resource is not found, or even no longer exists.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '406':
+          description: >-
+            The server is not implementing the media type requested by the
+            client for the application response. Only application/json is
+            currently accepted.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '429':
+          description: The rate limit for requests exceeded.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: >-
+            An internal server error occurred. Although the client appears to
+            provide a correct request, the server encountered an unexpected
+            condition that prevented it from responding to the request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+components:
+  parameters:
+    fieldsParam:
+      in: query
+      name: fields
+      required: false
+      description: >-
+        Allows you to retrieve only the information you want. To do this,
+        simply provide the name of the attributes separated by commas.
+        For example: **_fields=field1,field2_** indicates that only
+        field1 and field2 should be listed in the query result.
+      schema:
+        type: array
+        items:
+          type: string
+    pageParam:
+      in: query
+      name: page
+      required: false
+      description: The page number.
+      schema:
+        type: integer
+        format: int32
+        minimum: 1
+        default: 1
+    limitParam:
+      in: query
+      name: limit
+      required: false
+      description: The number of items to return.
+      schema:
+        type: integer
+        format: int32
+        maximum: 100
+        default: 20
+    sortParam:
+      in: query
+      name: sort
+      required: false
+      description: >-
+        Contains the names of the attributes, separated by commas, that
+        will be used to sort the result of the query. For ascending sort,
+        use the '+' character before the attribute name. For descending
+        sort, use the '-' character before the attribute name. By default,
+        the order is ascending, so the '+' symbol is optional, just enter
+        the attribute.
+      schema:
+        type: array
+        items:
+          type: string
+
+    filterParam:
+      in: query
+      name: ''
+      required: false
+      description: >-
+        To filter a collection by multiple concurrent attributes or filter
+        multiple values for an attribute, simply use the attribute/property
+        name with an equal sign and the expected values, separated by a comma.
+        **_property=value1,value2,value3_**. The query is not case sensitive.
+        Example: **_?name=elvis,john_** to retrieve exactly the same users with
+        elvis or john name.
+        For filtering with logical operators, just follow the syntax:
+        **_property=operator:value_**. The available operators are:
+         - **gt** -> Defines which value of the attribute is greater than
+                    (that is,>) the specified value.
+         - **gte** -> Defines which attribute value is greater than or equal to
+                    (that is,>=) the specified value.
+         - **lt** -> Define the value of the attribute to be less than (that is, <)
+                    the specified value.
+         - **lte** -> Defines which value of the attribute is less than or equal to
+                    (that is, <=) the specified value.
+
+        Example: **_?field1=gte:80&age=lt:100_** to recover the users with age
+        is greater than or equal to 80 and less then 100.
+      schema:
+        type: string
+    dateStartParam:
+      in: query
+      name: date_start
+      required: false
+      description: >-
+        Define start date in format: YYYY-MM-DD ou YYYY-MM-DD hh:mm:ss. The
+        attribute used for the query will be the registration_date.
+      schema:
+        type: string
+    dateEndParam:
+      in: query
+      name: date_end
+      required: false
+      description: >-
+        Define end date in format: YYYY-MM-DD ou YYYY-MM-DD hh:mm:ss.The
+        attribute used for the query will be the registration_date.
+      schema:
+        type: string
+        default: today
+    periodParam:
+      in: query
+      name: period
+      required: false
+      description: |-
+        Sets the period from the available ones:
+         - **[1..n]d** - Total days (1d, 2d, ...)
+         - **[1..n]w** - Total of weeks (1w, 2w, ...)
+         - **[1..n]m** - Total of months (1m, 2m, ...)
+         - **[1..n]y** - Total of years (1y, 2y, ...)
+
+        The attribute used for the query will be the registration_date.
+      schema:
+        type: string
+  # Reosurces
+  schemas:
+    PhysicalActivity:
+      type: object
+      required:
+        - id
+        - name
+        - start_time
+        - end_time
+        - duration
+        - calories
+        - child_id
+      properties:
+        id:
+          readOnly: true
+          type: string
+          format: uuid
+          description: Automatically generated key field.
+          example: 5a62be07de34500146d9c544
+        name:
+          type: string
+          description: Name of physical activity.
+          example: walk
+        start_time:
+          type: string
+          description: Physical activity start time in UTC format, according to ISO 8601.
+          example: "2018-08-15T14:03:40Z"
+        end_time:
+          type: string
+          description: Physical activity end time in UTC format, according to ISO 8601.
+          example: "2018-08-15T14:19:21Z"
+        duration:
+          type: integer
+          description: Total time in milliseconds spent in the physical activity.
+          example: 973000
+        calories:
+          type: integer
+          description: Calories spent during physical activity.
+          example: 100
+        steps:
+          type: integer
+          description: Number of steps taken during the physical activity.
+          example: 1340
+        levels:
+          type: array
+          description: Physical activity levels.
+          items:
+            type: object
+            required:
+              - name
+              - duration
+            properties:
+              name:
+                type: string
+                description: Name of physical activity level (sedentary, light, fair or very).
+              duration:
+                type: number
+                description: Total time spent in milliseconds on the level.
+          example:
+            - name: sedentary
+              duration: 0
+            - name: lightly
+              duration: 180000
+            - name: fairly
+              duration: 420000
+            - name: very
+              duration: 300000
+        child_id:
+          readOnly: true
+          type: string
+          format: uuid
+          description: Child belonging to physical activity
+          example: 5a62be07de34500146d9c544
+
+    Sleep:
+      type: object
+      required:
+        - id
+        - start_time
+        - end_time
+        - duration
+        - pattern
+        - child_id
+      properties:
+        id:
+          readOnly: true
+          type: string
+          format: uuid
+          description: Automatically generated key field.
+          example: 3bc1274329fb282470e45004
+        start_time:
+          type: string
+          format: date-time
+          description: Date and time of sleep onset in UTC format, according to ISO 8601.
+          example: "2018-08-18T01:40:30Z"
+        end_time:
+          type: string
+          format: date-time
+          description: End date and time of sleep in UTC format, according to ISO 8601.
+          example: "2018-08-18T09:52:30Z"
+        duration:
+          type: integer
+          description: Total time in milliseconds spent in all sleep patterns.
+          example: 29520000
+        pattern:
+          type: object
+          description: Sleep pattern tracking.
+          properties:
+            data_set:
+              type: array
+              description: Sleep pattern tracking (awake, asleep or restless).
+              items:
+                type: object
+                required:
+                  - start_time
+                  - name
+                  - duration
+                properties:
+                  start_time:
+                    type: string
+                    description: Date and time of sleep pattern onset.
+                  name:
+                    type: string
+                    description: Name of sleep pattern (awake, asleep or restless).
+                  duration:
+                    type: integer
+                    description: Total in milliseconds of the time spent in the sleep pattern.
+              example:
+                - start_time: "2018-08-18T01:40:30.00Z"
+                  name: restless
+                  duration: 60000
+                - start_time: "2018-08-18T01:41:30.00Z"
+                  name: asleep
+                  duration: 360000
+                - start_time: "2018-08-18T01:47:30.00Z"
+                  name: restless
+                  duration: 240000
+                - start_time: "2018-08-18T01:51:30.00Z"
+                  name: asleep
+                  duration: 60000
+                - start_time: "2018-08-18T01:52:30.00Z"
+                  name: restless
+                  duration: 60000
+                - start_time: "2018-08-18T01:53:30.00Z"
+                  name: asleep
+                  duration: 2100000
+                - start_time: "2018-08-18T02:28:30.00Z"
+                  name: restless
+                  duration: 240000
+                - start_time: "2018-08-18T02:32:30.00Z"
+                  name: awake
+                  duration: 180000
+                - start_time: "2018-08-18T02:35:30.00Z"
+                  name: asleep
+                  duration: 15120000
+                - start_time: "2018-08-18T06:47:30.00Z"
+                  name: restless
+                  duration: 60000
+                - start_time: "2018-08-18T06:48:30.00Z"
+                  name: asleep
+                  duration: 2580000
+                - start_time: "2018-08-18T07:31:30.00Z"
+                  name: restless
+                  duration: 120000
+                - start_time: "2018-08-18T07:33:30.00Z"
+                  name: asleep
+                  duration: 120000
+                - start_time: "2018-08-18T07:35:30.00Z"
+                  name: restless
+                  duration: 60000
+                - start_time: "2018-08-18T07:36:30.00Z"
+                  name: asleep
+                  duration: 1200000
+                - start_time: "2018-08-18T07:56:30.00Z"
+                  name: restless
+                  duration: 60000
+                - start_time: "2018-08-18T07:57:30.00Z"
+                  name: asleep
+                  duration: 2580000
+                - start_time: "2018-08-18T08:40:30.00Z"
+                  name: restless
+                  duration: 180000
+                - start_time: "2018-08-18T08:43:30.00Z"
+                  name: asleep
+                  duration: 1200000
+                - start_time: "2018-08-18T09:03:30.00Z"
+                  name: restless
+                  duration: 60000
+                - start_time: "2018-08-18T09:04:30.00Z"
+                  name: asleep
+                  duration: 1740000
+                - start_time: "2018-08-18T09:03:30.00Z"
+                  name: restless
+                  duration: 180000
+                - start_time: "2018-08-18T09:36:30.00Z"
+                  name: asleep
+                  duration: 960000
+            sumary:
+              type: object
+              readOnly: true
+              properties:
+                asleep:
+                  type: object
+                  properties:
+                    count:
+                      type: integer
+                      example: 11
+                    duration:
+                      type: integer
+                      example: 467
+                      description: Total time in minutes spent in the sleep pattern asleep.
+                awake:
+                  type: object
+                  properties:
+                    count:
+                      type: integer
+                      example: 1
+                    duration:
+                      type: integer
+                      example: 3
+                      description: Total time in minutes spent in the sleep pattern awake.
+                restless:
+                  type: object
+                  properties:
+                    count:
+                      type: integer
+                      example: 11
+                    duration:
+                      type: integer
+                      example: 22
+                      description: Total time in minutes spent in the sleep pattern restless.
+        child_id:
+          readOnly: true
+          type: string
+          format: uuid
+          description: Child belonging to sleep.
+          example: 5a62be07de34500146d9c544
+
+    Environment:
+      type: object
+      required:
+        - id
+        - institution_id
+        - location
+        - measurements
+        - timestamp
+      properties:
+        id:
+          readOnly: true
+          type: string
+          format: uuid
+          description: Automatically generated key field.
+          example: 5a62be07de34500146d9c544
+        institution_id:
+          type: string
+          format: uuid
+          description: Id of institution associated with a environment.
+          example: 5a62be07de34500146d9c624
+        location:
+          $ref: '#/components/schemas/Location'
+        measurements:
+          type: array
+          description: Array of environment measurements.
+          items:
+            type: object
+            required:
+              - type
+              - value
+              - unit
+            properties:
+              type:
+                type: string
+                description: Type of measurement.
+                example: temperature
+              value:
+                type: number
+                description: Value of measurement.
+                example: 28.6
+              unit:
+                type: string
+                description: Unit of measurement.
+                example: "°C"
+          example:
+            - type: temperature
+              value: 35.6
+              unit: "°C"
+            - type: humidity
+              value: 42.2
+              unit: "%"
+
+        climatized:
+          type: boolean
+          description: Boolean variable to identify if a environment is climatized.
+          example: true
+          default: false
+        timestamp:
+          type: string
+          description: Timestamp in UTC format, according to ISO 8601.
+          example: "2018-11-19T14:40:00Z"
+
+    Location:
+      type: object
+      required:
+        - local
+        - room
+      properties:
+        local:
+          type: string
+          description: Local where device is installed.
+          example: indoor
+        room:
+          type: string
+          description: Room where device is installed.
+          example: Bloco H sala 01
+        latitude:
+          type: number
+          description: Latitude from place's geolocation.
+          example: -7.2100766
+        longitude:
+          type: number
+          description: Longitude from place's geolocation.
+          example: -35.9175756
+
+    MultiStatus:
+      type: object
+      description: Default template for message when a request returns multiple status.
+      required:
+        - success
+        - error
+      properties:
+        success:
+          type: array
+          description: All items that were processed successfully.
+          items:
+            type: object
+            description: Item data processed.
+            properties:
+              code:
+                type: integer
+                description: The requisition status code for the item.
+                example: 201
+              item:
+                type: object
+                description: Item data that was successfully processed.
+        error:
+          type: array
+          description: All items that were were not processed due to some error.
+          items:
+            type: object
+            description: Item data not processed.
+            properties:
+              code:
+                type: integer
+                description: The requisition status code for the item.
+                example: 400
+              message:
+                type: string
+                description: Readable and short description of the error.
+              description:
+                type: string
+                description: Detailed description of the error.
+              item:
+                type: object
+                description: Item data that was not successfully processed
+
+    Error:
+      type: object
+      description: >-
+        Default template for error message.
+        All returned errors will follow this template.
+      required:
+        - code
+        - message
+        - description
+      properties:
+        code:
+          type: integer
+          description: >-
+            Unique API code that indicates specific details of the error, or
+            the actual status code of the response when the unique code is not
+            appropriate.
+        message:
+          type: string
+          description: Readable and short description of the error.
+        description:
+          type: string
+          description: Detailed description of the error.

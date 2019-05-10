@@ -1,0 +1,31 @@
+import { assert } from 'chai'
+import { Sleep } from '../../../src/application/domain/model/sleep'
+import { SleepMock } from '../../mocks/sleep.mock'
+import { SleepEvent } from '../../../src/application/integration-event/event/sleep.event'
+
+describe('IntegrationEvents: SleepEvent', () => {
+    describe('toJSON()', () => {
+        context('when the sleep is valid', () => {
+            it('should return the sleep save event', () => {
+                const sleep: Sleep = new SleepMock()
+
+                const result = new SleepEvent('SleepSaveEvent', new Date(), sleep).toJSON()
+                assert.propertyVal(result, 'event_name', 'SleepSaveEvent')
+                assert.property(result, 'timestamp')
+                assert.propertyVal(result.sleep, 'id', sleep.id)
+                assert.propertyVal(result.sleep, 'start_time', sleep.start_time!.toISOString())
+                assert.propertyVal(result.sleep, 'end_time', sleep.end_time!.toISOString())
+                assert.propertyVal(result.sleep, 'duration', sleep.duration)
+                assert.propertyVal(result.sleep, 'child_id', sleep.child_id)
+                assert.property(result.sleep, 'pattern')
+            })
+        })
+
+        context('when the sleep is undefined', () => {
+            it('should return empty object', () => {
+                const result = new SleepEvent('SleepSaveEvent', new Date(), undefined).toJSON()
+                assert.isEmpty(result)
+            })
+        })
+    })
+})

@@ -1,38 +1,60 @@
-const gulp = require('gulp')
-const ts = require('gulp-typescript')
-const tsProject = ts.createProject('tsconfig.json')
-const nodemon = require('gulp-nodemon')
-const COPY_YAML = ['src/swagger/*.yaml']
-const COPY_FILES = ['package.json']
+'use strict'
 
-gulp.task('ts', ['copy-yaml', 'copy-files'], () => {
-    return tsProject.src()
-        .pipe(tsProject())
-        .js.pipe(gulp.dest("dist"))
+// DEPENDENCIES
+const gulp = require('gulp'),
+    tslint = require('gulp-tslint'),
+    ts = require('gulp-typescript'),
+    nodemon = require('gulp-nodemon')
+
+// TSLINT
+gulp.task('ts-lint', () => {
+    const config = {formatter: 'verbose'}
+    return gulp.src(['src/**/*.ts'])
+        .pipe(tslint(config))
+        .pipe(tslint.report({
+            reportLimit: 5
+        }))
 })
 
-gulp.task('copy-yaml', () => {
-    return gulp.src(COPY_YAML)
-        .pipe(gulp.dest('dist/src/swagger'))
-})
-
+// COPY FILES
 gulp.task('copy-files', () => {
+    const COPY_FILES = ['package.json']
     return gulp.src(COPY_FILES)
         .pipe(gulp.dest('dist'))
 })
 
-gulp.task('watch', ['ts', 'serve'], () => {
-    gulp.watch(['*.ts', './config/*.ts', './src/**/*.ts', 'src/swagger/*.yaml'], ['ts'])
-})
-
-gulp.task('serve', ['ts'], () => {
+// WATCH
+gulp.task('watch', (done) => {
+    gulp.watch('./**/*.ts')
     nodemon({
-        script: "dist/server.js",
-        env: { "NODE_ENV": "dev" }
-    }).on('restart', function () {
-        console.log('restarted server!');
+        script: 'dist/server.js',
+        tasks: ['build'],
+        ext: 'ts json',
+        ignore: ['node_modules/', 'package.json', 'tsconfig.json']
+    }).on('restart', () => {
+        console.log('##################################### // ######################################')
+        console.log('########################### (0/ Server restarted... ###########################')
+    }).on('crash', function () {
+        console.error('Application has crashed!')
     })
+    done()
 })
 
-gulp.task('build', ['ts'])
-gulp.task('build:dev', ['watch'])
+// BUILD DEFAULT
+gulp.task('build', gulp.series(['ts-lint', 'copy-files'], function compiler() {
+        const tsProject = ts.createProject(
+            'tsconfig.json',
+            {typescript: require('typescript')}
+        )
+        return tsProject.src()
+            .pipe(tsProject())
+            .js.pipe(gulp.dest('dist'))
+            .on('error', (err) => {
+                console.error('Build error:', err.message)
+                // process.exit(1)
+            })
+    }
+))
+
+// BUILD DEV
+gulp.task('dev', gulp.series(['build', 'watch']))
