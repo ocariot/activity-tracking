@@ -19,7 +19,7 @@ import { readFileSync } from 'fs'
  *
  *  The fastest way is to create a copy of the .env.example file.
  */
-require('dotenv').load()
+require('dotenv').config()
 
 const logger: ILogger = DI.getInstance().getContainer().get<ILogger>(Identifier.LOGGER)
 const app: Application = (DI.getInstance().getContainer().get<App>(Identifier.APP)).getExpress()
@@ -27,8 +27,8 @@ const backgroundServices: BackgroundService = DI.getInstance().getContainer().ge
 const port_http = process.env.PORT_HTTP || Default.PORT_HTTP
 const port_https = process.env.PORT_HTTPS || Default.PORT_HTTPS
 const https_options = {
-    key: readFileSync(process.env.PRIVATE_KEY_CERT_PATH || Default.PRIVATE_KEY_CERT_PATH),
-    cert: readFileSync(process.env.CERT_PATH || Default.CERT_PATH)
+    key: readFileSync(process.env.SSL_KEY_PATH || Default.SSL_KEY_PATH),
+    cert: readFileSync(process.env.SSL_CERT_PATH || Default.SSL_CERT_PATH)
 }
 
 /**

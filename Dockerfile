@@ -9,6 +9,7 @@ COPY package.json /usr/src/ts
 RUN npm install
 COPY . /usr/src/ts
 
-EXPOSE 3000
+EXPOSE 4000
+EXPOSE 4001
 
 ENTRYPOINT npm run build && npm start
