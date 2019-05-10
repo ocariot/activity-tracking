@@ -1,6 +1,6 @@
 {
   "name": "tracking-service",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "This is the documentation of the RESTful API of the microservice for activity, sleep, environment and food tracking",
   "main": "dist/server.js",
   "scripts": {
