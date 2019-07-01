@@ -4,6 +4,7 @@ import helmet from 'helmet'
 import bodyParser from 'body-parser'
 import HttpStatus from 'http-status-codes'
 import swaggerUi from 'swagger-ui-express'
+import whitelist from '@nutes-uepb/express-ip-whitelist'
 import qs from 'query-strings-parser'
 import express, { Application, Request, Response } from 'express'
 import { Container, inject, injectable } from 'inversify'
@@ -14,7 +15,6 @@ import { DI } from './di/di'
 import { Identifier } from './di/identifiers'
 import { ILogger } from './utils/custom.logger'
 import { Strings } from './utils/strings'
-const whitelist = require('@nutes-uepb/express-ip-whitelist')
 
 /**
  * Implementation of class App.
