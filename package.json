@@ -48,6 +48,7 @@
     "all": true
   },
   "dependencies": {
+    "@nutes-uepb/express-ip-whitelist": "^1.0.0",
     "amqp-ts": "git+https://github.com/nutes-uepb/amqp-ts",
     "body-parser": "^1.19.0",
     "dotenv": "^8.0.0",
