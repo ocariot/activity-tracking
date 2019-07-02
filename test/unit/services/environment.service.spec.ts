@@ -306,7 +306,7 @@ describe('Services: Environment', () => {
                 return environmentService.add(incorrectEnvironment)
                     .catch(err => {
                         assert.propertyVal(err, 'message', 'The type of measurement provided "temperatures" is not supported...')
-                        assert.propertyVal(err, 'description', 'The types allowed are: temperature, humidity.')
+                        assert.propertyVal(err, 'description', 'The types allowed are: temperature, humidity, fat, weight.')
                     })
             })
         })
@@ -527,7 +527,7 @@ describe('Services: Environment', () => {
                         assert.propertyVal(result.error[3], 'description', 'The measurements collection must not be empty!')
                         assert.propertyVal(result.error[4], 'message', 'The type of measurement provided "temperatures" is not ' +
                             'supported...')
-                        assert.propertyVal(result.error[4], 'description', 'The types allowed are: temperature, humidity.')
+                        assert.propertyVal(result.error[4], 'description', 'The types allowed are: temperature, humidity, fat, weight.')
                         assert.propertyVal(result.error[5], 'message', 'Measurement are not in a format that is supported!')
                         assert.propertyVal(result.error[5], 'description', 'Validation of measurements failed: measurement type, ' +
                             'measurement value, measurement unit is required!')

@@ -99,7 +99,7 @@ describe('Validators: CreateEnvironment', () => {
                     CreateEnvironmentValidator.validate(environment)
                 } catch (err) {
                     assert.equal(err.message, 'The type of measurement provided "temperatures" is not supported...')
-                    assert.equal(err.description, 'The types allowed are: temperature, humidity.')
+                    assert.equal(err.description, 'The types allowed are: temperature, humidity, fat, weight.')
                 }
                 environment.measurements = measurements_aux
             })

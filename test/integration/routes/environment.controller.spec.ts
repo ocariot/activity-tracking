@@ -72,7 +72,7 @@ describe('Routes: environments', () => {
     /**
      * POST route with only one Environment in the body
      */
-    describe('POST /environments with only one Environment in the body', () => {
+    describe('POST /v1/environments with only one Environment in the body', () => {
         context('when posting a new Environment with success', () => {
             it('should return status code 201 and the saved Environment', () => {
                 const body = {
@@ -84,7 +84,7 @@ describe('Routes: environments', () => {
                 }
 
                 return request
-                    .post('/environments')
+                    .post('/v1/environments')
                     .send(body)
                     .set('Content-Type', 'application/json')
                     .expect(201)
@@ -119,7 +119,7 @@ describe('Routes: environments', () => {
                 }
 
                 return request
-                    .post('/environments')
+                    .post('/v1/environments')
                     .send(body)
                     .set('Content-Type', 'application/json')
                     .expect(409)
@@ -136,7 +136,7 @@ describe('Routes: environments', () => {
                 }
 
                 return request
-                    .post('/environments')
+                    .post('/v1/environments')
                     .send(body)
                     .set('Content-Type', 'application/json')
                     .expect(400)
@@ -160,7 +160,7 @@ describe('Routes: environments', () => {
                 }
 
                 return request
-                    .post('/environments')
+                    .post('/v1/environments')
                     .send(body)
                     .set('Content-Type', 'application/json')
                     .expect(400)
@@ -183,7 +183,7 @@ describe('Routes: environments', () => {
                 }
 
                 return request
-                    .post('/environments')
+                    .post('/v1/environments')
                     .send(body)
                     .set('Content-Type', 'application/json')
                     .expect(400)
@@ -206,7 +206,7 @@ describe('Routes: environments', () => {
                 }
 
                 return request
-                    .post('/environments')
+                    .post('/v1/environments')
                     .send(body)
                     .set('Content-Type', 'application/json')
                     .expect(400)
@@ -230,14 +230,14 @@ describe('Routes: environments', () => {
                 }
 
                 return request
-                    .post('/environments')
+                    .post('/v1/environments')
                     .send(body)
                     .set('Content-Type', 'application/json')
                     .expect(400)
                     .then(err => {
                         expect(err.body.code).to.eql(400)
                         expect(err.body.message).to.eql('The type of measurement provided "temperatures" is not supported...')
-                        expect(err.body.description).to.eql('The types allowed are: temperature, humidity.')
+                        expect(err.body.description).to.eql('The types allowed are: temperature, humidity, fat, weight.')
                     })
             })
         })
@@ -254,7 +254,7 @@ describe('Routes: environments', () => {
                 }
 
                 return request
-                    .post('/environments')
+                    .post('/v1/environments')
                     .send(body)
                     .set('Content-Type', 'application/json')
                     .expect(400)
@@ -270,7 +270,7 @@ describe('Routes: environments', () => {
     /**
      * POST route with an environment array in the body
      */
-    describe('POST /environments with an environment array in the body', () => {
+    describe('POST /v1/environments with an environment array in the body', () => {
         context('when all the environments are correct and still do not exist in the repository', () => {
             before(() => {
                 try {
@@ -297,7 +297,7 @@ describe('Routes: environments', () => {
                 })
 
                 return request
-                    .post('/environments')
+                    .post('/v1/environments')
                     .send(body)
                     .set('Content-Type', 'application/json')
                     .expect(201)
@@ -336,7 +336,7 @@ describe('Routes: environments', () => {
                 })
 
                 return request
-                    .post('/environments')
+                    .post('/v1/environments')
                     .send(body)
                     .set('Content-Type', 'application/json')
                     .expect(201)
@@ -384,7 +384,7 @@ describe('Routes: environments', () => {
                 })
 
                 return request
-                    .post('/environments')
+                    .post('/v1/environments')
                     .send(body)
                     .set('Content-Type', 'application/json')
                     .expect(201)
@@ -434,7 +434,7 @@ describe('Routes: environments', () => {
                 })
 
                 return request
-                    .post('/environments')
+                    .post('/v1/environments')
                     .send(body)
                     .set('Content-Type', 'application/json')
                     .expect(201)
@@ -450,7 +450,7 @@ describe('Routes: environments', () => {
                         expect(res.body.error[3].message).to.eql('Measurement are not in a format that is supported!')
                         expect(res.body.error[3].description).to.eql('The measurements collection must not be empty!')
                         expect(res.body.error[4].message).to.eql('The type of measurement provided "temperatures" is not supported...')
-                        expect(res.body.error[4].description).to.eql('The types allowed are: temperature, humidity.')
+                        expect(res.body.error[4].description).to.eql('The types allowed are: temperature, humidity, fat, weight.')
                         expect(res.body.error[5].message).to.eql('Measurement are not in a format that is supported!')
                         expect(res.body.error[5].description).to.eql('Validation of measurements failed: measurement type, measurement ' +
                             'value, measurement unit is required!')
@@ -475,7 +475,7 @@ describe('Routes: environments', () => {
     /**
      * GET route
      */
-    describe('GET /environments', () => {
+    describe('GET /v1/environments', () => {
         context('when get all environment of the database successfully', () => {
             it('should return status code 200 and a list of environments found', async () => {
                 try {
@@ -507,7 +507,7 @@ describe('Routes: environments', () => {
                 }
 
                 return request
-                    .get('/environments')
+                    .get('/v1/environments')
                     .set('Content-Type', 'application/json')
                     .expect(200)
                     .then(res => {
@@ -546,7 +546,7 @@ describe('Routes: environments', () => {
 
             it('should return status code 200 and an empty list', async () => {
                 return request
-                    .get('/environments')
+                    .get('/v1/environments')
                     .set('Content-Type', 'application/json')
                     .expect(200)
                     .then(res => {
@@ -612,7 +612,7 @@ describe('Routes: environments', () => {
                     throw new Error('Failure on environments routes test: ' + err.message)
                 }
 
-                const url = '/environments?climatized=true&fields=institution_id,location,measurements,' +
+                const url = '/v1/environments?climatized=true&fields=institution_id,location,measurements,' +
                     'climatized,timestamp&sort=institution_id&page=1&limit=3'
 
                 return request
@@ -655,7 +655,7 @@ describe('Routes: environments', () => {
             })
 
             it('should return status code 200 and an empty list', async () => {
-                const url = '/environments?climatized=true&fields=institution_id,location,measurements,' +
+                const url = '/v1/environments?climatized=true&fields=institution_id,location,measurements,' +
                     'climatized,timestamp&sort=institution_id&page=1&limit=3'
 
                 return request
@@ -672,7 +672,7 @@ describe('Routes: environments', () => {
     /**
      * DELETE route
      */
-    describe('DELETE /environments/:environment_id', () => {
+    describe('DELETE /v1/environments/:environment_id', () => {
         context('when the environment was deleted successfully', () => {
             it('should return status code 204 and no content for environment', async () => {
                 let result
@@ -706,7 +706,7 @@ describe('Routes: environments', () => {
                 }
 
                 return request
-                    .delete(`/environments/${result.id}`)
+                    .delete(`/v1/environments/${result.id}`)
                     .set('Content-Type', 'application/json')
                     .expect(204)
                     .then(res => {
@@ -726,7 +726,7 @@ describe('Routes: environments', () => {
 
             it('should return status code 204 and no content for environment', () => {
                 return request
-                    .delete(`/environments/${defaultEnvironment.id}`)
+                    .delete(`/v1/environments/${defaultEnvironment.id}`)
                     .set('Content-Type', 'application/json')
                     .expect(204)
                     .then(err => {
@@ -746,7 +746,7 @@ describe('Routes: environments', () => {
 
             it('should return status code 400 and info message about the invalid environment id', async () => {
                 return request
-                    .delete(`/environments/123`)
+                    .delete(`/v1/environments/123`)
                     .set('Content-Type', 'application/json')
                     .expect(400)
                     .then(err => {

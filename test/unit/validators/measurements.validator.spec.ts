@@ -35,7 +35,7 @@ describe('Validators: Measurements', () => {
                     MeasurementsValidator.validate(measurements)
                 } catch (err) {
                     assert.equal(err.message, 'The type of measurement provided "temperatures" is not supported...')
-                    assert.equal(err.description, 'The types allowed are: temperature, humidity.')
+                    assert.equal(err.description, 'The types allowed are: temperature, humidity, fat, weight.')
                 }
                 measurements = [new Measurement(MeasurementType.TEMPERATURE, Math.random() * 13 + 19, '°C'),
                     new Measurement(MeasurementType.HUMIDITY, Math.random() * 16 + 30, '%')]

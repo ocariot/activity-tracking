@@ -5,6 +5,8 @@ import { IJSONDeserializable } from '../utils/json.deserializable.interface'
 import { Measurement } from './measurement'
 import { JsonUtils } from '../utils/json.utils'
 import { DatetimeValidator } from '../validator/datetime.validator'
+import { Temperature } from './temperature'
+import { Humidity } from './humidity'
 
 /**
  * Entity implementation for environment measurements.
@@ -15,7 +17,7 @@ import { DatetimeValidator } from '../validator/datetime.validator'
 export class Environment extends Entity implements IJSONSerializable, IJSONDeserializable<Environment> {
     private _institution_id?: string // Id of institution associated with a environment.
     private _location?: Location // Sensor Location
-    private _measurements?: Array<Measurement> // Associated Measurements
+    private _measurements?: Array<Temperature | Humidity> // Associated Measurements
     private _climatized?: boolean // Boolean variable to identify if a environment is climatized.
     private _timestamp!: Date // Timestamp according to the UTC.
 
