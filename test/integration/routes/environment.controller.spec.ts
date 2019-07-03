@@ -449,7 +449,7 @@ describe('Routes: environments', () => {
                             'room is required!')
                         expect(res.body.error[3].message).to.eql('Measurement are not in a format that is supported!')
                         expect(res.body.error[3].description).to.eql('The measurements collection must not be empty!')
-                        expect(res.body.error[4].message).to.eql('The type of measurement provided "temperatures" is not supported...')
+                        expect(res.body.error[4].message).to.eql('Required fields were not provided!')
                         expect(res.body.error[4].description).to.eql('The types allowed are: temperature, humidity, fat, weight.')
                         expect(res.body.error[5].message).to.eql('Measurement are not in a format that is supported!')
                         expect(res.body.error[5].description).to.eql('Validation of measurements failed: measurement type, measurement ' +

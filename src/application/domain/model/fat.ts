@@ -32,7 +32,6 @@ export class Fat extends Measurement implements IJSONSerializable, IJSONDeserial
         if (json.id !== undefined) super.id = json.id
         if (json.timestamp !== undefined) this.timestamp = this.convertDatetimeString(json.timestamp)
         if (json.value !== undefined) this.value = json.value
-        if (json.unit !== undefined) this.unit = '%'
         if (json.child_id !== undefined) this.child_id = json.child_id
 
         return this
