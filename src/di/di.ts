@@ -57,6 +57,23 @@ import { LogEntity } from '../infrastructure/entity/log.entity'
 import { LogEntityMapper } from '../infrastructure/entity/mapper/log.entity.mapper'
 import { LogService } from '../application/service/log.service'
 import { ILogService } from '../application/port/log.service.interface'
+import { IFatService } from '../application/port/fat.service.interface'
+import { IWeightService } from '../application/port/weight.service.interface'
+import { IFatRepository } from '../application/port/fat.repository.interface'
+import { IWeightRepository } from '../application/port/weight.repository.interface'
+import { Fat } from '../application/domain/model/fat'
+import { FatEntity } from '../infrastructure/entity/fat.entity'
+import { FatEntityMapper } from '../infrastructure/entity/mapper/fat.entity.mapper'
+import { Weight } from '../application/domain/model/weight'
+import { WeightEntity } from '../infrastructure/entity/weight.entity'
+import { MeasurementRepoModel } from '../infrastructure/database/schema/measurement.schema'
+import { WeightEntityMapper } from '../infrastructure/entity/mapper/weight.entity.mapper'
+import { FatRepository } from '../infrastructure/repository/fat.repository'
+import { WeightRepository } from '../infrastructure/repository/weight.repository'
+import { FatService } from '../application/service/fat.service'
+import { WeightService } from '../application/service/weight.service'
+import { FatController } from '../ui/controller/fat.controller'
+import { WeightController } from '../ui/controller/weight.controller'
 
 export class DI {
     private static instance: DI
@@ -106,12 +123,16 @@ export class DI {
         this.container.bind<ActivityController>(Identifier.ACTIVITY_CONTROLLER).to(ActivityController).inSingletonScope()
         this.container.bind<EnvironmentController>(Identifier.ENVIRONMENT_CONTROLLER).to(EnvironmentController).inSingletonScope()
         this.container.bind<SleepController>(Identifier.SLEEP_CONTROLLER).to(SleepController).inSingletonScope()
+        this.container.bind<FatController>(Identifier.FAT_CONTROLLER).to(FatController).inSingletonScope()
+        this.container.bind<WeightController>(Identifier.WEIGHT_CONTROLLER).to(WeightController).inSingletonScope()
 
         // Services
         this.container.bind<IPhysicalActivityService>(Identifier.ACTIVITY_SERVICE).to(PhysicalActivityService).inSingletonScope()
         this.container.bind<ILogService>(Identifier.ACTIVITY_LOG_SERVICE).to(LogService).inSingletonScope()
         this.container.bind<IEnvironmentService>(Identifier.ENVIRONMENT_SERVICE).to(EnvironmentService).inSingletonScope()
         this.container.bind<ISleepService>(Identifier.SLEEP_SERVICE).to(SleepService).inSingletonScope()
+        this.container.bind<IFatService>(Identifier.FAT_SERVICE).to(FatService).inSingletonScope()
+        this.container.bind<IWeightService>(Identifier.WEIGHT_SERVICE).to(WeightService).inSingletonScope()
 
         // Repositories
         this.container
@@ -127,6 +148,12 @@ export class DI {
             .bind<ISleepRepository>(Identifier.SLEEP_REPOSITORY)
             .to(SleepRepository).inSingletonScope()
         this.container
+            .bind<IFatRepository>(Identifier.FAT_REPOSITORY)
+            .to(FatRepository).inSingletonScope()
+        this.container
+            .bind<IWeightRepository>(Identifier.WEIGHT_REPOSITORY)
+            .to(WeightRepository).inSingletonScope()
+        this.container
             .bind<IIntegrationEventRepository>(Identifier.INTEGRATION_EVENT_REPOSITORY)
             .to(IntegrationEventRepository).inSingletonScope()
 
@@ -135,6 +162,7 @@ export class DI {
         this.container.bind(Identifier.ACTIVITY_LOG_REPO_MODEL).toConstantValue(ActivityLogRepoModel)
         this.container.bind(Identifier.ENVIRONMENT_REPO_MODEL).toConstantValue(EnvironmentRepoModel)
         this.container.bind(Identifier.SLEEP_REPO_MODEL).toConstantValue(SleepRepoModel)
+        this.container.bind(Identifier.MEASUREMENT_REPO_MODEL).toConstantValue(MeasurementRepoModel)
         this.container.bind(Identifier.INTEGRATION_EVENT_REPO_MODEL).toConstantValue(IntegrationEventRepoModel)
 
         // Mappers
@@ -153,6 +181,12 @@ export class DI {
         this.container
             .bind<IEntityMapper<Sleep, SleepEntity>>(Identifier.SLEEP_ENTITY_MAPPER)
             .to(SleepEntityMapper).inSingletonScope()
+        this.container
+            .bind<IEntityMapper<Fat, FatEntity>>(Identifier.FAT_ENTITY_MAPPER)
+            .to(FatEntityMapper).inSingletonScope()
+        this.container
+            .bind<IEntityMapper<Weight, WeightEntity>>(Identifier.WEIGHT_ENTITY_MAPPER)
+            .to(WeightEntityMapper).inSingletonScope()
 
         // Background Services
         this.container

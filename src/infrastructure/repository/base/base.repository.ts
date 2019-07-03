@@ -28,7 +28,9 @@ export abstract class BaseRepository<T extends Entity, TModel> implements IRepos
         const itemNew: TModel = this.mapper.transform(item)
         return new Promise<T>((resolve, reject) => {
             this.Model.create(itemNew)
-                .then((result) => resolve(this.mapper.transform(result)))
+                .then((result) => {
+                    resolve(this.mapper.transform(result))
+                })
                 .catch(err => reject(this.mongoDBErrorListener(err)))
         })
     }

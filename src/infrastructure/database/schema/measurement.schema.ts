@@ -20,7 +20,8 @@ const measurementSchema = new Mongoose.Schema({
             type: Mongoose.Schema.Types.ObjectId,
         },
         fat: {
-            type: Number
+            type: Mongoose.Schema.Types.ObjectId,
+            ref: 'Measurement'
         },
     },
     {
@@ -35,5 +36,5 @@ const measurementSchema = new Mongoose.Schema({
         }
     }
 )
-measurementSchema.index({ timestamp: 1, child_id: 1 }, { unique: true }) // define index at schema level
+measurementSchema.index({ timestamp: 1, child_id: 1, type: 1 }, { unique: true }) // define index at schema level
 export const MeasurementRepoModel = Mongoose.model<IMeasurementModel>('Measurement', measurementSchema)

@@ -4,13 +4,10 @@ import { IEventBus } from '../../infrastructure/port/event.bus.interface'
 import { ILogger } from '../../utils/custom.logger'
 import { DI } from '../../di/di'
 import { PhysicalActivityEvent } from '../../application/integration-event/event/physical.activity.event'
-import { PhysicalActivitySaveEventHandler } from '../../application/integration-event/handler/physical.activity.save.event.handler'
 import { IPhysicalActivityRepository } from '../../application/port/physical.activity.repository.interface'
 import { SleepEvent } from '../../application/integration-event/event/sleep.event'
-import { SleepSaveEventHandler } from '../../application/integration-event/handler/sleep.save.event.handler'
 import { ISleepRepository } from '../../application/port/sleep.repository.interface'
 import { EnvironmentEvent } from '../../application/integration-event/event/environment.event'
-import { EnvironmentSaveEventHandler } from '../../application/integration-event/handler/environment.save.event.handler'
 import { IEnvironmentRepository } from '../../application/port/environment.repository.interface'
 import { Query } from '../../infrastructure/repository/query/query'
 import { IIntegrationEventRepository } from '../../application/port/integration.event.repository.interface'
@@ -22,6 +19,12 @@ import { UserEvent } from '../../application/integration-event/event/user.event'
 import { UserDeleteEventHandler } from '../../application/integration-event/handler/user.delete.event.handler'
 import { InstitutionEvent } from '../../application/integration-event/event/institution.event'
 import { InstitutionDeleteEventHandler } from '../../application/integration-event/handler/institution.delete.event.handler'
+import { IFatRepository } from '../../application/port/fat.repository.interface'
+import { IWeightRepository } from '../../application/port/weight.repository.interface'
+import { FatEvent } from '../../application/integration-event/event/fat.event'
+import { Fat } from '../../application/domain/model/fat'
+import { WeightEvent } from '../../application/integration-event/event/weight.event'
+import { Weight } from '../../application/domain/model/weight'
 
 @injectable()
 export class EventBusTask {
@@ -64,57 +67,14 @@ export class EventBusTask {
                 this._logger.info('Connection to subscribe established successfully!')
 
                 /**
-                 * Subscribe in event physical activity save
-                 */
-                const activitySaveEvent = new PhysicalActivityEvent('PhysicalActivitySaveEvent', new Date())
-                const activitySaveEventHandler = new PhysicalActivitySaveEventHandler(
-                    this._diContainer.get<IPhysicalActivityRepository>(Identifier.ACTIVITY_REPOSITORY), this._logger)
-                this._eventBus
-                    .subscribe(activitySaveEvent, activitySaveEventHandler, 'activities.save')
-                    .then((result: boolean) => {
-                        if (result) this._logger.info('Subscribe in PhysicalActivitySaveEvent successful!')
-                    })
-                    .catch(err => {
-                        this._logger.error(`Error in Subscribe PhysicalActivitySaveEvent! ${err.message}`)
-                    })
-
-                /**
-                 * Subscribe in event sleep save
-                 */
-                const sleepSaveEvent = new SleepEvent('SleepSaveEvent', new Date())
-                const sleepSaveEventHandler = new SleepSaveEventHandler(
-                    this._diContainer.get<ISleepRepository>(Identifier.SLEEP_REPOSITORY), this._logger)
-                this._eventBus
-                    .subscribe(sleepSaveEvent, sleepSaveEventHandler, 'sleep.save')
-                    .then((result: boolean) => {
-                        if (result) this._logger.info('Subscribe in SleepSaveEvent successful!')
-                    })
-                    .catch(err => {
-                        this._logger.error(`Error in Subscribe SleepSaveEvent! ${err.message}`)
-                    })
-
-                /**
-                 * Subscribe in event environment save
-                 */
-                const environmentSaveEvent = new EnvironmentEvent('EnvironmentSaveEvent', new Date())
-                const environmentSaveEventHandler = new EnvironmentSaveEventHandler(
-                    this._diContainer.get<IEnvironmentRepository>(Identifier.ENVIRONMENT_REPOSITORY), this._logger)
-                this._eventBus
-                    .subscribe(environmentSaveEvent, environmentSaveEventHandler, 'environments.save')
-                    .then((result: boolean) => {
-                        if (result) this._logger.info('Subscribe in EnvironmentSaveEvent successful!')
-                    })
-                    .catch(err => {
-                        this._logger.error(`Error in Subscribe EnvironmentSaveEvent! ${err.message}`)
-                    })
-
-                /**
                  * Subscribe in event user delete
                  */
                 const userDeleteEvent = new UserEvent('UserDeleteEvent', new Date())
                 const userDeleteEventHandler = new UserDeleteEventHandler(
                     this._diContainer.get<IPhysicalActivityRepository>(Identifier.ACTIVITY_REPOSITORY),
-                    this._diContainer.get<ISleepRepository>(Identifier.SLEEP_REPOSITORY), this._logger)
+                    this._diContainer.get<ISleepRepository>(Identifier.SLEEP_REPOSITORY),
+                    this._diContainer.get<IFatRepository>(Identifier.FAT_REPOSITORY),
+                    this._diContainer.get<IWeightRepository>(Identifier.WEIGHT_REPOSITORY), this._logger)
                 this._eventBus
                     .subscribe(userDeleteEvent, userDeleteEventHandler, 'users.delete')
                     .then((result: boolean) => {
@@ -239,6 +199,34 @@ export class EventBusTask {
                 new Sleep().fromJSON(event.sleep)
             )
             return eventBus.publish(sleepDeleteEvent, event.__routing_key)
+        } else if (event.event_name === 'FatSaveEvent') {
+            const fatSaveEvent: FatEvent = new FatEvent(
+                event.event_name,
+                event.timestamp,
+                new Fat().fromJSON(event.fat)
+            )
+            return eventBus.publish(fatSaveEvent, event.__routing_key)
+        } else if (event.event_name === 'FatDeleteEvent') {
+            const fatDeleteEvent: FatEvent = new FatEvent(
+                event.event_name,
+                event.timestamp,
+                new Fat().fromJSON(event.fat)
+            )
+            return eventBus.publish(fatDeleteEvent, event.__routing_key)
+        } else if (event.event_name === 'WeightSaveEvent') {
+            const weightSaveEvent: WeightEvent = new WeightEvent(
+                event.event_name,
+                event.timestamp,
+                new Weight().fromJSON(event.weight)
+            )
+            return eventBus.publish(weightSaveEvent, event.__routing_key)
+        } else if (event.event_name === 'WeightDeleteEvent') {
+            const weightDeleteEvent: WeightEvent = new WeightEvent(
+                event.event_name,
+                event.timestamp,
+                new Weight().fromJSON(event.weight)
+            )
+            return eventBus.publish(weightDeleteEvent, event.__routing_key)
         } else if (event.event_name === 'EnvironmentSaveEvent') {
             const environmentSaveEvent: EnvironmentEvent = new EnvironmentEvent(
                 event.event_name,

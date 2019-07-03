@@ -3,6 +3,7 @@ import { IJSONDeserializable } from '../utils/json.deserializable.interface'
 import { JsonUtils } from '../utils/json.utils'
 import { DatetimeValidator } from '../validator/datetime.validator'
 import { Measurement, MeasurementType } from './measurement'
+import { Fat } from './fat'
 
 /**
  * Entity implementation for weight measurements.
@@ -11,18 +12,18 @@ import { Measurement, MeasurementType } from './measurement'
  * @implements {IJSONSerializable, IJSONDeserializable<Weight>}
  */
 export class Weight extends Measurement implements IJSONSerializable, IJSONDeserializable<Weight> {
-    private _fat?: number // Value of body fat measurement associated with the weight measurement.
+    private _fat?: Fat // Object of body fat measurement associated with the weight measurement.
 
     constructor() {
         super()
         this.type = MeasurementType.WEIGHT
     }
 
-    get fat(): number | undefined {
+    get fat(): Fat | undefined {
         return this._fat
     }
 
-    set fat(value: number | undefined) {
+    set fat(value: Fat | undefined) {
         this._fat = value
     }
 
@@ -42,7 +43,10 @@ export class Weight extends Measurement implements IJSONSerializable, IJSONDeser
         if (json.value !== undefined) this.value = json.value
         if (json.unit !== undefined) this.unit = json.unit
         if (json.child_id !== undefined) this.child_id = json.child_id
-        if (json.fat !== undefined) this.fat = json.fat
+        if (json.fat !== undefined) {
+            this.fat = new Fat().fromJSON(json)
+            this.fat.value = json.fat
+        }
 
         return this
     }

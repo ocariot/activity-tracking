@@ -254,7 +254,7 @@ export class SleepService implements ISleepService {
             ObjectIdValidator.validate(childId, Strings.CHILD.PARAM_ID_NOT_VALID_FORMAT)
             ObjectIdValidator.validate(sleepId, Strings.SLEEP.PARAM_ID_NOT_VALID_FORMAT)
 
-            // 2. Create a Sleep with only two attributes, the id and child_id, to be used in publishing on the event bus
+            // 2. Create a Sleep with only one attribute, the id, to be used in publishing on the event bus
             const sleepToBeDeleted: Sleep = new Sleep()
             sleepToBeDeleted.id = sleepId
 

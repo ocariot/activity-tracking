@@ -28,7 +28,7 @@ export class WeightEntityMapper implements IEntityMapper<Weight, WeightEntity> {
         if (item.value !== undefined) result.value = item.value
         if (item.unit) result.unit = item.unit
         if (item.child_id) result.child_id = item.child_id
-        if (item.fat !== undefined) result.fat = item.fat
+        if (item.fat !== undefined) result.fat = item.fat.id
 
         return result
     }

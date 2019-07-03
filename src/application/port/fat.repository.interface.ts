@@ -14,10 +14,11 @@ export interface IFatRepository extends IRepository<Fat> {
      *
      * @param fatId Fat unique identifier.
      * @param childId Child unique identifier.
+     * @param type Type of Measurement.
      * @return {Promise<boolean>}
      * @throws {ValidationException | RepositoryException}
      */
-    removeByChild(fatId: string, childId: string): Promise<boolean>
+    removeByChild(fatId: string, childId: string, type: string): Promise<boolean>
 
     /**
      * Checks if a Fat already has a registration.

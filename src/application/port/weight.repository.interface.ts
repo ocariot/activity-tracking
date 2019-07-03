@@ -14,10 +14,11 @@ export interface IWeightRepository extends IRepository<Weight> {
      *
      * @param weightId Weight unique identifier.
      * @param childId Child unique identifier.
+     * @param measurementType Type of Measurement.
      * @return {Promise<boolean>}
      * @throws {ValidationException | RepositoryException}
      */
-    removeByChild(weightId: string, childId: string): Promise<boolean>
+    removeByChild(weightId: string, childId: string, measurementType: string): Promise<boolean>
 
     /**
      * Checks if a Weight already has a registration.
