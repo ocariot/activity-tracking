@@ -8,56 +8,56 @@ import { ApiException } from '../exception/api.exception'
 import { ILogger } from '../../utils/custom.logger'
 import { Query } from '../../infrastructure/repository/query/query'
 import { MultiStatus } from '../../application/domain/model/multi.status'
-import { IFatService } from '../../application/port/fat.service.interface'
-import { Fat } from '../../application/domain/model/fat'
+import { IBodyFatService } from '../../application/port/body.fat.service.interface'
+import { BodyFat } from '../../application/domain/model/body.fat'
 
 /**
- * Controller that implements Fat feature operations.
+ * Controller that implements BodyFat feature operations.
  *
  * @remarks To define paths, we use library inversify-express-utils.
  * @see {@link https://github.com/inversify/inversify-express-utils} for further information.
  */
 @controller('/v1/users/children')
-export class FatController {
+export class BodyFatController {
 
     /**
-     * Creates an instance of Fat controller.
+     * Creates an instance of BodyFat controller.
      *
-     * @param {IFatService} _fatService
+     * @param {IBodyFatService} _bodyFatService
      * @param {ILogger} _logger
      */
     constructor(
-        @inject(Identifier.FAT_SERVICE) private readonly _fatService: IFatService,
+        @inject(Identifier.BODY_FAT_SERVICE) private readonly _bodyFatService: IBodyFatService,
         @inject(Identifier.LOGGER) readonly _logger: ILogger
     ) {
     }
 
     /**
-     * Add new Fat or multiple new Fat objects.
+     * Add new BodyFat or multiple new BodyFat objects.
      *
      * @param {Request} req
      * @param {Response} res
      */
-    @httpPost('/:child_id/fat')
+    @httpPost('/:child_id/bodyfat')
     public async saveFat(@request() req: Request, @response() res: Response) {
         try {
-            // Multiple items of Fat
+            // Multiple items of BodyFat
             if (req.body instanceof Array) {
-                const fatArr: Array<Fat> = req.body.map(item => {
-                    const fatItem: Fat = new Fat().fromJSON(item)
-                    fatItem.child_id = req.params.child_id
-                    return fatItem
+                const bodyFatArr: Array<BodyFat> = req.body.map(item => {
+                    const bodyFatItem: BodyFat = new BodyFat().fromJSON(item)
+                    bodyFatItem.child_id = req.params.child_id
+                    return bodyFatItem
                 })
 
-                const resultMultiStatus: MultiStatus<Fat> = await this._fatService.add(fatArr)
+                const resultMultiStatus: MultiStatus<BodyFat> = await this._bodyFatService.add(bodyFatArr)
                 return res.status(HttpStatus.CREATED).send(resultMultiStatus)
             }
 
             // Only one item
-            const fatSave: Fat = new Fat().fromJSON(req.body)
-            fatSave.child_id = req.params.child_id
+            const bodyFatSave: BodyFat = new BodyFat().fromJSON(req.body)
+            bodyFatSave.child_id = req.params.child_id
 
-            const result: Fat = await this._fatService.add(fatSave)
+            const result: BodyFat = await this._bodyFatService.add(bodyFatSave)
             return res.status(HttpStatus.CREATED).send(result)
         } catch (err) {
             const handlerError = ApiExceptionManager.build(err)
@@ -67,17 +67,17 @@ export class FatController {
     }
 
     /**
-     * Recovers Fat of the child.
+     * Recovers BodyFat of the child.
      * For the query strings, the query-strings-parser middleware was used.
      * @see {@link https://www.npmjs.com/package/query-strings-parser} for further information.
      *
      * @param {Request} req
      * @param {Response} res
      */
-    @httpGet('/:child_id/fat')
-    public async getAllFatOfChild(@request() req: Request, @response() res: Response): Promise<Response> {
+    @httpGet('/:child_id/bodyfat')
+    public async getAllBodyFatOfChild(@request() req: Request, @response() res: Response): Promise<Response> {
         try {
-            const result = await this._fatService
+            const result = await this._bodyFatService
                 .getAllByChild(req.params.child_id, new Query().fromJSON(req.query))
             return res.status(HttpStatus.OK).send(result)
         } catch (err) {
@@ -88,18 +88,18 @@ export class FatController {
     }
 
     /**
-     * Get Fat by id and child.
+     * Get BodyFat by id and child.
      * For the query strings, the query-strings-parser middleware was used.
      * @see {@link https://www.npmjs.com/package/query-strings-parser} for further information.
      *
      * @param {Request} req
      * @param {Response} res
      */
-    @httpGet('/:child_id/fat/:fat_id')
-    public async getFatById(@request() req: Request, @response() res: Response): Promise<Response> {
+    @httpGet('/:child_id/bodyfat/:bodyfat_id')
+    public async getBodyFatById(@request() req: Request, @response() res: Response): Promise<Response> {
         try {
-            const result: Fat = await this._fatService
-                .getByIdAndChild(req.params.fat_id, req.params.child_id, new Query().fromJSON(req.query))
+            const result: BodyFat = await this._bodyFatService
+                .getByIdAndChild(req.params.bodyfat_id, req.params.child_id, new Query().fromJSON(req.query))
             if (!result) return res.status(HttpStatus.NOT_FOUND).send(this.getMessageFatNotFound())
             return res.status(HttpStatus.OK).send(result)
         } catch (err) {
@@ -110,15 +110,15 @@ export class FatController {
     }
 
     /**
-     * Remove Fat of the child.
+     * Remove BodyFat of the child.
      *
      * @param {Request} req
      * @param {Response} res
      */
-    @httpDelete('/:child_id/fat/:fat_id')
-    public async deleteFatOfChild(@request() req: Request, @response() res: Response): Promise<Response> {
+    @httpDelete('/:child_id/bodyfat/:bodyfat_id')
+    public async deleteBodyFatOfChild(@request() req: Request, @response() res: Response): Promise<Response> {
         try {
-            await this._fatService.removeByChild(req.params.fat_id, req.params.child_id)
+            await this._bodyFatService.removeByChild(req.params.bodyfat_id, req.params.child_id)
             return res.status(HttpStatus.NO_CONTENT).send()
         } catch (err) {
             const handlerError = ApiExceptionManager.build(err)
@@ -133,8 +133,8 @@ export class FatController {
     private getMessageFatNotFound(): object {
         return new ApiException(
             HttpStatus.NOT_FOUND,
-            'Fat not found!',
-            'Fat not found or already removed. A new operation for the same resource is not required!'
+            'BodyFat not found!',
+            'BodyFat not found or already removed. A new operation for the same resource is not required!'
         ).toJson()
     }
 }

@@ -3,7 +3,7 @@ import { IJSONDeserializable } from '../utils/json.deserializable.interface'
 import { JsonUtils } from '../utils/json.utils'
 import { DatetimeValidator } from '../validator/datetime.validator'
 import { Measurement, MeasurementType } from './measurement'
-import { Fat } from './fat'
+import { BodyFat } from './body.fat'
 
 /**
  * Entity implementation for weight measurements.
@@ -12,19 +12,19 @@ import { Fat } from './fat'
  * @implements {IJSONSerializable, IJSONDeserializable<Weight>}
  */
 export class Weight extends Measurement implements IJSONSerializable, IJSONDeserializable<Weight> {
-    private _fat?: Fat // Object of body fat measurement associated with the weight measurement.
+    private _body_fat?: BodyFat // Object of body_fat measurement associated with the weight measurement.
 
     constructor() {
         super()
         this.type = MeasurementType.WEIGHT
     }
 
-    get fat(): Fat | undefined {
-        return this._fat
+    get body_fat(): BodyFat | undefined {
+        return this._body_fat
     }
 
-    set fat(value: Fat | undefined) {
-        this._fat = value
+    set body_fat(value: BodyFat | undefined) {
+        this._body_fat = value
     }
 
     public convertDatetimeString(value: string): Date {
@@ -43,9 +43,9 @@ export class Weight extends Measurement implements IJSONSerializable, IJSONDeser
         if (json.value !== undefined) this.value = json.value
         if (json.unit !== undefined) this.unit = json.unit
         if (json.child_id !== undefined) this.child_id = json.child_id
-        if (json.fat !== undefined) {
-            this.fat = new Fat().fromJSON(json)
-            this.fat.value = json.fat
+        if (json.body_fat !== undefined) {
+            this.body_fat = new BodyFat().fromJSON(json)
+            this.body_fat.value = json.body_fat
         }
 
         return this
@@ -58,7 +58,7 @@ export class Weight extends Measurement implements IJSONSerializable, IJSONDeser
             value: this.value,
             unit: this.unit,
             child_id: this.child_id,
-            fat: this.fat
+            body_fat: (this.body_fat) ? this.body_fat.value : undefined
         }
     }
 }

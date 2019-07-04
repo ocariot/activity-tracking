@@ -4,36 +4,36 @@ import { IIntegrationEventHandler } from './integration.event.handler.interface'
 import { ILogger } from '../../../utils/custom.logger'
 import { ObjectIdValidator } from '../../domain/validator/object.id.validator'
 import { Strings } from '../../../utils/strings'
-import { IFatRepository } from '../../port/fat.repository.interface'
-import { FatEvent } from '../event/fat.event'
-import { Fat } from '../../domain/model/fat'
+import { IBodyFatRepository } from '../../port/body.fat.repository.interface'
+import { BodyFatEvent } from '../event/body.fat.event'
+import { BodyFat } from '../../domain/model/body.fat'
 
-export class FatDeleteEventHandler implements IIntegrationEventHandler<FatEvent> {
+export class BodyFatDeleteEventHandler implements IIntegrationEventHandler<BodyFatEvent> {
     private count: number = 0
 
     /**
-     * Creates an instance of FatDeleteEventHandler.
+     * Creates an instance of BodyFatDeleteEventHandler.
      *
-     * @param _fatRepository
+     * @param _bodyFatRepository
      * @param _logger
      */
     constructor(
-        @inject(Identifier.FAT_REPOSITORY) private readonly _fatRepository: IFatRepository,
+        @inject(Identifier.BODY_FAT_REPOSITORY) private readonly _bodyFatRepository: IBodyFatRepository,
         @inject(Identifier.LOGGER) private readonly _logger: ILogger
     ) {
     }
 
-    public async handle(event: FatEvent): Promise<void> {
+    public async handle(event: BodyFatEvent): Promise<void> {
         try {
-            // 1. Convert json fat to object.
-            const fat: Fat = new Fat().fromJSON(event.fat)
+            // 1. Convert json body_fat to object.
+            const body_fat: BodyFat = new BodyFat().fromJSON(event.body_fat)
 
             // 2. Validate id's
-            ObjectIdValidator.validate(fat.child_id!, Strings.CHILD.PARAM_ID_NOT_VALID_FORMAT)
-            ObjectIdValidator.validate(fat.id!, Strings.FAT.PARAM_ID_NOT_VALID_FORMAT)
+            ObjectIdValidator.validate(body_fat.child_id!, Strings.CHILD.PARAM_ID_NOT_VALID_FORMAT)
+            ObjectIdValidator.validate(body_fat.id!, Strings.BODY_FAT.PARAM_ID_NOT_VALID_FORMAT)
 
-            // 3. Try to remove the fat.
-            await this._fatRepository.removeByChild(fat.id!, fat.child_id!, fat.type!)
+            // 3. Try to remove the body_fat.
+            await this._bodyFatRepository.removeByChild(body_fat.id!, body_fat.child_id!, body_fat.type!)
 
             // 4. If got here, it's because the action was successful.
             this._logger.info(`Action for event ${event.event_name} successfully held! TOTAL: ${++this.count}`)

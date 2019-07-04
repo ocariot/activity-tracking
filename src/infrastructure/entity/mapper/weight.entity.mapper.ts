@@ -2,6 +2,7 @@ import { injectable } from 'inversify'
 import { IEntityMapper } from '../../port/entity.mapper.interface'
 import { WeightEntity } from '../weight.entity'
 import { Weight } from '../../../application/domain/model/weight'
+import { BodyFat } from '../../../application/domain/model/body.fat'
 
 @injectable()
 export class WeightEntityMapper implements IEntityMapper<Weight, WeightEntity> {
@@ -28,7 +29,7 @@ export class WeightEntityMapper implements IEntityMapper<Weight, WeightEntity> {
         if (item.value !== undefined) result.value = item.value
         if (item.unit) result.unit = item.unit
         if (item.child_id) result.child_id = item.child_id
-        if (item.fat !== undefined) result.fat = item.fat.id
+        if (item.body_fat !== undefined) result.body_fat = item.body_fat.id
 
         return result
     }
@@ -61,7 +62,10 @@ export class WeightEntityMapper implements IEntityMapper<Weight, WeightEntity> {
         if (json.value !== undefined) result.value = json.value
         if (json.unit !== undefined) result.unit = json.unit
         if (json.child_id !== undefined) result.child_id = json.child_id
-        if (json.fat !== undefined) result.fat = json.fat
+        if (json.body_fat) {
+            json.body_fat.timestamp = undefined
+            result.body_fat = new BodyFat().fromJSON(json.body_fat)
+        }
 
         return result
     }

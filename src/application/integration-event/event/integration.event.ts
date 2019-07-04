@@ -17,7 +17,7 @@ export abstract class IntegrationEvent<T> implements IJSONSerializable {
 export enum EventType {
     PHYSICAL_ACTIVITIES = 'physicalactivities',
     SLEEP = 'sleep',
-    FAT = 'fat',
+    BODY_FAT = 'body_fat',
     WEIGHT = 'weight',
     ENVIRONMENTS = 'environments',
     USERS = 'users',

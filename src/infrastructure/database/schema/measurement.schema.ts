@@ -19,7 +19,7 @@ const measurementSchema = new Mongoose.Schema({
         child_id: {
             type: Mongoose.Schema.Types.ObjectId,
         },
-        fat: {
+        body_fat: {
             type: Mongoose.Schema.Types.ObjectId,
             ref: 'Measurement'
         },

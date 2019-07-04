@@ -25,8 +25,8 @@ export abstract class Strings {
         PARAM_ID_NOT_VALID_FORMAT: 'Parameter {sleep_id} is not in valid format!'
     }
 
-    public static readonly FAT: any = {
-        PARAM_ID_NOT_VALID_FORMAT: 'Parameter {fat_id} is not in valid format!'
+    public static readonly BODY_FAT: any = {
+        PARAM_ID_NOT_VALID_FORMAT: 'Parameter {bodyfat_id} is not in valid format!'
     }
 
     public static readonly WEIGHT: any = {

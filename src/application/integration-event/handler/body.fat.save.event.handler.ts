@@ -3,40 +3,40 @@ import { Identifier } from '../../../di/identifiers'
 import { IIntegrationEventHandler } from './integration.event.handler.interface'
 import { ILogger } from '../../../utils/custom.logger'
 import { ConflictException } from '../../domain/exception/conflict.exception'
-import { FatEvent } from '../event/fat.event'
-import { IFatRepository } from '../../port/fat.repository.interface'
-import { Fat } from '../../domain/model/fat'
-import { CreateFatValidator } from '../../domain/validator/create.fat.validator'
+import { BodyFatEvent } from '../event/body.fat.event'
+import { IBodyFatRepository } from '../../port/body.fat.repository.interface'
+import { BodyFat } from '../../domain/model/body.fat'
+import { CreateBodyFatValidator } from '../../domain/validator/create.body.fat.validator'
 
-export class FatSaveEventHandler implements IIntegrationEventHandler<FatEvent> {
+export class BodyFatSaveEventHandler implements IIntegrationEventHandler<BodyFatEvent> {
     private count: number = 0
 
     /**
-     * Creates an instance of FatSaveEventHandler.
+     * Creates an instance of BodyFatSaveEventHandler.
      *
      * @param _fatRepository
      * @param _logger
      */
     constructor(
-        @inject(Identifier.FAT_REPOSITORY) private readonly _fatRepository: IFatRepository,
+        @inject(Identifier.BODY_FAT_REPOSITORY) private readonly _fatRepository: IBodyFatRepository,
         @inject(Identifier.LOGGER) private readonly _logger: ILogger
     ) {
     }
 
-    public async handle(event: FatEvent): Promise<void> {
+    public async handle(event: BodyFatEvent): Promise<void> {
         try {
-            // 1. Convert json fat to object.
-            const fat: Fat = new Fat().fromJSON(event.fat)
+            // 1. Convert json body_fat to object.
+            const fat: BodyFat = new BodyFat().fromJSON(event.body_fat)
 
             // 2. Validate object based on create action.
-            CreateFatValidator.validate(fat)
+            CreateBodyFatValidator.validate(fat)
 
             // 3. Checks whether the object already has a record.
             // If it exists, an exception of type ConflictException is thrown.
             const fatExist = await this._fatRepository.checkExist(fat)
-            if (fatExist) throw new ConflictException('Fat is already registered...')
+            if (fatExist) throw new ConflictException('BodyFat is already registered...')
 
-            // 4. Try to save the fat.
+            // 4. Try to save the body_fat.
             // Exceptions of type RepositoryException and ValidationException can be triggered.
             await this._fatRepository.create(fat)
 

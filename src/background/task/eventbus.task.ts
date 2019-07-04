@@ -19,10 +19,10 @@ import { UserEvent } from '../../application/integration-event/event/user.event'
 import { UserDeleteEventHandler } from '../../application/integration-event/handler/user.delete.event.handler'
 import { InstitutionEvent } from '../../application/integration-event/event/institution.event'
 import { InstitutionDeleteEventHandler } from '../../application/integration-event/handler/institution.delete.event.handler'
-import { IFatRepository } from '../../application/port/fat.repository.interface'
+import { IBodyFatRepository } from '../../application/port/body.fat.repository.interface'
 import { IWeightRepository } from '../../application/port/weight.repository.interface'
-import { FatEvent } from '../../application/integration-event/event/fat.event'
-import { Fat } from '../../application/domain/model/fat'
+import { BodyFatEvent } from '../../application/integration-event/event/body.fat.event'
+import { BodyFat } from '../../application/domain/model/body.fat'
 import { WeightEvent } from '../../application/integration-event/event/weight.event'
 import { Weight } from '../../application/domain/model/weight'
 
@@ -73,7 +73,7 @@ export class EventBusTask {
                 const userDeleteEventHandler = new UserDeleteEventHandler(
                     this._diContainer.get<IPhysicalActivityRepository>(Identifier.ACTIVITY_REPOSITORY),
                     this._diContainer.get<ISleepRepository>(Identifier.SLEEP_REPOSITORY),
-                    this._diContainer.get<IFatRepository>(Identifier.FAT_REPOSITORY),
+                    this._diContainer.get<IBodyFatRepository>(Identifier.BODY_FAT_REPOSITORY),
                     this._diContainer.get<IWeightRepository>(Identifier.WEIGHT_REPOSITORY), this._logger)
                 this._eventBus
                     .subscribe(userDeleteEvent, userDeleteEventHandler, 'users.delete')
@@ -199,20 +199,20 @@ export class EventBusTask {
                 new Sleep().fromJSON(event.sleep)
             )
             return eventBus.publish(sleepDeleteEvent, event.__routing_key)
-        } else if (event.event_name === 'FatSaveEvent') {
-            const fatSaveEvent: FatEvent = new FatEvent(
+        } else if (event.event_name === 'BodyFatSaveEvent') {
+            const bodyFatSaveEvent: BodyFatEvent = new BodyFatEvent(
                 event.event_name,
                 event.timestamp,
-                new Fat().fromJSON(event.fat)
+                new BodyFat().fromJSON(event.body_fat)
             )
-            return eventBus.publish(fatSaveEvent, event.__routing_key)
-        } else if (event.event_name === 'FatDeleteEvent') {
-            const fatDeleteEvent: FatEvent = new FatEvent(
+            return eventBus.publish(bodyFatSaveEvent, event.__routing_key)
+        } else if (event.event_name === 'BodyFatDeleteEvent') {
+            const bodyFatDeleteEvent: BodyFatEvent = new BodyFatEvent(
                 event.event_name,
                 event.timestamp,
-                new Fat().fromJSON(event.fat)
+                new BodyFat().fromJSON(event.body_fat)
             )
-            return eventBus.publish(fatDeleteEvent, event.__routing_key)
+            return eventBus.publish(bodyFatDeleteEvent, event.__routing_key)
         } else if (event.event_name === 'WeightSaveEvent') {
             const weightSaveEvent: WeightEvent = new WeightEvent(
                 event.event_name,

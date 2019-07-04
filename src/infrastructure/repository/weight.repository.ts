@@ -8,6 +8,7 @@ import { IQuery } from '../../application/port/query.interface'
 import { Weight } from '../../application/domain/model/weight'
 import { WeightEntity } from '../entity/weight.entity'
 import { IWeightRepository } from '../../application/port/weight.repository.interface'
+import { MeasurementType } from '../../application/domain/model/measurement'
 
 /**
  * Implementation of the weight repository.
@@ -22,6 +23,25 @@ export class WeightRepository extends BaseRepository<Weight, WeightEntity> imple
         @inject(Identifier.LOGGER) readonly logger: ILogger
     ) {
         super(measurementModel, weightMapper, logger)
+    }
+
+    /**
+     * Creates a Weight.
+     *
+     * @param item Weight object
+     * @return {Promise<Weight>}
+     * @throws {ValidationException | RepositoryException}
+     */
+    public async create(item: Weight): Promise<Weight> {
+        try {
+            const weight: Weight = await super.create(item)
+            const query = new Query()
+            query.filters = { _id: weight.id }
+
+            return this.findOne(query)
+        } catch (err) {
+            return Promise.reject(err)
+        }
     }
 
     /**
@@ -48,6 +68,52 @@ export class WeightRepository extends BaseRepository<Weight, WeightEntity> imple
     }
 
     /**
+     * Returns a list of Weight objects.
+     *
+     * @param query Query object
+     * @return {Promise<Array<Weight>>}
+     * @throws {ValidationException | RepositoryException}
+     */
+    public find(query: IQuery): Promise<Array<Weight>> {
+        const q: any = query.toJSON()
+        return new Promise<Array<Weight>>((resolve, reject) => {
+            this.measurementModel.find(q.filters)
+                .select(q.fields)
+                .sort(q.ordination)
+                .skip(Number((q.pagination.limit * q.pagination.page) - q.pagination.limit))
+                .limit(Number(q.pagination.limit))
+                .populate('body_fat')
+                .exec() // execute query
+                .then((result) => {
+                    resolve(result.map(item => this.mapper.transform(item)))
+                })
+                .catch(err => reject(this.mongoDBErrorListener(err)))
+        })
+    }
+
+    /**
+     * Returns a Weight object.
+     *
+     * @param query Query object
+     * @return {Promise<Weight>}
+     * @throws {ValidationException | RepositoryException}
+     */
+    public findOne(query: IQuery): Promise<Weight> {
+        const q: any = query.toJSON()
+        return new Promise<Weight>((resolve, reject) => {
+            this.measurementModel.findOne(q.filters)
+                .select(q.fields)
+                .populate('body_fat')
+                .exec()
+                .then((result) => {
+                    if (!result) return resolve(undefined)
+                    return resolve(this.mapper.transform(result))
+                })
+                .catch(err => reject(this.mongoDBErrorListener(err)))
+        })
+    }
+
+    /**
      * Removes Weight according to its unique identifier and related child.
      *
      * @param weightId Weight unique identifier.
@@ -58,7 +124,7 @@ export class WeightRepository extends BaseRepository<Weight, WeightEntity> imple
      */
     public removeByChild(weightId: string, childId: string, measurementType: string): Promise<boolean> {
         return new Promise<boolean>((resolve, reject) => {
-            this.Model.findOneAndDelete({ child_id: childId, _id: weightId, type: measurementType })
+            this.measurementModel.findOneAndDelete({ child_id: childId, _id: weightId, type: measurementType })
                 .exec()
                 .then(result => {
                     if (!result) return resolve(false)
@@ -81,12 +147,24 @@ export class WeightRepository extends BaseRepository<Weight, WeightEntity> imple
         query.filters = { child_id: childId }
 
         return new Promise<boolean>((resolve, reject) => {
-            this.Model.deleteMany(query.filters)
+            this.measurementModel.deleteMany(query.filters)
                 .then(result => {
                     if (!result) return resolve(false)
                     return resolve(true)
                 })
-                .catch(err => reject(this.mongoDBErrorListener(err)))
+                .catch(err => reject(super.mongoDBErrorListener(err)))
+        })
+    }
+
+    public async disassociateBodyFat(bodyFatId: string): Promise<boolean> {
+        return new Promise<boolean>((resolve, reject) => {
+            this.measurementModel
+                .findOneAndUpdate(
+                    { body_fat: bodyFatId, type: MeasurementType.WEIGHT },
+                    { body_fat: undefined }, { new: true })
+                .exec()
+                .then(() => resolve(true))
+                .catch(err => reject(super.mongoDBErrorListener(err)))
         })
     }
 }

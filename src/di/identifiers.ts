@@ -10,7 +10,7 @@ export abstract class Identifier {
     public static readonly HOME_CONTROLLER: any = Symbol.for('HomeController')
     public static readonly ACTIVITY_CONTROLLER: any = Symbol.for('ActivityController')
     public static readonly SLEEP_CONTROLLER: any = Symbol.for('SleepController')
-    public static readonly FAT_CONTROLLER: any = Symbol.for('FatController')
+    public static readonly BODY_FAT_CONTROLLER: any = Symbol.for('BodyFatController')
     public static readonly WEIGHT_CONTROLLER: any = Symbol.for('WeightController')
     public static readonly ENVIRONMENT_CONTROLLER: any = Symbol.for('EnvironmentController')
 
@@ -18,7 +18,7 @@ export abstract class Identifier {
     public static readonly ACTIVITY_SERVICE: any = Symbol.for('PhysicalActivityService')
     public static readonly ACTIVITY_LOG_SERVICE: any = Symbol.for('LogService')
     public static readonly SLEEP_SERVICE: any = Symbol.for('SleepService')
-    public static readonly FAT_SERVICE: any = Symbol.for('FatService')
+    public static readonly BODY_FAT_SERVICE: any = Symbol.for('BodyFatService')
     public static readonly WEIGHT_SERVICE: any = Symbol.for('WeightService')
     public static readonly ENVIRONMENT_SERVICE: any = Symbol.for('EnvironmentService')
 
@@ -26,7 +26,7 @@ export abstract class Identifier {
     public static readonly ACTIVITY_REPOSITORY: any = Symbol.for('PhysicalActivityRepository')
     public static readonly LOG_REPOSITORY: any = Symbol.for('LogRepository')
     public static readonly SLEEP_REPOSITORY: any = Symbol.for('SleepRepository')
-    public static readonly FAT_REPOSITORY: any = Symbol.for('FatRepository')
+    public static readonly BODY_FAT_REPOSITORY: any = Symbol.for('BodyFatRepository')
     public static readonly WEIGHT_REPOSITORY: any = Symbol.for('WeightRepository')
     public static readonly ENVIRONMENT_REPOSITORY: any = Symbol.for('EnvironmentRepository')
     public static readonly INTEGRATION_EVENT_REPOSITORY: any = Symbol.for('IntegrationEventRepository')
@@ -45,7 +45,7 @@ export abstract class Identifier {
     public static readonly LOG_ENTITY_MAPPER: any = Symbol.for('LogEntityMapper')
     public static readonly ENVIRONMENT_ENTITY_MAPPER: any = Symbol.for('EnvironmentEntityMapper')
     public static readonly SLEEP_ENTITY_MAPPER: any = Symbol.for('SleepEntityMapper')
-    public static readonly FAT_ENTITY_MAPPER: any = Symbol.for('FatEntityMapper')
+    public static readonly BODY_FAT_ENTITY_MAPPER: any = Symbol.for('BodyFatEntityMapper')
     public static readonly WEIGHT_ENTITY_MAPPER: any = Symbol.for('WeightEntityMapper')
 
     // Background Services

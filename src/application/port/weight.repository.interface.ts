@@ -38,4 +38,13 @@ export interface IWeightRepository extends IRepository<Weight> {
      * @throws {ValidationException | RepositoryException}
      */
     removeAllWeightFromChild(childId: string): Promise<boolean>
+
+    /**
+     * Disassociates a Weight object from a BodyFat.
+     *
+     * @param bodyFatId BodyFat id associated with Weight object.
+     * @return {Promise<boolean>}
+     * @throws {ValidationException | RepositoryException}
+     */
+    disassociateBodyFat(bodyFatId: string): Promise<boolean>
 }

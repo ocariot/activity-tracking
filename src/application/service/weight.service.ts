@@ -19,8 +19,9 @@ import { Weight } from '../domain/model/weight'
 import { WeightEvent } from '../integration-event/event/weight.event'
 import { CreateWeightValidator } from '../domain/validator/create.weight.validator'
 import { MeasurementType } from '../domain/model/measurement'
-import { Fat } from '../domain/model/fat'
-import { IFatRepository } from '../port/fat.repository.interface'
+import { BodyFat } from '../domain/model/body.fat'
+import { IBodyFatRepository } from '../port/body.fat.repository.interface'
+import { BodyFatEvent } from '../integration-event/event/body.fat.event'
 
 /**
  * Implementing Weight Service.
@@ -31,7 +32,7 @@ import { IFatRepository } from '../port/fat.repository.interface'
 export class WeightService implements IWeightService {
 
     constructor(@inject(Identifier.WEIGHT_REPOSITORY) private readonly _weightRepository: IWeightRepository,
-                @inject(Identifier.FAT_REPOSITORY) private readonly _fatRepository: IFatRepository,
+                @inject(Identifier.BODY_FAT_REPOSITORY) private readonly _bodyFatRepository: IBodyFatRepository,
                 @inject(Identifier.INTEGRATION_EVENT_REPOSITORY) private readonly _integrationEventRepository: IIntegrationEventRepository,
                 @inject(Identifier.RABBITMQ_EVENT_BUS) private readonly _eventBus: IEventBus,
                 @inject(Identifier.LOGGER) private readonly _logger: ILogger) {
@@ -76,6 +77,31 @@ export class WeightService implements IWeightService {
             try {
                 // 1. Validate the object.
                 CreateWeightValidator.validate(elem)
+
+                // 1.5. Create new BodyFat register if does not already exist.
+                let bodyFatSaved: BodyFat = new BodyFat()
+
+                if (elem.body_fat) {
+                    const bodyFat: BodyFat = await this._bodyFatRepository.customFindOne(elem.body_fat.timestamp!,
+                        elem.body_fat.child_id!, elem.body_fat.type!)
+
+                    if (bodyFat) elem.body_fat = bodyFat
+                    else {
+                        bodyFatSaved = await this._bodyFatRepository.create(elem.body_fat)
+                        elem.body_fat = bodyFatSaved
+
+                        // 1.5b. If created successfully, the object is published on the message bus.
+                        if (bodyFatSaved) {
+                            const event: BodyFatEvent = new BodyFatEvent('BodyFatSaveEvent', new Date(), bodyFatSaved)
+                            if (!(await this._eventBus.publish(event, 'bodyfat.save'))) {
+                                // 1.5c. Save Event for submission attempt later when there is connection to message channel.
+                                this.saveEvent(event)
+                            } else {
+                                this._logger.info(`Body Fat with ID: ${bodyFatSaved.id} published on event bus...`)
+                            }
+                        }
+                    }
+                }
 
                 // 2. Checks if Weight already exists.
                 const weightExist = await this._weightRepository.checkExist(elem)
@@ -131,14 +157,30 @@ export class WeightService implements IWeightService {
             // 1. Validate the object.
             CreateWeightValidator.validate(weight)
 
-            // 1.5. Create new Fat register if does not already exist.
-            let fatSaved: Fat = new Fat()
+            // 1.5. Create new BodyFat register if does not already exist.
+            let bodyFatSaved: BodyFat = new BodyFat()
 
-            if (weight.fat) {
-                fatSaved = await this._fatRepository.create(weight.fat)
+            if (weight.body_fat) {
+                const bodyFat: BodyFat = await this._bodyFatRepository.customFindOne(weight.body_fat.timestamp!,
+                    weight.body_fat.child_id!, weight.body_fat.type!)
+
+                if (bodyFat) weight.body_fat = bodyFat
+                else {
+                    bodyFatSaved = await this._bodyFatRepository.create(weight.body_fat)
+                    weight.body_fat = bodyFatSaved
+
+                    // 1.5b. If created successfully, the object is published on the message bus.
+                    if (bodyFatSaved) {
+                        const event: BodyFatEvent = new BodyFatEvent('BodyFatSaveEvent', new Date(), bodyFatSaved)
+                        if (!(await this._eventBus.publish(event, 'bodyfat.save'))) {
+                            // 1.5c. Save Event for submission attempt later when there is connection to message channel.
+                            this.saveEvent(event)
+                        } else {
+                            this._logger.info(`Body Fat with ID: ${bodyFatSaved.id} published on event bus...`)
+                        }
+                    }
+                }
             }
-
-            weight.fat = fatSaved
 
             // 2. Checks if Weight already exists.
             const weightExist = await this._weightRepository.checkExist(weight)
@@ -215,7 +257,7 @@ export class WeightService implements IWeightService {
     public getAllByChild(childId: string, query: IQuery): Promise<Array<Weight>> {
         ObjectIdValidator.validate(childId, Strings.CHILD.PARAM_ID_NOT_VALID_FORMAT)
 
-        query.addFilter({ child_id: childId })
+        query.addFilter({ child_id: childId, type: MeasurementType.WEIGHT })
         return this._weightRepository.find(query)
     }
 
@@ -279,6 +321,7 @@ export class WeightService implements IWeightService {
         saveEvent.__operation = 'publish'
         if (event.event_name === 'WeightSaveEvent') saveEvent.__routing_key = 'weight.save'
         if (event.event_name === 'WeightDeleteEvent') saveEvent.__routing_key = 'weight.delete'
+        if (event.event_name === 'BodyFatSaveEvent') saveEvent.__routing_key = 'bodyfat.save'
         this._integrationEventRepository
             .create(JSON.parse(JSON.stringify(saveEvent)))
             .then(() => {

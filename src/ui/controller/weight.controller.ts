@@ -46,7 +46,7 @@ export class WeightController {
                 const weightArr: Array<Weight> = req.body.map(item => {
                     const weightItem: Weight = new Weight().fromJSON(item)
                     weightItem.child_id = req.params.child_id
-                    if (weightItem.fat) weightItem.fat.child_id = req.params.child_id
+                    if (weightItem.body_fat) weightItem.body_fat.child_id = req.params.child_id
                     return weightItem
                 })
 
@@ -57,7 +57,7 @@ export class WeightController {
             // Only one item
             const weightSave: Weight = new Weight().fromJSON(req.body)
             weightSave.child_id = req.params.child_id
-            if (weightSave.fat) weightSave.fat.child_id = req.params.child_id
+            if (weightSave.body_fat) weightSave.body_fat.child_id = req.params.child_id
 
             const result: Weight = await this._weightService.add(weightSave)
             return res.status(HttpStatus.CREATED).send(result)

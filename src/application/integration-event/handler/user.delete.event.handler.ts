@@ -6,7 +6,7 @@ import { UserEvent } from '../event/user.event'
 import { IPhysicalActivityRepository } from '../../port/physical.activity.repository.interface'
 import { ISleepRepository } from '../../port/sleep.repository.interface'
 import { ObjectIdValidator } from '../../domain/validator/object.id.validator'
-import { IFatRepository } from '../../port/fat.repository.interface'
+import { IBodyFatRepository } from '../../port/body.fat.repository.interface'
 import { IWeightRepository } from '../../port/weight.repository.interface'
 
 export class UserDeleteEventHandler implements IIntegrationEventHandler<UserEvent> {
@@ -15,14 +15,14 @@ export class UserDeleteEventHandler implements IIntegrationEventHandler<UserEven
      *
      * @param _activityRepository
      * @param _sleepRepository
-     * @param _fatRepository
+     * @param _bodyFatRepository
      * @param _weightRepository
      * @param _logger
      */
     constructor(
         @inject(Identifier.ACTIVITY_REPOSITORY) private readonly _activityRepository: IPhysicalActivityRepository,
         @inject(Identifier.SLEEP_REPOSITORY) private readonly _sleepRepository: ISleepRepository,
-        @inject(Identifier.FAT_REPOSITORY) private readonly _fatRepository: IFatRepository,
+        @inject(Identifier.BODY_FAT_REPOSITORY) private readonly _bodyFatRepository: IBodyFatRepository,
         @inject(Identifier.WEIGHT_REPOSITORY) private readonly _weightRepository: IWeightRepository,
         @inject(Identifier.LOGGER) private readonly _logger: ILogger
     ) {
@@ -42,8 +42,8 @@ export class UserDeleteEventHandler implements IIntegrationEventHandler<UserEven
             // 1b. Try to delete all the sleep objects associated with this user.
             await this._sleepRepository.removeAllSleepFromChild(childId)
 
-            // 1c. Try to delete all the fat objects associated with this user.
-            await this._fatRepository.removeAllFatFromChild(childId)
+            // 1c. Try to delete all the bodyfat objects associated with this user.
+            await this._bodyFatRepository.removeAllBodyFatFromChild(childId)
 
             // 1d. Try to delete all the weight objects associated with this user.
             await this._weightRepository.removeAllWeightFromChild(childId)

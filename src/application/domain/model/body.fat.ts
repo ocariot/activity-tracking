@@ -5,16 +5,16 @@ import { DatetimeValidator } from '../validator/datetime.validator'
 import { Measurement, MeasurementType } from './measurement'
 
 /**
- * Entity implementation for body fat measurements.
+ * Entity implementation for body_fat measurements.
  *
  * @extends {Entity}
- * @implements {IJSONSerializable, IJSONDeserializable<Fat>}
+ * @implements {IJSONSerializable, IJSONDeserializable<BodyFat>}
  */
-export class Fat extends Measurement implements IJSONSerializable, IJSONDeserializable<Fat> {
+export class BodyFat extends Measurement implements IJSONSerializable, IJSONDeserializable<BodyFat> {
 
     constructor() {
         super()
-        this.type = MeasurementType.FAT
+        this.type = MeasurementType.BODY_FAT
         this.unit = '%'
     }
 
@@ -23,7 +23,7 @@ export class Fat extends Measurement implements IJSONSerializable, IJSONDeserial
         return new Date(value)
     }
 
-    public fromJSON(json: any): Fat {
+    public fromJSON(json: any): BodyFat {
         if (!json) return this
         if (typeof json === 'string' && JsonUtils.isJsonString(json)) {
             json = JSON.parse(json)
