@@ -6,7 +6,7 @@ import { EnvironmentMock } from '../../mocks/environment.mock'
 import { TemperatureMock } from '../../mocks/temperature.mock'
 import { HumidityMock } from '../../mocks/humidity.mock'
 
-describe('Mappers: EnvironmentEntity', () => {
+describe('Mappers: EnvironmentEntityMapper', () => {
     const environment: EnvironmentMock = new EnvironmentMock()
 
     // Create environment JSON
@@ -35,7 +35,7 @@ describe('Mappers: EnvironmentEntity', () => {
         })
 
         context('when the parameter is a JSON', () => {
-            it('should not normally execute the method, returning an Environment as a result of the transformation', () => {
+            it('should normally execute the method, returning an Environment as a result of the transformation', () => {
                 const result = new EnvironmentEntityMapper().transform(environmentJSON)
                 assert.propertyVal(result, 'id', environmentJSON.id)
                 assert.propertyVal(result, 'institution_id', environmentJSON.institution_id)
@@ -47,7 +47,7 @@ describe('Mappers: EnvironmentEntity', () => {
         })
 
         context('when the parameter is a undefined', () => {
-            it('should not normally execute the method, returning an empty Environment as a result of the transformation', () => {
+            it('should normally execute the method, returning an empty Environment as a result of the transformation', () => {
                 const result = new EnvironmentEntityMapper().transform(undefined)
 
                 assert.isObject(result)

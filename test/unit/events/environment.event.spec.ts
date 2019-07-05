@@ -2,6 +2,7 @@ import { assert } from 'chai'
 import { Environment } from '../../../src/application/domain/model/environment'
 import { EnvironmentMock } from '../../mocks/environment.mock'
 import { EnvironmentEvent } from '../../../src/application/integration-event/event/environment.event'
+import { EventType } from '../../../src/application/integration-event/event/integration.event'
 
 describe('IntegrationEvents: EnvironmentEvent', () => {
     describe('toJSON()', () => {
@@ -12,6 +13,7 @@ describe('IntegrationEvents: EnvironmentEvent', () => {
                 const result = new EnvironmentEvent('EnvironmentSaveEvent', new Date(), environment).toJSON()
                 assert.propertyVal(result, 'event_name', 'EnvironmentSaveEvent')
                 assert.property(result, 'timestamp')
+                assert.propertyVal(result, 'type', EventType.ENVIRONMENTS)
                 assert.propertyVal(result.environment, 'id', environment.id)
                 assert.propertyVal(result.environment, 'institution_id', environment.institution_id)
                 assert.propertyVal(result.environment, 'timestamp', environment.timestamp)

@@ -2,6 +2,7 @@ import { assert } from 'chai'
 import { Institution } from '../../../src/application/domain/model/institution'
 import { InstitutionEvent } from '../../../src/application/integration-event/event/institution.event'
 import { InstitutionMock } from '../../mocks/institution.mock'
+import { EventType } from '../../../src/application/integration-event/event/integration.event'
 
 describe('IntegrationEvents: InstitutionEvent', () => {
     describe('toJSON()', () => {
@@ -11,6 +12,7 @@ describe('IntegrationEvents: InstitutionEvent', () => {
             const result = new InstitutionEvent('InstitutionDeleteEvent', new Date(), institution).toJSON()
             assert.propertyVal(result, 'event_name', 'InstitutionDeleteEvent')
             assert.property(result, 'timestamp')
+            assert.propertyVal(result, 'type', EventType.INSTITUTIONS)
             assert.propertyVal(result.institution, 'id', institution.id)
         })
 
