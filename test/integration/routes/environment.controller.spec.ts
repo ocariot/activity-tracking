@@ -8,10 +8,14 @@ import { EnvironmentMock } from '../../mocks/environment.mock'
 import { Environment } from '../../../src/application/domain/model/environment'
 import { Location } from '../../../src/application/domain/model/location'
 import { expect } from 'chai'
-import { Measurement, MeasurementType } from '../../../src/application/domain/model/measurement'
+import { MeasurementType } from '../../../src/application/domain/model/measurement'
 import { EnvironmentRepoModel } from '../../../src/infrastructure/database/schema/environment.schema'
 import { Strings } from '../../../src/utils/strings'
 import { EnvironmentEntityMapper } from '../../../src/infrastructure/entity/mapper/environment.entity.mapper'
+import { Temperature } from '../../../src/application/domain/model/temperature'
+import { TemperatureMock } from '../../mocks/temperature.mock'
+import { HumidityMock } from '../../mocks/humidity.mock'
+import { Humidity } from '../../../src/application/domain/model/humidity'
 
 const container: Container = DI.getInstance().getContainer()
 const backgroundServices: BackgroundService = container.get(Identifier.BACKGROUND_SERVICE)
@@ -33,19 +37,29 @@ describe('Routes: environments', () => {
 
     // Incorrect environments
     const incorrectEnv1: Environment = new Environment()        // Without required fields
+
     const incorrectEnv2: Environment = new EnvironmentMock()   // Institution id invalid
     incorrectEnv2.institution_id = '5c6dd16ea1a67d0034e6108bc'
+
     const incorrectEnv3: Environment = new EnvironmentMock()   // location invalid
     incorrectEnv3.location!.local = ''
     incorrectEnv3.location!.room = ''
-    const incorrectEnv4: Environment = new EnvironmentMock()   // Measurement invalid (empty array)
-    incorrectEnv4.measurements = new Array<Measurement>()
-    const incorrectEnv5: Environment = new EnvironmentMock()   // Measurement invalid (type)
-    incorrectEnv5.measurements = [new Measurement(MeasurementType.HUMIDITY, 34, '%'),
-        new Measurement('Temperatures', 40, '°C')]
-    const incorrectEnv6: Environment = new EnvironmentMock()   // Measurement invalid (missing fields)
-    incorrectEnv6.measurements = [new Measurement(MeasurementType.HUMIDITY, 34, '%'),
-        new Measurement()]
+
+    const incorrectEnv4: Environment = new EnvironmentMock()   // Temperature invalid (missing fields)
+    incorrectEnv4.temperature = new Temperature()
+
+    const incorrectEnv5: Environment = new EnvironmentMock()   // Temperature invalid (type)
+    const incorrectTemperature: Temperature = new TemperatureMock()
+    incorrectTemperature.type = 'temperatures'
+    incorrectEnv5.temperature = incorrectTemperature
+
+    const incorrectEnv6: Environment = new EnvironmentMock()   // Humidity invalid (missing fields)
+    incorrectEnv6.humidity = new Humidity()
+
+    const incorrectEnv7: Environment = new EnvironmentMock()   // Humidity invalid (type)
+    const incorrectHumidity: Humidity = new HumidityMock()
+    incorrectHumidity.type = 'humiditys'
+    incorrectEnv7.humidity = incorrectHumidity
 
     // Array with correct and incorrect environments
     const mixedEnvironmentsArr: Array<Environment> = new Array<EnvironmentMock>()
@@ -60,6 +74,7 @@ describe('Routes: environments', () => {
     incorrectEnvironmentsArr.push(incorrectEnv4)
     incorrectEnvironmentsArr.push(incorrectEnv5)
     incorrectEnvironmentsArr.push(incorrectEnv6)
+    incorrectEnvironmentsArr.push(incorrectEnv7)
 
     // Start services
     before(async () => {
@@ -78,7 +93,8 @@ describe('Routes: environments', () => {
                 const body = {
                     institution_id: defaultEnvironment.institution_id,
                     location: defaultEnvironment.location,
-                    measurements: defaultEnvironment.measurements,
+                    temperature: defaultEnvironment.temperature,
+                    humidity: defaultEnvironment.humidity,
                     climatized: defaultEnvironment.climatized,
                     timestamp: defaultEnvironment.timestamp
                 }
@@ -96,12 +112,10 @@ describe('Routes: environments', () => {
                         expect(res.body.location.room).to.eql(defaultEnvironment.location!.room)
                         expect(res.body.location.latitude).to.eql(defaultEnvironment.location!.latitude)
                         expect(res.body.location.longitude).to.eql(defaultEnvironment.location!.longitude)
-                        expect(res.body.measurements[0].type).to.eql(defaultEnvironment.measurements![0].type)
-                        expect(res.body.measurements[0].value).to.eql(defaultEnvironment.measurements![0].value)
-                        expect(res.body.measurements[0].unit).to.eql(defaultEnvironment.measurements![0].unit)
-                        expect(res.body.measurements[1].type).to.eql(defaultEnvironment.measurements![1].type)
-                        expect(res.body.measurements[1].value).to.eql(defaultEnvironment.measurements![1].value)
-                        expect(res.body.measurements[1].unit).to.eql(defaultEnvironment.measurements![1].unit)
+                        expect(res.body.temperature.value).to.eql(defaultEnvironment.temperature!.value)
+                        expect(res.body.temperature.unit).to.eql(defaultEnvironment.temperature!.unit)
+                        expect(res.body.humidity.value).to.eql(defaultEnvironment.humidity!.value)
+                        expect(res.body.humidity.unit).to.eql(defaultEnvironment.humidity!.unit)
                         expect(res.body.climatized).to.eql(defaultEnvironment.climatized)
                         expect(res.body.timestamp).to.eql(defaultEnvironment.timestamp.toISOString())
                     })
@@ -113,7 +127,8 @@ describe('Routes: environments', () => {
                 const body = {
                     institution_id: defaultEnvironment.institution_id,
                     location: defaultEnvironment.location,
-                    measurements: defaultEnvironment.measurements,
+                    temperature: defaultEnvironment.temperature,
+                    humidity: defaultEnvironment.humidity,
                     climatized: defaultEnvironment.climatized,
                     timestamp: defaultEnvironment.timestamp
                 }
@@ -143,8 +158,8 @@ describe('Routes: environments', () => {
                     .then(err => {
                         expect(err.body.code).to.eql(400)
                         expect(err.body.message).to.eql('Required fields were not provided...')
-                        expect(err.body.description).to.eql('Validation of environment measurements failed: timestamp, ' +
-                            'institution_id, location, measurements required!')
+                        expect(err.body.description).to.eql('Validation of environment failed: timestamp, institution_id, ' +
+                            'location, temperature required!')
                     })
             })
         })
@@ -154,7 +169,8 @@ describe('Routes: environments', () => {
                 const body = {
                     institution_id: '5a62be07de34500146d9c5442',
                     location: defaultEnvironment.location,
-                    measurements: defaultEnvironment.measurements,
+                    temperature: defaultEnvironment.temperature,
+                    humidity: defaultEnvironment.humidity,
                     climatized: defaultEnvironment.climatized,
                     timestamp: defaultEnvironment.timestamp
                 }
@@ -177,7 +193,8 @@ describe('Routes: environments', () => {
                 const body = {
                     institution_id: defaultEnvironment.institution_id,
                     location: new Location(),
-                    measurements: defaultEnvironment.measurements,
+                    temperature: defaultEnvironment.temperature,
+                    humidity: defaultEnvironment.humidity,
                     climatized: defaultEnvironment.climatized,
                     timestamp: defaultEnvironment.timestamp
                 }
@@ -195,12 +212,13 @@ describe('Routes: environments', () => {
             })
         })
 
-        context('when a validation error occurs (measurements array is empty)', () => {
+        context('when a validation error occurs (the temperature is invalid (missing fields))', () => {
             it('should return status code 400 and info message about the invalid measurements array', () => {
                 const body = {
                     institution_id: defaultEnvironment.institution_id,
                     location: defaultEnvironment.location,
-                    measurements: new Array<Measurement>(),
+                    temperature: new Temperature(),
+                    humidity: defaultEnvironment.humidity,
                     climatized: defaultEnvironment.climatized,
                     timestamp: defaultEnvironment.timestamp
                 }
@@ -212,19 +230,20 @@ describe('Routes: environments', () => {
                     .expect(400)
                     .then(err => {
                         expect(err.body.code).to.eql(400)
-                        expect(err.body.message).to.eql('Measurement are not in a format that is supported!')
-                        expect(err.body.description).to.eql('The measurements collection must not be empty!')
+                        expect(err.body.message).to.eql('Required fields were not provided...')
+                        expect(err.body.description).to.eql('Validation of environment failed: temperature.value, ' +
+                            'temperature.unit required!')
                     })
             })
         })
 
-        context('when a validation error occurs (measurements array has an item with invalid type)', () => {
+        context('when a validation error occurs (the temperature has an invalid type)', () => {
             it('should return status code 400 and info message about the invalid measurements array', () => {
                 const body = {
                     institution_id: defaultEnvironment.institution_id,
                     location: defaultEnvironment.location,
-                    measurements: [ new Measurement(MeasurementType.HUMIDITY, 34, '%'),
-                                    new Measurement('Temperatures', 40, '°C')],
+                    temperature: incorrectTemperature,
+                    humidity: defaultEnvironment.humidity,
                     climatized: defaultEnvironment.climatized,
                     timestamp: defaultEnvironment.timestamp
                 }
@@ -236,19 +255,19 @@ describe('Routes: environments', () => {
                     .expect(400)
                     .then(err => {
                         expect(err.body.code).to.eql(400)
-                        expect(err.body.message).to.eql('The type of measurement provided "temperatures" is not supported...')
-                        expect(err.body.description).to.eql('The types allowed are: temperature, humidity, body_fat, weight.')
+                        expect(err.body.message).to.eql('The type of temperature provided "temperatures" is not supported...')
+                        expect(err.body.description).to.eql('The type allowed is "temperature".')
                     })
             })
         })
 
-        context('when a validation error occurs (measurements array has an item that has missing required fields)', () => {
+        context('when a validation error occurs (the humidity is invalid (missing fields))', () => {
             it('should return status code 400 and info message about the invalid measurements array', () => {
                 const body = {
                     institution_id: defaultEnvironment.institution_id,
                     location: defaultEnvironment.location,
-                    measurements: [ new Measurement(MeasurementType.HUMIDITY, 34, '%'),
-                        new Measurement()],
+                    temperature: defaultEnvironment.temperature,
+                    humidity: new Humidity(),
                     climatized: defaultEnvironment.climatized,
                     timestamp: defaultEnvironment.timestamp
                 }
@@ -260,9 +279,33 @@ describe('Routes: environments', () => {
                     .expect(400)
                     .then(err => {
                         expect(err.body.code).to.eql(400)
-                        expect(err.body.message).to.eql('Measurement are not in a format that is supported!')
-                        expect(err.body.description).to.eql('Validation of measurements failed: measurement type, ' +
-                            'measurement value, measurement unit is required!')
+                        expect(err.body.message).to.eql('Required fields were not provided...')
+                        expect(err.body.description).to.eql('Validation of environment failed: humidity.value, ' +
+                            'humidity.unit required!')
+                    })
+            })
+        })
+
+        context('when a validation error occurs (the humidity has an invalid type)', () => {
+            it('should return status code 400 and info message about the invalid measurements array', () => {
+                const body = {
+                    institution_id: defaultEnvironment.institution_id,
+                    location: defaultEnvironment.location,
+                    temperature: defaultEnvironment.temperature,
+                    humidity: incorrectHumidity,
+                    climatized: defaultEnvironment.climatized,
+                    timestamp: defaultEnvironment.timestamp
+                }
+
+                return request
+                    .post('/v1/environments')
+                    .send(body)
+                    .set('Content-Type', 'application/json')
+                    .expect(400)
+                    .then(err => {
+                        expect(err.body.code).to.eql(400)
+                        expect(err.body.message).to.eql('The type of humidity provided "humiditys" is not supported...')
+                        expect(err.body.description).to.eql('The type allowed is: "humidity".')
                     })
             })
         })
@@ -289,7 +332,8 @@ describe('Routes: environments', () => {
                         id: environment.id,
                         institution_id: environment.institution_id,
                         location: environment.location,
-                        measurements: environment.measurements,
+                        temperature: environment.temperature,
+                        humidity: environment.humidity,
                         climatized: environment.climatized,
                         timestamp: environment.timestamp
                     }
@@ -310,7 +354,12 @@ describe('Routes: environments', () => {
                             if (res.body.success[i].item.climatized)
                                 expect(res.body.success[i].item.climatized).to.eql(correctEnvironmentsArr[i].climatized)
                             expect(res.body.success[i].item.timestamp).to.eql(correctEnvironmentsArr[i].timestamp.toISOString())
-                            expect(res.body.success[i].item.measurements).to.not.be.empty
+                            expect(res.body.success[i].item.temperature.type).to.eql(correctEnvironmentsArr[i].temperature!.type)
+                            expect(res.body.success[i].item.temperature.value).to.eql(correctEnvironmentsArr[i].temperature!.value)
+                            expect(res.body.success[i].item.temperature.unit).to.eql(correctEnvironmentsArr[i].temperature!.unit)
+                            expect(res.body.success[i].item.humidity.type).to.eql(correctEnvironmentsArr[i].humidity!.type)
+                            expect(res.body.success[i].item.humidity.value).to.eql(correctEnvironmentsArr[i].humidity!.value)
+                            expect(res.body.success[i].item.humidity.unit).to.eql(correctEnvironmentsArr[i].humidity!.unit)
                         }
 
                         expect(res.body.error.length).to.eql(0)
@@ -328,7 +377,8 @@ describe('Routes: environments', () => {
                         id: environment.id,
                         institution_id: environment.institution_id,
                         location: environment.location,
-                        measurements: environment.measurements,
+                        temperature: environment.temperature,
+                        humidity: environment.humidity,
                         climatized: environment.climatized,
                         timestamp: environment.timestamp
                     }
@@ -350,7 +400,12 @@ describe('Routes: environments', () => {
                             if (res.body.error[i].item.climatized)
                                 expect(res.body.error[i].item.climatized).to.eql(correctEnvironmentsArr[i].climatized)
                             expect(res.body.error[i].item.timestamp).to.eql(correctEnvironmentsArr[i].timestamp.toISOString())
-                            expect(res.body.error[i].item.measurements).to.not.be.empty
+                            expect(res.body.error[i].item.temperature.type).to.eql(correctEnvironmentsArr[i].temperature!.type)
+                            expect(res.body.error[i].item.temperature.value).to.eql(correctEnvironmentsArr[i].temperature!.value)
+                            expect(res.body.error[i].item.temperature.unit).to.eql(correctEnvironmentsArr[i].temperature!.unit)
+                            expect(res.body.error[i].item.humidity.type).to.eql(correctEnvironmentsArr[i].humidity!.type)
+                            expect(res.body.error[i].item.humidity.value).to.eql(correctEnvironmentsArr[i].humidity!.value)
+                            expect(res.body.error[i].item.humidity.unit).to.eql(correctEnvironmentsArr[i].humidity!.unit)
                         }
 
                         expect(res.body.success.length).to.eql(0)
@@ -376,7 +431,8 @@ describe('Routes: environments', () => {
                         id: environment.id,
                         institution_id: environment.institution_id,
                         location: environment.location,
-                        measurements: environment.measurements,
+                        temperature: environment.temperature,
+                        humidity: environment.humidity,
                         climatized: environment.climatized,
                         timestamp: environment.timestamp
                     }
@@ -397,13 +453,18 @@ describe('Routes: environments', () => {
                         if (res.body.success[0].item.climatized)
                             expect(res.body.success[0].item.climatized).to.eql(mixedEnvironmentsArr[0].climatized)
                         expect(res.body.success[0].item.timestamp).to.eql(mixedEnvironmentsArr[0].timestamp.toISOString())
-                        expect(res.body.success[0].item.measurements).to.not.be.empty
+                        expect(res.body.success[0].item.temperature.type).to.eql(mixedEnvironmentsArr[0].temperature!.type)
+                        expect(res.body.success[0].item.temperature.value).to.eql(mixedEnvironmentsArr[0].temperature!.value)
+                        expect(res.body.success[0].item.temperature.unit).to.eql(mixedEnvironmentsArr[0].temperature!.unit)
+                        expect(res.body.success[0].item.humidity.type).to.eql(mixedEnvironmentsArr[0].humidity!.type)
+                        expect(res.body.success[0].item.humidity.value).to.eql(mixedEnvironmentsArr[0].humidity!.value)
+                        expect(res.body.success[0].item.humidity.unit).to.eql(mixedEnvironmentsArr[0].humidity!.unit)
 
                         // Error item
                         expect(res.body.error[0].code).to.eql(HttpStatus.BAD_REQUEST)
                         expect(res.body.error[0].message).to.eql('Required fields were not provided...')
-                        expect(res.body.error[0].description).to.eql('Validation of environment measurements failed: timestamp, ' +
-                            'institution_id, location, measurements required!')
+                        expect(res.body.error[0].description).to.eql('Validation of environment failed: timestamp, ' +
+                            'institution_id, location, temperature required!')
                     })
             })
         })
@@ -426,7 +487,8 @@ describe('Routes: environments', () => {
                         id: environment.id,
                         institution_id: environment.institution_id,
                         location: environment.location,
-                        measurements: environment.measurements,
+                        temperature: environment.temperature,
+                        humidity: environment.humidity,
                         climatized: environment.climatized,
                         timestamp: environment.timestamp
                     }
@@ -440,20 +502,21 @@ describe('Routes: environments', () => {
                     .expect(201)
                     .then(res => {
                         expect(res.body.error[0].message).to.eql('Required fields were not provided...')
-                        expect(res.body.error[0].description).to.eql('Validation of environment measurements failed: timestamp, ' +
-                            'institution_id, location, measurements required!')
+                        expect(res.body.error[0].description).to.eql('Validation of environment failed: timestamp, ' +
+                            'institution_id, location, temperature required!')
                         expect(res.body.error[1].message).to.eql(Strings.ERROR_MESSAGE.UUID_NOT_VALID_FORMAT)
                         expect(res.body.error[1].description).to.eql(Strings.ERROR_MESSAGE.UUID_NOT_VALID_FORMAT_DESC)
                         expect(res.body.error[2].message).to.eql('Location are not in a format that is supported...')
                         expect(res.body.error[2].description).to.eql('Validation of location failed: location local, location ' +
                             'room is required!')
-                        expect(res.body.error[3].message).to.eql('Measurement are not in a format that is supported!')
-                        expect(res.body.error[3].description).to.eql('The measurements collection must not be empty!')
-                        expect(res.body.error[4].message).to.eql('Required fields were not provided!')
-                        expect(res.body.error[4].description).to.eql('The types allowed are: temperature, humidity, body_fat, weight.')
-                        expect(res.body.error[5].message).to.eql('Measurement are not in a format that is supported!')
-                        expect(res.body.error[5].description).to.eql('Validation of measurements failed: measurement type, measurement ' +
-                            'value, measurement unit is required!')
+                        expect(res.body.error[3].message).to.eql('Required fields were not provided...')
+                        expect(res.body.error[3].description).to.eql('Validation of environment failed: temperature.value, ' +
+                            'temperature.unit required!')
+                        expect(res.body.error[4].message).to.eql('The type of temperature provided "temperatures" is not supported...')
+                        expect(res.body.error[4].description).to.eql('The type allowed is "temperature".')
+                        expect(res.body.error[5].message).to.eql('Required fields were not provided...')
+                        expect(res.body.error[5].description).to.eql('Validation of environment failed: humidity.value, ' +
+                            'humidity.unit required!')
 
                         for (let i = 0; i < res.body.error.length; i++) {
                             expect(res.body.error[i].code).to.eql(HttpStatus.BAD_REQUEST)
@@ -464,7 +527,14 @@ describe('Routes: environments', () => {
                                 expect(res.body.error[i].item.climatized).to.eql(incorrectEnvironmentsArr[i].climatized)
                             if (i !== 0) expect(res.body.error[i].item.timestamp)
                                 .to.eql(incorrectEnvironmentsArr[i].timestamp.toISOString())
-                            if (i !== 0 && i !== 3) expect(res.body.error[i].item.measurements).to.not.be.empty
+                            if (i !== 0 && i !== 3) {
+                                expect(res.body.error[i].item.temperature.type).to.eql(incorrectEnvironmentsArr[i].temperature!.type)
+                                expect(res.body.error[i].item.temperature.value).to.eql(incorrectEnvironmentsArr[i].temperature!.value)
+                                expect(res.body.error[i].item.temperature.unit).to.eql(incorrectEnvironmentsArr[i].temperature!.unit)
+                                expect(res.body.error[i].item.humidity.type).to.eql(incorrectEnvironmentsArr[i].humidity!.type)
+                                expect(res.body.error[i].item.humidity.value).to.eql(incorrectEnvironmentsArr[i].humidity!.value)
+                                expect(res.body.error[i].item.humidity.unit).to.eql(incorrectEnvironmentsArr[i].humidity!.unit)
+                            }
                         }
 
                         expect(res.body.success.length).to.eql(0)
@@ -487,18 +557,14 @@ describe('Routes: environments', () => {
                             latitude: defaultEnvironment.location!.latitude,
                             longitude: defaultEnvironment.location!.longitude
                         },
-                        measurements: [
-                            {
-                                type: MeasurementType.TEMPERATURE,
-                                value: defaultEnvironment.measurements![0].value,
-                                unit: '°C'
-                            },
-                            {
-                                type: MeasurementType.HUMIDITY,
-                                value: defaultEnvironment.measurements![1].value,
-                                unit: '%'
-                            }
-                        ],
+                        temperature: {
+                            value: defaultEnvironment.temperature!.value,
+                            unit: '°C'
+                        },
+                        humidity: {
+                            value: defaultEnvironment.humidity!.value,
+                            unit: '%'
+                        },
                         climatized: defaultEnvironment.climatized,
                         timestamp: new Date(2019)
                     })
@@ -523,12 +589,10 @@ describe('Routes: environments', () => {
                         expect(res.body[0].location.room).to.eql(defaultEnvironment.location!.room)
                         expect(res.body[0].location.latitude).to.eql(defaultEnvironment.location!.latitude)
                         expect(res.body[0].location.longitude).to.eql(defaultEnvironment.location!.longitude)
-                        expect(res.body[0].measurements[0].type).to.eql(defaultEnvironment.measurements![0].type)
-                        expect(res.body[0].measurements[0].value).to.eql(defaultEnvironment.measurements![0].value)
-                        expect(res.body[0].measurements[0].unit).to.eql(defaultEnvironment.measurements![0].unit)
-                        expect(res.body[0].measurements[1].type).to.eql(defaultEnvironment.measurements![1].type)
-                        expect(res.body[0].measurements[1].value).to.eql(defaultEnvironment.measurements![1].value)
-                        expect(res.body[0].measurements[1].unit).to.eql(defaultEnvironment.measurements![1].unit)
+                        expect(res.body[0].temperature.value).to.eql(defaultEnvironment.temperature!.value)
+                        expect(res.body[0].temperature.unit).to.eql(defaultEnvironment.temperature!.unit)
+                        expect(res.body[0].humidity.value).to.eql(defaultEnvironment.humidity!.value)
+                        expect(res.body[0].humidity.unit).to.eql(defaultEnvironment.humidity!.unit)
                         expect(res.body[0].climatized).to.eql(defaultEnvironment.climatized)
                         expect(res.body[0].timestamp).to.eql((new Date(2019)).toISOString())
                     })
@@ -569,18 +633,14 @@ describe('Routes: environments', () => {
                             latitude: defaultEnvironment.location!.latitude,
                             longitude: defaultEnvironment.location!.longitude
                         },
-                        measurements: [
-                            {
-                                type: MeasurementType.TEMPERATURE,
-                                value: 34,
-                                unit: '°C'
-                            },
-                            {
-                                type: MeasurementType.HUMIDITY,
-                                value: 40,
-                                unit: '%'
-                            }
-                        ],
+                        temperature: {
+                            value: defaultEnvironment.temperature!.value,
+                            unit: '°C'
+                        },
+                        humidity: {
+                            value: defaultEnvironment.humidity!.value,
+                            unit: '%'
+                        },
                         climatized: true,
                         timestamp: defaultEnvironment.timestamp
                     })
@@ -593,18 +653,14 @@ describe('Routes: environments', () => {
                             latitude: '34.54323217',
                             longitude: '7.54534798'
                         },
-                        measurements: [
-                            {
-                                type: MeasurementType.HUMIDITY,
-                                value: 32,
-                                unit: '%'
-                            },
-                            {
-                                type: MeasurementType.TEMPERATURE,
-                                value: 38,
-                                unit: '°C'
-                            }
-                        ],
+                        temperature: {
+                            value: defaultEnvironment.temperature!.value,
+                            unit: '°C'
+                        },
+                        humidity: {
+                            value: defaultEnvironment.humidity!.value,
+                            unit: '%'
+                        },
                         climatized: false,
                         timestamp: defaultEnvironment.timestamp
                     })
@@ -612,7 +668,7 @@ describe('Routes: environments', () => {
                     throw new Error('Failure on environments routes test: ' + err.message)
                 }
 
-                const url = '/v1/environments?climatized=true&fields=institution_id,location,measurements,' +
+                const url = '/v1/environments?climatized=true&fields=institution_id,location,temperature,humidity,' +
                     'climatized,timestamp&sort=institution_id&page=1&limit=3'
 
                 return request
@@ -632,12 +688,10 @@ describe('Routes: environments', () => {
                         expect(res.body[0].location.room).to.eql(defaultEnvironment.location!.room)
                         expect(res.body[0].location.latitude).to.eql(defaultEnvironment.location!.latitude)
                         expect(res.body[0].location.longitude).to.eql(defaultEnvironment.location!.longitude)
-                        expect(res.body[0].measurements[0].type).to.eql(defaultEnvironment.measurements![0].type)
-                        expect(res.body[0].measurements[0]).to.have.property('value')
-                        expect(res.body[0].measurements[0].unit).to.eql(defaultEnvironment.measurements![0].unit)
-                        expect(res.body[0].measurements[1].type).to.eql(defaultEnvironment.measurements![1].type)
-                        expect(res.body[0].measurements[1]).to.have.property('value')
-                        expect(res.body[0].measurements[1].unit).to.eql(defaultEnvironment.measurements![1].unit)
+                        expect(res.body[0].temperature.value).to.eql(defaultEnvironment.temperature!.value)
+                        expect(res.body[0].temperature.unit).to.eql(defaultEnvironment.temperature!.unit)
+                        expect(res.body[0].humidity.value).to.eql(defaultEnvironment.humidity!.value)
+                        expect(res.body[0].humidity.unit).to.eql(defaultEnvironment.humidity!.unit)
                         expect(res.body[0]).to.have.property('climatized')
                         expect(res.body[0]).to.have.property('timestamp')
                     })

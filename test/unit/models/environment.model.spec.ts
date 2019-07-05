@@ -2,16 +2,17 @@ import { ObjectID } from 'bson'
 import { assert } from 'chai'
 import { ValidationException } from '../../../src/application/domain/exception/validation.exception'
 import { Environment } from '../../../src/application/domain/model/environment'
-import { Measurement, MeasurementType } from '../../../src/application/domain/model/measurement'
 import { Location } from '../../../src/application/domain/model/location'
+import { TemperatureMock } from '../../mocks/temperature.mock'
+import { HumidityMock } from '../../mocks/humidity.mock'
 
 describe('Models: Environment', () => {
     const environmentJSON: any = {
         id: new ObjectID(),
         institution_id: new ObjectID(),
         location: new Location('indoor', 'room 201'),
-        measurements: [ new Measurement(MeasurementType.HUMIDITY, 34, '%'),
-                        new Measurement(MeasurementType.TEMPERATURE, 40, '°C')],
+        temperature: new TemperatureMock(),
+        humidity: new HumidityMock(),
         climatized: true,
         timestamp: new Date().toISOString()
     }
@@ -43,7 +44,8 @@ describe('Models: Environment', () => {
                 assert.propertyVal(result, 'institution_id', environmentJSON.institution_id)
                 assert.propertyVal(result.location, 'local', environmentJSON.location.local)
                 assert.propertyVal(result.location, 'room', environmentJSON.location.room)
-                assert.deepPropertyVal(result, 'measurements', environmentJSON.measurements)
+                assert.propertyVal(result, 'temperature', environmentJSON.temperature)
+                assert.propertyVal(result, 'humidity', environmentJSON.humidity)
                 assert.typeOf(result.climatized, 'boolean')
                 assert.propertyVal(result, 'climatized', environmentJSON.climatized)
                 assert.equal(result.timestamp.toISOString(), environmentJSON.timestamp)
@@ -56,7 +58,8 @@ describe('Models: Environment', () => {
                 assert.isUndefined(result.id)
                 assert.isUndefined(result.institution_id)
                 assert.isUndefined(result.location)
-                assert.isUndefined(result.measurements)
+                assert.isUndefined(result.temperature)
+                assert.isUndefined(result.humidity)
                 assert.isUndefined(result.climatized)
                 assert.isUndefined(result.timestamp)
             })
@@ -69,7 +72,12 @@ describe('Models: Environment', () => {
                 assert.propertyVal(result, 'institution_id', environmentJSON.institution_id.toHexString())
                 assert.propertyVal(result.location, 'local', environmentJSON.location.local)
                 assert.propertyVal(result.location, 'room', environmentJSON.location.room)
-                assert.deepPropertyVal(result, 'measurements', environmentJSON.measurements)
+                assert.propertyVal(result.temperature, 'type', environmentJSON.temperature.type)
+                assert.propertyVal(result.temperature, 'value', environmentJSON.temperature.value)
+                assert.propertyVal(result.temperature, 'unit', environmentJSON.temperature.unit)
+                assert.propertyVal(result.humidity, 'type', environmentJSON.humidity.type)
+                assert.propertyVal(result.humidity, 'value', environmentJSON.humidity.value)
+                assert.propertyVal(result.humidity, 'unit', environmentJSON.humidity.unit)
                 assert.typeOf(result.climatized, 'boolean')
                 assert.propertyVal(result, 'climatized', environmentJSON.climatized)
                 assert.equal(result.timestamp.toISOString(), environmentJSON.timestamp)
@@ -86,13 +94,8 @@ describe('Models: Environment', () => {
                 assert.propertyVal(result, 'institution_id', environmentJSON.institution_id)
                 assert.propertyVal(result.location, 'local', environmentJSON.location.local)
                 assert.propertyVal(result.location, 'room', environmentJSON.location.room)
-                // Measurements
-                assert.propertyVal(result.measurements![0], 'type', environmentJSON.measurements[0].type)
-                assert.propertyVal(result.measurements![0], 'value', environmentJSON.measurements[0].value)
-                assert.propertyVal(result.measurements![0], 'unit', environmentJSON.measurements[0].unit)
-                assert.propertyVal(result.measurements![1], 'type', environmentJSON.measurements[1].type)
-                assert.propertyVal(result.measurements![1], 'value', environmentJSON.measurements[1].value)
-                assert.propertyVal(result.measurements![1], 'unit', environmentJSON.measurements[1].unit)
+                assert.propertyVal(result, 'temperature', environmentJSON.temperature)
+                assert.propertyVal(result, 'humidity', environmentJSON.humidity)
                 assert.typeOf(result.climatized, 'boolean')
                 assert.propertyVal(result, 'climatized', environmentJSON.climatized)
                 assert.equal(result.timestamp.toISOString(), environmentJSON.timestamp)

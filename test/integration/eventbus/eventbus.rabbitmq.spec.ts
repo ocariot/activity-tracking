@@ -21,6 +21,8 @@ import { UserEvent } from '../../../src/application/integration-event/event/user
 import { UserDeleteEventHandler } from '../../../src/application/integration-event/handler/user.delete.event.handler'
 import { InstitutionEvent } from '../../../src/application/integration-event/event/institution.event'
 import { InstitutionDeleteEventHandler } from '../../../src/application/integration-event/handler/institution.delete.event.handler'
+import { IWeightRepository } from '../../../src/application/port/weight.repository.interface'
+import { IBodyFatRepository } from '../../../src/application/port/body.fat.repository.interface'
 
 const container: Container = DI.getInstance().getContainer()
 const eventBus: EventBusRabbitMQ = container.get(Identifier.RABBITMQ_EVENT_BUS)
@@ -155,7 +157,9 @@ describe('EVENT BUS', () => {
                 const userDeleteEvent = new UserEvent('UserDeleteEvent', new Date())
                 const userDeleteEventHandler = new UserDeleteEventHandler(
                     container.get<IPhysicalActivityRepository>(Identifier.ACTIVITY_REPOSITORY),
-                    container.get<ISleepRepository>(Identifier.SLEEP_REPOSITORY), logger)
+                    container.get<ISleepRepository>(Identifier.SLEEP_REPOSITORY),
+                    container.get<IBodyFatRepository>(Identifier.BODY_FAT_REPOSITORY),
+                    container.get<IWeightRepository>(Identifier.WEIGHT_REPOSITORY), logger)
                 return eventBus
                     .subscribe(userDeleteEvent, userDeleteEventHandler, 'users.delete')
                     .then(result => {

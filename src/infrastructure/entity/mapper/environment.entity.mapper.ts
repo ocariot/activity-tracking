@@ -2,7 +2,6 @@ import { injectable } from 'inversify'
 import { Environment } from '../../../application/domain/model/environment'
 import { EnvironmentEntity } from '../environment.entity'
 import { Location } from '../../../application/domain/model/location'
-import { Measurement } from '../../../application/domain/model/measurement'
 import { IEntityMapper } from '../../port/entity.mapper.interface'
 
 @injectable()
@@ -29,9 +28,8 @@ export class EnvironmentEntityMapper implements IEntityMapper<Environment, Envir
         if (item.location) result.location = item.location.toJSON()
         if (item.climatized !== undefined) result.climatized = item.climatized
         if (item.timestamp) result.timestamp = item.timestamp
-        if (item.measurements && item.measurements.length > 0) {
-            result.measurements = item.measurements.map((measurement: Measurement) => measurement.toJSON())
-        }
+        if (item.temperature) result.temperature = item.temperature
+        if (item.humidity) result.humidity = item.humidity
 
         return result
     }
@@ -63,9 +61,8 @@ export class EnvironmentEntityMapper implements IEntityMapper<Environment, Envir
         if (json.location !== undefined) result.location = new Location().fromJSON(json.location)
         if (json.climatized !== undefined) result.climatized = json.climatized
         if (json.timestamp !== undefined) result.timestamp = json.timestamp
-        if (json.measurements !== undefined) {
-            result.measurements = json.measurements.map(item => new Measurement().fromJSON(item))
-        }
+        if (json.temperature !== undefined) result.temperature = json.temperature
+        if (json.humidity !== undefined) result.humidity = json.humidity
 
         return result
     }
