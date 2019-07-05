@@ -199,20 +199,6 @@ export class EventBusTask {
                 new Sleep().fromJSON(event.sleep)
             )
             return eventBus.publish(sleepDeleteEvent, event.__routing_key)
-        } else if (event.event_name === 'BodyFatSaveEvent') {
-            const bodyFatSaveEvent: BodyFatEvent = new BodyFatEvent(
-                event.event_name,
-                event.timestamp,
-                new BodyFat().fromJSON(event.body_fat)
-            )
-            return eventBus.publish(bodyFatSaveEvent, event.__routing_key)
-        } else if (event.event_name === 'BodyFatDeleteEvent') {
-            const bodyFatDeleteEvent: BodyFatEvent = new BodyFatEvent(
-                event.event_name,
-                event.timestamp,
-                new BodyFat().fromJSON(event.body_fat)
-            )
-            return eventBus.publish(bodyFatDeleteEvent, event.__routing_key)
         } else if (event.event_name === 'WeightSaveEvent') {
             const weightSaveEvent: WeightEvent = new WeightEvent(
                 event.event_name,
@@ -227,6 +213,20 @@ export class EventBusTask {
                 new Weight().fromJSON(event.weight)
             )
             return eventBus.publish(weightDeleteEvent, event.__routing_key)
+        } else if (event.event_name === 'BodyFatSaveEvent') {
+            const bodyFatSaveEvent: BodyFatEvent = new BodyFatEvent(
+                event.event_name,
+                event.timestamp,
+                new BodyFat().fromJSON(event.body_fat)
+            )
+            return eventBus.publish(bodyFatSaveEvent, event.__routing_key)
+        } else if (event.event_name === 'BodyFatDeleteEvent') {
+            const bodyFatDeleteEvent: BodyFatEvent = new BodyFatEvent(
+                event.event_name,
+                event.timestamp,
+                new BodyFat().fromJSON(event.body_fat)
+            )
+            return eventBus.publish(bodyFatDeleteEvent, event.__routing_key)
         } else if (event.event_name === 'EnvironmentSaveEvent') {
             const environmentSaveEvent: EnvironmentEvent = new EnvironmentEvent(
                 event.event_name,

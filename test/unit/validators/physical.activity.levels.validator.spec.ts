@@ -88,7 +88,7 @@ describe('Validators: PhysicalActivityLevels', () => {
             })
         })
 
-        context('when the physical activity levels array has an invalid measurement (missing all fields)', () => {
+        context('when the physical activity levels array has an invalid level (missing all fields)', () => {
             it('should throw a ValidationException', () => {
                 const levelsJSON = {
                     name: '',

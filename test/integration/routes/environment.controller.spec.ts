@@ -8,7 +8,6 @@ import { EnvironmentMock } from '../../mocks/environment.mock'
 import { Environment } from '../../../src/application/domain/model/environment'
 import { Location } from '../../../src/application/domain/model/location'
 import { expect } from 'chai'
-import { MeasurementType } from '../../../src/application/domain/model/measurement'
 import { EnvironmentRepoModel } from '../../../src/infrastructure/database/schema/environment.schema'
 import { Strings } from '../../../src/utils/strings'
 import { EnvironmentEntityMapper } from '../../../src/infrastructure/entity/mapper/environment.entity.mapper'
@@ -213,7 +212,7 @@ describe('Routes: environments', () => {
         })
 
         context('when a validation error occurs (the temperature is invalid (missing fields))', () => {
-            it('should return status code 400 and info message about the invalid measurements array', () => {
+            it('should return status code 400 and info message about the invalid temperature', () => {
                 const body = {
                     institution_id: defaultEnvironment.institution_id,
                     location: defaultEnvironment.location,
@@ -238,7 +237,7 @@ describe('Routes: environments', () => {
         })
 
         context('when a validation error occurs (the temperature has an invalid type)', () => {
-            it('should return status code 400 and info message about the invalid measurements array', () => {
+            it('should return status code 400 and info message about the invalid temperature', () => {
                 const body = {
                     institution_id: defaultEnvironment.institution_id,
                     location: defaultEnvironment.location,
@@ -262,7 +261,7 @@ describe('Routes: environments', () => {
         })
 
         context('when a validation error occurs (the humidity is invalid (missing fields))', () => {
-            it('should return status code 400 and info message about the invalid measurements array', () => {
+            it('should return status code 400 and info message about the invalid humidity', () => {
                 const body = {
                     institution_id: defaultEnvironment.institution_id,
                     location: defaultEnvironment.location,
@@ -287,7 +286,7 @@ describe('Routes: environments', () => {
         })
 
         context('when a validation error occurs (the humidity has an invalid type)', () => {
-            it('should return status code 400 and info message about the invalid measurements array', () => {
+            it('should return status code 400 and info message about the invalid humidity', () => {
                 const body = {
                     institution_id: defaultEnvironment.institution_id,
                     location: defaultEnvironment.location,
@@ -709,7 +708,7 @@ describe('Routes: environments', () => {
             })
 
             it('should return status code 200 and an empty list', async () => {
-                const url = '/v1/environments?climatized=true&fields=institution_id,location,measurements,' +
+                const url = '/v1/environments?climatized=true&fields=institution_id,location,temperature,humidity,' +
                     'climatized,timestamp&sort=institution_id&page=1&limit=3'
 
                 return request
@@ -740,18 +739,14 @@ describe('Routes: environments', () => {
                             latitude: (defaultEnvironment.location) ? defaultEnvironment.location.latitude : '',
                             longitude: (defaultEnvironment.location) ? defaultEnvironment.location.longitude : ''
                         },
-                        measurements: [
-                            {
-                                type: MeasurementType.HUMIDITY,
-                                value: 34,
-                                unit: '%'
-                            },
-                            {
-                                type: MeasurementType.TEMPERATURE,
-                                value: 40,
-                                unit: '°C'
-                            }
-                        ],
+                        temperature: {
+                            value: defaultEnvironment.temperature!.value,
+                            unit: '°C'
+                        },
+                        humidity: {
+                            value: defaultEnvironment.humidity!.value,
+                            unit: '%'
+                        },
                         climatized: true,
                         timestamp: defaultEnvironment.timestamp
                     })

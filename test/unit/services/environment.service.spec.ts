@@ -229,8 +229,8 @@ describe('Services: Environment', () => {
                     .withArgs(incorrectEnvironment)
                     .chain('exec')
                     .rejects({ message: 'Required fields were not provided...',
-                               description: 'Validation of environment measurements failed: timestamp, institution_id, ' +
-                                   'location, measurements required!' })
+                               description: 'Validation of environment failed: timestamp, institution_id, location, ' +
+                                   'temperature required!' })
 
                 return environmentService.add(incorrectEnvironment)
                     .catch(err => {

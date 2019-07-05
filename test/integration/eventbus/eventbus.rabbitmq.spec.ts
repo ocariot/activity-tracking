@@ -12,9 +12,7 @@ import { EnvironmentMock } from '../../mocks/environment.mock'
 import { PhysicalActivitySaveEventHandler } from '../../../src/application/integration-event/handler/physical.activity.save.event.handler'
 import { IPhysicalActivityRepository } from '../../../src/application/port/physical.activity.repository.interface'
 import { ILogger } from '../../../src/utils/custom.logger'
-import { SleepSaveEventHandler } from '../../../src/application/integration-event/handler/sleep.save.event.handler'
 import { ISleepRepository } from '../../../src/application/port/sleep.repository.interface'
-import { EnvironmentSaveEventHandler } from '../../../src/application/integration-event/handler/environment.save.event.handler'
 import { IEnvironmentRepository } from '../../../src/application/port/environment.repository.interface'
 import { EventBusRabbitMQ } from '../../../src/infrastructure/eventbus/rabbitmq/eventbus.rabbitmq'
 import { UserEvent } from '../../../src/application/integration-event/event/user.event'
@@ -23,6 +21,10 @@ import { InstitutionEvent } from '../../../src/application/integration-event/eve
 import { InstitutionDeleteEventHandler } from '../../../src/application/integration-event/handler/institution.delete.event.handler'
 import { IWeightRepository } from '../../../src/application/port/weight.repository.interface'
 import { IBodyFatRepository } from '../../../src/application/port/body.fat.repository.interface'
+import { WeightEvent } from '../../../src/application/integration-event/event/weight.event'
+import { WeightMock } from '../../mocks/weight.mock'
+import { BodyFatEvent } from '../../../src/application/integration-event/event/body.fat.event'
+import { BodyFatMock } from '../../mocks/body.fat.mock'
 
 const container: Container = DI.getInstance().getContainer()
 const eventBus: EventBusRabbitMQ = container.get(Identifier.RABBITMQ_EVENT_BUS)
@@ -30,6 +32,8 @@ const logger: ILogger = container.get(Identifier.LOGGER)
 const pubPhysicalActivityTotal: number = 10
 const pubSleepTotal: number = 10
 const pubEnvironmentTotal: number = 10
+const pubWeightTotal: number = 10
+const pubBodyFatTotal: number = 10
 
 describe('EVENT BUS', () => {
     before(() => {
@@ -99,57 +103,6 @@ describe('EVENT BUS', () => {
     // Uncomment the line 109 (this._logger.info (`Bus event message received!`)) from the
     // src/infrastructure/eventbus/rabbitmq/eventbus.rabbitmq.ts file to see receiving messages
     describe('SUBSCRIBE', () => {
-        it('should return true to subscribe in PhysicalActivitySaveEvent', async () => {
-            try {
-                await eventBus.connectionSub.tryConnect(1, 500)
-
-                const activitySaveEvent = new PhysicalActivityEvent('PhysicalActivitySaveEvent', new Date())
-                const activitySaveEventHandler = new PhysicalActivitySaveEventHandler(
-                    container.get<IPhysicalActivityRepository>(Identifier.ACTIVITY_REPOSITORY), logger)
-                return eventBus
-                    .subscribe(activitySaveEvent, activitySaveEventHandler, 'activities.save')
-                    .then(result => {
-                        expect(result).to.equal(true)
-                    })
-            } catch (err) {
-                throw new Error('Failure on EventBus test: ' + err.message)
-            }
-        })
-
-        it('should return true to subscribe in SleepSaveEvent', async () => {
-            try {
-                await eventBus.connectionSub.tryConnect(1, 500)
-
-                const sleepSaveEvent = new SleepEvent('SleepSaveEvent', new Date())
-                const sleepSaveEventHandler = new SleepSaveEventHandler(
-                    container.get<ISleepRepository>(Identifier.SLEEP_REPOSITORY), logger)
-                return eventBus
-                    .subscribe(sleepSaveEvent, sleepSaveEventHandler, 'sleep.save')
-                    .then(result => {
-                        expect(result).to.equal(true)
-                    })
-            } catch (err) {
-                throw new Error('Failure on EventBus test: ' + err.message)
-            }
-        })
-
-        it('should return true to subscribe in EnvironmentSaveEvent', async () => {
-            try {
-                await eventBus.connectionSub.tryConnect(1, 500)
-
-                const environmentSaveEvent = new EnvironmentEvent('EnvironmentSaveEvent', new Date())
-                const environmentSaveEventHandler = new EnvironmentSaveEventHandler(
-                    container.get<IEnvironmentRepository>(Identifier.ENVIRONMENT_REPOSITORY), logger)
-                return eventBus
-                    .subscribe(environmentSaveEvent, environmentSaveEventHandler, 'environments.save')
-                    .then(result => {
-                        expect(result).to.equal(true)
-                    })
-            } catch (err) {
-                throw new Error('Failure on EventBus test: ' + err.message)
-            }
-        })
-
         it('should return true to subscribe in UserDeleteEvent', async () => {
             try {
                 await eventBus.connectionSub.tryConnect(1, 500)
@@ -254,7 +207,7 @@ describe('EVENT BUS', () => {
                 }
             })
 
-            it('should return true for publish of updated of SWIM physical activity.', async () => {
+            it('should return true for publish of update of SWIM physical activity.', async () => {
                 try {
                     await eventBus.connectionPub.tryConnect(1, 500)
 
@@ -333,7 +286,7 @@ describe('EVENT BUS', () => {
                 }
             })
 
-            it('should return true for publish of updated of sleep.', async () => {
+            it('should return true for publish of update of sleep.', async () => {
                 try {
                     await eventBus.connectionPub.tryConnect(1, 500)
 
@@ -371,7 +324,7 @@ describe('EVENT BUS', () => {
                     let count: number = 0
 
                     // Save in file
-                    // require('fs').writeFileSync('./sleep.data.json', JSON.stringify(new EnvironmentMock().toJSON()), 'utf-8')
+                    // require('fs').writeFileSync('./environment.data.json', JSON.stringify(new EnvironmentMock().toJSON()), 'utf-8')
 
                     for (let i = 0; i < pubEnvironmentTotal; i++) {
                         const result = await eventBus.publish(
@@ -394,6 +347,84 @@ describe('EVENT BUS', () => {
                     return eventBus.publish(
                         new EnvironmentEvent('EnvironmentDeleteEvent', new Date(), new EnvironmentMock()),
                         'environments.delete')
+                        .then((result: boolean) => {
+                            expect(result).to.equal(true)
+                        })
+                } catch (err) {
+                    throw new Error('Failure on EventBus test: ' + err.message)
+                }
+            })
+        })
+
+        context('Weight', () => {
+            it(`should return true to ${pubWeightTotal} published weight objects.`, async () => {
+                try {
+                    await eventBus.connectionPub.tryConnect(1, 500)
+                    let count: number = 0
+
+                    // Save in file
+                    // require('fs').writeFileSync('./weight.data.json', JSON.stringify(new WeightMock().toJSON()), 'utf-8')
+
+                    for (let i = 0; i < pubWeightTotal; i++) {
+                        const result = await eventBus.publish(
+                            new WeightEvent('WeightSaveEvent', new Date(),
+                                new WeightMock()),
+                            'weight.save')
+                        expect(result).to.equal(true)
+                        count++
+                    }
+                    expect(count).equals(pubWeightTotal)
+                } catch (err) {
+                    throw new Error('Failure on EventBus test: ' + err.message)
+                }
+            })
+
+            it('should return true for publish of delete of weight.', async () => {
+                try {
+                    await eventBus.connectionPub.tryConnect(1, 500)
+
+                    return eventBus.publish(
+                        new WeightEvent('WeightDeleteEvent', new Date(), new WeightMock()),
+                        'weight.delete')
+                        .then((result: boolean) => {
+                            expect(result).to.equal(true)
+                        })
+                } catch (err) {
+                    throw new Error('Failure on EventBus test: ' + err.message)
+                }
+            })
+        })
+
+        context('BodyFat', () => {
+            it(`should return true to ${pubBodyFatTotal} published body fat objects.`, async () => {
+                try {
+                    await eventBus.connectionPub.tryConnect(1, 500)
+                    let count: number = 0
+
+                    // Save in file
+                    // require('fs').writeFileSync('./bodyfat.data.json', JSON.stringify(new BodyFatMock().toJSON()), 'utf-8')
+
+                    for (let i = 0; i < pubBodyFatTotal; i++) {
+                        const result = await eventBus.publish(
+                            new BodyFatEvent('BodyFatSaveEvent', new Date(),
+                                new BodyFatMock()),
+                            'bodyfat.save')
+                        expect(result).to.equal(true)
+                        count++
+                    }
+                    expect(count).equals(pubBodyFatTotal)
+                } catch (err) {
+                    throw new Error('Failure on EventBus test: ' + err.message)
+                }
+            })
+
+            it('should return true for publish of delete of body fat.', async () => {
+                try {
+                    await eventBus.connectionPub.tryConnect(1, 500)
+
+                    return eventBus.publish(
+                        new BodyFatEvent('BodyFatDeleteEvent', new Date(), new BodyFatMock()),
+                        'bodyfat.delete')
                         .then((result: boolean) => {
                             expect(result).to.equal(true)
                         })

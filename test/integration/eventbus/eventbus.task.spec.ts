@@ -13,6 +13,10 @@ import { Query } from '../../../src/infrastructure/repository/query/query'
 import { IConnectionDB } from '../../../src/infrastructure/port/connection.db.interface'
 import { EnvironmentEvent } from '../../../src/application/integration-event/event/environment.event'
 import { EnvironmentMock } from '../../mocks/environment.mock'
+import { WeightEvent } from '../../../src/application/integration-event/event/weight.event'
+import { BodyFatEvent } from '../../../src/application/integration-event/event/body.fat.event'
+import { WeightMock } from '../../mocks/weight.mock'
+import { BodyFatMock } from '../../mocks/body.fat.mock'
 
 const container: Container = DI.getInstance().getContainer()
 const eventBusTask: EventBusTask = container.get(Identifier.EVENT_BUS_TASK)
@@ -45,6 +49,8 @@ describe('EVENT BUS TASK', () => {
                     await createActivityIntegrationEvents()
                     await createSleepIntegrationEvents()
                     await createEnvironmentIntegrationEvents()
+                    await createWeightIntegrationEvents()
+                    await createBodyFatIntegrationEvents()
 
                     eventBusTask.run()
 
@@ -123,6 +129,8 @@ describe('EVENT BUS TASK', () => {
         //             await createActivityIntegrationEvents()
         //             await createSleepIntegrationEvents()
         //             await createEnvironmentIntegrationEvents()
+        //             await createWeightIntegrationEvents()
+        //             await createBodyFatIntegrationEvents()
         //
         //             eventBusTask.run()
         //
@@ -134,7 +142,7 @@ describe('EVENT BUS TASK', () => {
         //             await sleep(1000)
         //
         //             const result: Array<any> = await integrationRepository.find(new Query())
-        //             expect(result.length).to.eql(8)
+        //             expect(result.length).to.eql(12)
         //         } catch (err) {
         //             throw new Error('Failure on EventBusTask test: ' + err.message)
         //         }
@@ -207,6 +215,42 @@ async function createEnvironmentIntegrationEvents(): Promise<any> {
     saveEvent = event.toJSON()
     saveEvent.__operation = 'publish'
     saveEvent.__routing_key = 'environments.delete'
+    await integrationRepository.create(JSON.parse(JSON.stringify(saveEvent)))
+
+    return Promise.resolve()
+}
+
+async function createWeightIntegrationEvents(): Promise<any> {
+    // Save
+    let event: WeightEvent = new WeightEvent('WeightSaveEvent', new Date(), new WeightMock())
+    let saveEvent: any = event.toJSON()
+    saveEvent.__operation = 'publish'
+    saveEvent.__routing_key = 'weight.save'
+    await integrationRepository.create(JSON.parse(JSON.stringify(saveEvent)))
+
+    // Delete
+    event = new WeightEvent('WeightDeleteEvent', new Date(), new WeightMock())
+    saveEvent = event.toJSON()
+    saveEvent.__operation = 'publish'
+    saveEvent.__routing_key = 'weight.delete'
+    await integrationRepository.create(JSON.parse(JSON.stringify(saveEvent)))
+
+    return Promise.resolve()
+}
+
+async function createBodyFatIntegrationEvents(): Promise<any> {
+    // Save
+    let event: BodyFatEvent = new BodyFatEvent('BodyFatSaveEvent', new Date(), new BodyFatMock())
+    let saveEvent: any = event.toJSON()
+    saveEvent.__operation = 'publish'
+    saveEvent.__routing_key = 'bodyfat.save'
+    await integrationRepository.create(JSON.parse(JSON.stringify(saveEvent)))
+
+    // Delete
+    event = new BodyFatEvent('BodyFatDeleteEvent', new Date(), new BodyFatMock())
+    saveEvent = event.toJSON()
+    saveEvent.__operation = 'publish'
+    saveEvent.__routing_key = 'bodyfat.delete'
     await integrationRepository.create(JSON.parse(JSON.stringify(saveEvent)))
 
     return Promise.resolve()

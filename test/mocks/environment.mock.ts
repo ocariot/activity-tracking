@@ -1,6 +1,6 @@
 import { Environment } from '../../src/application/domain/model/environment'
 import { Location } from '../../src/application/domain/model/location'
-import { Measurement, MeasurementType } from '../../src/application/domain/model/measurement'
+import { MeasurementType } from '../../src/application/domain/model/measurement'
 import { Temperature } from '../../src/application/domain/model/temperature'
 import { Humidity } from '../../src/application/domain/model/humidity'
 
@@ -26,22 +26,22 @@ export class EnvironmentMock extends Environment {
         })
     }
 
-    private generateTemp(): Measurement {
-        const measurement: Measurement = new Temperature()
-        measurement.type = MeasurementType.TEMPERATURE
-        measurement.value = Math.random() * 13 + 19 // 19-31
-        measurement.unit = '°C'
+    private generateTemp(): Temperature {
+        const temperature: Temperature = new Temperature()
+        temperature.type = MeasurementType.TEMPERATURE
+        temperature.value = Math.random() * 13 + 19 // 19-31
+        temperature.unit = '°C'
 
-        return measurement
+        return temperature
     }
 
-    private generateHumi(): Measurement {
-        const measurement: Measurement = new Humidity()
-        measurement.type = MeasurementType.HUMIDITY
-        measurement.value = Math.random() * 16 + 30 // 30-45
-        measurement.unit = '%'
+    private generateHumi(): Humidity {
+        const humidity: Humidity = new Humidity()
+        humidity.type = MeasurementType.HUMIDITY
+        humidity.value = Math.random() * 16 + 30 // 30-45
+        humidity.unit = '%'
 
-        return measurement
+        return humidity
     }
 
     private generateObjectId(): string {
