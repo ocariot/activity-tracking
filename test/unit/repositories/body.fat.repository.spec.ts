@@ -2,20 +2,20 @@ import sinon from 'sinon'
 import { assert } from 'chai'
 import { EntityMapperMock } from '../../mocks/entity.mapper.mock'
 import { CustomLoggerMock } from '../../mocks/custom.logger.mock'
-import { PhysicalActivity } from '../../../src/application/domain/model/physical.activity'
-import { PhysicalActivityMock } from '../../mocks/physical.activity.mock'
-import { ActivityRepoModel } from '../../../src/infrastructure/database/schema/activity.schema'
-import { IPhysicalActivityRepository } from '../../../src/application/port/physical.activity.repository.interface'
-import { PhysicalActivityRepository } from '../../../src/infrastructure/repository/physical.activity.repository'
 import { ObjectID } from 'bson'
+import { BodyFat } from '../../../src/application/domain/model/body.fat'
+import { BodyFatMock } from '../../mocks/body.fat.mock'
+import { MeasurementRepoModel } from '../../../src/infrastructure/database/schema/measurement.schema'
+import { IBodyFatRepository } from '../../../src/application/port/body.fat.repository.interface'
+import { BodyFatRepository } from '../../../src/infrastructure/repository/body.fat.repository'
 
 require('sinon-mongoose')
 
-describe('Repositories: PhysicalActivityRepository', () => {
-    const defaultActivity: PhysicalActivity = new PhysicalActivityMock()
+describe('Repositories: BodyFatRepository', () => {
+    const defaultBodyFat: BodyFat = new BodyFatMock()
 
-    const modelFake: any = ActivityRepoModel
-    const repo: IPhysicalActivityRepository = new PhysicalActivityRepository(modelFake, new EntityMapperMock(), new CustomLoggerMock())
+    const modelFake: any = MeasurementRepoModel
+    const repo: IBodyFatRepository = new BodyFatRepository(modelFake, new EntityMapperMock(), new CustomLoggerMock())
 
     const queryMock: any = {
         toJSON: () => {
@@ -23,8 +23,9 @@ describe('Repositories: PhysicalActivityRepository', () => {
                 fields: {},
                 ordination: {},
                 pagination: { page: 1, limit: 100, skip: 0 },
-                filters: {  start_time: defaultActivity.start_time,
-                            child_id: defaultActivity.child_id }
+                filters: {  timestamp: defaultBodyFat.timestamp,
+                            child_id: defaultBodyFat.child_id,
+                            type: defaultBodyFat.type }
             }
         }
     }
@@ -33,8 +34,8 @@ describe('Repositories: PhysicalActivityRepository', () => {
         sinon.restore()
     })
 
-    describe('checkExist(activity: PhysicalActivity)', () => {
-        context('when the physical activity is found', () => {
+    describe('checkExist(bodyFat: BodyFat)', () => {
+        context('when the BodyFat is found', () => {
             it('should return true if exists in search by the filters bellow', () => {
                 sinon
                     .mock(modelFake)
@@ -43,14 +44,14 @@ describe('Repositories: PhysicalActivityRepository', () => {
                     .chain('exec')
                     .resolves(true)
 
-                return repo.checkExist(defaultActivity)
+                return repo.checkExist(defaultBodyFat)
                     .then(result => {
                         assert.isTrue(result)
                     })
             })
         })
 
-        context('when the physical activity is not found', () => {
+        context('when the BodyFat is not found', () => {
             it('should return false', () => {
                 sinon
                     .mock(modelFake)
@@ -59,7 +60,7 @@ describe('Repositories: PhysicalActivityRepository', () => {
                     .chain('exec')
                     .resolves(false)
 
-                return repo.checkExist(defaultActivity)
+                return repo.checkExist(defaultBodyFat)
                     .then(result => {
                         assert.isFalse(result)
                     })
@@ -76,7 +77,7 @@ describe('Repositories: PhysicalActivityRepository', () => {
                     .rejects({ message: 'An internal error has occurred in the database!',
                                description: 'Please try again later...' })
 
-                return repo.checkExist(defaultActivity)
+                return repo.checkExist(defaultBodyFat)
                     .catch((err: any) => {
                         assert.propertyVal(err, 'message', 'An internal error has occurred in the database!')
                         assert.propertyVal(err, 'description', 'Please try again later...')
@@ -85,60 +86,42 @@ describe('Repositories: PhysicalActivityRepository', () => {
         })
     })
 
-    describe('updateByChild(activity: PhysicalActivity)', () => {
-
-        const customQueryMock: any = {
-            toJSON: () => {
-                return {
-                    fields: {},
-                    ordination: {},
-                    pagination: { page: 1, limit: 100, skip: 0 },
-                    filters: {  _id: defaultActivity.id,
-                                child_id: defaultActivity.child_id }
-                }
-            }
-        }
-
-        context('when the physical activity is found and the update operation is done successfully', () => {
-            it('should return the updated physical activity', () => {
-                defaultActivity.id = `${new ObjectID()}`
-
+    describe('selectByChild(bodyFatTimestamp: Date, childId: string, bodyFatType: string)', () => {
+        context('when the BodyFat is found', () => {
+            it('should return the BodyFat found', () => {
                 sinon
                     .mock(modelFake)
-                    .expects('findOneAndUpdate')
-                    .withArgs(customQueryMock.toJSON().filters)
+                    .expects('findOne')
+                    .withArgs(queryMock.toJSON().filters)
                     .chain('exec')
-                    .resolves(defaultActivity)
+                    .resolves(defaultBodyFat)
 
-                return repo.updateByChild(defaultActivity)
-                    .then(activity => {
-                        activity = activity.toJSON()
-
-                        assert.propertyVal(activity, 'id', activity.id)
-                        assert.propertyVal(activity, 'start_time', activity.start_time)
-                        assert.propertyVal(activity, 'end_time', activity.end_time)
-                        assert.propertyVal(activity, 'duration', activity.duration)
-                        assert.propertyVal(activity, 'name', activity.name)
-                        assert.propertyVal(activity, 'calories', activity.calories)
-                        assert.propertyVal(activity, 'levels', activity.levels)
-                        assert.propertyVal(activity, 'steps', activity.steps)
-                        assert.propertyVal(activity, 'child_id', activity.child_id)
+                return repo.selectByChild(defaultBodyFat.timestamp!, defaultBodyFat.child_id!, defaultBodyFat.type!)
+                    .then(result => {
+                        assert.propertyVal(result, 'id', defaultBodyFat.id)
+                        assert.propertyVal(result, 'type', defaultBodyFat.type)
+                        assert.propertyVal(result, 'timestamp', defaultBodyFat.timestamp)
+                        assert.propertyVal(result, 'value', defaultBodyFat.value)
+                        assert.propertyVal(result, 'unit', defaultBodyFat.unit)
+                        assert.propertyVal(result, 'child_id', defaultBodyFat.child_id)
                     })
             })
         })
 
-        context('when the physical activity is not found', () => {
-            it('should return undefined representing that physical activity was not found', () => {
+        context('when the BodyFat is not found', () => {
+            it('should return undefined', () => {
+                queryMock.toJSON().filters.timestamp = new Date()
+
                 sinon
                     .mock(modelFake)
-                    .expects('findOneAndUpdate')
-                    .withArgs(customQueryMock.toJSON().filters)
+                    .expects('findOne')
+                    .withArgs(queryMock.toJSON().filters)
                     .chain('exec')
                     .resolves(undefined)
 
-                return repo.updateByChild(defaultActivity)
-                    .then((result: any) => {
-                        assert.isUndefined(result)
+                return repo.selectByChild(defaultBodyFat.timestamp!, defaultBodyFat.child_id!, defaultBodyFat.type!)
+                    .then(result => {
+                        assert.equal(result, undefined)
                     })
             })
         })
@@ -147,14 +130,14 @@ describe('Repositories: PhysicalActivityRepository', () => {
             it('should throw a RepositoryException', () => {
                 sinon
                     .mock(modelFake)
-                    .expects('findOneAndUpdate')
-                    .withArgs(customQueryMock.toJSON().filters)
+                    .expects('findOne')
+                    .withArgs(queryMock.toJSON().filters)
                     .chain('exec')
                     .rejects({ message: 'An internal error has occurred in the database!',
                                description: 'Please try again later...' })
 
-                return repo.updateByChild(defaultActivity)
-                    .catch((err) => {
+                return repo.selectByChild(defaultBodyFat.timestamp!, defaultBodyFat.child_id!, defaultBodyFat.type!)
+                    .catch((err: any) => {
                         assert.propertyVal(err, 'message', 'An internal error has occurred in the database!')
                         assert.propertyVal(err, 'description', 'Please try again later...')
                     })
@@ -162,38 +145,35 @@ describe('Repositories: PhysicalActivityRepository', () => {
         })
     })
 
-    describe('removeByChild(activityId: string | number, childId: string)', () => {
-        context('when the physical activity is found and the delete operation is done successfully', () => {
+    describe('removeByChild(bodyFatId: string, childId: string, measurementType: string)', () => {
+        context('when the BodyFat is found and the delete operation is done successfully', () => {
             it('should return true for confirm delete', () => {
-                defaultActivity.child_id = '5a62be07de34500146d9c544'
-
                 sinon
                     .mock(modelFake)
                     .expects('findOneAndDelete')
-                    .withArgs({ child_id: defaultActivity.child_id, _id: defaultActivity.id })
+                    .withArgs({ child_id: defaultBodyFat.child_id, _id: defaultBodyFat.id, type: defaultBodyFat.type })
                     .chain('exec')
                     .resolves(true)
 
-                return repo.removeByChild(defaultActivity.id!, defaultActivity.child_id)
+                return repo.removeByChild(defaultBodyFat.id!, defaultBodyFat.child_id!, defaultBodyFat.type!)
                     .then((result: boolean) => {
                         assert.isTrue(result)
                     })
             })
         })
 
-        context('when the physical activity is not found', () => {
-            it('should return false for confirm that the physical activity was not found', () => {
+        context('when the BodyFat is not found', () => {
+            it('should return false for confirm that the BodyFat was not found', () => {
                 const randomChildId: any = new ObjectID()
-                const randomId: any = new ObjectID()
 
                 sinon
                     .mock(modelFake)
                     .expects('findOneAndDelete')
-                    .withArgs({ child_id: randomChildId, _id: randomId })
+                    .withArgs({ child_id: randomChildId, _id: defaultBodyFat.id, type: defaultBodyFat.type })
                     .chain('exec')
                     .resolves(false)
 
-                return repo.removeByChild(randomId, randomChildId)
+                return repo.removeByChild(defaultBodyFat.id!, randomChildId, defaultBodyFat.type!)
                     .then((result: boolean) => {
                         assert.isFalse(result)
                     })
@@ -202,17 +182,15 @@ describe('Repositories: PhysicalActivityRepository', () => {
 
         context('when a database error occurs', () => {
             it('should throw a RepositoryException', () => {
-                defaultActivity.id = '1a2b3c'
-
                 sinon
                     .mock(modelFake)
                     .expects('findOneAndDelete')
-                    .withArgs({ child_id: defaultActivity.child_id, _id: defaultActivity.id })
+                    .withArgs({ child_id: defaultBodyFat.child_id, _id: defaultBodyFat.id, type: defaultBodyFat.type })
                     .chain('exec')
                     .rejects({ message: 'An internal error has occurred in the database!',
                                description: 'Please try again later...' })
 
-                return repo.removeByChild(defaultActivity.id, defaultActivity.child_id)
+                return repo.removeByChild(defaultBodyFat.id!, defaultBodyFat.child_id!, defaultBodyFat.type!)
                     .catch (err => {
                         assert.propertyVal(err, 'message', 'An internal error has occurred in the database!')
                         assert.propertyVal(err, 'description', 'Please try again later...')
@@ -221,24 +199,23 @@ describe('Repositories: PhysicalActivityRepository', () => {
         })
     })
 
-    describe('removeAllActivitiesFromChild(childId: string)', () => {
-        context('when there is at least one physical activity associated with that childID and the delete operation is ' +
-            'done successfully', () => {
+    describe('removeAllBodyFatFromChild(childId: string)', () => {
+        context('when there is at least one BodyFat associated with that childId and the delete operation is done successfully', () => {
             it('should return true for confirm delete', () => {
                 sinon
                     .mock(modelFake)
                     .expects('deleteMany')
-                    .withArgs({ child_id: defaultActivity.child_id })
+                    .withArgs({ child_id: defaultBodyFat.child_id })
                     .resolves(true)
 
-                return repo.removeAllActivitiesFromChild(defaultActivity.child_id)
+                return repo.removeAllBodyFatFromChild(defaultBodyFat.child_id!)
                     .then((result: boolean) => {
                         assert.isTrue(result)
                     })
             })
         })
 
-        context('when there is no physical activity associated with that childId', () => {
+        context('when there is no BodyFat associated with that childId', () => {
             it('should return false', () => {
                 const randomChildId: any = new ObjectID()
 
@@ -248,7 +225,7 @@ describe('Repositories: PhysicalActivityRepository', () => {
                     .withArgs({ child_id: randomChildId })
                     .resolves(false)
 
-                return repo.removeAllActivitiesFromChild(randomChildId)
+                return repo.removeAllBodyFatFromChild(randomChildId)
                     .then((result: boolean) => {
                         assert.isFalse(result)
                     })
@@ -260,11 +237,11 @@ describe('Repositories: PhysicalActivityRepository', () => {
                 sinon
                     .mock(modelFake)
                     .expects('deleteMany')
-                    .withArgs({ child_id: defaultActivity.child_id })
+                    .withArgs({ child_id: defaultBodyFat.child_id })
                     .rejects({ message: 'An internal error has occurred in the database!',
                                description: 'Please try again later...' })
 
-                return repo.removeAllActivitiesFromChild(defaultActivity.child_id)
+                return repo.removeAllBodyFatFromChild(defaultBodyFat.child_id!)
                     .catch (err => {
                         assert.propertyVal(err, 'message', 'An internal error has occurred in the database!')
                         assert.propertyVal(err, 'description', 'Please try again later...')

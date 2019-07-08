@@ -16,8 +16,9 @@ const temperature_aux: Temperature = environment.temperature!
 const humidity_aux: Humidity = environment.humidity!
 const timestamp_aux: Date = environment.timestamp
 const local_aux: string = environment.location!.local
+const room_aux: string = environment.location!.room
 
-describe('Validators: CreateEnvironment', () => {
+describe('Validators: CreateEnvironmentValidator', () => {
     describe('validate(environment: Environment)', () => {
         context('when the environment has all the required parameters, and that they have valid values', () => {
             it('should return undefined representing the success of the validation', () => {
@@ -71,14 +72,18 @@ describe('Validators: CreateEnvironment', () => {
                 environment.location = location_aux
                 environment.temperature = temperature_aux
                 environment.timestamp = timestamp_aux
-                if (environment.location) environment.location.local = ''
+                if (environment.location) {
+                    environment.location.local = ''
+                    environment.location.room = ''
+                }
                 try {
                     CreateEnvironmentValidator.validate(environment)
                 } catch (err) {
                     assert.equal(err.message, 'Location are not in a format that is supported...')
-                    assert.equal(err.description, 'Validation of location failed: location local is required!')
+                    assert.equal(err.description, 'Validation of location failed: location local, location room is required!')
                 }
                 environment.location.local = local_aux
+                environment.location.room = room_aux
             })
         })
 

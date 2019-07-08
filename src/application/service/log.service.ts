@@ -47,7 +47,7 @@ export class LogService implements ILogService {
                 CreateLogValidator.validate(elem)
 
                 // 2. Check if it already exists in the database.
-                const log = await this._logRepository.findOneByChild(elem.child_id, elem.type, elem.date)
+                const log = await this._logRepository.selectByChild(elem.child_id, elem.type, elem.date)
 
                 if (log) { // If exists.
                     // 3a. Update physical activity log.

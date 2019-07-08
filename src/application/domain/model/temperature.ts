@@ -21,7 +21,6 @@ export class Temperature extends Measurement implements IJSONSerializable, IJSON
             json = JSON.parse(json)
         }
 
-        if (json.type !== undefined) this.type = json.type
         if (json.value !== undefined) this.value = json.value
         if (json.unit !== undefined) this.unit = json.unit
 
@@ -30,6 +29,7 @@ export class Temperature extends Measurement implements IJSONSerializable, IJSON
 
     public toJSON(): any {
         return {
+            id: super.id,
             type: this.type,
             value: this.value,
             unit: this.unit,

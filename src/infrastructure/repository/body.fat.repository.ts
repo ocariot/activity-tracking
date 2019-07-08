@@ -56,7 +56,7 @@ export class BodyFatRepository extends BaseRepository<BodyFat, BodyFatEntity> im
      * @return {Promise<BodyFat>}
      * @throws {ValidationException | RepositoryException}
      */
-    public async customFindOne(bodyFatTimestamp: Date, childId: string, bodyFatType: string): Promise<BodyFat> {
+    public async selectByChild(bodyFatTimestamp: Date, childId: string, bodyFatType: string): Promise<BodyFat> {
         // Creates the query with the received parameters
         const query: IQuery = new Query()
         query.filters = {

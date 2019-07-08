@@ -11,7 +11,7 @@ import { SleepRepository } from '../../../src/infrastructure/repository/sleep.re
 
 require('sinon-mongoose')
 
-describe('Repositories: Sleep', () => {
+describe('Repositories: SleepRepository', () => {
     const defaultSleep: Sleep = new SleepMock()
 
     const modelFake: any = SleepRepoModel
@@ -66,31 +66,8 @@ describe('Repositories: Sleep', () => {
             })
         })
 
-        context('when the sleep start_time is undefined', () => {
+        context('when a database error occurs', () => {
             it('should throw a RepositoryException', () => {
-                defaultSleep.start_time = undefined
-
-                sinon
-                    .mock(modelFake)
-                    .expects('findOne')
-                    .withArgs(queryMock.toJSON().filters)
-                    .chain('exec')
-                    .rejects({ message: 'An internal error has occurred in the database!',
-                               description: 'Please try again later...' })
-
-                return repo.checkExist(defaultSleep)
-                    .catch((err: any) => {
-                        assert.propertyVal(err, 'message', 'An internal error has occurred in the database!')
-                        assert.propertyVal(err, 'description', 'Please try again later...')
-                    })
-            })
-        })
-
-        context('when the sleep id is undefined', () => {
-            it('should throw a RepositoryException', () => {
-                defaultSleep.start_time = new Date()
-                defaultSleep.id = undefined
-
                 sinon
                     .mock(modelFake)
                     .expects('findOne')
@@ -163,31 +140,8 @@ describe('Repositories: Sleep', () => {
             })
         })
 
-        context('when the sleep id is invalid', () => {
+        context('when a database error occurs', () => {
             it('should throw a RepositoryException', () => {
-                defaultSleep.id = '5b4b'
-
-                sinon
-                    .mock(modelFake)
-                    .expects('findOneAndUpdate')
-                    .withArgs(customQueryMock.toJSON().filters)
-                    .chain('exec')
-                    .rejects({ message: 'An internal error has occurred in the database!',
-                               description: 'Please try again later...' })
-
-                return repo.updateByChild(defaultSleep)
-                    .catch (err => {
-                        assert.propertyVal(err, 'message', 'An internal error has occurred in the database!')
-                        assert.propertyVal(err, 'description', 'Please try again later...')
-                    })
-            })
-        })
-
-        context('when the sleep child_id is invalid', () => {
-            it('should throw a RepositoryException', () => {
-                defaultSleep.id = `${new ObjectID()}`
-                defaultSleep.child_id = '5b4b'
-
                 sinon
                     .mock(modelFake)
                     .expects('findOneAndUpdate')
@@ -243,31 +197,8 @@ describe('Repositories: Sleep', () => {
             })
         })
 
-        context('when the sleep id is invalid', () => {
+        context('when a database error occurs', () => {
             it('should throw a RepositoryException', () => {
-                defaultSleep.id = '1a2b3c'
-
-                sinon
-                    .mock(modelFake)
-                    .expects('findOneAndDelete')
-                    .withArgs({ child_id: defaultSleep.child_id, _id: defaultSleep.id })
-                    .chain('exec')
-                    .rejects({ message: 'An internal error has occurred in the database!',
-                               description: 'Please try again later...' })
-
-                return repo.removeByChild(defaultSleep.id, defaultSleep.child_id)
-                    .catch (err => {
-                        assert.propertyVal(err, 'message', 'An internal error has occurred in the database!')
-                        assert.propertyVal(err, 'description', 'Please try again later...')
-                    })
-            })
-        })
-
-        context('when the sleep child_id is invalid', () => {
-            it('should throw a RepositoryException', () => {
-                defaultSleep.id = `${new ObjectID()}`
-                defaultSleep.child_id = '1a2b3c'
-
                 sinon
                     .mock(modelFake)
                     .expects('findOneAndDelete')
@@ -320,10 +251,8 @@ describe('Repositories: Sleep', () => {
             })
         })
 
-        context('when the child_id parameter is invalid', () => {
+        context('when a database error occurs', () => {
             it('should throw a RepositoryException', () => {
-                defaultSleep.child_id = '1a2b3c'
-
                 sinon
                     .mock(modelFake)
                     .expects('deleteMany')

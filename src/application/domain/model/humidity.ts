@@ -21,7 +21,6 @@ export class Humidity extends Measurement implements IJSONSerializable, IJSONDes
             json = JSON.parse(json)
         }
 
-        if (json.type !== undefined) this.type = json.type
         if (json.value !== undefined) this.value = json.value
         if (json.unit !== undefined) this.unit = json.unit
 
@@ -30,6 +29,7 @@ export class Humidity extends Measurement implements IJSONSerializable, IJSONDes
 
     public toJSON(): any {
         return {
+            id: super.id,
             type: this.type,
             value: this.value,
             unit: this.unit,

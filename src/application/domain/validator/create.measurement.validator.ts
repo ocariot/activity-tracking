@@ -2,7 +2,6 @@ import { ValidationException } from '../exception/validation.exception'
 import { Strings } from '../../../utils/strings'
 import { ObjectIdValidator } from './object.id.validator'
 import { Measurement, MeasurementType } from '../model/measurement'
-// import { DatetimeValidator } from './datetime.validator'
 
 export class CreateMeasurementValidator {
     public static validate(measurement: Measurement): void | ValidationException {
@@ -17,10 +16,6 @@ export class CreateMeasurementValidator {
         }
         if (!measurement.timestamp) fields.push('timestamp')
         if (measurement.value === undefined) fields.push('value')
-        else if (measurement.value < 0) {
-            throw new ValidationException('Value field is invalid...',
-                'Measurement validation failed: '.concat(Strings.ERROR_MESSAGE.NEGATIVE_PARAMETER))
-        }
         if (!measurement.unit) fields.push('unit')
 
         if (!measurement.child_id) fields.push('child_id')

@@ -8,7 +8,7 @@ let levels: Array<PhysicalActivityLevel> =
          new PhysicalActivityLevel(ActivityLevelType.FAIRLY, Math.floor((Math.random() * 10) * 60000)),
          new PhysicalActivityLevel(ActivityLevelType.VERY, Math.floor((Math.random() * 10) * 60000))]
 
-describe('Validators: PhysicalActivityLevels', () => {
+describe('Validators: PhysicalActivityLevelsValidator', () => {
     describe('validate(levels: Array<PhysicalActivityLevel>)', () => {
         context('when the physical activity levels in array has all the required parameters, and that they have valid values', () => {
             it('should return undefined representing the success of the validation', () => {

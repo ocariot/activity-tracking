@@ -18,5 +18,5 @@ export interface ILogRepository extends IRepository<Log> {
      * @return {Promise<Log>}
      * @throws {ValidationException | RepositoryException}
      */
-    findOneByChild(childId: string, logType: LogType, dateLog: string): Promise<Log>
+    selectByChild(childId: string, logType: LogType, dateLog: string): Promise<Log>
 }

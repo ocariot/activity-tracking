@@ -10,7 +10,7 @@ import { ObjectID } from 'bson'
 
 require('sinon-mongoose')
 
-describe('Repositories: Environment', () => {
+describe('Repositories: EnvironmentRepository', () => {
     const defaultEnvironment: EnvironmentMock = new EnvironmentMock()
 
     const modelFake: any = EnvironmentRepoModel
@@ -124,10 +124,8 @@ describe('Repositories: Environment', () => {
             })
         })
 
-        context('when the institution_id parameter is invalid', () => {
+        context('when a database error occurs', () => {
             it('should throw a RepositoryException', () => {
-                defaultEnvironment.institution_id = '1a2b3c'
-
                 sinon
                     .mock(modelFake)
                     .expects('deleteMany')
@@ -135,7 +133,7 @@ describe('Repositories: Environment', () => {
                     .rejects({ message: 'An internal error has occurred in the database!',
                                description: 'Please try again later...' })
 
-                return repo.removeAllEnvironmentsFromInstitution(defaultEnvironment.institution_id)
+                return repo.removeAllEnvironmentsFromInstitution(defaultEnvironment.institution_id!)
                     .catch (err => {
                         assert.propertyVal(err, 'message', 'An internal error has occurred in the database!')
                         assert.propertyVal(err, 'description', 'Please try again later...')

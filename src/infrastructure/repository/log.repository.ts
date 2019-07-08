@@ -31,7 +31,7 @@ export class LogRepository extends BaseRepository<Log, LogEntity>
      * @return {Promise<Log>}
      * @throws {ValidationException | RepositoryException}
      */
-    public async findOneByChild(childId: string, logType: LogType, dateLog: string): Promise<Log> {
+    public async selectByChild(childId: string, logType: LogType, dateLog: string): Promise<Log> {
         // Creates the query with the received parameters
         const query: IQuery = new Query()
         query.filters = {

@@ -7,7 +7,7 @@ import { SleepMock } from '../../mocks/sleep.mock'
 
 const sleep: SleepMock = new SleepMock()
 
-describe('Validators: CreateSleep', () => {
+describe('Validators: CreateSleepValidator', () => {
     describe('validate(sleep: Sleep)', () => {
         /**
          * Activity parameters

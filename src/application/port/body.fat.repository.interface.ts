@@ -35,11 +35,11 @@ export interface IBodyFatRepository extends IRepository<BodyFat> {
      *
      * @param bodyFatTimestamp Timestamp associated with BodyFat.
      * @param childId Child unique identifier.
-     * @param fatType Type of the Measurement.
+     * @param bodyFatType Type of the Measurement.
      * @return {Promise<BodyFat>}
      * @throws {ValidationException | RepositoryException}
      */
-    customFindOne(bodyFatTimestamp: Date, childId: string, fatType: string): Promise<BodyFat>
+    selectByChild(bodyFatTimestamp: Date, childId: string, bodyFatType: string): Promise<BodyFat>
 
     /**
      * Removes all BodyFat objects associated with the childId received.

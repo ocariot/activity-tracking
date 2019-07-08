@@ -82,7 +82,7 @@ export class WeightService implements IWeightService {
                 let bodyFatSaved: BodyFat = new BodyFat()
 
                 if (elem.body_fat) {
-                    const bodyFat: BodyFat = await this._bodyFatRepository.customFindOne(elem.body_fat.timestamp!,
+                    const bodyFat: BodyFat = await this._bodyFatRepository.selectByChild(elem.body_fat.timestamp!,
                         elem.body_fat.child_id!, elem.body_fat.type!)
 
                     if (bodyFat) elem.body_fat = bodyFat
@@ -161,7 +161,7 @@ export class WeightService implements IWeightService {
             let bodyFatSaved: BodyFat = new BodyFat()
 
             if (weight.body_fat) {
-                const bodyFat: BodyFat = await this._bodyFatRepository.customFindOne(weight.body_fat.timestamp!,
+                const bodyFat: BodyFat = await this._bodyFatRepository.selectByChild(weight.body_fat.timestamp!,
                     weight.body_fat.child_id!, weight.body_fat.type!)
 
                 if (bodyFat) weight.body_fat = bodyFat
