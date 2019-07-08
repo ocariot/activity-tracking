@@ -654,7 +654,7 @@ describe('Services: Environment', () => {
                 environment.id = '507f1f77bcf86cd799439011'
                 sinon
                     .mock(modelFake)
-                    .expects('deleteOne')
+                    .expects('findOneAndDelete')
                     .withArgs(environment.id)
                     .chain('exec')
                     .resolves(true)
@@ -671,7 +671,7 @@ describe('Services: Environment', () => {
                 environment.id = '5c6dd16ea1a67d0034e6108b'
                 sinon
                     .mock(modelFake)
-                    .expects('deleteOne')
+                    .expects('findOneAndDelete')
                     .withArgs(environment.id)
                     .chain('exec')
                     .resolves(false)
@@ -689,7 +689,7 @@ describe('Services: Environment', () => {
                 environment.id = '507f1f77bcf86cd799439011'
                 sinon
                     .mock(modelFake)
-                    .expects('deleteOne')
+                    .expects('findOneAndDelete')
                     .withArgs(environment.id)
                     .chain('exec')
                     .resolves(true)
@@ -707,7 +707,7 @@ describe('Services: Environment', () => {
                 environment.id = '5c6dd16ea1a67d0034e6108b2'
                 sinon
                     .mock(modelFake)
-                    .expects('deleteOne')
+                    .expects('findOneAndDelete')
                     .withArgs(environment.id)
                     .chain('exec')
                     .rejects({ message: Strings.ENVIRONMENT.PARAM_ID_NOT_VALID_FORMAT,

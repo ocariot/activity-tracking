@@ -162,7 +162,7 @@ export class BodyFatService implements IBodyFatService {
      * @throws {RepositoryException}
      */
     public async getAll(query: IQuery): Promise<Array<BodyFat>> {
-        return this._bodyFatRepository.find(query)
+        throw new Error('Unsupported feature!')
     }
 
     /**

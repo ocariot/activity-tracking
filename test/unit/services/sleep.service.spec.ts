@@ -1137,8 +1137,8 @@ describe('Services: SleepService', () => {
                 sleep.child_id = '5a62be07de34500146d9c544'     // Make child_id valid again
                 sinon
                     .mock(modelFake)
-                    .expects('deleteOne')
-                    .withArgs(sleep.id)
+                    .expects('findOneAndDelete')
+                    .withArgs({ child_id: sleep.child_id, _id: sleep.id })
                     .chain('exec')
                     .resolves(true)
 
@@ -1154,8 +1154,8 @@ describe('Services: SleepService', () => {
                 sleep.id = '5a62be07de34500146d9c544'            // Make mock return false
                 sinon
                     .mock(modelFake)
-                    .expects('deleteOne')
-                    .withArgs(sleep.id)
+                    .expects('findOneAndDelete')
+                    .withArgs({ child_id: sleep.child_id, _id: sleep.id })
                     .chain('exec')
                     .resolves(false)
 
@@ -1173,8 +1173,8 @@ describe('Services: SleepService', () => {
                 sleep.child_id = '5a62be07de34500146d9c544'     // Make child_id valid again
                 sinon
                     .mock(modelFake)
-                    .expects('deleteOne')
-                    .withArgs(sleep.id)
+                    .expects('findOneAndDelete')
+                    .withArgs({ child_id: sleep.child_id, _id: sleep.id })
                     .chain('exec')
                     .resolves(true)
 
@@ -1191,8 +1191,8 @@ describe('Services: SleepService', () => {
                 incorrectSleep.child_id = '5a62be07de34500146d9c5442'     // Make child_id invalid
                 sinon
                     .mock(modelFake)
-                    .expects('deleteOne')
-                    .withArgs(incorrectSleep.id)
+                    .expects('findOneAndDelete')
+                    .withArgs({ child_id: incorrectSleep.child_id, _id: incorrectSleep.id })
                     .chain('exec')
                     .rejects({ message: Strings.CHILD.PARAM_ID_NOT_VALID_FORMAT,
                                description: Strings.ERROR_MESSAGE.UUID_NOT_VALID_FORMAT_DESC })
@@ -1211,8 +1211,8 @@ describe('Services: SleepService', () => {
                 incorrectSleep.id = '5a62be07de34500146d9c5442'       // Make sleep id invalid
                 sinon
                     .mock(modelFake)
-                    .expects('deleteOne')
-                    .withArgs(incorrectSleep.id)
+                    .expects('findOneAndDelete')
+                    .withArgs({ child_id: incorrectSleep.child_id, _id: incorrectSleep.id })
                     .chain('exec')
                     .rejects({ message: Strings.SLEEP.PARAM_ID_NOT_VALID_FORMAT,
                                description: Strings.ERROR_MESSAGE.UUID_NOT_VALID_FORMAT_DESC })

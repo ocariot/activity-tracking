@@ -414,7 +414,7 @@ describe('Repositories: WeightRepository', () => {
                     .expects('findOneAndUpdate')
                     .withArgs({ body_fat: defaultWeight.body_fat!.id, type: MeasurementType.WEIGHT })
                     .chain('exec')
-                    .resolves(defaultWeight)
+                    .resolves(true)
 
                 return repo.disassociateBodyFat(defaultWeight.body_fat!.id!)
                     .then(result => {
@@ -431,7 +431,7 @@ describe('Repositories: WeightRepository', () => {
                     .expects('findOneAndUpdate')
                     .withArgs({ body_fat: defaultWeight.body_fat!.id, type: MeasurementType.WEIGHT })
                     .chain('exec')
-                    .resolves(undefined)
+                    .resolves(true)
 
                 return repo.disassociateBodyFat(defaultWeight.body_fat!.id!)
                     .then((result: any) => {
