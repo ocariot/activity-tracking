@@ -9,7 +9,7 @@ import { JsonUtils } from '../utils/json.utils'
  */
 export class SleepPatternSummaryData implements IJSONSerializable, IJSONDeserializable<SleepPatternSummaryData> {
     private _count: number
-    private _duration: number // in minutes
+    private _duration: number // in milliseconds
 
     constructor(count: number, duration: number) {
         this._count = count

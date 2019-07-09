@@ -214,7 +214,7 @@ export class WeightService implements IWeightService {
      * @throws {RepositoryException}
      */
     public async getAll(query: IQuery): Promise<Array<Weight>> {
-        return this._weightRepository.find(query)
+        throw new Error('Unsupported feature!')
     }
 
     /**

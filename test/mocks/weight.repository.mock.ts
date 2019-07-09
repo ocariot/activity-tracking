@@ -14,9 +14,7 @@ export class WeightRepositoryMock implements IWeightRepository {
     }
 
     public create(item: Weight): Promise<Weight> {
-        if (item.id === '507f1f77bcf86cd799439011')
-            return Promise.resolve(new WeightMock())
-        return Promise.resolve(undefined!)
+        return Promise.resolve(item)
     }
 
     public delete(id: string | number): Promise<boolean> {

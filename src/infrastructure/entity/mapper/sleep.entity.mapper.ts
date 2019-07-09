@@ -111,8 +111,7 @@ export class SleepEntityMapper implements IEntityMapper<Sleep, SleepEntity> {
     }
 
     /**
-     * Sum the sleep pattern durations that are in milliseconds
-     * and are converted into minutes.
+     * Sum the sleep pattern durations that are in milliseconds.
      *
      * @param pattern
      * @param dataSet
@@ -121,6 +120,6 @@ export class SleepEntityMapper implements IEntityMapper<Sleep, SleepEntity> {
         return dataSet.reduce((prev, item) => {
             if (item.name.toLowerCase() === pattern && item.duration) return prev + item.duration
             return prev
-        }, 0) / 60000
+        }, 0)
     }
 }

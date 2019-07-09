@@ -23,6 +23,10 @@ export class IntegrationEventRepositoryMock implements IIntegrationEventReposito
             if (item.body_fat.id !== '507f1f77bcf86cd799439012') {
                 return Promise.resolve(item)
             }
+        } else if (item.weight) {
+            if (item.weight.id !== '507f1f77bcf86cd799439012') {
+                return Promise.resolve(item)
+            }
         }
         return Promise.reject(new RepositoryException('Mock RepositoryException', 'Description of mock RepositoryException'))
     }

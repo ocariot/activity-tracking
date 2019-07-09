@@ -1,7 +1,6 @@
 import { IJSONSerializable } from '../utils/json.serializable.interface'
 import { IJSONDeserializable } from '../utils/json.deserializable.interface'
 import { JsonUtils } from '../utils/json.utils'
-import { DatetimeValidator } from '../validator/datetime.validator'
 import { Measurement, MeasurementType } from './measurement'
 import { BodyFat } from './body.fat'
 
@@ -25,11 +24,6 @@ export class Weight extends Measurement implements IJSONSerializable, IJSONDeser
 
     set body_fat(value: BodyFat | undefined) {
         this._body_fat = value
-    }
-
-    public convertDatetimeString(value: string): Date {
-        DatetimeValidator.validate(value)
-        return new Date(value)
     }
 
     public fromJSON(json: any): Weight {
