@@ -124,14 +124,9 @@ describe('Routes: users.children.sleep', () => {
                     .then(res => {
                         defaultSleep.id = res.body.id
                         expect(res.body.id).to.eql(defaultSleep.id)
-                        expect(res.body).to.have.property('start_time')
                         expect(res.body.start_time).to.eql(defaultSleep.start_time!.toISOString())
-                        expect(res.body).to.have.property('end_time')
                         expect(res.body.end_time).to.eql(defaultSleep.end_time!.toISOString())
-                        expect(res.body).to.have.property('duration')
                         expect(res.body.duration).to.eql(defaultSleep.duration)
-                        expect(res.body).to.have.property('pattern')
-                        expect(res.body).to.have.property('child_id')
                         expect(res.body.child_id).to.eql(defaultSleep.child_id)
                     })
             })
@@ -1283,8 +1278,8 @@ describe('Routes: users.children.sleep', () => {
                     throw new Error('Failure on users.children.sleep routes test: ' + err.message)
                 }
 
-                const url = `/v1/users/children/${result.child_id}/sleep/${result.id}?child_id=${result.child_id}&fields=start_time,end_time,
-                    duration,pattern,child_id&sort=child_id&page=1&limit=3`
+                const url = `/v1/users/children/${result.child_id}/sleep/${result.id}?child_id=${result.child_id}
+                    &fields=start_time,end_time,duration,pattern,child_id&sort=child_id&page=1&limit=3`
 
                 return request
                     .get(url)

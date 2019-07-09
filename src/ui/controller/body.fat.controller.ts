@@ -100,7 +100,7 @@ export class BodyFatController {
         try {
             const result: BodyFat = await this._bodyFatService
                 .getByIdAndChild(req.params.bodyfat_id, req.params.child_id, new Query().fromJSON(req.query))
-            if (!result) return res.status(HttpStatus.NOT_FOUND).send(this.getMessageFatNotFound())
+            if (!result) return res.status(HttpStatus.NOT_FOUND).send(this.getMessageBodyFatNotFound())
             return res.status(HttpStatus.OK).send(result)
         } catch (err) {
             const handlerError = ApiExceptionManager.build(err)
@@ -130,7 +130,7 @@ export class BodyFatController {
     /**
      * Default message when resource is not found or does not exist.
      */
-    private getMessageFatNotFound(): object {
+    private getMessageBodyFatNotFound(): object {
         return new ApiException(
             HttpStatus.NOT_FOUND,
             'BodyFat not found!',

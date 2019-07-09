@@ -41,7 +41,7 @@ describe('Services: BodyFatService', () => {
     /**
      * For POST route with multiple BodyFat objects
      */
-        // Array with correct BodyFat objects
+    // Array with correct BodyFat objects
     const correctBodyFatArr: Array<BodyFat> = new Array<BodyFatMock>()
     for (let i = 0; i < 3; i++) {
         correctBodyFatArr.push(new BodyFatMock())

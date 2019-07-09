@@ -13,7 +13,6 @@ import { MultiStatus } from '../domain/model/multi.status'
 import { StatusSuccess } from '../domain/model/status.success'
 import { StatusError } from '../domain/model/status.error'
 import { ValidationException } from '../domain/exception/validation.exception'
-import { ConflictException } from '../domain/exception/conflict.exception'
 import { ObjectIdValidator } from '../domain/validator/object.id.validator'
 import { LogTypeValidator } from '../domain/validator/log.type.validator'
 
@@ -68,7 +67,6 @@ export class LogService implements ILogService {
             } catch (err) {
                 let statusCode: number = HttpStatus.INTERNAL_SERVER_ERROR
                 if (err instanceof ValidationException) statusCode = HttpStatus.BAD_REQUEST
-                if (err instanceof ConflictException) statusCode = HttpStatus.CONFLICT
 
                 // 4c. Creates a StatusError object for the construction of the MultiStatus response.
                 const statusError: StatusError<Log> = new StatusError<Log>(statusCode, err.message, err.description, elem)

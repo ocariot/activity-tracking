@@ -12,7 +12,7 @@ export class WeightMock extends Weight {
     private generateWeight(): void {
         super.id = this.generateObjectId()
         super.type = MeasurementType.WEIGHT
-        super.timestamp = new Date()
+        super.timestamp = new Date(1560826800000 + Math.floor((Math.random() * 1000)))
         super.value = Math.random() * 16 + 50 // 50-65
         super.unit = 'kg'
         super.child_id = '5a62be07de34500146d9c544'
