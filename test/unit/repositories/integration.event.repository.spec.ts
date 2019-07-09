@@ -11,7 +11,7 @@ import { PhysicalActivity } from '../../../src/application/domain/model/physical
 
 require('sinon-mongoose')
 
-describe('Repositories: IntegrationEvent', () => {
+describe('Repositories: IntegrationEventRepository', () => {
     // Mock events
     const activitySaveEvent: PhysicalActivityEvent = new PhysicalActivityEvent('PhysicalActivitySaveEvent',
         new Date(), new PhysicalActivityMock())

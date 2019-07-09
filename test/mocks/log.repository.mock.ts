@@ -41,7 +41,7 @@ export class LogRepositoryMock implements ILogRepository {
         return Promise.resolve(item)
     }
 
-    public findOneByChild(child_id: string, type: LogType, date: string): Promise<Log> {
+    public selectByChild(child_id: string, type: LogType, date: string): Promise<Log> {
         return Promise.resolve(new LogMock())
     }
 }

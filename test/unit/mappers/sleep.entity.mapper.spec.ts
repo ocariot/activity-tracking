@@ -2,7 +2,7 @@ import { assert } from 'chai'
 import { SleepEntityMapper } from '../../../src/infrastructure/entity/mapper/sleep.entity.mapper'
 import { SleepMock } from '../../mocks/sleep.mock'
 
-describe('Mappers: SleepEntity', () => {
+describe('Mappers: SleepEntityMapper', () => {
     const sleep: SleepMock = new SleepMock()
 
     // Create sleep JSON
@@ -46,7 +46,7 @@ describe('Mappers: SleepEntity', () => {
         })
 
         context('when the parameter is a JSON', () => {
-            it('should not normally execute the method, returning a Sleep as a result of the transformation', () => {
+            it('should normally execute the method, returning a Sleep as a result of the transformation', () => {
                 const result = new SleepEntityMapper().transform(sleepJSON)
                 assert.propertyVal(result, 'id', sleepJSON.id)
                 assert.propertyVal(result, 'start_time', sleepJSON.start_time)
@@ -59,7 +59,7 @@ describe('Mappers: SleepEntity', () => {
         })
 
         context('when the parameter is a undefined', () => {
-            it('should not normally execute the method, returning an empty Sleep as a result of the transformation', () => {
+            it('should normally execute the method, returning an empty Sleep as a result of the transformation', () => {
                 const result = new SleepEntityMapper().transform(undefined)
 
                 assert.isObject(result)

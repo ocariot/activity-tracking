@@ -8,7 +8,7 @@ import { PhysicalActivityMock } from '../../mocks/physical.activity.mock'
 
 const activity: PhysicalActivityMock = new PhysicalActivityMock()
 
-describe('Validators: UpdatePhysicalActivity', () => {
+describe('Validators: UpdatePhysicalActivityValidator', () => {
     describe('validate(physicalActivity: PhysicalActivity)', () => {
         /**
          * Activity parameters

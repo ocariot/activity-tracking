@@ -18,11 +18,14 @@ import { IQuery } from '../../../src/application/port/query.interface'
 import { Query } from '../../../src/infrastructure/repository/query/query'
 import { Strings } from '../../../src/utils/strings'
 import { Environment } from '../../../src/application/domain/model/environment'
-import { Measurement, MeasurementType } from '../../../src/application/domain/model/measurement'
 import { IEventBus } from '../../../src/infrastructure/port/event.bus.interface'
 import { ILogger } from '../../../src/utils/custom.logger'
 import { MultiStatus } from '../../../src/application/domain/model/multi.status'
 import { MultiStatusMock } from '../../mocks/multi.status.mock'
+import { TemperatureMock } from '../../mocks/temperature.mock'
+import { Temperature } from '../../../src/application/domain/model/temperature'
+import { Humidity } from '../../../src/application/domain/model/humidity'
+import { HumidityMock } from '../../mocks/humidity.mock'
 
 require('sinon-mongoose')
 
@@ -56,16 +59,21 @@ describe('Services: Environment', () => {
     incorrectEnv3.location!.local = ''
     incorrectEnv3.location!.room = ''
 
-    const incorrectEnv4: Environment = new EnvironmentMock()   // Measurement invalid (empty array)
-    incorrectEnv4.measurements = new Array<Measurement>()
+    const incorrectEnv4: Environment = new EnvironmentMock()   // Temperature invalid (missing fields)
+    incorrectEnv4.temperature = new Temperature()
 
-    const incorrectEnv5: Environment = new EnvironmentMock()   // Measurement invalid (type)
-    incorrectEnv5.measurements = [new Measurement(MeasurementType.HUMIDITY, 34, '%'),
-                                  new Measurement('Temperatures', 40, '°C')]
+    const incorrectEnv5: Environment = new EnvironmentMock()   // Temperature invalid (type)
+    const incorrectTemperature: Temperature = new TemperatureMock()
+    incorrectTemperature.type = 'temperatures'
+    incorrectEnv5.temperature = incorrectTemperature
 
-    const incorrectEnv6: Environment = new EnvironmentMock()   // Measurement invalid (missing fields)
-    incorrectEnv6.measurements = [new Measurement(MeasurementType.HUMIDITY, 34, '%'),
-                                  new Measurement()]
+    const incorrectEnv6: Environment = new EnvironmentMock()   // Humidity invalid (missing fields)
+    incorrectEnv6.humidity = new Humidity()
+
+    const incorrectEnv7: Environment = new EnvironmentMock()   // Humidity invalid (type)
+    const incorrectHumidity: Humidity = new HumidityMock()
+    incorrectHumidity.type = 'humiditys'
+    incorrectEnv7.humidity = incorrectHumidity
 
     // Array with correct and incorrect environments
     const mixedEnvironmentsArr: Array<Environment> = new Array<EnvironmentMock>()
@@ -80,6 +88,7 @@ describe('Services: Environment', () => {
     incorrectEnvironmentsArr.push(incorrectEnv4)
     incorrectEnvironmentsArr.push(incorrectEnv5)
     incorrectEnvironmentsArr.push(incorrectEnv6)
+    incorrectEnvironmentsArr.push(incorrectEnv7)
 
     /**
      * Mock MultiStatus responses
@@ -138,7 +147,8 @@ describe('Services: Environment', () => {
                         assert.propertyVal(result, 'location', environment.location)
                         if (result.climatized) assert.propertyVal(result, 'climatized', environment.climatized)
                         assert.propertyVal(result, 'timestamp', environment.timestamp)
-                        assert.propertyVal(result, 'measurements', environment.measurements)
+                        assert.propertyVal(result, 'temperature', environment.temperature)
+                        assert.propertyVal(result, 'humidity', environment.humidity)
                     })
             })
         })
@@ -162,7 +172,8 @@ describe('Services: Environment', () => {
                         assert.propertyVal(result, 'location', environment.location)
                         if (result.climatized) assert.propertyVal(result, 'climatized', environment.climatized)
                         assert.propertyVal(result, 'timestamp', environment.timestamp)
-                        assert.propertyVal(result, 'measurements', environment.measurements)
+                        assert.propertyVal(result, 'temperature', environment.temperature)
+                        assert.propertyVal(result, 'humidity', environment.humidity)
                     })
             })
         })
@@ -186,7 +197,8 @@ describe('Services: Environment', () => {
                         assert.propertyVal(result, 'location', environment.location)
                         if (result.climatized) assert.propertyVal(result, 'climatized', environment.climatized)
                         assert.propertyVal(result, 'timestamp', environment.timestamp)
-                        assert.propertyVal(result, 'measurements', environment.measurements)
+                        assert.propertyVal(result, 'temperature', environment.temperature)
+                        assert.propertyVal(result, 'humidity', environment.humidity)
                     })
             })
         })
@@ -217,14 +229,14 @@ describe('Services: Environment', () => {
                     .withArgs(incorrectEnvironment)
                     .chain('exec')
                     .rejects({ message: 'Required fields were not provided...',
-                               description: 'Validation of environment measurements failed: timestamp, institution_id, ' +
-                                   'location, measurements required!' })
+                               description: 'Validation of environment failed: timestamp, institution_id, location, ' +
+                                   'temperature required!' })
 
                 return environmentService.add(incorrectEnvironment)
                     .catch(err => {
                         assert.propertyVal(err, 'message', 'Required fields were not provided...')
-                        assert.propertyVal(err, 'description', 'Validation of environment measurements failed: timestamp, ' +
-                            'institution_id, location, measurements required!')
+                        assert.propertyVal(err, 'description', 'Validation of environment failed: timestamp, ' +
+                            'institution_id, location, temperature required!')
                     })
             })
         })
@@ -270,65 +282,82 @@ describe('Services: Environment', () => {
             })
         })
 
-        context('when the Environment is incorrect (the measurements array is empty)', () => {
+        context('when the Environment is incorrect (the temperature is invalid (missing fields))', () => {
             it('should throw a ValidationException', () => {
                 incorrectEnvironment.location!.local = 'Indoor'
                 incorrectEnvironment.location!.room = 'Room 01'
-                incorrectEnvironment.measurements = new Array<Measurement>()
+                incorrectEnvironment.temperature = new Temperature()
                 sinon
                     .mock(modelFake)
                     .expects('create')
                     .withArgs(incorrectEnvironment)
                     .chain('exec')
-                    .rejects({ message: 'Measurement are not in a format that is supported!',
-                               description: 'The measurements collection must not be empty!' })
+                    .rejects({ message: 'Required fields were not provided...',
+                               description: 'Validation of environment failed: temperature.value, temperature.unit required!' })
 
                 return environmentService.add(incorrectEnvironment)
                     .catch(err => {
-                        assert.propertyVal(err, 'message', 'Measurement are not in a format that is supported!')
-                        assert.propertyVal(err, 'description', 'The measurements collection must not be empty!')
+                        assert.propertyVal(err, 'message', 'Required fields were not provided...')
+                        assert.propertyVal(err, 'description', 'Validation of environment failed: temperature.value, ' +
+                            'temperature.unit required!')
                     })
             })
         })
 
-        context('when the Environment is incorrect (the measurements array has an item with invalid type)', () => {
+        context('when the Environment is incorrect (the temperature has an invalid type)', () => {
             it('should throw a ValidationException', () => {
-                incorrectEnvironment.measurements = [new Measurement(MeasurementType.HUMIDITY, 34, '%'),
-                                            new Measurement('Temperatures', 40, '°C')]
+                incorrectEnvironment.temperature = incorrectTemperature
                 sinon
                     .mock(modelFake)
                     .expects('create')
                     .withArgs(incorrectEnvironment)
                     .chain('exec')
-                    .rejects({ message: 'The type of measurement provided "temperatures" is not supported...',
-                               description: 'The types allowed are: temperature, humidity.' })
+                    .rejects({ message: 'The type of temperature provided "temperatures" is not supported...',
+                               description: 'The type allowed is "temperature".' })
 
                 return environmentService.add(incorrectEnvironment)
                     .catch(err => {
-                        assert.propertyVal(err, 'message', 'The type of measurement provided "temperatures" is not supported...')
-                        assert.propertyVal(err, 'description', 'The types allowed are: temperature, humidity.')
+                        assert.propertyVal(err, 'message', 'The type of temperature provided "temperatures" is not supported...')
+                        assert.propertyVal(err, 'description', 'The type allowed is "temperature".')
                     })
             })
         })
 
-        context('when the Environment is incorrect (the measurements array has an item with empty fields)', () => {
+        context('when the Environment is incorrect (the humidity is invalid (missing fields))', () => {
             it('should throw a ValidationException', () => {
-                incorrectEnvironment.measurements = [new Measurement(MeasurementType.HUMIDITY, 34, '%'),
-                                            new Measurement()]
+                incorrectEnvironment.temperature = new TemperatureMock()
+                incorrectEnvironment.humidity = new Humidity()
                 sinon
                     .mock(modelFake)
                     .expects('create')
                     .withArgs(incorrectEnvironment)
                     .chain('exec')
-                    .rejects({ message: 'Measurement are not in a format that is supported!',
-                               description: 'Validation of measurements failed: measurement type, measurement value, ' +
-                                   'measurement unit is required!' })
+                    .rejects({ message: 'Required fields were not provided...',
+                               description: 'Validation of environment failed: humidity.value, humidity.unit required!' })
 
                 return environmentService.add(incorrectEnvironment)
                     .catch(err => {
-                        assert.propertyVal(err, 'message', 'Measurement are not in a format that is supported!')
-                        assert.propertyVal(err, 'description', 'Validation of measurements failed: measurement type, ' +
-                            'measurement value, measurement unit is required!')
+                        assert.propertyVal(err, 'message', 'Required fields were not provided...')
+                        assert.propertyVal(err, 'description', 'Validation of environment failed: humidity.value, humidity.unit required!')
+                    })
+            })
+        })
+
+        context('when the Environment is incorrect (the humidity has an invalid type)', () => {
+            it('should throw a ValidationException', () => {
+                incorrectEnvironment.humidity = incorrectHumidity
+                sinon
+                    .mock(modelFake)
+                    .expects('create')
+                    .withArgs(incorrectEnvironment)
+                    .chain('exec')
+                    .rejects({ message: 'The type of humidity provided "humiditys" is not supported...',
+                               description: 'The type allowed is: "humidity".' })
+
+                return environmentService.add(incorrectEnvironment)
+                    .catch(err => {
+                        assert.propertyVal(err, 'message', 'The type of humidity provided "humiditys" is not supported...')
+                        assert.propertyVal(err, 'description', 'The type allowed is: "humidity".')
                     })
             })
         })
@@ -361,7 +390,8 @@ describe('Services: Environment', () => {
                             if (result.success[i].item.climatized)
                                 assert.propertyVal(result.success[i].item, 'climatized', correctEnvironmentsArr[i].climatized)
                             assert.propertyVal(result.success[i].item, 'timestamp', correctEnvironmentsArr[i].timestamp)
-                            assert.propertyVal(result.success[i].item, 'measurements', correctEnvironmentsArr[i].measurements)
+                            assert.propertyVal(result.success[i].item, 'temperature', correctEnvironmentsArr[i].temperature)
+                            assert.propertyVal(result.success[i].item, 'humidity', correctEnvironmentsArr[i].humidity)
                         }
 
                         assert.isEmpty(result.error)
@@ -393,7 +423,8 @@ describe('Services: Environment', () => {
                             if (result.success[i].item.climatized)
                                 assert.propertyVal(result.success[i].item, 'climatized', correctEnvironmentsArr[i].climatized)
                             assert.propertyVal(result.success[i].item, 'timestamp', correctEnvironmentsArr[i].timestamp)
-                            assert.propertyVal(result.success[i].item, 'measurements', correctEnvironmentsArr[i].measurements)
+                            assert.propertyVal(result.success[i].item, 'temperature', correctEnvironmentsArr[i].temperature)
+                            assert.propertyVal(result.success[i].item, 'humidity', correctEnvironmentsArr[i].humidity)
                         }
 
                         assert.isEmpty(result.error)
@@ -427,7 +458,8 @@ describe('Services: Environment', () => {
                             if (result.success[i].item.climatized)
                                 assert.propertyVal(result.success[i].item, 'climatized', correctEnvironmentsArr[i].climatized)
                             assert.propertyVal(result.success[i].item, 'timestamp', correctEnvironmentsArr[i].timestamp)
-                            assert.propertyVal(result.success[i].item, 'measurements', correctEnvironmentsArr[i].measurements)
+                            assert.propertyVal(result.success[i].item, 'temperature', correctEnvironmentsArr[i].temperature)
+                            assert.propertyVal(result.success[i].item, 'humidity', correctEnvironmentsArr[i].humidity)
                         }
 
                         assert.isEmpty(result.error)
@@ -463,7 +495,8 @@ describe('Services: Environment', () => {
                             if (result.error[i].item.climatized)
                                 assert.propertyVal(result.error[i].item, 'climatized', correctEnvironmentsArr[i].climatized)
                             assert.propertyVal(result.error[i].item, 'timestamp', correctEnvironmentsArr[i].timestamp)
-                            assert.propertyVal(result.error[i].item, 'measurements', correctEnvironmentsArr[i].measurements)
+                            assert.propertyVal(result.error[i].item, 'temperature', correctEnvironmentsArr[i].temperature)
+                            assert.propertyVal(result.error[i].item, 'humidity', correctEnvironmentsArr[i].humidity)
                         }
 
                         assert.isEmpty(result.success)
@@ -492,12 +525,13 @@ describe('Services: Environment', () => {
                         if (result.success[0].item.climatized)
                             assert.propertyVal(result.success[0].item, 'climatized', mixedEnvironmentsArr[0].climatized)
                         assert.propertyVal(result.success[0].item, 'timestamp', mixedEnvironmentsArr[0].timestamp)
-                        assert.propertyVal(result.success[0].item, 'measurements', mixedEnvironmentsArr[0].measurements)
+                        assert.propertyVal(result.success[0].item, 'temperature', mixedEnvironmentsArr[0].temperature)
+                        assert.propertyVal(result.success[0].item, 'humidity', mixedEnvironmentsArr[0].humidity)
 
                         assert.propertyVal(result.error[0], 'code', HttpStatus.BAD_REQUEST)
                         assert.propertyVal(result.error[0], 'message', 'Required fields were not provided...')
-                        assert.propertyVal(result.error[0], 'description', 'Validation of environment measurements failed: timestamp, ' +
-                            'institution_id, location, measurements required!')
+                        assert.propertyVal(result.error[0], 'description', 'Validation of environment failed: timestamp, ' +
+                            'institution_id, location, temperature required!')
                     })
             })
         })
@@ -516,21 +550,24 @@ describe('Services: Environment', () => {
                         result = result as MultiStatus<Environment>
 
                         assert.propertyVal(result.error[0], 'message', 'Required fields were not provided...')
-                        assert.propertyVal(result.error[0], 'description', 'Validation of environment measurements failed: timestamp, ' +
-                            'institution_id, location, measurements required!')
+                        assert.propertyVal(result.error[0], 'description', 'Validation of environment failed: timestamp, ' +
+                            'institution_id, location, temperature required!')
                         assert.propertyVal(result.error[1], 'message', Strings.ERROR_MESSAGE.UUID_NOT_VALID_FORMAT)
                         assert.propertyVal(result.error[1], 'description', Strings.ERROR_MESSAGE.UUID_NOT_VALID_FORMAT_DESC)
                         assert.propertyVal(result.error[2], 'message', 'Location are not in a format that is supported...')
                         assert.propertyVal(result.error[2], 'description', 'Validation of location failed: location local, location ' +
                             'room is required!')
-                        assert.propertyVal(result.error[3], 'message', 'Measurement are not in a format that is supported!')
-                        assert.propertyVal(result.error[3], 'description', 'The measurements collection must not be empty!')
-                        assert.propertyVal(result.error[4], 'message', 'The type of measurement provided "temperatures" is not ' +
+                        assert.propertyVal(result.error[3], 'message', 'Required fields were not provided...')
+                        assert.propertyVal(result.error[3], 'description', 'Validation of environment failed: temperature.value, ' +
+                            'temperature.unit required!')
+                        assert.propertyVal(result.error[4], 'message', 'The type of temperature provided "temperatures" is not ' +
                             'supported...')
-                        assert.propertyVal(result.error[4], 'description', 'The types allowed are: temperature, humidity.')
-                        assert.propertyVal(result.error[5], 'message', 'Measurement are not in a format that is supported!')
-                        assert.propertyVal(result.error[5], 'description', 'Validation of measurements failed: measurement type, ' +
-                            'measurement value, measurement unit is required!')
+                        assert.propertyVal(result.error[4], 'description', 'The type allowed is "temperature".')
+                        assert.propertyVal(result.error[5], 'message', 'Required fields were not provided...')
+                        assert.propertyVal(result.error[5], 'description', 'Validation of environment failed: humidity.value, ' +
+                            'humidity.unit required!')
+                        assert.propertyVal(result.error[6], 'message', 'The type of humidity provided "humiditys" is not supported...')
+                        assert.propertyVal(result.error[6], 'description', 'The type allowed is: "humidity".')
 
                         for (let i = 0; i < result.error.length; i++) {
                             assert.propertyVal(result.error[i], 'code', HttpStatus.BAD_REQUEST)
@@ -540,7 +577,8 @@ describe('Services: Environment', () => {
                             if (result.error[i].item.climatized)
                                 assert.propertyVal(result.error[i].item, 'climatized', incorrectEnvironmentsArr[i].climatized)
                             assert.propertyVal(result.error[i].item, 'timestamp', incorrectEnvironmentsArr[i].timestamp)
-                            assert.propertyVal(result.error[i].item, 'measurements', incorrectEnvironmentsArr[i].measurements)
+                            assert.propertyVal(result.error[i].item, 'temperature', incorrectEnvironmentsArr[i].temperature)
+                            assert.propertyVal(result.error[i].item, 'humidity', incorrectEnvironmentsArr[i].humidity)
                         }
 
                         assert.isEmpty(result.success)
@@ -616,7 +654,7 @@ describe('Services: Environment', () => {
                 environment.id = '507f1f77bcf86cd799439011'
                 sinon
                     .mock(modelFake)
-                    .expects('deleteOne')
+                    .expects('findOneAndDelete')
                     .withArgs(environment.id)
                     .chain('exec')
                     .resolves(true)
@@ -633,7 +671,7 @@ describe('Services: Environment', () => {
                 environment.id = '5c6dd16ea1a67d0034e6108b'
                 sinon
                     .mock(modelFake)
-                    .expects('deleteOne')
+                    .expects('findOneAndDelete')
                     .withArgs(environment.id)
                     .chain('exec')
                     .resolves(false)
@@ -651,7 +689,7 @@ describe('Services: Environment', () => {
                 environment.id = '507f1f77bcf86cd799439011'
                 sinon
                     .mock(modelFake)
-                    .expects('deleteOne')
+                    .expects('findOneAndDelete')
                     .withArgs(environment.id)
                     .chain('exec')
                     .resolves(true)
@@ -669,7 +707,7 @@ describe('Services: Environment', () => {
                 environment.id = '5c6dd16ea1a67d0034e6108b2'
                 sinon
                     .mock(modelFake)
-                    .expects('deleteOne')
+                    .expects('findOneAndDelete')
                     .withArgs(environment.id)
                     .chain('exec')
                     .rejects({ message: Strings.ENVIRONMENT.PARAM_ID_NOT_VALID_FORMAT,

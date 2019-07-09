@@ -1287,8 +1287,8 @@ describe('Services: PhysicalActivityService', () => {
                 activity.child_id = '5a62be07de34500146d9c544'     // Make child_id valid again
                 sinon
                     .mock(modelFake)
-                    .expects('deleteOne')
-                    .withArgs(activity.id)
+                    .expects('findOneAndDelete')
+                    .withArgs({ child_id: activity.child_id, _id: activity.id })
                     .chain('exec')
                     .resolves(true)
 
@@ -1304,8 +1304,8 @@ describe('Services: PhysicalActivityService', () => {
                 activity.id = '5a62be07de34500146d9c544'            // Make mock return false
                 sinon
                     .mock(modelFake)
-                    .expects('deleteOne')
-                    .withArgs(activity.id)
+                    .expects('findOneAndDelete')
+                    .withArgs({ child_id: activity.child_id, _id: activity.id })
                     .chain('exec')
                     .resolves(false)
 
@@ -1323,8 +1323,8 @@ describe('Services: PhysicalActivityService', () => {
                 activity.child_id = '5a62be07de34500146d9c544'     // Make child_id valid again
                 sinon
                     .mock(modelFake)
-                    .expects('deleteOne')
-                    .withArgs(activity.id)
+                    .expects('findOneAndDelete')
+                    .withArgs({ child_id: activity.child_id, _id: activity.id })
                     .chain('exec')
                     .resolves(true)
 
@@ -1341,8 +1341,8 @@ describe('Services: PhysicalActivityService', () => {
                 incorrectActivity.child_id = '5a62be07de34500146d9c5442'     // Make child_id invalid
                 sinon
                     .mock(modelFake)
-                    .expects('deleteOne')
-                    .withArgs(incorrectActivity.id)
+                    .expects('findOneAndDelete')
+                    .withArgs({ child_id: incorrectActivity.child_id, _id: incorrectActivity.id })
                     .chain('exec')
                     .rejects({ message: Strings.CHILD.PARAM_ID_NOT_VALID_FORMAT,
                                description: Strings.ERROR_MESSAGE.UUID_NOT_VALID_FORMAT_DESC })
@@ -1361,8 +1361,8 @@ describe('Services: PhysicalActivityService', () => {
                 incorrectActivity.id = '5a62be07de34500146d9c5442'       // Make activity id invalid
                 sinon
                     .mock(modelFake)
-                    .expects('deleteOne')
-                    .withArgs(incorrectActivity.id)
+                    .expects('findOneAndDelete')
+                    .withArgs({ child_id: incorrectActivity.child_id, _id: incorrectActivity.id })
                     .chain('exec')
                     .rejects({ message: Strings.PHYSICAL_ACTIVITY.PARAM_ID_NOT_VALID_FORMAT,
                                description: Strings.ERROR_MESSAGE.UUID_NOT_VALID_FORMAT_DESC })

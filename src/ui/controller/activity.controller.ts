@@ -20,7 +20,7 @@ import { PhysicalActivityLog } from '../../application/domain/model/physical.act
  * @remarks To define paths, we use library inversify-express-utils.
  * @see {@link https://github.com/inversify/inversify-express-utils} for further information.
  */
-@controller('/users/children')
+@controller('/v1/users/children')
 export class ActivityController {
 
     /**

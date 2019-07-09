@@ -4,7 +4,7 @@ import { Log, LogType } from '../../../src/application/domain/model/log'
 import { PhysicalActivityLog } from '../../../src/application/domain/model/physical.activity.log'
 import { PhysicalActivityLogEntityMapper } from '../../../src/infrastructure/entity/mapper/physical.activity.log.entity.mapper'
 
-describe('Mappers: PhysicalActivityLogEntity', () => {
+describe('Mappers: PhysicalActivityLogEntityMapper', () => {
     const activityLog: PhysicalActivityLog = new PhysicalActivityLog()
     activityLog.id = '5a62be07de34500146d9c544'
     activityLog.steps = [new Log('2019-03-11', 1000, LogType.STEPS, '5a62be07de34500146d9c544'),
@@ -32,7 +32,7 @@ describe('Mappers: PhysicalActivityLogEntity', () => {
         })
 
         context('when the parameter is a JSON', () => {
-            it('should not normally execute the method, returning a PhysicalActivityLog as a result of the transformation', () => {
+            it('should normally execute the method, returning a PhysicalActivityLog as a result of the transformation', () => {
                 const result = new PhysicalActivityEntityMapper().transform(activityLogJSON)
                 assert.propertyVal(result, 'id', activityLogJSON.id)
                 assert.propertyVal(result, 'steps', activityLogJSON.steps)
@@ -41,7 +41,7 @@ describe('Mappers: PhysicalActivityLogEntity', () => {
         })
 
         context('when the parameter is a undefined', () => {
-            it('should not normally execute the method, returning an empty PhysicalActivityLog as a result of the transformation', () => {
+            it('should normally execute the method, returning an empty PhysicalActivityLog as a result of the transformation', () => {
                 const result = new PhysicalActivityLogEntityMapper().transform(undefined)
 
                 assert.isObject(result)

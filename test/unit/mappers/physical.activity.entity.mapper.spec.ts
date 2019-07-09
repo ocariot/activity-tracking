@@ -2,7 +2,7 @@ import { assert } from 'chai'
 import { PhysicalActivityEntityMapper } from '../../../src/infrastructure/entity/mapper/physical.activity.entity.mapper'
 import { PhysicalActivityMock } from '../../mocks/physical.activity.mock'
 
-describe('Mappers: PhysicalActivityEntity', () => {
+describe('Mappers: PhysicalActivityEntityMapper', () => {
     const activity: PhysicalActivityMock = new PhysicalActivityMock()
 
     // Create physical activity JSON
@@ -59,7 +59,7 @@ describe('Mappers: PhysicalActivityEntity', () => {
         })
 
         context('when the parameter is a JSON', () => {
-            it('should not normally execute the method, returning a PhysicalActivity as a result of the transformation', () => {
+            it('should normally execute the method, returning a PhysicalActivity as a result of the transformation', () => {
                 const result = new PhysicalActivityEntityMapper().transform(activityJSON)
                 assert.propertyVal(result, 'id', activityJSON.id)
                 assert.propertyVal(result, 'start_time', activityJSON.start_time)
@@ -81,7 +81,7 @@ describe('Mappers: PhysicalActivityEntity', () => {
         })
 
         context('when the parameter is a undefined', () => {
-            it('should not normally execute the method, returning an empty PhysicalActivity as a result of the transformation', () => {
+            it('should normally execute the method, returning an empty PhysicalActivity as a result of the transformation', () => {
                 const result = new PhysicalActivityEntityMapper().transform(undefined)
 
                 assert.isObject(result)

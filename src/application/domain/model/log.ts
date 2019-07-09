@@ -10,7 +10,7 @@ import { Entity } from './entity'
  */
 export class Log extends Entity implements IJSONSerializable, IJSONDeserializable<Log> {
     private _date!: string // Date of the log according to the format yyyy-MM-dd.
-    private _value!: number // Total time in milliseconds spent in the day.
+    private _value!: number // Log value.
     private _type!: LogType // Log type
     private _child_id!: string // Child ID
 

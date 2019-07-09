@@ -2,6 +2,7 @@ import { assert } from 'chai'
 import { PhysicalActivity } from '../../../src/application/domain/model/physical.activity'
 import { PhysicalActivityMock } from '../../mocks/physical.activity.mock'
 import { PhysicalActivityEvent } from '../../../src/application/integration-event/event/physical.activity.event'
+import { EventType } from '../../../src/application/integration-event/event/integration.event'
 
 describe('IntegrationEvents: PhysicalActivityEvent', () => {
     describe('toJSON()', () => {
@@ -12,6 +13,7 @@ describe('IntegrationEvents: PhysicalActivityEvent', () => {
                 const result = new PhysicalActivityEvent('PhysicalActivitySaveEvent', new Date(), activity).toJSON()
                 assert.propertyVal(result, 'event_name', 'PhysicalActivitySaveEvent')
                 assert.property(result, 'timestamp')
+                assert.propertyVal(result, 'type', EventType.PHYSICAL_ACTIVITIES)
                 assert.propertyVal(result.physicalactivity, 'id', activity.id)
                 assert.propertyVal(result.physicalactivity, 'start_time', activity.start_time!.toISOString())
                 assert.propertyVal(result.physicalactivity, 'end_time', activity.end_time!.toISOString())

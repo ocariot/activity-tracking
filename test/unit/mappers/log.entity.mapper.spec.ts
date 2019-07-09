@@ -2,7 +2,7 @@ import { assert } from 'chai'
 import { Log, LogType } from '../../../src/application/domain/model/log'
 import { LogEntityMapper } from '../../../src/infrastructure/entity/mapper/log.entity.mapper'
 
-describe('Mappers: LogEntity', () => {
+describe('Mappers: LogEntityMapper', () => {
     const log: Log = new Log('2019-03-1', 1000, LogType.CALORIES, '5a62be07de34500146d9c544')
     log.id = '5a62be07de34500146d9c544'
 
@@ -28,7 +28,7 @@ describe('Mappers: LogEntity', () => {
         })
 
         context('when the parameter is a JSON', () => {
-            it('should not normally execute the method, returning a Log as a result of the transformation', () => {
+            it('should normally execute the method, returning a Log as a result of the transformation', () => {
                 const result = new LogEntityMapper().transform(logJSON)
                 assert.propertyVal(result, 'id', logJSON.id)
                 assert.propertyVal(result, 'date', (logJSON.date.toISOString()).substring(0, (logJSON.date.toISOString()).indexOf('T')))
@@ -39,7 +39,7 @@ describe('Mappers: LogEntity', () => {
         })
 
         context('when the parameter is a undefined', () => {
-            it('should not normally execute the method, returning an empty Log as a result of the transformation', () => {
+            it('should normally execute the method, returning an empty Log as a result of the transformation', () => {
                 const result = new LogEntityMapper().transform(undefined)
 
                 assert.isObject(result)

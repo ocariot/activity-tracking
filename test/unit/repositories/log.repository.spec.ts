@@ -10,7 +10,7 @@ import { LogRepository } from '../../../src/infrastructure/repository/log.reposi
 
 require('sinon-mongoose')
 
-describe('Repositories: Log', () => {
+describe('Repositories: LogRepository', () => {
     const defaultLog: Log = new LogMock()
 
     const modelFake: any = ActivityLogRepoModel
@@ -43,7 +43,7 @@ describe('Repositories: Log', () => {
                     .chain('exec')
                     .resolves(defaultLog)
 
-                return repo.findOneByChild(defaultLog.child_id, defaultLog.type, defaultLog.date)
+                return repo.selectByChild(defaultLog.child_id, defaultLog.type, defaultLog.date)
                     .then(result => {
                         assert.propertyVal(result, 'id', defaultLog.id)
                         assert.propertyVal(result, 'date', defaultLog.date)
@@ -65,17 +65,15 @@ describe('Repositories: Log', () => {
                     .chain('exec')
                     .resolves(undefined)
 
-                return repo.findOneByChild(defaultLog.child_id, defaultLog.type, defaultLog.date)
+                return repo.selectByChild(defaultLog.child_id, defaultLog.type, defaultLog.date)
                     .then(result => {
                         assert.equal(result, undefined)
                     })
             })
         })
 
-        context('when the child id of the log is invalid', () => {
+        context('when a database error occurs', () => {
             it('should throw a RepositoryException', () => {
-                defaultLog.child_id = '5a62be07de34500146d9c5442'
-
                 sinon
                     .mock(modelFake)
                     .expects('findOne')
@@ -84,28 +82,7 @@ describe('Repositories: Log', () => {
                     .rejects({ message: 'An internal error has occurred in the database!',
                                description: 'Please try again later...' })
 
-                return repo.findOneByChild(defaultLog.child_id, defaultLog.type, defaultLog.date)
-                    .catch((err: any) => {
-                        assert.propertyVal(err, 'message', 'An internal error has occurred in the database!')
-                        assert.propertyVal(err, 'description', 'Please try again later...')
-                    })
-            })
-        })
-
-        context('when the log date is invalid', () => {
-            it('should throw a RepositoryException', () => {
-                defaultLog.child_id = '5a62be07de34500146d9c544'        // Make child_id valid again
-                defaultLog.date = '20199-04-15'
-
-                sinon
-                    .mock(modelFake)
-                    .expects('findOne')
-                    .withArgs(queryMock.toJSON().filters)
-                    .chain('exec')
-                    .rejects({ message: 'An internal error has occurred in the database!',
-                               description: 'Please try again later...' })
-
-                return repo.findOneByChild(defaultLog.child_id, defaultLog.type, defaultLog.date)
+                return repo.selectByChild(defaultLog.child_id, defaultLog.type, defaultLog.date)
                     .catch((err: any) => {
                         assert.propertyVal(err, 'message', 'An internal error has occurred in the database!')
                         assert.propertyVal(err, 'description', 'Please try again later...')

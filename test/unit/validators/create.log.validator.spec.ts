@@ -5,7 +5,7 @@ import { Strings } from '../../../src/utils/strings'
 
 const log: Log = new Log('2019-03-11', 1000, LogType.STEPS, '5a62be07de34500146d9c544')
 
-describe('Validators: CreateLog', () => {
+describe('Validators: CreateLogValidator', () => {
     describe('validate(activityLog: Log)', () => {
         context('when the log has all the required parameters, and that they have valid values', () => {
             it('should return undefined representing the success of the validation', () => {

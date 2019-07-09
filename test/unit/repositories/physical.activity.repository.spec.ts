@@ -11,7 +11,7 @@ import { ObjectID } from 'bson'
 
 require('sinon-mongoose')
 
-describe('Repositories: PhysicalActivity', () => {
+describe('Repositories: PhysicalActivityRepository', () => {
     const defaultActivity: PhysicalActivity = new PhysicalActivityMock()
 
     const modelFake: any = ActivityRepoModel
@@ -66,31 +66,8 @@ describe('Repositories: PhysicalActivity', () => {
             })
         })
 
-        context('when the physical activity start_time is undefined', () => {
+        context('when a database error occurs', () => {
             it('should throw a RepositoryException', () => {
-                defaultActivity.start_time = undefined
-
-                sinon
-                    .mock(modelFake)
-                    .expects('findOne')
-                    .withArgs(queryMock.toJSON().filters)
-                    .chain('exec')
-                    .rejects({ message: 'An internal error has occurred in the database!',
-                               description: 'Please try again later...' })
-
-                return repo.checkExist(defaultActivity)
-                    .catch((err: any) => {
-                        assert.propertyVal(err, 'message', 'An internal error has occurred in the database!')
-                        assert.propertyVal(err, 'description', 'Please try again later...')
-                    })
-            })
-        })
-
-        context('when the physical activity id is undefined', () => {
-            it('should throw a RepositoryException', () => {
-                defaultActivity.start_time = new Date()
-                defaultActivity.id = undefined
-
                 sinon
                     .mock(modelFake)
                     .expects('findOne')
@@ -166,31 +143,8 @@ describe('Repositories: PhysicalActivity', () => {
             })
         })
 
-        context('when the physical activity id is invalid', () => {
+        context('when a database error occurs', () => {
             it('should throw a RepositoryException', () => {
-                defaultActivity.id = '5b4b'
-
-                sinon
-                    .mock(modelFake)
-                    .expects('findOneAndUpdate')
-                    .withArgs(customQueryMock.toJSON().filters)
-                    .chain('exec')
-                    .rejects({ message: 'An internal error has occurred in the database!',
-                               description: 'Please try again later...' })
-
-                return repo.updateByChild(defaultActivity)
-                    .catch((err) => {
-                        assert.propertyVal(err, 'message', 'An internal error has occurred in the database!')
-                        assert.propertyVal(err, 'description', 'Please try again later...')
-                    })
-            })
-        })
-
-        context('when the physical activity child_id is invalid', () => {
-            it('should throw a RepositoryException', () => {
-                defaultActivity.id = `${new ObjectID()}`
-                defaultActivity.child_id = '5b4b'
-
                 sinon
                     .mock(modelFake)
                     .expects('findOneAndUpdate')
@@ -246,7 +200,7 @@ describe('Repositories: PhysicalActivity', () => {
             })
         })
 
-        context('when the physical activity id is invalid', () => {
+        context('when a database error occurs', () => {
             it('should throw a RepositoryException', () => {
                 defaultActivity.id = '1a2b3c'
 
@@ -259,27 +213,6 @@ describe('Repositories: PhysicalActivity', () => {
                                description: 'Please try again later...' })
 
                 return repo.removeByChild(defaultActivity.id, defaultActivity.child_id)
-                    .catch (err => {
-                        assert.propertyVal(err, 'message', 'An internal error has occurred in the database!')
-                        assert.propertyVal(err, 'description', 'Please try again later...')
-                    })
-            })
-        })
-
-        context('when the physical activity child_id is invalid', () => {
-            it('should throw a RepositoryException', () => {
-                defaultActivity.id = `${new ObjectID()}`
-                defaultActivity.child_id = '1a2b3c'
-
-                sinon
-                    .mock(modelFake)
-                    .expects('findOneAndDelete')
-                    .withArgs({ child_id: defaultActivity.child_id, _id: defaultActivity.id })
-                    .chain('exec')
-                    .rejects({ message: 'An internal error has occurred in the database!',
-                               description: 'Please try again later...' })
-
-                return repo.removeByChild(defaultActivity.id!, defaultActivity.child_id)
                     .catch (err => {
                         assert.propertyVal(err, 'message', 'An internal error has occurred in the database!')
                         assert.propertyVal(err, 'description', 'Please try again later...')
@@ -322,10 +255,8 @@ describe('Repositories: PhysicalActivity', () => {
             })
         })
 
-        context('when the child_id parameter is invalid', () => {
+        context('when a database error occurs', () => {
             it('should throw a RepositoryException', () => {
-                defaultActivity.child_id = '1a2b3c'
-
                 sinon
                     .mock(modelFake)
                     .expects('deleteMany')

@@ -24,7 +24,7 @@ dataSet.push(dataSetItem)
 dataSet.push(dataSetItem2)
 dataSet.push(dataSetItem3)
 
-describe('Validators: SleepPatternDataSet', () => {
+describe('Validators: SleepPatternDataSetValidator', () => {
     describe('validate(dataset: Array<SleepPatternDataSet>)', () => {
         context('when the sleep pattern data set array has all the required parameters, and that they have valid values', () => {
             it('should return undefined representing the success of the validation', () => {

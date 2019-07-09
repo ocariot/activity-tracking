@@ -106,7 +106,7 @@ describe('Routes: users.children.sleep', () => {
     /**
      * POST route with only one Sleep in the body
      */
-    describe('POST /users/children/:child_id/sleep with only one Sleep in the body', () => {
+    describe('POST /v1/users/children/:child_id/sleep with only one Sleep in the body', () => {
         context('when posting a new Sleep with success', () => {
             it('should return status code 201 and the saved Sleep', () => {
                 const body = {
@@ -117,21 +117,16 @@ describe('Routes: users.children.sleep', () => {
                 }
 
                 return request
-                    .post(`/users/children/${defaultSleep.child_id}/sleep`)
+                    .post(`/v1/users/children/${defaultSleep.child_id}/sleep`)
                     .send(body)
                     .set('Content-Type', 'application/json')
                     .expect(201)
                     .then(res => {
                         defaultSleep.id = res.body.id
                         expect(res.body.id).to.eql(defaultSleep.id)
-                        expect(res.body).to.have.property('start_time')
                         expect(res.body.start_time).to.eql(defaultSleep.start_time!.toISOString())
-                        expect(res.body).to.have.property('end_time')
                         expect(res.body.end_time).to.eql(defaultSleep.end_time!.toISOString())
-                        expect(res.body).to.have.property('duration')
                         expect(res.body.duration).to.eql(defaultSleep.duration)
-                        expect(res.body).to.have.property('pattern')
-                        expect(res.body).to.have.property('child_id')
                         expect(res.body.child_id).to.eql(defaultSleep.child_id)
                     })
             })
@@ -147,7 +142,7 @@ describe('Routes: users.children.sleep', () => {
                 }
 
                 return request
-                    .post(`/users/children/${defaultSleep.child_id}/sleep`)
+                    .post(`/v1/users/children/${defaultSleep.child_id}/sleep`)
                     .send(body)
                     .set('Content-Type', 'application/json')
                     .expect(409)
@@ -163,7 +158,7 @@ describe('Routes: users.children.sleep', () => {
                 const body = {}
 
                 return request
-                    .post(`/users/children/${defaultSleep.child_id}/sleep`)
+                    .post(`/v1/users/children/${defaultSleep.child_id}/sleep`)
                     .send(body)
                     .set('Content-Type', 'application/json')
                     .expect(400)
@@ -184,7 +179,7 @@ describe('Routes: users.children.sleep', () => {
                 }
 
                 return request
-                    .post(`/users/children/${defaultSleep.child_id}/sleep`)
+                    .post(`/v1/users/children/${defaultSleep.child_id}/sleep`)
                     .send(body)
                     .set('Content-Type', 'application/json')
                     .expect(400)
@@ -206,7 +201,7 @@ describe('Routes: users.children.sleep', () => {
                 }
 
                 return request
-                    .post(`/users/children/${defaultSleep.child_id}/sleep`)
+                    .post(`/v1/users/children/${defaultSleep.child_id}/sleep`)
                     .send(body)
                     .set('Content-Type', 'application/json')
                     .expect(400)
@@ -229,7 +224,7 @@ describe('Routes: users.children.sleep', () => {
                 }
 
                 return request
-                    .post(`/users/children/${defaultSleep.child_id}/sleep`)
+                    .post(`/v1/users/children/${defaultSleep.child_id}/sleep`)
                     .send(body)
                     .set('Content-Type', 'application/json')
                     .expect(400)
@@ -252,7 +247,7 @@ describe('Routes: users.children.sleep', () => {
                 }
 
                 return request
-                    .post(`/users/children/${defaultSleep.child_id}/sleep`)
+                    .post(`/v1/users/children/${defaultSleep.child_id}/sleep`)
                     .send(body)
                     .set('Content-Type', 'application/json')
                     .expect(400)
@@ -274,7 +269,7 @@ describe('Routes: users.children.sleep', () => {
                 }
 
                 return request
-                    .post(`/users/children/123/sleep`)
+                    .post(`/v1/users/children/123/sleep`)
                     .send(body)
                     .set('Content-Type', 'application/json')
                     .expect(400)
@@ -296,7 +291,7 @@ describe('Routes: users.children.sleep', () => {
                 }
 
                 return request
-                    .post(`/users/children/${defaultSleep.child_id}/sleep`)
+                    .post(`/v1/users/children/${defaultSleep.child_id}/sleep`)
                     .send(body)
                     .set('Content-Type', 'application/json')
                     .expect(400)
@@ -320,7 +315,7 @@ describe('Routes: users.children.sleep', () => {
                 }
 
                 return request
-                    .post(`/users/children/${defaultSleep.child_id}/sleep`)
+                    .post(`/v1/users/children/${defaultSleep.child_id}/sleep`)
                     .send(body)
                     .set('Content-Type', 'application/json')
                     .expect(400)
@@ -346,7 +341,7 @@ describe('Routes: users.children.sleep', () => {
                 }
 
                 return request
-                    .post(`/users/children/${defaultSleep.child_id}/sleep`)
+                    .post(`/v1/users/children/${defaultSleep.child_id}/sleep`)
                     .send(body)
                     .set('Content-Type', 'application/json')
                     .expect(400)
@@ -377,7 +372,7 @@ describe('Routes: users.children.sleep', () => {
                 }
 
                 return request
-                    .post(`/users/children/${defaultSleep.child_id}/sleep`)
+                    .post(`/v1/users/children/${defaultSleep.child_id}/sleep`)
                     .send(body)
                     .set('Content-Type', 'application/json')
                     .expect(400)
@@ -393,7 +388,7 @@ describe('Routes: users.children.sleep', () => {
     /**
      * POST route with a Sleep array in the body
      */
-    describe('POST /users/children/:child_id/sleep with a Sleep array in the body', () => {
+    describe('POST /v1/users/children/:child_id/sleep with a Sleep array in the body', () => {
         context('when all the sleep objects are correct and still do not exist in the repository', () => {
             before(() => {
                 try {
@@ -418,7 +413,7 @@ describe('Routes: users.children.sleep', () => {
                 })
 
                 return request
-                    .post(`/users/children/${defaultSleep.child_id}/sleep`)
+                    .post(`/v1/users/children/${defaultSleep.child_id}/sleep`)
                     .send(body)
                     .set('Content-Type', 'application/json')
                     .expect(201)
@@ -453,7 +448,7 @@ describe('Routes: users.children.sleep', () => {
                 })
 
                 return request
-                    .post(`/users/children/${defaultSleep.child_id}/sleep`)
+                    .post(`/v1/users/children/${defaultSleep.child_id}/sleep`)
                     .send(body)
                     .set('Content-Type', 'application/json')
                     .expect(201)
@@ -497,7 +492,7 @@ describe('Routes: users.children.sleep', () => {
                 })
 
                 return request
-                    .post(`/users/children/${defaultSleep.child_id}/sleep`)
+                    .post(`/v1/users/children/${defaultSleep.child_id}/sleep`)
                     .send(body)
                     .set('Content-Type', 'application/json')
                     .expect(201)
@@ -543,7 +538,7 @@ describe('Routes: users.children.sleep', () => {
                 })
 
                 return request
-                    .post(`/users/children/${defaultSleep.child_id}/sleep`)
+                    .post(`/v1/users/children/${defaultSleep.child_id}/sleep`)
                     .send(body)
                     .set('Content-Type', 'application/json')
                     .expect(201)
@@ -593,7 +588,7 @@ describe('Routes: users.children.sleep', () => {
     /**
      * Route GET all
      */
-    describe('GET /users/children/sleep', () => {
+    describe('GET /v1/users/children/sleep', () => {
         context('when get all sleep of the database successfully', () => {
             it('should return status code 200 and a list of all sleep found', async () => {
                 await createSleep({
@@ -621,7 +616,7 @@ describe('Routes: users.children.sleep', () => {
                 })
 
                 return request
-                    .get('/users/children/sleep')
+                    .get('/v1/users/children/sleep')
                     .set('Content-Type', 'application/json')
                     .expect(200)
                     .then(res => {
@@ -652,7 +647,7 @@ describe('Routes: users.children.sleep', () => {
 
             it('should return status code 200 and an empty list', async () => {
                 return request
-                    .get('/users/children/sleep')
+                    .get('/v1/users/children/sleep')
                     .set('Content-Type', 'application/json')
                     .expect(200)
                     .then(res => {
@@ -726,7 +721,7 @@ describe('Routes: users.children.sleep', () => {
                     throw new Error('Failure on users.children.sleep routes test: ' + err.message)
                 }
 
-                const url = `/users/children/sleep?child_id=${defaultSleep.child_id}&fields=start_time,end_time,
+                const url = `/v1/users/children/sleep?child_id=${defaultSleep.child_id}&fields=start_time,end_time,
                     duration,pattern,child_id&sort=child_id&page=1&limit=3`
 
                 return request
@@ -761,7 +756,7 @@ describe('Routes: users.children.sleep', () => {
             })
 
             it('should return status code 200 and an empty list', async () => {
-                const url = `/users/children/sleep?child_id=${defaultSleep.child_id}&fields=start_time,end_time,
+                const url = `/v1/users/children/sleep?child_id=${defaultSleep.child_id}&fields=start_time,end_time,
                     duration,pattern,child_id&sort=child_id&page=1&limit=3`
 
                 return request
@@ -778,7 +773,7 @@ describe('Routes: users.children.sleep', () => {
     /**
      * Route GET all sleep by child
      */
-    describe('GET /users/children/:child_id/sleep', () => {
+    describe('GET /v1/users/children/:child_id/sleep', () => {
         context('when get all sleep of a specific child of the database successfully', () => {
             before(() => {
                 try {
@@ -818,7 +813,7 @@ describe('Routes: users.children.sleep', () => {
                 }
 
                 return request
-                    .get(`/users/children/${defaultSleep.child_id}/sleep`)
+                    .get(`/v1/users/children/${defaultSleep.child_id}/sleep`)
                     .set('Content-Type', 'application/json')
                     .expect(200)
                     .then(res => {
@@ -849,7 +844,7 @@ describe('Routes: users.children.sleep', () => {
 
             it('should return status code 200 and an empty list', async () => {
                 return request
-                    .get(`/users/children/${defaultSleep.child_id}/sleep`)
+                    .get(`/v1/users/children/${defaultSleep.child_id}/sleep`)
                     .set('Content-Type', 'application/json')
                     .expect(200)
                     .then(res => {
@@ -898,7 +893,7 @@ describe('Routes: users.children.sleep', () => {
                 }
 
                 return request
-                    .get(`/users/children/123/sleep`)
+                    .get(`/v1/users/children/123/sleep`)
                     .set('Content-Type', 'application/json')
                     .expect(400)
                     .then(err => {
@@ -949,7 +944,7 @@ describe('Routes: users.children.sleep', () => {
                     throw new Error('Failure on users.children.sleep routes test: ' + err.message)
                 }
 
-                const url = `/users/children/${defaultSleep.child_id}/sleep?child_id=${defaultSleep.child_id}&fields=start_time,end_time,
+                const url = `/v1/users/children/${defaultSleep.child_id}/sleep?child_id=${defaultSleep.child_id}&fields=start_time,end_time,
                     duration,pattern,child_id&sort=child_id&page=1&limit=3`
 
                 return request
@@ -984,7 +979,7 @@ describe('Routes: users.children.sleep', () => {
             })
 
             it('should return status code 200 and an empty list', async () => {
-                const url = `/users/children/${defaultSleep.child_id}/sleep?child_id=${defaultSleep.child_id}&fields=start_time,end_time,
+                const url = `/v1/users/children/${defaultSleep.child_id}/sleep?child_id=${defaultSleep.child_id}&fields=start_time,end_time,
                     duration,pattern,child_id&sort=child_id&page=1&limit=3`
 
                 return request
@@ -1037,7 +1032,7 @@ describe('Routes: users.children.sleep', () => {
                     throw new Error('Failure on users.children.sleep routes test: ' + err.message)
                 }
 
-                const url = `/users/children/123/sleep?child_id=${defaultSleep.child_id}&fields=start_time,end_time,
+                const url = `/v1/users/children/123/sleep?child_id=${defaultSleep.child_id}&fields=start_time,end_time,
                     duration,pattern,child_id&sort=child_id&page=1&limit=3`
 
                 return request
@@ -1055,7 +1050,7 @@ describe('Routes: users.children.sleep', () => {
     /**
      * Route GET a sleep by child
      */
-    describe('GET /users/children/:child_id/sleep/:sleep_id', () => {
+    describe('GET /v1/users/children/:child_id/sleep/:sleep_id', () => {
         context('when get a specific sleep of a child of the database successfully', () => {
             before(() => {
                 try {
@@ -1097,7 +1092,7 @@ describe('Routes: users.children.sleep', () => {
                 }
 
                 return request
-                    .get(`/users/children/${result.child_id}/sleep/${result.id}`)
+                    .get(`/v1/users/children/${result.child_id}/sleep/${result.id}`)
                     .set('Content-Type', 'application/json')
                     .expect(200)
                     .then(res => {
@@ -1125,7 +1120,7 @@ describe('Routes: users.children.sleep', () => {
 
             it('should return status code 404 and an info message describing that sleep was not found', async () => {
                 return request
-                    .get(`/users/children/${defaultSleep.child_id}/sleep/${defaultSleep.id}`)
+                    .get(`/v1/users/children/${defaultSleep.child_id}/sleep/${defaultSleep.id}`)
                     .set('Content-Type', 'application/json')
                     .expect(404)
                     .then(err => {
@@ -1178,7 +1173,7 @@ describe('Routes: users.children.sleep', () => {
                 }
 
                 return request
-                    .get(`/users/children/123/sleep/${result.id}`)
+                    .get(`/v1/users/children/123/sleep/${result.id}`)
                     .set('Content-Type', 'application/json')
                     .expect(400)
                     .then(err => {
@@ -1230,7 +1225,7 @@ describe('Routes: users.children.sleep', () => {
                 }
 
                 return request
-                    .get(`/users/children/${result.child_id}/sleep/123`)
+                    .get(`/v1/users/children/${result.child_id}/sleep/123`)
                     .set('Content-Type', 'application/json')
                     .expect(400)
                     .then(err => {
@@ -1283,8 +1278,8 @@ describe('Routes: users.children.sleep', () => {
                     throw new Error('Failure on users.children.sleep routes test: ' + err.message)
                 }
 
-                const url = `/users/children/${result.child_id}/sleep/${result.id}?child_id=${result.child_id}&fields=start_time,end_time,
-                    duration,pattern,child_id&sort=child_id&page=1&limit=3`
+                const url = `/v1/users/children/${result.child_id}/sleep/${result.id}?child_id=${result.child_id}
+                    &fields=start_time,end_time,duration,pattern,child_id&sort=child_id&page=1&limit=3`
 
                 return request
                     .get(url)
@@ -1312,7 +1307,7 @@ describe('Routes: users.children.sleep', () => {
             })
 
             it('should return status code 404 and an info message describing that sleep was not found', async () => {
-                const url = `/users/children/${defaultSleep.child_id}/sleep/${defaultSleep.id}?child_id=${defaultSleep.child_id}
+                const url = `/v1/users/children/${defaultSleep.child_id}/sleep/${defaultSleep.id}?child_id=${defaultSleep.child_id}
                     &fields=start_time,end_time, duration,pattern,child_id&sort=child_id&page=1&limit=3`
 
                 return request
@@ -1369,7 +1364,7 @@ describe('Routes: users.children.sleep', () => {
                     throw new Error('Failure on users.children.sleep routes test: ' + err.message)
                 }
 
-                const url = `/users/children/123/sleep/${result.id}?child_id=${result.child_id}&fields=start_time,end_time,
+                const url = `/v1/users/children/123/sleep/${result.id}?child_id=${result.child_id}&fields=start_time,end_time,
                     duration,pattern,child_id&sort=child_id&page=1&limit=3`
 
                 return request
@@ -1425,7 +1420,7 @@ describe('Routes: users.children.sleep', () => {
                     throw new Error('Failure on users.children.sleep routes test: ' + err.message)
                 }
 
-                const url = `/users/children/${result.child_id}/sleep/123?child_id=${result.child_id}&fields=start_time,end_time,
+                const url = `/v1/users/children/${result.child_id}/sleep/123?child_id=${result.child_id}&fields=start_time,end_time,
                     duration,pattern,child_id&sort=child_id&page=1&limit=3`
 
                 return request
@@ -1443,7 +1438,7 @@ describe('Routes: users.children.sleep', () => {
     /**
      * PATCH route
      */
-    describe('PATCH /users/children/:child_id/sleep/:sleep_id', () => {
+    describe('PATCH /v1/users/children/:child_id/sleep/:sleep_id', () => {
         context('when this sleep exists in the database and is updated successfully', () => {
             before(() => {
                 try {
@@ -1472,7 +1467,7 @@ describe('Routes: users.children.sleep', () => {
                 }
 
                 return request
-                    .patch(`/users/children/${result.child_id}/sleep/${result.id}`)
+                    .patch(`/v1/users/children/${result.child_id}/sleep/${result.id}`)
                     .send(body)
                     .set('Content-Type', 'application/json')
                     .expect(200)
@@ -1507,7 +1502,7 @@ describe('Routes: users.children.sleep', () => {
                 }
 
                 return request
-                    .patch(`/users/children/${defaultSleep.child_id}/sleep/${defaultSleep.id}`)
+                    .patch(`/v1/users/children/${defaultSleep.child_id}/sleep/${defaultSleep.id}`)
                     .send(body)
                     .set('Content-Type', 'application/json')
                     .expect(404)
@@ -1548,7 +1543,7 @@ describe('Routes: users.children.sleep', () => {
                 }
 
                 return request
-                    .patch(`/users/children/123/sleep/${result.id}`)
+                    .patch(`/v1/users/children/123/sleep/${result.id}`)
                     .send(body)
                     .set('Content-Type', 'application/json')
                     .expect(400)
@@ -1588,7 +1583,7 @@ describe('Routes: users.children.sleep', () => {
                 }
 
                 return request
-                    .patch(`/users/children/${result.child_id}/sleep/123`)
+                    .patch(`/v1/users/children/${result.child_id}/sleep/123`)
                     .send(body)
                     .set('Content-Type', 'application/json')
                     .expect(400)
@@ -1625,7 +1620,7 @@ describe('Routes: users.children.sleep', () => {
                 }
 
                 return request
-                    .patch(`/users/children/${result.child_id}/sleep/${result.id}`)
+                    .patch(`/v1/users/children/${result.child_id}/sleep/${result.id}`)
                     .send(body)
                     .set('Content-Type', 'application/json')
                     .expect(400)
@@ -1665,7 +1660,7 @@ describe('Routes: users.children.sleep', () => {
                 }
 
                 return request
-                    .patch(`/users/children/${result.child_id}/sleep/${result.id}`)
+                    .patch(`/v1/users/children/${result.child_id}/sleep/${result.id}`)
                     .send(body)
                     .set('Content-Type', 'application/json')
                     .expect(400)
@@ -1707,7 +1702,7 @@ describe('Routes: users.children.sleep', () => {
                 }
 
                 return request
-                    .patch(`/users/children/${result.child_id}/sleep/${result.id}`)
+                    .patch(`/v1/users/children/${result.child_id}/sleep/${result.id}`)
                     .send(body)
                     .set('Content-Type', 'application/json')
                     .expect(400)
@@ -1751,7 +1746,7 @@ describe('Routes: users.children.sleep', () => {
                 }
 
                 return request
-                    .patch(`/users/children/${result.child_id}/sleep/${result.id}`)
+                    .patch(`/v1/users/children/${result.child_id}/sleep/${result.id}`)
                     .send(body)
                     .set('Content-Type', 'application/json')
                     .expect(400)
@@ -1800,7 +1795,7 @@ describe('Routes: users.children.sleep', () => {
                 }
 
                 return request
-                    .patch(`/users/children/${result.child_id}/sleep/${result.id}`)
+                    .patch(`/v1/users/children/${result.child_id}/sleep/${result.id}`)
                     .send(body)
                     .set('Content-Type', 'application/json')
                     .expect(400)
@@ -1816,7 +1811,7 @@ describe('Routes: users.children.sleep', () => {
     /**
      * DELETE route
      */
-    describe('DELETE /users/children/:child_id/sleep/:sleep_id', () => {
+    describe('DELETE /v1/users/children/:child_id/sleep/:sleep_id', () => {
         context('when the sleep was deleted successfully', () => {
             before(() => {
                 try {
@@ -1858,7 +1853,7 @@ describe('Routes: users.children.sleep', () => {
                 }
 
                 return request
-                    .delete(`/users/children/${result.child_id}/sleep/${result.id}`)
+                    .delete(`/v1/users/children/${result.child_id}/sleep/${result.id}`)
                     .set('Content-Type', 'application/json')
                     .expect(204)
                     .then(res => {
@@ -1878,7 +1873,7 @@ describe('Routes: users.children.sleep', () => {
 
             it('should return status code 204 and no content for sleep', async () => {
                 return request
-                    .delete(`/users/children/${defaultSleep.child_id}/sleep/${defaultSleep.id}`)
+                    .delete(`/v1/users/children/${defaultSleep.child_id}/sleep/${defaultSleep.id}`)
                     .set('Content-Type', 'application/json')
                     .expect(204)
                     .then(res => {
@@ -1928,7 +1923,7 @@ describe('Routes: users.children.sleep', () => {
                 }
 
                 return request
-                    .delete(`/users/children/123/sleep/${result.id}`)
+                    .delete(`/v1/users/children/123/sleep/${result.id}`)
                     .set('Content-Type', 'application/json')
                     .expect(400)
                     .then(err => {
@@ -1980,7 +1975,7 @@ describe('Routes: users.children.sleep', () => {
                 }
 
                 return request
-                    .delete(`/users/children/${result.child_id}/sleep/123`)
+                    .delete(`/v1/users/children/${result.child_id}/sleep/123`)
                     .set('Content-Type', 'application/json')
                     .expect(400)
                     .then(err => {

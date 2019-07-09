@@ -16,7 +16,7 @@ import { MultiStatus } from '../../application/domain/model/multi.status'
  * @remarks To define paths, we use library inversify-express-utils.
  * @see {@link https://github.com/inversify/inversify-express-utils} for further information.
  */
-@controller('/environments')
+@controller('/v1/environments')
 export class EnvironmentController {
 
     /**

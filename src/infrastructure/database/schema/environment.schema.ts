@@ -20,20 +20,22 @@ const environmentSchema = new Mongoose.Schema({
             latitude: { type: Number },
             longitude: { type: Number }
         },
-        measurements: [{
-            type: {
-                type: String,
-                required: true
-            },
+        temperature: {
             value: {
-                type: Number,
-                required: true
+                type: Number
             },
             unit: {
-                type: String,
-                required: true
+                type: String
             }
-        }],
+        },
+        humidity: {
+            value: {
+                type: Number
+            },
+            unit: {
+                type: String
+            }
+        },
         climatized: { type: Boolean },
         timestamp: {
             type: Date,

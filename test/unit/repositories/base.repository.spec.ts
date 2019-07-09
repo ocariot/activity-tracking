@@ -23,7 +23,7 @@ class TestRepository<T extends Entity, TModel> extends BaseRepository<any, any> 
     }
 }
 
-describe('Repositories: Base', () => {
+describe('Repositories: BaseRepository', () => {
 
     const defaultSleep: Sleep = new SleepMock()
 
