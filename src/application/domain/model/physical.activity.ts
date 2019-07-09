@@ -3,6 +3,7 @@ import { IJSONDeserializable } from '../utils/json.deserializable.interface'
 import { JsonUtils } from '../utils/json.utils'
 import { PhysicalActivityLevel } from './physical.activity.level'
 import { Activity } from './activity'
+import { PhysicalActivityHeartRate } from './physical.activity.heart.rate'
 
 /**
  * Implementation of the physical physicalactivity entity.
@@ -15,6 +16,7 @@ export class PhysicalActivity extends Activity implements IJSONSerializable, IJS
     private _calories?: number // Calories spent during physical physicalactivity.
     private _steps?: number // Number of steps taken during the physical physicalactivity.
     private _levels?: Array<PhysicalActivityLevel> // PhysicalActivity levels (sedentary, light, fair or very).
+    private _heart_rate?: PhysicalActivityHeartRate // PhysicalActivity heart rate
 
     constructor() {
         super()
@@ -52,6 +54,14 @@ export class PhysicalActivity extends Activity implements IJSONSerializable, IJS
         this._levels = value
     }
 
+    get heart_rate(): PhysicalActivityHeartRate | undefined {
+        return this._heart_rate
+    }
+
+    set heart_rate(value: PhysicalActivityHeartRate | undefined) {
+        this._heart_rate = value
+    }
+
     public fromJSON(json: any): PhysicalActivity {
         if (!json) return this
         super.fromJSON(json)
@@ -66,6 +76,7 @@ export class PhysicalActivity extends Activity implements IJSONSerializable, IJS
         if (json.levels !== undefined && json.levels instanceof Array) {
             this.levels = json.levels.map(level => new PhysicalActivityLevel().fromJSON(level))
         }
+        if (json.heart_rate) this.heart_rate = json.heart_rate
 
         return this
     }
@@ -77,7 +88,8 @@ export class PhysicalActivity extends Activity implements IJSONSerializable, IJS
                 name: this.name,
                 calories: this.calories,
                 steps: this.steps,
-                levels: this.levels ? this.levels.map(item => item.toJSON()) : this.levels
+                levels: this.levels ? this.levels.map(item => item.toJSON()) : this.levels,
+                heart_rate: this.heart_rate
             }
         }
     }

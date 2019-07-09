@@ -12,6 +12,7 @@ import { SleepPattern } from './sleep.pattern'
  */
 export class Sleep extends Activity implements IJSONSerializable, IJSONDeserializable<Sleep> {
     private _pattern?: SleepPattern // Sleep pattern tracking.
+    private _type?: SleepType // Type of Sleep modeling
 
     constructor() {
         super()
@@ -23,6 +24,14 @@ export class Sleep extends Activity implements IJSONSerializable, IJSONDeseriali
 
     set pattern(value: SleepPattern | undefined) {
         this._pattern = value
+    }
+
+    get type(): SleepType | undefined {
+        return this._type
+    }
+
+    set type(value: SleepType | undefined) {
+        this._type = value
     }
 
     public fromJSON(json: any): Sleep {
@@ -46,4 +55,12 @@ export class Sleep extends Activity implements IJSONSerializable, IJSONDeseriali
             }
         }
     }
+}
+
+/**
+ * Name of traceable sleep types.
+ */
+export enum SleepType {
+    CLASSIC = 'classic',
+    STAGES = 'stages'
 }
