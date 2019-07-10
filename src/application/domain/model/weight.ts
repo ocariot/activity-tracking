@@ -52,7 +52,7 @@ export class Weight extends Measurement implements IJSONSerializable, IJSONDeser
             value: this.value,
             unit: this.unit,
             child_id: this.child_id,
-            body_fat: (this.body_fat) ? this.body_fat.value : undefined
+            body_fat: this.body_fat ? this.body_fat.value : undefined
         }
     }
 }

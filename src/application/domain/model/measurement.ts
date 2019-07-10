@@ -98,7 +98,7 @@ export class Measurement extends Entity implements IJSONSerializable, IJSONDeser
 }
 
 /**
- * Name of traceable sleep stages.
+ * Name of traceable measurements.
  */
 export enum MeasurementType {
     TEMPERATURE = 'temperature',

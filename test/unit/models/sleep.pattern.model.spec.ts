@@ -1,7 +1,7 @@
 import { assert } from 'chai'
 import { SleepPatternSummaryData } from '../../../src/application/domain/model/sleep.pattern.summary.data'
 import { SleepPattern, SleepPatternType } from '../../../src/application/domain/model/sleep.pattern'
-import { SleepPatternSummary } from '../../../src/application/domain/model/sleep.pattern.summary'
+import { SleepPatternPhasesSummary } from '../../../src/application/domain/model/sleep.pattern.phases.summary'
 import { SleepPatternDataSet } from '../../../src/application/domain/model/sleep.pattern.data.set'
 
 describe('Models: SleepPattern', () => {
@@ -22,7 +22,7 @@ describe('Models: SleepPattern', () => {
 
     const summaryDataJSON: any = {
         data_set: [dataSetItem, dataSetItem2, dataSetItem3],
-        summary: new SleepPatternSummary(new SleepPatternSummaryData(2, 10000),
+        summary: new SleepPatternPhasesSummary(new SleepPatternSummaryData(2, 10000),
                                          new SleepPatternSummaryData(3, 20000),
                                          new SleepPatternSummaryData(4, 30000))
     }

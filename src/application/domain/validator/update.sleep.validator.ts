@@ -12,6 +12,6 @@ export class UpdateSleepValidator {
             throw new ValidationException('Duration field is invalid...',
                 'Sleep validation failed: '.concat(Strings.ERROR_MESSAGE.NEGATIVE_PARAMETER))
         }
-        if (sleep.pattern) SleepPatternValidator.validate(sleep.pattern)
+        if (sleep.pattern) SleepPatternValidator.validate(sleep.pattern, sleep.type!)
     }
 }

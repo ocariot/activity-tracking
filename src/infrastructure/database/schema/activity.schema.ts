@@ -39,6 +39,55 @@ const physicalActivitySchema = new Mongoose.Schema({
                 }
             }
         ],
+        heart_rate: {
+            average: {
+                type: Number
+            },
+            out_of_range_zone: {
+                min: {
+                    type: Number
+                },
+                max: {
+                    type: Number
+                },
+                duration: {
+                    type: Number
+                }
+            },
+            fat_burn_zone: {
+                min: {
+                    type: Number
+                },
+                max: {
+                    type: Number
+                },
+                duration: {
+                    type: Number
+                }
+            },
+            cardio_zone: {
+                min: {
+                    type: Number
+                },
+                max: {
+                    type: Number
+                },
+                duration: {
+                    type: Number
+                }
+            },
+            peak_zone: {
+                min: {
+                    type: Number
+                },
+                max: {
+                    type: Number
+                },
+                duration: {
+                    type: Number
+                }
+            }
+        },
         child_id: {
             type: Mongoose.Schema.Types.ObjectId,
             required: true

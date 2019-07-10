@@ -87,8 +87,8 @@ export class Environment extends Entity implements IJSONSerializable, IJSONDeser
         if (json.id !== undefined) super.id = json.id
         if (json.institution_id !== undefined) this.institution_id = json.institution_id
         if (json.location !== undefined) this.location = new Location().fromJSON(json.location)
-        if (json.temperature !== undefined) this.temperature = json.temperature
-        if (json.humidity !== undefined) this.humidity = json.humidity
+        if (json.temperature !== undefined) this.temperature = new Temperature().fromJSON(json.temperature)
+        if (json.humidity !== undefined) this.humidity = new Humidity().fromJSON(json.humidity)
         this.climatized = json.climatized
         if (json.timestamp !== undefined) this.timestamp = this.convertDatetimeString(json.timestamp)
 
@@ -100,8 +100,14 @@ export class Environment extends Entity implements IJSONSerializable, IJSONDeser
             id: super.id,
             institution_id: this.institution_id,
             location: this.location ? this.location.toJSON() : this.location,
-            temperature: this.temperature,
-            humidity: this.humidity,
+            temperature: this.temperature ? {
+                value: this.temperature.value,
+                unit: this.temperature.unit
+            } : this.temperature,
+            humidity: this.humidity ? {
+                value: this.humidity.value,
+                unit: this.humidity.unit
+            } : this.humidity,
             climatized: this.climatized,
             timestamp: this.timestamp
         }

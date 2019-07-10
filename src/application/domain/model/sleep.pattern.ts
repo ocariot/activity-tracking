@@ -1,8 +1,9 @@
 import { SleepPatternDataSet } from './sleep.pattern.data.set'
-import { SleepPatternSummary } from './sleep.pattern.summary'
+import { SleepPatternPhasesSummary } from './sleep.pattern.phases.summary'
 import { IJSONSerializable } from '../utils/json.serializable.interface'
 import { IJSONDeserializable } from '../utils/json.deserializable.interface'
 import { JsonUtils } from '../utils/json.utils'
+import { SleepPatternStagesSummary } from './sleep.pattern.stages.summary'
 
 /**
  * Implementation of the entity of the pattern of sleep.
@@ -11,7 +12,7 @@ import { JsonUtils } from '../utils/json.utils'
  */
 export class SleepPattern implements IJSONSerializable, IJSONDeserializable<SleepPattern> {
     private _data_set!: Array<SleepPatternDataSet> // Sleep pattern tracking.
-    private _summary!: SleepPatternSummary // Summary of sleep pattern.
+    private _summary!: SleepPatternPhasesSummary | SleepPatternStagesSummary // Summary of sleep pattern.
 
     get data_set(): Array<SleepPatternDataSet> {
         return this._data_set
@@ -21,11 +22,11 @@ export class SleepPattern implements IJSONSerializable, IJSONDeserializable<Slee
         this._data_set = value
     }
 
-    get summary(): SleepPatternSummary {
+    get summary(): SleepPatternPhasesSummary | SleepPatternStagesSummary {
         return this._summary
     }
 
-    set summary(value: SleepPatternSummary) {
+    set summary(value: SleepPatternPhasesSummary | SleepPatternStagesSummary) {
         this._summary = value
     }
 
@@ -38,7 +39,7 @@ export class SleepPattern implements IJSONSerializable, IJSONDeserializable<Slee
         if (json.data_set !== undefined && json.data_set instanceof Array) {
             this.data_set = json.data_set.map(patternDataSet => new SleepPatternDataSet().fromJSON(patternDataSet))
         }
-        if (json.summary !== undefined) this.summary = new SleepPatternSummary().fromJSON(json.summary)
+        if (json.summary !== undefined) this.summary = new SleepPatternPhasesSummary().fromJSON(json.summary)
 
         return this
     }
@@ -49,13 +50,4 @@ export class SleepPattern implements IJSONSerializable, IJSONDeserializable<Slee
             summary: this.summary ? this.summary.toJSON() : this.summary
         }
     }
-}
-
-/**
- * Name of traceable sleep stages.
- */
-export enum SleepPatternType {
-    AWAKE = 'awake',
-    ASLEEP = 'asleep',
-    RESTLESS = 'restless'
 }

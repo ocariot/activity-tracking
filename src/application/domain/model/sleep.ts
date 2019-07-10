@@ -11,8 +11,8 @@ import { SleepPattern } from './sleep.pattern'
  * @implements { IJSONSerializable, IJSONDeserializable<Sleep>
  */
 export class Sleep extends Activity implements IJSONSerializable, IJSONDeserializable<Sleep> {
-    private _pattern?: SleepPattern // Sleep pattern tracking.
-    private _type?: SleepType // Type of Sleep modeling
+    private _pattern?: SleepPattern // Sleep Pattern tracking.
+    private _type?: SleepType // Sleep Pattern type
 
     constructor() {
         super()
@@ -43,6 +43,7 @@ export class Sleep extends Activity implements IJSONSerializable, IJSONDeseriali
         }
 
         if (json.pattern !== undefined) this.pattern = new SleepPattern().fromJSON(json.pattern)
+        if (json.type !== undefined) this.type = json.type
 
         return this
     }
@@ -51,14 +52,15 @@ export class Sleep extends Activity implements IJSONSerializable, IJSONDeseriali
         return {
             ...super.toJSON(),
             ...{
-                pattern: this.pattern ? this.pattern.toJSON() : this.pattern
+                pattern: this.pattern ? this.pattern.toJSON() : this.pattern,
+                type: this.type
             }
         }
     }
 }
 
 /**
- * Name of traceable sleep types.
+ * Names of traceable sleep types.
  */
 export enum SleepType {
     CLASSIC = 'classic',

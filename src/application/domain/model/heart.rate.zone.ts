@@ -1,29 +1,24 @@
-import { Entity } from './entity'
 import { JsonUtils } from '../utils/json.utils'
 
-export class HeartRateZone extends Entity {
-    private _min_value?: number // Minimum value of heart rate zone.
-    private _max_value?: number // Maximum value of heart rate zone.
-    private _duration?: number  // Total minutes remaining in the heart rate zone.
+export class HeartRateZone {
+    private _min?: number // Minimum value of the heart rate zone.
+    private _max?: number // Maximum value of the heart rate zone.
+    private _duration?: number  // Duration in the heart rate zone (given in milliseconds).
 
-    constructor() {
-        super()
+    get min(): number | undefined {
+        return this._min
     }
 
-    get min_value(): number | undefined {
-        return this._min_value
+    set min(value: number | undefined) {
+        this._min = value
     }
 
-    set min_value(value: number | undefined) {
-        this._min_value = value
+    get max(): number | undefined {
+        return this._max
     }
 
-    get max_value(): number | undefined {
-        return this._max_value
-    }
-
-    set max_value(value: number | undefined) {
-        this._max_value = value
+    set max(value: number | undefined) {
+        this._max = value
     }
 
     get duration(): number | undefined {
@@ -40,9 +35,8 @@ export class HeartRateZone extends Entity {
             json = JSON.parse(json)
         }
 
-        if (json.id !== undefined) super.id = json.id
-        if (json.min_value !== undefined) this.min_value = json.min_value
-        if (json.max_value !== undefined) this.max_value = json.max_value
+        if (json.min !== undefined) this.min = json.min
+        if (json.max !== undefined) this.max = json.max
         if (json.duration !== undefined) this.duration = json.duration
 
         return this
@@ -50,9 +44,8 @@ export class HeartRateZone extends Entity {
 
     public toJSON(): any {
         return {
-            id: super.id,
-            min_value: this.min_value,
-            max_value: this.max_value,
+            min: this.min,
+            max: this.max,
             duration: this.duration,
         }
     }

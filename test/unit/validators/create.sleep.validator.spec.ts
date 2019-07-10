@@ -1,11 +1,12 @@
 import { assert } from 'chai'
 import { Strings } from '../../../src/utils/strings'
 import { CreateSleepValidator } from '../../../src/application/domain/validator/create.sleep.validator'
-import { SleepPattern, SleepPatternType } from '../../../src/application/domain/model/sleep.pattern'
+import { SleepPattern } from '../../../src/application/domain/model/sleep.pattern'
 import { SleepPatternDataSet } from '../../../src/application/domain/model/sleep.pattern.data.set'
 import { SleepMock } from '../../mocks/sleep.mock'
 
 const sleep: SleepMock = new SleepMock()
+const data_set_aux = sleep.pattern!.data_set
 
 describe('Validators: CreateSleepValidator', () => {
     describe('validate(sleep: Sleep)', () => {
@@ -138,6 +139,7 @@ describe('Validators: CreateSleepValidator', () => {
                     assert.equal(err.message, 'Dataset are not in a format that is supported!')
                     assert.equal(err.description, 'The data_set collection must not be empty!')
                 }
+                sleep.pattern!.data_set = data_set_aux
             })
         })
 
@@ -145,7 +147,7 @@ describe('Validators: CreateSleepValidator', () => {
             () => {
                 it('should throw a ValidationException', () => {
                     const dataSetItemTest: SleepPatternDataSet = new SleepPatternDataSet()
-                    dataSetItemTest.name = SleepPatternType.RESTLESS
+                    dataSetItemTest.name = sleep.pattern!.data_set[0].name
                     dataSetItemTest.duration = Math.floor(Math.random() * 5 + 1) * 60000 // 1-5min milliseconds
 
                     sleep.pattern!.data_set = [dataSetItemTest]
@@ -180,7 +182,7 @@ describe('Validators: CreateSleepValidator', () => {
                 it('should throw a ValidationException', () => {
                     const dataSetItemTest: SleepPatternDataSet = new SleepPatternDataSet()
                     dataSetItemTest.start_time = new Date(sleep.start_time!)
-                    dataSetItemTest.name = SleepPatternType.RESTLESS
+                    dataSetItemTest.name = sleep.pattern!.data_set[0].name
                     dataSetItemTest.duration = -60000
                     sleep.pattern!.data_set = [dataSetItemTest]
                     try {

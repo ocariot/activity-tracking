@@ -4,7 +4,7 @@ import { ValidationException } from '../../../src/application/domain/exception/v
 import { Sleep } from '../../../src/application/domain/model/sleep'
 import { SleepPattern, SleepPatternType } from '../../../src/application/domain/model/sleep.pattern'
 import { SleepPatternDataSet } from '../../../src/application/domain/model/sleep.pattern.data.set'
-import { SleepPatternSummary } from '../../../src/application/domain/model/sleep.pattern.summary'
+import { SleepPatternPhasesSummary } from '../../../src/application/domain/model/sleep.pattern.phases.summary'
 import { SleepPatternSummaryData } from '../../../src/application/domain/model/sleep.pattern.summary.data'
 
 describe('Models: Sleep', () => {
@@ -30,7 +30,7 @@ describe('Models: Sleep', () => {
 
     const sleepPattern: SleepPattern = new SleepPattern()
     sleepPattern.data_set = dataSet
-    sleepPattern.summary = new SleepPatternSummary(new SleepPatternSummaryData(2, 10000),
+    sleepPattern.summary = new SleepPatternPhasesSummary(new SleepPatternSummaryData(2, 10000),
         new SleepPatternSummaryData(3, 20000),
         new SleepPatternSummaryData(4, 30000))
 

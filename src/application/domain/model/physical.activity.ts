@@ -76,7 +76,7 @@ export class PhysicalActivity extends Activity implements IJSONSerializable, IJS
         if (json.levels !== undefined && json.levels instanceof Array) {
             this.levels = json.levels.map(level => new PhysicalActivityLevel().fromJSON(level))
         }
-        if (json.heart_rate) this.heart_rate = json.heart_rate
+        if (json.heart_rate) this.heart_rate = new PhysicalActivityHeartRate().fromJSON(json.heart_rate)
 
         return this
     }
@@ -89,7 +89,7 @@ export class PhysicalActivity extends Activity implements IJSONSerializable, IJS
                 calories: this.calories,
                 steps: this.steps,
                 levels: this.levels ? this.levels.map(item => item.toJSON()) : this.levels,
-                heart_rate: this.heart_rate
+                heart_rate: this.heart_rate ? this.heart_rate.toJSON() : this.heart_rate
             }
         }
     }
