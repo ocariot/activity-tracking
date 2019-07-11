@@ -13,18 +13,19 @@ import { IQuery } from '../../../src/application/port/query.interface'
 import { Query } from '../../../src/infrastructure/repository/query/query'
 import { Strings } from '../../../src/utils/strings'
 import { SleepMock } from '../../mocks/sleep.mock'
-import { Sleep } from '../../../src/application/domain/model/sleep'
+import { Sleep, SleepType } from '../../../src/application/domain/model/sleep'
 import { SleepRepoModel } from '../../../src/infrastructure/database/schema/sleep.schema'
 import { ISleepService } from '../../../src/application/port/sleep.service.interface'
 import { SleepService } from '../../../src/application/service/sleep.service'
 import { ISleepRepository } from '../../../src/application/port/sleep.repository.interface'
 import { SleepRepositoryMock } from '../../mocks/sleep.repository.mock'
-import { SleepPattern, SleepPatternType } from '../../../src/application/domain/model/sleep.pattern'
+import { SleepPattern } from '../../../src/application/domain/model/sleep.pattern'
 import { SleepPatternDataSet } from '../../../src/application/domain/model/sleep.pattern.data.set'
 import { IEventBus } from '../../../src/infrastructure/port/event.bus.interface'
 import { ILogger } from '../../../src/utils/custom.logger'
 import { MultiStatus } from '../../../src/application/domain/model/multi.status'
 import { MultiStatusMock } from '../../mocks/multi.status.mock'
+import { ObjectID } from 'bson'
 
 require('sinon-mongoose')
 
@@ -48,10 +49,19 @@ describe('Services: SleepService', () => {
     }
 
     // Incorrect sleep objects
+    const incorrectSleepJSON: any = {
+        id: new ObjectID(),
+        start_time: sleep.start_time!.toISOString(),
+        end_time: sleep.end_time!.toISOString(),
+        duration: sleep.duration,
+        pattern: undefined,
+        type: '',
+        child_id: new ObjectID()
+    }
+
     const incorrectSleep1: Sleep = new Sleep()        // Without all required fields
 
-    const incorrectSleep2: Sleep = new SleepMock()    // Without Sleep fields
-    incorrectSleep2.pattern = undefined
+    const incorrectSleep2: Sleep = new Sleep().fromJSON(incorrectSleepJSON)    // Without Sleep fields
 
     const incorrectSleep3: Sleep = new SleepMock()    // start_time with a date newer than end_time
     incorrectSleep3.start_time = new Date('2018-12-15T12:52:59Z')
@@ -67,22 +77,52 @@ describe('Services: SleepService', () => {
     const incorrectSleep6: Sleep = new SleepMock()    // child_id is invalid
     incorrectSleep6.child_id = '5a62be07de34500146d9c5442'
 
-    const incorrectSleep7: Sleep = new SleepMock()    // Missing data_set of pattern
-    incorrectSleep7.pattern = new SleepPattern()
+    incorrectSleepJSON.type = 'classics'
+    const incorrectSleep7: Sleep = new Sleep().fromJSON(incorrectSleepJSON)
 
-    const incorrectSleep8: Sleep = new SleepMock()    // The pattern has an empty data_set array
-    incorrectSleep8.pattern!.data_set = new Array<SleepPatternDataSet>()
+    const incorrectSleep8: Sleep = new SleepMock()    // Missing data_set of pattern
+    incorrectSleep8.pattern = new SleepPattern()
 
-    const incorrectSleep9: Sleep = new SleepMock()    // Missing fields of some item from the data_set array of pattern
+    const incorrectSleep9: Sleep = new SleepMock()    // The pattern has an empty data_set array
+    incorrectSleep9.pattern!.data_set = new Array<SleepPatternDataSet>()
+
+    const incorrectSleep10: Sleep = new SleepMock()    // Missing fields of some item from the data_set array of pattern
     const dataSetItemSleep9: SleepPatternDataSet = new SleepPatternDataSet()
-    incorrectSleep9.pattern!.data_set = [dataSetItemSleep9]
+    incorrectSleep10.pattern!.data_set = [dataSetItemSleep9]
 
-    const incorrectSleep10: Sleep = new SleepMock()    // There is a negative duration on some item from the data_set array of pattern
+    const incorrectSleep11: Sleep = new SleepMock()    // There is a negative duration on some item from the data_set array of pattern
     const dataSetItemSleep10: SleepPatternDataSet = new SleepPatternDataSet()
     dataSetItemSleep10.start_time = new Date(sleep.start_time!)
-    dataSetItemSleep10.name = SleepPatternType.RESTLESS
+    dataSetItemSleep10.name = incorrectSleep11.pattern!.data_set[0].name
     dataSetItemSleep10.duration = -(Math.floor(Math.random() * 5 + 1) * 60000)
-    incorrectSleep10.pattern!.data_set = [dataSetItemSleep10]
+    incorrectSleep11.pattern!.data_set = [dataSetItemSleep10]
+
+    const incorrectSleep12: Sleep = new SleepMock()     // The sleep pattern data set array has an invalid item with an invalid name
+    const wrongDataSetItemJSON: any = {
+        start_time : new Date('2018-08-18T01:30:30Z'),
+        name : 'restlesss',
+        duration : Math.floor(Math.random() * 5 + 1) * 60000 // 1-5min
+    }
+    incorrectSleep12.pattern!.data_set = [new SleepPatternDataSet().fromJSON(wrongDataSetItemJSON)]
+
+    // The sleep pattern data set array has an invalid item with an invalid name and the sleep type is "stages"
+    const wrongSleepJSON: any = {
+        id: new ObjectID(),
+        start_time: sleep.start_time!.toISOString(),
+        end_time: sleep.end_time!.toISOString(),
+        duration: sleep.duration,
+        pattern: new SleepPattern(),
+        type: SleepType.STAGES,
+        child_id: new ObjectID()
+    }
+    const incorrectSleep13: Sleep = new Sleep().fromJSON(wrongSleepJSON)
+    const wrongDataSetItem13JSON: any = {
+        start_time : new Date('2018-08-18T01:30:30Z'),
+        name : 'deeps',
+        duration : Math.floor(Math.random() * 5 + 1) * 60000 // 1-5min
+    }
+    incorrectSleep13.pattern!.data_set = new Array<SleepPatternDataSet>()
+    incorrectSleep13.pattern!.data_set[0] = new SleepPatternDataSet().fromJSON(wrongDataSetItem13JSON)
 
     // Array with correct and incorrect sleep objects
     const mixedSleepArr: Array<Sleep> = new Array<SleepMock>()
@@ -101,6 +141,9 @@ describe('Services: SleepService', () => {
     incorrectSleepArr.push(incorrectSleep8)
     incorrectSleepArr.push(incorrectSleep9)
     incorrectSleepArr.push(incorrectSleep10)
+    incorrectSleepArr.push(incorrectSleep11)
+    incorrectSleepArr.push(incorrectSleep12)
+    incorrectSleepArr.push(incorrectSleep13)
 
     /**
      * Mock MultiStatus responses
@@ -157,10 +200,10 @@ describe('Services: SleepService', () => {
                         assert.propertyVal(result, 'id', sleep.id)
                         assert.propertyVal(result, 'start_time', sleep.start_time)
                         assert.propertyVal(result, 'end_time', sleep.end_time)
-                        assert.typeOf(result.duration, 'number')
                         assert.propertyVal(result, 'duration', sleep.duration)
                         assert.propertyVal(result, 'child_id', sleep.child_id)
                         assert.propertyVal(result, 'pattern', sleep.pattern)
+                        assert.propertyVal(result, 'type', sleep.type)
                     })
             })
         })
@@ -182,10 +225,10 @@ describe('Services: SleepService', () => {
                         assert.propertyVal(result, 'id', sleep.id)
                         assert.propertyVal(result, 'start_time', sleep.start_time)
                         assert.propertyVal(result, 'end_time', sleep.end_time)
-                        assert.typeOf(result.duration, 'number')
                         assert.propertyVal(result, 'duration', sleep.duration)
                         assert.propertyVal(result, 'child_id', sleep.child_id)
                         assert.propertyVal(result, 'pattern', sleep.pattern)
+                        assert.propertyVal(result, 'type', sleep.type)
                     })
             })
         })
@@ -207,10 +250,10 @@ describe('Services: SleepService', () => {
                         assert.propertyVal(result, 'id', sleep.id)
                         assert.propertyVal(result, 'start_time', sleep.start_time)
                         assert.propertyVal(result, 'end_time', sleep.end_time)
-                        assert.typeOf(result.duration, 'number')
                         assert.propertyVal(result, 'duration', sleep.duration)
                         assert.propertyVal(result, 'child_id', sleep.child_id)
                         assert.propertyVal(result, 'pattern', sleep.pattern)
+                        assert.propertyVal(result, 'type', sleep.type)
                     })
             })
         })
@@ -255,8 +298,16 @@ describe('Services: SleepService', () => {
 
         context('when the Sleep is incorrect (missing sleep fields)', () => {
             it('should throw a ValidationException', async () => {
-                incorrectSleep = new SleepMock()
-                incorrectSleep.pattern = undefined
+                const sleepJSON: any = {
+                    id: new ObjectID(),
+                    start_time: sleep.start_time!.toISOString(),
+                    end_time: sleep.end_time!.toISOString(),
+                    duration: sleep.duration,
+                    pattern: undefined,
+                    type: '',
+                    child_id: new ObjectID()
+                }
+                incorrectSleep = new Sleep().fromJSON(sleepJSON)
                 sinon
                     .mock(modelFake)
                     .expects('create')
@@ -269,7 +320,7 @@ describe('Services: SleepService', () => {
                     return await sleepService.add(incorrectSleep)
                 } catch (err) {
                     assert.propertyVal(err, 'message', 'Required fields were not provided...')
-                    assert.propertyVal(err, 'description', 'Sleep validation failed: pattern is required!')
+                    assert.propertyVal(err, 'description', 'Sleep validation failed: type, pattern is required!')
                 }
             })
         })
@@ -363,8 +414,38 @@ describe('Services: SleepService', () => {
             })
         })
 
+        context('when the Sleep is incorrect (type is invalid)', () => {
+            it('should throw a ValidationException', async () => {
+                const sleepJSON: any = {
+                    id: new ObjectID(),
+                    start_time: sleep.start_time!.toISOString(),
+                    end_time: sleep.end_time!.toISOString(),
+                    duration: sleep.duration,
+                    pattern: sleep.pattern,
+                    type: 'classics',
+                    child_id: new ObjectID()
+                }
+                incorrectSleep = new Sleep().fromJSON(sleepJSON)
+                sinon
+                    .mock(modelFake)
+                    .expects('create')
+                    .withArgs(incorrectSleep)
+                    .chain('exec')
+                    .rejects({ message: 'Required fields were not provided...',
+                               description: 'Sleep validation failed: pattern is required!' })
+
+                try {
+                    return await sleepService.add(incorrectSleep)
+                } catch (err) {
+                    assert.propertyVal(err, 'message', 'The type provided "classics" is not supported...')
+                    assert.propertyVal(err, 'description', 'The allowed Sleep Pattern types are: classic, stages.')
+                }
+            })
+        })
+
         context('when the Sleep is incorrect (missing data_set of pattern)', () => {
             it('should throw a ValidationException', async () => {
+                incorrectSleep = new SleepMock()
                 incorrectSleep.child_id = '5a62be07de34500146d9c544'           // Make child_id valid
                 incorrectSleep.pattern = new SleepPattern()
                 sinon
@@ -432,7 +513,7 @@ describe('Services: SleepService', () => {
             it('should throw a ValidationException', async () => {
                 const dataSetItemTest: SleepPatternDataSet = new SleepPatternDataSet()
                 dataSetItemTest.start_time = new Date(sleep.start_time!)
-                dataSetItemTest.name = SleepPatternType.RESTLESS
+                dataSetItemTest.name = incorrectSleep.pattern!.data_set[0].name
                 dataSetItemTest.duration = -(Math.floor(Math.random() * 5 + 1) * 60000)
                 incorrectSleep.pattern!.data_set = [dataSetItemTest]
                 sinon
@@ -450,6 +531,73 @@ describe('Services: SleepService', () => {
                     assert.propertyVal(err, 'message', 'Some (or several) duration field of sleep pattern is invalid...')
                     assert.propertyVal(err, 'description', 'Sleep Pattern dataset validation failed: The value provided ' +
                         'has a negative value!')
+                }
+            })
+        })
+
+        context('when the Sleep is incorrect (the sleep pattern data set array has an invalid item with an invalid name)', () => {
+            it('should throw a ValidationException', async () => {
+                const dataSetItemJSON: any = {
+                    start_time : new Date('2018-08-18T01:30:30Z'),
+                    name : 'restlesss',
+                    duration : Math.floor(Math.random() * 5 + 1) * 60000 // 1-5min
+                }
+                incorrectSleep.pattern!.data_set = [new SleepPatternDataSet().fromJSON(dataSetItemJSON)]
+                sinon
+                    .mock(modelFake)
+                    .expects('create')
+                    .withArgs(incorrectSleep)
+                    .chain('exec')
+                    .rejects({ message: 'Some (or several) duration field of sleep pattern is invalid...',
+                               description: 'Sleep Pattern dataset validation failed: The value provided ' +
+                                   'has a negative value!' })
+
+                try {
+                    return await sleepService.add(incorrectSleep)
+                } catch (err) {
+                    assert.propertyVal(err, 'message', 'The sleep pattern name provided "restlesss" is not supported...')
+                    if (incorrectSleep.type === SleepType.CLASSIC)
+                        assert.propertyVal(err, 'description', 'The names of the allowed patterns are: asleep, restless, awake.')
+                    else
+                        assert.propertyVal(err, 'description', 'The names of the allowed patterns are: deep, light, rem, wake.')
+                }
+            })
+        })
+
+        context('when the Sleep is incorrect (the sleep pattern data set array has an invalid item with an invalid name ' +
+            'and the sleep type is "stages")', () => {
+            it('should throw a ValidationException', async () => {
+                const sleepJSON: any = {
+                    id: new ObjectID(),
+                    start_time: sleep.start_time!.toISOString(),
+                    end_time: sleep.end_time!.toISOString(),
+                    duration: sleep.duration,
+                    pattern: new SleepPattern(),
+                    type: SleepType.STAGES,
+                    child_id: new ObjectID()
+                }
+                incorrectSleep = new Sleep().fromJSON(sleepJSON)
+                const dataSetItemJSON: any = {
+                    start_time : new Date('2018-08-18T01:30:30Z'),
+                    name : 'deeps',
+                    duration : Math.floor(Math.random() * 5 + 1) * 60000 // 1-5min
+                }
+                incorrectSleep.pattern!.data_set = new Array<SleepPatternDataSet>()
+                incorrectSleep.pattern!.data_set[0] = new SleepPatternDataSet().fromJSON(dataSetItemJSON)
+                sinon
+                    .mock(modelFake)
+                    .expects('create')
+                    .withArgs(incorrectSleep)
+                    .chain('exec')
+                    .rejects({ message: 'Some (or several) duration field of sleep pattern is invalid...',
+                               description: 'Sleep Pattern dataset validation failed: The value provided ' +
+                                   'has a negative value!' })
+
+                try {
+                    return await sleepService.add(incorrectSleep)
+                } catch (err) {
+                    assert.propertyVal(err, 'message', 'The sleep pattern name provided "deeps" is not supported...')
+                    assert.propertyVal(err, 'description', 'The names of the allowed patterns are: deep, light, rem, wake.')
                 }
             })
         })
@@ -479,10 +627,10 @@ describe('Services: SleepService', () => {
                             assert.propertyVal(result.success[i].item, 'id', correctSleepArr[i].id)
                             assert.propertyVal(result.success[i].item, 'start_time', correctSleepArr[i].start_time)
                             assert.propertyVal(result.success[i].item, 'end_time', correctSleepArr[i].end_time)
-                            assert.typeOf(result.success[i].item.duration, 'number')
                             assert.propertyVal(result.success[i].item, 'duration', correctSleepArr[i].duration)
                             assert.propertyVal(result.success[i].item, 'child_id', correctSleepArr[i].child_id)
                             assert.propertyVal(result.success[i].item, 'pattern', correctSleepArr[i].pattern)
+                            assert.propertyVal(result.success[i].item, 'type', correctSleepArr[i].type)
                         }
 
                         assert.isEmpty(result.error)
@@ -512,10 +660,10 @@ describe('Services: SleepService', () => {
                             assert.propertyVal(result.success[i].item, 'id', correctSleepArr[i].id)
                             assert.propertyVal(result.success[i].item, 'start_time', correctSleepArr[i].start_time)
                             assert.propertyVal(result.success[i].item, 'end_time', correctSleepArr[i].end_time)
-                            assert.typeOf(result.success[i].item.duration, 'number')
                             assert.propertyVal(result.success[i].item, 'duration', correctSleepArr[i].duration)
                             assert.propertyVal(result.success[i].item, 'child_id', correctSleepArr[i].child_id)
                             assert.propertyVal(result.success[i].item, 'pattern', correctSleepArr[i].pattern)
+                            assert.propertyVal(result.success[i].item, 'type', correctSleepArr[i].type)
                         }
 
                         assert.isEmpty(result.error)
@@ -547,10 +695,10 @@ describe('Services: SleepService', () => {
                             assert.propertyVal(result.success[i].item, 'id', correctSleepArr[i].id)
                             assert.propertyVal(result.success[i].item, 'start_time', correctSleepArr[i].start_time)
                             assert.propertyVal(result.success[i].item, 'end_time', correctSleepArr[i].end_time)
-                            assert.typeOf(result.success[i].item.duration, 'number')
                             assert.propertyVal(result.success[i].item, 'duration', correctSleepArr[i].duration)
                             assert.propertyVal(result.success[i].item, 'child_id', correctSleepArr[i].child_id)
                             assert.propertyVal(result.success[i].item, 'pattern', correctSleepArr[i].pattern)
+                            assert.propertyVal(result.success[i].item, 'type', correctSleepArr[i].type)
                         }
 
                         assert.isEmpty(result.error)
@@ -584,10 +732,10 @@ describe('Services: SleepService', () => {
                             assert.propertyVal(result.error[i].item, 'id', correctSleepArr[i].id)
                             assert.propertyVal(result.error[i].item, 'start_time', correctSleepArr[i].start_time)
                             assert.propertyVal(result.error[i].item, 'end_time', correctSleepArr[i].end_time)
-                            assert.typeOf(result.error[i].item.duration, 'number')
                             assert.propertyVal(result.error[i].item, 'duration', correctSleepArr[i].duration)
                             assert.propertyVal(result.error[i].item, 'child_id', correctSleepArr[i].child_id)
                             assert.propertyVal(result.error[i].item, 'pattern', correctSleepArr[i].pattern)
+                            assert.propertyVal(result.error[i].item, 'type', correctSleepArr[i].type)
                         }
 
                         assert.isEmpty(result.success)
@@ -613,10 +761,10 @@ describe('Services: SleepService', () => {
                         assert.propertyVal(result.success[0].item, 'id', mixedSleepArr[0].id)
                         assert.propertyVal(result.success[0].item, 'start_time', mixedSleepArr[0].start_time)
                         assert.propertyVal(result.success[0].item, 'end_time', mixedSleepArr[0].end_time)
-                        assert.typeOf(result.success[0].item.duration, 'number')
                         assert.propertyVal(result.success[0].item, 'duration', mixedSleepArr[0].duration)
                         assert.propertyVal(result.success[0].item, 'child_id', mixedSleepArr[0].child_id)
                         assert.propertyVal(result.success[0].item, 'pattern', mixedSleepArr[0].pattern)
+                        assert.propertyVal(result.success[0].item, 'type', mixedSleepArr[0].type)
 
                         assert.propertyVal(result.error[0], 'code', HttpStatus.BAD_REQUEST)
                         assert.propertyVal(result.error[0], 'message', 'Required fields were not provided...')
@@ -643,7 +791,7 @@ describe('Services: SleepService', () => {
                         assert.propertyVal(result.error[0], 'description', 'Activity validation failed: start_time, end_time, ' +
                             'duration, child_id is required!')
                         assert.propertyVal(result.error[1], 'message', 'Required fields were not provided...')
-                        assert.propertyVal(result.error[1], 'description', 'Sleep validation failed: pattern is required!')
+                        assert.propertyVal(result.error[1], 'description', 'Sleep validation failed: type, pattern is required!')
                         assert.propertyVal(result.error[2], 'message', 'Date field is invalid...')
                         assert.propertyVal(result.error[2], 'description', 'Date validation failed: The end_time parameter can not ' +
                             'contain a older date than that the start_time parameter!')
@@ -655,27 +803,40 @@ describe('Services: SleepService', () => {
                             'negative value!')
                         assert.propertyVal(result.error[5], 'message', Strings.CHILD.PARAM_ID_NOT_VALID_FORMAT)
                         assert.propertyVal(result.error[5], 'description', Strings.ERROR_MESSAGE.UUID_NOT_VALID_FORMAT_DESC)
-                        assert.propertyVal(result.error[6], 'message', 'Pattern are not in a format that is supported...')
-                        assert.propertyVal(result.error[6], 'description', 'Validation of the standard of sleep failed: data_set is ' +
+                        assert.propertyVal(result.error[6], 'message', 'The type provided "classics" is not supported...')
+                        assert.propertyVal(result.error[6], 'description', 'The allowed Sleep Pattern types are: classic, stages.')
+                        assert.propertyVal(result.error[7], 'message', 'Pattern are not in a format that is supported...')
+                        assert.propertyVal(result.error[7], 'description', 'Validation of the standard of sleep failed: data_set is ' +
                             'required!')
-                        assert.propertyVal(result.error[7], 'message', 'Dataset are not in a format that is supported!')
-                        assert.propertyVal(result.error[7], 'description', 'The data_set collection must not be empty!')
                         assert.propertyVal(result.error[8], 'message', 'Dataset are not in a format that is supported!')
-                        assert.propertyVal(result.error[8], 'description', 'Validation of the sleep pattern dataset failed: ' +
+                        assert.propertyVal(result.error[8], 'description', 'The data_set collection must not be empty!')
+                        assert.propertyVal(result.error[9], 'message', 'Dataset are not in a format that is supported!')
+                        assert.propertyVal(result.error[9], 'description', 'Validation of the sleep pattern dataset failed: ' +
                             'data_set start_time, data_set name, data_set duration is required!')
-                        assert.propertyVal(result.error[9], 'message', 'Some (or several) duration field of sleep pattern is invalid...')
-                        assert.propertyVal(result.error[9], 'description', 'Sleep Pattern dataset validation failed: The value provided ' +
+                        assert.propertyVal(result.error[10], 'message', 'Some (or several) duration field of sleep pattern is invalid...')
+                        assert.propertyVal(result.error[10], 'description', 'Sleep Pattern dataset validation failed: The value provided ' +
                             'has a negative value!')
+                        assert.propertyVal(result.error[11], 'message', 'The sleep pattern name provided "restlesss" is not supported...')
+                        if (result.error[11].item.type === SleepType.CLASSIC) {
+                            assert.propertyVal(result.error[11], 'description', 'The names of the allowed patterns are: ' +
+                                'asleep, restless, awake.')
+                        } else {
+                            assert.propertyVal(result.error[11], 'description', 'The names of the allowed patterns are: ' +
+                                'deep, light, rem, wake.')
+                        }
+                        assert.propertyVal(result.error[12], 'message', 'The sleep pattern name provided "deeps" is not supported...')
+                        assert.propertyVal(result.error[12], 'description', 'The names of the allowed patterns are: ' +
+                            'deep, light, rem, wake.')
 
                         for (let i = 0; i < result.error.length; i++) {
                             assert.propertyVal(result.error[i], 'code', HttpStatus.BAD_REQUEST)
                             if (i !== 0) assert.propertyVal(result.error[i].item, 'id', incorrectSleepArr[i].id)
                             if (i !== 0) assert.propertyVal(result.error[i].item, 'start_time', incorrectSleepArr[i].start_time)
                             if (i !== 0) assert.propertyVal(result.error[i].item, 'end_time', incorrectSleepArr[i].end_time)
-                            if (i !== 0) assert.typeOf(result.error[i].item.duration, 'number')
                             if (i !== 0) assert.propertyVal(result.error[i].item, 'duration', incorrectSleepArr[i].duration)
                             if (i !== 0) assert.propertyVal(result.error[i].item, 'child_id', incorrectSleepArr[i].child_id)
                             if (i !== 0) assert.propertyVal(result.error[i].item, 'pattern', incorrectSleepArr[i].pattern)
+                            if (i !== 0) assert.propertyVal(result.error[i].item, 'type', incorrectSleepArr[i].type)
                         }
 
                         assert.isEmpty(result.success)
@@ -929,10 +1090,10 @@ describe('Services: SleepService', () => {
                         assert.propertyVal(result, 'id', sleep.id)
                         assert.propertyVal(result, 'start_time', sleep.start_time)
                         assert.propertyVal(result, 'end_time', sleep.end_time)
-                        assert.typeOf(result.duration, 'number')
                         assert.propertyVal(result, 'duration', sleep.duration)
                         assert.propertyVal(result, 'child_id', sleep.child_id)
                         assert.propertyVal(result, 'pattern', sleep.pattern)
+                        assert.propertyVal(result, 'type', sleep.type)
                     })
             })
         })
@@ -971,10 +1132,10 @@ describe('Services: SleepService', () => {
                         assert.propertyVal(result, 'id', sleep.id)
                         assert.propertyVal(result, 'start_time', sleep.start_time)
                         assert.propertyVal(result, 'end_time', sleep.end_time)
-                        assert.typeOf(result.duration, 'number')
                         assert.propertyVal(result, 'duration', sleep.duration)
                         assert.propertyVal(result, 'child_id', sleep.child_id)
                         assert.propertyVal(result, 'pattern', sleep.pattern)
+                        assert.propertyVal(result, 'type', sleep.type)
                     })
             })
         })
@@ -1105,7 +1266,7 @@ describe('Services: SleepService', () => {
             it('should throw a ValidationException', () => {
                 const dataSetItemTest: SleepPatternDataSet = new SleepPatternDataSet()
                 dataSetItemTest.start_time = new Date(sleep.start_time!)
-                dataSetItemTest.name = SleepPatternType.RESTLESS
+                dataSetItemTest.name = incorrectSleep.pattern!.data_set[0].name
                 dataSetItemTest.duration = -(Math.floor(Math.random() * 5 + 1) * 60000)
                 incorrectSleep.pattern!.data_set = [dataSetItemTest]
                 sinon

@@ -14,7 +14,6 @@ describe('Models: StatusSuccess', () => {
         context('when the json is correct', () => {
             it('should return an StatusSuccess model', () => {
                 const result = new StatusSuccess().fromJSON(statusSuccessJSON)
-                assert.typeOf(result.code, 'string')
                 assert.propertyVal(result, 'code', statusSuccessJSON.code)
                 assert.propertyVal(result.item, 'date', statusSuccessJSON.item.date)
                 assert.propertyVal(result.item, 'value', statusSuccessJSON.item.value)
@@ -34,7 +33,6 @@ describe('Models: StatusSuccess', () => {
         context('when the json is a string', () => {
             it('should transform the string in json and return StatusSuccess model', () => {
                 const result = new StatusSuccess().fromJSON(JSON.stringify(statusSuccessJSON))
-                assert.typeOf(result.code, 'string')
                 assert.propertyVal(result, 'code', statusSuccessJSON.code)
                 assert.propertyVal(result.item, 'date', statusSuccessJSON.item.date)
                 assert.propertyVal(result.item, 'value', statusSuccessJSON.item.value)
@@ -47,7 +45,6 @@ describe('Models: StatusSuccess', () => {
             it('should return a JSON from StatusSuccess model', () => {
                 let result = new StatusSuccess().fromJSON(statusSuccessJSON)
                 result = result.toJSON()
-                assert.typeOf(result.code, 'string')
                 assert.propertyVal(result, 'code', statusSuccessJSON.code)
                 assert.propertyVal(result.item, 'date', statusSuccessJSON.item.date)
                 assert.propertyVal(result.item, 'value', statusSuccessJSON.item.value)

@@ -36,8 +36,8 @@ describe('Models: Activity', () => {
             it('should return an Activity model', () => {
                 const result = new Activity().fromJSON(activityJSON)
                 assert.propertyVal(result, 'id', activityJSON.id)
-                assert.equal(result.start_time!.toISOString(), activityJSON.start_time)
-                assert.equal(result.end_time!.toISOString(), activityJSON.end_time)
+                assert.deepEqual(result.start_time!.toISOString(), activityJSON.start_time)
+                assert.deepEqual(result.end_time!.toISOString(), activityJSON.end_time)
                 assert.propertyVal(result, 'duration', activityJSON.duration)
                 assert.propertyVal(result, 'child_id', activityJSON.child_id)
             })
@@ -58,8 +58,8 @@ describe('Models: Activity', () => {
             it('should transform the string in json and return Activity model', () => {
                 const result = new Activity().fromJSON(JSON.stringify(activityJSON))
                 assert.propertyVal(result, 'id', activityJSON.id.toHexString())
-                assert.equal(result.start_time!.toISOString(), activityJSON.start_time)
-                assert.equal(result.end_time!.toISOString(), activityJSON.end_time)
+                assert.deepEqual(result.start_time!.toISOString(), activityJSON.start_time)
+                assert.deepEqual(result.end_time!.toISOString(), activityJSON.end_time)
                 assert.propertyVal(result, 'duration', activityJSON.duration)
                 assert.propertyVal(result, 'child_id', activityJSON.child_id.toHexString())
             })

@@ -8,11 +8,11 @@ import { expect } from 'chai'
 import { SleepMock } from '../../mocks/sleep.mock'
 import { Sleep } from '../../../src/application/domain/model/sleep'
 import { Strings } from '../../../src/utils/strings'
-import { SleepPattern, SleepPatternType } from '../../../src/application/domain/model/sleep.pattern'
+import { SleepPattern } from '../../../src/application/domain/model/sleep.pattern'
 import { SleepRepoModel } from '../../../src/infrastructure/database/schema/sleep.schema'
 import { SleepEntityMapper } from '../../../src/infrastructure/entity/mapper/sleep.entity.mapper'
 import { ObjectID } from 'bson'
-import { SleepPatternDataSet } from '../../../src/application/domain/model/sleep.pattern.data.set'
+import { PhasesPatternType, SleepPatternDataSet } from '../../../src/application/domain/model/sleep.pattern.data.set'
 
 const container: Container = DI.getInstance().getContainer()
 const backgroundServices: BackgroundService = container.get(Identifier.BACKGROUND_SERVICE)
@@ -64,7 +64,7 @@ describe('Routes: users.children.sleep', () => {
     const incorrectSleep9: Sleep = new SleepMock()    // There is a negative duration on some item from the data_set array of pattern
     const dataSetItemSleep9: SleepPatternDataSet = new SleepPatternDataSet()
     dataSetItemSleep9.start_time = new Date(defaultSleep.start_time!)
-    dataSetItemSleep9.name = SleepPatternType.RESTLESS
+    dataSetItemSleep9.name = incorrectSleep9.pattern!.data_set[0].name
     dataSetItemSleep9.duration = -(Math.floor(Math.random() * 5 + 1) * 60000)
     incorrectSleep9.pattern!.data_set = [dataSetItemSleep9]
 
@@ -598,17 +598,17 @@ describe('Routes: users.children.sleep', () => {
                     pattern: [
                         {
                             start_time: defaultSleep.start_time,
-                            name: SleepPatternType.RESTLESS,
+                            name: PhasesPatternType.RESTLESS,
                             duration: Math.floor(Math.random() * 5 + 1) * 60000
                         },
                         {
                             start_time: defaultSleep.start_time,
-                            name: SleepPatternType.ASLEEP,
+                            name: PhasesPatternType.ASLEEP,
                             duration: Math.floor(Math.random() * 120 + 1) * 60000
                         },
                         {
                             start_time: defaultSleep.start_time,
-                            name: SleepPatternType.AWAKE,
+                            name: PhasesPatternType.AWAKE,
                             duration: Math.floor(Math.random() * 3 + 1) * 60000
                         }
                     ],
@@ -677,17 +677,17 @@ describe('Routes: users.children.sleep', () => {
                         pattern: [
                             {
                                 start_time: defaultSleep.start_time,
-                                name: SleepPatternType.RESTLESS,
+                                name: PhasesPatternType.RESTLESS,
                                 duration: Math.floor(Math.random() * 5 + 1) * 60000
                             },
                             {
                                 start_time: defaultSleep.start_time,
-                                name: SleepPatternType.ASLEEP,
+                                name: PhasesPatternType.ASLEEP,
                                 duration: Math.floor(Math.random() * 120 + 1) * 60000
                             },
                             {
                                 start_time: defaultSleep.start_time,
-                                name: SleepPatternType.AWAKE,
+                                name: PhasesPatternType.AWAKE,
                                 duration: Math.floor(Math.random() * 3 + 1) * 60000
                             }
                         ],
@@ -701,17 +701,17 @@ describe('Routes: users.children.sleep', () => {
                         pattern: [
                             {
                                 start_time: defaultSleep.start_time,
-                                name: SleepPatternType.RESTLESS,
+                                name: PhasesPatternType.RESTLESS,
                                 duration: Math.floor(Math.random() * 5 + 1) * 60000
                             },
                             {
                                 start_time: defaultSleep.start_time,
-                                name: SleepPatternType.ASLEEP,
+                                name: PhasesPatternType.ASLEEP,
                                 duration: Math.floor(Math.random() * 120 + 1) * 60000
                             },
                             {
                                 start_time: defaultSleep.start_time,
-                                name: SleepPatternType.AWAKE,
+                                name: PhasesPatternType.AWAKE,
                                 duration: Math.floor(Math.random() * 3 + 1) * 60000
                             }
                         ],
@@ -792,17 +792,17 @@ describe('Routes: users.children.sleep', () => {
                         pattern: [
                             {
                                 start_time: defaultSleep.start_time,
-                                name: SleepPatternType.RESTLESS,
+                                name: PhasesPatternType.RESTLESS,
                                 duration: Math.floor(Math.random() * 5 + 1) * 60000
                             },
                             {
                                 start_time: defaultSleep.start_time,
-                                name: SleepPatternType.ASLEEP,
+                                name: PhasesPatternType.ASLEEP,
                                 duration: Math.floor(Math.random() * 120 + 1) * 60000
                             },
                             {
                                 start_time: defaultSleep.start_time,
-                                name: SleepPatternType.AWAKE,
+                                name: PhasesPatternType.AWAKE,
                                 duration: Math.floor(Math.random() * 3 + 1) * 60000
                             }
                         ],
@@ -872,17 +872,17 @@ describe('Routes: users.children.sleep', () => {
                         pattern: [
                             {
                                 start_time: defaultSleep.start_time,
-                                name: SleepPatternType.RESTLESS,
+                                name: PhasesPatternType.RESTLESS,
                                 duration: Math.floor(Math.random() * 5 + 1) * 60000
                             },
                             {
                                 start_time: defaultSleep.start_time,
-                                name: SleepPatternType.ASLEEP,
+                                name: PhasesPatternType.ASLEEP,
                                 duration: Math.floor(Math.random() * 120 + 1) * 60000
                             },
                             {
                                 start_time: defaultSleep.start_time,
-                                name: SleepPatternType.AWAKE,
+                                name: PhasesPatternType.AWAKE,
                                 duration: Math.floor(Math.random() * 3 + 1) * 60000
                             }
                         ],
@@ -924,17 +924,17 @@ describe('Routes: users.children.sleep', () => {
                         pattern: [
                             {
                                 start_time: defaultSleep.start_time,
-                                name: SleepPatternType.RESTLESS,
+                                name: PhasesPatternType.RESTLESS,
                                 duration: Math.floor(Math.random() * 5 + 1) * 60000
                             },
                             {
                                 start_time: defaultSleep.start_time,
-                                name: SleepPatternType.ASLEEP,
+                                name: PhasesPatternType.ASLEEP,
                                 duration: Math.floor(Math.random() * 120 + 1) * 60000
                             },
                             {
                                 start_time: defaultSleep.start_time,
-                                name: SleepPatternType.AWAKE,
+                                name: PhasesPatternType.AWAKE,
                                 duration: Math.floor(Math.random() * 3 + 1) * 60000
                             }
                         ],
@@ -1012,17 +1012,17 @@ describe('Routes: users.children.sleep', () => {
                         pattern: [
                             {
                                 start_time: defaultSleep.start_time,
-                                name: SleepPatternType.RESTLESS,
+                                name: PhasesPatternType.RESTLESS,
                                 duration: Math.floor(Math.random() * 5 + 1) * 60000
                             },
                             {
                                 start_time: defaultSleep.start_time,
-                                name: SleepPatternType.ASLEEP,
+                                name: PhasesPatternType.ASLEEP,
                                 duration: Math.floor(Math.random() * 120 + 1) * 60000
                             },
                             {
                                 start_time: defaultSleep.start_time,
-                                name: SleepPatternType.AWAKE,
+                                name: PhasesPatternType.AWAKE,
                                 duration: Math.floor(Math.random() * 3 + 1) * 60000
                             }
                         ],
@@ -1071,17 +1071,17 @@ describe('Routes: users.children.sleep', () => {
                         pattern: [
                             {
                                 start_time: defaultSleep.start_time,
-                                name: SleepPatternType.RESTLESS,
+                                name: PhasesPatternType.RESTLESS,
                                 duration: Math.floor(Math.random() * 5 + 1) * 60000
                             },
                             {
                                 start_time: defaultSleep.start_time,
-                                name: SleepPatternType.ASLEEP,
+                                name: PhasesPatternType.ASLEEP,
                                 duration: Math.floor(Math.random() * 120 + 1) * 60000
                             },
                             {
                                 start_time: defaultSleep.start_time,
-                                name: SleepPatternType.AWAKE,
+                                name: PhasesPatternType.AWAKE,
                                 duration: Math.floor(Math.random() * 3 + 1) * 60000
                             }
                         ],
@@ -1152,17 +1152,17 @@ describe('Routes: users.children.sleep', () => {
                         pattern: [
                             {
                                 start_time: defaultSleep.start_time,
-                                name: SleepPatternType.RESTLESS,
+                                name: PhasesPatternType.RESTLESS,
                                 duration: Math.floor(Math.random() * 5 + 1) * 60000
                             },
                             {
                                 start_time: defaultSleep.start_time,
-                                name: SleepPatternType.ASLEEP,
+                                name: PhasesPatternType.ASLEEP,
                                 duration: Math.floor(Math.random() * 120 + 1) * 60000
                             },
                             {
                                 start_time: defaultSleep.start_time,
-                                name: SleepPatternType.AWAKE,
+                                name: PhasesPatternType.AWAKE,
                                 duration: Math.floor(Math.random() * 3 + 1) * 60000
                             }
                         ],
@@ -1204,17 +1204,17 @@ describe('Routes: users.children.sleep', () => {
                         pattern: [
                             {
                                 start_time: defaultSleep.start_time,
-                                name: SleepPatternType.RESTLESS,
+                                name: PhasesPatternType.RESTLESS,
                                 duration: Math.floor(Math.random() * 5 + 1) * 60000
                             },
                             {
                                 start_time: defaultSleep.start_time,
-                                name: SleepPatternType.ASLEEP,
+                                name: PhasesPatternType.ASLEEP,
                                 duration: Math.floor(Math.random() * 120 + 1) * 60000
                             },
                             {
                                 start_time: defaultSleep.start_time,
-                                name: SleepPatternType.AWAKE,
+                                name: PhasesPatternType.AWAKE,
                                 duration: Math.floor(Math.random() * 3 + 1) * 60000
                             }
                         ],
@@ -1258,17 +1258,17 @@ describe('Routes: users.children.sleep', () => {
                         pattern: [
                             {
                                 start_time: defaultSleep.start_time,
-                                name: SleepPatternType.RESTLESS,
+                                name: PhasesPatternType.RESTLESS,
                                 duration: Math.floor(Math.random() * 5 + 1) * 60000
                             },
                             {
                                 start_time: defaultSleep.start_time,
-                                name: SleepPatternType.ASLEEP,
+                                name: PhasesPatternType.ASLEEP,
                                 duration: Math.floor(Math.random() * 120 + 1) * 60000
                             },
                             {
                                 start_time: defaultSleep.start_time,
-                                name: SleepPatternType.AWAKE,
+                                name: PhasesPatternType.AWAKE,
                                 duration: Math.floor(Math.random() * 3 + 1) * 60000
                             }
                         ],
@@ -1344,17 +1344,17 @@ describe('Routes: users.children.sleep', () => {
                         pattern: [
                             {
                                 start_time: defaultSleep.start_time,
-                                name: SleepPatternType.RESTLESS,
+                                name: PhasesPatternType.RESTLESS,
                                 duration: Math.floor(Math.random() * 5 + 1) * 60000
                             },
                             {
                                 start_time: defaultSleep.start_time,
-                                name: SleepPatternType.ASLEEP,
+                                name: PhasesPatternType.ASLEEP,
                                 duration: Math.floor(Math.random() * 120 + 1) * 60000
                             },
                             {
                                 start_time: defaultSleep.start_time,
-                                name: SleepPatternType.AWAKE,
+                                name: PhasesPatternType.AWAKE,
                                 duration: Math.floor(Math.random() * 3 + 1) * 60000
                             }
                         ],
@@ -1400,17 +1400,17 @@ describe('Routes: users.children.sleep', () => {
                         pattern: [
                             {
                                 start_time: defaultSleep.start_time,
-                                name: SleepPatternType.RESTLESS,
+                                name: PhasesPatternType.RESTLESS,
                                 duration: Math.floor(Math.random() * 5 + 1) * 60000
                             },
                             {
                                 start_time: defaultSleep.start_time,
-                                name: SleepPatternType.ASLEEP,
+                                name: PhasesPatternType.ASLEEP,
                                 duration: Math.floor(Math.random() * 120 + 1) * 60000
                             },
                             {
                                 start_time: defaultSleep.start_time,
-                                name: SleepPatternType.AWAKE,
+                                name: PhasesPatternType.AWAKE,
                                 duration: Math.floor(Math.random() * 3 + 1) * 60000
                             }
                         ],
@@ -1832,17 +1832,17 @@ describe('Routes: users.children.sleep', () => {
                         pattern: [
                             {
                                 start_time: defaultSleep.start_time,
-                                name: SleepPatternType.RESTLESS,
+                                name: PhasesPatternType.RESTLESS,
                                 duration: Math.floor(Math.random() * 5 + 1) * 60000
                             },
                             {
                                 start_time: defaultSleep.start_time,
-                                name: SleepPatternType.ASLEEP,
+                                name: PhasesPatternType.ASLEEP,
                                 duration: Math.floor(Math.random() * 120 + 1) * 60000
                             },
                             {
                                 start_time: defaultSleep.start_time,
-                                name: SleepPatternType.AWAKE,
+                                name: PhasesPatternType.AWAKE,
                                 duration: Math.floor(Math.random() * 3 + 1) * 60000
                             }
                         ],
@@ -1902,17 +1902,17 @@ describe('Routes: users.children.sleep', () => {
                         pattern: [
                             {
                                 start_time: defaultSleep.start_time,
-                                name: SleepPatternType.RESTLESS,
+                                name: PhasesPatternType.RESTLESS,
                                 duration: Math.floor(Math.random() * 5 + 1) * 60000
                             },
                             {
                                 start_time: defaultSleep.start_time,
-                                name: SleepPatternType.ASLEEP,
+                                name: PhasesPatternType.ASLEEP,
                                 duration: Math.floor(Math.random() * 120 + 1) * 60000
                             },
                             {
                                 start_time: defaultSleep.start_time,
-                                name: SleepPatternType.AWAKE,
+                                name: PhasesPatternType.AWAKE,
                                 duration: Math.floor(Math.random() * 3 + 1) * 60000
                             }
                         ],
@@ -1954,17 +1954,17 @@ describe('Routes: users.children.sleep', () => {
                         pattern: [
                             {
                                 start_time: defaultSleep.start_time,
-                                name: SleepPatternType.RESTLESS,
+                                name: PhasesPatternType.RESTLESS,
                                 duration: Math.floor(Math.random() * 5 + 1) * 60000
                             },
                             {
                                 start_time: defaultSleep.start_time,
-                                name: SleepPatternType.ASLEEP,
+                                name: PhasesPatternType.ASLEEP,
                                 duration: Math.floor(Math.random() * 120 + 1) * 60000
                             },
                             {
                                 start_time: defaultSleep.start_time,
-                                name: SleepPatternType.AWAKE,
+                                name: PhasesPatternType.AWAKE,
                                 duration: Math.floor(Math.random() * 3 + 1) * 60000
                             }
                         ],
@@ -2003,17 +2003,17 @@ async function createSleepToBeUpdated(defaultSleep: Sleep): Promise<any> {
         pattern: [
             {
                 start_time: defaultSleep.start_time,
-                name: SleepPatternType.RESTLESS,
+                name: PhasesPatternType.RESTLESS,
                 duration: Math.floor(Math.random() * 5 + 1) * 60000
             },
             {
                 start_time: defaultSleep.start_time,
-                name: SleepPatternType.ASLEEP,
+                name: PhasesPatternType.ASLEEP,
                 duration: Math.floor(Math.random() * 120 + 1) * 60000
             },
             {
                 start_time: defaultSleep.start_time,
-                name: SleepPatternType.AWAKE,
+                name: PhasesPatternType.AWAKE,
                 duration: Math.floor(Math.random() * 3 + 1) * 60000
             }
         ],

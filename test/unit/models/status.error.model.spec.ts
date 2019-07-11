@@ -18,11 +18,8 @@ describe('Models: StatusError', () => {
         context('when the json is correct', () => {
             it('should return an StatusError model', () => {
                 const result = new StatusError().fromJSON(statusErrorJSON)
-                assert.typeOf(result.code, 'string')
                 assert.propertyVal(result, 'code', statusErrorJSON.code)
-                assert.typeOf(result.message, 'string')
                 assert.propertyVal(result, 'message', statusErrorJSON.message)
-                assert.typeOf(result.description, 'string')
                 assert.propertyVal(result, 'description', statusErrorJSON.description)
                 assert.propertyVal(result.item, 'date', statusErrorJSON.item.date)
                 assert.propertyVal(result.item, 'value', statusErrorJSON.item.value)
@@ -44,11 +41,8 @@ describe('Models: StatusError', () => {
         context('when the json is a string', () => {
             it('should transform the string in json and return StatusError model', () => {
                 const result = new StatusError().fromJSON(JSON.stringify(statusErrorJSON))
-                assert.typeOf(result.code, 'string')
                 assert.propertyVal(result, 'code', statusErrorJSON.code)
-                assert.typeOf(result.message, 'string')
                 assert.propertyVal(result, 'message', statusErrorJSON.message)
-                assert.typeOf(result.description, 'string')
                 assert.propertyVal(result, 'description', statusErrorJSON.description)
                 assert.propertyVal(result.item, 'date', statusErrorJSON.item.date)
                 assert.propertyVal(result.item, 'value', statusErrorJSON.item.value)
@@ -61,11 +55,8 @@ describe('Models: StatusError', () => {
             it('should return a JSON from StatusError model', () => {
                 let result = new StatusError().fromJSON(statusErrorJSON)
                 result = result.toJSON()
-                assert.typeOf(result.code, 'string')
                 assert.propertyVal(result, 'code', statusErrorJSON.code)
-                assert.typeOf(result.message, 'string')
                 assert.propertyVal(result, 'message', statusErrorJSON.message)
-                assert.typeOf(result.description, 'string')
                 assert.propertyVal(result, 'description', statusErrorJSON.description)
                 assert.propertyVal(result.item, 'date', statusErrorJSON.item.date)
                 assert.propertyVal(result.item, 'value', statusErrorJSON.item.value)

@@ -37,7 +37,6 @@ describe('Models: Temperature', () => {
                 assert.propertyVal(result, 'type', temperatureJSON.type)
                 assert.propertyVal(result, 'value', temperatureJSON.value)
                 assert.propertyVal(result, 'unit', temperatureJSON.unit)
-                assert.propertyVal(result, 'child_id', temperatureJSON.child_id)
             })
         })
     })

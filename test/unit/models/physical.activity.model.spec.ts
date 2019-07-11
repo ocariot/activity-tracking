@@ -44,14 +44,10 @@ describe('Models: PhysicalActivity', () => {
             it('should return an PhysicalActivity model', () => {
                 const result = new PhysicalActivity().fromJSON(activityJSON)
                 assert.propertyVal(result, 'id', activityJSON.id)
-                assert.typeOf(result.duration, 'number')
                 assert.propertyVal(result, 'duration', activityJSON.duration)
                 assert.propertyVal(result, 'child_id', activityJSON.child_id)
-                assert.typeOf(result.name, 'string')
                 assert.propertyVal(result, 'name', activityJSON.name)
-                assert.typeOf(result.calories, 'number')
                 assert.propertyVal(result, 'calories', activityJSON.calories)
-                assert.typeOf(result.steps, 'number')
                 assert.propertyVal(result, 'steps', activityJSON.steps)
                 // PhysicalActivity levels
                 assert.deepPropertyVal(result, 'levels', activityJSON.levels)
@@ -77,14 +73,10 @@ describe('Models: PhysicalActivity', () => {
             it('should transform the string in json and return PhysicalActivity model', () => {
                 const result = new PhysicalActivity().fromJSON(JSON.stringify(activityJSON))
                 assert.propertyVal(result, 'id', activityJSON.id.toHexString())
-                assert.typeOf(result.duration, 'number')
                 assert.propertyVal(result, 'duration', activityJSON.duration)
                 assert.propertyVal(result, 'child_id', activityJSON.child_id.toHexString())
-                assert.typeOf(result.name, 'string')
                 assert.propertyVal(result, 'name', activityJSON.name)
-                assert.typeOf(result.calories, 'number')
                 assert.propertyVal(result, 'calories', activityJSON.calories)
-                assert.typeOf(result.steps, 'number')
                 assert.propertyVal(result, 'steps', activityJSON.steps)
                 // PhysicalActivity levels
                 assert.deepPropertyVal(result, 'levels', activityJSON.levels)
@@ -98,14 +90,10 @@ describe('Models: PhysicalActivity', () => {
                 let result = new PhysicalActivity().fromJSON(activityJSON)
                 result = result.toJSON()
                 assert.propertyVal(result, 'id', activityJSON.id)
-                assert.typeOf(result.duration, 'number')
                 assert.propertyVal(result, 'duration', activityJSON.duration)
                 assert.propertyVal(result, 'child_id', activityJSON.child_id)
-                assert.typeOf(result.name, 'string')
                 assert.propertyVal(result, 'name', activityJSON.name)
-                assert.typeOf(result.calories, 'number')
                 assert.propertyVal(result, 'calories', activityJSON.calories)
-                assert.typeOf(result.steps, 'number')
                 assert.propertyVal(result, 'steps', activityJSON.steps)
                 // PhysicalActivity levels
                 // Level 1

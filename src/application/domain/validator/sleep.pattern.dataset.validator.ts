@@ -20,11 +20,11 @@ export class SleepPatternDataSetValidator {
             if (!data.name) fields.push('data_set name')
             else if (sleepType === SleepType.CLASSIC && !phasesPatternTypes.includes(data.name)) {
                     throw new ValidationException(`The sleep pattern name provided "${data.name}" is not supported...`,
-                        'The names of the allowed patterns are: '.concat(phasesPatternTypes.join(', ')))
+                        'The names of the allowed patterns are: '.concat(phasesPatternTypes.join(', ').concat('.')))
             }
             else if (sleepType === SleepType.STAGES && !stagesPatternTypes.includes(data.name)) {
                     throw new ValidationException(`The sleep pattern name provided "${data.name}" is not supported...`,
-                        'The names of the allowed patterns are: '.concat(stagesPatternTypes.join(', ')))
+                        'The names of the allowed patterns are: '.concat(stagesPatternTypes.join(', ').concat('.')))
             }
             if (data.duration === undefined) fields.push('data_set duration')
             else if (data.duration < 0) {

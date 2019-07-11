@@ -3,6 +3,7 @@ import { PhysicalActivityEntityMapper } from '../../../src/infrastructure/entity
 import { Log, LogType } from '../../../src/application/domain/model/log'
 import { PhysicalActivityLog } from '../../../src/application/domain/model/physical.activity.log'
 import { PhysicalActivityLogEntityMapper } from '../../../src/infrastructure/entity/mapper/physical.activity.log.entity.mapper'
+import { PhysicalActivityLogEntity } from '../../../src/infrastructure/entity/physical.activity.log.entity'
 
 describe('Mappers: PhysicalActivityLogEntityMapper', () => {
     const activityLog: PhysicalActivityLog = new PhysicalActivityLog()
@@ -24,7 +25,7 @@ describe('Mappers: PhysicalActivityLogEntityMapper', () => {
     describe('transform(item: any)', () => {
         context('when the parameter is of type PhysicalActivityLog', () => {
             it('should normally execute the method, returning a PhysicalActivityLogEntity as a result of the transformation', () => {
-                const result = new PhysicalActivityLogEntityMapper().transform(activityLog)
+                const result: PhysicalActivityLogEntity = new PhysicalActivityLogEntityMapper().transform(activityLog)
                 assert.propertyVal(result, 'id', activityLog.id)
                 assert(result.steps, 'steps must not be undefined')
                 assert(result.calories, 'calories must not be undefined')
@@ -33,7 +34,7 @@ describe('Mappers: PhysicalActivityLogEntityMapper', () => {
 
         context('when the parameter is a JSON', () => {
             it('should normally execute the method, returning a PhysicalActivityLog as a result of the transformation', () => {
-                const result = new PhysicalActivityEntityMapper().transform(activityLogJSON)
+                const result: PhysicalActivityLog = new PhysicalActivityEntityMapper().transform(activityLogJSON)
                 assert.propertyVal(result, 'id', activityLogJSON.id)
                 assert.propertyVal(result, 'steps', activityLogJSON.steps)
                 assert.propertyVal(result, 'calories', activityLogJSON.calories)
@@ -42,7 +43,7 @@ describe('Mappers: PhysicalActivityLogEntityMapper', () => {
 
         context('when the parameter is a undefined', () => {
             it('should normally execute the method, returning an empty PhysicalActivityLog as a result of the transformation', () => {
-                const result = new PhysicalActivityLogEntityMapper().transform(undefined)
+                const result: PhysicalActivityLog = new PhysicalActivityLogEntityMapper().transform(undefined)
 
                 assert.isObject(result)
                 assert.propertyVal(result, 'id', undefined)

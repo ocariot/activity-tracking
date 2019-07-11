@@ -19,7 +19,8 @@ describe('IntegrationEvents: SleepEvent', () => {
                 assert.propertyVal(result.sleep, 'end_time', sleep.end_time!.toISOString())
                 assert.propertyVal(result.sleep, 'duration', sleep.duration)
                 assert.propertyVal(result.sleep, 'child_id', sleep.child_id)
-                assert.property(result.sleep, 'pattern')
+                assert.propertyVal(result.sleep, 'type', sleep.type)
+                assert.deepPropertyVal(result.sleep, 'pattern', sleep.pattern!.toJSON())
             })
         })
 

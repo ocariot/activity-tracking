@@ -2,25 +2,26 @@ import { ObjectID } from 'bson'
 import { assert } from 'chai'
 import { ValidationException } from '../../../src/application/domain/exception/validation.exception'
 import { Sleep } from '../../../src/application/domain/model/sleep'
-import { SleepPattern, SleepPatternType } from '../../../src/application/domain/model/sleep.pattern'
-import { SleepPatternDataSet } from '../../../src/application/domain/model/sleep.pattern.data.set'
+import { SleepPattern } from '../../../src/application/domain/model/sleep.pattern'
+import { PhasesPatternType, SleepPatternDataSet } from '../../../src/application/domain/model/sleep.pattern.data.set'
 import { SleepPatternPhasesSummary } from '../../../src/application/domain/model/sleep.pattern.phases.summary'
 import { SleepPatternSummaryData } from '../../../src/application/domain/model/sleep.pattern.summary.data'
 
 describe('Models: Sleep', () => {
+    // Creating a sleepPattern
     const dataSetItem: SleepPatternDataSet = new SleepPatternDataSet()
     dataSetItem.start_time = new Date('2018-08-18T01:30:30Z')
-    dataSetItem.name = SleepPatternType.RESTLESS
+    dataSetItem.name = PhasesPatternType.RESTLESS
     dataSetItem.duration = Math.floor(Math.random() * 5 + 1) * 60000 // 1-5min milliseconds
 
     const dataSetItem2: SleepPatternDataSet = new SleepPatternDataSet()
     dataSetItem2.start_time = new Date('2018-08-18T01:45:30Z')
-    dataSetItem2.name = SleepPatternType.AWAKE
+    dataSetItem2.name = PhasesPatternType.AWAKE
     dataSetItem2.duration = Math.floor(Math.random() * 3 + 1) * 60000 // 1-3min in milliseconds
 
     const dataSetItem3: SleepPatternDataSet = new SleepPatternDataSet()
     dataSetItem3.start_time = new Date('2018-08-18T02:45:30Z')
-    dataSetItem3.name = SleepPatternType.ASLEEP
+    dataSetItem3.name = PhasesPatternType.ASLEEP
     dataSetItem3.duration = Math.floor(Math.random() * 120 + 1) * 60000 // 1-180min in milliseconds
 
     const dataSet: Array<SleepPatternDataSet> = new Array<SleepPatternDataSet>()
@@ -69,10 +70,8 @@ describe('Models: Sleep', () => {
                 assert.propertyVal(result, 'id', sleepJSON.id)
                 assert.equal(result.start_time!.toISOString(), sleepJSON.start_time)
                 assert.equal(result.end_time!.toISOString(), sleepJSON.end_time)
-                assert.typeOf(result.duration, 'number')
                 assert.propertyVal(result, 'duration', sleepJSON.duration)
                 assert.propertyVal(result, 'child_id', sleepJSON.child_id)
-                // Pattern dataset
                 assert.deepPropertyVal(result, 'pattern', sleepJSON.pattern)
             })
         })
@@ -95,10 +94,8 @@ describe('Models: Sleep', () => {
                 assert.propertyVal(result, 'id', sleepJSON.id.toHexString())
                 assert.equal(result.start_time!.toISOString(), sleepJSON.start_time)
                 assert.equal(result.end_time!.toISOString(), sleepJSON.end_time)
-                assert.typeOf(result.duration, 'number')
                 assert.propertyVal(result, 'duration', sleepJSON.duration)
                 assert.propertyVal(result, 'child_id', sleepJSON.child_id.toHexString())
-                // Pattern dataset
                 assert.deepPropertyVal(result, 'pattern', sleepJSON.pattern)
             })
         })
@@ -112,34 +109,9 @@ describe('Models: Sleep', () => {
                 assert.propertyVal(result, 'id', sleepJSON.id)
                 assert.propertyVal(result, 'start_time', sleepJSON.start_time)
                 assert.propertyVal(result, 'end_time', sleepJSON.end_time)
-                assert.typeOf(result.duration, 'number')
                 assert.propertyVal(result, 'duration', sleepJSON.duration)
                 assert.propertyVal(result, 'child_id', sleepJSON.child_id)
-                // Pattern dataset
-                assert(result.pattern!.data_set[0].start_time, 'data_set[0] start_time must not be undefined')
-                assert.propertyVal(result.pattern!.data_set[0], 'name', sleepJSON.pattern.data_set[0].name)
-                assert.propertyVal(result.pattern!.data_set[0], 'duration', sleepJSON.pattern.data_set[0].duration)
-                assert(result.pattern!.data_set[1].start_time, 'data_set[1] start_time must not be undefined')
-                assert.propertyVal(result.pattern!.data_set[1], 'name', sleepJSON.pattern.data_set[1].name)
-                assert.propertyVal(result.pattern!.data_set[1], 'duration', sleepJSON.pattern.data_set[1].duration)
-                assert(result.pattern!.data_set[2].start_time, 'data_set[2] start_time must not be undefined')
-                assert.propertyVal(result.pattern!.data_set[2], 'name', sleepJSON.pattern.data_set[2].name)
-                assert.propertyVal(result.pattern!.data_set[2], 'duration', sleepJSON.pattern.data_set[2].duration)
-                // Pattern summary awake
-                assert.typeOf(result.pattern!.summary.awake.count, 'number')
-                assert.propertyVal(result.pattern!.summary.awake, 'count', sleepJSON.pattern.summary.awake.count)
-                assert.typeOf(result.pattern!.summary.awake.duration, 'number')
-                assert.propertyVal(result.pattern!.summary.awake, 'duration', sleepJSON.pattern.summary.awake.duration)
-                // Pattern summary asleep
-                assert.typeOf(result.pattern!.summary.asleep.count, 'number')
-                assert.propertyVal(result.pattern!.summary.asleep, 'count', sleepJSON.pattern.summary.asleep.count)
-                assert.typeOf(result.pattern!.summary.asleep.duration, 'number')
-                assert.propertyVal(result.pattern!.summary.asleep, 'duration', sleepJSON.pattern.summary.asleep.duration)
-                // Pattern summary restless
-                assert.typeOf(result.pattern!.summary.restless.count, 'number')
-                assert.propertyVal(result.pattern!.summary.restless, 'count', sleepJSON.pattern.summary.restless.count)
-                assert.typeOf(result.pattern!.summary.restless.duration, 'number')
-                assert.propertyVal(result.pattern!.summary.restless, 'duration', sleepJSON.pattern.summary.restless.duration)
+                assert.deepPropertyVal(result, 'pattern', (new SleepPattern().fromJSON(sleepJSON.pattern)).toJSON())
             })
         })
     })
