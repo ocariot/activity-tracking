@@ -18,7 +18,7 @@ export class PhysicalActivityHeartRateMock extends PhysicalActivityHeartRate {
             fat_burn_zone: {
                 min: 91,
                 max: 127,
-                duration: 10
+                duration: 600000
             },
             cardio_zone: {
                 min: 127,

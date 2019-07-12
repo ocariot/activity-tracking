@@ -1,5 +1,4 @@
 import { assert } from 'chai'
-// import { Strings } from '../../../src/utils/strings'
 import { PhysicalActivityHeartRate } from '../../../src/application/domain/model/physical.activity.heart.rate'
 import { PhysicalActivityHeartRateMock } from '../../mocks/physical.activity.heart.rate.mock'
 import { PhysicalActivityHeartRateValidator } from '../../../src/application/domain/validator/physical.activity.heart.rate.validator'
@@ -55,12 +54,12 @@ describe('Validators: PhysicalActivityHeartRateValidator', () => {
                     assert.equal(err.message, 'Average field is invalid...')
                     assert.equal(err.description, 'PhysicalActivityHeartRate validation failed: The value provided has a negative value!')
                 }
+                activityHeartRate.average = 120
             })
         })
 
         context('when the PhysicalActivityHeartRate has an invalid "Out of Range Zone" parameter (the parameter is empty)', () => {
             it('should throw a ValidationException', () => {
-                activityHeartRate.average = 120
                 activityHeartRate.out_of_range_zone = new HeartRateZone()
                 try {
                     PhysicalActivityHeartRateValidator.validate(activityHeartRate)
@@ -125,45 +124,6 @@ describe('Validators: PhysicalActivityHeartRateValidator', () => {
             })
         })
 
-        context('when the PhysicalActivityHeartRate has an invalid "Fat Burn Zone" parameter (the min parameter is negative)', () => {
-            it('should throw a ValidationException', () => {
-                activityHeartRate.fat_burn_zone!.min = -91
-                try {
-                    PhysicalActivityHeartRateValidator.validate(activityHeartRate)
-                } catch (err) {
-                    assert.equal(err.message, 'Min field is invalid...')
-                    assert.equal(err.description, 'HeartRateZone validation failed: The value provided has a negative value!')
-                }
-                activityHeartRate.fat_burn_zone!.min = 91
-            })
-        })
-
-        context('when the PhysicalActivityHeartRate has an invalid "Cardio Zone" parameter (the min parameter is negative)', () => {
-            it('should throw a ValidationException', () => {
-                activityHeartRate.cardio_zone!.min = -127
-                try {
-                    PhysicalActivityHeartRateValidator.validate(activityHeartRate)
-                } catch (err) {
-                    assert.equal(err.message, 'Min field is invalid...')
-                    assert.equal(err.description, 'HeartRateZone validation failed: The value provided has a negative value!')
-                }
-                activityHeartRate.cardio_zone!.min = 127
-            })
-        })
-
-        context('when the PhysicalActivityHeartRate has an invalid "Peak Zone" parameter (the min parameter is negative)', () => {
-            it('should throw a ValidationException', () => {
-                activityHeartRate.peak_zone!.min = -154
-                try {
-                    PhysicalActivityHeartRateValidator.validate(activityHeartRate)
-                } catch (err) {
-                    assert.equal(err.message, 'Min field is invalid...')
-                    assert.equal(err.description, 'HeartRateZone validation failed: The value provided has a negative value!')
-                }
-                activityHeartRate.peak_zone!.min = 154
-            })
-        })
-
         context('when the PhysicalActivityHeartRate has an invalid "Out of Range Zone" parameter (the max parameter is negative)', () => {
             it('should throw a ValidationException', () => {
                 activityHeartRate.out_of_range_zone!.max = -91
@@ -175,6 +135,34 @@ describe('Validators: PhysicalActivityHeartRateValidator', () => {
                 }
                 activityHeartRate.out_of_range_zone!.max = 91
 
+            })
+        })
+
+        context('when the PhysicalActivityHeartRate has an invalid "Out of Range Zone" parameter ' +
+            '(the duration parameter is negative)', () => {
+            it('should throw a ValidationException', () => {
+                activityHeartRate.out_of_range_zone!.duration = -60000
+                try {
+                    PhysicalActivityHeartRateValidator.validate(activityHeartRate)
+                } catch (err) {
+                    assert.equal(err.message, 'Duration field is invalid...')
+                    assert.equal(err.description, 'HeartRateZone validation failed: The value provided has a negative value!')
+                }
+                activityHeartRate.out_of_range_zone!.duration = 60000
+
+            })
+        })
+
+        context('when the PhysicalActivityHeartRate has an invalid "Fat Burn Zone" parameter (the min parameter is negative)', () => {
+            it('should throw a ValidationException', () => {
+                activityHeartRate.fat_burn_zone!.min = -91
+                try {
+                    PhysicalActivityHeartRateValidator.validate(activityHeartRate)
+                } catch (err) {
+                    assert.equal(err.message, 'Min field is invalid...')
+                    assert.equal(err.description, 'HeartRateZone validation failed: The value provided has a negative value!')
+                }
+                activityHeartRate.fat_burn_zone!.min = 91
             })
         })
 
@@ -191,6 +179,32 @@ describe('Validators: PhysicalActivityHeartRateValidator', () => {
             })
         })
 
+        context('when the PhysicalActivityHeartRate has an invalid "Fat Burn Zone" parameter (the duration parameter is negative)', () => {
+            it('should throw a ValidationException', () => {
+                activityHeartRate.fat_burn_zone!.duration = -600000
+                try {
+                    PhysicalActivityHeartRateValidator.validate(activityHeartRate)
+                } catch (err) {
+                    assert.equal(err.message, 'Duration field is invalid...')
+                    assert.equal(err.description, 'HeartRateZone validation failed: The value provided has a negative value!')
+                }
+                activityHeartRate.fat_burn_zone!.duration = 600000
+            })
+        })
+
+        context('when the PhysicalActivityHeartRate has an invalid "Cardio Zone" parameter (the min parameter is negative)', () => {
+            it('should throw a ValidationException', () => {
+                activityHeartRate.cardio_zone!.min = -127
+                try {
+                    PhysicalActivityHeartRateValidator.validate(activityHeartRate)
+                } catch (err) {
+                    assert.equal(err.message, 'Min field is invalid...')
+                    assert.equal(err.description, 'HeartRateZone validation failed: The value provided has a negative value!')
+                }
+                activityHeartRate.cardio_zone!.min = 127
+            })
+        })
+
         context('when the PhysicalActivityHeartRate has an invalid "Cardio Zone" parameter (the max parameter is negative)', () => {
             it('should throw a ValidationException', () => {
                 activityHeartRate.cardio_zone!.max = -154
@@ -204,6 +218,32 @@ describe('Validators: PhysicalActivityHeartRateValidator', () => {
             })
         })
 
+        context('when the PhysicalActivityHeartRate has an invalid "Cardio Zone" parameter (the duration parameter is negative)', () => {
+            it('should throw a ValidationException', () => {
+                activityHeartRate.cardio_zone!.duration = -60000
+                try {
+                    PhysicalActivityHeartRateValidator.validate(activityHeartRate)
+                } catch (err) {
+                    assert.equal(err.message, 'Duration field is invalid...')
+                    assert.equal(err.description, 'HeartRateZone validation failed: The value provided has a negative value!')
+                }
+                activityHeartRate.cardio_zone!.duration = 60000
+            })
+        })
+
+        context('when the PhysicalActivityHeartRate has an invalid "Peak Zone" parameter (the min parameter is negative)', () => {
+            it('should throw a ValidationException', () => {
+                activityHeartRate.peak_zone!.min = -154
+                try {
+                    PhysicalActivityHeartRateValidator.validate(activityHeartRate)
+                } catch (err) {
+                    assert.equal(err.message, 'Min field is invalid...')
+                    assert.equal(err.description, 'HeartRateZone validation failed: The value provided has a negative value!')
+                }
+                activityHeartRate.peak_zone!.min = 154
+            })
+        })
+
         context('when the PhysicalActivityHeartRate has an invalid "Peak Zone" parameter (the max parameter is negative)', () => {
             it('should throw a ValidationException', () => {
                 activityHeartRate.peak_zone!.max = -220
@@ -214,6 +254,19 @@ describe('Validators: PhysicalActivityHeartRateValidator', () => {
                     assert.equal(err.description, 'HeartRateZone validation failed: The value provided has a negative value!')
                 }
                 activityHeartRate.peak_zone!.max = 220
+            })
+        })
+
+        context('when the PhysicalActivityHeartRate has an invalid "Peak Zone" parameter (the duration parameter is negative)', () => {
+            it('should throw a ValidationException', () => {
+                activityHeartRate.peak_zone!.duration = -60000
+                try {
+                    PhysicalActivityHeartRateValidator.validate(activityHeartRate)
+                } catch (err) {
+                    assert.equal(err.message, 'Duration field is invalid...')
+                    assert.equal(err.description, 'HeartRateZone validation failed: The value provided has a negative value!')
+                }
+                activityHeartRate.peak_zone!.duration = 60000
             })
         })
     })

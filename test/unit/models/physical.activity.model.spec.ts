@@ -51,6 +51,7 @@ describe('Models: PhysicalActivity', () => {
                 assert.propertyVal(result, 'steps', activityJSON.steps)
                 // PhysicalActivity levels
                 assert.deepPropertyVal(result, 'levels', activityJSON.levels)
+                assert.deepPropertyVal(result, 'heart_rate', activityJSON.heart_rate)
             })
         })
 
@@ -66,6 +67,7 @@ describe('Models: PhysicalActivity', () => {
                 assert.isUndefined(result.calories)
                 assert.isUndefined(result.steps)
                 assert.isUndefined(result.levels)
+                assert.isUndefined(result.heart_rate)
             })
         })
 
@@ -80,6 +82,7 @@ describe('Models: PhysicalActivity', () => {
                 assert.propertyVal(result, 'steps', activityJSON.steps)
                 // PhysicalActivity levels
                 assert.deepPropertyVal(result, 'levels', activityJSON.levels)
+                assert.deepPropertyVal(result, 'heart_rate', activityJSON.heart_rate)
             })
         })
     })
@@ -108,6 +111,7 @@ describe('Models: PhysicalActivity', () => {
                 // Level 4
                 assert.propertyVal(result.levels![3], 'name', activityJSON.levels[3].name)
                 assert.propertyVal(result.levels![3], 'duration', activityJSON.levels[3].duration)
+                assert.propertyVal(result, 'heart_rate', activityJSON.heart_rate)
             })
         })
     })

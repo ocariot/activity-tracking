@@ -15,6 +15,8 @@ import { ObjectID } from 'bson'
 import { Log, LogType } from '../../../src/application/domain/model/log'
 import { LogMock } from '../../mocks/log.mock'
 import { ActivityLogRepoModel } from '../../../src/infrastructure/database/schema/activity.log.schema'
+import { PhysicalActivityHeartRate } from '../../../src/application/domain/model/physical.activity.heart.rate'
+import { HeartRateZone } from '../../../src/application/domain/model/heart.rate.zone'
 
 const container: Container = DI.getInstance().getContainer()
 const backgroundServices: BackgroundService = container.get(Identifier.BACKGROUND_SERVICE)
@@ -134,6 +136,22 @@ describe('Routes: users/children', () => {
     incorrectActivityJSON.levels[0].duration = -(Math.floor((Math.random() * 10) * 60000))
     incorrectActivity10 = incorrectActivity10.fromJSON(incorrectActivityJSON)
 
+    // The PhysicalActivityHeartRate is empty
+    const incorrectActivity11: PhysicalActivity = new PhysicalActivityMock()
+    incorrectActivity11.heart_rate = new PhysicalActivityHeartRate()
+
+    // The PhysicalActivityHeartRate average is negative
+    const incorrectActivity12: PhysicalActivity = new PhysicalActivityMock()
+    incorrectActivity12.heart_rate!.average = -120
+
+    // The PhysicalActivityHeartRate is invalid (the "Fat Burn Zone" parameter is empty)
+    const incorrectActivity13: PhysicalActivity = new PhysicalActivityMock()
+    incorrectActivity13.heart_rate!.fat_burn_zone = new HeartRateZone()
+
+    // The PhysicalActivityHeartRate is invalid (the "Fat Burn Zone" parameter has a negative duration)
+    const incorrectActivity14: PhysicalActivity = new PhysicalActivityMock()
+    incorrectActivity14.heart_rate!.fat_burn_zone!.duration = -600000
+
     // Array with correct and incorrect activities
     const mixedActivitiesArr: Array<PhysicalActivity> = new Array<PhysicalActivityMock>()
     mixedActivitiesArr.push(new PhysicalActivityMock())
@@ -151,6 +169,10 @@ describe('Routes: users/children', () => {
     incorrectActivitiesArr.push(incorrectActivity8)
     incorrectActivitiesArr.push(incorrectActivity9)
     incorrectActivitiesArr.push(incorrectActivity10)
+    incorrectActivitiesArr.push(incorrectActivity11)
+    incorrectActivitiesArr.push(incorrectActivity12)
+    incorrectActivitiesArr.push(incorrectActivity13)
+    incorrectActivitiesArr.push(incorrectActivity14)
 
     // Start services
     before(async () => {
@@ -184,7 +206,8 @@ describe('Routes: users/children', () => {
                     duration: defaultActivity.duration,
                     calories: defaultActivity.calories,
                     steps: defaultActivity.steps ? defaultActivity.steps : undefined,
-                    levels: defaultActivity.levels ? defaultActivity.levels : undefined
+                    levels: defaultActivity.levels ? defaultActivity.levels : undefined,
+                    heart_rate: defaultActivity.heart_rate ? defaultActivity.heart_rate : undefined
                 }
 
                 return request
@@ -206,6 +229,7 @@ describe('Routes: users/children', () => {
                         if (defaultActivity.levels) {
                             expect(res.body).to.have.property('levels')
                         }
+                        expect(res.body.heart_rate).to.eql(defaultActivity.heart_rate!.toJSON())
                         expect(res.body.child_id).to.eql(defaultActivity.child_id)
                     })
             })
@@ -220,7 +244,8 @@ describe('Routes: users/children', () => {
                     duration: defaultActivity.duration,
                     calories: defaultActivity.calories,
                     steps: defaultActivity.steps ? defaultActivity.steps : undefined,
-                    levels: defaultActivity.levels ? defaultActivity.levels : undefined
+                    levels: defaultActivity.levels ? defaultActivity.levels : undefined,
+                    heart_rate: defaultActivity.heart_rate ? defaultActivity.heart_rate : undefined
                 }
 
                 return request
@@ -259,7 +284,8 @@ describe('Routes: users/children', () => {
                     end_time: defaultActivity.end_time,
                     duration: defaultActivity.duration,
                     steps: defaultActivity.steps ? defaultActivity.steps : undefined,
-                    levels: defaultActivity.levels ? defaultActivity.levels : undefined
+                    levels: defaultActivity.levels ? defaultActivity.levels : undefined,
+                    heart_rate: defaultActivity.heart_rate ? defaultActivity.heart_rate : undefined
                 }
 
                 return request
@@ -284,7 +310,8 @@ describe('Routes: users/children', () => {
                     duration: defaultActivity.duration,
                     calories: defaultActivity.calories,
                     steps: defaultActivity.steps ? defaultActivity.steps : undefined,
-                    levels: defaultActivity.levels ? defaultActivity.levels : undefined
+                    levels: defaultActivity.levels ? defaultActivity.levels : undefined,
+                    heart_rate: defaultActivity.heart_rate ? defaultActivity.heart_rate : undefined
                 }
 
                 return request
@@ -310,7 +337,8 @@ describe('Routes: users/children', () => {
                     duration: Math.floor(Math.random() * 180 + 1) * 60000,
                     calories: defaultActivity.calories,
                     steps: defaultActivity.steps ? defaultActivity.steps : undefined,
-                    levels: defaultActivity.levels ? defaultActivity.levels : undefined
+                    levels: defaultActivity.levels ? defaultActivity.levels : undefined,
+                    heart_rate: defaultActivity.heart_rate ? defaultActivity.heart_rate : undefined
                 }
 
                 return request
@@ -336,7 +364,8 @@ describe('Routes: users/children', () => {
                     duration: -(defaultActivity.duration!),
                     calories: defaultActivity.calories,
                     steps: defaultActivity.steps ? defaultActivity.steps : undefined,
-                    levels: defaultActivity.levels ? defaultActivity.levels : undefined
+                    levels: defaultActivity.levels ? defaultActivity.levels : undefined,
+                    heart_rate: defaultActivity.heart_rate ? defaultActivity.heart_rate : undefined
                 }
 
                 return request
@@ -358,6 +387,10 @@ describe('Routes: users/children', () => {
                     start_time: defaultActivity.start_time,
                     end_time: defaultActivity.end_time,
                     duration: defaultActivity.duration,
+                    calories: -(defaultActivity.calories!),
+                    steps: defaultActivity.steps ? defaultActivity.steps : undefined,
+                    levels: defaultActivity.levels ? defaultActivity.levels : undefined,
+                    heart_rate: defaultActivity.heart_rate ? defaultActivity.heart_rate : undefined
                 }
 
                 return request
@@ -382,7 +415,8 @@ describe('Routes: users/children', () => {
                     duration: defaultActivity.duration,
                     calories: -(defaultActivity.calories!),
                     steps: defaultActivity.steps ? defaultActivity.steps : undefined,
-                    levels: defaultActivity.levels ? defaultActivity.levels : undefined
+                    levels: defaultActivity.levels ? defaultActivity.levels : undefined,
+                    heart_rate: defaultActivity.heart_rate ? defaultActivity.heart_rate : undefined
                 }
 
                 return request
@@ -407,7 +441,8 @@ describe('Routes: users/children', () => {
                     duration: defaultActivity.duration,
                     calories: defaultActivity.calories,
                     steps: -200,
-                    levels: defaultActivity.levels ? defaultActivity.levels : undefined
+                    levels: defaultActivity.levels ? defaultActivity.levels : undefined,
+                    heart_rate: defaultActivity.heart_rate ? defaultActivity.heart_rate : undefined
                 }
 
                 return request
@@ -450,7 +485,8 @@ describe('Routes: users/children', () => {
                             name: ActivityLevelType.VERY,
                             duration: Math.floor((Math.random() * 10) * 60000)
                         }
-                    ]
+                    ],
+                    heart_rate: defaultActivity.heart_rate ? defaultActivity.heart_rate : undefined
                 }
 
                 return request
@@ -492,7 +528,8 @@ describe('Routes: users/children', () => {
                             name: ActivityLevelType.VERY,
                             duration: Math.floor((Math.random() * 10) * 60000)
                         }
-                    ]
+                    ],
+                    heart_rate: defaultActivity.heart_rate ? defaultActivity.heart_rate : undefined
                 }
 
                 return request
@@ -535,7 +572,8 @@ describe('Routes: users/children', () => {
                             name: ActivityLevelType.VERY,
                             duration: Math.floor((Math.random() * 10) * 60000)
                         }
-                    ]
+                    ],
+                    heart_rate: defaultActivity.heart_rate ? defaultActivity.heart_rate : undefined
                 }
 
                 return request
@@ -548,6 +586,115 @@ describe('Routes: users/children', () => {
                         expect(err.body.message).to.eql('Some (or several) duration field of levels array is invalid...')
                         expect(err.body.description).to.eql('Physical Activity Level validation failed: The value ' +
                             'provided has a negative value!')
+                    })
+            })
+        })
+
+        context('when a validation error occurs (the PhysicalActivityHeartRate is empty)', () => {
+            it('should return status code 400 and info message about the invalid levels array', () => {
+                const body = {
+                    name: incorrectActivity11.name,
+                    start_time: incorrectActivity11.start_time,
+                    end_time: incorrectActivity11.end_time,
+                    duration: incorrectActivity11.duration,
+                    calories: incorrectActivity11.calories,
+                    steps: incorrectActivity11.steps ? incorrectActivity11.steps : undefined,
+                    levels: incorrectActivity11.levels ? incorrectActivity11.levels : undefined,
+                    heart_rate: incorrectActivity11.heart_rate ? incorrectActivity11.heart_rate : undefined
+                }
+
+                return request
+                    .post(`/v1/users/children/${incorrectActivity11.child_id}/physicalactivities`)
+                    .send(body)
+                    .set('Content-Type', 'application/json')
+                    .expect(400)
+                    .then(err => {
+                        expect(err.body.code).to.eql(400)
+                        expect(err.body.message).to.eql('Required fields were not provided...')
+                        expect(err.body.description).to.eql('PhysicalActivityHeartRate validation failed: ' +
+                            'average, out_of_range_zone, fat_burn_zone, cardio_zone, peak_zone is required!')
+                    })
+            })
+        })
+
+        context('when a validation error occurs (the PhysicalActivityHeartRate has a negative average parameter)', () => {
+            it('should return status code 400 and info message about the invalid levels array', () => {
+                const body = {
+                    name: incorrectActivity12.name,
+                    start_time: incorrectActivity12.start_time,
+                    end_time: incorrectActivity12.end_time,
+                    duration: incorrectActivity12.duration,
+                    calories: incorrectActivity12.calories,
+                    steps: incorrectActivity12.steps ? incorrectActivity12.steps : undefined,
+                    levels: incorrectActivity12.levels ? incorrectActivity12.levels : undefined,
+                    heart_rate: incorrectActivity12.heart_rate ? incorrectActivity12.heart_rate : undefined
+                }
+
+                return request
+                    .post(`/v1/users/children/${incorrectActivity12.child_id}/physicalactivities`)
+                    .send(body)
+                    .set('Content-Type', 'application/json')
+                    .expect(400)
+                    .then(err => {
+                        expect(err.body.code).to.eql(400)
+                        expect(err.body.message).to.eql('Average field is invalid...')
+                        expect(err.body.description).to.eql('PhysicalActivityHeartRate validation failed: ' +
+                            'The value provided has a negative value!')
+                    })
+            })
+        })
+
+        context('when a validation error occurs (the "Fat Burn Zone" parameter of PhysicalActivityHeartRate is empty)', () => {
+            it('should return status code 400 and info message about the invalid levels array', () => {
+                const body = {
+                    name: incorrectActivity13.name,
+                    start_time: incorrectActivity13.start_time,
+                    end_time: incorrectActivity13.end_time,
+                    duration: incorrectActivity13.duration,
+                    calories: incorrectActivity13.calories,
+                    steps: incorrectActivity13.steps ? incorrectActivity13.steps : undefined,
+                    levels: incorrectActivity13.levels ? incorrectActivity13.levels : undefined,
+                    heart_rate: incorrectActivity13.heart_rate ? incorrectActivity13.heart_rate : undefined
+                }
+
+                return request
+                    .post(`/v1/users/children/${incorrectActivity13.child_id}/physicalactivities`)
+                    .send(body)
+                    .set('Content-Type', 'application/json')
+                    .expect(400)
+                    .then(err => {
+                        expect(err.body.code).to.eql(400)
+                        expect(err.body.message).to.eql('Required fields were not provided...')
+                        expect(err.body.description).to.eql('HeartRateZone validation failed: ' +
+                            'min, max, duration is required!')
+                    })
+            })
+        })
+
+        context('when a validation error occurs (the "Fat Burn Zone" parameter of PhysicalActivityHeartRate ' +
+            'has a negative duration)', () => {
+            it('should return status code 400 and info message about the invalid levels array', () => {
+                const body = {
+                    name: incorrectActivity14.name,
+                    start_time: incorrectActivity14.start_time,
+                    end_time: incorrectActivity14.end_time,
+                    duration: incorrectActivity14.duration,
+                    calories: incorrectActivity14.calories,
+                    steps: incorrectActivity14.steps ? incorrectActivity14.steps : undefined,
+                    levels: incorrectActivity14.levels ? incorrectActivity14.levels : undefined,
+                    heart_rate: incorrectActivity14.heart_rate ? incorrectActivity14.heart_rate : undefined
+                }
+
+                return request
+                    .post(`/v1/users/children/${incorrectActivity14.child_id}/physicalactivities`)
+                    .send(body)
+                    .set('Content-Type', 'application/json')
+                    .expect(400)
+                    .then(err => {
+                        expect(err.body.code).to.eql(400)
+                        expect(err.body.message).to.eql('Duration field is invalid...')
+                        expect(err.body.description).to.eql('HeartRateZone validation failed: ' +
+                            'The value provided has a negative value!')
                     })
             })
         })
@@ -577,7 +724,8 @@ describe('Routes: users/children', () => {
                         duration: activity.duration,
                         calories: activity.calories,
                         steps: activity.steps ? activity.steps : undefined,
-                        levels: activity.levels ? activity.levels : undefined
+                        levels: activity.levels ? activity.levels : undefined,
+                        heart_rate: activity.heart_rate ? activity.heart_rate : undefined
                     }
                     body.push(bodyElem)
                 })
@@ -595,11 +743,14 @@ describe('Routes: users/children', () => {
                             expect(res.body.success[i].item.end_time).to.eql(correctActivitiesArr[i].end_time!.toISOString())
                             expect(res.body.success[i].item.duration).to.eql(correctActivitiesArr[i].duration)
                             expect(res.body.success[i].item.calories).to.eql(correctActivitiesArr[i].calories)
-                            if (res.body.success[i].item.steps) {
+                            if (correctActivitiesArr[i].steps) {
                                 expect(res.body.success[i].item.steps).to.eql(correctActivitiesArr[i].steps)
                             }
                             if (correctActivitiesArr[i].levels) {
                                 expect(res.body.success[i].item).to.have.property('levels')
+                            }
+                            if (correctActivitiesArr[i].heart_rate) {
+                                expect(res.body.success[i].item.heart_rate).to.eql(correctActivitiesArr[i].heart_rate!.toJSON())
                             }
                             expect(res.body.success[i].item.child_id).to.eql(correctActivitiesArr[i].child_id)
                         }
@@ -622,7 +773,8 @@ describe('Routes: users/children', () => {
                         duration: activity.duration,
                         calories: activity.calories,
                         steps: activity.steps ? activity.steps : undefined,
-                        levels: activity.levels ? activity.levels : undefined
+                        levels: activity.levels ? activity.levels : undefined,
+                        heart_rate: activity.heart_rate ? activity.heart_rate : undefined
                     }
                     body.push(bodyElem)
                 })
@@ -641,11 +793,14 @@ describe('Routes: users/children', () => {
                             expect(res.body.error[i].item.end_time).to.eql(correctActivitiesArr[i].end_time!.toISOString())
                             expect(res.body.error[i].item.duration).to.eql(correctActivitiesArr[i].duration)
                             expect(res.body.error[i].item.calories).to.eql(correctActivitiesArr[i].calories)
-                            if (res.body.error[i].item.steps) {
+                            if (correctActivitiesArr[i].steps) {
                                 expect(res.body.error[i].item.steps).to.eql(correctActivitiesArr[i].steps)
                             }
                             if (correctActivitiesArr[i].levels) {
                                 expect(res.body.error[i].item).to.have.property('levels')
+                            }
+                            if (correctActivitiesArr[i].heart_rate) {
+                                expect(res.body.error[i].item.heart_rate).to.eql(correctActivitiesArr[i].heart_rate!.toJSON())
                             }
                             expect(res.body.error[i].item.child_id).to.eql(correctActivitiesArr[i].child_id)
                         }
@@ -676,7 +831,8 @@ describe('Routes: users/children', () => {
                         duration: activity.duration,
                         calories: activity.calories,
                         steps: activity.steps ? activity.steps : undefined,
-                        levels: activity.levels ? activity.levels : undefined
+                        levels: activity.levels ? activity.levels : undefined,
+                        heart_rate: activity.heart_rate ? activity.heart_rate : undefined
                     }
                     body.push(bodyElem)
                 })
@@ -694,11 +850,14 @@ describe('Routes: users/children', () => {
                         expect(res.body.success[0].item.end_time).to.eql(mixedActivitiesArr[0].end_time!.toISOString())
                         expect(res.body.success[0].item.duration).to.eql(mixedActivitiesArr[0].duration)
                         expect(res.body.success[0].item.calories).to.eql(mixedActivitiesArr[0].calories)
-                        if (res.body.success[0].item.steps) {
+                        if (mixedActivitiesArr[0].steps) {
                             expect(res.body.success[0].item.steps).to.eql(mixedActivitiesArr[0].steps)
                         }
                         if (mixedActivitiesArr[0].levels) {
                             expect(res.body.success[0].item).to.have.property('levels')
+                        }
+                        if (mixedActivitiesArr[0].heart_rate) {
+                            expect(res.body.success[0].item.heart_rate).to.eql(mixedActivitiesArr[0].heart_rate.toJSON())
                         }
                         expect(res.body.success[0].item.child_id).to.eql(mixedActivitiesArr[0].child_id)
 
@@ -733,6 +892,7 @@ describe('Routes: users/children', () => {
                         calories: activity.calories,
                         steps: activity.steps ? activity.steps : undefined,
                         levels: activity.levels ? activity.levels : undefined,
+                        heart_rate: activity.heart_rate ? activity.heart_rate : undefined
                     }
                     body.push(bodyElem)
                 })
@@ -744,48 +904,78 @@ describe('Routes: users/children', () => {
                     .expect(201)
                     .then(res => {
                         expect(res.body.error[0].message).to.eql('Required fields were not provided...')
-                        expect(res.body.error[0].description).to.eql('Activity validation failed: start_time, end_time, ' +
-                            'duration is required!')
+                        expect(res.body.error[0].description).to.eql('Activity validation failed: ' +
+                            'start_time, end_time, duration is required!')
                         expect(res.body.error[1].message).to.eql('Required fields were not provided...')
                         expect(res.body.error[1].description).to.eql('Physical Activity validation failed: name, calories is required!')
                         expect(res.body.error[2].message).to.eql('Date field is invalid...')
-                        expect(res.body.error[2].description).to.eql('Date validation failed: The end_time parameter can not contain ' +
-                            'a older date than that the start_time parameter!')
+                        expect(res.body.error[2].description).to.eql('Date validation failed: ' +
+                            'The end_time parameter can not contain a older date than that the start_time parameter!')
                         expect(res.body.error[3].message).to.eql('Duration field is invalid...')
-                        expect(res.body.error[3].description).to.eql('Duration validation failed: Activity duration value does not ' +
-                            'match values passed in start_time and end_time parameters!')
+                        expect(res.body.error[3].description).to.eql('Duration validation failed: ' +
+                            'Activity duration value does not match values passed in start_time and end_time parameters!')
                         expect(res.body.error[4].message).to.eql('Duration field is invalid...')
-                        expect(res.body.error[4].description).to.eql('Activity validation failed: The value provided has a negative value!')
+                        expect(res.body.error[4].description).to.eql('Activity validation failed: ' +
+                            'The value provided has a negative value!')
                         expect(res.body.error[5].message).to.eql('Calories field is invalid...')
-                        expect(res.body.error[5].description).to.eql('Physical Activity validation failed: The value provided has a ' +
-                            'negative value!')
+                        expect(res.body.error[5].description).to.eql('Physical Activity validation failed: ' +
+                            'The value provided has a negative value!')
                         expect(res.body.error[6].message).to.eql('Steps field is invalid...')
-                        expect(res.body.error[6].description).to.eql('Physical Activity validation failed: The value provided has a ' +
-                            'negative value!')
+                        expect(res.body.error[6].description).to.eql('Physical Activity validation failed: ' +
+                            'The value provided has a negative value!')
                         expect(res.body.error[7].message).to.eql('The name of level provided "sedentaries" is not supported...')
-                        expect(res.body.error[7].description).to.eql('The names of the allowed levels are: sedentary, lightly, fairly, ' +
-                            'very.')
+                        expect(res.body.error[7].description).to.eql('The names of the allowed levels are: ' +
+                            'sedentary, lightly, fairly, very.')
                         expect(res.body.error[8].message).to.eql('Level are not in a format that is supported!')
-                        expect(res.body.error[8].description).to.eql('Must have values ​​for the following levels: sedentary, lightly, ' +
-                            'fairly, very.')
+                        expect(res.body.error[8].description).to.eql('Must have values ​​for the following levels:' +
+                            ' sedentary, lightly, fairly, very.')
                         expect(res.body.error[9].message).to.eql('Some (or several) duration field of levels array is invalid...')
-                        expect(res.body.error[9].description).to.eql('Physical Activity Level validation failed: The value provided has ' +
-                            'a negative value!')
+                        expect(res.body.error[9].description).to.eql('Physical Activity Level validation failed: ' +
+                            'The value provided has a negative value!')
+                        expect(res.body.error[10].message).to.eql('Required fields were not provided...')
+                        expect(res.body.error[10].description).to.eql('PhysicalActivityHeartRate validation failed: ' +
+                            'average, out_of_range_zone, fat_burn_zone, cardio_zone, peak_zone is required!')
+                        expect(res.body.error[11].message).to.eql('Average field is invalid...')
+                        expect(res.body.error[11].description).to.eql('PhysicalActivityHeartRate validation failed: ' +
+                            'The value provided has a negative value!')
+                        expect(res.body.error[12].message).to.eql('Required fields were not provided...')
+                        expect(res.body.error[12].description).to.eql('HeartRateZone validation failed: ' +
+                            'min, max, duration is required!')
+                        expect(res.body.error[13].message).to.eql('Duration field is invalid...')
+                        expect(res.body.error[13].description).to.eql('HeartRateZone validation failed: ' +
+                            'The value provided has a negative value!')
 
                         for (let i = 0; i < res.body.error.length; i++) {
                             expect(res.body.error[i].code).to.eql(HttpStatus.BAD_REQUEST)
                             expect(res.body.error[i].item.name).to.eql(incorrectActivitiesArr[i].name)
-                            if (i !== 0)
+                            if (res.body.error[i].item.start_time)
                                 expect(res.body.error[i].item.start_time).to.eql(incorrectActivitiesArr[i].start_time!.toISOString())
-                            if (i !== 0)
+                            if (res.body.error[i].item.end_time)
                                 expect(res.body.error[i].item.end_time).to.eql(incorrectActivitiesArr[i].end_time!.toISOString())
                             expect(res.body.error[i].item.duration).to.eql(incorrectActivitiesArr[i].duration)
                             expect(res.body.error[i].item.calories).to.eql(incorrectActivitiesArr[i].calories)
-                            if (res.body.error[i].item.steps) {
+                            if (incorrectActivitiesArr[i].steps) {
                                 expect(res.body.error[i].item.steps).to.eql(incorrectActivitiesArr[i].steps)
                             }
                             if (incorrectActivitiesArr[i].levels) {
                                 expect(res.body.error[i].item).to.have.property('levels')
+                            }
+                            if (i !== 0 && i !== 10 && i !== 12 && incorrectActivitiesArr[i].heart_rate) {
+                                expect(res.body.error[i].item.heart_rate).to.eql(incorrectActivitiesArr[i].heart_rate!.toJSON())
+                            }
+                            // The toJSON() method does not work very well to test the "heart_rate.fat_burn_zone" object in this index
+                            // (because it is empty and the toJSON () result will not hit with the return of the route)
+                            if (i === 12) {
+                                expect(res.body.error[i].item.heart_rate.average)
+                                    .to.eql(incorrectActivitiesArr[i].heart_rate!.average)
+                                expect(res.body.error[i].item.heart_rate.out_of_range_zone)
+                                    .to.eql(incorrectActivitiesArr[i].heart_rate!.out_of_range_zone!.toJSON())
+                                expect(res.body.error[i].item.heart_rate.fat_burn_zone)
+                                    .to.eql(incorrectActivitiesArr[i].heart_rate!.fat_burn_zone)
+                                expect(res.body.error[i].item.heart_rate.cardio_zone)
+                                    .to.eql(incorrectActivitiesArr[i].heart_rate!.cardio_zone!.toJSON())
+                                expect(res.body.error[i].item.heart_rate.peak_zone)
+                                    .to.eql(incorrectActivitiesArr[i].heart_rate!.peak_zone!.toJSON())
                             }
                             if (i !== 0)
                                 expect(res.body.error[i].item.child_id).to.eql(incorrectActivitiesArr[i].child_id)
@@ -811,6 +1001,7 @@ describe('Routes: users/children', () => {
                         calories: otherActivity.calories,
                         steps: otherActivity.steps ? otherActivity.steps : undefined,
                         levels: otherActivity.levels ? otherActivity.levels : undefined,
+                        heart_rate: otherActivity.heart_rate ? otherActivity.heart_rate : undefined,
                         child_id: otherActivity.child_id
                     })
                 } catch (err) {
@@ -839,6 +1030,9 @@ describe('Routes: users/children', () => {
                         }
                         if (otherActivity.levels) {
                             expect(res.body[0]).to.have.property('levels')
+                        }
+                        if (otherActivity.heart_rate) {
+                            expect(res.body[0].heart_rate).to.eql(otherActivity.heart_rate.toJSON())
                         }
                         expect(res.body[0].child_id).to.eql(otherActivity.child_id)
                     })
@@ -887,6 +1081,7 @@ describe('Routes: users/children', () => {
                         calories: defaultActivity.calories,
                         steps: defaultActivity.steps ? defaultActivity.steps : undefined,
                         levels: defaultActivity.levels ? defaultActivity.levels : undefined,
+                        heart_rate: defaultActivity.heart_rate ? defaultActivity.heart_rate : undefined,
                         child_id: defaultActivity.child_id
                     })
 
@@ -898,6 +1093,7 @@ describe('Routes: users/children', () => {
                         calories: defaultActivity.calories,
                         steps: defaultActivity.steps ? defaultActivity.steps : undefined,
                         levels: defaultActivity.levels ? defaultActivity.levels : undefined,
+                        heart_rate: defaultActivity.heart_rate ? defaultActivity.heart_rate : undefined,
                         child_id: new ObjectID()
                     })
                 } catch (err) {
@@ -905,7 +1101,7 @@ describe('Routes: users/children', () => {
                 }
 
                 const url = `/v1/users/children/physicalactivities?child_id=${defaultActivity.child_id}&fields=name,
-                    start_time,end_time,duration,calories,steps,levels,child_id&sort=child_id&page=1&limit=3`
+                    start_time,end_time,duration,calories,steps,levels,heart_rate,child_id&sort=child_id&page=1&limit=3`
 
                 return request
                     .get(url)
@@ -924,11 +1120,14 @@ describe('Routes: users/children', () => {
                         expect(res.body[0].end_time).to.eql(defaultActivity.end_time!.toISOString())
                         expect(res.body[0].duration).to.eql(defaultActivity.duration)
                         expect(res.body[0].calories).to.eql(defaultActivity.calories)
-                        if (res.body[0].steps) {
+                        if (defaultActivity.steps) {
                             expect(res.body[0].steps).to.eql(defaultActivity.steps)
                         }
                         if (defaultActivity.levels) {
                             expect(res.body[0]).to.have.property('levels')
+                        }
+                        if (defaultActivity.heart_rate) {
+                            expect(res.body[0].heart_rate).to.eql(defaultActivity.heart_rate.toJSON())
                         }
                         expect(res.body[0].child_id).to.eql(defaultActivity.child_id)
                     })
@@ -947,7 +1146,7 @@ describe('Routes: users/children', () => {
 
             it('should return status code 200 and an empty list', async () => {
                 const url = `/v1/users/children/physicalactivities?child_id=${defaultActivity.child_id}&fields=name,
-                    start_time,end_time,duration,calories,steps,levels,child_id&sort=child_id&page=1&limit=3`
+                    start_time,end_time,duration,calories,steps,levels,heart_rate,child_id&sort=child_id&page=1&limit=3`
 
                 return request
                     .get(url)
@@ -983,6 +1182,7 @@ describe('Routes: users/children', () => {
                         calories: defaultActivity.calories,
                         steps: defaultActivity.steps ? defaultActivity.steps : undefined,
                         levels: defaultActivity.levels ? defaultActivity.levels : undefined,
+                        heart_rate: defaultActivity.heart_rate ? defaultActivity.heart_rate : undefined,
                         child_id: defaultActivity.child_id
                     })
                 } catch (err) {
@@ -1006,11 +1206,14 @@ describe('Routes: users/children', () => {
                         expect(res.body[0].end_time).to.eql(defaultActivity.end_time!.toISOString())
                         expect(res.body[0].duration).to.eql(defaultActivity.duration)
                         expect(res.body[0].calories).to.eql(defaultActivity.calories)
-                        if (res.body[0].steps) {
+                        if (defaultActivity.steps) {
                             expect(res.body[0].steps).to.eql(defaultActivity.steps)
                         }
                         if (defaultActivity.levels) {
                             expect(res.body[0]).to.have.property('levels')
+                        }
+                        if (defaultActivity.heart_rate) {
+                            expect(res.body[0].heart_rate).to.eql(defaultActivity.heart_rate.toJSON())
                         }
                         expect(res.body[0].child_id).to.eql(defaultActivity.child_id)
                     })
@@ -1057,6 +1260,7 @@ describe('Routes: users/children', () => {
                         calories: defaultActivity.calories,
                         steps: defaultActivity.steps ? defaultActivity.steps : undefined,
                         levels: defaultActivity.levels ? defaultActivity.levels : undefined,
+                        heart_rate: defaultActivity.heart_rate ? defaultActivity.heart_rate : undefined,
                         child_id: defaultActivity.child_id
                     })
                 } catch (err) {
@@ -1096,6 +1300,7 @@ describe('Routes: users/children', () => {
                         calories: defaultActivity.calories,
                         steps: defaultActivity.steps ? defaultActivity.steps : undefined,
                         levels: defaultActivity.levels ? defaultActivity.levels : undefined,
+                        heart_rate: defaultActivity.heart_rate ? defaultActivity.heart_rate : undefined,
                         child_id: defaultActivity.child_id
                     })
 
@@ -1107,6 +1312,7 @@ describe('Routes: users/children', () => {
                         calories: defaultActivity.calories,
                         steps: defaultActivity.steps ? defaultActivity.steps : undefined,
                         levels: defaultActivity.levels ? defaultActivity.levels : undefined,
+                        heart_rate: defaultActivity.heart_rate ? defaultActivity.heart_rate : undefined,
                         child_id: new ObjectID()
                     })
                 } catch (err) {
@@ -1114,7 +1320,7 @@ describe('Routes: users/children', () => {
                 }
 
                 const url = `/v1/users/children/${defaultActivity.child_id}/physicalactivities?child_id=${defaultActivity.child_id}
-                    &fields=name,start_time,end_time,duration,calories,steps,levels,child_id&sort=child_id&page=1&limit=3`
+                    &fields=name,start_time,end_time,duration,calories,steps,levels,heart_rate,child_id&sort=child_id&page=1&limit=3`
 
                 return request
                     .get(url)
@@ -1133,11 +1339,14 @@ describe('Routes: users/children', () => {
                         expect(res.body[0].end_time).to.eql(defaultActivity.end_time!.toISOString())
                         expect(res.body[0].duration).to.eql(defaultActivity.duration)
                         expect(res.body[0].calories).to.eql(defaultActivity.calories)
-                        if (res.body[0].steps) {
+                        if (defaultActivity.steps) {
                             expect(res.body[0].steps).to.eql(defaultActivity.steps)
                         }
                         if (defaultActivity.levels) {
                             expect(res.body[0]).to.have.property('levels')
+                        }
+                        if (defaultActivity.heart_rate) {
+                            expect(res.body[0].heart_rate).to.eql(defaultActivity.heart_rate.toJSON())
                         }
                         expect(res.body[0].child_id).to.eql(defaultActivity.child_id)
                     })
@@ -1156,7 +1365,7 @@ describe('Routes: users/children', () => {
 
             it('should return status code 200 and an empty list', async () => {
                 const url = `/v1/users/children/${defaultActivity.child_id}/physicalactivities?child_id=${defaultActivity.child_id}
-                    &fields=name,start_time,end_time,duration,calories,steps,levels,child_id&sort=child_id&page=1&limit=3`
+                    &fields=name,start_time,end_time,duration,calories,steps,levels,heart_rate,child_id&sort=child_id&page=1&limit=3`
 
                 return request
                     .get(url)
@@ -1189,6 +1398,7 @@ describe('Routes: users/children', () => {
                         calories: defaultActivity.calories,
                         steps: defaultActivity.steps ? defaultActivity.steps : undefined,
                         levels: defaultActivity.levels ? defaultActivity.levels : undefined,
+                        heart_rate: defaultActivity.heart_rate ? defaultActivity.heart_rate : undefined,
                         child_id: defaultActivity.child_id
                     })
                 } catch (err) {
@@ -1196,7 +1406,7 @@ describe('Routes: users/children', () => {
                 }
 
                 const url = `/v1/users/children/123/physicalactivities?child_id=${defaultActivity.child_id}&fields=start_time,end_time,
-                    &fields=name,start_time,end_time,duration,calories,steps,levels,child_id&sort=child_id&page=1&limit=3`
+                    &fields=name,start_time,end_time,duration,calories,steps,levels,heart_rate,child_id&sort=child_id&page=1&limit=3`
 
                 return request
                     .get(url)
@@ -1235,6 +1445,7 @@ describe('Routes: users/children', () => {
                         calories: defaultActivity.calories,
                         steps: defaultActivity.steps ? defaultActivity.steps : undefined,
                         levels: defaultActivity.levels ? defaultActivity.levels : undefined,
+                        heart_rate: defaultActivity.heart_rate ? defaultActivity.heart_rate : undefined,
                         child_id: defaultActivity.child_id
                     })
                 } catch (err) {
@@ -1255,11 +1466,14 @@ describe('Routes: users/children', () => {
                         expect(res.body.end_time).to.eql(defaultActivity.end_time!.toISOString())
                         expect(res.body.duration).to.eql(defaultActivity.duration)
                         expect(res.body.calories).to.eql(defaultActivity.calories)
-                        if (res.body.steps) {
+                        if (defaultActivity.steps) {
                             expect(res.body.steps).to.eql(defaultActivity.steps)
                         }
                         if (defaultActivity.levels) {
                             expect(res.body).to.have.property('levels')
+                        }
+                        if (defaultActivity.heart_rate) {
+                            expect(res.body.heart_rate).to.eql(defaultActivity.heart_rate.toJSON())
                         }
                         expect(res.body.child_id).to.eql(defaultActivity.child_id)
                     })
@@ -1310,6 +1524,7 @@ describe('Routes: users/children', () => {
                         calories: defaultActivity.calories,
                         steps: defaultActivity.steps ? defaultActivity.steps : undefined,
                         levels: defaultActivity.levels ? defaultActivity.levels : undefined,
+                        heart_rate: defaultActivity.heart_rate ? defaultActivity.heart_rate : undefined,
                         child_id: defaultActivity.child_id
                     })
                 } catch (err) {
@@ -1349,6 +1564,7 @@ describe('Routes: users/children', () => {
                         calories: defaultActivity.calories,
                         steps: defaultActivity.steps ? defaultActivity.steps : undefined,
                         levels: defaultActivity.levels ? defaultActivity.levels : undefined,
+                        heart_rate: defaultActivity.heart_rate ? defaultActivity.heart_rate : undefined,
                         child_id: defaultActivity.child_id
                     })
                 } catch (err) {
@@ -1390,6 +1606,7 @@ describe('Routes: users/children', () => {
                         calories: defaultActivity.calories,
                         steps: defaultActivity.steps ? defaultActivity.steps : undefined,
                         levels: defaultActivity.levels ? defaultActivity.levels : undefined,
+                        heart_rate: defaultActivity.heart_rate ? defaultActivity.heart_rate : undefined,
                         child_id: defaultActivity.child_id
                     })
                 } catch (err) {
@@ -1397,7 +1614,7 @@ describe('Routes: users/children', () => {
                 }
 
                 const url = `/v1/users/children/${result.child_id}/physicalactivities/${result.id}?child_id=${result.child_id}
-                    &fields=name,start_time,end_time,duration,calories,steps,levels,child_id&sort=child_id&page=1&limit=3`
+                    &fields=name,start_time,end_time,duration,calories,steps,levels,heart_rate,child_id&sort=child_id&page=1&limit=3`
 
                 return request
                     .get(url)
@@ -1410,11 +1627,14 @@ describe('Routes: users/children', () => {
                         expect(res.body.end_time).to.eql(defaultActivity.end_time!.toISOString())
                         expect(res.body.duration).to.eql(defaultActivity.duration)
                         expect(res.body.calories).to.eql(defaultActivity.calories)
-                        if (res.body.steps) {
+                        if (defaultActivity.steps) {
                             expect(res.body.steps).to.eql(defaultActivity.steps)
                         }
                         if (defaultActivity.levels) {
                             expect(res.body).to.have.property('levels')
+                        }
+                        if (defaultActivity.heart_rate) {
+                            expect(res.body.heart_rate).to.eql(defaultActivity.heart_rate.toJSON())
                         }
                         expect(res.body.child_id).to.eql(defaultActivity.child_id)
                     })
@@ -1443,6 +1663,7 @@ describe('Routes: users/children', () => {
                         calories: defaultActivity.calories,
                         steps: defaultActivity.steps ? defaultActivity.steps : undefined,
                         levels: defaultActivity.levels ? defaultActivity.levels : undefined,
+                        heart_rate: defaultActivity.heart_rate ? defaultActivity.heart_rate : undefined,
                         child_id: defaultActivity.child_id
                     })
 
@@ -1452,7 +1673,7 @@ describe('Routes: users/children', () => {
                 }
 
                 const url = `/v1/users/children/${result.child_id}/physicalactivities/${result.id}?child_id=${result.child_id}
-                    &fields=name,start_time,end_time,duration,calories,steps,levels,child_id&sort=child_id&page=1&limit=3`
+                    &fields=name,start_time,end_time,duration,calories,steps,levels,heart_rate,child_id&sort=child_id&page=1&limit=3`
 
                 return request
                     .get(url)
@@ -1489,6 +1710,7 @@ describe('Routes: users/children', () => {
                         calories: defaultActivity.calories,
                         steps: defaultActivity.steps ? defaultActivity.steps : undefined,
                         levels: defaultActivity.levels ? defaultActivity.levels : undefined,
+                        heart_rate: defaultActivity.heart_rate ? defaultActivity.heart_rate : undefined,
                         child_id: defaultActivity.child_id
                     })
                 } catch (err) {
@@ -1496,7 +1718,7 @@ describe('Routes: users/children', () => {
                 }
 
                 const url = `/v1/users/children/123/physicalactivities/${result.id}?child_id=${result.child_id}&fields=name,
-                    start_time,end_time,duration,calories,steps,levels,child_id&sort=child_id&page=1&limit=3`
+                    start_time,end_time,duration,calories,steps,levels,heart_rate,child_id&sort=child_id&page=1&limit=3`
 
                 return request
                     .get(url)
@@ -1532,6 +1754,7 @@ describe('Routes: users/children', () => {
                         calories: defaultActivity.calories,
                         steps: defaultActivity.steps ? defaultActivity.steps : undefined,
                         levels: defaultActivity.levels ? defaultActivity.levels : undefined,
+                        heart_rate: defaultActivity.heart_rate ? defaultActivity.heart_rate : undefined,
                         child_id: defaultActivity.child_id
                     })
                 } catch (err) {
@@ -1539,7 +1762,7 @@ describe('Routes: users/children', () => {
                 }
 
                 const url = `/v1/users/children/${result.child_id}/physicalactivities/123?child_id=${result.child_id}
-                    &fields=name,start_time,end_time,duration,calories,steps,levels,child_id&sort=child_id&page=1&limit=3`
+                    &fields=name,start_time,end_time,duration,calories,steps,levels,heart_rate,child_id&sort=child_id&page=1&limit=3`
 
                 return request
                     .get(url)
@@ -1585,6 +1808,7 @@ describe('Routes: users/children', () => {
                     calories: defaultActivity.calories,
                     steps: defaultActivity.steps ? defaultActivity.steps : undefined,
                     levels: defaultActivity.levels ? defaultActivity.levels : undefined,
+                    heart_rate: defaultActivity.heart_rate ? defaultActivity.heart_rate : undefined,
                     child_id: defaultActivity.child_id
                 }
 
@@ -1599,6 +1823,16 @@ describe('Routes: users/children', () => {
                         expect(res.body.start_time).to.eql(defaultActivity.start_time!.toISOString())
                         expect(res.body.end_time).to.eql(defaultActivity.end_time!.toISOString())
                         expect(res.body.duration).to.eql(defaultActivity.duration)
+                        expect(res.body.calories).to.eql(defaultActivity.calories)
+                        if (defaultActivity.steps) {
+                            expect(res.body.steps).to.eql(defaultActivity.steps)
+                        }
+                        if (defaultActivity.levels) {
+                            expect(res.body).to.have.property('levels')
+                        }
+                        if (defaultActivity.heart_rate) {
+                            expect(res.body.heart_rate).to.eql(defaultActivity.heart_rate.toJSON())
+                        }
                         expect(res.body.child_id).to.eql(defaultActivity.child_id)
                     })
             })
@@ -1623,6 +1857,7 @@ describe('Routes: users/children', () => {
                     calories: defaultActivity.calories,
                     steps: defaultActivity.steps ? defaultActivity.steps : undefined,
                     levels: defaultActivity.levels ? defaultActivity.levels : undefined,
+                    heart_rate: defaultActivity.heart_rate ? defaultActivity.heart_rate : undefined,
                     child_id: defaultActivity.child_id
                 }
 
@@ -1668,6 +1903,7 @@ describe('Routes: users/children', () => {
                     calories: defaultActivity.calories,
                     steps: defaultActivity.steps ? defaultActivity.steps : undefined,
                     levels: defaultActivity.levels ? defaultActivity.levels : undefined,
+                    heart_rate: defaultActivity.heart_rate ? defaultActivity.heart_rate : undefined,
                     child_id: defaultActivity.child_id
                 }
 
@@ -1712,6 +1948,7 @@ describe('Routes: users/children', () => {
                     calories: defaultActivity.calories,
                     steps: defaultActivity.steps ? defaultActivity.steps : undefined,
                     levels: defaultActivity.levels ? defaultActivity.levels : undefined,
+                    heart_rate: defaultActivity.heart_rate ? defaultActivity.heart_rate : undefined,
                     child_id: defaultActivity.child_id
                 }
 
@@ -1887,6 +2124,7 @@ describe('Routes: users/children', () => {
                             duration: Math.floor((Math.random() * 10) * 60000)
                         }
                     ],
+                    heart_rate: defaultActivity.heart_rate ? defaultActivity.heart_rate : undefined,
                     child_id: defaultActivity.child_id
                 }
 
@@ -1948,6 +2186,7 @@ describe('Routes: users/children', () => {
                             duration: Math.floor((Math.random() * 10) * 60000)
                         }
                     ],
+                    heart_rate: defaultActivity.heart_rate ? defaultActivity.heart_rate : undefined,
                     child_id: defaultActivity.child_id
                 }
 
@@ -2010,6 +2249,7 @@ describe('Routes: users/children', () => {
                             duration: Math.floor((Math.random() * 10) * 60000)
                         }
                     ],
+                    heart_rate: defaultActivity.heart_rate ? defaultActivity.heart_rate : undefined,
                     child_id: defaultActivity.child_id
                 }
 
@@ -2023,6 +2263,183 @@ describe('Routes: users/children', () => {
                         expect(err.body.message).to.eql('Some (or several) duration field of levels array is invalid...')
                         expect(err.body.description).to.eql('Physical Activity Level validation failed: The value ' +
                             'provided has a negative value!')
+                    })
+            })
+        })
+
+        context('when a validation error occurs (the PhysicalActivityHeartRate is empty)', () => {
+            before(() => {
+                try {
+                    deleteAllActivity()
+                } catch (err) {
+                    throw new Error('Failure on users.children.physicalactivities routes test: ' + err.message)
+                }
+            })
+
+            it('should return status code 400 and info message about the invalid levels array', async () => {
+                let result
+
+                try {
+                    // physical activity to be updated
+                    result = await createActivityToBeUpdated(defaultActivity)
+                } catch (err) {
+                    throw new Error('Failure on users.children.physicalactivities routes test: ' + err.message)
+                }
+
+                const body = {
+                    name: incorrectActivity11.name,
+                    start_time: incorrectActivity11.start_time,
+                    end_time: incorrectActivity11.end_time,
+                    duration: incorrectActivity11.duration,
+                    calories: incorrectActivity11.calories,
+                    steps: incorrectActivity11.steps ? incorrectActivity11.steps : undefined,
+                    levels: incorrectActivity11.levels ? incorrectActivity11.levels : undefined,
+                    heart_rate: incorrectActivity11.heart_rate ? incorrectActivity11.heart_rate : undefined
+                }
+
+                return request
+                    .patch(`/v1/users/children/${result.child_id}/physicalactivities/${result.id}`)
+                    .send(body)
+                    .set('Content-Type', 'application/json')
+                    .expect(400)
+                    .then(err => {
+                        expect(err.body.code).to.eql(400)
+                        expect(err.body.message).to.eql('Required fields were not provided...')
+                        expect(err.body.description).to.eql('PhysicalActivityHeartRate validation failed: ' +
+                            'average, out_of_range_zone, fat_burn_zone, cardio_zone, peak_zone is required!')
+                    })
+            })
+        })
+
+        context('when a validation error occurs (the PhysicalActivityHeartRate has a negative average parameter)', () => {
+            before(() => {
+                try {
+                    deleteAllActivity()
+                } catch (err) {
+                    throw new Error('Failure on users.children.physicalactivities routes test: ' + err.message)
+                }
+            })
+
+            it('should return status code 400 and info message about the invalid levels array', async () => {
+                let result
+
+                try {
+                    // physical activity to be updated
+                    result = await createActivityToBeUpdated(defaultActivity)
+                } catch (err) {
+                    throw new Error('Failure on users.children.physicalactivities routes test: ' + err.message)
+                }
+
+                const body = {
+                    name: incorrectActivity12.name,
+                    start_time: incorrectActivity12.start_time,
+                    end_time: incorrectActivity12.end_time,
+                    duration: incorrectActivity12.duration,
+                    calories: incorrectActivity12.calories,
+                    steps: incorrectActivity12.steps ? incorrectActivity12.steps : undefined,
+                    levels: incorrectActivity12.levels ? incorrectActivity12.levels : undefined,
+                    heart_rate: incorrectActivity12.heart_rate ? incorrectActivity12.heart_rate : undefined
+                }
+
+                return request
+                    .patch(`/v1/users/children/${result.child_id}/physicalactivities/${result.id}`)
+                    .send(body)
+                    .set('Content-Type', 'application/json')
+                    .expect(400)
+                    .then(err => {
+                        expect(err.body.code).to.eql(400)
+                        expect(err.body.message).to.eql('Average field is invalid...')
+                        expect(err.body.description).to.eql('PhysicalActivityHeartRate validation failed: ' +
+                            'The value provided has a negative value!')
+                    })
+            })
+        })
+
+        context('when a validation error occurs (the "Fat Burn Zone" parameter of PhysicalActivityHeartRate is empty)', () => {
+            before(() => {
+                try {
+                    deleteAllActivity()
+                } catch (err) {
+                    throw new Error('Failure on users.children.physicalactivities routes test: ' + err.message)
+                }
+            })
+
+            it('should return status code 400 and info message about the invalid levels array', async () => {
+                let result
+
+                try {
+                    // physical activity to be updated
+                    result = await createActivityToBeUpdated(defaultActivity)
+                } catch (err) {
+                    throw new Error('Failure on users.children.physicalactivities routes test: ' + err.message)
+                }
+
+                const body = {
+                    name: incorrectActivity13.name,
+                    start_time: incorrectActivity13.start_time,
+                    end_time: incorrectActivity13.end_time,
+                    duration: incorrectActivity13.duration,
+                    calories: incorrectActivity13.calories,
+                    steps: incorrectActivity13.steps ? incorrectActivity13.steps : undefined,
+                    levels: incorrectActivity13.levels ? incorrectActivity13.levels : undefined,
+                    heart_rate: incorrectActivity13.heart_rate ? incorrectActivity13.heart_rate : undefined
+                }
+
+                return request
+                    .patch(`/v1/users/children/${result.child_id}/physicalactivities/${result.id}`)
+                    .send(body)
+                    .set('Content-Type', 'application/json')
+                    .expect(400)
+                    .then(err => {
+                        expect(err.body.code).to.eql(400)
+                        expect(err.body.message).to.eql('Required fields were not provided...')
+                        expect(err.body.description).to.eql('HeartRateZone validation failed: ' +
+                            'min, max, duration is required!')
+                    })
+            })
+        })
+
+        context('when a validation error occurs (the "Fat Burn Zone" parameter of PhysicalActivityHeartRate ' +
+            'has a negative duration)', () => {
+            before(() => {
+                try {
+                    deleteAllActivity()
+                } catch (err) {
+                    throw new Error('Failure on users.children.physicalactivities routes test: ' + err.message)
+                }
+            })
+
+            it('should return status code 400 and info message about the invalid levels array', async () => {
+                let result
+
+                try {
+                    // physical activity to be updated
+                    result = await createActivityToBeUpdated(defaultActivity)
+                } catch (err) {
+                    throw new Error('Failure on users.children.physicalactivities routes test: ' + err.message)
+                }
+
+                const body = {
+                    name: incorrectActivity14.name,
+                    start_time: incorrectActivity14.start_time,
+                    end_time: incorrectActivity14.end_time,
+                    duration: incorrectActivity14.duration,
+                    calories: incorrectActivity14.calories,
+                    steps: incorrectActivity14.steps ? incorrectActivity14.steps : undefined,
+                    levels: incorrectActivity14.levels ? incorrectActivity14.levels : undefined,
+                    heart_rate: incorrectActivity14.heart_rate ? incorrectActivity14.heart_rate : undefined
+                }
+
+                return request
+                    .patch(`/v1/users/children/${result.child_id}/physicalactivities/${result.id}`)
+                    .send(body)
+                    .set('Content-Type', 'application/json')
+                    .expect(400)
+                    .then(err => {
+                        expect(err.body.code).to.eql(400)
+                        expect(err.body.message).to.eql('Duration field is invalid...')
+                        expect(err.body.description).to.eql('HeartRateZone validation failed: ' +
+                            'The value provided has a negative value!')
                     })
             })
         })
@@ -2052,6 +2469,7 @@ describe('Routes: users/children', () => {
                         calories: defaultActivity.calories,
                         steps: defaultActivity.steps ? defaultActivity.steps : undefined,
                         levels: defaultActivity.levels ? defaultActivity.levels : undefined,
+                        heart_rate: defaultActivity.heart_rate ? defaultActivity.heart_rate : undefined,
                         child_id: defaultActivity.child_id
                     })
                 } catch (err) {
@@ -2109,6 +2527,7 @@ describe('Routes: users/children', () => {
                         calories: defaultActivity.calories,
                         steps: defaultActivity.steps ? defaultActivity.steps : undefined,
                         levels: defaultActivity.levels ? defaultActivity.levels : undefined,
+                        heart_rate: defaultActivity.heart_rate ? defaultActivity.heart_rate : undefined,
                         child_id: defaultActivity.child_id
                     })
                 } catch (err) {
@@ -2148,6 +2567,7 @@ describe('Routes: users/children', () => {
                         calories: defaultActivity.calories,
                         steps: defaultActivity.steps ? defaultActivity.steps : undefined,
                         levels: defaultActivity.levels ? defaultActivity.levels : undefined,
+                        heart_rate: defaultActivity.heart_rate ? defaultActivity.heart_rate : undefined,
                         child_id: defaultActivity.child_id
                     })
                 } catch (err) {
@@ -2910,6 +3330,7 @@ async function createActivityToBeUpdated(defaultActivity: PhysicalActivity): Pro
         calories: defaultActivity.calories,
         steps: defaultActivity.steps ? defaultActivity.steps : undefined,
         levels: defaultActivity.levels ? defaultActivity.levels : undefined,
+        heart_rate: defaultActivity.heart_rate ? defaultActivity.heart_rate : undefined,
         child_id: defaultActivity.child_id
     })
 

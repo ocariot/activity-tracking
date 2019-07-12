@@ -77,7 +77,7 @@ describe('Services: SleepService', () => {
     const incorrectSleep6: Sleep = new SleepMock()    // child_id is invalid
     incorrectSleep6.child_id = '5a62be07de34500146d9c5442'
 
-    incorrectSleepJSON.type = 'classics'
+    incorrectSleepJSON.type = 'classics'              // Sleep type is invalid
     const incorrectSleep7: Sleep = new Sleep().fromJSON(incorrectSleepJSON)
 
     const incorrectSleep8: Sleep = new SleepMock()    // Missing data_set of pattern
@@ -314,7 +314,7 @@ describe('Services: SleepService', () => {
                     .withArgs(incorrectSleep)
                     .chain('exec')
                     .rejects({ message: 'Required fields were not provided...',
-                               description: 'Sleep validation failed: pattern is required!' })
+                               description: 'Sleep validation failed: type, pattern is required!' })
 
                 try {
                     return await sleepService.add(incorrectSleep)
@@ -431,8 +431,8 @@ describe('Services: SleepService', () => {
                     .expects('create')
                     .withArgs(incorrectSleep)
                     .chain('exec')
-                    .rejects({ message: 'Required fields were not provided...',
-                               description: 'Sleep validation failed: pattern is required!' })
+                    .rejects({ message: 'The type provided "classics" is not supported...',
+                               description: 'The allowed Sleep Pattern types are: classic, stages.' })
 
                 try {
                     return await sleepService.add(incorrectSleep)
@@ -548,9 +548,8 @@ describe('Services: SleepService', () => {
                     .expects('create')
                     .withArgs(incorrectSleep)
                     .chain('exec')
-                    .rejects({ message: 'Some (or several) duration field of sleep pattern is invalid...',
-                               description: 'Sleep Pattern dataset validation failed: The value provided ' +
-                                   'has a negative value!' })
+                    .rejects({ message: 'The sleep pattern name provided "restlesss" is not supported...',
+                               description: 'The names of the allowed patterns are: asleep, restless, awake.' })
 
                 try {
                     return await sleepService.add(incorrectSleep)
@@ -589,9 +588,8 @@ describe('Services: SleepService', () => {
                     .expects('create')
                     .withArgs(incorrectSleep)
                     .chain('exec')
-                    .rejects({ message: 'Some (or several) duration field of sleep pattern is invalid...',
-                               description: 'Sleep Pattern dataset validation failed: The value provided ' +
-                                   'has a negative value!' })
+                    .rejects({ message: 'The sleep pattern name provided "deeps" is not supported...',
+                               description: 'The names of the allowed patterns are: deep, light, rem, wake.' })
 
                 try {
                     return await sleepService.add(incorrectSleep)
@@ -1200,6 +1198,35 @@ describe('Services: SleepService', () => {
             })
         })
 
+        context('when the Sleep is incorrect (type is invalid)', () => {
+            it('should throw a ValidationException', async () => {
+                const sleepJSON: any = {
+                    id: new ObjectID(),
+                    start_time: sleep.start_time!.toISOString(),
+                    end_time: sleep.end_time!.toISOString(),
+                    duration: sleep.duration,
+                    pattern: sleep.pattern,
+                    type: 'classics',
+                    child_id: new ObjectID()
+                }
+                incorrectSleep = new Sleep().fromJSON(sleepJSON)
+                sinon
+                    .mock(modelFake)
+                    .expects('findOneAndUpdate')
+                    .withArgs(incorrectSleep)
+                    .chain('exec')
+                    .rejects({ message: 'The type provided "classics" is not supported...',
+                               description: 'The allowed Sleep Pattern types are: classic, stages.' })
+
+                try {
+                    return await sleepService.updateByChild(incorrectSleep)
+                } catch (err) {
+                    assert.propertyVal(err, 'message', 'The type provided "classics" is not supported...')
+                    assert.propertyVal(err, 'description', 'The allowed Sleep Pattern types are: classic, stages.')
+                }
+            })
+        })
+
         context('when the sleep is incorrect (missing data_set of pattern)', () => {
             it('should throw a ValidationException', () => {
                 incorrectSleep = new SleepMock()
@@ -1283,6 +1310,69 @@ describe('Services: SleepService', () => {
                         assert.propertyVal(err, 'message', 'Some (or several) duration field of sleep pattern is invalid...')
                         assert.propertyVal(err, 'description', 'Sleep Pattern dataset validation failed: The value provided ' +
                             'has a negative value!')
+                    })
+            })
+        })
+
+        context('when the Sleep is incorrect (the sleep pattern data set array has an invalid item with an invalid name)', () => {
+            it('should throw a ValidationException', () => {
+                const dataSetItemJSON: any = {
+                    start_time : new Date('2018-08-18T01:30:30Z'),
+                    name : 'restlesss',
+                    duration : Math.floor(Math.random() * 5 + 1) * 60000 // 1-5min
+                }
+                incorrectSleep.pattern!.data_set = [new SleepPatternDataSet().fromJSON(dataSetItemJSON)]
+                sinon
+                    .mock(modelFake)
+                    .expects('findOneAndUpdate')
+                    .withArgs(incorrectSleep)
+                    .chain('exec')
+                    .rejects({ message: 'The sleep pattern name provided "restlesss" is not supported...',
+                               description: 'The names of the allowed patterns are: asleep, restless, awake.' })
+
+                return sleepService.updateByChild(incorrectSleep)
+                    .catch (err => {
+                        assert.propertyVal(err, 'message', 'The sleep pattern name provided "restlesss" is not supported...')
+                        if (incorrectSleep.type === SleepType.CLASSIC)
+                            assert.propertyVal(err, 'description', 'The names of the allowed patterns are: asleep, restless, awake.')
+                        else
+                            assert.propertyVal(err, 'description', 'The names of the allowed patterns are: deep, light, rem, wake.')
+                    })
+            })
+        })
+
+        context('when the Sleep is incorrect (the sleep pattern data set array has an invalid item with an invalid name ' +
+            'and the sleep type is "stages")', () => {
+            it('should throw a ValidationException', () => {
+                const sleepJSON: any = {
+                    id: new ObjectID(),
+                    start_time: sleep.start_time!.toISOString(),
+                    end_time: sleep.end_time!.toISOString(),
+                    duration: sleep.duration,
+                    pattern: new SleepPattern(),
+                    type: SleepType.STAGES,
+                    child_id: new ObjectID()
+                }
+                incorrectSleep = new Sleep().fromJSON(sleepJSON)
+                const dataSetItemJSON: any = {
+                    start_time : new Date('2018-08-18T01:30:30Z'),
+                    name : 'deeps',
+                    duration : Math.floor(Math.random() * 5 + 1) * 60000 // 1-5min
+                }
+                incorrectSleep.pattern!.data_set = new Array<SleepPatternDataSet>()
+                incorrectSleep.pattern!.data_set[0] = new SleepPatternDataSet().fromJSON(dataSetItemJSON)
+                sinon
+                    .mock(modelFake)
+                    .expects('findOneAndUpdate')
+                    .withArgs(incorrectSleep)
+                    .chain('exec')
+                    .rejects({ message: 'The sleep pattern name provided "deeps" is not supported...',
+                               description: 'The names of the allowed patterns are: deep, light, rem, wake.' })
+
+                return sleepService.updateByChild(incorrectSleep)
+                    .catch (err => {
+                        assert.propertyVal(err, 'message', 'The sleep pattern name provided "deeps" is not supported...')
+                        assert.propertyVal(err, 'description', 'The names of the allowed patterns are: deep, light, rem, wake.')
                     })
             })
         })
