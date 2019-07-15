@@ -26,9 +26,9 @@ export class PhysicalActivityMock extends PhysicalActivity {
         }
 
         // Create levels or not, true creates false not
-        if (Math.random() >= 0.5) { // true or false random
-            super.levels = this.generatePhysicalActivityLevels()
-        }
+        // if (Math.random() >= 0.5) { // true or false random
+        super.levels = this.generatePhysicalActivityLevels()
+        // }
         super.heart_rate = this.generateHeartRate()
     }
 

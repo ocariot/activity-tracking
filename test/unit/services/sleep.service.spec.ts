@@ -995,9 +995,9 @@ describe('Services: SleepService', () => {
         })
     })
 
-    // /**
-    //  * Method: getAllByChild(childId: string, query: IQuery)
-    //  */
+    /**
+     * Method: getAllByChild(childId: string, query: IQuery)
+     */
     describe('getAllByChild(childId: string, query: IQuery)', () => {
         context('when there is at least one sleep associated with that childId', () => {
             it('should return a Sleep array', () => {

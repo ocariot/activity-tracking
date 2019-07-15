@@ -7,7 +7,7 @@ import { BackgroundService } from '../../../src/background/background.service'
 import { expect } from 'chai'
 import { Strings } from '../../../src/utils/strings'
 import { PhysicalActivity } from '../../../src/application/domain/model/physical.activity'
-import { ActivityLevelType } from '../../../src/application/domain/model/physical.activity.level'
+import { ActivityLevelType, PhysicalActivityLevel } from '../../../src/application/domain/model/physical.activity.level'
 import { ActivityRepoModel } from '../../../src/infrastructure/database/schema/activity.schema'
 import { PhysicalActivityMock } from '../../mocks/physical.activity.mock'
 import { PhysicalActivityEntityMapper } from '../../../src/infrastructure/entity/mapper/physical.activity.entity.mapper'
@@ -227,7 +227,8 @@ describe('Routes: users/children', () => {
                             expect(res.body.steps).to.eql(defaultActivity.steps)
                         }
                         if (defaultActivity.levels) {
-                            expect(res.body).to.have.property('levels')
+                            expect(res.body.levels)
+                                .to.eql(defaultActivity.levels.map((elem: PhysicalActivityLevel) => elem.toJSON()))
                         }
                         expect(res.body.heart_rate).to.eql(defaultActivity.heart_rate!.toJSON())
                         expect(res.body.child_id).to.eql(defaultActivity.child_id)
@@ -747,7 +748,8 @@ describe('Routes: users/children', () => {
                                 expect(res.body.success[i].item.steps).to.eql(correctActivitiesArr[i].steps)
                             }
                             if (correctActivitiesArr[i].levels) {
-                                expect(res.body.success[i].item).to.have.property('levels')
+                                expect(res.body.success[i].item.levels)
+                                    .to.eql(correctActivitiesArr[i].levels!.map((elem: PhysicalActivityLevel) => elem.toJSON()))
                             }
                             if (correctActivitiesArr[i].heart_rate) {
                                 expect(res.body.success[i].item.heart_rate).to.eql(correctActivitiesArr[i].heart_rate!.toJSON())
@@ -797,7 +799,8 @@ describe('Routes: users/children', () => {
                                 expect(res.body.error[i].item.steps).to.eql(correctActivitiesArr[i].steps)
                             }
                             if (correctActivitiesArr[i].levels) {
-                                expect(res.body.error[i].item).to.have.property('levels')
+                                expect(res.body.error[i].item.levels)
+                                    .to.eql(correctActivitiesArr[i].levels!.map((elem: PhysicalActivityLevel) => elem.toJSON()))
                             }
                             if (correctActivitiesArr[i].heart_rate) {
                                 expect(res.body.error[i].item.heart_rate).to.eql(correctActivitiesArr[i].heart_rate!.toJSON())
@@ -854,7 +857,8 @@ describe('Routes: users/children', () => {
                             expect(res.body.success[0].item.steps).to.eql(mixedActivitiesArr[0].steps)
                         }
                         if (mixedActivitiesArr[0].levels) {
-                            expect(res.body.success[0].item).to.have.property('levels')
+                            expect(res.body.success[0].item.levels)
+                                .to.eql(mixedActivitiesArr[0].levels.map((elem: PhysicalActivityLevel) => elem.toJSON()))
                         }
                         if (mixedActivitiesArr[0].heart_rate) {
                             expect(res.body.success[0].item.heart_rate).to.eql(mixedActivitiesArr[0].heart_rate.toJSON())
@@ -957,8 +961,9 @@ describe('Routes: users/children', () => {
                             if (incorrectActivitiesArr[i].steps) {
                                 expect(res.body.error[i].item.steps).to.eql(incorrectActivitiesArr[i].steps)
                             }
-                            if (incorrectActivitiesArr[i].levels) {
-                                expect(res.body.error[i].item).to.have.property('levels')
+                            if (i !== 8 && incorrectActivitiesArr[i].levels) {
+                                expect(res.body.error[i].item.levels)
+                                    .to.eql(incorrectActivitiesArr[i].levels!.map((elem: PhysicalActivityLevel) => elem.toJSON()))
                             }
                             if (i !== 0 && i !== 10 && i !== 12 && incorrectActivitiesArr[i].heart_rate) {
                                 expect(res.body.error[i].item.heart_rate).to.eql(incorrectActivitiesArr[i].heart_rate!.toJSON())
@@ -1015,8 +1020,8 @@ describe('Routes: users/children', () => {
                     .then(res => {
                         otherActivity.id = res.body[0].id
                         // Check for the existence of properties only in the first element of the array
-                        // because there is a guarantee that there will be at least one object, which was
-                        // created in the case of POST route success test
+                        // because there is a guarantee that there will be at least one object (created
+                        // in the case of a successful POST route test or using the create method above).
                         expect(res.body).is.an.instanceOf(Array)
                         expect(res.body.length).to.not.eql(0)
                         expect(res.body[0].id).to.eql(otherActivity.id)
@@ -1029,7 +1034,8 @@ describe('Routes: users/children', () => {
                             expect(res.body[0].steps).to.eql(otherActivity.steps)
                         }
                         if (otherActivity.levels) {
-                            expect(res.body[0]).to.have.property('levels')
+                            expect(res.body[0].levels)
+                                .to.eql(otherActivity.levels.map((elem: PhysicalActivityLevel) => elem.toJSON()))
                         }
                         if (otherActivity.heart_rate) {
                             expect(res.body[0].heart_rate).to.eql(otherActivity.heart_rate.toJSON())
@@ -1112,8 +1118,8 @@ describe('Routes: users/children', () => {
                         expect(res.body).is.an.instanceOf(Array)
                         expect(res.body.length).to.not.eql(0)
                         // Check for the existence of properties only in the first element of the array
-                        // because there is a guarantee that there will be at least one object with the property
-                        // 'climatized' = true (the only query filter)
+                        // because there is a guarantee that there will be at least one object (created
+                        // in the case of a successful POST route test or using the create method above).
                         expect(res.body[0].id).to.eql(defaultActivity.id)
                         expect(res.body[0].name).to.eql(defaultActivity.name)
                         expect(res.body[0].start_time).to.eql(defaultActivity.start_time!.toISOString())
@@ -1124,7 +1130,8 @@ describe('Routes: users/children', () => {
                             expect(res.body[0].steps).to.eql(defaultActivity.steps)
                         }
                         if (defaultActivity.levels) {
-                            expect(res.body[0]).to.have.property('levels')
+                            expect(res.body[0].levels)
+                                .to.eql(defaultActivity.levels.map((elem: PhysicalActivityLevel) => elem.toJSON()))
                         }
                         if (defaultActivity.heart_rate) {
                             expect(res.body[0].heart_rate).to.eql(defaultActivity.heart_rate.toJSON())
@@ -1198,8 +1205,8 @@ describe('Routes: users/children', () => {
                         expect(res.body).is.an.instanceOf(Array)
                         expect(res.body.length).to.not.eql(0)
                         // Check for the existence of properties only in the first element of the array
-                        // because there is a guarantee that there will be at least one object, which was
-                        // created in the case of POST route success test
+                        // because there is a guarantee that there will be at least one object (created
+                        // in the case of a successful POST route test or using the create method above).
                         expect(res.body[0].id).to.eql(defaultActivity.id)
                         expect(res.body[0].name).to.eql(defaultActivity.name)
                         expect(res.body[0].start_time).to.eql(defaultActivity.start_time!.toISOString())
@@ -1210,7 +1217,8 @@ describe('Routes: users/children', () => {
                             expect(res.body[0].steps).to.eql(defaultActivity.steps)
                         }
                         if (defaultActivity.levels) {
-                            expect(res.body[0]).to.have.property('levels')
+                            expect(res.body[0].levels)
+                                .to.eql(defaultActivity.levels.map((elem: PhysicalActivityLevel) => elem.toJSON()))
                         }
                         if (defaultActivity.heart_rate) {
                             expect(res.body[0].heart_rate).to.eql(defaultActivity.heart_rate.toJSON())
@@ -1331,8 +1339,8 @@ describe('Routes: users/children', () => {
                         expect(res.body).is.an.instanceOf(Array)
                         expect(res.body.length).to.not.eql(0)
                         // Check for the existence of properties only in the first element of the array
-                        // because there is a guarantee that there will be at least one object with the property
-                        // 'climatized' = true (the only query filter)
+                        // because there is a guarantee that there will be at least one object (created
+                        // in the case of a successful POST route test or using the create method above).
                         expect(res.body[0].id).to.eql(defaultActivity.id)
                         expect(res.body[0].name).to.eql(defaultActivity.name)
                         expect(res.body[0].start_time).to.eql(defaultActivity.start_time!.toISOString())
@@ -1343,7 +1351,8 @@ describe('Routes: users/children', () => {
                             expect(res.body[0].steps).to.eql(defaultActivity.steps)
                         }
                         if (defaultActivity.levels) {
-                            expect(res.body[0]).to.have.property('levels')
+                            expect(res.body[0].levels)
+                                .to.eql(defaultActivity.levels.map((elem: PhysicalActivityLevel) => elem.toJSON()))
                         }
                         if (defaultActivity.heart_rate) {
                             expect(res.body[0].heart_rate).to.eql(defaultActivity.heart_rate.toJSON())
@@ -1458,8 +1467,8 @@ describe('Routes: users/children', () => {
                     .expect(200)
                     .then(res => {
                         // Check for the existence of properties only in the first element of the array
-                        // because there is a guarantee that there will be at least one object, which was
-                        // created in the case of POST route success test
+                        // because there is a guarantee that there will be at least one object (created
+                        // in the case of a successful POST route test or using the create method above).
                         expect(res.body.id).to.eql(result.id)
                         expect(res.body.name).to.eql(defaultActivity.name)
                         expect(res.body.start_time).to.eql(defaultActivity.start_time!.toISOString())
@@ -1470,7 +1479,8 @@ describe('Routes: users/children', () => {
                             expect(res.body.steps).to.eql(defaultActivity.steps)
                         }
                         if (defaultActivity.levels) {
-                            expect(res.body).to.have.property('levels')
+                            expect(res.body.levels)
+                                .to.eql(defaultActivity.levels.map((elem: PhysicalActivityLevel) => elem.toJSON()))
                         }
                         if (defaultActivity.heart_rate) {
                             expect(res.body.heart_rate).to.eql(defaultActivity.heart_rate.toJSON())
@@ -1631,7 +1641,8 @@ describe('Routes: users/children', () => {
                             expect(res.body.steps).to.eql(defaultActivity.steps)
                         }
                         if (defaultActivity.levels) {
-                            expect(res.body).to.have.property('levels')
+                            expect(res.body.levels)
+                                .to.eql(defaultActivity.levels.map((elem: PhysicalActivityLevel) => elem.toJSON()))
                         }
                         if (defaultActivity.heart_rate) {
                             expect(res.body.heart_rate).to.eql(defaultActivity.heart_rate.toJSON())
@@ -1828,7 +1839,8 @@ describe('Routes: users/children', () => {
                             expect(res.body.steps).to.eql(defaultActivity.steps)
                         }
                         if (defaultActivity.levels) {
-                            expect(res.body).to.have.property('levels')
+                            expect(res.body.levels)
+                                .to.eql(defaultActivity.levels.map((elem: PhysicalActivityLevel) => elem.toJSON()))
                         }
                         if (defaultActivity.heart_rate) {
                             expect(res.body.heart_rate).to.eql(defaultActivity.heart_rate.toJSON())
@@ -2617,13 +2629,11 @@ describe('Routes: users/children', () => {
                     .set('Content-Type', 'application/json')
                     .expect(201)
                     .then(res => {
-                        expect(res.body.success).is.an.instanceOf(Array)
                         for (let i = 0; i < res.body.success.length; i++) {
                             expect(res.body.success[i].code).to.eql(HttpStatus.CREATED)
                             expect(res.body.success[i].item.date).to.eql(correctLogsArr[i].date)
                             expect(res.body.success[i].item.value).to.eql(correctLogsArr[i].value)
                         }
-                        expect(res.body.error).is.an.instanceOf(Array)
                         expect(res.body.error.length).to.eql(0)
                     })
             })
@@ -2648,13 +2658,11 @@ describe('Routes: users/children', () => {
                     .set('Content-Type', 'application/json')
                     .expect(201)
                     .then(res => {
-                        expect(res.body.success).is.an.instanceOf(Array)
                         for (let i = 0; i < res.body.success.length; i++) {
                             expect(res.body.success[i].code).to.eql(HttpStatus.CREATED)
                             expect(res.body.success[i].item.date).to.eql(correctLogsArr[i].date)
                             expect(res.body.success[i].item.value).to.eql(correctLogsArr[i].value)
                         }
-                        expect(res.body.error).is.an.instanceOf(Array)
                         expect(res.body.error.length).to.eql(0)
                     })
             })
@@ -2684,13 +2692,11 @@ describe('Routes: users/children', () => {
                     .set('Content-Type', 'application/json')
                     .expect(201)
                     .then(res => {
-                        expect(res.body.success).is.an.instanceOf(Array)
                         for (let i = 0; i < res.body.success.length; i++) {
                             expect(res.body.success[i].code).to.eql(HttpStatus.CREATED)
                             expect(res.body.success[i].item.date).to.eql(correctLogsArr[i].date)
                             expect(res.body.success[i].item.value).to.eql(correctLogsArr[i].value)
                         }
-                        expect(res.body.error).is.an.instanceOf(Array)
                         expect(res.body.error.length).to.eql(0)
                     })
             })
@@ -2719,13 +2725,11 @@ describe('Routes: users/children', () => {
                     .set('Content-Type', 'application/json')
                     .expect(201)
                     .then(res => {
-                        expect(res.body.success).is.an.instanceOf(Array)
                         for (let i = 0; i < res.body.success.length; i++) {
                             expect(res.body.success[i].code).to.eql(HttpStatus.CREATED)
                             expect(res.body.success[i].item.date).to.eql(correctLogsArr[i].date)
                             expect(res.body.success[i].item.value).to.eql(correctLogsArr[i].value)
                         }
-                        expect(res.body.error).is.an.instanceOf(Array)
                         expect(res.body.error.length).to.eql(0)
                     })
             })
@@ -2751,14 +2755,11 @@ describe('Routes: users/children', () => {
                     .set('Content-Type', 'application/json')
                     .expect(201)
                     .then(res => {
-                        expect(res.body.success).is.an.instanceOf(Array)
                         for (let i = 0; i < res.body.success.length; i++) {
                             expect(res.body.success[i].code).to.eql(HttpStatus.CREATED)
                             expect(res.body.success[i].item.date).to.eql(mixedLogsArr[i].date)
                             expect(res.body.success[i].item.value).to.eql(mixedLogsArr[i].value)
                         }
-
-                        expect(res.body.error).is.an.instanceOf(Array)
 
                         expect(res.body.error[0].message).to.eql('Date parameter: 20199-03-08, is not in valid ISO 8601 format.')
                         expect(res.body.error[0].description).to.eql('Date must be in the format: yyyy-MM-dd')
@@ -2795,7 +2796,6 @@ describe('Routes: users/children', () => {
                     .set('Content-Type', 'application/json')
                     .expect(201)
                     .then(res => {
-                        expect(res.body.success).is.an.instanceOf(Array)
                         expect(res.body.success.length).to.eql(0)
                         for (let i = 0; i < res.body.error.length; i++) {
                             expect(res.body.error[i].code).to.eql(HttpStatus.BAD_REQUEST)
@@ -2828,7 +2828,6 @@ describe('Routes: users/children', () => {
                     .set('Content-Type', 'application/json')
                     .expect(201)
                     .then(res => {
-                        expect(res.body.success).is.an.instanceOf(Array)
                         expect(res.body.success.length).to.eql(0)
                         for (let i = 0; i < res.body.error.length; i++) {
                             expect(res.body.error[i].code).to.eql(HttpStatus.BAD_REQUEST)
@@ -2865,13 +2864,11 @@ describe('Routes: users/children', () => {
                     .set('Content-Type', 'application/json')
                     .expect(201)
                     .then(res => {
-                        expect(res.body.success).is.an.instanceOf(Array)
                         for (let i = 0; i < res.body.success.length; i++) {
                             expect(res.body.success[i].code).to.eql(HttpStatus.CREATED)
                             expect(res.body.success[i].item.date).to.eql(correctLogsArr[i].date)
                             expect(res.body.success[i].item.value).to.eql(correctLogsArr[i].value)
                         }
-                        expect(res.body.error).is.an.instanceOf(Array)
                         expect(res.body.error[0].code).to.eql(HttpStatus.BAD_REQUEST)
                         expect(res.body.error[0].message).to.eql('Required fields were not provided...')
                         expect(res.body.error[0].description).to.eql('Physical Activity log validation failed: date, value is required!')
@@ -2911,9 +2908,7 @@ describe('Routes: users/children', () => {
                     .set('Content-Type', 'application/json')
                     .expect(200)
                     .then(res => {
-                        expect(res.body.steps).is.an.instanceOf(Array)
                         expect(res.body.steps.length).to.eql(0)
-                        expect(res.body.calories).is.an.instanceOf(Array)
                         expect(res.body.calories.length).to.eql(0)
                     })
             })
@@ -3006,9 +3001,7 @@ describe('Routes: users/children', () => {
                     .set('Content-Type', 'application/json')
                     .expect(200)
                     .then(res => {
-                        expect(res.body.steps).is.an.instanceOf(Array)
                         expect(res.body.steps.length).to.eql(0)
-                        expect(res.body.calories).is.an.instanceOf(Array)
                         expect(res.body.calories.length).to.eql(0)
                     })
             })
@@ -3106,7 +3099,6 @@ describe('Routes: users/children', () => {
                     .set('Content-Type', 'application/json')
                     .expect(200)
                     .then(res => {
-                        expect(res.body).is.an.instanceOf(Array)
                         expect(res.body.length).to.eql(0)
                     })
             })
@@ -3206,6 +3198,14 @@ describe('Routes: users/children', () => {
 
         context('when there is an attempt to get all logs in a time interval using the "query-strings-parser" library but there ' +
                 'is no corresponding logs with the query in the database', () => {
+            before(() => {
+                try {
+                    deleteAllLogs()
+                } catch (err) {
+                    throw new Error('Failure on users.children.physicalactivities routes test: ' + err.message)
+                }
+            })
+
             it('should return status code 200 and an empty array of logs', async () => {
                 const basePath = `/v1/users/children/${defaultActivity.child_id}/physicalactivities/logs/${correctLogsArr[0].type}`
                 const specificPath = `/date/2005-10-01/2005-10-10`
@@ -3217,7 +3217,6 @@ describe('Routes: users/children', () => {
                     .set('Content-Type', 'application/json')
                     .expect(200)
                     .then(res => {
-                        expect(res.body).is.an.instanceOf(Array)
                         expect(res.body.length).to.eql(0)
                     })
             })
@@ -3225,6 +3224,14 @@ describe('Routes: users/children', () => {
 
         context('when there is an attempt to get all logs in a time interval using the "query-strings-parser" library ' +
                 'but the parameters are incorrect (child_id is invalid)', () => {
+            before(() => {
+                try {
+                    deleteAllLogs()
+                } catch (err) {
+                    throw new Error('Failure on users.children.physicalactivities routes test: ' + err.message)
+                }
+            })
+
             it('should return status code 400 and an info message about the invalid child_id', async () => {
                 const basePath = `/v1/users/children/123/physicalactivities/logs/${correctLogsArr[0].type}`
                 const specificPath = `/date/${correctLogsArr[0].date}/${correctLogsArr[0].date}`
@@ -3245,6 +3252,14 @@ describe('Routes: users/children', () => {
 
         context('when there is an attempt to get all logs in a time interval using the "query-strings-parser" library ' +
                 'but the parameters are incorrect (resource is invalid)', () => {
+            before(() => {
+                try {
+                    deleteAllLogs()
+                } catch (err) {
+                    throw new Error('Failure on users.children.physicalactivities routes test: ' + err.message)
+                }
+            })
+
             it('should return status code 400 and an info message about the invalid resource', async () => {
                 const basePath = `/v1/users/children/${defaultActivity.child_id}/physicalactivities/logs/calorie`
                 const specificPath = `/date/${correctLogsArr[0].date}/${correctLogsArr[0].date}`
@@ -3265,6 +3280,14 @@ describe('Routes: users/children', () => {
 
         context('when there is an attempt to get all logs in a time interval using the "query-strings-parser" library ' +
                 'but the parameters are incorrect (date_start is invalid)', () => {
+            before(() => {
+                try {
+                    deleteAllLogs()
+                } catch (err) {
+                    throw new Error('Failure on users.children.physicalactivities routes test: ' + err.message)
+                }
+            })
+
             it('should return status code 400 and an info message about the invalid date_start', async () => {
                 const basePath = `/v1/users/children/${defaultActivity.child_id}/physicalactivities/logs/${correctLogsArr[0].type}`
                 const specificPath = `/date/20199-10-01/${correctLogsArr[0].date}`

@@ -12,7 +12,7 @@ import { SleepPattern } from '../../../src/application/domain/model/sleep.patter
 import { SleepRepoModel } from '../../../src/infrastructure/database/schema/sleep.schema'
 import { SleepEntityMapper } from '../../../src/infrastructure/entity/mapper/sleep.entity.mapper'
 import { ObjectID } from 'bson'
-import { PhasesPatternType, SleepPatternDataSet } from '../../../src/application/domain/model/sleep.pattern.data.set'
+import { SleepPatternDataSet } from '../../../src/application/domain/model/sleep.pattern.data.set'
 
 const container: Container = DI.getInstance().getContainer()
 const backgroundServices: BackgroundService = container.get(Identifier.BACKGROUND_SERVICE)
@@ -740,24 +740,6 @@ describe('Routes: users.children.sleep', () => {
      * Route GET all
      */
     describe('GET /v1/users/children/sleep', () => {
-        const defaultPattern = [
-            {
-                start_time: defaultSleep.start_time,
-                name: PhasesPatternType.RESTLESS,
-                duration: Math.floor(Math.random() * 5 + 1) * 60000
-            },
-            {
-                start_time: defaultSleep.start_time,
-                name: PhasesPatternType.ASLEEP,
-                duration: Math.floor(Math.random() * 120 + 1) * 60000
-            },
-            {
-                start_time: defaultSleep.start_time,
-                name: PhasesPatternType.AWAKE,
-                duration: Math.floor(Math.random() * 3 + 1) * 60000
-            }
-        ]
-
         context('when get all sleep of the database successfully', () => {
             it('should return status code 200 and a list of all sleep found', async () => {
                 await createSleep({
@@ -778,8 +760,8 @@ describe('Routes: users.children.sleep', () => {
                         expect(res.body).is.an.instanceOf(Array)
                         expect(res.body.length).to.not.eql(0)
                         // Check for the existence of properties only in the first element of the array
-                        // because there is a guarantee that there will be at least one object, which was
-                        // created in the case of POST route success test
+                        // because there is a guarantee that there will be at least one object (created
+                        // in the case of the successful POST route test or with the create method above).
                         expect(res.body[0].id).to.eql(defaultSleep.id)
                         expect(res.body[0].start_time).to.eql(defaultSleep.start_time!.toISOString())
                         expect(res.body[0].end_time).to.eql(defaultSleep.end_time!.toISOString())
@@ -830,7 +812,7 @@ describe('Routes: users.children.sleep', () => {
                         start_time: defaultSleep.start_time,
                         end_time: defaultSleep.end_time,
                         duration: defaultSleep.duration,
-                        pattern: defaultPattern,
+                        pattern: defaultSleep.pattern!.data_set,
                         type: defaultSleep.type,
                         child_id: defaultSleep.child_id
                     })
@@ -839,23 +821,7 @@ describe('Routes: users.children.sleep', () => {
                         start_time: defaultSleep.start_time,
                         end_time: defaultSleep.end_time,
                         duration: defaultSleep.duration,
-                        pattern: [
-                            {
-                                start_time: defaultSleep.start_time,
-                                name: PhasesPatternType.RESTLESS,
-                                duration: Math.floor(Math.random() * 5 + 1) * 60000
-                            },
-                            {
-                                start_time: defaultSleep.start_time,
-                                name: PhasesPatternType.ASLEEP,
-                                duration: Math.floor(Math.random() * 120 + 1) * 60000
-                            },
-                            {
-                                start_time: defaultSleep.start_time,
-                                name: PhasesPatternType.AWAKE,
-                                duration: Math.floor(Math.random() * 3 + 1) * 60000
-                            }
-                        ],
+                        pattern: defaultSleep.pattern!.data_set,
                         type: defaultSleep.type,
                         child_id: new ObjectID()
                     })
@@ -875,13 +841,14 @@ describe('Routes: users.children.sleep', () => {
                         expect(res.body).is.an.instanceOf(Array)
                         expect(res.body.length).to.not.eql(0)
                         // Check for the existence of properties only in the first element of the array
-                        // because there is a guarantee that there will be at least one object with the property
-                        // 'climatized' = true (the only query filter)
+                        // because there is a guarantee that there will be at least one object (created
+                        // in the case of the successful POST route test or with the create method above).
                         expect(res.body[0].id).to.eql(defaultSleep.id)
                         expect(res.body[0].start_time).to.eql(defaultSleep.start_time!.toISOString())
                         expect(res.body[0].end_time).to.eql(defaultSleep.end_time!.toISOString())
                         expect(res.body[0].duration).to.eql(defaultSleep.duration)
-                        // expect(res.body[0].pattern.data_set).to.eql(defaultPattern)
+                        expect(res.body[0].pattern.data_set)
+                            .to.eql(defaultSleep.pattern!.data_set.map((elem: SleepPatternDataSet) => elem.toJSON()))
                         expect(res.body[0].type).to.eql(defaultSleep.type)
                         expect(res.body[0].child_id).to.eql(defaultSleep.child_id)
                     })
@@ -932,23 +899,7 @@ describe('Routes: users.children.sleep', () => {
                         start_time: defaultSleep.start_time,
                         end_time: defaultSleep.end_time,
                         duration: defaultSleep.duration,
-                        pattern: [
-                            {
-                                start_time: defaultSleep.start_time,
-                                name: PhasesPatternType.RESTLESS,
-                                duration: Math.floor(Math.random() * 5 + 1) * 60000
-                            },
-                            {
-                                start_time: defaultSleep.start_time,
-                                name: PhasesPatternType.ASLEEP,
-                                duration: Math.floor(Math.random() * 120 + 1) * 60000
-                            },
-                            {
-                                start_time: defaultSleep.start_time,
-                                name: PhasesPatternType.AWAKE,
-                                duration: Math.floor(Math.random() * 3 + 1) * 60000
-                            }
-                        ],
+                        pattern: defaultSleep.pattern!.data_set,
                         type: defaultSleep.type,
                         child_id: defaultSleep.child_id
                     })
@@ -965,13 +916,14 @@ describe('Routes: users.children.sleep', () => {
                         expect(res.body).is.an.instanceOf(Array)
                         expect(res.body.length).to.not.eql(0)
                         // Check for the existence of properties only in the first element of the array
-                        // because there is a guarantee that there will be at least one object, which was
-                        // created in the case of POST route success test
+                        // because there is a guarantee that there will be at least one object (created
+                        // in the case of the successful POST route test or with the create method above).
                         expect(res.body[0].id).to.eql(defaultSleep.id)
                         expect(res.body[0].start_time).to.eql(defaultSleep.start_time!.toISOString())
                         expect(res.body[0].end_time).to.eql(defaultSleep.end_time!.toISOString())
                         expect(res.body[0].duration).to.eql(defaultSleep.duration)
-                        // expect(res.body[0].pattern).to.eql(defaultSleep.pattern)
+                        expect(res.body[0].pattern.data_set)
+                            .to.eql(defaultSleep.pattern!.data_set.map((elem: SleepPatternDataSet) => elem.toJSON()))
                         expect(res.body[0].type).to.eql(defaultSleep.type)
                         expect(res.body[0].child_id).to.eql(defaultSleep.child_id)
                     })
@@ -1014,23 +966,7 @@ describe('Routes: users.children.sleep', () => {
                         start_time: defaultSleep.start_time,
                         end_time: defaultSleep.end_time,
                         duration: defaultSleep.duration,
-                        pattern: [
-                            {
-                                start_time: defaultSleep.start_time,
-                                name: PhasesPatternType.RESTLESS,
-                                duration: Math.floor(Math.random() * 5 + 1) * 60000
-                            },
-                            {
-                                start_time: defaultSleep.start_time,
-                                name: PhasesPatternType.ASLEEP,
-                                duration: Math.floor(Math.random() * 120 + 1) * 60000
-                            },
-                            {
-                                start_time: defaultSleep.start_time,
-                                name: PhasesPatternType.AWAKE,
-                                duration: Math.floor(Math.random() * 3 + 1) * 60000
-                            }
-                        ],
+                        pattern: defaultSleep.pattern!.data_set,
                         type: defaultSleep.type,
                         child_id: defaultSleep.child_id
                     })
@@ -1067,23 +1003,7 @@ describe('Routes: users.children.sleep', () => {
                         start_time: defaultSleep.start_time,
                         end_time: defaultSleep.end_time,
                         duration: defaultSleep.duration,
-                        pattern: [
-                            {
-                                start_time: defaultSleep.start_time,
-                                name: PhasesPatternType.RESTLESS,
-                                duration: Math.floor(Math.random() * 5 + 1) * 60000
-                            },
-                            {
-                                start_time: defaultSleep.start_time,
-                                name: PhasesPatternType.ASLEEP,
-                                duration: Math.floor(Math.random() * 120 + 1) * 60000
-                            },
-                            {
-                                start_time: defaultSleep.start_time,
-                                name: PhasesPatternType.AWAKE,
-                                duration: Math.floor(Math.random() * 3 + 1) * 60000
-                            }
-                        ],
+                        pattern: defaultSleep.pattern!.data_set,
                         type: defaultSleep.type,
                         child_id: defaultSleep.child_id
                     })
@@ -1103,13 +1023,14 @@ describe('Routes: users.children.sleep', () => {
                         expect(res.body).is.an.instanceOf(Array)
                         expect(res.body.length).to.not.eql(0)
                         // Check for the existence of properties only in the first element of the array
-                        // because there is a guarantee that there will be at least one object with the property
-                        // 'climatized' = true (the only query filter)
+                        // because there is a guarantee that there will be at least one object (created
+                        // in the case of the successful POST route test or with the create method above).
                         expect(res.body[0].id).to.eql(defaultSleep.id)
                         expect(res.body[0].start_time).to.eql(defaultSleep.start_time!.toISOString())
                         expect(res.body[0].end_time).to.eql(defaultSleep.end_time!.toISOString())
                         expect(res.body[0].duration).to.eql(defaultSleep.duration)
-                        // expect(res.body[0].pattern).to.eql(defaultSleep.pattern)
+                        expect(res.body[0].pattern.data_set)
+                            .to.eql(defaultSleep.pattern!.data_set.map((elem: SleepPatternDataSet) => elem.toJSON()))
                         expect(res.body[0].type).to.eql(defaultSleep.type)
                         expect(res.body[0].child_id).to.eql(defaultSleep.child_id)
                     })
@@ -1157,23 +1078,7 @@ describe('Routes: users.children.sleep', () => {
                         start_time: defaultSleep.start_time,
                         end_time: defaultSleep.end_time,
                         duration: defaultSleep.duration,
-                        pattern: [
-                            {
-                                start_time: defaultSleep.start_time,
-                                name: PhasesPatternType.RESTLESS,
-                                duration: Math.floor(Math.random() * 5 + 1) * 60000
-                            },
-                            {
-                                start_time: defaultSleep.start_time,
-                                name: PhasesPatternType.ASLEEP,
-                                duration: Math.floor(Math.random() * 120 + 1) * 60000
-                            },
-                            {
-                                start_time: defaultSleep.start_time,
-                                name: PhasesPatternType.AWAKE,
-                                duration: Math.floor(Math.random() * 3 + 1) * 60000
-                            }
-                        ],
+                        pattern: defaultSleep.pattern!.data_set,
                         type: defaultSleep.type,
                         child_id: defaultSleep.child_id
                     })
@@ -1217,23 +1122,7 @@ describe('Routes: users.children.sleep', () => {
                         start_time: defaultSleep.start_time,
                         end_time: defaultSleep.end_time,
                         duration: defaultSleep.duration,
-                        pattern: [
-                            {
-                                start_time: defaultSleep.start_time,
-                                name: PhasesPatternType.RESTLESS,
-                                duration: Math.floor(Math.random() * 5 + 1) * 60000
-                            },
-                            {
-                                start_time: defaultSleep.start_time,
-                                name: PhasesPatternType.ASLEEP,
-                                duration: Math.floor(Math.random() * 120 + 1) * 60000
-                            },
-                            {
-                                start_time: defaultSleep.start_time,
-                                name: PhasesPatternType.AWAKE,
-                                duration: Math.floor(Math.random() * 3 + 1) * 60000
-                            }
-                        ],
+                        pattern: defaultSleep.pattern!.data_set,
                         type: defaultSleep.type,
                         child_id: defaultSleep.child_id
                     })
@@ -1247,13 +1136,14 @@ describe('Routes: users.children.sleep', () => {
                     .expect(200)
                     .then(res => {
                         // Check for the existence of properties only in the first element of the array
-                        // because there is a guarantee that there will be at least one object, which was
-                        // created in the case of POST route success test
+                        // because there is a guarantee that there will be at least one object (created
+                        // in the case of the successful POST route test or with the create method above).
                         expect(res.body.id).to.eql(result.id)
                         expect(res.body.start_time).to.eql(result.start_time!.toISOString())
                         expect(res.body.end_time).to.eql(result.end_time!.toISOString())
                         expect(res.body.duration).to.eql(result.duration)
-                        // expect(res.body.pattern.data_set).to.eql(result.pattern.data_set)
+                        expect(res.body.pattern.data_set)
+                            .to.eql(defaultSleep.pattern!.data_set.map((elem: SleepPatternDataSet) => elem.toJSON()))
                         expect(res.body.type).to.eql(result.type)
                         expect(res.body.child_id).to.eql(result.child_id.toString())
                     })
@@ -1300,23 +1190,7 @@ describe('Routes: users.children.sleep', () => {
                         start_time: defaultSleep.start_time,
                         end_time: defaultSleep.end_time,
                         duration: defaultSleep.duration,
-                        pattern: [
-                            {
-                                start_time: defaultSleep.start_time,
-                                name: PhasesPatternType.RESTLESS,
-                                duration: Math.floor(Math.random() * 5 + 1) * 60000
-                            },
-                            {
-                                start_time: defaultSleep.start_time,
-                                name: PhasesPatternType.ASLEEP,
-                                duration: Math.floor(Math.random() * 120 + 1) * 60000
-                            },
-                            {
-                                start_time: defaultSleep.start_time,
-                                name: PhasesPatternType.AWAKE,
-                                duration: Math.floor(Math.random() * 3 + 1) * 60000
-                            }
-                        ],
+                        pattern: defaultSleep.pattern!.data_set,
                         type: defaultSleep.type,
                         child_id: defaultSleep.child_id
                     })
@@ -1353,23 +1227,7 @@ describe('Routes: users.children.sleep', () => {
                         start_time: defaultSleep.start_time,
                         end_time: defaultSleep.end_time,
                         duration: defaultSleep.duration,
-                        pattern: [
-                            {
-                                start_time: defaultSleep.start_time,
-                                name: PhasesPatternType.RESTLESS,
-                                duration: Math.floor(Math.random() * 5 + 1) * 60000
-                            },
-                            {
-                                start_time: defaultSleep.start_time,
-                                name: PhasesPatternType.ASLEEP,
-                                duration: Math.floor(Math.random() * 120 + 1) * 60000
-                            },
-                            {
-                                start_time: defaultSleep.start_time,
-                                name: PhasesPatternType.AWAKE,
-                                duration: Math.floor(Math.random() * 3 + 1) * 60000
-                            }
-                        ],
+                        pattern: defaultSleep.pattern!.data_set,
                         type: defaultSleep.type,
                         child_id: defaultSleep.child_id
                     })
@@ -1408,23 +1266,7 @@ describe('Routes: users.children.sleep', () => {
                         start_time: defaultSleep.start_time,
                         end_time: defaultSleep.end_time,
                         duration: defaultSleep.duration,
-                        pattern: [
-                            {
-                                start_time: defaultSleep.start_time,
-                                name: PhasesPatternType.RESTLESS,
-                                duration: Math.floor(Math.random() * 5 + 1) * 60000
-                            },
-                            {
-                                start_time: defaultSleep.start_time,
-                                name: PhasesPatternType.ASLEEP,
-                                duration: Math.floor(Math.random() * 120 + 1) * 60000
-                            },
-                            {
-                                start_time: defaultSleep.start_time,
-                                name: PhasesPatternType.AWAKE,
-                                duration: Math.floor(Math.random() * 3 + 1) * 60000
-                            }
-                        ],
+                        pattern: defaultSleep.pattern!.data_set,
                         type: defaultSleep.type,
                         child_id: defaultSleep.child_id
                     })
@@ -1444,7 +1286,8 @@ describe('Routes: users.children.sleep', () => {
                         expect(res.body.start_time).to.eql(result.start_time!.toISOString())
                         expect(res.body.end_time).to.eql(result.end_time!.toISOString())
                         expect(res.body.duration).to.eql(result.duration)
-                        // expect(res.body.pattern).to.eql(result.pattern)
+                        expect(res.body.pattern.data_set)
+                            .to.eql(defaultSleep.pattern!.data_set.map((elem: SleepPatternDataSet) => elem.toJSON()))
                         expect(res.body.type).to.eql(result.type)
                         expect(res.body.child_id).to.eql(result.child_id.toString())
                     })
@@ -1496,23 +1339,7 @@ describe('Routes: users.children.sleep', () => {
                         start_time: defaultSleep.start_time,
                         end_time: defaultSleep.end_time,
                         duration: defaultSleep.duration,
-                        pattern: [
-                            {
-                                start_time: defaultSleep.start_time,
-                                name: PhasesPatternType.RESTLESS,
-                                duration: Math.floor(Math.random() * 5 + 1) * 60000
-                            },
-                            {
-                                start_time: defaultSleep.start_time,
-                                name: PhasesPatternType.ASLEEP,
-                                duration: Math.floor(Math.random() * 120 + 1) * 60000
-                            },
-                            {
-                                start_time: defaultSleep.start_time,
-                                name: PhasesPatternType.AWAKE,
-                                duration: Math.floor(Math.random() * 3 + 1) * 60000
-                            }
-                        ],
+                        pattern: defaultSleep.pattern!.data_set,
                         type: defaultSleep.type,
                         child_id: defaultSleep.child_id
                     })
@@ -1553,23 +1380,7 @@ describe('Routes: users.children.sleep', () => {
                         start_time: defaultSleep.start_time,
                         end_time: defaultSleep.end_time,
                         duration: defaultSleep.duration,
-                        pattern: [
-                            {
-                                start_time: defaultSleep.start_time,
-                                name: PhasesPatternType.RESTLESS,
-                                duration: Math.floor(Math.random() * 5 + 1) * 60000
-                            },
-                            {
-                                start_time: defaultSleep.start_time,
-                                name: PhasesPatternType.ASLEEP,
-                                duration: Math.floor(Math.random() * 120 + 1) * 60000
-                            },
-                            {
-                                start_time: defaultSleep.start_time,
-                                name: PhasesPatternType.AWAKE,
-                                duration: Math.floor(Math.random() * 3 + 1) * 60000
-                            }
-                        ],
+                        pattern: defaultSleep.pattern!.data_set,
                         type: defaultSleep.type,
                         child_id: defaultSleep.child_id
                     })
@@ -1635,7 +1446,8 @@ describe('Routes: users.children.sleep', () => {
                         expect(res.body.start_time).to.eql(defaultSleep.start_time!.toISOString())
                         expect(res.body.end_time).to.eql(defaultSleep.end_time!.toISOString())
                         expect(res.body.duration).to.eql(defaultSleep.duration)
-                        // expect(res.body.pattern).to.eql(defaultSleep.pattern)
+                        expect(res.body.pattern.data_set)
+                            .to.eql(defaultSleep.pattern!.data_set.map((elem: SleepPatternDataSet) => elem.toJSON()))
                         expect(res.body.type).to.eql(defaultSleep.type)
                         expect(res.body.child_id).to.eql(defaultSleep.child_id)
                     })
@@ -1778,7 +1590,11 @@ describe('Routes: users.children.sleep', () => {
 
                 // Sleep to update
                 const body = {
-                    duration: -(defaultSleep.duration!)
+                    start_time: defaultSleep.start_time,
+                    end_time: defaultSleep.end_time,
+                    duration: -(defaultSleep.duration!),
+                    pattern: defaultSleep.pattern,
+                    type: defaultSleep.type
                 }
 
                 return request
@@ -1790,6 +1606,47 @@ describe('Routes: users.children.sleep', () => {
                         expect(err.body.code).to.eql(400)
                         expect(err.body.message).to.eql('Duration field is invalid...')
                         expect(err.body.description).to.eql('Sleep validation failed: The value provided has a negative value!')
+                    })
+            })
+        })
+
+        context('when a validation error occurs (the sleep type is invalid)', () => {
+            before(() => {
+                try {
+                    deleteAllSleep()
+                } catch (err) {
+                    throw new Error('Failure on users.children.sleep routes test: ' + err.message)
+                }
+            })
+
+            it('should return status code 400 and info message about the invalid duration', async () => {
+                let result
+
+                try {
+                    // Sleep to be updated
+                    result = await createSleepToBeUpdated(defaultSleep)
+                } catch (err) {
+                    throw new Error('Failure on users.children.sleep routes test: ' + err.message)
+                }
+
+                // Sleep to update
+                const body = {
+                    start_time: defaultSleep.start_time,
+                    end_time: defaultSleep.end_time,
+                    duration: defaultSleep.duration,
+                    pattern: defaultSleep.pattern,
+                    type: 'deeps'
+                }
+
+                return request
+                    .patch(`/v1/users/children/${result.child_id}/sleep/${result.id}`)
+                    .send(body)
+                    .set('Content-Type', 'application/json')
+                    .expect(400)
+                    .then(err => {
+                        expect(err.body.code).to.eql(400)
+                        expect(err.body.message).to.eql('The type provided "deeps" is not supported...')
+                        expect(err.body.description).to.eql('The allowed Sleep Pattern types are: classic, stages.')
                     })
             })
         })
@@ -1973,6 +1830,105 @@ describe('Routes: users.children.sleep', () => {
                     })
             })
         })
+
+        context('when a validation error occurs (the sleep pattern data set array has an invalid item with an invalid name)', () => {
+            before(() => {
+                try {
+                    deleteAllSleep()
+                } catch (err) {
+                    throw new Error('Failure on users.children.sleep routes test: ' + err.message)
+                }
+            })
+
+            it('should return status code 400 and info message about the invalid data_set array of pattern', async () => {
+                let result
+
+                try {
+                    // Sleep to be updated
+                    result = await createSleepToBeUpdated(defaultSleep)
+                } catch (err) {
+                    throw new Error('Failure on users.children.sleep routes test: ' + err.message)
+                }
+
+                // Sleep to update
+                const body = {
+                    start_time: defaultSleep.start_time,
+                    end_time: defaultSleep.end_time,
+                    duration: defaultSleep.duration,
+                    pattern: {
+                        data_set: [
+                            {
+                                start_time: '2018-08-18T01:40:30.00Z',
+                                name: 'restlesss',
+                                duration: (Math.floor(Math.random() * 5 + 1) * 60000)
+                            }
+                        ]
+                    },
+                    type: SleepType.CLASSIC
+                }
+
+                return request
+                    .patch(`/v1/users/children/${result.child_id}/sleep/${result.id}`)
+                    .send(body)
+                    .set('Content-Type', 'application/json')
+                    .expect(400)
+                    .then(err => {
+                        expect(err.body.code).to.eql(400)
+                        expect(err.body.message).to.eql('The sleep pattern name provided "restlesss" is not supported...')
+                        expect(err.body.description).to.eql('The names of the allowed patterns are: asleep, restless, awake.')
+                    })
+            })
+        })
+
+        context('when a validation error occurs (the sleep pattern data set array has an invalid item with an invalid name' +
+            ' and the sleep type is "stages")', () => {
+            before(() => {
+                try {
+                    deleteAllSleep()
+                } catch (err) {
+                    throw new Error('Failure on users.children.sleep routes test: ' + err.message)
+                }
+            })
+
+            it('should return status code 400 and info message about the invalid data_set array of pattern', async () => {
+                let result
+
+                try {
+                    // Sleep to be updated
+                    result = await createSleepToBeUpdated(defaultSleep)
+                } catch (err) {
+                    throw new Error('Failure on users.children.sleep routes test: ' + err.message)
+                }
+
+                // Sleep to update
+                const body = {
+                    start_time: defaultSleep.start_time,
+                    end_time: defaultSleep.end_time,
+                    duration: defaultSleep.duration,
+                    pattern: {
+                        data_set: [
+                            {
+                                start_time: '2018-08-18T01:40:30.00Z',
+                                name: 'deeps',
+                                duration: (Math.floor(Math.random() * 5 + 1) * 60000)
+                            }
+                        ]
+                    },
+                    type: SleepType.STAGES
+                }
+
+                return request
+                    .patch(`/v1/users/children/${result.child_id}/sleep/${result.id}`)
+                    .send(body)
+                    .set('Content-Type', 'application/json')
+                    .expect(400)
+                    .then(err => {
+                        expect(err.body.code).to.eql(400)
+                        expect(err.body.message).to.eql('The sleep pattern name provided "deeps" is not supported...')
+                        expect(err.body.description).to.eql('The names of the allowed patterns are: deep, light, rem, wake.')
+                    })
+            })
+        })
     })
     /**
      * DELETE route
@@ -1995,23 +1951,7 @@ describe('Routes: users.children.sleep', () => {
                         start_time: defaultSleep.start_time,
                         end_time: defaultSleep.end_time,
                         duration: defaultSleep.duration,
-                        pattern: [
-                            {
-                                start_time: defaultSleep.start_time,
-                                name: PhasesPatternType.RESTLESS,
-                                duration: Math.floor(Math.random() * 5 + 1) * 60000
-                            },
-                            {
-                                start_time: defaultSleep.start_time,
-                                name: PhasesPatternType.ASLEEP,
-                                duration: Math.floor(Math.random() * 120 + 1) * 60000
-                            },
-                            {
-                                start_time: defaultSleep.start_time,
-                                name: PhasesPatternType.AWAKE,
-                                duration: Math.floor(Math.random() * 3 + 1) * 60000
-                            }
-                        ],
+                        pattern: defaultSleep.pattern!.data_set,
                         type: defaultSleep.type,
                         child_id: defaultSleep.child_id
                     })
@@ -2066,23 +2006,7 @@ describe('Routes: users.children.sleep', () => {
                         start_time: defaultSleep.start_time,
                         end_time: defaultSleep.end_time,
                         duration: defaultSleep.duration,
-                        pattern: [
-                            {
-                                start_time: defaultSleep.start_time,
-                                name: PhasesPatternType.RESTLESS,
-                                duration: Math.floor(Math.random() * 5 + 1) * 60000
-                            },
-                            {
-                                start_time: defaultSleep.start_time,
-                                name: PhasesPatternType.ASLEEP,
-                                duration: Math.floor(Math.random() * 120 + 1) * 60000
-                            },
-                            {
-                                start_time: defaultSleep.start_time,
-                                name: PhasesPatternType.AWAKE,
-                                duration: Math.floor(Math.random() * 3 + 1) * 60000
-                            }
-                        ],
+                        pattern: defaultSleep.pattern!.data_set,
                         type: defaultSleep.type,
                         child_id: defaultSleep.child_id
                     })
@@ -2119,23 +2043,7 @@ describe('Routes: users.children.sleep', () => {
                         start_time: defaultSleep.start_time,
                         end_time: defaultSleep.end_time,
                         duration: defaultSleep.duration,
-                        pattern: [
-                            {
-                                start_time: defaultSleep.start_time,
-                                name: PhasesPatternType.RESTLESS,
-                                duration: Math.floor(Math.random() * 5 + 1) * 60000
-                            },
-                            {
-                                start_time: defaultSleep.start_time,
-                                name: PhasesPatternType.ASLEEP,
-                                duration: Math.floor(Math.random() * 120 + 1) * 60000
-                            },
-                            {
-                                start_time: defaultSleep.start_time,
-                                name: PhasesPatternType.AWAKE,
-                                duration: Math.floor(Math.random() * 3 + 1) * 60000
-                            }
-                        ],
+                        pattern: defaultSleep.pattern!.data_set,
                         type: defaultSleep.type,
                         child_id: defaultSleep.child_id
                     })
@@ -2169,23 +2077,7 @@ async function createSleepToBeUpdated(defaultSleep: Sleep): Promise<any> {
         start_time: defaultSleep.start_time,
         end_time: defaultSleep.end_time,
         duration: defaultSleep.duration,
-        pattern: [
-            {
-                start_time: defaultSleep.start_time,
-                name: PhasesPatternType.RESTLESS,
-                duration: Math.floor(Math.random() * 5 + 1) * 60000
-            },
-            {
-                start_time: defaultSleep.start_time,
-                name: PhasesPatternType.ASLEEP,
-                duration: Math.floor(Math.random() * 120 + 1) * 60000
-            },
-            {
-                start_time: defaultSleep.start_time,
-                name: PhasesPatternType.AWAKE,
-                duration: Math.floor(Math.random() * 3 + 1) * 60000
-            }
-        ],
+        pattern: defaultSleep.pattern!.data_set,
         type: defaultSleep.type,
         child_id: defaultSleep.child_id
     })

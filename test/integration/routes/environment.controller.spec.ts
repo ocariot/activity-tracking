@@ -287,7 +287,7 @@ describe('Routes: environments', () => {
                             expect(res.body.success[i].code).to.eql(HttpStatus.CREATED)
                             expect(res.body.success[i].item.id).to.eql(correctEnvironmentsArr[i].id)
                             expect(res.body.success[i].item.institution_id).to.eql(correctEnvironmentsArr[i].institution_id)
-                            expect(res.body.success[i].item.location).to.not.be.empty
+                            expect(res.body.success[i].item.location).to.eql(correctEnvironmentsArr[i].location!.toJSON())
                             if (res.body.success[i].item.climatized)
                                 expect(res.body.success[i].item.climatized).to.eql(correctEnvironmentsArr[i].climatized)
                             expect(res.body.success[i].item.timestamp).to.eql(correctEnvironmentsArr[i].timestamp.toISOString())
@@ -331,7 +331,7 @@ describe('Routes: environments', () => {
                             expect(res.body.error[i].message).to.eql('Measurement of environment is already registered...')
                             expect(res.body.error[i].item.id).to.eql(correctEnvironmentsArr[i].id)
                             expect(res.body.error[i].item.institution_id).to.eql(correctEnvironmentsArr[i].institution_id)
-                            expect(res.body.error[i].item.location).to.not.be.empty
+                            expect(res.body.error[i].item.location).to.eql(correctEnvironmentsArr[i].location!.toJSON())
                             if (res.body.error[i].item.climatized)
                                 expect(res.body.error[i].item.climatized).to.eql(correctEnvironmentsArr[i].climatized)
                             expect(res.body.error[i].item.timestamp).to.eql(correctEnvironmentsArr[i].timestamp.toISOString())
@@ -382,7 +382,7 @@ describe('Routes: environments', () => {
                         expect(res.body.success[0].code).to.eql(HttpStatus.CREATED)
                         expect(res.body.success[0].item.id).to.eql(mixedEnvironmentsArr[0].id)
                         expect(res.body.success[0].item.institution_id).to.eql(mixedEnvironmentsArr[0].institution_id)
-                        expect(res.body.success[0].item.location).to.not.be.empty
+                        expect(res.body.success[0].item.location).to.eql(mixedEnvironmentsArr[0].location!.toJSON())
                         if (res.body.success[0].item.climatized)
                             expect(res.body.success[0].item.climatized).to.eql(mixedEnvironmentsArr[0].climatized)
                         expect(res.body.success[0].item.timestamp).to.eql(mixedEnvironmentsArr[0].timestamp.toISOString())
@@ -451,7 +451,7 @@ describe('Routes: environments', () => {
                             expect(res.body.error[i].code).to.eql(HttpStatus.BAD_REQUEST)
                             expect(res.body.error[i].item.id).to.eql(incorrectEnvironmentsArr[i].id)
                             expect(res.body.error[i].item.institution_id).to.eql(incorrectEnvironmentsArr[i].institution_id)
-                            if (i !== 0) expect(res.body.error[i].item.location).to.not.be.empty
+                            if (i !== 0) expect(res.body.error[i].item.location).to.eql(incorrectEnvironmentsArr[i].location!.toJSON())
                             if (res.body.error[i].item.climatized)
                                 expect(res.body.error[i].item.climatized).to.eql(incorrectEnvironmentsArr[i].climatized)
                             if (i !== 0) expect(res.body.error[i].item.timestamp)
@@ -508,8 +508,8 @@ describe('Routes: environments', () => {
                         expect(res.body).is.an.instanceOf(Array)
                         expect(res.body.length).to.not.eql(0)
                         // Check for the existence of properties only in the first element of the array
-                        // because there is a guarantee that there will be at least one object, which was
-                        // created in the case of POST route success test
+                        // because there is a guarantee that there will be at least one object (created
+                        // in the case of the successful POST route test or with the create method above).
                         expect(res.body[0].id).to.eql(defaultEnvironment.id)
                         expect(res.body[0].institution_id).to.eql(defaultEnvironment.institution_id)
                         expect(res.body[0].location.local).to.eql(defaultEnvironment.location!.local)
@@ -607,8 +607,9 @@ describe('Routes: environments', () => {
                         expect(res.body).is.an.instanceOf(Array)
                         expect(res.body.length).to.not.eql(0)
                         // Check for the existence of properties only in the first element of the array
-                        // because there is a guarantee that there will be at least one object with the property
-                        // 'climatized' = true (the only query filter)
+                        // because there is a guarantee that there will be at least one object (created
+                        // in the case of the successful POST route test or with the create method above)
+                        // with the property 'climatized' = true (the only query filter)
                         expect(res.body[0].id).to.eql(defaultEnvironment.id)
                         expect(res.body[0].institution_id).to.eql(defaultEnvironment.institution_id)
                         expect(res.body[0].location.local).to.eql(defaultEnvironment.location!.local)
@@ -619,8 +620,8 @@ describe('Routes: environments', () => {
                         expect(res.body[0].temperature.unit).to.eql(defaultEnvironment.temperature!.unit)
                         expect(res.body[0].humidity.value).to.eql(defaultEnvironment.humidity!.value)
                         expect(res.body[0].humidity.unit).to.eql(defaultEnvironment.humidity!.unit)
-                        expect(res.body[0]).to.have.property('climatized')
-                        expect(res.body[0]).to.have.property('timestamp')
+                        expect(res.body[0].climatized).to.eql(true)
+                        expect(res.body[0].timestamp).to.eql(defaultEnvironment.timestamp.toISOString())
                     })
             })
         })

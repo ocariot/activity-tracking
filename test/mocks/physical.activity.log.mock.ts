@@ -14,6 +14,7 @@ export class PhysicalActivityLogMock extends PhysicalActivityLog {
         logsArr.forEach(elem => {
             if (elem.type === LogType.STEPS) super.steps.push(elem)
             if (elem.type === LogType.CALORIES) super.calories.push(elem)
+            if (elem.type === LogType.ACTIVE_MINUTES) super.active_minutes.push(elem)
         })
     }
 }
