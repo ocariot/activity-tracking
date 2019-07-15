@@ -78,7 +78,6 @@ export class WeightRepository extends BaseRepository<Weight, WeightEntity> imple
         const q: any = query.toJSON()
         return new Promise<Array<Weight>>((resolve, reject) => {
             this.measurementModel.find(q.filters)
-                .select(q.fields)
                 .sort(q.ordination)
                 .skip(Number((q.pagination.limit * q.pagination.page) - q.pagination.limit))
                 .limit(Number(q.pagination.limit))
@@ -102,7 +101,6 @@ export class WeightRepository extends BaseRepository<Weight, WeightEntity> imple
         const q: any = query.toJSON()
         return new Promise<Weight>((resolve, reject) => {
             this.measurementModel.findOne(q.filters)
-                .select(q.fields)
                 .populate('body_fat')
                 .exec()
                 .then((result) => {
