@@ -25,6 +25,8 @@ import { IEventBus } from '../../../src/infrastructure/port/event.bus.interface'
 import { ILogger } from '../../../src/utils/custom.logger'
 import { MultiStatusMock } from '../../mocks/multi.status.mock'
 import { MultiStatus } from '../../../src/application/domain/model/multi.status'
+import { PhysicalActivityHeartRate } from '../../../src/application/domain/model/physical.activity.heart.rate'
+import { HeartRateZone } from '../../../src/application/domain/model/heart.rate.zone'
 
 require('sinon-mongoose')
 
@@ -118,6 +120,22 @@ describe('Services: PhysicalActivityService', () => {
     incorrectActivityJSON.levels[0].duration = -(Math.floor((Math.random() * 10) * 60000))
     incorrectActivity11 = incorrectActivity11.fromJSON(incorrectActivityJSON)
 
+    // The PhysicalActivityHeartRate is empty
+    const incorrectActivity12: PhysicalActivity = new PhysicalActivityMock()
+    incorrectActivity12.heart_rate = new PhysicalActivityHeartRate()
+
+    // The PhysicalActivityHeartRate average is negative
+    const incorrectActivity13: PhysicalActivity = new PhysicalActivityMock()
+    incorrectActivity13.heart_rate!.average = -120
+
+    // The PhysicalActivityHeartRate is invalid (the "Fat Burn Zone" parameter is empty)
+    const incorrectActivity14: PhysicalActivity = new PhysicalActivityMock()
+    incorrectActivity14.heart_rate!.fat_burn_zone = new HeartRateZone()
+
+    // The PhysicalActivityHeartRate is invalid (the "Fat Burn Zone" parameter has a negative duration)
+    const incorrectActivity15: PhysicalActivity = new PhysicalActivityMock()
+    incorrectActivity15.heart_rate!.fat_burn_zone!.duration = -600000
+
     // Array with correct and incorrect activities
     const mixedActivitiesArr: Array<PhysicalActivity> = new Array<PhysicalActivityMock>()
     mixedActivitiesArr.push(new PhysicalActivityMock())
@@ -136,6 +154,10 @@ describe('Services: PhysicalActivityService', () => {
     incorrectActivitiesArr.push(incorrectActivity9)
     incorrectActivitiesArr.push(incorrectActivity10)
     incorrectActivitiesArr.push(incorrectActivity11)
+    incorrectActivitiesArr.push(incorrectActivity12)
+    incorrectActivitiesArr.push(incorrectActivity13)
+    incorrectActivitiesArr.push(incorrectActivity14)
+    incorrectActivitiesArr.push(incorrectActivity15)
 
     /**
      * Mock MultiStatus responses
@@ -193,15 +215,13 @@ describe('Services: PhysicalActivityService', () => {
                         assert.propertyVal(result, 'id', activity.id)
                         assert.propertyVal(result, 'start_time', activity.start_time)
                         assert.propertyVal(result, 'end_time', activity.end_time)
-                        assert.typeOf(result.duration, 'number')
                         assert.propertyVal(result, 'duration', activity.duration)
                         assert.propertyVal(result, 'child_id', activity.child_id)
-                        assert.typeOf(result.name, 'string')
                         assert.propertyVal(result, 'name', activity.name)
-                        assert.typeOf(result.calories, 'number')
                         assert.propertyVal(result, 'calories', activity.calories)
                         assert.propertyVal(result, 'steps', activity.steps)
                         assert.propertyVal(result, 'levels', activity.levels)
+                        assert.propertyVal(result, 'heart_rate', activity.heart_rate)
                     })
             })
         })
@@ -223,15 +243,13 @@ describe('Services: PhysicalActivityService', () => {
                         assert.propertyVal(result, 'id', activity.id)
                         assert.propertyVal(result, 'start_time', activity.start_time)
                         assert.propertyVal(result, 'end_time', activity.end_time)
-                        assert.typeOf(result.duration, 'number')
                         assert.propertyVal(result, 'duration', activity.duration)
                         assert.propertyVal(result, 'child_id', activity.child_id)
-                        assert.typeOf(result.name, 'string')
                         assert.propertyVal(result, 'name', activity.name)
-                        assert.typeOf(result.calories, 'number')
                         assert.propertyVal(result, 'calories', activity.calories)
                         assert.propertyVal(result, 'steps', activity.steps)
                         assert.propertyVal(result, 'levels', activity.levels)
+                        assert.propertyVal(result, 'heart_rate', activity.heart_rate)
                     })
             })
         })
@@ -254,15 +272,13 @@ describe('Services: PhysicalActivityService', () => {
                         assert.propertyVal(result, 'id', activity.id)
                         assert.propertyVal(result, 'start_time', activity.start_time)
                         assert.propertyVal(result, 'end_time', activity.end_time)
-                        assert.typeOf(result.duration, 'number')
                         assert.propertyVal(result, 'duration', activity.duration)
                         assert.propertyVal(result, 'child_id', activity.child_id)
-                        assert.typeOf(result.name, 'string')
                         assert.propertyVal(result, 'name', activity.name)
-                        assert.typeOf(result.calories, 'number')
                         assert.propertyVal(result, 'calories', activity.calories)
                         assert.propertyVal(result, 'steps', activity.steps)
                         assert.propertyVal(result, 'levels', activity.levels)
+                        assert.propertyVal(result, 'heart_rate', activity.heart_rate)
                     })
             })
         })
@@ -529,6 +545,87 @@ describe('Services: PhysicalActivityService', () => {
                 }
             })
         })
+
+        context('when the physical activity is incorrect (the PhysicalActivityHeartRate is empty)', () => {
+            it('should throw a ValidationException', async () => {
+                sinon
+                    .mock(modelFake)
+                    .expects('create')
+                    .withArgs(incorrectActivity12)
+                    .chain('exec')
+                    .rejects({ message: 'Required fields were not provided...',
+                               description: 'PhysicalActivityHeartRate validation failed: ' +
+                                   'average, out_of_range_zone, fat_burn_zone, cardio_zone, peak_zone is required!' })
+
+                try {
+                    return await activityService.add(incorrectActivity12)
+                } catch (err) {
+                    assert.propertyVal(err, 'message', 'Required fields were not provided...')
+                    assert.propertyVal(err, 'description', 'PhysicalActivityHeartRate validation failed: ' +
+                        'average, out_of_range_zone, fat_burn_zone, cardio_zone, peak_zone is required!')
+                }
+            })
+        })
+
+        context('when the physical activity is incorrect (the PhysicalActivityHeartRate has a negative average parameter)', () => {
+            it('should throw a ValidationException', async () => {
+                sinon
+                    .mock(modelFake)
+                    .expects('create')
+                    .withArgs(incorrectActivity13)
+                    .chain('exec')
+                    .rejects({ message: 'Average field is invalid...',
+                               description: 'PhysicalActivityHeartRate validation failed: ' +
+                                   'The value provided has a negative value!' })
+
+                try {
+                    return await activityService.add(incorrectActivity13)
+                } catch (err) {
+                    assert.propertyVal(err, 'message', 'Average field is invalid...')
+                    assert.propertyVal(err, 'description', 'PhysicalActivityHeartRate validation failed: ' +
+                        'The value provided has a negative value!')
+                }
+            })
+        })
+
+        context('when the physical activity is incorrect (the "Fat Burn Zone" parameter of PhysicalActivityHeartRate is empty)', () => {
+            it('should throw a ValidationException', async () => {
+                sinon
+                    .mock(modelFake)
+                    .expects('create')
+                    .withArgs(incorrectActivity14)
+                    .chain('exec')
+                    .rejects({ message: 'Required fields were not provided...',
+                               description: 'HeartRateZone validation failed: min, max, duration is required!' })
+
+                try {
+                    return await activityService.add(incorrectActivity14)
+                } catch (err) {
+                    assert.propertyVal(err, 'message', 'Required fields were not provided...')
+                    assert.propertyVal(err, 'description', 'HeartRateZone validation failed: min, max, duration is required!')
+                }
+            })
+        })
+
+        context('when the physical activity is incorrect ' +
+            '(the "Fat Burn Zone" parameter of PhysicalActivityHeartRate has a negative duration)', () => {
+            it('should throw a ValidationException', async () => {
+                sinon
+                    .mock(modelFake)
+                    .expects('create')
+                    .withArgs(incorrectActivity15)
+                    .chain('exec')
+                    .rejects({ message: 'Duration field is invalid...',
+                               description: 'HeartRateZone validation failed: The value provided has a negative value!' })
+
+                try {
+                    return await activityService.add(incorrectActivity15)
+                } catch (err) {
+                    assert.propertyVal(err, 'message', 'Duration field is invalid...')
+                    assert.propertyVal(err, 'description', 'HeartRateZone validation failed: The value provided has a negative value!')
+                }
+            })
+        })
     })
 
     /**
@@ -555,15 +652,13 @@ describe('Services: PhysicalActivityService', () => {
                             assert.propertyVal(result.success[i].item, 'id', correctActivitiesArr[i].id)
                             assert.propertyVal(result.success[i].item, 'start_time', correctActivitiesArr[i].start_time)
                             assert.propertyVal(result.success[i].item, 'end_time', correctActivitiesArr[i].end_time)
-                            assert.typeOf(result.success[i].item.duration, 'number')
                             assert.propertyVal(result.success[i].item, 'duration', correctActivitiesArr[i].duration)
                             assert.propertyVal(result.success[i].item, 'child_id', correctActivitiesArr[i].child_id)
-                            assert.typeOf(result.success[i].item.name, 'string')
                             assert.propertyVal(result.success[i].item, 'name', correctActivitiesArr[i].name)
-                            assert.typeOf(result.success[i].item.calories, 'number')
                             assert.propertyVal(result.success[i].item, 'calories', correctActivitiesArr[i].calories)
                             assert.propertyVal(result.success[i].item, 'steps', correctActivitiesArr[i].steps)
                             assert.propertyVal(result.success[i].item, 'levels', correctActivitiesArr[i].levels)
+                            assert.propertyVal(result.success[i].item, 'heart_rate', correctActivitiesArr[i].heart_rate)
                         }
 
                         assert.isEmpty(result.error)
@@ -593,15 +688,13 @@ describe('Services: PhysicalActivityService', () => {
                             assert.propertyVal(result.success[i].item, 'id', correctActivitiesArr[i].id)
                             assert.propertyVal(result.success[i].item, 'start_time', correctActivitiesArr[i].start_time)
                             assert.propertyVal(result.success[i].item, 'end_time', correctActivitiesArr[i].end_time)
-                            assert.typeOf(result.success[i].item.duration, 'number')
                             assert.propertyVal(result.success[i].item, 'duration', correctActivitiesArr[i].duration)
                             assert.propertyVal(result.success[i].item, 'child_id', correctActivitiesArr[i].child_id)
-                            assert.typeOf(result.success[i].item.name, 'string')
                             assert.propertyVal(result.success[i].item, 'name', correctActivitiesArr[i].name)
-                            assert.typeOf(result.success[i].item.calories, 'number')
                             assert.propertyVal(result.success[i].item, 'calories', correctActivitiesArr[i].calories)
                             assert.propertyVal(result.success[i].item, 'steps', correctActivitiesArr[i].steps)
                             assert.propertyVal(result.success[i].item, 'levels', correctActivitiesArr[i].levels)
+                            assert.propertyVal(result.success[i].item, 'heart_rate', correctActivitiesArr[i].heart_rate)
                         }
 
                         assert.isEmpty(result.error)
@@ -633,15 +726,13 @@ describe('Services: PhysicalActivityService', () => {
                             assert.propertyVal(result.success[i].item, 'id', correctActivitiesArr[i].id)
                             assert.propertyVal(result.success[i].item, 'start_time', correctActivitiesArr[i].start_time)
                             assert.propertyVal(result.success[i].item, 'end_time', correctActivitiesArr[i].end_time)
-                            assert.typeOf(result.success[i].item.duration, 'number')
                             assert.propertyVal(result.success[i].item, 'duration', correctActivitiesArr[i].duration)
                             assert.propertyVal(result.success[i].item, 'child_id', correctActivitiesArr[i].child_id)
-                            assert.typeOf(result.success[i].item.name, 'string')
                             assert.propertyVal(result.success[i].item, 'name', correctActivitiesArr[i].name)
-                            assert.typeOf(result.success[i].item.calories, 'number')
                             assert.propertyVal(result.success[i].item, 'calories', correctActivitiesArr[i].calories)
                             assert.propertyVal(result.success[i].item, 'steps', correctActivitiesArr[i].steps)
                             assert.propertyVal(result.success[i].item, 'levels', correctActivitiesArr[i].levels)
+                            assert.propertyVal(result.success[i].item, 'heart_rate', correctActivitiesArr[i].heart_rate)
                         }
 
                         assert.isEmpty(result.error)
@@ -675,15 +766,13 @@ describe('Services: PhysicalActivityService', () => {
                             assert.propertyVal(result.error[i].item, 'id', correctActivitiesArr[i].id)
                             assert.propertyVal(result.error[i].item, 'start_time', correctActivitiesArr[i].start_time)
                             assert.propertyVal(result.error[i].item, 'end_time', correctActivitiesArr[i].end_time)
-                            assert.typeOf(result.error[i].item.duration, 'number')
                             assert.propertyVal(result.error[i].item, 'duration', correctActivitiesArr[i].duration)
                             assert.propertyVal(result.error[i].item, 'child_id', correctActivitiesArr[i].child_id)
-                            assert.typeOf(result.error[i].item.name, 'string')
                             assert.propertyVal(result.error[i].item, 'name', correctActivitiesArr[i].name)
-                            assert.typeOf(result.error[i].item.calories, 'number')
                             assert.propertyVal(result.error[i].item, 'calories', correctActivitiesArr[i].calories)
                             assert.propertyVal(result.error[i].item, 'steps', correctActivitiesArr[i].steps)
                             assert.propertyVal(result.error[i].item, 'levels', correctActivitiesArr[i].levels)
+                            assert.propertyVal(result.error[i].item, 'heart_rate', correctActivitiesArr[i].heart_rate)
                         }
 
                         assert.isEmpty(result.success)
@@ -709,15 +798,13 @@ describe('Services: PhysicalActivityService', () => {
                         assert.propertyVal(result.success[0].item, 'id', mixedActivitiesArr[0].id)
                         assert.propertyVal(result.success[0].item, 'start_time', mixedActivitiesArr[0].start_time)
                         assert.propertyVal(result.success[0].item, 'end_time', mixedActivitiesArr[0].end_time)
-                        assert.typeOf(result.success[0].item.duration, 'number')
                         assert.propertyVal(result.success[0].item, 'duration', mixedActivitiesArr[0].duration)
                         assert.propertyVal(result.success[0].item, 'child_id', mixedActivitiesArr[0].child_id)
-                        assert.typeOf(result.success[0].item.name, 'string')
                         assert.propertyVal(result.success[0].item, 'name', mixedActivitiesArr[0].name)
-                        assert.typeOf(result.success[0].item.calories, 'number')
                         assert.propertyVal(result.success[0].item, 'calories', mixedActivitiesArr[0].calories)
                         assert.propertyVal(result.success[0].item, 'steps', mixedActivitiesArr[0].steps)
                         assert.propertyVal(result.success[0].item, 'levels', mixedActivitiesArr[0].levels)
+                        assert.propertyVal(result.success[0].item, 'heart_rate', mixedActivitiesArr[0].heart_rate)
 
                         assert.propertyVal(result.error[0], 'code', HttpStatus.BAD_REQUEST)
                         assert.propertyVal(result.error[0], 'message', 'Required fields were not provided...')
@@ -742,52 +829,62 @@ describe('Services: PhysicalActivityService', () => {
                         result = result as MultiStatus<PhysicalActivity>
 
                         assert.propertyVal(result.error[0], 'message', 'Required fields were not provided...')
-                        assert.propertyVal(result.error[0], 'description', 'Activity validation failed: start_time, end_time, ' +
-                            'duration, child_id is required!')
+                        assert.propertyVal(result.error[0], 'description', 'Activity validation failed: ' +
+                            'start_time, end_time, duration, child_id is required!')
                         assert.propertyVal(result.error[1], 'message', 'Required fields were not provided...')
-                        assert.propertyVal(result.error[1], 'description', 'Physical Activity validation failed: name, calories ' +
-                            'is required!')
+                        assert.propertyVal(result.error[1], 'description', 'Physical Activity validation failed: ' +
+                            'name, calories is required!')
                         assert.propertyVal(result.error[2], 'message', 'Date field is invalid...')
-                        assert.propertyVal(result.error[2], 'description', 'Date validation failed: The end_time parameter can not ' +
-                            'contain a older date than that the start_time parameter!')
+                        assert.propertyVal(result.error[2], 'description', 'Date validation failed: ' +
+                            'The end_time parameter can not contain a older date than that the start_time parameter!')
                         assert.propertyVal(result.error[3], 'message', 'Duration field is invalid...')
-                        assert.propertyVal(result.error[3], 'description', 'Duration validation failed: Activity duration value does ' +
-                            'not match values passed in start_time and end_time parameters!')
+                        assert.propertyVal(result.error[3], 'description', 'Duration validation failed: ' +
+                            'Activity duration value does not match values passed in start_time and end_time parameters!')
                         assert.propertyVal(result.error[4], 'message', 'Duration field is invalid...')
-                        assert.propertyVal(result.error[4], 'description', 'Activity validation failed: The value provided has a ' +
-                            'negative value!')
+                        assert.propertyVal(result.error[4], 'description', 'Activity validation failed: ' +
+                            'The value provided has a negative value!')
                         assert.propertyVal(result.error[5], 'message', Strings.CHILD.PARAM_ID_NOT_VALID_FORMAT)
                         assert.propertyVal(result.error[5], 'description', Strings.ERROR_MESSAGE.UUID_NOT_VALID_FORMAT_DESC)
                         assert.propertyVal(result.error[6], 'message', 'Calories field is invalid...')
-                        assert.propertyVal(result.error[6], 'description', 'Physical Activity validation failed: The value provided ' +
-                            'has a negative value!')
+                        assert.propertyVal(result.error[6], 'description', 'Physical Activity validation failed: ' +
+                            'The value provided has a negative value!')
                         assert.propertyVal(result.error[7], 'message', 'Steps field is invalid...')
-                        assert.propertyVal(result.error[7], 'description', 'Physical Activity validation failed: The value provided ' +
-                            'has a negative value!')
+                        assert.propertyVal(result.error[7], 'description', 'Physical Activity validation failed: ' +
+                            'The value provided has a negative value!')
                         assert.propertyVal(result.error[8], 'message', 'The name of level provided "sedentaries" is not supported...')
-                        assert.propertyVal(result.error[8], 'description', 'The names of the allowed levels are: sedentary, lightly, ' +
-                            'fairly, very.')
+                        assert.propertyVal(result.error[8], 'description', 'The names of the allowed levels are: ' +
+                            'sedentary, lightly, fairly, very.')
                         assert.propertyVal(result.error[9], 'message', 'Level are not in a format that is supported!')
-                        assert.propertyVal(result.error[9], 'description', 'Must have values ​​for the following levels: sedentary, ' +
-                            'lightly, fairly, very.')
+                        assert.propertyVal(result.error[9], 'description', 'Must have values ​​for the following levels: ' +
+                            'sedentary, lightly, fairly, very.')
                         assert.propertyVal(result.error[10], 'message', 'Some (or several) duration field of levels array is invalid...')
-                        assert.propertyVal(result.error[10], 'description', 'Physical Activity Level validation failed: The value ' +
-                            'provided has a negative value!')
+                        assert.propertyVal(result.error[10], 'description', 'Physical Activity Level validation failed: ' +
+                            'The value provided has a negative value!')
+                        assert.propertyVal(result.error[11], 'message', 'Required fields were not provided...')
+                        assert.propertyVal(result.error[11], 'description', 'PhysicalActivityHeartRate validation failed: ' +
+                            'average, out_of_range_zone, fat_burn_zone, cardio_zone, peak_zone is required!')
+                        assert.propertyVal(result.error[12], 'message', 'Average field is invalid...')
+                        assert.propertyVal(result.error[12], 'description', 'PhysicalActivityHeartRate validation failed: ' +
+                            'The value provided has a negative value!')
+                        assert.propertyVal(result.error[13], 'message', 'Required fields were not provided...')
+                        assert.propertyVal(result.error[13], 'description', 'HeartRateZone validation failed: ' +
+                            'min, max, duration is required!')
+                        assert.propertyVal(result.error[14], 'message', 'Duration field is invalid...')
+                        assert.propertyVal(result.error[14], 'description', 'HeartRateZone validation failed: ' +
+                            'The value provided has a negative value!')
 
                         for (let i = 0; i < result.error.length; i++) {
                             assert.propertyVal(result.error[i], 'code', HttpStatus.BAD_REQUEST)
                             if (i !== 0) assert.propertyVal(result.error[i].item, 'id', incorrectActivitiesArr[i].id)
                             if (i !== 0) assert.propertyVal(result.error[i].item, 'start_time', incorrectActivitiesArr[i].start_time)
                             if (i !== 0) assert.propertyVal(result.error[i].item, 'end_time', incorrectActivitiesArr[i].end_time)
-                            if (i !== 0) assert.typeOf(result.error[i].item.duration, 'number')
                             if (i !== 0) assert.propertyVal(result.error[i].item, 'duration', incorrectActivitiesArr[i].duration)
                             if (i !== 0) assert.propertyVal(result.error[i].item, 'child_id', incorrectActivitiesArr[i].child_id)
-                            if (i !== 0) assert.typeOf(result.error[i].item.name, 'string')
                             if (i !== 0) assert.propertyVal(result.error[i].item, 'name', incorrectActivitiesArr[i].name)
-                            if (i !== 0 && i !== 1) assert.typeOf(result.error[i].item.calories, 'number')
                             if (i !== 0) assert.propertyVal(result.error[i].item, 'calories', incorrectActivitiesArr[i].calories)
                             if (i !== 0) assert.propertyVal(result.error[i].item, 'steps', incorrectActivitiesArr[i].steps)
                             if (i !== 0) assert.propertyVal(result.error[i].item, 'levels', incorrectActivitiesArr[i].levels)
+                            if (i !== 0) assert.propertyVal(result.error[i].item, 'heart_rate', incorrectActivitiesArr[i].heart_rate)
                         }
 
                         assert.isEmpty(result.success)
@@ -1042,15 +1139,13 @@ describe('Services: PhysicalActivityService', () => {
                         assert.propertyVal(result, 'id', activity.id)
                         assert.propertyVal(result, 'start_time', activity.start_time)
                         assert.propertyVal(result, 'end_time', activity.end_time)
-                        assert.typeOf(result.duration, 'number')
                         assert.propertyVal(result, 'duration', activity.duration)
                         assert.propertyVal(result, 'child_id', activity.child_id)
-                        assert.typeOf(result.name, 'string')
                         assert.propertyVal(result, 'name', activity.name)
-                        assert.typeOf(result.calories, 'number')
                         assert.propertyVal(result, 'calories', activity.calories)
                         assert.propertyVal(result, 'steps', activity.steps)
                         assert.propertyVal(result, 'levels', activity.levels)
+                        assert.propertyVal(result, 'heart_rate', activity.heart_rate)
                     })
             })
         })
@@ -1089,15 +1184,13 @@ describe('Services: PhysicalActivityService', () => {
                         assert.propertyVal(result, 'id', activity.id)
                         assert.propertyVal(result, 'start_time', activity.start_time)
                         assert.propertyVal(result, 'end_time', activity.end_time)
-                        assert.typeOf(result.duration, 'number')
                         assert.propertyVal(result, 'duration', activity.duration)
                         assert.propertyVal(result, 'child_id', activity.child_id)
-                        assert.typeOf(result.name, 'string')
                         assert.propertyVal(result, 'name', activity.name)
-                        assert.typeOf(result.calories, 'number')
                         assert.propertyVal(result, 'calories', activity.calories)
                         assert.propertyVal(result, 'steps', activity.steps)
                         assert.propertyVal(result, 'levels', activity.levels)
+                        assert.propertyVal(result, 'heart_rate', activity.heart_rate)
                     })
             })
         })
@@ -1272,6 +1365,83 @@ describe('Services: PhysicalActivityService', () => {
                         assert.propertyVal(err, 'message', 'Some (or several) duration field of levels array is invalid...')
                         assert.propertyVal(err, 'description', 'Physical Activity Level validation failed: The value provided ' +
                             'has a negative value!')
+                    })
+            })
+        })
+
+        context('when the physical activity is incorrect (the PhysicalActivityHeartRate is empty)', () => {
+            it('should throw a ValidationException', async () => {
+                sinon
+                    .mock(modelFake)
+                    .expects('findOneAndUpdate')
+                    .withArgs(incorrectActivity12)
+                    .chain('exec')
+                    .rejects({ message: 'Required fields were not provided...',
+                               description: 'PhysicalActivityHeartRate validation failed: ' +
+                                   'average, out_of_range_zone, fat_burn_zone, cardio_zone, peak_zone is required!' })
+
+                return await activityService.updateByChild(incorrectActivity12)
+                    .catch (err => {
+                        assert.propertyVal(err, 'message', 'Required fields were not provided...')
+                        assert.propertyVal(err, 'description', 'PhysicalActivityHeartRate validation failed: ' +
+                            'average, out_of_range_zone, fat_burn_zone, cardio_zone, peak_zone is required!')
+                    })
+            })
+        })
+
+        context('when the physical activity is incorrect (the PhysicalActivityHeartRate has a negative average parameter)', () => {
+            it('should throw a ValidationException', async () => {
+                sinon
+                    .mock(modelFake)
+                    .expects('findOneAndUpdate')
+                    .withArgs(incorrectActivity13)
+                    .chain('exec')
+                    .rejects({ message: 'Average field is invalid...',
+                               description: 'PhysicalActivityHeartRate validation failed: ' +
+                                   'The value provided has a negative value!' })
+
+                return await activityService.updateByChild(incorrectActivity13)
+                    .catch (err => {
+                        assert.propertyVal(err, 'message', 'Average field is invalid...')
+                        assert.propertyVal(err, 'description', 'PhysicalActivityHeartRate validation failed: ' +
+                            'The value provided has a negative value!')
+                    })
+            })
+        })
+
+        context('when the physical activity is incorrect (the "Fat Burn Zone" parameter of PhysicalActivityHeartRate is empty)', () => {
+            it('should throw a ValidationException', async () => {
+                sinon
+                    .mock(modelFake)
+                    .expects('findOneAndUpdate')
+                    .withArgs(incorrectActivity14)
+                    .chain('exec')
+                    .rejects({ message: 'Required fields were not provided...',
+                               description: 'HeartRateZone validation failed: min, max, duration is required!' })
+
+                return await activityService.updateByChild(incorrectActivity14)
+                    .catch (err => {
+                        assert.propertyVal(err, 'message', 'Required fields were not provided...')
+                        assert.propertyVal(err, 'description', 'HeartRateZone validation failed: min, max, duration is required!')
+                    })
+            })
+        })
+
+        context('when the physical activity is incorrect ' +
+            '(the "Fat Burn Zone" parameter of PhysicalActivityHeartRate has a negative duration)', () => {
+            it('should throw a ValidationException', async () => {
+                sinon
+                    .mock(modelFake)
+                    .expects('findOneAndUpdate')
+                    .withArgs(incorrectActivity15)
+                    .chain('exec')
+                    .rejects({ message: 'Duration field is invalid...',
+                               description: 'HeartRateZone validation failed: The value provided has a negative value!' })
+
+                return await activityService.updateByChild(incorrectActivity15)
+                    .catch (err => {
+                        assert.propertyVal(err, 'message', 'Duration field is invalid...')
+                        assert.propertyVal(err, 'description', 'HeartRateZone validation failed: The value provided has a negative value!')
                     })
             })
         })

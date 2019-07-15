@@ -37,7 +37,6 @@ describe('Models: Humidity', () => {
                 assert.propertyVal(result, 'type', humidityJSON.type)
                 assert.propertyVal(result, 'value', humidityJSON.value)
                 assert.propertyVal(result, 'unit', humidityJSON.unit)
-                assert.propertyVal(result, 'child_id', humidityJSON.child_id)
             })
         })
     })

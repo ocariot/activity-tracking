@@ -28,11 +28,6 @@ export class Temperature extends Measurement implements IJSONSerializable, IJSON
     }
 
     public toJSON(): any {
-        return {
-            id: super.id,
-            type: this.type,
-            value: this.value,
-            unit: this.unit,
-        }
+        return super.toJSON()
     }
 }

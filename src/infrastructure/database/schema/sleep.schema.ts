@@ -30,6 +30,9 @@ const sleepSchema = new Mongoose.Schema({
                 required: true
             }
         }],
+        type: {
+            type: String
+        },
         child_id: {
             type: Mongoose.Schema.Types.ObjectId,
             required: true

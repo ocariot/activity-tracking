@@ -113,12 +113,12 @@ describe('Repositories: SleepRepository', () => {
                 return repo.updateByChild(defaultSleep)
                     .then(sleep => {
                         sleep = sleep.toJSON()
-
                         assert.propertyVal(sleep, 'id', sleep.id)
                         assert.propertyVal(sleep, 'start_time', sleep.start_time)
                         assert.propertyVal(sleep, 'end_time', sleep.end_time)
                         assert.propertyVal(sleep, 'duration', sleep.duration)
                         assert.propertyVal(sleep, 'pattern', sleep.pattern)
+                        assert.propertyVal(sleep, 'type', sleep.type)
                         assert.propertyVal(sleep, 'child_id', sleep.child_id)
                     })
             })

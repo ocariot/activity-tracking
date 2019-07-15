@@ -4,6 +4,8 @@ import { MeasurementType } from '../../../src/application/domain/model/measureme
 import { WeightMock } from '../../mocks/weight.mock'
 import { BodyFatMock } from '../../mocks/body.fat.mock'
 import { WeightEntityMapper } from '../../../src/infrastructure/entity/mapper/weight.entity.mapper'
+import { WeightEntity } from '../../../src/infrastructure/entity/weight.entity'
+import { Weight } from '../../../src/application/domain/model/weight'
 
 describe('Mappers: WeightEntityMapper', () => {
     const weight: WeightMock = new WeightMock()
@@ -22,7 +24,7 @@ describe('Mappers: WeightEntityMapper', () => {
     describe('transform(item: any)', () => {
         context('when the parameter is of type Weight', () => {
             it('should normally execute the method, returning an WeightEntity as a result of the transformation', () => {
-                const result = new WeightEntityMapper().transform(weight)
+                const result: WeightEntity = new WeightEntityMapper().transform(weight)
                 assert.propertyVal(result, 'id', weight.id)
                 assert.propertyVal(result, 'type', weight.type)
                 assert.propertyVal(result, 'timestamp', weight.timestamp)
@@ -35,7 +37,7 @@ describe('Mappers: WeightEntityMapper', () => {
 
         context('when the parameter is a JSON', () => {
             it('should normally execute the method, returning a Weight as a result of the transformation', () => {
-                const result = new WeightEntityMapper().transform(weightJSON)
+                const result: Weight = new WeightEntityMapper().transform(weightJSON)
                 assert.propertyVal(result, 'id', weightJSON.id)
                 assert.propertyVal(result, 'type', weightJSON.type)
                 assert.propertyVal(result, 'timestamp', weightJSON.timestamp)
@@ -53,7 +55,7 @@ describe('Mappers: WeightEntityMapper', () => {
 
         context('when the parameter is a undefined', () => {
             it('should normally execute the method, returning an empty Weight as a result of the transformation', () => {
-                const result = new WeightEntityMapper().transform(undefined)
+                const result: Weight = new WeightEntityMapper().transform(undefined)
 
                 assert.isObject(result)
                 assert.propertyVal(result, 'id', undefined)

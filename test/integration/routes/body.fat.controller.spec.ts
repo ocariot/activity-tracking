@@ -287,8 +287,8 @@ describe('Routes: users.children.bodyfat', () => {
                         expect(res.body).is.an.instanceOf(Array)
                         expect(res.body.length).to.not.eql(0)
                         // Check for the existence of properties only in the first element of the array
-                        // because there is a guarantee that there will be at least one object, which was
-                        // created in the case of POST route success test
+                        // because there is a guarantee that there will be at least one object (created
+                        // in the case of a successful POST route test or using the create method above).
                         expect(res.body[0].id).to.eql(defaultBodyFat.id)
                         expect(res.body[0].timestamp).to.eql(defaultBodyFat.timestamp!.toISOString())
                         expect(res.body[0].value).to.eql(defaultBodyFat.value)
@@ -361,8 +361,8 @@ describe('Routes: users.children.bodyfat', () => {
                         expect(res.body).is.an.instanceOf(Array)
                         expect(res.body.length).to.not.eql(0)
                         // Check for the existence of properties only in the first element of the array
-                        // because there is a guarantee that there will be at least one object with the property
-                        // 'climatized' = true (the only query filter)
+                        // because there is a guarantee that there will be at least one object (created
+                        // in the case of a successful POST route test or using the create method above).
                         expect(res.body[0].id).to.eql(defaultBodyFat.id)
                         expect(res.body[0].timestamp).to.eql(defaultBodyFat.timestamp!.toISOString())
                         expect(res.body[0].value).to.eql(defaultBodyFat.value)
@@ -430,8 +430,8 @@ describe('Routes: users.children.bodyfat', () => {
                     .expect(200)
                     .then(res => {
                         // Check for the existence of properties only in the first element of the array
-                        // because there is a guarantee that there will be at least one object, which was
-                        // created in the case of POST route success test
+                        // because there is a guarantee that there will be at least one object (created
+                        // in the case of a successful POST route test or using the create method above).
                         expect(res.body.id).to.eql(result.id)
                         expect(res.body.timestamp).to.eql(result.timestamp!.toISOString())
                         expect(res.body.value).to.eql(result.value)

@@ -3,6 +3,7 @@ import { PhysicalActivity } from '../model/physical.activity'
 import { PhysicalActivityLevelsValidator } from './physical.activity.levels.validator'
 import { Strings } from '../../../utils/strings'
 import { CreateActivityValidator } from './create.activity.validator'
+import { PhysicalActivityHeartRateValidator } from './physical.activity.heart.rate.validator'
 
 export class CreatePhysicalActivityValidator {
     public static validate(activity: PhysicalActivity): void | ValidationException {
@@ -20,6 +21,7 @@ export class CreatePhysicalActivityValidator {
                 'Physical Activity validation failed: '.concat(Strings.ERROR_MESSAGE.NEGATIVE_PARAMETER))
         }
         if (activity.levels && activity.levels.length > 0) PhysicalActivityLevelsValidator.validate(activity.levels)
+        if (activity.heart_rate) PhysicalActivityHeartRateValidator.validate(activity.heart_rate)
 
         if (fields.length > 0) {
             throw new ValidationException('Required fields were not provided...',

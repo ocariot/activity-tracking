@@ -1,6 +1,7 @@
 import { assert } from 'chai'
 import { Log, LogType } from '../../../src/application/domain/model/log'
 import { LogEntityMapper } from '../../../src/infrastructure/entity/mapper/log.entity.mapper'
+import { LogEntity } from '../../../src/infrastructure/entity/log.entity'
 
 describe('Mappers: LogEntityMapper', () => {
     const log: Log = new Log('2019-03-1', 1000, LogType.CALORIES, '5a62be07de34500146d9c544')
@@ -18,9 +19,9 @@ describe('Mappers: LogEntityMapper', () => {
     describe('transform(item: any)', () => {
         context('when the parameter is of type Log', () => {
             it('should normally execute the method, returning a LogEntity as a result of the transformation', () => {
-                const result = new LogEntityMapper().transform(log)
+                const result: LogEntity = new LogEntityMapper().transform(log)
                 assert.propertyVal(result, 'id', log.id)
-                assert.equal((result.date.toISOString()).substring(0, (result.date.toISOString()).indexOf('T')), log.date)
+                assert.equal((result.date!.toISOString()).substring(0, (result.date!.toISOString()).indexOf('T')), log.date)
                 assert.propertyVal(result, 'value', log.value)
                 assert.propertyVal(result, 'type', log.type)
                 assert.propertyVal(result, 'child_id', log.child_id)
@@ -29,7 +30,7 @@ describe('Mappers: LogEntityMapper', () => {
 
         context('when the parameter is a JSON', () => {
             it('should normally execute the method, returning a Log as a result of the transformation', () => {
-                const result = new LogEntityMapper().transform(logJSON)
+                const result: Log = new LogEntityMapper().transform(logJSON)
                 assert.propertyVal(result, 'id', logJSON.id)
                 assert.propertyVal(result, 'date', (logJSON.date.toISOString()).substring(0, (logJSON.date.toISOString()).indexOf('T')))
                 assert.propertyVal(result, 'value', logJSON.value)
@@ -40,7 +41,7 @@ describe('Mappers: LogEntityMapper', () => {
 
         context('when the parameter is a undefined', () => {
             it('should normally execute the method, returning an empty Log as a result of the transformation', () => {
-                const result = new LogEntityMapper().transform(undefined)
+                const result: Log = new LogEntityMapper().transform(undefined)
 
                 assert.isObject(result)
                 assert.propertyVal(result, 'id', undefined)

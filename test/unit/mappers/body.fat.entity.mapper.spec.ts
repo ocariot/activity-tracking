@@ -3,6 +3,8 @@ import { assert } from 'chai'
 import { BodyFatMock } from '../../mocks/body.fat.mock'
 import { BodyFatEntityMapper } from '../../../src/infrastructure/entity/mapper/body.fat.entity.mapper'
 import { MeasurementType } from '../../../src/application/domain/model/measurement'
+import { BodyFatEntity } from '../../../src/infrastructure/entity/body.fat.entity'
+import { BodyFat } from '../../../src/application/domain/model/body.fat'
 
 describe('Mappers: BodyFatEntityMapper', () => {
     const body_fat: BodyFatMock = new BodyFatMock()
@@ -20,7 +22,7 @@ describe('Mappers: BodyFatEntityMapper', () => {
     describe('transform(item: any)', () => {
         context('when the parameter is of type BodyFat', () => {
             it('should normally execute the method, returning a BodyFatEntity as a result of the transformation', () => {
-                const result = new BodyFatEntityMapper().transform(body_fat)
+                const result: BodyFatEntity = new BodyFatEntityMapper().transform(body_fat)
                 assert.propertyVal(result, 'id', body_fat.id)
                 assert.propertyVal(result, 'type', body_fat.type)
                 assert.propertyVal(result, 'timestamp', body_fat.timestamp)
@@ -32,7 +34,7 @@ describe('Mappers: BodyFatEntityMapper', () => {
 
         context('when the parameter is a JSON', () => {
             it('should normally execute the method, returning a BodyFat as a result of the transformation', () => {
-                const result = new BodyFatEntityMapper().transform(bodyFatJSON)
+                const result: BodyFat = new BodyFatEntityMapper().transform(bodyFatJSON)
                 assert.propertyVal(result, 'id', bodyFatJSON.id)
                 assert.propertyVal(result, 'type', bodyFatJSON.type)
                 assert.propertyVal(result, 'timestamp', bodyFatJSON.timestamp)
@@ -44,7 +46,7 @@ describe('Mappers: BodyFatEntityMapper', () => {
 
         context('when the parameter is a undefined', () => {
             it('should normally execute the method, returning an empty BodyFat as a result of the transformation', () => {
-                const result = new BodyFatEntityMapper().transform(undefined)
+                const result: BodyFat = new BodyFatEntityMapper().transform(undefined)
 
                 assert.isObject(result)
                 assert.propertyVal(result, 'id', undefined)

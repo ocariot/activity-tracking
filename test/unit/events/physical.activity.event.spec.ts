@@ -3,6 +3,8 @@ import { PhysicalActivity } from '../../../src/application/domain/model/physical
 import { PhysicalActivityMock } from '../../mocks/physical.activity.mock'
 import { PhysicalActivityEvent } from '../../../src/application/integration-event/event/physical.activity.event'
 import { EventType } from '../../../src/application/integration-event/event/integration.event'
+import { PhysicalActivityLevel } from '../../../src/application/domain/model/physical.activity.level'
+// import { PhysicalActivityHeartRate } from '../../../src/application/domain/model/physical.activity.heart.rate'
 
 describe('IntegrationEvents: PhysicalActivityEvent', () => {
     describe('toJSON()', () => {
@@ -21,7 +23,11 @@ describe('IntegrationEvents: PhysicalActivityEvent', () => {
                 assert.propertyVal(result.physicalactivity, 'child_id', activity.child_id)
                 assert.propertyVal(result.physicalactivity, 'name', activity.name)
                 assert.propertyVal(result.physicalactivity, 'calories', activity.calories)
-                if (activity.levels) assert.property(result.physicalactivity, 'levels')
+                assert.deepPropertyVal(result.physicalactivity, 'heart_rate', activity.heart_rate!.toJSON())
+                if (activity.levels) {
+                    assert.deepPropertyVal(result.physicalactivity, 'levels',
+                        activity.levels.map((elem: PhysicalActivityLevel) => elem.toJSON()))
+                }
             })
         })
 

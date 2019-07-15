@@ -6,9 +6,9 @@ import { JsonUtils } from '../utils/json.utils'
 /**
  * The implementation of the summary entity of sleep pattern.
  *
- * @implements {IJSONSerializable, IJSONDeserializable<SleepPatternSummary>}
+ * @implements {IJSONSerializable, IJSONDeserializable<SleepPatternPhasesSummary>}
  */
-export class SleepPatternSummary implements IJSONSerializable, IJSONDeserializable<SleepPatternSummary> {
+export class SleepPatternPhasesSummary implements IJSONSerializable, IJSONDeserializable<SleepPatternPhasesSummary> {
     private _awake!: SleepPatternSummaryData
     private _asleep!: SleepPatternSummaryData
     private _restless!: SleepPatternSummaryData
@@ -43,7 +43,7 @@ export class SleepPatternSummary implements IJSONSerializable, IJSONDeserializab
         this._restless = value
     }
 
-    public fromJSON(json: any): SleepPatternSummary {
+    public fromJSON(json: any): SleepPatternPhasesSummary {
         if (!json) return this
         if (typeof json === 'string' && JsonUtils.isJsonString(json)) {
             json = JSON.parse(json)
@@ -62,7 +62,7 @@ export class SleepPatternSummary implements IJSONSerializable, IJSONDeserializab
         return {
             awake: this.awake,
             asleep: this.asleep,
-            restless: this.restless
+            restless: this.restless,
         }
     }
 }

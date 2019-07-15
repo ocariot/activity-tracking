@@ -123,6 +123,7 @@ describe('Repositories: PhysicalActivityRepository', () => {
                         assert.propertyVal(activity, 'levels', activity.levels)
                         assert.propertyVal(activity, 'steps', activity.steps)
                         assert.propertyVal(activity, 'child_id', activity.child_id)
+                        assert.propertyVal(activity, 'heart_rate', activity.heart_rate)
                     })
             })
         })
