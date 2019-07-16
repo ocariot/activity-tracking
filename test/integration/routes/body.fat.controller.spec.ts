@@ -350,7 +350,7 @@ describe('Routes: users.children.bodyfat', () => {
                 }
 
                 const url = `/v1/users/children/${defaultBodyFat.child_id}/bodyfat?child_id=${defaultBodyFat.child_id}
-                    &fields=timestamp,value,unit,child_id&sort=child_id&page=1&limit=3`
+                    &sort=child_id&page=1&limit=3`
 
                 return request
                     .get(url)
@@ -384,7 +384,7 @@ describe('Routes: users.children.bodyfat', () => {
 
             it('should return status code 200 and an empty list', async () => {
                 const url = `/v1/users/children/${defaultBodyFat.child_id}/bodyfat?child_id=${defaultBodyFat.child_id}
-                    &fields=timestamp,value,unit,child_id&sort=child_id&page=1&limit=3`
+                    &sort=child_id&page=1&limit=3`
 
                 return request
                     .get(url)
@@ -560,7 +560,7 @@ describe('Routes: users.children.bodyfat', () => {
                 }
 
                 const url = `/v1/users/children/${result.child_id}/bodyfat/${result.id}?child_id=${result.child_id}
-                    &fields=timestamp,value,unit,child_id&sort=child_id&page=1&limit=3`
+                    &sort=child_id&page=1&limit=3`
 
                 return request
                     .get(url)
@@ -588,7 +588,7 @@ describe('Routes: users.children.bodyfat', () => {
 
             it('should return status code 404 and an info message describing that BodyFat was not found', async () => {
                 const url = `/v1/users/children/${defaultBodyFat.child_id}/bodyfat/${defaultBodyFat.id}?child_id=${defaultBodyFat.child_id}
-                    &fields=timestamp,value,unit,child_id&sort=child_id&page=1&limit=3`
+                    &sort=child_id&page=1&limit=3`
 
                 return request
                     .get(url)
@@ -628,7 +628,7 @@ describe('Routes: users.children.bodyfat', () => {
                 }
 
                 const url = `/v1/users/children/123/bodyfat/${result.id}?child_id=${result.child_id}
-                    &fields=timestamp,value,unit,child_id&sort=child_id&page=1&limit=3`
+                    &sort=child_id&page=1&limit=3`
 
                 return request
                     .get(url)
@@ -667,7 +667,7 @@ describe('Routes: users.children.bodyfat', () => {
                 }
 
                 const url = `/v1/users/children/${result.child_id}/bodyfat/123?child_id=${result.child_id}
-                    &fields=timestamp,value,unit,child_id&sort=child_id&page=1&limit=3`
+                    &sort=child_id&page=1&limit=3`
 
                 return request
                     .get(url)

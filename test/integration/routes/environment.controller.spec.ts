@@ -595,8 +595,7 @@ describe('Routes: environments', () => {
                     throw new Error('Failure on environments routes test: ' + err.message)
                 }
 
-                const url = '/v1/environments?climatized=true&fields=institution_id,location,temperature,humidity,' +
-                    'climatized,timestamp&sort=institution_id&page=1&limit=3'
+                const url = '/v1/environments?climatized=true&sort=institution_id&page=1&limit=3'
 
                 return request
                     .get(url)
@@ -637,8 +636,7 @@ describe('Routes: environments', () => {
             })
 
             it('should return status code 200 and an empty list', async () => {
-                const url = '/v1/environments?climatized=true&fields=institution_id,location,temperature,humidity,' +
-                    'climatized,timestamp&sort=institution_id&page=1&limit=3'
+                const url = '/v1/environments?climatized=true&sort=institution_id&page=1&limit=3'
 
                 return request
                     .get(url)

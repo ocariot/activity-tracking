@@ -42,7 +42,6 @@ export class LogRepository extends BaseRepository<Log, LogEntity>
 
         return new Promise<Log>((resolve, reject) => {
             this.Model.findOne(query.filters)
-                .select(query.fields)
                 .exec()
                 .then((result: Log) => {
                     if (!result) return resolve(undefined)

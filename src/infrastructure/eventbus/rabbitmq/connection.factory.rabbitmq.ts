@@ -15,13 +15,7 @@ export class ConnectionFactoryRabbitMQ implements IConnectionFactory {
      */
     public async createConnection(_retries: number, _interval: number): Promise<Connection> {
         try {
-            const conn = new Connection('amqp://username:password@host:port/vhost'
-                    .replace('host', process.env.RABBITMQ_HOST || Default.RABBITMQ_HOST)
-                    .replace('port', (process.env.RABBITMQ_PORT || Default.RABBITMQ_PORT).toString())
-                    .replace('vhost', 'ocariot')
-                    .replace('username', process.env.RABBITMQ_USERNAME || Default.RABBITMQ_USERNAME)
-                    .replace('password', process.env.RABBITMQ_PASSWORD || Default.RABBITMQ_PASSWORD)
-                ,
+            const conn = new Connection(process.env.RABBITMQ_URI || Default.RABBITMQ_URI,
                 {}, { retries: _retries, interval: _interval })
             await conn.initialized
             return Promise.resolve(conn)

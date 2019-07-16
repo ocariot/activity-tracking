@@ -829,8 +829,7 @@ describe('Routes: users.children.sleep', () => {
                     throw new Error('Failure on users.children.sleep routes test: ' + err.message)
                 }
 
-                const url = `/v1/users/children/sleep?child_id=${defaultSleep.child_id}&fields=start_time,end_time,
-                    duration,pattern,type,child_id&sort=child_id&page=1&limit=3`
+                const url = `/v1/users/children/sleep?child_id=${defaultSleep.child_id}&sort=child_id&page=1&limit=3`
 
                 return request
                     .get(url)
@@ -866,8 +865,7 @@ describe('Routes: users.children.sleep', () => {
             })
 
             it('should return status code 200 and an empty list', async () => {
-                const url = `/v1/users/children/sleep?child_id=${defaultSleep.child_id}&fields=start_time,end_time,
-                    duration,pattern,child_id&sort=child_id&page=1&limit=3`
+                const url = `/v1/users/children/sleep?child_id=${defaultSleep.child_id}&sort=child_id&page=1&limit=3`
 
                 return request
                     .get(url)
@@ -1011,8 +1009,8 @@ describe('Routes: users.children.sleep', () => {
                     throw new Error('Failure on users.children.sleep routes test: ' + err.message)
                 }
 
-                const url = `/v1/users/children/${defaultSleep.child_id}/sleep?child_id=${defaultSleep.child_id}&fields=start_time,end_time,
-                    duration,pattern,type,child_id&sort=child_id&page=1&limit=3`
+                const url = `/v1/users/children/${defaultSleep.child_id}/sleep?child_id=${defaultSleep.child_id}
+                    &sort=child_id&page=1&limit=3`
 
                 return request
                     .get(url)
@@ -1048,8 +1046,8 @@ describe('Routes: users.children.sleep', () => {
             })
 
             it('should return status code 200 and an empty list', async () => {
-                const url = `/v1/users/children/${defaultSleep.child_id}/sleep?child_id=${defaultSleep.child_id}&fields=start_time,end_time,
-                    duration,pattern,type,child_id&sort=child_id&page=1&limit=3`
+                const url = `/v1/users/children/${defaultSleep.child_id}/sleep?child_id=${defaultSleep.child_id}
+                    &sort=child_id&page=1&limit=3`
 
                 return request
                     .get(url)
@@ -1086,8 +1084,8 @@ describe('Routes: users.children.sleep', () => {
                     throw new Error('Failure on users.children.sleep routes test: ' + err.message)
                 }
 
-                const url = `/v1/users/children/123/sleep?child_id=${defaultSleep.child_id}&fields=start_time,end_time,
-                    duration,pattern,type,child_id&sort=child_id&page=1&limit=3`
+                const url = `/v1/users/children/123/sleep?child_id=${defaultSleep.child_id}
+                    &sort=child_id&page=1&limit=3`
 
                 return request
                     .get(url)
@@ -1275,7 +1273,7 @@ describe('Routes: users.children.sleep', () => {
                 }
 
                 const url = `/v1/users/children/${result.child_id}/sleep/${result.id}?child_id=${result.child_id}
-                    &fields=start_time,end_time,duration,pattern,type,child_id&sort=child_id&page=1&limit=3`
+                    &sort=child_id&page=1&limit=3`
 
                 return request
                     .get(url)
@@ -1306,7 +1304,7 @@ describe('Routes: users.children.sleep', () => {
 
             it('should return status code 404 and an info message describing that sleep was not found', async () => {
                 const url = `/v1/users/children/${defaultSleep.child_id}/sleep/${defaultSleep.id}?child_id=${defaultSleep.child_id}
-                    &fields=start_time,end_time, duration,pattern,type,child_id&sort=child_id&page=1&limit=3`
+                    &sort=child_id&page=1&limit=3`
 
                 return request
                     .get(url)
@@ -1347,8 +1345,8 @@ describe('Routes: users.children.sleep', () => {
                     throw new Error('Failure on users.children.sleep routes test: ' + err.message)
                 }
 
-                const url = `/v1/users/children/123/sleep/${result.id}?child_id=${result.child_id}&fields=start_time,end_time,
-                    duration,pattern,type,child_id&sort=child_id&page=1&limit=3`
+                const url = `/v1/users/children/123/sleep/${result.id}?child_id=${result.child_id}
+                    &sort=child_id&page=1&limit=3`
 
                 return request
                     .get(url)
@@ -1388,8 +1386,8 @@ describe('Routes: users.children.sleep', () => {
                     throw new Error('Failure on users.children.sleep routes test: ' + err.message)
                 }
 
-                const url = `/v1/users/children/${result.child_id}/sleep/123?child_id=${result.child_id}&fields=start_time,end_time,
-                    duration,pattern,type,child_id&sort=child_id&page=1&limit=3`
+                const url = `/v1/users/children/${result.child_id}/sleep/123?child_id=${result.child_id}
+                    &sort=child_id&page=1&limit=3`
 
                 return request
                     .get(url)

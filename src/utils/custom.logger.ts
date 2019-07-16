@@ -47,13 +47,13 @@ export class CustomLogger implements ILogger {
         }
 
         switch ((process.env.NODE_ENV || Default.NODE_ENV)) {
-            case 'production':
-                this._options.level = 'warning'
-                this._options.silent = false
-                break
             case 'test':
                 this._options.level = 'none'
                 this._options.silent = true
+                break
+            case 'production':
+                this._options.level = 'warning'
+                this._options.silent = false
                 break
             default: // development or other
                 this._options.level = 'debug'

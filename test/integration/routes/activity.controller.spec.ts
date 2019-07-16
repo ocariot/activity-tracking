@@ -1106,8 +1106,8 @@ describe('Routes: users/children', () => {
                     throw new Error('Failure on users.children.physicalactivities routes test: ' + err.message)
                 }
 
-                const url = `/v1/users/children/physicalactivities?child_id=${defaultActivity.child_id}&fields=name,
-                    start_time,end_time,duration,calories,steps,levels,heart_rate,child_id&sort=child_id&page=1&limit=3`
+                const url = `/v1/users/children/physicalactivities?child_id=${defaultActivity.child_id}
+                    &sort=child_id&page=1&limit=3`
 
                 return request
                     .get(url)
@@ -1152,8 +1152,8 @@ describe('Routes: users/children', () => {
             })
 
             it('should return status code 200 and an empty list', async () => {
-                const url = `/v1/users/children/physicalactivities?child_id=${defaultActivity.child_id}&fields=name,
-                    start_time,end_time,duration,calories,steps,levels,heart_rate,child_id&sort=child_id&page=1&limit=3`
+                const url = `/v1/users/children/physicalactivities?child_id=${defaultActivity.child_id}
+                    &sort=child_id&page=1&limit=3`
 
                 return request
                     .get(url)
@@ -1328,7 +1328,7 @@ describe('Routes: users/children', () => {
                 }
 
                 const url = `/v1/users/children/${defaultActivity.child_id}/physicalactivities?child_id=${defaultActivity.child_id}
-                    &fields=name,start_time,end_time,duration,calories,steps,levels,heart_rate,child_id&sort=child_id&page=1&limit=3`
+                    &sort=child_id&page=1&limit=3`
 
                 return request
                     .get(url)
@@ -1374,7 +1374,7 @@ describe('Routes: users/children', () => {
 
             it('should return status code 200 and an empty list', async () => {
                 const url = `/v1/users/children/${defaultActivity.child_id}/physicalactivities?child_id=${defaultActivity.child_id}
-                    &fields=name,start_time,end_time,duration,calories,steps,levels,heart_rate,child_id&sort=child_id&page=1&limit=3`
+                    &sort=child_id&page=1&limit=3`
 
                 return request
                     .get(url)
@@ -1415,7 +1415,7 @@ describe('Routes: users/children', () => {
                 }
 
                 const url = `/v1/users/children/123/physicalactivities?child_id=${defaultActivity.child_id}&fields=start_time,end_time,
-                    &fields=name,start_time,end_time,duration,calories,steps,levels,heart_rate,child_id&sort=child_id&page=1&limit=3`
+                    &sort=child_id&page=1&limit=3`
 
                 return request
                     .get(url)
@@ -1624,7 +1624,7 @@ describe('Routes: users/children', () => {
                 }
 
                 const url = `/v1/users/children/${result.child_id}/physicalactivities/${result.id}?child_id=${result.child_id}
-                    &fields=name,start_time,end_time,duration,calories,steps,levels,heart_rate,child_id&sort=child_id&page=1&limit=3`
+                    &sort=child_id&page=1&limit=3`
 
                 return request
                     .get(url)
@@ -1684,7 +1684,7 @@ describe('Routes: users/children', () => {
                 }
 
                 const url = `/v1/users/children/${result.child_id}/physicalactivities/${result.id}?child_id=${result.child_id}
-                    &fields=name,start_time,end_time,duration,calories,steps,levels,heart_rate,child_id&sort=child_id&page=1&limit=3`
+                    &sort=child_id&page=1&limit=3`
 
                 return request
                     .get(url)
@@ -1728,8 +1728,8 @@ describe('Routes: users/children', () => {
                     throw new Error('Failure on users.children.physicalactivities routes test: ' + err.message)
                 }
 
-                const url = `/v1/users/children/123/physicalactivities/${result.id}?child_id=${result.child_id}&fields=name,
-                    start_time,end_time,duration,calories,steps,levels,heart_rate,child_id&sort=child_id&page=1&limit=3`
+                const url = `/v1/users/children/123/physicalactivities/${result.id}?child_id=${result.child_id}
+                    &sort=child_id&page=1&limit=3`
 
                 return request
                     .get(url)
@@ -1773,7 +1773,7 @@ describe('Routes: users/children', () => {
                 }
 
                 const url = `/v1/users/children/${result.child_id}/physicalactivities/123?child_id=${result.child_id}
-                    &fields=name,start_time,end_time,duration,calories,steps,levels,heart_rate,child_id&sort=child_id&page=1&limit=3`
+                    &sort=child_id&page=1&limit=3`
 
                 return request
                     .get(url)
@@ -2974,7 +2974,7 @@ describe('Routes: users/children', () => {
             it('should return status code 200 and the result as needed in the query', async () => {
                 const basePath = `/v1/users/children/${defaultActivity.child_id}/physicalactivities/logs`
                 const specificPath = `/date/${correctLogsArr[0].date}/${correctLogsArr[0].date}`
-                let url = `${basePath}${specificPath}?date=${correctLogsArr[0].date}&fields=date,value,type,child_id`
+                let url = `${basePath}${specificPath}?date=${correctLogsArr[0].date}`
                 url += '&sort=date&page=1&limit=2'
 
                 return request
@@ -2993,7 +2993,7 @@ describe('Routes: users/children', () => {
             it('should return status code 200 and an empty PhysicalActivityLog', async () => {
                 const basePath = `/v1/users/children/${defaultActivity.child_id}/physicalactivities/logs`
                 const specificPath = `/date/2005-10-01/2005-10-10`
-                let url = `${basePath}${specificPath}?date=${correctLogsArr[0].date}&fields=date,value,type,child_id`
+                let url = `${basePath}${specificPath}?date=${correctLogsArr[0].date}`
                 url += '&sort=date&page=1&limit=2'
 
                 return request
@@ -3012,7 +3012,7 @@ describe('Routes: users/children', () => {
             it('should return status code 400 and an info message about the invalid child_id', async () => {
                 const basePath = `/v1/users/children/123/physicalactivities/logs`
                 const specificPath = `/date/${correctLogsArr[0].date}/${correctLogsArr[0].date}`
-                let url = `${basePath}${specificPath}?date=${correctLogsArr[0].date}&fields=date,value,type,child_id`
+                let url = `${basePath}${specificPath}?date=${correctLogsArr[0].date}`
                 url += '&sort=date&page=1&limit=2'
 
                 return request
@@ -3032,7 +3032,7 @@ describe('Routes: users/children', () => {
             it('should return status code 400 and an info message about the invalid date_start', async () => {
                 const basePath = `/v1/users/children/${defaultActivity.child_id}/physicalactivities/logs`
                 const specificPath = `/date/20199-10-01/${correctLogsArr[0].date}`
-                let url = `${basePath}${specificPath}?date=${correctLogsArr[0].date}&fields=date,value,type,child_id`
+                let url = `${basePath}${specificPath}?date=${correctLogsArr[0].date}`
                 url += '&sort=date&page=1&limit=2'
 
                 return request
@@ -3052,7 +3052,7 @@ describe('Routes: users/children', () => {
             it('should return status code 400 and an info message about the invalid date_end', async () => {
                 const basePath = `/v1/users/children/${defaultActivity.child_id}/physicalactivities/logs`
                 const specificPath = `/date/${correctLogsArr[0].date}/20199-10-01`
-                let url = `${basePath}${specificPath}?date=${correctLogsArr[0].date}&fields=date,value,type,child_id`
+                let url = `${basePath}${specificPath}?date=${correctLogsArr[0].date}`
                 url += '&sort=date&page=1&limit=2'
 
                 return request
@@ -3182,7 +3182,7 @@ describe('Routes: users/children', () => {
             it('should return status code 200 and the result as needed in the query', async () => {
                 const basePath = `/v1/users/children/${defaultActivity.child_id}/physicalactivities/logs/${LogType.CALORIES}`
                 const specificPath = `/date/${correctLogsArr[0].date}/${correctLogsArr[0].date}`
-                let url = `${basePath}${specificPath}?date=${correctLogsArr[0].date}&fields=date,value,type,child_id`
+                let url = `${basePath}${specificPath}?date=${correctLogsArr[0].date}`
                 url += '&sort=date&page=1&limit=2'
 
                 return request
@@ -3209,7 +3209,7 @@ describe('Routes: users/children', () => {
             it('should return status code 200 and an empty array of logs', async () => {
                 const basePath = `/v1/users/children/${defaultActivity.child_id}/physicalactivities/logs/${correctLogsArr[0].type}`
                 const specificPath = `/date/2005-10-01/2005-10-10`
-                let url = `${basePath}${specificPath}?date=${correctLogsArr[0].date}&fields=date,value,type,child_id`
+                let url = `${basePath}${specificPath}?date=${correctLogsArr[0].date}`
                 url += '&sort=date&page=1&limit=2'
 
                 return request
@@ -3235,7 +3235,7 @@ describe('Routes: users/children', () => {
             it('should return status code 400 and an info message about the invalid child_id', async () => {
                 const basePath = `/v1/users/children/123/physicalactivities/logs/${correctLogsArr[0].type}`
                 const specificPath = `/date/${correctLogsArr[0].date}/${correctLogsArr[0].date}`
-                let url = `${basePath}${specificPath}?date=${correctLogsArr[0].date}&fields=date,value,type,child_id`
+                let url = `${basePath}${specificPath}?date=${correctLogsArr[0].date}`
                 url += '&sort=date&page=1&limit=2'
 
                 return request
@@ -3263,7 +3263,7 @@ describe('Routes: users/children', () => {
             it('should return status code 400 and an info message about the invalid resource', async () => {
                 const basePath = `/v1/users/children/${defaultActivity.child_id}/physicalactivities/logs/calorie`
                 const specificPath = `/date/${correctLogsArr[0].date}/${correctLogsArr[0].date}`
-                let url = `${basePath}${specificPath}?date=${correctLogsArr[0].date}&fields=date,value,type,child_id`
+                let url = `${basePath}${specificPath}?date=${correctLogsArr[0].date}`
                 url += '&sort=date&page=1&limit=2'
 
                 return request
@@ -3291,7 +3291,7 @@ describe('Routes: users/children', () => {
             it('should return status code 400 and an info message about the invalid date_start', async () => {
                 const basePath = `/v1/users/children/${defaultActivity.child_id}/physicalactivities/logs/${correctLogsArr[0].type}`
                 const specificPath = `/date/20199-10-01/${correctLogsArr[0].date}`
-                let url = `${basePath}${specificPath}?date=${correctLogsArr[0].date}&fields=date,value,type,child_id`
+                let url = `${basePath}${specificPath}?date=${correctLogsArr[0].date}`
                 url += '&sort=date&page=1&limit=2'
 
                 return request
@@ -3319,7 +3319,7 @@ describe('Routes: users/children', () => {
             it('should return status code 400 and an info message about the invalid date_end', async () => {
                 const basePath = `/v1/users/children/${defaultActivity.child_id}/physicalactivities/logs/${correctLogsArr[0].type}`
                 const specificPath = `/date/${correctLogsArr[0].date}/20199-10-01`
-                let url = `${basePath}${specificPath}?date=${correctLogsArr[0].date}&fields=date,value,type,child_id`
+                let url = `${basePath}${specificPath}?date=${correctLogsArr[0].date}`
                 url += '&sort=date&page=1&limit=2'
 
                 return request

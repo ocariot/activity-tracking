@@ -376,7 +376,7 @@ describe('Routes: users.children.weight', () => {
                     })
 
                     const url = `/v1/users/children/${defaultWeight.child_id}/weight?child_id=${defaultWeight.child_id}
-                    &fields=timestamp,value,unit,child_id,body_fat&sort=child_id&page=1&limit=3`
+                        &sort=child_id&page=1&limit=3`
 
                     return request
                         .get(url)
@@ -414,7 +414,7 @@ describe('Routes: users.children.weight', () => {
 
             it('should return status code 200 and an empty list', async () => {
                 const url = `/v1/users/children/${defaultWeight.child_id}/weight?child_id=${defaultWeight.child_id}
-                    &fields=timestamp,value,unit,child_id,body_fat&sort=child_id&page=1&limit=3`
+                    &sort=child_id&page=1&limit=3`
 
                 return request
                     .get(url)
@@ -625,7 +625,7 @@ describe('Routes: users.children.weight', () => {
                 }
 
                 const url = `/v1/users/children/${result.child_id}/weight/${result.id}?child_id=${result.child_id}
-                    &fields=timestamp,value,unit,child_id,body_fat&sort=child_id&page=1&limit=3`
+                    &sort=child_id&page=1&limit=3`
 
                 return request
                     .get(url)
@@ -654,7 +654,7 @@ describe('Routes: users.children.weight', () => {
 
             it('should return status code 404 and an info message describing that Weight was not found', async () => {
                 const url = `/v1/users/children/${defaultWeight.child_id}/weight/${defaultWeight.id}?child_id=${defaultWeight.child_id}
-                    &fields=timestamp,value,unit,child_id,body_fat&sort=child_id&page=1&limit=3`
+                    &sort=child_id&page=1&limit=3`
 
                 return request
                     .get(url)
@@ -702,7 +702,7 @@ describe('Routes: users.children.weight', () => {
                 }
 
                 const url = `/v1/users/children/123/weight/${result.id}?child_id=${result.child_id}
-                    &fields=timestamp,value,unit,child_id,body_fat&sort=child_id&page=1&limit=3`
+                    &sort=child_id&page=1&limit=3`
 
                 return request
                     .get(url)
@@ -749,7 +749,7 @@ describe('Routes: users.children.weight', () => {
                 }
 
                 const url = `/v1/users/children/${result.child_id}/weight/123?child_id=${result.child_id}
-                    &fields=timestamp,value,unit,child_id,body_fat&sort=child_id&page=1&limit=3`
+                    &sort=child_id&page=1&limit=3`
 
                 return request
                     .get(url)

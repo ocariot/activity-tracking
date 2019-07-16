@@ -79,13 +79,13 @@ export class App {
      * @return Promise<void>
      */
     private async setupHostWhitelist(): Promise<void> {
-        const options = {
-            log: (clientIp, accessDenied) => {
-                if (accessDenied) this._logger.warn(`Access denied for IP ${clientIp}`)
-            }
-        }
-
-        this.express.use(whitelist(process.env.HOST_WHITELIST || Default.IP_WHITELIST, options))
+        this.express.use(whitelist(process.env.HOST_WHITELIST || Default.IP_WHITELIST,
+            {
+                log: (clientIp, accessDenied) => {
+                    if (accessDenied) this._logger.warn(`Access denied for IP ${clientIp}`)
+                }
+            })
+        )
     }
 
     /**

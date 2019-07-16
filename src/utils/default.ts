@@ -16,14 +16,11 @@ export abstract class Default {
     public static readonly LOGO_URI: string = 'http://www.ocariot.com.br/wp-content/uploads/2018/08/cropped-512-32x32.png'
 
     // MongoDB
-    public static readonly MONGODB_URI: string = 'mongodb://127.0.0.1:27017/tracking-service'
-    public static readonly MONGODB_URI_TEST: string = 'mongodb://127.0.0.1:27017/tracking-service-test'
+    public static readonly MONGODB_URI: string = 'mongodb://127.0.0.1:27017/ocariot-activity-tracking'
+    public static readonly MONGODB_URI_TEST: string = 'mongodb://127.0.0.1:27017/ocariot-activity-tracking-test'
 
     // RabbitMQ
-    public static readonly RABBITMQ_HOST: string = '127.0.0.1:5672'
-    public static readonly RABBITMQ_PORT: number = 5672
-    public static readonly RABBITMQ_USERNAME: string = 'guest'
-    public static readonly RABBITMQ_PASSWORD: string = 'guest'
+    public static readonly RABBITMQ_URI: string = 'amqp://guest:guest@127.0.0.1:5672/ocariot'
 
     // Log
     public static readonly LOG_DIR: string = 'logs'
