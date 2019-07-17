@@ -61,7 +61,7 @@ describe('Routes: users.children.weight', () => {
     /**
      * POST route with only one Weight in the body
      */
-    describe('POST /v1/users/children/:child_id/weight with only one Weight in the body', () => {
+    describe('POST /v1/users/children/:child_id/weights with only one Weight in the body', () => {
         context('when posting a new Weight with success', () => {
             it('should return status code 201 and the saved Weight', () => {
                 const body = {
@@ -72,7 +72,7 @@ describe('Routes: users.children.weight', () => {
                 }
 
                 return request
-                    .post(`/v1/users/children/${defaultWeight.child_id}/weight`)
+                    .post(`/v1/users/children/${defaultWeight.child_id}/weights`)
                     .send(body)
                     .set('Content-Type', 'application/json')
                     .expect(201)
@@ -98,7 +98,7 @@ describe('Routes: users.children.weight', () => {
                 }
 
                 return request
-                    .post(`/v1/users/children/${defaultWeight.child_id}/weight`)
+                    .post(`/v1/users/children/${defaultWeight.child_id}/weights`)
                     .send(body)
                     .set('Content-Type', 'application/json')
                     .expect(409)
@@ -114,7 +114,7 @@ describe('Routes: users.children.weight', () => {
                 const body = {}
 
                 return request
-                    .post(`/v1/users/children/${defaultWeight.child_id}/weight`)
+                    .post(`/v1/users/children/${defaultWeight.child_id}/weights`)
                     .send(body)
                     .set('Content-Type', 'application/json')
                     .expect(400)
@@ -136,7 +136,7 @@ describe('Routes: users.children.weight', () => {
                 }
 
                 return request
-                    .post(`/v1/users/children/123/weight`)
+                    .post(`/v1/users/children/123/weights`)
                     .send(body)
                     .set('Content-Type', 'application/json')
                     .expect(400)
@@ -151,7 +151,7 @@ describe('Routes: users.children.weight', () => {
     /**
      * POST route with a Weight array in the body
      */
-    describe('POST /v1/users/children/:child_id/weight with a Weight array in the body', () => {
+    describe('POST /v1/users/children/:child_id/weights with a Weight array in the body', () => {
         context('when all the Weight objects are correct and still do not exist in the repository', () => {
             before(() => {
                 try {
@@ -176,7 +176,7 @@ describe('Routes: users.children.weight', () => {
                 })
 
                 return request
-                    .post(`/v1/users/children/${defaultWeight.child_id}/weight`)
+                    .post(`/v1/users/children/${defaultWeight.child_id}/weights`)
                     .send(body)
                     .set('Content-Type', 'application/json')
                     .expect(201)
@@ -211,7 +211,7 @@ describe('Routes: users.children.weight', () => {
                 })
 
                 return request
-                    .post(`/v1/users/children/${defaultWeight.child_id}/weight`)
+                    .post(`/v1/users/children/${defaultWeight.child_id}/weights`)
                     .send(body)
                     .set('Content-Type', 'application/json')
                     .expect(201)
@@ -255,7 +255,7 @@ describe('Routes: users.children.weight', () => {
                 })
 
                 return request
-                    .post(`/v1/users/children/${defaultWeight.child_id}/weight`)
+                    .post(`/v1/users/children/${defaultWeight.child_id}/weights`)
                     .send(body)
                     .set('Content-Type', 'application/json')
                     .expect(201)
@@ -279,7 +279,7 @@ describe('Routes: users.children.weight', () => {
     /**
      * Route GET all Weight
      */
-    describe('GET /v1/users/children/:child_id/weight', () => {
+    describe('GET /v1/users/children/:child_id/weights', () => {
         context('when get all Weight of a child successfully', () => {
             it('should return status code 200 and a list of all Weight objects found', async () => {
                 const result = await createBodyFat({
@@ -298,7 +298,7 @@ describe('Routes: users.children.weight', () => {
                 })
 
                 return request
-                    .get(`/v1/users/children/${defaultWeight.child_id}/weight`)
+                    .get(`/v1/users/children/${defaultWeight.child_id}/weights`)
                     .set('Content-Type', 'application/json')
                     .expect(200)
                     .then(res => {
@@ -329,7 +329,7 @@ describe('Routes: users.children.weight', () => {
 
             it('should return status code 200 and an empty list', async () => {
                 return request
-                    .get(`/v1/users/children/${defaultWeight.child_id}/weight`)
+                    .get(`/v1/users/children/${defaultWeight.child_id}/weights`)
                     .set('Content-Type', 'application/json')
                     .expect(200)
                     .then(res => {
@@ -375,7 +375,7 @@ describe('Routes: users.children.weight', () => {
                         body_fat: result
                     })
 
-                    const url = `/v1/users/children/${defaultWeight.child_id}/weight?child_id=${defaultWeight.child_id}
+                    const url = `/v1/users/children/${defaultWeight.child_id}/weights?child_id=${defaultWeight.child_id}
                         &sort=child_id&page=1&limit=3`
 
                     return request
@@ -413,7 +413,7 @@ describe('Routes: users.children.weight', () => {
             })
 
             it('should return status code 200 and an empty list', async () => {
-                const url = `/v1/users/children/${defaultWeight.child_id}/weight?child_id=${defaultWeight.child_id}
+                const url = `/v1/users/children/${defaultWeight.child_id}/weights?child_id=${defaultWeight.child_id}
                     &sort=child_id&page=1&limit=3`
 
                 return request
@@ -430,7 +430,7 @@ describe('Routes: users.children.weight', () => {
     /**
      * Route GET a Weight by child
      */
-    describe('GET /v1/users/children/:child_id/weight/:weight_id', () => {
+    describe('GET /v1/users/children/:child_id/weights/:weight_id', () => {
         context('when get a specific Weight of a child of the database successfully', () => {
             before(() => {
                 try {
@@ -464,7 +464,7 @@ describe('Routes: users.children.weight', () => {
                 }
 
                 return request
-                    .get(`/v1/users/children/${result.child_id}/weight/${result.id}`)
+                    .get(`/v1/users/children/${result.child_id}/weights/${result.id}`)
                     .set('Content-Type', 'application/json')
                     .expect(200)
                     .then(res => {
@@ -492,7 +492,7 @@ describe('Routes: users.children.weight', () => {
 
             it('should return status code 404 and an info message describing that Weight was not found', async () => {
                 return request
-                    .get(`/v1/users/children/${defaultWeight.child_id}/weight/${defaultWeight.id}`)
+                    .get(`/v1/users/children/${defaultWeight.child_id}/weights/${defaultWeight.id}`)
                     .set('Content-Type', 'application/json')
                     .expect(404)
                     .then(err => {
@@ -536,7 +536,7 @@ describe('Routes: users.children.weight', () => {
                 }
 
                 return request
-                    .get(`/v1/users/children/123/weight/${result.id}`)
+                    .get(`/v1/users/children/123/weights/${result.id}`)
                     .set('Content-Type', 'application/json')
                     .expect(400)
                     .then(err => {
@@ -579,7 +579,7 @@ describe('Routes: users.children.weight', () => {
                 }
 
                 return request
-                    .get(`/v1/users/children/${result.child_id}/weight/123`)
+                    .get(`/v1/users/children/${result.child_id}/weights/123`)
                     .set('Content-Type', 'application/json')
                     .expect(400)
                     .then(err => {
@@ -624,7 +624,7 @@ describe('Routes: users.children.weight', () => {
                     throw new Error('Failure on users.children.weight routes test: ' + err.message)
                 }
 
-                const url = `/v1/users/children/${result.child_id}/weight/${result.id}?child_id=${result.child_id}
+                const url = `/v1/users/children/${result.child_id}/weights/${result.id}?child_id=${result.child_id}
                     &sort=child_id&page=1&limit=3`
 
                 return request
@@ -653,7 +653,7 @@ describe('Routes: users.children.weight', () => {
             })
 
             it('should return status code 404 and an info message describing that Weight was not found', async () => {
-                const url = `/v1/users/children/${defaultWeight.child_id}/weight/${defaultWeight.id}?child_id=${defaultWeight.child_id}
+                const url = `/v1/users/children/${defaultWeight.child_id}/weights/${defaultWeight.id}?child_id=${defaultWeight.child_id}
                     &sort=child_id&page=1&limit=3`
 
                 return request
@@ -701,7 +701,7 @@ describe('Routes: users.children.weight', () => {
                     throw new Error('Failure on users.children.weight routes test: ' + err.message)
                 }
 
-                const url = `/v1/users/children/123/weight/${result.id}?child_id=${result.child_id}
+                const url = `/v1/users/children/123/weights/${result.id}?child_id=${result.child_id}
                     &sort=child_id&page=1&limit=3`
 
                 return request
@@ -748,7 +748,7 @@ describe('Routes: users.children.weight', () => {
                     throw new Error('Failure on users.children.weight routes test: ' + err.message)
                 }
 
-                const url = `/v1/users/children/${result.child_id}/weight/123?child_id=${result.child_id}
+                const url = `/v1/users/children/${result.child_id}/weights/123?child_id=${result.child_id}
                     &sort=child_id&page=1&limit=3`
 
                 return request
@@ -766,7 +766,7 @@ describe('Routes: users.children.weight', () => {
     /**
      * DELETE route
      */
-    describe('DELETE /v1/users/children/:child_id/weight/:weight_id', () => {
+    describe('DELETE /v1/users/children/:child_id/weights/:weight_id', () => {
         context('when the Weight was deleted successfully', () => {
             before(() => {
                 try {
@@ -799,7 +799,7 @@ describe('Routes: users.children.weight', () => {
                 }
 
                 return request
-                    .delete(`/v1/users/children/${result.child_id}/weight/${result.id}`)
+                    .delete(`/v1/users/children/${result.child_id}/weights/${result.id}`)
                     .set('Content-Type', 'application/json')
                     .expect(204)
                     .then(res => {
@@ -819,7 +819,7 @@ describe('Routes: users.children.weight', () => {
 
             it('should return status code 204 and no content for Weight', async () => {
                 return request
-                    .delete(`/v1/users/children/${defaultWeight.child_id}/weight/${defaultWeight.id}`)
+                    .delete(`/v1/users/children/${defaultWeight.child_id}/weights/${defaultWeight.id}`)
                     .set('Content-Type', 'application/json')
                     .expect(204)
                     .then(res => {
@@ -860,7 +860,7 @@ describe('Routes: users.children.weight', () => {
                 }
 
                 return request
-                    .delete(`/v1/users/children/123/weight/${result.id}`)
+                    .delete(`/v1/users/children/123/weights/${result.id}`)
                     .set('Content-Type', 'application/json')
                     .expect(400)
                     .then(err => {
@@ -903,7 +903,7 @@ describe('Routes: users.children.weight', () => {
                 }
 
                 return request
-                    .delete(`/v1/users/children/${result.child_id}/weight/123`)
+                    .delete(`/v1/users/children/${result.child_id}/weights/123`)
                     .set('Content-Type', 'application/json')
                     .expect(400)
                     .then(err => {

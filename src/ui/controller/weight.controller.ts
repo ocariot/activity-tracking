@@ -38,7 +38,7 @@ export class WeightController {
      * @param {Request} req
      * @param {Response} res
      */
-    @httpPost('/:child_id/weight')
+    @httpPost('/:child_id/weights')
     public async saveWeight(@request() req: Request, @response() res: Response) {
         try {
             // Multiple items of Weight
@@ -76,7 +76,7 @@ export class WeightController {
      * @param {Request} req
      * @param {Response} res
      */
-    @httpGet('/:child_id/weight')
+    @httpGet('/:child_id/weights')
     public async getAllWeightOfChild(@request() req: Request, @response() res: Response): Promise<Response> {
         try {
             const result = await this._weightService
@@ -97,7 +97,7 @@ export class WeightController {
      * @param {Request} req
      * @param {Response} res
      */
-    @httpGet('/:child_id/weight/:weight_id')
+    @httpGet('/:child_id/weights/:weight_id')
     public async getWeightById(@request() req: Request, @response() res: Response): Promise<Response> {
         try {
             const result: Weight = await this._weightService
@@ -117,7 +117,7 @@ export class WeightController {
      * @param {Request} req
      * @param {Response} res
      */
-    @httpDelete('/:child_id/weight/:weight_id')
+    @httpDelete('/:child_id/weights/:weight_id')
     public async deleteWeightOfChild(@request() req: Request, @response() res: Response): Promise<Response> {
         try {
             await this._weightService.removeByChild(req.params.weight_id, req.params.child_id)

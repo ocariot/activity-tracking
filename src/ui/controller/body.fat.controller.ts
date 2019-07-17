@@ -38,7 +38,7 @@ export class BodyFatController {
      * @param {Request} req
      * @param {Response} res
      */
-    @httpPost('/:child_id/bodyfat')
+    @httpPost('/:child_id/bodyfats')
     public async saveFat(@request() req: Request, @response() res: Response) {
         try {
             // Multiple items of BodyFat
@@ -74,7 +74,7 @@ export class BodyFatController {
      * @param {Request} req
      * @param {Response} res
      */
-    @httpGet('/:child_id/bodyfat')
+    @httpGet('/:child_id/bodyfats')
     public async getAllBodyFatOfChild(@request() req: Request, @response() res: Response): Promise<Response> {
         try {
             const result = await this._bodyFatService
@@ -95,7 +95,7 @@ export class BodyFatController {
      * @param {Request} req
      * @param {Response} res
      */
-    @httpGet('/:child_id/bodyfat/:bodyfat_id')
+    @httpGet('/:child_id/bodyfats/:bodyfat_id')
     public async getBodyFatById(@request() req: Request, @response() res: Response): Promise<Response> {
         try {
             const result: BodyFat = await this._bodyFatService
@@ -115,7 +115,7 @@ export class BodyFatController {
      * @param {Request} req
      * @param {Response} res
      */
-    @httpDelete('/:child_id/bodyfat/:bodyfat_id')
+    @httpDelete('/:child_id/bodyfats/:bodyfat_id')
     public async deleteBodyFatOfChild(@request() req: Request, @response() res: Response): Promise<Response> {
         try {
             await this._bodyFatService.removeByChild(req.params.bodyfat_id, req.params.child_id)

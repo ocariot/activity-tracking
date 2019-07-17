@@ -60,7 +60,7 @@ describe('Routes: users.children.bodyfat', () => {
     /**
      * POST route with only one BodyFat in the body
      */
-    describe('POST /v1/users/children/:child_id/bodyfat with only one BodyFat in the body', () => {
+    describe('POST /v1/users/children/:child_id/bodyfats with only one BodyFat in the body', () => {
         context('when posting a new BodyFat with success', () => {
             it('should return status code 201 and the saved BodyFat', () => {
                 const body = {
@@ -70,7 +70,7 @@ describe('Routes: users.children.bodyfat', () => {
                 }
 
                 return request
-                    .post(`/v1/users/children/${defaultBodyFat.child_id}/bodyfat`)
+                    .post(`/v1/users/children/${defaultBodyFat.child_id}/bodyfats`)
                     .send(body)
                     .set('Content-Type', 'application/json')
                     .expect(201)
@@ -94,7 +94,7 @@ describe('Routes: users.children.bodyfat', () => {
                 }
 
                 return request
-                    .post(`/v1/users/children/${defaultBodyFat.child_id}/bodyfat`)
+                    .post(`/v1/users/children/${defaultBodyFat.child_id}/bodyfats`)
                     .send(body)
                     .set('Content-Type', 'application/json')
                     .expect(409)
@@ -110,7 +110,7 @@ describe('Routes: users.children.bodyfat', () => {
                 const body = {}
 
                 return request
-                    .post(`/v1/users/children/${defaultBodyFat.child_id}/bodyfat`)
+                    .post(`/v1/users/children/${defaultBodyFat.child_id}/bodyfats`)
                     .send(body)
                     .set('Content-Type', 'application/json')
                     .expect(400)
@@ -131,7 +131,7 @@ describe('Routes: users.children.bodyfat', () => {
                 }
 
                 return request
-                    .post(`/v1/users/children/123/bodyfat`)
+                    .post(`/v1/users/children/123/bodyfats`)
                     .send(body)
                     .set('Content-Type', 'application/json')
                     .expect(400)
@@ -146,7 +146,7 @@ describe('Routes: users.children.bodyfat', () => {
     /**
      * POST route with a BodyFat array in the body
      */
-    describe('POST /v1/users/children/:child_id/bodyfat with a BodyFat array in the body', () => {
+    describe('POST /v1/users/children/:child_id/bodyfats with a BodyFat array in the body', () => {
         context('when all the BodyFat objects are correct and still do not exist in the repository', () => {
             before(() => {
                 try {
@@ -170,7 +170,7 @@ describe('Routes: users.children.bodyfat', () => {
                 })
 
                 return request
-                    .post(`/v1/users/children/${defaultBodyFat.child_id}/bodyfat`)
+                    .post(`/v1/users/children/${defaultBodyFat.child_id}/bodyfats`)
                     .send(body)
                     .set('Content-Type', 'application/json')
                     .expect(201)
@@ -203,7 +203,7 @@ describe('Routes: users.children.bodyfat', () => {
                 })
 
                 return request
-                    .post(`/v1/users/children/${defaultBodyFat.child_id}/bodyfat`)
+                    .post(`/v1/users/children/${defaultBodyFat.child_id}/bodyfats`)
                     .send(body)
                     .set('Content-Type', 'application/json')
                     .expect(201)
@@ -245,7 +245,7 @@ describe('Routes: users.children.bodyfat', () => {
                 })
 
                 return request
-                    .post(`/v1/users/children/${defaultBodyFat.child_id}/bodyfat`)
+                    .post(`/v1/users/children/${defaultBodyFat.child_id}/bodyfats`)
                     .send(body)
                     .set('Content-Type', 'application/json')
                     .expect(201)
@@ -268,7 +268,7 @@ describe('Routes: users.children.bodyfat', () => {
     /**
      * Route GET all BodyFat
      */
-    describe('GET /v1/users/children/:child_id/bodyfat', () => {
+    describe('GET /v1/users/children/:child_id/bodyfats', () => {
         context('when get all BodyFat of a child successfully', () => {
             it('should return status code 200 and a list of all BodyFat objects found', async () => {
                 await createBodyFat({
@@ -279,7 +279,7 @@ describe('Routes: users.children.bodyfat', () => {
                 })
 
                 return request
-                    .get(`/v1/users/children/${defaultBodyFat.child_id}/bodyfat`)
+                    .get(`/v1/users/children/${defaultBodyFat.child_id}/bodyfats`)
                     .set('Content-Type', 'application/json')
                     .expect(200)
                     .then(res => {
@@ -309,7 +309,7 @@ describe('Routes: users.children.bodyfat', () => {
 
             it('should return status code 200 and an empty list', async () => {
                 return request
-                    .get(`/v1/users/children/${defaultBodyFat.child_id}/bodyfat`)
+                    .get(`/v1/users/children/${defaultBodyFat.child_id}/bodyfats`)
                     .set('Content-Type', 'application/json')
                     .expect(200)
                     .then(res => {
@@ -349,7 +349,7 @@ describe('Routes: users.children.bodyfat', () => {
                     throw new Error('Failure on users.children.bodyfat routes test: ' + err.message)
                 }
 
-                const url = `/v1/users/children/${defaultBodyFat.child_id}/bodyfat?child_id=${defaultBodyFat.child_id}
+                const url = `/v1/users/children/${defaultBodyFat.child_id}/bodyfats?child_id=${defaultBodyFat.child_id}
                     &sort=child_id&page=1&limit=3`
 
                 return request
@@ -383,7 +383,7 @@ describe('Routes: users.children.bodyfat', () => {
             })
 
             it('should return status code 200 and an empty list', async () => {
-                const url = `/v1/users/children/${defaultBodyFat.child_id}/bodyfat?child_id=${defaultBodyFat.child_id}
+                const url = `/v1/users/children/${defaultBodyFat.child_id}/bodyfats?child_id=${defaultBodyFat.child_id}
                     &sort=child_id&page=1&limit=3`
 
                 return request
@@ -400,7 +400,7 @@ describe('Routes: users.children.bodyfat', () => {
     /**
      * Route GET a BodyFat by child
      */
-    describe('GET /v1/users/children/:child_id/bodyfat/:bodyfat_id', () => {
+    describe('GET /v1/users/children/:child_id/bodyfats/:bodyfat_id', () => {
         context('when get a specific BodyFat of a child of the database successfully', () => {
             before(() => {
                 try {
@@ -425,7 +425,7 @@ describe('Routes: users.children.bodyfat', () => {
                 }
 
                 return request
-                    .get(`/v1/users/children/${result.child_id}/bodyfat/${result.id}`)
+                    .get(`/v1/users/children/${result.child_id}/bodyfats/${result.id}`)
                     .set('Content-Type', 'application/json')
                     .expect(200)
                     .then(res => {
@@ -452,7 +452,7 @@ describe('Routes: users.children.bodyfat', () => {
 
             it('should return status code 404 and an info message describing that BodyFat was not found', async () => {
                 return request
-                    .get(`/v1/users/children/${defaultBodyFat.child_id}/bodyfat/${defaultBodyFat.id}`)
+                    .get(`/v1/users/children/${defaultBodyFat.child_id}/bodyfats/${defaultBodyFat.id}`)
                     .set('Content-Type', 'application/json')
                     .expect(404)
                     .then(err => {
@@ -488,7 +488,7 @@ describe('Routes: users.children.bodyfat', () => {
                 }
 
                 return request
-                    .get(`/v1/users/children/123/bodyfat/${result.id}`)
+                    .get(`/v1/users/children/123/bodyfats/${result.id}`)
                     .set('Content-Type', 'application/json')
                     .expect(400)
                     .then(err => {
@@ -523,7 +523,7 @@ describe('Routes: users.children.bodyfat', () => {
                 }
 
                 return request
-                    .get(`/v1/users/children/${result.child_id}/bodyfat/123`)
+                    .get(`/v1/users/children/${result.child_id}/bodyfats/123`)
                     .set('Content-Type', 'application/json')
                     .expect(400)
                     .then(err => {
@@ -559,7 +559,7 @@ describe('Routes: users.children.bodyfat', () => {
                     throw new Error('Failure on users.children.bodyfat routes test: ' + err.message)
                 }
 
-                const url = `/v1/users/children/${result.child_id}/bodyfat/${result.id}?child_id=${result.child_id}
+                const url = `/v1/users/children/${result.child_id}/bodyfats/${result.id}?child_id=${result.child_id}
                     &sort=child_id&page=1&limit=3`
 
                 return request
@@ -587,7 +587,7 @@ describe('Routes: users.children.bodyfat', () => {
             })
 
             it('should return status code 404 and an info message describing that BodyFat was not found', async () => {
-                const url = `/v1/users/children/${defaultBodyFat.child_id}/bodyfat/${defaultBodyFat.id}?child_id=${defaultBodyFat.child_id}
+                const url = `/v1/users/children/${defaultBodyFat.child_id}/bodyfats/${defaultBodyFat.id}?child_id=${defaultBodyFat.child_id}
                     &sort=child_id&page=1&limit=3`
 
                 return request
@@ -627,7 +627,7 @@ describe('Routes: users.children.bodyfat', () => {
                     throw new Error('Failure on users.children.bodyfat routes test: ' + err.message)
                 }
 
-                const url = `/v1/users/children/123/bodyfat/${result.id}?child_id=${result.child_id}
+                const url = `/v1/users/children/123/bodyfats/${result.id}?child_id=${result.child_id}
                     &sort=child_id&page=1&limit=3`
 
                 return request
@@ -666,7 +666,7 @@ describe('Routes: users.children.bodyfat', () => {
                     throw new Error('Failure on users.children.bodyfat routes test: ' + err.message)
                 }
 
-                const url = `/v1/users/children/${result.child_id}/bodyfat/123?child_id=${result.child_id}
+                const url = `/v1/users/children/${result.child_id}/bodyfats/123?child_id=${result.child_id}
                     &sort=child_id&page=1&limit=3`
 
                 return request
@@ -684,7 +684,7 @@ describe('Routes: users.children.bodyfat', () => {
     /**
      * DELETE route
      */
-    describe('DELETE /v1/users/children/:child_id/bodyfat/:bodyfat_id', () => {
+    describe('DELETE /v1/users/children/:child_id/bodyfats/:bodyfat_id', () => {
         context('when the BodyFat was deleted successfully', () => {
             before(() => {
                 try {
@@ -709,7 +709,7 @@ describe('Routes: users.children.bodyfat', () => {
                 }
 
                 return request
-                    .delete(`/v1/users/children/${result.child_id}/bodyfat/${result.id}`)
+                    .delete(`/v1/users/children/${result.child_id}/bodyfats/${result.id}`)
                     .set('Content-Type', 'application/json')
                     .expect(204)
                     .then(res => {
@@ -729,7 +729,7 @@ describe('Routes: users.children.bodyfat', () => {
 
             it('should return status code 204 and no content for BodyFat', async () => {
                 return request
-                    .delete(`/v1/users/children/${defaultBodyFat.child_id}/bodyfat/${defaultBodyFat.id}`)
+                    .delete(`/v1/users/children/${defaultBodyFat.child_id}/bodyfats/${defaultBodyFat.id}`)
                     .set('Content-Type', 'application/json')
                     .expect(204)
                     .then(res => {
@@ -762,7 +762,7 @@ describe('Routes: users.children.bodyfat', () => {
                 }
 
                 return request
-                    .delete(`/v1/users/children/123/bodyfat/${result.id}`)
+                    .delete(`/v1/users/children/123/bodyfats/${result.id}`)
                     .set('Content-Type', 'application/json')
                     .expect(400)
                     .then(err => {
@@ -797,7 +797,7 @@ describe('Routes: users.children.bodyfat', () => {
                 }
 
                 return request
-                    .delete(`/v1/users/children/${result.child_id}/bodyfat/123`)
+                    .delete(`/v1/users/children/${result.child_id}/bodyfats/123`)
                     .set('Content-Type', 'application/json')
                     .expect(400)
                     .then(err => {
