@@ -1106,8 +1106,7 @@ describe('Routes: users/children', () => {
                     throw new Error('Failure on users.children.physicalactivities routes test: ' + err.message)
                 }
 
-                const url = `/v1/users/children/physicalactivities?child_id=${defaultActivity.child_id}
-                    &sort=child_id&page=1&limit=3`
+                const url = `/v1/users/children/physicalactivities?sort=child_id&page=1&limit=3`
 
                 return request
                     .get(url)
@@ -1152,8 +1151,7 @@ describe('Routes: users/children', () => {
             })
 
             it('should return status code 200 and an empty list', async () => {
-                const url = `/v1/users/children/physicalactivities?child_id=${defaultActivity.child_id}
-                    &sort=child_id&page=1&limit=3`
+                const url = `/v1/users/children/physicalactivities?sort=child_id&page=1&limit=3`
 
                 return request
                     .get(url)

@@ -829,7 +829,7 @@ describe('Routes: users.children.sleep', () => {
                     throw new Error('Failure on users.children.sleep routes test: ' + err.message)
                 }
 
-                const url = `/v1/users/children/sleep?child_id=${defaultSleep.child_id}&sort=child_id&page=1&limit=3`
+                const url = `/v1/users/children/sleep?sort=child_id&page=1&limit=3`
 
                 return request
                     .get(url)
@@ -865,7 +865,7 @@ describe('Routes: users.children.sleep', () => {
             })
 
             it('should return status code 200 and an empty list', async () => {
-                const url = `/v1/users/children/sleep?child_id=${defaultSleep.child_id}&sort=child_id&page=1&limit=3`
+                const url = `/v1/users/children/sleep?sort=child_id&page=1&limit=3`
 
                 return request
                     .get(url)
