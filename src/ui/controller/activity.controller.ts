@@ -181,7 +181,7 @@ export class ActivityController {
      * @param {Request} req
      * @param {Response} res
      */
-    @httpPost('/:child_id/physicalactivities/logs/:resource')
+    @httpPost('/:child_id/logs/:resource')
     public async saveLog(@request() req: Request, @response() res: Response) {
         try {
 
@@ -212,7 +212,7 @@ export class ActivityController {
      * @param {Request} req
      * @param {Response} res
      */
-    @httpGet('/:child_id/physicalactivities/logs/date/:date_start/:date_end')
+    @httpGet('/:child_id/logs/date/:date_start/:date_end')
     public async getLogs(@request() req: Request, @response() res: Response): Promise<Response> {
         try {
             const result: PhysicalActivityLog = await this._activityLogService
@@ -233,7 +233,7 @@ export class ActivityController {
      * @param {Request} req
      * @param {Response} res
      */
-    @httpGet('/:child_id/physicalactivities/logs/:resource/date/:date_start/:date_end')
+    @httpGet('/:child_id/logs/:resource/date/:date_start/:date_end')
     public async getLogByResource(@request() req: Request, @response() res: Response): Promise<Response> {
         try {
             const result: Array<Log> = await this._activityLogService
