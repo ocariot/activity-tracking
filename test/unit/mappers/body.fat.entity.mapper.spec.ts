@@ -48,8 +48,12 @@ describe('Mappers: BodyFatEntityMapper', () => {
             it('should normally execute the method, returning an empty BodyFat as a result of the transformation', () => {
                 const result: BodyFat = new BodyFatEntityMapper().transform(undefined)
 
-                assert.isObject(result)
                 assert.propertyVal(result, 'id', undefined)
+                assert.propertyVal(result, 'type', MeasurementType.BODY_FAT)
+                assert.propertyVal(result, 'timestamp', undefined)
+                assert.propertyVal(result, 'value', undefined)
+                assert.propertyVal(result, 'unit', '%')
+                assert.propertyVal(result, 'child_id', undefined)
             })
         })
     })

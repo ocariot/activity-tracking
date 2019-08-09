@@ -43,7 +43,6 @@ describe('Mappers: PhysicalActivityLogEntityMapper', () => {
             it('should normally execute the method, returning an empty PhysicalActivityLog as a result of the transformation', () => {
                 const result: PhysicalActivityLog = new PhysicalActivityLogEntityMapper().transform(undefined)
 
-                assert.isObject(result)
                 assert.propertyVal(result, 'id', undefined)
                 assert.propertyVal(result, 'steps', undefined)
                 assert.propertyVal(result, 'calories', undefined)

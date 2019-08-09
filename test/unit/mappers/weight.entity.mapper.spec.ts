@@ -57,8 +57,13 @@ describe('Mappers: WeightEntityMapper', () => {
             it('should normally execute the method, returning an empty Weight as a result of the transformation', () => {
                 const result: Weight = new WeightEntityMapper().transform(undefined)
 
-                assert.isObject(result)
                 assert.propertyVal(result, 'id', undefined)
+                assert.propertyVal(result, 'type', MeasurementType.WEIGHT)
+                assert.propertyVal(result, 'timestamp', undefined)
+                assert.propertyVal(result, 'value', undefined)
+                assert.propertyVal(result, 'unit', undefined)
+                assert.propertyVal(result, 'child_id', undefined)
+                assert.propertyVal(result, 'body_fat', undefined)
             })
         })
     })

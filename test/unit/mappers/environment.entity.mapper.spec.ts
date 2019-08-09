@@ -54,8 +54,13 @@ describe('Mappers: EnvironmentEntityMapper', () => {
             it('should normally execute the method, returning an empty Environment as a result of the transformation', () => {
                 const result: Environment = new EnvironmentEntityMapper().transform(undefined)
 
-                assert.isObject(result)
                 assert.propertyVal(result, 'id', undefined)
+                assert.propertyVal(result, 'institution_id', undefined)
+                assert.propertyVal(result, 'location', undefined)
+                assert.propertyVal(result, 'temperature', undefined)
+                assert.propertyVal(result, 'humidity', undefined)
+                assert.propertyVal(result, 'climatized', undefined)
+                assert.propertyVal(result, 'timestamp', undefined)
             })
         })
     })

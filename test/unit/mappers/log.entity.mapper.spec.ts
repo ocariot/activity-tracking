@@ -43,8 +43,11 @@ describe('Mappers: LogEntityMapper', () => {
             it('should normally execute the method, returning an empty Log as a result of the transformation', () => {
                 const result: Log = new LogEntityMapper().transform(undefined)
 
-                assert.isObject(result)
                 assert.propertyVal(result, 'id', undefined)
+                assert.propertyVal(result, 'date', undefined)
+                assert.propertyVal(result, 'value', undefined)
+                assert.propertyVal(result, 'type', undefined)
+                assert.propertyVal(result, 'child_id', undefined)
             })
         })
     })

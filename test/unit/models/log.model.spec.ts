@@ -4,7 +4,7 @@ import { Log, LogType } from '../../../src/application/domain/model/log'
 
 describe('Models: Log', () => {
     const logJSON: any = {
-        date: '2019-03-11',
+        date: '2019-3-9',
         value: 200,
         type: LogType.CALORIES,
         child_id: new ObjectID()
@@ -47,7 +47,7 @@ describe('Models: Log', () => {
             it('should return a JSON from Log model', () => {
                 let result = new Log().fromJSON(logJSON)
                 result = result.toJSON()
-                assert.propertyVal(result, 'date', logJSON.date)
+                assert.propertyVal(result, 'date', '2019-03-09')
                 assert.propertyVal(result, 'value', logJSON.value)
             })
         })

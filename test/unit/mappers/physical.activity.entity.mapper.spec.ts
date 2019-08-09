@@ -107,8 +107,16 @@ describe('Mappers: PhysicalActivityEntityMapper', () => {
             it('should normally execute the method, returning an empty PhysicalActivity as a result of the transformation', () => {
                 const result: PhysicalActivity = new PhysicalActivityEntityMapper().transform(undefined)
 
-                assert.isObject(result)
                 assert.propertyVal(result, 'id', undefined)
+                assert.propertyVal(result, 'start_time', undefined)
+                assert.propertyVal(result, 'end_time', undefined)
+                assert.propertyVal(result, 'duration', undefined)
+                assert.propertyVal(result, 'child_id', undefined)
+                assert.propertyVal(result, 'name', undefined)
+                assert.propertyVal(result, 'calories', undefined)
+                assert.propertyVal(result, 'steps', undefined)
+                assert.propertyVal(result, 'levels', undefined)
+                assert.propertyVal(result, 'heart_rate', undefined)
             })
         })
     })

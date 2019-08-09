@@ -67,8 +67,13 @@ describe('Mappers: SleepEntityMapper', () => {
             it('should normally execute the method, returning an empty Sleep as a result of the transformation', () => {
                 const result: Sleep = new SleepEntityMapper().transform(undefined)
 
-                assert.isObject(result)
                 assert.propertyVal(result, 'id', undefined)
+                assert.propertyVal(result, 'start_time', undefined)
+                assert.propertyVal(result, 'end_time', undefined)
+                assert.propertyVal(result, 'duration', undefined)
+                assert.propertyVal(result, 'child_id', undefined)
+                assert.propertyVal(result, 'pattern', undefined)
+                assert.propertyVal(result, 'type', undefined)
             })
         })
     })
