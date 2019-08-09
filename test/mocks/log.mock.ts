@@ -50,7 +50,7 @@ export class LogMock extends Log {
 
     private generateType(): LogType {
         let logType
-        switch (Math.floor((Math.random() * 3 + 1))) { // 1, 2 or 3
+        switch (Math.floor((Math.random() * 4 + 1))) { // 1, 2, 3 or 4
             case 1:
                 logType = LogType.STEPS
                 return logType
@@ -59,6 +59,9 @@ export class LogMock extends Log {
                 return logType
             case 3:
                 logType = LogType.ACTIVE_MINUTES
+                return logType
+            case 4:
+                logType = LogType.SEDENTARY_MINUTES
                 return logType
             default:
                 return LogType.STEPS

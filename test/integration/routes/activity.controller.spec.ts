@@ -2599,7 +2599,7 @@ describe('Routes: users/children', () => {
     /**
      * POST route for Log
      */
-    describe('POST /v1/users/children/:child_id/physicalactivities/logs/:resource', () => {
+    describe('POST /v1/users/children/:child_id/logs/:resource', () => {
         context('when all the logs in the body are correct and it still does not exist in the repository', () => {
             before(() => {
                 try {
@@ -2622,7 +2622,7 @@ describe('Routes: users/children', () => {
                 })
 
                 return request
-                    .post(`/v1/users/children/${defaultActivity.child_id}/physicalactivities/logs/${LogType.STEPS}`)
+                    .post(`/v1/users/children/${defaultActivity.child_id}/logs/${LogType.STEPS}`)
                     .send(body)
                     .set('Content-Type', 'application/json')
                     .expect(201)
@@ -2651,7 +2651,7 @@ describe('Routes: users/children', () => {
                 })
 
                 return request
-                    .post(`/v1/users/children/${defaultActivity.child_id}/physicalactivities/logs/${LogType.STEPS}`)
+                    .post(`/v1/users/children/${defaultActivity.child_id}/logs/${LogType.STEPS}`)
                     .send(body)
                     .set('Content-Type', 'application/json')
                     .expect(201)
@@ -2685,7 +2685,7 @@ describe('Routes: users/children', () => {
                 })
 
                 return request
-                    .post(`/v1/users/children/${defaultActivity.child_id}/physicalactivities/logs/${LogType.STEPS}`)
+                    .post(`/v1/users/children/${defaultActivity.child_id}/logs/${LogType.STEPS}`)
                     .send(body)
                     .set('Content-Type', 'application/json')
                     .expect(201)
@@ -2718,7 +2718,7 @@ describe('Routes: users/children', () => {
                 })
 
                 return request
-                    .post(`/v1/users/children/${defaultActivity.child_id}/physicalactivities/logs/${LogType.STEPS}`)
+                    .post(`/v1/users/children/${defaultActivity.child_id}/logs/${LogType.STEPS}`)
                     .send(body)
                     .set('Content-Type', 'application/json')
                     .expect(201)
@@ -2748,7 +2748,7 @@ describe('Routes: users/children', () => {
                 })
 
                 return request
-                    .post(`/v1/users/children/${defaultActivity.child_id}/physicalactivities/logs/${LogType.STEPS}`)
+                    .post(`/v1/users/children/${defaultActivity.child_id}/logs/${LogType.STEPS}`)
                     .send(body)
                     .set('Content-Type', 'application/json')
                     .expect(201)
@@ -2789,7 +2789,7 @@ describe('Routes: users/children', () => {
                 })
 
                 return request
-                    .post(`/v1/users/children/123/physicalactivities/logs/${LogType.STEPS}`)
+                    .post(`/v1/users/children/123/logs/${LogType.STEPS}`)
                     .send(body)
                     .set('Content-Type', 'application/json')
                     .expect(201)
@@ -2821,7 +2821,7 @@ describe('Routes: users/children', () => {
                 })
 
                 return request
-                    .post(`/v1/users/children/${defaultActivity.child_id}/physicalactivities/logs/step`)
+                    .post(`/v1/users/children/${defaultActivity.child_id}/logs/step`)
                     .send(body)
                     .set('Content-Type', 'application/json')
                     .expect(201)
@@ -2829,9 +2829,10 @@ describe('Routes: users/children', () => {
                         expect(res.body.success.length).to.eql(0)
                         for (let i = 0; i < res.body.error.length; i++) {
                             expect(res.body.error[i].code).to.eql(HttpStatus.BAD_REQUEST)
-                            expect(res.body.error[i].message).to.eql('The name of type provided "step" is not supported...')
-                            expect(res.body.error[i].description).to.eql('The names of the allowed types are: steps, calories, ' +
-                                'active_minutes.')
+                            expect(res.body.error[i].message)
+                                .to.eql('The name of type provided "step" is not supported...')
+                            expect(res.body.error[i].description)
+                                .to.eql('The names of the allowed types are: steps, calories, active_minutes, sedentary_minutes.')
                             expect(res.body.error[i].item.date).to.eql(correctLogsArr[i].date)
                             expect(res.body.error[i].item.value).to.eql(correctLogsArr[i].value)
                         }
@@ -2857,7 +2858,7 @@ describe('Routes: users/children', () => {
                 })
 
                 return request
-                    .post(`/v1/users/children/${defaultActivity.child_id}/physicalactivities/logs/${LogType.CALORIES}`)
+                    .post(`/v1/users/children/${defaultActivity.child_id}/logs/${LogType.CALORIES}`)
                     .send(body)
                     .set('Content-Type', 'application/json')
                     .expect(201)
@@ -2877,10 +2878,10 @@ describe('Routes: users/children', () => {
     /**
      * GET route for Log
      */
-    describe('GET /v1/users/children/:child_id/physicalactivities/logs/date/:date_start/:date_end', () => {
+    describe('GET /v1/users/children/:child_id/logs/date/:date_start/:date_end', () => {
         context('when the parameters are correct and there are corresponding logs with the query', () => {
             it('should return status code 200 and a PhysicalActivityLog with steps and/or calories logs', async () => {
-                const basePath = `/v1/users/children/${defaultActivity.child_id}/physicalactivities/logs`
+                const basePath = `/v1/users/children/${defaultActivity.child_id}/logs`
                 const specificPath = `/date/${correctLogsArr[0].date}/${correctLogsArr[0].date}`
                 const url = `${basePath}${specificPath}`
 
@@ -2897,7 +2898,7 @@ describe('Routes: users/children', () => {
 
         context('when the parameters are correct but there are no corresponding logs with the query', () => {
             it('should return status code 200 and an empty PhysicalActivityLog', async () => {
-                const basePath = `/v1/users/children/${defaultActivity.child_id}/physicalactivities/logs`
+                const basePath = `/v1/users/children/${defaultActivity.child_id}/logs`
                 const specificPath = `/date/2005-10-01/2005-10-10`
                 const url = `${basePath}${specificPath}`
 
@@ -2914,7 +2915,7 @@ describe('Routes: users/children', () => {
 
         context('when the parameters are incorrect (child_id is invalid)', () => {
             it('should return status code 400 and an info message about the invalid child_id', async () => {
-                const basePath = `/v1/users/children/123/physicalactivities/logs`
+                const basePath = `/v1/users/children/123/logs`
                 const specificPath = `/date/${correctLogsArr[0].date}/${correctLogsArr[0].date}`
                 const url = `${basePath}${specificPath}`
 
@@ -2932,7 +2933,7 @@ describe('Routes: users/children', () => {
 
         context('when the parameters are incorrect (date_start is invalid)', () => {
             it('should return status code 400 and an info message about the invalid date_start', async () => {
-                const basePath = `/v1/users/children/${defaultActivity.child_id}/physicalactivities/logs`
+                const basePath = `/v1/users/children/${defaultActivity.child_id}/logs`
                 const specificPath = `/date/20199-10-01/${correctLogsArr[0].date}`
                 const url = `${basePath}${specificPath}`
 
@@ -2950,7 +2951,7 @@ describe('Routes: users/children', () => {
 
         context('when the parameters are incorrect (date_end is invalid)', () => {
             it('should return status code 400 and an info message about the invalid date_end', async () => {
-                const basePath = `/v1/users/children/${defaultActivity.child_id}/physicalactivities/logs`
+                const basePath = `/v1/users/children/${defaultActivity.child_id}/logs`
                 const specificPath = `/date/${correctLogsArr[0].date}/20199-10-01`
                 const url = `${basePath}${specificPath}`
 
@@ -2970,7 +2971,7 @@ describe('Routes: users/children', () => {
          */
         context('when get all logs in a time interval using the "query-strings-parser" library', () => {
             it('should return status code 200 and the result as needed in the query', async () => {
-                const basePath = `/v1/users/children/${defaultActivity.child_id}/physicalactivities/logs`
+                const basePath = `/v1/users/children/${defaultActivity.child_id}/logs`
                 const specificPath = `/date/${correctLogsArr[0].date}/${correctLogsArr[0].date}`
                 let url = `${basePath}${specificPath}?date=${correctLogsArr[0].date}`
                 url += '&sort=date&page=1&limit=2'
@@ -2989,7 +2990,7 @@ describe('Routes: users/children', () => {
         context('when there is an attempt to get all logs in a time interval using the "query-strings-parser" library but there ' +
                 'are no corresponding logs with the query in the database', () => {
             it('should return status code 200 and an empty PhysicalActivityLog', async () => {
-                const basePath = `/v1/users/children/${defaultActivity.child_id}/physicalactivities/logs`
+                const basePath = `/v1/users/children/${defaultActivity.child_id}/logs`
                 const specificPath = `/date/2005-10-01/2005-10-10`
                 let url = `${basePath}${specificPath}?date=${correctLogsArr[0].date}`
                 url += '&sort=date&page=1&limit=2'
@@ -3008,7 +3009,7 @@ describe('Routes: users/children', () => {
         context('when there is an attempt to get all logs in a time interval using the "query-strings-parser" library ' +
                 'but the parameters are incorrect (child_id is invalid)', () => {
             it('should return status code 400 and an info message about the invalid child_id', async () => {
-                const basePath = `/v1/users/children/123/physicalactivities/logs`
+                const basePath = `/v1/users/children/123/logs`
                 const specificPath = `/date/${correctLogsArr[0].date}/${correctLogsArr[0].date}`
                 let url = `${basePath}${specificPath}?date=${correctLogsArr[0].date}`
                 url += '&sort=date&page=1&limit=2'
@@ -3028,7 +3029,7 @@ describe('Routes: users/children', () => {
         context('when there is an attempt to get all logs in a time interval using the "query-strings-parser" library ' +
                 'but the parameters are incorrect (date_start is invalid)', () => {
             it('should return status code 400 and an info message about the invalid date_start', async () => {
-                const basePath = `/v1/users/children/${defaultActivity.child_id}/physicalactivities/logs`
+                const basePath = `/v1/users/children/${defaultActivity.child_id}/logs`
                 const specificPath = `/date/20199-10-01/${correctLogsArr[0].date}`
                 let url = `${basePath}${specificPath}?date=${correctLogsArr[0].date}`
                 url += '&sort=date&page=1&limit=2'
@@ -3048,7 +3049,7 @@ describe('Routes: users/children', () => {
         context('when there is an attempt to get all logs in a time interval using the "query-strings-parser" library ' +
                 'but the parameters are incorrect (date_end is invalid)', () => {
             it('should return status code 400 and an info message about the invalid date_end', async () => {
-                const basePath = `/v1/users/children/${defaultActivity.child_id}/physicalactivities/logs`
+                const basePath = `/v1/users/children/${defaultActivity.child_id}/logs`
                 const specificPath = `/date/${correctLogsArr[0].date}/20199-10-01`
                 let url = `${basePath}${specificPath}?date=${correctLogsArr[0].date}`
                 url += '&sort=date&page=1&limit=2'
@@ -3068,10 +3069,10 @@ describe('Routes: users/children', () => {
     /**
      * GET route for Log by resource
      */
-    describe('GET /v1/users/children/:child_id/physicalactivities/logs/:resource/date/:date_start/:date_end', () => {
+    describe('GET /v1/users/children/:child_id/logs/:resource/date/:date_start/:date_end', () => {
         context('when the parameters are correct and there are corresponding logs with the query', () => {
             it('should return status code 200 and an array of Logs with steps and/or calories logs', async () => {
-                const basePath = `/v1/users/children/${defaultActivity.child_id}/physicalactivities/logs/${LogType.CALORIES}`
+                const basePath = `/v1/users/children/${defaultActivity.child_id}/logs/${LogType.CALORIES}`
                 const specificPath = `/date/${correctLogsArr[0].date}/${correctLogsArr[0].date}`
                 const url = `${basePath}${specificPath}`
 
@@ -3088,7 +3089,7 @@ describe('Routes: users/children', () => {
 
         context('when the parameters are correct but there are no corresponding logs with the query', () => {
             it('should return status code 200 and an empty array of logs', async () => {
-                const basePath = `/v1/users/children/${defaultActivity.child_id}/physicalactivities/logs/${correctLogsArr[0].type}`
+                const basePath = `/v1/users/children/${defaultActivity.child_id}/logs/${correctLogsArr[0].type}`
                 const specificPath = `/date/2005-10-01/2005-10-10`
                 const url = `${basePath}${specificPath}`
 
@@ -3104,7 +3105,7 @@ describe('Routes: users/children', () => {
 
         context('when the parameters are incorrect (child_id is invalid)', () => {
             it('should return status code 400 and an info message about the invalid child_id', async () => {
-                const basePath = `/v1/users/children/123/physicalactivities/logs/${correctLogsArr[0].type}`
+                const basePath = `/v1/users/children/123/logs/${correctLogsArr[0].type}`
                 const specificPath = `/date/${correctLogsArr[0].date}/${correctLogsArr[0].date}`
                 const url = `${basePath}${specificPath}`
 
@@ -3122,7 +3123,7 @@ describe('Routes: users/children', () => {
 
         context('when the parameters are incorrect (resource is invalid)', () => {
             it('should return status code 400 and an info message about the invalid resource', async () => {
-                const basePath = `/v1/users/children/${defaultActivity.child_id}/physicalactivities/logs/step`
+                const basePath = `/v1/users/children/${defaultActivity.child_id}/logs/step`
                 const specificPath = `/date/${correctLogsArr[0].date}/${correctLogsArr[0].date}`
                 const url = `${basePath}${specificPath}`
 
@@ -3133,14 +3134,15 @@ describe('Routes: users/children', () => {
                     .then(err => {
                         expect(err.body.code).to.eql(400)
                         expect(err.body.message).to.eql('The name of type provided "step" is not supported...')
-                        expect(err.body.description).to.eql('The names of the allowed types are: steps, calories, active_minutes.')
+                        expect(err.body.description)
+                            .to.eql('The names of the allowed types are: steps, calories, active_minutes, sedentary_minutes.')
                     })
             })
         })
 
         context('when the parameters are incorrect (date_start is invalid)', () => {
             it('should return status code 400 and an info message about the invalid date_start', async () => {
-                const basePath = `/v1/users/children/${defaultActivity.child_id}/physicalactivities/logs/${correctLogsArr[0].type}`
+                const basePath = `/v1/users/children/${defaultActivity.child_id}/logs/${correctLogsArr[0].type}`
                 const specificPath = `/date/20199-10-01/${correctLogsArr[0].date}`
                 const url = `${basePath}${specificPath}`
 
@@ -3158,7 +3160,7 @@ describe('Routes: users/children', () => {
 
         context('when the parameters are incorrect (date_end is invalid)', () => {
             it('should return status code 400 and an info message about the invalid date_end', async () => {
-                const basePath = `/v1/users/children/${defaultActivity.child_id}/physicalactivities/logs/${correctLogsArr[0].type}`
+                const basePath = `/v1/users/children/${defaultActivity.child_id}/logs/${correctLogsArr[0].type}`
                 const specificPath = `/date/${correctLogsArr[0].date}/20199-10-01`
                 const url = `${basePath}${specificPath}`
 
@@ -3178,7 +3180,7 @@ describe('Routes: users/children', () => {
          */
         context('when get all logs in a time interval using the "query-strings-parser" library', () => {
             it('should return status code 200 and the result as needed in the query', async () => {
-                const basePath = `/v1/users/children/${defaultActivity.child_id}/physicalactivities/logs/${LogType.CALORIES}`
+                const basePath = `/v1/users/children/${defaultActivity.child_id}/logs/${LogType.CALORIES}`
                 const specificPath = `/date/${correctLogsArr[0].date}/${correctLogsArr[0].date}`
                 let url = `${basePath}${specificPath}?date=${correctLogsArr[0].date}`
                 url += '&sort=date&page=1&limit=2'
@@ -3205,7 +3207,7 @@ describe('Routes: users/children', () => {
             })
 
             it('should return status code 200 and an empty array of logs', async () => {
-                const basePath = `/v1/users/children/${defaultActivity.child_id}/physicalactivities/logs/${correctLogsArr[0].type}`
+                const basePath = `/v1/users/children/${defaultActivity.child_id}/logs/${correctLogsArr[0].type}`
                 const specificPath = `/date/2005-10-01/2005-10-10`
                 let url = `${basePath}${specificPath}?date=${correctLogsArr[0].date}`
                 url += '&sort=date&page=1&limit=2'
@@ -3231,7 +3233,7 @@ describe('Routes: users/children', () => {
             })
 
             it('should return status code 400 and an info message about the invalid child_id', async () => {
-                const basePath = `/v1/users/children/123/physicalactivities/logs/${correctLogsArr[0].type}`
+                const basePath = `/v1/users/children/123/logs/${correctLogsArr[0].type}`
                 const specificPath = `/date/${correctLogsArr[0].date}/${correctLogsArr[0].date}`
                 let url = `${basePath}${specificPath}?date=${correctLogsArr[0].date}`
                 url += '&sort=date&page=1&limit=2'
@@ -3259,7 +3261,7 @@ describe('Routes: users/children', () => {
             })
 
             it('should return status code 400 and an info message about the invalid resource', async () => {
-                const basePath = `/v1/users/children/${defaultActivity.child_id}/physicalactivities/logs/calorie`
+                const basePath = `/v1/users/children/${defaultActivity.child_id}/logs/calorie`
                 const specificPath = `/date/${correctLogsArr[0].date}/${correctLogsArr[0].date}`
                 let url = `${basePath}${specificPath}?date=${correctLogsArr[0].date}`
                 url += '&sort=date&page=1&limit=2'
@@ -3271,7 +3273,8 @@ describe('Routes: users/children', () => {
                     .then(err => {
                         expect(err.body.code).to.eql(400)
                         expect(err.body.message).to.eql('The name of type provided "calorie" is not supported...')
-                        expect(err.body.description).to.eql('The names of the allowed types are: steps, calories, active_minutes.')
+                        expect(err.body.description)
+                            .to.eql('The names of the allowed types are: steps, calories, active_minutes, sedentary_minutes.')
                     })
             })
         })
@@ -3287,7 +3290,7 @@ describe('Routes: users/children', () => {
             })
 
             it('should return status code 400 and an info message about the invalid date_start', async () => {
-                const basePath = `/v1/users/children/${defaultActivity.child_id}/physicalactivities/logs/${correctLogsArr[0].type}`
+                const basePath = `/v1/users/children/${defaultActivity.child_id}/logs/${correctLogsArr[0].type}`
                 const specificPath = `/date/20199-10-01/${correctLogsArr[0].date}`
                 let url = `${basePath}${specificPath}?date=${correctLogsArr[0].date}`
                 url += '&sort=date&page=1&limit=2'
@@ -3315,7 +3318,7 @@ describe('Routes: users/children', () => {
             })
 
             it('should return status code 400 and an info message about the invalid date_end', async () => {
-                const basePath = `/v1/users/children/${defaultActivity.child_id}/physicalactivities/logs/${correctLogsArr[0].type}`
+                const basePath = `/v1/users/children/${defaultActivity.child_id}/logs/${correctLogsArr[0].type}`
                 const specificPath = `/date/${correctLogsArr[0].date}/20199-10-01`
                 let url = `${basePath}${specificPath}?date=${correctLogsArr[0].date}`
                 url += '&sort=date&page=1&limit=2'

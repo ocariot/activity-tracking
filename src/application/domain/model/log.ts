@@ -100,5 +100,6 @@ export class Log extends Entity implements IJSONSerializable, IJSONDeserializabl
 export enum LogType {
     STEPS = 'steps',
     CALORIES = 'calories',
-    ACTIVE_MINUTES = 'active_minutes'
+    ACTIVE_MINUTES = 'active_minutes',
+    SEDENTARY_MINUTES = 'sedentary_minutes'
 }

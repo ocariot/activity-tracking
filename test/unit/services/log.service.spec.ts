@@ -162,11 +162,14 @@ describe('Services: Log', () => {
 
                 return  logService.addLogs(incorrectLogsArr)
                     .then(result => {
-                        assert.propertyVal(result.error[0], 'message', 'Date parameter: 20199-03-08, is not in valid ISO 8601 format.')
-                        assert.propertyVal(result.error[0], 'description', 'Date must be in the format: yyyy-MM-dd')
-                        assert.propertyVal(result.error[1], 'message', 'The name of type provided "step" is not supported...')
-                        assert.propertyVal(result.error[1], 'description', 'The names of the allowed types are: steps, calories, ' +
-                            'active_minutes.')
+                        assert.propertyVal(result.error[0], 'message',
+                            'Date parameter: 20199-03-08, is not in valid ISO 8601 format.')
+                        assert.propertyVal(result.error[0], 'description',
+                            'Date must be in the format: yyyy-MM-dd')
+                        assert.propertyVal(result.error[1], 'message',
+                            'The name of type provided "step" is not supported...')
+                        assert.propertyVal(result.error[1], 'description',
+                            'The names of the allowed types are: steps, calories, active_minutes, sedentary_minutes.')
 
                         for (let i = 0; i < result.error.length; i++) {
                             assert.propertyVal(result.error[i], 'code', HttpStatus.BAD_REQUEST)
@@ -203,11 +206,14 @@ describe('Services: Log', () => {
                             assert.propertyVal(result.success[i].item, 'child_id', mixedLogsArr[i].child_id)
                         }
 
-                        assert.propertyVal(result.error[0], 'message', 'Date parameter: 20199-03-08, is not in valid ISO 8601 format.')
-                        assert.propertyVal(result.error[0], 'description', 'Date must be in the format: yyyy-MM-dd')
-                        assert.propertyVal(result.error[1], 'message', 'The name of type provided "step" is not supported...')
-                        assert.propertyVal(result.error[1], 'description', 'The names of the allowed types are: steps, calories, ' +
-                            'active_minutes.')
+                        assert.propertyVal(result.error[0], 'message',
+                            'Date parameter: 20199-03-08, is not in valid ISO 8601 format.')
+                        assert.propertyVal(result.error[0], 'description',
+                            'Date must be in the format: yyyy-MM-dd')
+                        assert.propertyVal(result.error[1], 'message',
+                            'The name of type provided "step" is not supported...')
+                        assert.propertyVal(result.error[1], 'description',
+                            'The names of the allowed types are: steps, calories, active_minutes, sedentary_minutes.')
 
                         for (let i = 0; i < result.error.length; i++) {
                             assert.propertyVal(result.error[i], 'code', HttpStatus.BAD_REQUEST)
@@ -244,12 +250,14 @@ describe('Services: Log', () => {
                             assert.propertyVal(result.success[i].item, 'child_id', mixedLogsArr[i].child_id)
                         }
 
-                        assert.propertyVal(result.error[0], 'message', 'Value field is invalid...')
-                        assert.propertyVal(result.error[0], 'description', 'Physical Activity log validation failed: The value ' +
-                            'provided has a negative value!')
-                        assert.propertyVal(result.error[1], 'message', 'The name of type provided "step" is not supported...')
-                        assert.propertyVal(result.error[1], 'description', 'The names of the allowed types are: steps, calories, ' +
-                            'active_minutes.')
+                        assert.propertyVal(result.error[0], 'message',
+                            'Value field is invalid...')
+                        assert.propertyVal(result.error[0], 'description',
+                            'Physical Activity log validation failed: The value provided has a negative value!')
+                        assert.propertyVal(result.error[1], 'message',
+                            'The name of type provided "step" is not supported...')
+                        assert.propertyVal(result.error[1], 'description',
+                            'The names of the allowed types are: steps, calories, active_minutes, sedentary_minutes.')
 
                         for (let i = 0; i < result.error.length; i++) {
                             assert.propertyVal(result.error[i], 'code', HttpStatus.BAD_REQUEST)
@@ -287,10 +295,12 @@ describe('Services: Log', () => {
                         }
 
                         assert.propertyVal(result.error[0], 'message', Strings.CHILD.PARAM_ID_NOT_VALID_FORMAT)
-                        assert.propertyVal(result.error[0], 'description', Strings.ERROR_MESSAGE.UUID_NOT_VALID_FORMAT_DESC)
-                        assert.propertyVal(result.error[1], 'message', 'The name of type provided "step" is not supported...')
-                        assert.propertyVal(result.error[1], 'description', 'The names of the allowed types are: steps, calories, ' +
-                            'active_minutes.')
+                        assert.propertyVal(result.error[0], 'description',
+                            Strings.ERROR_MESSAGE.UUID_NOT_VALID_FORMAT_DESC)
+                        assert.propertyVal(result.error[1], 'message',
+                            'The name of type provided "step" is not supported...')
+                        assert.propertyVal(result.error[1], 'description',
+                            'The names of the allowed types are: steps, calories, active_minutes, sedentary_minutes.')
 
                         for (let i = 0; i < result.error.length; i++) {
                             assert.propertyVal(result.error[i], 'code', HttpStatus.BAD_REQUEST)
@@ -329,12 +339,14 @@ describe('Services: Log', () => {
                             assert.propertyVal(result.success[i].item, 'child_id', mixedLogsArr[i].child_id)
                         }
 
-                        assert.propertyVal(result.error[0], 'message', 'Required fields were not provided...')
-                        assert.propertyVal(result.error[0], 'description', 'Physical Activity log validation failed: type, ' +
-                            'date, value, child_id is required!')
-                        assert.propertyVal(result.error[1], 'message', 'The name of type provided "step" is not supported...')
-                        assert.propertyVal(result.error[1], 'description', 'The names of the allowed types are: steps, calories, ' +
-                            'active_minutes.')
+                        assert.propertyVal(result.error[0], 'message',
+                            'Required fields were not provided...')
+                        assert.propertyVal(result.error[0], 'description',
+                            'Physical Activity log validation failed: type, date, value, child_id is required!')
+                        assert.propertyVal(result.error[1], 'message',
+                            'The name of type provided "step" is not supported...')
+                        assert.propertyVal(result.error[1], 'description',
+                            'The names of the allowed types are: steps, calories, active_minutes, sedentary_minutes.')
 
                         for (let i = 0; i < result.error.length; i++) {
                             assert.propertyVal(result.error[i], 'code', HttpStatus.BAD_REQUEST)
@@ -619,9 +631,10 @@ describe('Services: Log', () => {
                     return logService.getByChildResourceAndDate(correctLogsArr[0].child_id, otherIncorrectLog.type,
                         correctLogsArr[0].date, correctLogsArr[1].date, query)
                 } catch (err) {
-                    assert.propertyVal(err, 'message', 'The name of type provided "step" is not supported...')
-                    assert.propertyVal(err, 'description', 'The names of the allowed types are: steps, calories, ' +
-                        'active_minutes.')
+                    assert.propertyVal(err, 'message',
+                        'The name of type provided "step" is not supported...')
+                    assert.propertyVal(err, 'description',
+                        'The names of the allowed types are: steps, calories, active_minutes, sedentary_minutes.')
                 }
             })
         })
