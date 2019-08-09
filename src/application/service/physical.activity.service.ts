@@ -70,29 +70,10 @@ export class PhysicalActivityService implements IPhysicalActivityService {
 
         for (const elem of activity) {
             try {
-                // 1. Validate the object.
-                CreatePhysicalActivityValidator.validate(elem)
+                // Add each activity from the array
+                await this.addActivity(elem)
 
-                // 2. Checks if physical activity already exists.
-                const activityExist = await this._activityRepository.checkExist(elem)
-                if (activityExist) throw new ConflictException('Physical Activity is already registered...')
-
-                // 3. Create new physical activity register.
-                const activityItemSaved: PhysicalActivity = await this._activityRepository.create(elem)
-
-                // 4. If created successfully, the object is published on the message bus.
-                if (activityItemSaved) {
-                    const event: PhysicalActivityEvent = new PhysicalActivityEvent('PhysicalActivitySaveEvent',
-                        new Date(), activityItemSaved)
-                    if (!(await this._eventBus.publish(event, 'activities.save'))) {
-                        // 5. Save Event for submission attempt later when there is connection to message channel.
-                        this.saveEvent(event)
-                    } else {
-                        this._logger.info(`Physical Activity with ID: ${activityItemSaved.id} published on event bus...`)
-                    }
-                }
-
-                // 6a. Create a StatusSuccess object for the construction of the MultiStatus response.
+                // Create a StatusSuccess object for the construction of the MultiStatus response.
                 const statusSuccess: StatusSuccess<PhysicalActivity> = new StatusSuccess<PhysicalActivity>(HttpStatus.CREATED, elem)
                 statusSuccessArr.push(statusSuccess)
             } catch (err) {
@@ -100,18 +81,18 @@ export class PhysicalActivityService implements IPhysicalActivityService {
                 if (err instanceof ValidationException) statusCode = HttpStatus.BAD_REQUEST
                 if (err instanceof ConflictException) statusCode = HttpStatus.CONFLICT
 
-                // 6b. Create a StatusError object for the construction of the MultiStatus response.
+                // Create a StatusError object for the construction of the MultiStatus response.
                 const statusError: StatusError<PhysicalActivity> = new StatusError<PhysicalActivity>(statusCode, err.message,
                     err.description, elem)
                 statusErrorArr.push(statusError)
             }
         }
 
-        // 7. Build the MultiStatus response.
+        // Build the MultiStatus response.
         multiStatus.success = statusSuccessArr
         multiStatus.error = statusErrorArr
 
-        // 8. Returns the created MultiStatus object.
+        // Returns the created MultiStatus object.
         return Promise.resolve(multiStatus)
     }
 

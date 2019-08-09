@@ -71,28 +71,10 @@ export class SleepService implements ISleepService {
 
         for (const elem of sleep) {
             try {
-                // 1. Validate the object.
-                CreateSleepValidator.validate(elem)
+                // Add each sleep from the array
+                await this.addSleep(elem)
 
-                // 2. Checks if sleep already exists.
-                const sleepExist = await this._sleepRepository.checkExist(elem)
-                if (sleepExist) throw new ConflictException('Sleep is already registered...')
-
-                // 3. Create new sleep register.
-                const sleepItemSaved: Sleep = await this._sleepRepository.create(elem)
-
-                // 4. If created successfully, the object is published on the message bus.
-                if (sleepItemSaved) {
-                    const event: SleepEvent = new SleepEvent('SleepSaveEvent', new Date(), sleepItemSaved)
-                    if (!(await this._eventBus.publish(event, 'sleep.save'))) {
-                        // 5. Save Event for submission attempt later when there is connection to message channel.
-                        this.saveEvent(event)
-                    } else {
-                        this._logger.info(`Sleep with ID: ${sleepItemSaved.id} published on event bus...`)
-                    }
-                }
-
-                // 6a. Create a StatusSuccess object for the construction of the MultiStatus response.
+                // Create a StatusSuccess object for the construction of the MultiStatus response.
                 const statusSuccess: StatusSuccess<Sleep> = new StatusSuccess<Sleep>(HttpStatus.CREATED, elem)
                 statusSuccessArr.push(statusSuccess)
             } catch (err) {
@@ -100,18 +82,18 @@ export class SleepService implements ISleepService {
                 if (err instanceof ValidationException) statusCode = HttpStatus.BAD_REQUEST
                 if (err instanceof ConflictException) statusCode = HttpStatus.CONFLICT
 
-                // 6b. Create a StatusError object for the construction of the MultiStatus response.
+                // Create a StatusError object for the construction of the MultiStatus response.
                 const statusError: StatusError<Sleep> = new StatusError<Sleep>(statusCode, err.message,
                     err.description, elem)
                 statusErrorArr.push(statusError)
             }
         }
 
-        // 7. Build the MultiStatus response.
+        // Build the MultiStatus response.
         multiStatus.success = statusSuccessArr
         multiStatus.error = statusErrorArr
 
-        // 8. Returns the created MultiStatus object.
+        // Returns the created MultiStatus object.
         return Promise.resolve(multiStatus)
     }
 

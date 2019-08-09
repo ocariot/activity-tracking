@@ -12,7 +12,7 @@ import { ILogger } from '../../utils/custom.logger'
 import { ILogService } from '../../application/port/log.service.interface'
 import { Log } from '../../application/domain/model/log'
 import { MultiStatus } from '../../application/domain/model/multi.status'
-import { PhysicalActivityLog } from '../../application/domain/model/physical.activity.log'
+import { ChildLog } from '../../application/domain/model/child.log'
 
 /**
  * Controller that implements PhysicalActivity feature operations.
@@ -176,7 +176,7 @@ export class ActivityController {
     }
 
     /**
-     * Add new physical activity log.
+     * Add new child log.
      *
      * @param {Request} req
      * @param {Response} res
@@ -215,7 +215,7 @@ export class ActivityController {
     @httpGet('/:child_id/logs/date/:date_start/:date_end')
     public async getLogs(@request() req: Request, @response() res: Response): Promise<Response> {
         try {
-            const result: PhysicalActivityLog = await this._activityLogService
+            const result: ChildLog = await this._activityLogService
                 .getByChildAndDate(req.params.child_id, req.params.date_start, req.params.date_end, new Query().fromJSON(req.query))
             return res.status(HttpStatus.OK).send(result)
         } catch (err) {

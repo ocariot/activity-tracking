@@ -46,9 +46,6 @@ import { IIntegrationEventRepository } from '../application/port/integration.eve
 import { IntegrationEventRepository } from '../infrastructure/repository/integration.event.repository'
 import { IntegrationEventRepoModel } from '../infrastructure/database/schema/integration.event.schema'
 import { EventBusTask } from '../background/task/eventbus.task'
-import { PhysicalActivityLogEntity } from '../infrastructure/entity/physical.activity.log.entity'
-import { PhysicalActivityLog } from '../application/domain/model/physical.activity.log'
-import { PhysicalActivityLogEntityMapper } from '../infrastructure/entity/mapper/physical.activity.log.entity.mapper'
 import { ActivityLogRepoModel } from '../infrastructure/database/schema/activity.log.schema'
 import { ILogRepository } from '../application/port/log.repository.interface'
 import { LogRepository } from '../infrastructure/repository/log.repository'
@@ -169,9 +166,6 @@ export class DI {
         this.container
             .bind<IEntityMapper<PhysicalActivity, ActivityEntity>>(Identifier.ACTIVITY_ENTITY_MAPPER)
             .to(PhysicalActivityEntityMapper).inSingletonScope()
-        this.container
-            .bind<IEntityMapper<PhysicalActivityLog, PhysicalActivityLogEntity>>(Identifier.ACTIVITY_LOG_ENTITY_MAPPER)
-            .to(PhysicalActivityLogEntityMapper).inSingletonScope()
         this.container
             .bind<IEntityMapper<Log, LogEntity>>(Identifier.LOG_ENTITY_MAPPER)
             .to(LogEntityMapper).inSingletonScope()

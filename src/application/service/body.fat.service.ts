@@ -73,28 +73,10 @@ export class BodyFatService implements IBodyFatService {
 
         for (const elem of bodyFat) {
             try {
-                // 1. Validate the object.
-                CreateBodyFatValidator.validate(elem)
+                // Add each body fat from the array
+                await this.addFat(elem)
 
-                // 2. Checks if BodyFat already exists.
-                const bodyFatExist = await this._bodyFatRepository.checkExist(elem)
-                if (bodyFatExist) throw new ConflictException('BodyFat is already registered...')
-
-                // 3. Create new BodyFat register.
-                const bodyFatItemSaved: BodyFat = await this._bodyFatRepository.create(elem)
-
-                // 4. If created successfully, the object is published on the message bus.
-                if (bodyFatItemSaved) {
-                    const event: BodyFatEvent = new BodyFatEvent('BodyFatSaveEvent', new Date(), bodyFatItemSaved)
-                    if (!(await this._eventBus.publish(event, 'bodyfat.save'))) {
-                        // 5. Save Event for submission attempt later when there is connection to message channel.
-                        this.saveEvent(event)
-                    } else {
-                        this._logger.info(`BodyFat with ID: ${bodyFatItemSaved.id} published on event bus...`)
-                    }
-                }
-
-                // 6a. Create a StatusSuccess object for the construction of the MultiStatus response.
+                // Create a StatusSuccess object for the construction of the MultiStatus response.
                 const statusSuccess: StatusSuccess<BodyFat> = new StatusSuccess<BodyFat>(HttpStatus.CREATED, elem)
                 statusSuccessArr.push(statusSuccess)
             } catch (err) {
@@ -102,18 +84,18 @@ export class BodyFatService implements IBodyFatService {
                 if (err instanceof ValidationException) statusCode = HttpStatus.BAD_REQUEST
                 if (err instanceof ConflictException) statusCode = HttpStatus.CONFLICT
 
-                // 6b. Create a StatusError object for the construction of the MultiStatus response.
+                // Create a StatusError object for the construction of the MultiStatus response.
                 const statusError: StatusError<BodyFat> = new StatusError<BodyFat>(statusCode, err.message,
                     err.description, elem)
                 statusErrorArr.push(statusError)
             }
         }
 
-        // 7. Build the MultiStatus response.
+        // Build the MultiStatus response.
         multiStatus.success = statusSuccessArr
         multiStatus.error = statusErrorArr
 
-        // 8. Returns the created MultiStatus object.
+        // Returns the created MultiStatus object.
         return Promise.resolve(multiStatus)
     }
 

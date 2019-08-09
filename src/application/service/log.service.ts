@@ -8,7 +8,7 @@ import { Log, LogType } from '../domain/model/log'
 import { ILogRepository } from '../port/log.repository.interface'
 import { CreateLogValidator } from '../domain/validator/create.log.validator'
 import { DateValidator } from '../domain/validator/date.validator'
-import { PhysicalActivityLog } from '../domain/model/physical.activity.log'
+import { ChildLog } from '../domain/model/child.log'
 import { MultiStatus } from '../domain/model/multi.status'
 import { StatusSuccess } from '../domain/model/status.success'
 import { StatusError } from '../domain/model/status.error'
@@ -17,7 +17,7 @@ import { ObjectIdValidator } from '../domain/validator/object.id.validator'
 import { LogTypeValidator } from '../domain/validator/log.type.validator'
 
 /**
- * Implementing physical activity service
+ * Implementing log service
  *
  * @implements {ILogService}
  */
@@ -49,7 +49,7 @@ export class LogService implements ILogService {
                 const log = await this._logRepository.selectByChild(elem.child_id, elem.type, elem.date)
 
                 if (log) { // If exists.
-                    // 3a. Update physical activity log.
+                    // 3a. Update child log.
                     log.value = elem.value
                     await this._logRepository.update(log)
 
@@ -57,7 +57,7 @@ export class LogService implements ILogService {
                     const statusSuccess: StatusSuccess<Log> = new StatusSuccess<Log>(HttpStatus.CREATED, elem)
                     statusSuccessArr.push(statusSuccess)
                 } else {
-                    // 3b. Creates new physical activity log.
+                    // 3b. Creates new child log.
                     await this._logRepository.create(elem)
 
                     // 4b. Creates a StatusSuccess object for the construction of the MultiStatus response.
@@ -86,7 +86,7 @@ export class LogService implements ILogService {
      * Get the data of all logs in the infrastructure.
      *
      * @param query Defines object to be used for queries.
-     * @return {Promise<Array<PhysicalActivityLog>>}
+     * @return {Promise<Array<ChildLog>>}
      * @throws {RepositoryException}
      */
     public async getAll(query: IQuery): Promise<Array<Log>> {
@@ -98,7 +98,7 @@ export class LogService implements ILogService {
      *
      * @param id Unique identifier.
      * @param query Defines object to be used for queries.
-     * @return {Promise<PhysicalActivityLog>}
+     * @return {Promise<ChildLog>}
      * @throws {RepositoryException}
      */
     public async getById(id: string, query: IQuery): Promise<Log> {
@@ -106,16 +106,17 @@ export class LogService implements ILogService {
     }
 
     /**
-     * Retrieve the physical activities logs with information on the total steps and calories of a child in a given period.
+     * Retrieve the child logs with information on the total steps, calories, activeMinutes and sedentaryMinutes
+     * of a child in a given period.
      *
      * @param childId Child ID.
      * @param dateStart Range start date.
      * @param dateEnd Range end date.
      * @param query Defines object to be used for queries.
-     * @return {Promise<PhysicalActivityLog>}
+     * @return {Promise<ChildLog>}
      * @throws {RepositoryException}
      */
-    public async getByChildAndDate(childId: string, dateStart: string, dateEnd: string, query: IQuery): Promise<PhysicalActivityLog> {
+    public async getByChildAndDate(childId: string, dateStart: string, dateEnd: string, query: IQuery): Promise<ChildLog> {
         ObjectIdValidator.validate(childId, Strings.CHILD.PARAM_ID_NOT_VALID_FORMAT)
         DateValidator.validate(dateStart)
         DateValidator.validate(dateEnd)
@@ -129,8 +130,8 @@ export class LogService implements ILogService {
         })
 
         try {
-            // Creates a PhysicalActivityLog object with all the resources listed with arrays.
-            const physical: PhysicalActivityLog = new PhysicalActivityLog()
+            // Creates a ChildLog object with all the resources listed with arrays.
+            const childLog: ChildLog = new ChildLog()
             const stepsArr: Array<Log> = new Array<Log>()
             const caloriesArr: Array<Log> = new Array<Log>()
             const activeMinutesArr: Array<Log> = new Array<Log>()
@@ -144,19 +145,20 @@ export class LogService implements ILogService {
                 else if (item.type === LogType.SEDENTARY_MINUTES) sedentaryMinutesArr.push(item)
             })
 
-            physical.steps = stepsArr
-            physical.calories = caloriesArr
-            physical.active_minutes = activeMinutesArr
-            physical.sedentary_minutes = sedentaryMinutesArr
+            childLog.steps = stepsArr
+            childLog.calories = caloriesArr
+            childLog.active_minutes = activeMinutesArr
+            childLog.sedentary_minutes = sedentaryMinutesArr
 
-            return Promise.resolve(physical)
+            return Promise.resolve(childLog)
         } catch (err) {
             return Promise.reject(err)
         }
     }
 
     /**
-     * Retrieve the physical activities logs with information on the total steps or calories of a child in a given period.
+     * Retrieve the child logs with information on the total steps, calories, activeMinutes or sedentaryMinutes
+     * of a child in a given period.
      *
      * @param childId Child ID.
      * @param desiredResource Desired resource.

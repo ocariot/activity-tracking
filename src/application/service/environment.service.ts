@@ -70,29 +70,10 @@ export class EnvironmentService implements IEnvironmentService {
 
         for (const elem of environment) {
             try {
-                // 1. Validate the object.
-                CreateEnvironmentValidator.validate(elem)
+                // Add each environment from the array
+                await this.addEnvironment(elem)
 
-                // 2. Checks if environment already exists.
-                const envItemExist = await this._environmentRepository.checkExist(elem)
-                if (envItemExist) throw new ConflictException('Measurement of environment is already registered...')
-
-                // 3. Create new environment register.
-                const envItemSaved: Environment = await this._environmentRepository.create(elem)
-
-                // 4. If created successfully, the object is published on the message bus.
-                if (envItemSaved) {
-                    const event: EnvironmentEvent = new EnvironmentEvent('EnvironmentSaveEvent',
-                        new Date(), envItemSaved)
-                    if (!(await this._eventBus.publish(event, 'environments.save'))) {
-                        // 5. Save Event for submission attempt later when there is connection to message channel.
-                        this.saveEvent(event)
-                    } else {
-                        this._logger.info(`Measurement of environment with ID: ${envItemSaved.id} published on event bus...`)
-                    }
-                }
-
-                // 6a. Create a StatusSuccess object for the construction of the MultiStatus response.
+                // Create a StatusSuccess object for the construction of the MultiStatus response.
                 const statusSuccess: StatusSuccess<Environment> = new StatusSuccess<Environment>(HttpStatus.CREATED, elem)
                 statusSuccessArr.push(statusSuccess)
             } catch (err) {
@@ -100,18 +81,18 @@ export class EnvironmentService implements IEnvironmentService {
                 if (err instanceof ValidationException) statusCode = HttpStatus.BAD_REQUEST
                 if (err instanceof ConflictException) statusCode = HttpStatus.CONFLICT
 
-                // 6b. Create a StatusError object for the construction of the MultiStatus response.
+                // Create a StatusError object for the construction of the MultiStatus response.
                 const statusError: StatusError<Environment> = new StatusError<Environment>(statusCode, err.message,
                     err.description, elem)
                 statusErrorArr.push(statusError)
             }
         }
 
-        // 7. Build the MultiStatus response.
+        // Build the MultiStatus response.
         multiStatus.success = statusSuccessArr
         multiStatus.error = statusErrorArr
 
-        // 8. Returns the created MultiStatus object.
+        // Returns the created MultiStatus object.
         return Promise.resolve(multiStatus)
     }
 

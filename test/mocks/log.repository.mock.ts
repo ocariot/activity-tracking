@@ -19,7 +19,7 @@ export class LogRepositoryMock implements ILogRepository {
     public find(query: any): Promise<Array<Log>> {
         const logsArr: Array<Log> = new Array<Log>()
         const child_id: string = query.filters.child_id
-        // Only for the test case that returns a filled PhysicalActivityLog
+        // Only for the test case that returns a filled ChildLog
         if (!(child_id === '507f1f77bcf86cd799439011')) {
             // Mock correct logs array
             for (let i = 0; i < 5; i++ ) {

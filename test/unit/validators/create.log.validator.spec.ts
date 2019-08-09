@@ -21,7 +21,7 @@ describe('Validators: CreateLogValidator', () => {
                     CreateLogValidator.validate(log)
                 } catch (err) {
                     assert.equal(err.message, 'Required fields were not provided...')
-                    assert.equal(err.description, 'Physical Activity log validation failed: type is required!')
+                    assert.equal(err.description, 'Child log validation failed: type is required!')
                 }
             })
         })
@@ -36,7 +36,7 @@ describe('Validators: CreateLogValidator', () => {
                 } catch (err) {
                     assert.equal(err.message, 'Required fields were not provided...')
                     assert.equal(err.description,
-                        'Physical Activity log validation failed: type, date, value, child_id is required!')
+                        'Child log validation failed: type, date, value, child_id is required!')
                 }
             })
         })
@@ -97,7 +97,7 @@ describe('Validators: CreateLogValidator', () => {
                 } catch (err) {
                     assert.equal(err.message, 'Value field is invalid...')
                     assert.equal(err.description,
-                        'Physical Activity log validation failed: The value provided has a negative value!')
+                        'Child log validation failed: The value provided has a negative value!')
                 }
                 log.value = 1000
             })

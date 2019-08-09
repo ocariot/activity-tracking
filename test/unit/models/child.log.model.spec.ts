@@ -1,10 +1,10 @@
 import { assert } from 'chai'
-import { PhysicalActivityLog } from '../../../src/application/domain/model/physical.activity.log'
+import { ChildLog } from '../../../src/application/domain/model/child.log'
 import { LogMock } from '../../mocks/log.mock'
 import { LogType } from '../../../src/application/domain/model/log'
 import { ObjectID } from 'bson'
 
-describe('Models: PhysicalActivityLog', () => {
+describe('Models: ChildLog', () => {
     const activityLogJSON: any = {
         id: new ObjectID(),
         steps: [(new LogMock(LogType.STEPS)).toJSON()],
@@ -15,9 +15,8 @@ describe('Models: PhysicalActivityLog', () => {
 
     describe('fromJSON(json: any)', () => {
         context('when the json is correct', () => {
-            it('should return an PhysicalActivityLog model', () => {
-                const result = new PhysicalActivityLog().fromJSON(activityLogJSON)
-                assert.deepPropertyVal(result, 'id', activityLogJSON.id)
+            it('should return an ChildLog model', () => {
+                const result = new ChildLog().fromJSON(activityLogJSON)
                 assert.deepPropertyVal(result.steps[0], 'date', activityLogJSON.steps[0].date)
                 assert.deepPropertyVal(result.steps[0], 'value', activityLogJSON.steps[0].value)
                 assert.deepPropertyVal(result.calories[0], 'date', activityLogJSON.calories[0].date)
@@ -30,8 +29,8 @@ describe('Models: PhysicalActivityLog', () => {
         })
 
         context('when the json is undefined', () => {
-            it('should return an PhysicalActivityLog model with all attributes with undefined value', () => {
-                const result = new PhysicalActivityLog().fromJSON(undefined)
+            it('should return an ChildLog model with all attributes with undefined value', () => {
+                const result = new ChildLog().fromJSON(undefined)
                 assert.isUndefined(result.steps)
                 assert.isUndefined(result.calories)
                 assert.isUndefined(result.active_minutes)
@@ -40,9 +39,8 @@ describe('Models: PhysicalActivityLog', () => {
         })
 
         context('when the json is a string', () => {
-            it('should transform the string in json and return PhysicalActivityLog model', () => {
-                const result = new PhysicalActivityLog().fromJSON(JSON.stringify(activityLogJSON))
-                assert.deepPropertyVal(result, 'id', activityLogJSON.id.toHexString())
+            it('should transform the string in json and return ChildLog model', () => {
+                const result = new ChildLog().fromJSON(JSON.stringify(activityLogJSON))
                 assert.deepPropertyVal(result.steps[0], 'date', activityLogJSON.steps[0].date)
                 assert.deepPropertyVal(result.steps[0], 'value', activityLogJSON.steps[0].value)
                 assert.deepPropertyVal(result.calories[0], 'date', activityLogJSON.calories[0].date)
@@ -56,11 +54,10 @@ describe('Models: PhysicalActivityLog', () => {
     })
 
     describe('toJSON()', () => {
-        context('when the PhysicalActivityLog model is correct', () => {
-            it('should return a JSON from PhysicalActivityLog model', () => {
-                let result = new PhysicalActivityLog().fromJSON(activityLogJSON)
+        context('when the ChildLog model is correct', () => {
+            it('should return a JSON from ChildLog model', () => {
+                let result = new ChildLog().fromJSON(activityLogJSON)
                 result = result.toJSON()
-                assert.deepPropertyVal(result, 'id', activityLogJSON.id)
                 assert.deepPropertyVal(result, 'steps', activityLogJSON.steps)
                 assert.deepPropertyVal(result, 'calories', activityLogJSON.calories)
                 assert.deepPropertyVal(result, 'active_minutes', activityLogJSON.active_minutes)

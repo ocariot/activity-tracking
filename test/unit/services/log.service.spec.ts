@@ -253,7 +253,7 @@ describe('Services: Log', () => {
                         assert.propertyVal(result.error[0], 'message',
                             'Value field is invalid...')
                         assert.propertyVal(result.error[0], 'description',
-                            'Physical Activity log validation failed: The value provided has a negative value!')
+                            'Child log validation failed: The value provided has a negative value!')
                         assert.propertyVal(result.error[1], 'message',
                             'The name of type provided "step" is not supported...')
                         assert.propertyVal(result.error[1], 'description',
@@ -342,7 +342,7 @@ describe('Services: Log', () => {
                         assert.propertyVal(result.error[0], 'message',
                             'Required fields were not provided...')
                         assert.propertyVal(result.error[0], 'description',
-                            'Physical Activity log validation failed: type, date, value, child_id is required!')
+                            'Child log validation failed: type, date, value, child_id is required!')
                         assert.propertyVal(result.error[1], 'message',
                             'The name of type provided "step" is not supported...')
                         assert.propertyVal(result.error[1], 'description',
@@ -366,7 +366,7 @@ describe('Services: Log', () => {
      */
     describe('getByChildAndDate(childId: string, dateStart: Date, dateEnd: Date, query: IQuery)', () => {
         context('when the parameters are correct and there are corresponding logs with the query', () => {
-            it('should return a PhysicalActivityLog with steps and/or calories logs',  () => {
+            it('should return a ChildLog with steps and/or calories logs',  () => {
                 const query: IQuery = new Query()
                 query.filters = {
                     child_id: correctLogsArr[0].child_id,
@@ -393,7 +393,7 @@ describe('Services: Log', () => {
         })
 
         context('when the parameters are correct but there are no corresponding logs with the query', () => {
-            it('should return an empty PhysicalActivityLog',  () => {
+            it('should return an empty ChildLog',  () => {
                 correctLogsArr[0].child_id = '507f1f77bcf86cd799439011'
                 const query: IQuery = new Query()
                 query.filters = {

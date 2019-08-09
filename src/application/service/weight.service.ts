@@ -75,53 +75,10 @@ export class WeightService implements IWeightService {
 
         for (const elem of weight) {
             try {
-                // 1. Validate the object.
-                CreateWeightValidator.validate(elem)
+                // Add each weight from the array
+                await this.addWeight(elem)
 
-                // 1.5. Create new BodyFat register if does not already exist.
-                let bodyFatSaved: BodyFat = new BodyFat()
-
-                if (elem.body_fat) {
-                    const bodyFat: BodyFat = await this._bodyFatRepository.selectByChild(elem.body_fat.timestamp!,
-                        elem.body_fat.child_id!, elem.body_fat.type!)
-
-                    if (bodyFat) elem.body_fat = bodyFat
-                    else {
-                        bodyFatSaved = await this._bodyFatRepository.create(elem.body_fat)
-                        elem.body_fat = bodyFatSaved
-
-                        // 1.5b. If created successfully, the object is published on the message bus.
-                        if (bodyFatSaved) {
-                            const event: BodyFatEvent = new BodyFatEvent('BodyFatSaveEvent', new Date(), bodyFatSaved)
-                            if (!(await this._eventBus.publish(event, 'bodyfat.save'))) {
-                                // 1.5c. Save Event for submission attempt later when there is connection to message channel.
-                                this.saveEvent(event)
-                            } else {
-                                this._logger.info(`Body Fat with ID: ${bodyFatSaved.id} published on event bus...`)
-                            }
-                        }
-                    }
-                }
-
-                // 2. Checks if Weight already exists.
-                const weightExist = await this._weightRepository.checkExist(elem)
-                if (weightExist) throw new ConflictException('Weight is already registered...')
-
-                // 3. Create new Weight register.
-                const weightItemSaved: Weight = await this._weightRepository.create(elem)
-
-                // 4. If created successfully, the object is published on the message bus.
-                if (weightItemSaved) {
-                    const event: WeightEvent = new WeightEvent('WeightSaveEvent', new Date(), weightItemSaved)
-                    if (!(await this._eventBus.publish(event, 'weight.save'))) {
-                        // 5. Save Event for submission attempt later when there is connection to message channel.
-                        this.saveEvent(event)
-                    } else {
-                        this._logger.info(`Weight with ID: ${weightItemSaved.id} published on event bus...`)
-                    }
-                }
-
-                // 6a. Create a StatusSuccess object for the construction of the MultiStatus response.
+                // Create a StatusSuccess object for the construction of the MultiStatus response.
                 const statusSuccess: StatusSuccess<Weight> = new StatusSuccess<Weight>(HttpStatus.CREATED, elem)
                 statusSuccessArr.push(statusSuccess)
             } catch (err) {
@@ -129,18 +86,18 @@ export class WeightService implements IWeightService {
                 if (err instanceof ValidationException) statusCode = HttpStatus.BAD_REQUEST
                 if (err instanceof ConflictException) statusCode = HttpStatus.CONFLICT
 
-                // 6b. Create a StatusError object for the construction of the MultiStatus response.
+                // Create a StatusError object for the construction of the MultiStatus response.
                 const statusError: StatusError<Weight> = new StatusError<Weight>(statusCode, err.message,
                     err.description, elem)
                 statusErrorArr.push(statusError)
             }
         }
 
-        // 7. Build the MultiStatus response.
+        // Build the MultiStatus response.
         multiStatus.success = statusSuccessArr
         multiStatus.error = statusErrorArr
 
-        // 8. Returns the created MultiStatus object.
+        // Returns the created MultiStatus object.
         return Promise.resolve(multiStatus)
     }
 

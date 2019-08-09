@@ -2762,7 +2762,7 @@ describe('Routes: users/children', () => {
                         expect(res.body.error[0].message).to.eql('Date parameter: 20199-03-08, is not in valid ISO 8601 format.')
                         expect(res.body.error[0].description).to.eql('Date must be in the format: yyyy-MM-dd')
                         expect(res.body.error[1].message).to.eql('Value field is invalid...')
-                        expect(res.body.error[1].description).to.eql('Physical Activity log validation failed: The value ' +
+                        expect(res.body.error[1].description).to.eql('Child log validation failed: The value ' +
                             'provided has a negative value!')
 
                         for (let i = 0; i < res.body.error.length; i++) {
@@ -2870,7 +2870,7 @@ describe('Routes: users/children', () => {
                         }
                         expect(res.body.error[0].code).to.eql(HttpStatus.BAD_REQUEST)
                         expect(res.body.error[0].message).to.eql('Required fields were not provided...')
-                        expect(res.body.error[0].description).to.eql('Physical Activity log validation failed: date, value is required!')
+                        expect(res.body.error[0].description).to.eql('Child log validation failed: date, value is required!')
                     })
             })
         })
@@ -2880,7 +2880,7 @@ describe('Routes: users/children', () => {
      */
     describe('GET /v1/users/children/:child_id/logs/date/:date_start/:date_end', () => {
         context('when the parameters are correct and there are corresponding logs with the query', () => {
-            it('should return status code 200 and a PhysicalActivityLog with steps and/or calories logs', async () => {
+            it('should return status code 200 and a ChildLog with steps and/or calories logs', async () => {
                 const basePath = `/v1/users/children/${defaultActivity.child_id}/logs`
                 const specificPath = `/date/${correctLogsArr[0].date}/${correctLogsArr[0].date}`
                 const url = `${basePath}${specificPath}`
@@ -2897,7 +2897,7 @@ describe('Routes: users/children', () => {
         })
 
         context('when the parameters are correct but there are no corresponding logs with the query', () => {
-            it('should return status code 200 and an empty PhysicalActivityLog', async () => {
+            it('should return status code 200 and an empty ChildLog', async () => {
                 const basePath = `/v1/users/children/${defaultActivity.child_id}/logs`
                 const specificPath = `/date/2005-10-01/2005-10-10`
                 const url = `${basePath}${specificPath}`
@@ -2989,7 +2989,7 @@ describe('Routes: users/children', () => {
 
         context('when there is an attempt to get all logs in a time interval using the "query-strings-parser" library but there ' +
                 'are no corresponding logs with the query in the database', () => {
-            it('should return status code 200 and an empty PhysicalActivityLog', async () => {
+            it('should return status code 200 and an empty ChildLog', async () => {
                 const basePath = `/v1/users/children/${defaultActivity.child_id}/logs`
                 const specificPath = `/date/2005-10-01/2005-10-10`
                 let url = `${basePath}${specificPath}?date=${correctLogsArr[0].date}`

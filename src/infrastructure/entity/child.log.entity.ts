@@ -1,4 +1,4 @@
-export class PhysicalActivityLogEntity {
+export class ChildLogEntity {
     public id?: string
     public steps?: Array<any> // Logs of steps of a child
     public calories?: Array<any> // Logs of calories of a child
