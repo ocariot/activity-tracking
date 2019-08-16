@@ -61,8 +61,10 @@ describe('Validators: CreateBodyFatValidator', () => {
                 try {
                     CreateBodyFatValidator.validate(bodyFat)
                 } catch (err) {
-                    assert.equal(err.message, 'The type of measurement provided "invalid_type" is not supported...')
-                    assert.equal(err.description, 'The allowed types are: temperature, humidity, body_fat, weight.')
+                    assert.equal(err.message,
+                        'The type of measurement provided "invalid_type" is not supported...')
+                    assert.equal(err.description,
+                        'The allowed types are: temperature, humidity, pm1, pm2.5, pm10, body_fat, weight.')
                 }
                 bodyFat.type = type_aux
             })

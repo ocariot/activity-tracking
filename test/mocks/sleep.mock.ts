@@ -51,11 +51,11 @@ export class SleepMock extends Sleep {
         dataSetItem.start_time = new Date(start_time)
         if (sleepType === SleepType.CLASSIC) {
             switch (Math.floor((Math.random() * 3))) { // 0-2
-                case 1:
+                case 0:
                     dataSetItem.name = PhasesPatternType.RESTLESS
                     dataSetItem.duration = Math.floor(Math.random() * 5 + 1) * 60000 // 1-5min milliseconds
                     return dataSetItem
-                case 2:
+                case 1:
                     dataSetItem.name = PhasesPatternType.AWAKE
                     dataSetItem.duration = Math.floor(Math.random() * 3 + 1) * 60000 // 1-3min in milliseconds
                     return dataSetItem
@@ -67,15 +67,15 @@ export class SleepMock extends Sleep {
             }
         } else {
             switch (Math.floor((Math.random() * 4))) { // 0-3
-                case 1:
+                case 0:
                     dataSetItem.name = StagesPatternType.DEEP
                     dataSetItem.duration = Math.floor(Math.random() * 5 + 1) * 60000 // 1-5min milliseconds
                     return dataSetItem
-                case 2:
+                case 1:
                     dataSetItem.name = StagesPatternType.LIGHT
                     dataSetItem.duration = Math.floor(Math.random() * 3 + 1) * 60000 // 1-3min in milliseconds
                     return dataSetItem
-                case 3:
+                case 2:
                     dataSetItem.name = StagesPatternType.REM
                     dataSetItem.duration = Math.floor(Math.random() * 3 + 1) * 60000 // 1-3min in milliseconds
                     return dataSetItem

@@ -58,7 +58,7 @@ export class PhysicalActivityRepository extends BaseRepository<PhysicalActivity,
     public updateByChild(activity: PhysicalActivity): Promise<PhysicalActivity> {
         const itemUp: ActivityEntity = this.activityMapper.transform(activity)
         return new Promise<PhysicalActivity>((resolve, reject) => {
-            this.Model.findOneAndUpdate({
+            this.activityModel.findOneAndUpdate({
                     child_id: itemUp.child_id,
                     _id: itemUp.id
                 },
@@ -82,7 +82,7 @@ export class PhysicalActivityRepository extends BaseRepository<PhysicalActivity,
      */
     public removeByChild(activityId: string | number, childId: string): Promise<boolean> {
         return new Promise<boolean>((resolve, reject) => {
-            this.Model.findOneAndDelete({ child_id: childId, _id: activityId })
+            this.activityModel.findOneAndDelete({ child_id: childId, _id: activityId })
                 .exec()
                 .then(result => {
                     if (!result) return resolve(false)
@@ -105,12 +105,12 @@ export class PhysicalActivityRepository extends BaseRepository<PhysicalActivity,
         query.filters = { child_id: childId }
 
         return new Promise<boolean>((resolve, reject) => {
-            this.Model.deleteMany(query.filters)
+            this.activityModel.deleteMany(query.filters)
                 .then(result => {
                     if (!result) return resolve(false)
                     return resolve(true)
                 })
-                .catch(err => reject(this.mongoDBErrorListener(err)))
+                .catch(err => reject(super.mongoDBErrorListener(err)))
         })
     }
 }

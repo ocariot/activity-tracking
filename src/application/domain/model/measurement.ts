@@ -16,13 +16,8 @@ export class Measurement extends Entity implements IJSONSerializable, IJSONDeser
     private _unit?: string // Unit of measurement.
     private _child_id?: string // Id of child associated with the measurement.
 
-    constructor(type?: string, value?: number, unit?: string, timestamp?: Date, child_id?: string) {
+    constructor() {
         super()
-        if (type) this.type = type
-        if (value) this.value = value
-        if (unit) this.unit = unit
-        if (timestamp) this.timestamp = timestamp
-        if (child_id) this.child_id = child_id
     }
 
     get type(): string | undefined {
@@ -103,6 +98,9 @@ export class Measurement extends Entity implements IJSONSerializable, IJSONDeser
 export enum MeasurementType {
     TEMPERATURE = 'temperature',
     HUMIDITY = 'humidity',
+    PM1 = 'pm1',
+    PM2_5 = 'pm2.5',
+    PM10 = 'pm10',
     BODY_FAT = 'body_fat',
     WEIGHT = 'weight'
 }

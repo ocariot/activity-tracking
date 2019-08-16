@@ -86,7 +86,7 @@ export class WeightRepository extends BaseRepository<Weight, WeightEntity> imple
                 .then((result) => {
                     resolve(result.map(item => this.mapper.transform(item)))
                 })
-                .catch(err => reject(this.mongoDBErrorListener(err)))
+                .catch(err => reject(super.mongoDBErrorListener(err)))
         })
     }
 
@@ -107,7 +107,7 @@ export class WeightRepository extends BaseRepository<Weight, WeightEntity> imple
                     if (!result) return resolve(undefined)
                     return resolve(this.mapper.transform(result))
                 })
-                .catch(err => reject(this.mongoDBErrorListener(err)))
+                .catch(err => reject(super.mongoDBErrorListener(err)))
         })
     }
 

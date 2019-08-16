@@ -249,13 +249,16 @@ describe('Services: BodyFatService', () => {
                     .withArgs(incorrectBodyFat)
                     .chain('exec')
                     .rejects({ message: 'The type of measurement provided "invalidtype" is not supported...',
-                               description: 'The allowed types are: temperature, humidity, body_fat, weight.' })
+                               description:
+                                   'The allowed types are: temperature, humidity, pm1, pm2.5, pm10, body_fat, weight.' })
 
                 try {
                     return await bodyFatService.add(incorrectBodyFat)
                 } catch (err) {
-                    assert.propertyVal(err, 'message', 'The type of measurement provided "invalidtype" is not supported...')
-                    assert.propertyVal(err, 'description', 'The allowed types are: temperature, humidity, body_fat, weight.')
+                    assert.propertyVal(err, 'message',
+                        'The type of measurement provided "invalidtype" is not supported...')
+                    assert.propertyVal(err, 'description',
+                        'The allowed types are: temperature, humidity, pm1, pm2.5, pm10, body_fat, weight.')
                 }
             })
         })
@@ -441,15 +444,18 @@ describe('Services: BodyFatService', () => {
                     .then((result: BodyFat | MultiStatus<BodyFat>) => {
                         result = result as MultiStatus<BodyFat>
 
-                        assert.propertyVal(result.error[0], 'message', 'Required fields were not provided...')
-                        assert.propertyVal(result.error[0], 'description', 'Measurement validation failed: type, ' +
-                            'timestamp, value, unit, child_id is required!')
-                        assert.propertyVal(result.error[1], 'message', Strings.CHILD.PARAM_ID_NOT_VALID_FORMAT)
-                        assert.propertyVal(result.error[1], 'description', Strings.ERROR_MESSAGE.UUID_NOT_VALID_FORMAT_DESC)
-                        assert.propertyVal(result.error[2], 'message', 'The type of measurement provided "invalidtype" ' +
-                            'is not supported...')
-                        assert.propertyVal(result.error[2], 'description', 'The allowed types are: temperature, humidity, ' +
-                            'body_fat, weight.')
+                        assert.propertyVal(result.error[0], 'message',
+                            'Required fields were not provided...')
+                        assert.propertyVal(result.error[0], 'description',
+                            'Measurement validation failed: type, timestamp, value, unit, child_id is required!')
+                        assert.propertyVal(result.error[1], 'message',
+                            Strings.CHILD.PARAM_ID_NOT_VALID_FORMAT)
+                        assert.propertyVal(result.error[1], 'description',
+                            Strings.ERROR_MESSAGE.UUID_NOT_VALID_FORMAT_DESC)
+                        assert.propertyVal(result.error[2], 'message',
+                            'The type of measurement provided "invalidtype" is not supported...')
+                        assert.propertyVal(result.error[2], 'description',
+                            'The allowed types are: temperature, humidity, pm1, pm2.5, pm10, body_fat, weight.')
 
                         for (let i = 0; i < result.error.length; i++) {
                             assert.propertyVal(result.error[i], 'code', HttpStatus.BAD_REQUEST)

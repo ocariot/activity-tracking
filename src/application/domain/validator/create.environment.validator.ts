@@ -2,11 +2,13 @@ import { ValidationException } from '../exception/validation.exception'
 import { Environment } from '../model/environment'
 import { LocationValidator } from './location.validator'
 import { ObjectIdValidator } from './object.id.validator'
-import { MeasurementType } from '../model/measurement'
+import { Measurement, MeasurementType } from '../model/measurement'
 
 export class CreateEnvironmentValidator {
     public static validate(environment: Environment): void | ValidationException {
         const fields: Array<string> = []
+        const message: string = 'Measurement are not in a format that is supported!'
+        const measurementTypes = Object.values(MeasurementType)
 
         // validate null
         if (!environment.timestamp) fields.push('timestamp')
@@ -14,23 +16,21 @@ export class CreateEnvironmentValidator {
         else ObjectIdValidator.validate(environment.institution_id)
         if (!environment.location) fields.push('location')
         else LocationValidator.validate(environment.location)
-        if (!environment.temperature) fields.push('temperature')
-        else {
-            if (environment.temperature.type !== MeasurementType.TEMPERATURE) {
-                throw new ValidationException(`The type of temperature provided "${environment.temperature.type}" is not supported...`,
-                    'The type allowed is "'.concat(MeasurementType.TEMPERATURE).concat('".'))
-            }
-            if (environment.temperature.value === undefined) fields.push('temperature.value')
-            if (!environment.temperature.unit) fields.push('temperature.unit')
+        if (!environment.measurements) fields.push('measurements')
+        else if (!environment.measurements.length) {
+            throw new ValidationException(message, 'The measurements collection must not be empty!')
         }
-
-        if (environment.humidity) {
-            if (environment.humidity.type !== MeasurementType.HUMIDITY) {
-                throw new ValidationException(`The type of humidity provided "${environment.humidity.type}" is not supported...`,
-                    'The type allowed is: "'.concat(MeasurementType.HUMIDITY).concat('".'))
-            }
-            if (environment.humidity.value === undefined) fields.push('humidity.value')
-            if (!environment.humidity.unit) fields.push('humidity.unit')
+        else {
+            environment.measurements.forEach((measurement: Measurement) => {
+                // validate null
+                if (!measurement.type) fields.push('measurement type')
+                else if (!measurementTypes.includes(measurement.type)) {
+                    throw new ValidationException(`The type of measurement provided "${measurement.type}" is not supported...`,
+                        'The types allowed are: '.concat(Object.values(MeasurementType).join(', '), '.'))
+                }
+                if (measurement.value === undefined) fields.push('measurement value')
+                if (!measurement.unit) fields.push('measurement unit')
+            })
         }
 
         if (fields.length > 0) {

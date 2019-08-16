@@ -41,13 +41,13 @@ export class LogRepository extends BaseRepository<Log, LogEntity>
         }
 
         return new Promise<Log>((resolve, reject) => {
-            this.Model.findOne(query.filters)
+            this.logModel.findOne(query.filters)
                 .exec()
                 .then((result: Log) => {
                     if (!result) return resolve(undefined)
                     return resolve(this.logMapper.transform(result))
                 })
-                .catch(err => reject(this.mongoDBErrorListener(err)))
+                .catch(err => reject(super.mongoDBErrorListener(err)))
         })
     }
 }

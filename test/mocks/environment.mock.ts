@@ -1,7 +1,6 @@
 import { Environment } from '../../src/application/domain/model/environment'
 import { Location } from '../../src/application/domain/model/location'
-import { Temperature } from '../../src/application/domain/model/temperature'
-import { Humidity } from '../../src/application/domain/model/humidity'
+import { Measurement, MeasurementType } from '../../src/application/domain/model/measurement'
 
 export class EnvironmentMock extends Environment {
 
@@ -15,8 +14,7 @@ export class EnvironmentMock extends Environment {
         super.institution_id = this.generateObjectId()
         super.timestamp = new Date()
         super.climatized = (Math.random() >= 0.5)
-        super.temperature = this.generateTemp()
-        super.humidity = this.generateHumi()
+        super.measurements = this.generateMeasurements()
         super.location = new Location().fromJSON({
             local: 'Indoor',
             room: 'room 01',
@@ -25,20 +23,75 @@ export class EnvironmentMock extends Environment {
         })
     }
 
-    private generateTemp(): Temperature {
-        const temperature: Temperature = new Temperature()
-        temperature.value = Math.random() * 13 + 19 // 19-31
-        temperature.unit = '°C'
+    private generateMeasurements(): Array<Measurement> {
+        const measurements: Array<Measurement> = []
 
-        return temperature
+        for (let i = 0; i < 3; i++) {
+            switch (Math.floor((Math.random() * 5))) { // 0-4
+                case 0:
+                    measurements.push(this.generateHumi())
+                    break
+                case 1:
+                    measurements.push(this.generatePm1())
+                    break
+                case 2:
+                    measurements.push(this.generatePm2_5())
+                    break
+                case 3:
+                    measurements.push(this.generatePm10())
+                    break
+                default:
+                    measurements.push(this.generateTemp())
+                    break
+            }
+        }
+
+        return measurements
     }
 
-    private generateHumi(): Humidity {
-        const humidity: Humidity = new Humidity()
-        humidity.value = Math.random() * 16 + 30 // 30-45
-        humidity.unit = '%'
+    private generateTemp(): Measurement {
+        const measurement: Measurement = new Measurement()
+        measurement.type = MeasurementType.TEMPERATURE
+        measurement.value = Math.random() * 13 + 19 // 19-31
+        measurement.unit = '°C'
 
-        return humidity
+        return measurement
+    }
+
+    private generateHumi(): Measurement {
+        const measurement: Measurement = new Measurement()
+        measurement.type = MeasurementType.HUMIDITY
+        measurement.value = Math.random() * 16 + 30 // 30-45
+        measurement.unit = '%'
+
+        return measurement
+    }
+
+    private generatePm1(): Measurement {
+        const measurement: Measurement = new Measurement()
+        measurement.type = MeasurementType.PM1
+        measurement.value = Math.random() // 0-1
+        measurement.unit = 'µm'
+
+        return measurement
+    }
+
+    private generatePm2_5(): Measurement {
+        const measurement: Measurement = new Measurement()
+        measurement.type = MeasurementType.PM2_5
+        measurement.value = Math.random() * 2.6 // 0-2.5
+        measurement.unit = 'µm'
+
+        return measurement
+    }
+
+    private generatePm10(): Measurement {
+        const measurement: Measurement = new Measurement()
+        measurement.type = MeasurementType.PM10
+        measurement.value = Math.random() * 11 // 0-10
+        measurement.unit = 'µm'
+
+        return measurement
     }
 
     private generateObjectId(): string {

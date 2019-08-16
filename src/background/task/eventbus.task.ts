@@ -1,8 +1,8 @@
-import { Container, inject, injectable } from 'inversify'
+import { inject, injectable } from 'inversify'
 import { Identifier } from '../../di/identifiers'
 import { IEventBus } from '../../infrastructure/port/event.bus.interface'
 import { ILogger } from '../../utils/custom.logger'
-import { DI } from '../../di/di'
+import { DIContainer } from '../../di/di'
 import { PhysicalActivityEvent } from '../../application/integration-event/event/physical.activity.event'
 import { IPhysicalActivityRepository } from '../../application/port/physical.activity.repository.interface'
 import { SleepEvent } from '../../application/integration-event/event/sleep.event'
@@ -28,7 +28,6 @@ import { Weight } from '../../application/domain/model/weight'
 
 @injectable()
 export class EventBusTask {
-    private readonly _diContainer: Container
     private handlerPub: any
 
     constructor(
@@ -36,7 +35,6 @@ export class EventBusTask {
         @inject(Identifier.INTEGRATION_EVENT_REPOSITORY) private readonly _integrationEventRepository: IIntegrationEventRepository,
         @inject(Identifier.LOGGER) private readonly _logger: ILogger
     ) {
-        this._diContainer = DI.getInstance().getContainer()
         this._eventBus.enableLogger(true)
     }
 
@@ -71,10 +69,10 @@ export class EventBusTask {
                  */
                 const userDeleteEvent = new UserEvent('UserDeleteEvent', new Date())
                 const userDeleteEventHandler = new UserDeleteEventHandler(
-                    this._diContainer.get<IPhysicalActivityRepository>(Identifier.ACTIVITY_REPOSITORY),
-                    this._diContainer.get<ISleepRepository>(Identifier.SLEEP_REPOSITORY),
-                    this._diContainer.get<IBodyFatRepository>(Identifier.BODY_FAT_REPOSITORY),
-                    this._diContainer.get<IWeightRepository>(Identifier.WEIGHT_REPOSITORY), this._logger)
+                    DIContainer.get<IPhysicalActivityRepository>(Identifier.ACTIVITY_REPOSITORY),
+                    DIContainer.get<ISleepRepository>(Identifier.SLEEP_REPOSITORY),
+                    DIContainer.get<IBodyFatRepository>(Identifier.BODY_FAT_REPOSITORY),
+                    DIContainer.get<IWeightRepository>(Identifier.WEIGHT_REPOSITORY), this._logger)
                 this._eventBus
                     .subscribe(userDeleteEvent, userDeleteEventHandler, 'users.delete')
                     .then((result: boolean) => {
@@ -89,7 +87,7 @@ export class EventBusTask {
                  */
                 const institutionDeleteEvent = new InstitutionEvent('InstitutionDeleteEvent', new Date())
                 const institutionDeleteEventHandler = new InstitutionDeleteEventHandler(
-                    this._diContainer.get<IEnvironmentRepository>(Identifier.ENVIRONMENT_REPOSITORY), this._logger)
+                    DIContainer.get<IEnvironmentRepository>(Identifier.ENVIRONMENT_REPOSITORY), this._logger)
                 this._eventBus
                     .subscribe(institutionDeleteEvent, institutionDeleteEventHandler, 'institutions.delete')
                     .then((result: boolean) => {

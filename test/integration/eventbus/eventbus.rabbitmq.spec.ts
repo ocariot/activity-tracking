@@ -1,7 +1,6 @@
 import { expect } from 'chai'
-import { DI } from '../../../src/di/di'
+import { DIContainer } from '../../../src/di/di'
 import { Identifier } from '../../../src/di/identifiers'
-import { Container } from 'inversify'
 import { PhysicalActivityEvent } from '../../../src/application/integration-event/event/physical.activity.event'
 import { EventBusException } from '../../../src/application/domain/exception/eventbus.exception'
 import { SleepMock } from '../../mocks/sleep.mock'
@@ -26,9 +25,8 @@ import { WeightMock } from '../../mocks/weight.mock'
 import { BodyFatEvent } from '../../../src/application/integration-event/event/body.fat.event'
 import { BodyFatMock } from '../../mocks/body.fat.mock'
 
-const container: Container = DI.getInstance().getContainer()
-const eventBus: EventBusRabbitMQ = container.get(Identifier.RABBITMQ_EVENT_BUS)
-const logger: ILogger = container.get(Identifier.LOGGER)
+const eventBus: EventBusRabbitMQ = DIContainer.get(Identifier.RABBITMQ_EVENT_BUS)
+const logger: ILogger = DIContainer.get(Identifier.LOGGER)
 const pubPhysicalActivityTotal: number = 10
 const pubSleepTotal: number = 10
 const pubEnvironmentTotal: number = 10
@@ -66,7 +64,7 @@ describe('EVENT BUS', () => {
                 .subscribe(
                     new PhysicalActivityEvent(''),
                     new PhysicalActivitySaveEventHandler(
-                        container.get<IPhysicalActivityRepository>(Identifier.ACTIVITY_REPOSITORY),
+                        DIContainer.get<IPhysicalActivityRepository>(Identifier.ACTIVITY_REPOSITORY),
                         logger
                     ),
                     ''
@@ -109,10 +107,10 @@ describe('EVENT BUS', () => {
 
                 const userDeleteEvent = new UserEvent('UserDeleteEvent', new Date())
                 const userDeleteEventHandler = new UserDeleteEventHandler(
-                    container.get<IPhysicalActivityRepository>(Identifier.ACTIVITY_REPOSITORY),
-                    container.get<ISleepRepository>(Identifier.SLEEP_REPOSITORY),
-                    container.get<IBodyFatRepository>(Identifier.BODY_FAT_REPOSITORY),
-                    container.get<IWeightRepository>(Identifier.WEIGHT_REPOSITORY), logger)
+                    DIContainer.get<IPhysicalActivityRepository>(Identifier.ACTIVITY_REPOSITORY),
+                    DIContainer.get<ISleepRepository>(Identifier.SLEEP_REPOSITORY),
+                    DIContainer.get<IBodyFatRepository>(Identifier.BODY_FAT_REPOSITORY),
+                    DIContainer.get<IWeightRepository>(Identifier.WEIGHT_REPOSITORY), logger)
                 return eventBus
                     .subscribe(userDeleteEvent, userDeleteEventHandler, 'users.delete')
                     .then(result => {
@@ -129,7 +127,7 @@ describe('EVENT BUS', () => {
 
                 const institutionDeleteEvent = new InstitutionEvent('InstitutionDeleteEvent', new Date())
                 const institutionDeleteEventHandler = new InstitutionDeleteEventHandler(
-                    container.get<IEnvironmentRepository>(Identifier.ENVIRONMENT_REPOSITORY), logger)
+                    DIContainer.get<IEnvironmentRepository>(Identifier.ENVIRONMENT_REPOSITORY), logger)
                 return eventBus
                     .subscribe(institutionDeleteEvent, institutionDeleteEventHandler, 'institutions.delete')
                     .then(result => {

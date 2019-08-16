@@ -1,6 +1,5 @@
 import HttpStatus from 'http-status-codes'
-import { Container } from 'inversify'
-import { DI } from '../../../src/di/di'
+import { DIContainer } from '../../../src/di/di'
 import { Identifier } from '../../../src/di/identifiers'
 import { App } from '../../../src/app'
 import { BackgroundService } from '../../../src/background/background.service'
@@ -14,9 +13,8 @@ import { SleepEntityMapper } from '../../../src/infrastructure/entity/mapper/sle
 import { ObjectID } from 'bson'
 import { SleepPatternDataSet } from '../../../src/application/domain/model/sleep.pattern.data.set'
 
-const container: Container = DI.getInstance().getContainer()
-const backgroundServices: BackgroundService = container.get(Identifier.BACKGROUND_SERVICE)
-const app: App = container.get(Identifier.APP)
+const backgroundServices: BackgroundService = DIContainer.get(Identifier.BACKGROUND_SERVICE)
+const app: App = DIContainer.get(Identifier.APP)
 const request = require('supertest')(app.getExpress())
 
 describe('Routes: users.children.sleep', () => {

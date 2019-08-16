@@ -67,8 +67,10 @@ describe('Validators: CreateWeightValidator', () => {
                 try {
                     CreateWeightValidator.validate(weight)
                 } catch (err) {
-                    assert.equal(err.message, 'The type of measurement provided "invalid_type" is not supported...')
-                    assert.equal(err.description, 'The allowed types are: temperature, humidity, body_fat, weight.')
+                    assert.equal(err.message,
+                        'The type of measurement provided "invalid_type" is not supported...')
+                    assert.equal(err.description,
+                        'The allowed types are: temperature, humidity, pm1, pm2.5, pm10, body_fat, weight.')
                 }
                 weight.type = type_aux
                 weight.timestamp = timestamp_aux
@@ -113,8 +115,10 @@ describe('Validators: CreateWeightValidator', () => {
                 try {
                     CreateWeightValidator.validate(weight)
                 } catch (err) {
-                    assert.equal(err.message, 'The type of measurement provided "invalidtype" is not supported...')
-                    assert.equal(err.description, 'The allowed types are: temperature, humidity, body_fat, weight.')
+                    assert.equal(err.message,
+                        'The type of measurement provided "invalidtype" is not supported...')
+                    assert.equal(err.description,
+                        'The allowed types are: temperature, humidity, pm1, pm2.5, pm10, body_fat, weight.')
                 }
                 weight.body_fat = body_fat_aux
             })

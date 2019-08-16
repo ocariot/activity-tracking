@@ -1,6 +1,5 @@
 import HttpStatus from 'http-status-codes'
-import { Container } from 'inversify'
-import { DI } from '../../../src/di/di'
+import { DIContainer } from '../../../src/di/di'
 import { Identifier } from '../../../src/di/identifiers'
 import { App } from '../../../src/app'
 import { BackgroundService } from '../../../src/background/background.service'
@@ -18,9 +17,8 @@ import { ActivityLogRepoModel } from '../../../src/infrastructure/database/schem
 import { PhysicalActivityHeartRate } from '../../../src/application/domain/model/physical.activity.heart.rate'
 import { HeartRateZone } from '../../../src/application/domain/model/heart.rate.zone'
 
-const container: Container = DI.getInstance().getContainer()
-const backgroundServices: BackgroundService = container.get(Identifier.BACKGROUND_SERVICE)
-const app: App = container.get(Identifier.APP)
+const backgroundServices: BackgroundService = DIContainer.get(Identifier.BACKGROUND_SERVICE)
+const app: App = DIContainer.get(Identifier.APP)
 const request = require('supertest')(app.getExpress())
 
 describe('Routes: users/children', () => {

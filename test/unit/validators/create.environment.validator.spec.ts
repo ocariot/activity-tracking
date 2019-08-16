@@ -4,16 +4,12 @@ import { Environment } from '../../../src/application/domain/model/environment'
 import { EnvironmentMock } from '../../mocks/environment.mock'
 import { Strings } from '../../../src/utils/strings'
 import { Location } from '../../../src/application/domain/model/location'
-import { Humidity } from '../../../src/application/domain/model/humidity'
-import { Temperature } from '../../../src/application/domain/model/temperature'
-import { TemperatureMock } from '../../mocks/temperature.mock'
-import { HumidityMock } from '../../mocks/humidity.mock'
+import { Measurement, MeasurementType } from '../../../src/application/domain/model/measurement'
 
 const environment: Environment = new EnvironmentMock()
 const institution_id_aux: string = environment.institution_id!
 const location_aux: Location = environment.location!
-const temperature_aux: Temperature = environment.temperature!
-const humidity_aux: Humidity = environment.humidity!
+const measurements_aux: Array<Measurement> = environment.measurements!
 const timestamp_aux: Date = environment.timestamp
 const local_aux: string = environment.location!.local
 const room_aux: string = environment.location!.room
@@ -42,14 +38,14 @@ describe('Validators: CreateEnvironmentValidator', () => {
         context('when the environment does not have any of the required parameters', () => {
             it('should throw a ValidationException', () => {
                 environment.location = undefined
-                environment.temperature = undefined
+                environment.measurements = undefined
                 environment.timestamp = undefined!
                 try {
                     CreateEnvironmentValidator.validate(environment)
                 } catch (err) {
                     assert.equal(err.message, 'Required fields were not provided...')
                     assert.equal(err.description, 'Validation of environment failed: timestamp, ' +
-                        'institution_id, location, temperature required!')
+                        'institution_id, location, measurements required!')
                 }
             })
         })
@@ -70,7 +66,7 @@ describe('Validators: CreateEnvironmentValidator', () => {
             it('should throw a ValidationException', () => {
                 environment.institution_id = institution_id_aux
                 environment.location = location_aux
-                environment.temperature = temperature_aux
+                environment.measurements = measurements_aux
                 environment.timestamp = timestamp_aux
                 if (environment.location) {
                     environment.location.local = ''
@@ -87,59 +83,60 @@ describe('Validators: CreateEnvironmentValidator', () => {
             })
         })
 
-        context('when the environment has an empty temperature measurement', () => {
+        context('when the environment has an empty measurement array', () => {
             it('should throw a ValidationException', () => {
-                environment.temperature = new Temperature()
+                environment.measurements = new Array<Measurement>()
+                try {
+                    CreateEnvironmentValidator.validate(environment)
+                } catch (err) {
+                    assert.equal(err.message, 'Measurement are not in a format that is supported!')
+                    assert.equal(err.description, 'The measurements collection must not be empty!')
+                }
+                environment.measurements = measurements_aux
+            })
+        })
+
+        context('when the environment has an invalid measurement (invalid type)', () => {
+            it('should throw a ValidationException', () => {
+                environment.measurements![1].type = 'Temperatures'
+                try {
+                    CreateEnvironmentValidator.validate(environment)
+                } catch (err) {
+                    assert.equal(err.message, 'The type of measurement provided "temperatures" is not supported...')
+                    assert.equal(err.description,
+                        'The types allowed are: temperature, humidity, pm1, pm2.5, pm10, body_fat, weight.')
+                }
+                environment.measurements = measurements_aux
+            })
+        })
+
+        context('when the environment has an invalid measurement (missing one of the fields, the unit)', () => {
+            it('should throw a ValidationException', () => {
+                const measurement: Measurement = new Measurement()
+                measurement.type = MeasurementType.TEMPERATURE
+                measurement.value = 40
+                environment.measurements![1] = measurement
                 try {
                     CreateEnvironmentValidator.validate(environment)
                 } catch (err) {
                     assert.equal(err.message, 'Required fields were not provided...')
-                    assert.equal(err.description, 'Validation of environment failed: temperature.value, temperature.unit required!')
+                    assert.equal(err.description, 'Validation of environment failed: measurement unit required!')
                 }
-                environment.temperature = temperature_aux
+                environment.measurements = measurements_aux
             })
         })
 
-        context('when the environment has a temperature with an invalid type', () => {
+        context('when the environment has an invalid measurement (missing all fields)', () => {
             it('should throw a ValidationException', () => {
-                const incorrectTemp: Temperature = new TemperatureMock()
-                incorrectTemp.type = 'temperatures'
-                environment.temperature = incorrectTemp
-                try {
-                    CreateEnvironmentValidator.validate(environment)
-                } catch (err) {
-                    assert.equal(err.message, 'The type of temperature provided "temperatures" is not supported...')
-                    assert.equal(err.description, 'The type allowed is "temperature".')
-                }
-                environment.temperature = temperature_aux
-            })
-        })
-
-        context('when the environment has an empty humidity measurement', () => {
-            it('should throw a ValidationException', () => {
-                environment.humidity = new Humidity()
+                environment.measurements![1] = new Measurement()
                 try {
                     CreateEnvironmentValidator.validate(environment)
                 } catch (err) {
                     assert.equal(err.message, 'Required fields were not provided...')
-                    assert.equal(err.description, 'Validation of environment failed: humidity.value, humidity.unit required!')
+                    assert.equal(err.description, 'Validation of environment failed: measurement type,' +
+                        ' measurement value, measurement unit required!')
                 }
-                environment.humidity = humidity_aux
-            })
-        })
-
-        context('when the environment has a humidity with an invalid type', () => {
-            it('should throw a ValidationException', () => {
-                const incorrectHumidity: Humidity = new HumidityMock()
-                incorrectHumidity.type = 'humiditys'
-                environment.humidity = incorrectHumidity
-                try {
-                    CreateEnvironmentValidator.validate(environment)
-                } catch (err) {
-                    assert.equal(err.message, 'The type of humidity provided "humiditys" is not supported...')
-                    assert.equal(err.description, 'The type allowed is: "humidity".')
-                }
-                environment.humidity = humidity_aux
+                environment.measurements = measurements_aux
             })
         })
     })

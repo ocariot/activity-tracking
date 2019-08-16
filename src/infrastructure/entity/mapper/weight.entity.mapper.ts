@@ -54,8 +54,8 @@ export class WeightEntityMapper implements IEntityMapper<Weight, WeightEntity> {
      */
     public jsonToModel(json: any): Weight {
         const result: Weight = new Weight()
-
         if (!json) return result
+
         if (json.id !== undefined) result.id = json.id
         if (json.type !== undefined) result.type = json.type
         if (json.timestamp !== undefined) result.timestamp = json.timestamp

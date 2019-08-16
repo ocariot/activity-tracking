@@ -1,7 +1,6 @@
 import { expect } from 'chai'
-import { DI } from '../../../src/di/di'
+import { DIContainer } from '../../../src/di/di'
 import { Identifier } from '../../../src/di/identifiers'
-import { Container } from 'inversify'
 import { PhysicalActivityEvent } from '../../../src/application/integration-event/event/physical.activity.event'
 import { EventBusTask } from '../../../src/background/task/eventbus.task'
 import { IIntegrationEventRepository } from '../../../src/application/port/integration.event.repository.interface'
@@ -18,10 +17,9 @@ import { BodyFatEvent } from '../../../src/application/integration-event/event/b
 import { WeightMock } from '../../mocks/weight.mock'
 import { BodyFatMock } from '../../mocks/body.fat.mock'
 
-const container: Container = DI.getInstance().getContainer()
-const eventBusTask: EventBusTask = container.get(Identifier.EVENT_BUS_TASK)
-const integrationRepository: IIntegrationEventRepository = container.get(Identifier.INTEGRATION_EVENT_REPOSITORY)
-const mongoDBConnection: IConnectionDB = container.get(Identifier.MONGODB_CONNECTION)
+const eventBusTask: EventBusTask = DIContainer.get(Identifier.EVENT_BUS_TASK)
+const integrationRepository: IIntegrationEventRepository = DIContainer.get(Identifier.INTEGRATION_EVENT_REPOSITORY)
+const mongoDBConnection: IConnectionDB = DIContainer.get(Identifier.MONGODB_CONNECTION)
 
 describe('EVENT BUS TASK', () => {
     before(async () => {

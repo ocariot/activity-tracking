@@ -66,14 +66,14 @@ export class BodyFatRepository extends BaseRepository<BodyFat, BodyFatEntity> im
         }
 
         return new Promise<BodyFat>((resolve, reject) => {
-            this.Model.findOne(query.filters)
+            this.measurementModel.findOne(query.filters)
                 .select(query.fields)
                 .exec()
                 .then((result: BodyFat) => {
                     if (!result) return resolve(undefined)
                     return resolve(this.bodyFatMapper.transform(result))
                 })
-                .catch(err => reject(this.mongoDBErrorListener(err)))
+                .catch(err => reject(super.mongoDBErrorListener(err)))
         })
     }
 
@@ -88,7 +88,7 @@ export class BodyFatRepository extends BaseRepository<BodyFat, BodyFatEntity> im
      */
     public removeByChild(bodyFatId: string, childId: string, measurementType: string): Promise<boolean> {
         return new Promise<boolean>((resolve, reject) => {
-            this.Model.findOneAndDelete({ child_id: childId, _id: bodyFatId, type: measurementType })
+            this.measurementModel.findOneAndDelete({ child_id: childId, _id: bodyFatId, type: measurementType })
                 .exec()
                 .then(result => {
                     if (!result) return resolve(false)
@@ -111,12 +111,12 @@ export class BodyFatRepository extends BaseRepository<BodyFat, BodyFatEntity> im
         query.filters = { child_id: childId }
 
         return new Promise<boolean>((resolve, reject) => {
-            this.Model.deleteMany(query.filters)
+            this.measurementModel.deleteMany(query.filters)
                 .then(result => {
                     if (!result) return resolve(false)
                     return resolve(true)
                 })
-                .catch(err => reject(this.mongoDBErrorListener(err)))
+                .catch(err => reject(super.mongoDBErrorListener(err)))
         })
     }
 }

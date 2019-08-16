@@ -3,8 +3,7 @@ import { Environment } from '../../../application/domain/model/environment'
 import { EnvironmentEntity } from '../environment.entity'
 import { Location } from '../../../application/domain/model/location'
 import { IEntityMapper } from '../../port/entity.mapper.interface'
-import { Temperature } from '../../../application/domain/model/temperature'
-import { Humidity } from '../../../application/domain/model/humidity'
+import { Measurement } from '../../../application/domain/model/measurement'
 
 @injectable()
 export class EnvironmentEntityMapper implements IEntityMapper<Environment, EnvironmentEntity> {
@@ -30,8 +29,9 @@ export class EnvironmentEntityMapper implements IEntityMapper<Environment, Envir
         if (item.location) result.location = item.location.toJSON()
         if (item.climatized !== undefined) result.climatized = item.climatized
         if (item.timestamp) result.timestamp = item.timestamp
-        if (item.temperature) result.temperature = item.temperature.toJSON()
-        if (item.humidity) result.humidity = item.humidity.toJSON()
+        if (item.measurements && item.measurements.length > 0) {
+            result.measurements = item.measurements.map((measurement: Measurement) => measurement.toJSON())
+        }
 
         return result
     }
@@ -63,8 +63,9 @@ export class EnvironmentEntityMapper implements IEntityMapper<Environment, Envir
         if (json.location !== undefined) result.location = new Location().fromJSON(json.location)
         if (json.climatized !== undefined) result.climatized = json.climatized
         if (json.timestamp !== undefined) result.timestamp = json.timestamp
-        if (json.temperature !== undefined) result.temperature = new Temperature().fromJSON(json.temperature)
-        if (json.humidity !== undefined) result.humidity = new Humidity().fromJSON(json.humidity)
+        if (json.measurements !== undefined) {
+            result.measurements = json.measurements.map(item => new Measurement().fromJSON(item))
+        }
 
         return result
     }

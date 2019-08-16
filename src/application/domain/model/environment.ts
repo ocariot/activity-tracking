@@ -4,8 +4,7 @@ import { IJSONSerializable } from '../utils/json.serializable.interface'
 import { IJSONDeserializable } from '../utils/json.deserializable.interface'
 import { JsonUtils } from '../utils/json.utils'
 import { DatetimeValidator } from '../validator/datetime.validator'
-import { Temperature } from './temperature'
-import { Humidity } from './humidity'
+import { Measurement } from './measurement'
 
 /**
  * Entity implementation for environment measurements.
@@ -16,8 +15,7 @@ import { Humidity } from './humidity'
 export class Environment extends Entity implements IJSONSerializable, IJSONDeserializable<Environment> {
     private _institution_id?: string // Id of institution associated with a environment.
     private _location?: Location // Sensor Location
-    private _temperature?: Temperature // Temperature measurement associated with a environment.
-    private _humidity?: Humidity // Humidity measurement associated with a environment.
+    private _measurements?: Array<Measurement> // Associated Measurements
     private _climatized?: boolean // Boolean variable to identify if a environment is climatized.
     private _timestamp!: Date // Timestamp according to the UTC.
 
@@ -41,20 +39,12 @@ export class Environment extends Entity implements IJSONSerializable, IJSONDeser
         this._location = value
     }
 
-    get temperature(): Temperature | undefined {
-        return this._temperature
+    get measurements(): Array<Measurement> | undefined {
+        return this._measurements
     }
 
-    set temperature(value: Temperature | undefined) {
-        this._temperature = value
-    }
-
-    get humidity(): Humidity | undefined {
-        return this._humidity
-    }
-
-    set humidity(value: Humidity | undefined) {
-        this._humidity = value
+    set measurements(value: Array<Measurement> | undefined) {
+        this._measurements = value
     }
 
     get climatized(): boolean | undefined {
@@ -87,8 +77,9 @@ export class Environment extends Entity implements IJSONSerializable, IJSONDeser
         if (json.id !== undefined) super.id = json.id
         if (json.institution_id !== undefined) this.institution_id = json.institution_id
         if (json.location !== undefined) this.location = new Location().fromJSON(json.location)
-        if (json.temperature !== undefined) this.temperature = new Temperature().fromJSON(json.temperature)
-        if (json.humidity !== undefined) this.humidity = new Humidity().fromJSON(json.humidity)
+        if (json.measurements !== undefined && json.measurements instanceof Array) {
+            this.measurements = json.measurements.map(item => new Measurement().fromJSON(item))
+        }
         this.climatized = json.climatized
         if (json.timestamp !== undefined) this.timestamp = this.convertDatetimeString(json.timestamp)
 
@@ -100,14 +91,7 @@ export class Environment extends Entity implements IJSONSerializable, IJSONDeser
             id: super.id,
             institution_id: this.institution_id,
             location: this.location ? this.location.toJSON() : this.location,
-            temperature: this.temperature ? {
-                value: this.temperature.value,
-                unit: this.temperature.unit
-            } : this.temperature,
-            humidity: this.humidity ? {
-                value: this.humidity.value,
-                unit: this.humidity.unit
-            } : this.humidity,
+            measurements: this.measurements ? this.measurements.map(item => item.toJSON()) : this.measurements,
             climatized: this.climatized,
             timestamp: this.timestamp
         }
