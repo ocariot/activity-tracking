@@ -8,8 +8,8 @@ Microservice responsible for tracking activities, sleep, environments and measur
 **Main features:**
 - Tracking of physical activities;
 - Tracking of sleep records;
-- Tracking of environments
-- Tracking of measurements associated with children (weight and body fat);
+- Tracking of environments;
+- Tracking of measurements associated with children (weight and body fat).
  
  See the [documentation](https://github.com/ocariot/activity-tracking/wiki) for more information.
 
@@ -41,7 +41,7 @@ For development and testing environments the easiest and fastest way is to gener
 ```sh
 ./create-self-signed-certs.sh
 ```
-The following files will be created: `server.crt`, `server.key`, `ca.crt`, `jwt.key`, and `jwt.key.pub`.
+The following files will be created: `ca.crt`, `server.crt` and `server.key`.
 
 In production environments its highly recommended to always use valid certificates and provided by a certificate authority (CA). A good option is [Let's Encrypt](https://letsencrypt.org)  which is a CA that provides  free certificates. The service is provided by the Internet Security Research Group (ISRG). The process to obtain the certificate is extremely simple, as it is only required to provide a valid domain and prove control over it. With Let's Encrypt, you do this by using [software](https://certbot.eff.org/) that uses the ACME protocol, which typically runs on your host. If you prefer, you can use the service provided by the [SSL For Free](https://www.sslforfree.com/)  website and follow the walkthrough. The service is free because the certificates are provided by Let's Encrypt, and it makes the process of obtaining the certificates less painful.
 
