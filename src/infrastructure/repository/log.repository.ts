@@ -3,7 +3,7 @@ import { inject, injectable } from 'inversify'
 import { Identifier } from '../../di/identifiers'
 import { IEntityMapper } from '../port/entity.mapper.interface'
 import { ILogger } from '../../utils/custom.logger'
-import { Log, LogType } from '../../application/domain/model/log'
+import { Log } from '../../application/domain/model/log'
 import { LogEntity } from '../entity/log.entity'
 import { ILogRepository } from '../../application/port/log.repository.interface'
 import { Query } from './query/query'
@@ -31,7 +31,7 @@ export class LogRepository extends BaseRepository<Log, LogEntity>
      * @return {Promise<Log>}
      * @throws {ValidationException | RepositoryException}
      */
-    public async selectByChild(childId: string, logType: LogType, dateLog: string): Promise<Log> {
+    public async selectByChild(childId: string, logType: string, dateLog: string): Promise<Log> {
         // Creates the query with the received parameters
         const query: IQuery = new Query()
         query.filters = {

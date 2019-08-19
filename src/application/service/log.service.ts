@@ -168,7 +168,7 @@ export class LogService implements ILogService {
      * @return {Promise<Array<Log>>}
      * @throws {RepositoryException}
      */
-    public getByChildResourceAndDate(childId: string, desiredResource: LogType, dateStart: string,
+    public getByChildResourceAndDate(childId: string, desiredResource: string, dateStart: string,
                                      dateEnd: string, query: IQuery): Promise<Array<Log>> {
         ObjectIdValidator.validate(childId, Strings.CHILD.PARAM_ID_NOT_VALID_FORMAT)
         LogTypeValidator.validate(desiredResource)

@@ -2,12 +2,12 @@ import { Log, LogType } from '../../src/application/domain/model/log'
 
 export class LogMock extends Log {
 
-    constructor(type?: LogType) {
+    constructor(type?: string) {
         super()
         this.generateLog(type)
     }
 
-    private generateLog(type?: LogType): void {
+    private generateLog(type?: string): void {
         if (!type) type = this.generateType()
 
         super.id = this.generateObjectId()
@@ -48,8 +48,8 @@ export class LogMock extends Log {
         return `${date.getFullYear()}-${monthString}-${dayString}`
     }
 
-    private generateType(): LogType {
-        let logType
+    private generateType(): string {
+        let logType: string
         switch (Math.floor((Math.random() * 4 + 1))) { // 1, 2, 3 or 4
             case 1:
                 logType = LogType.STEPS

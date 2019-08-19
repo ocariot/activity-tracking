@@ -13,7 +13,7 @@ import { PhysicalActivityEntityMapper } from '../../../src/infrastructure/entity
 import { ObjectID } from 'bson'
 import { Log, LogType } from '../../../src/application/domain/model/log'
 import { LogMock } from '../../mocks/log.mock'
-import { ActivityLogRepoModel } from '../../../src/infrastructure/database/schema/activity.log.schema'
+import { ChildLogRepoModel } from '../../../src/infrastructure/database/schema/activity.log.schema'
 import { PhysicalActivityHeartRate } from '../../../src/application/domain/model/physical.activity.heart.rate'
 import { HeartRateZone } from '../../../src/application/domain/model/heart.rate.zone'
 
@@ -3193,7 +3193,7 @@ function deleteAllActivity(): void {
 }
 
 function deleteAllLogs(): void {
-    ActivityLogRepoModel.deleteMany({}, err => {
+    ChildLogRepoModel.deleteMany({}, err => {
         if (err) console.log(err)
     })
 }

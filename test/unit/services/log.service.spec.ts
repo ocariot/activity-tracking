@@ -3,7 +3,7 @@ import sinon from 'sinon'
 import { assert } from 'chai'
 import { LogMock } from '../../mocks/log.mock'
 import { Log, LogType } from '../../../src/application/domain/model/log'
-import { ActivityLogRepoModel } from '../../../src/infrastructure/database/schema/activity.log.schema'
+import { ChildLogRepoModel } from '../../../src/infrastructure/database/schema/activity.log.schema'
 import { ILogRepository } from '../../../src/application/port/log.repository.interface'
 import { LogRepositoryMock } from '../../mocks/log.repository.mock'
 import { ILogService } from '../../../src/application/port/log.service.interface'
@@ -59,7 +59,7 @@ describe('Services: Log', () => {
     const multiStatusMixed: MultiStatus<Log> = new MultiStatusMock<Log>(mixedLogsArr) // Mixed MultiStatus
     const multiStatusIncorrect: MultiStatus<Log> = new MultiStatusMock<Log>(incorrectLogsArr) // Mixed MultiStatus
 
-    const modelFake = ActivityLogRepoModel
+    const modelFake = ChildLogRepoModel
     const logRepo: ILogRepository = new LogRepositoryMock()
 
     const logService: ILogService = new LogService(logRepo)

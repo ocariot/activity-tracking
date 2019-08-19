@@ -1,5 +1,5 @@
 import { ILogRepository } from '../../src/application/port/log.repository.interface'
-import { Log, LogType } from '../../src/application/domain/model/log'
+import { Log } from '../../src/application/domain/model/log'
 import { LogMock } from './log.mock'
 
 export class LogRepositoryMock implements ILogRepository {
@@ -41,7 +41,7 @@ export class LogRepositoryMock implements ILogRepository {
         return Promise.resolve(item)
     }
 
-    public selectByChild(child_id: string, type: LogType, date: string): Promise<Log> {
+    public selectByChild(child_id: string, type: string, date: string): Promise<Log> {
         return Promise.resolve(new LogMock())
     }
 }

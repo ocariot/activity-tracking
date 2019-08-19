@@ -1,5 +1,5 @@
 import { IRepository } from './repository.interface'
-import { Log, LogType } from '../domain/model/log'
+import { Log } from '../domain/model/log'
 
 /**
  * Interface of the log repository
@@ -18,5 +18,5 @@ export interface ILogRepository extends IRepository<Log> {
      * @return {Promise<Log>}
      * @throws {ValidationException | RepositoryException}
      */
-    selectByChild(childId: string, logType: LogType, dateLog: string): Promise<Log>
+    selectByChild(childId: string, logType: string, dateLog: string): Promise<Log>
 }

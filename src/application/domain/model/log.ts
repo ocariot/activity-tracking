@@ -11,10 +11,10 @@ import { Entity } from './entity'
 export class Log extends Entity implements IJSONSerializable, IJSONDeserializable<Log> {
     private _date!: string // Date of the log according to the format yyyy-MM-dd.
     private _value!: number // Log value.
-    private _type!: LogType // Log type
+    private _type!: string // Log type
     private _child_id!: string // Child ID
 
-    constructor(date?: string, value?: number, type?: LogType, child_id?: string) {
+    constructor(date?: string, value?: number, type?: string, child_id?: string) {
         super()
         if (date) this.date = date
         if (value) this.value = value
@@ -38,11 +38,11 @@ export class Log extends Entity implements IJSONSerializable, IJSONDeserializabl
         this._value = value
     }
 
-    get type(): LogType {
+    get type(): string {
         return this._type
     }
 
-    set type(value: LogType) {
+    set type(value: string) {
         this._type = value
     }
 

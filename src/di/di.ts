@@ -46,7 +46,7 @@ import { IIntegrationEventRepository } from '../application/port/integration.eve
 import { IntegrationEventRepository } from '../infrastructure/repository/integration.event.repository'
 import { IntegrationEventRepoModel } from '../infrastructure/database/schema/integration.event.schema'
 import { EventBusTask } from '../background/task/eventbus.task'
-import { ActivityLogRepoModel } from '../infrastructure/database/schema/activity.log.schema'
+import { ChildLogRepoModel } from '../infrastructure/database/schema/activity.log.schema'
 import { ILogRepository } from '../application/port/log.repository.interface'
 import { LogRepository } from '../infrastructure/repository/log.repository'
 import { Log } from '../application/domain/model/log'
@@ -144,7 +144,7 @@ export class IoC {
 
         // Models
         this.container.bind(Identifier.ACTIVITY_REPO_MODEL).toConstantValue(ActivityRepoModel)
-        this.container.bind(Identifier.ACTIVITY_LOG_REPO_MODEL).toConstantValue(ActivityLogRepoModel)
+        this.container.bind(Identifier.ACTIVITY_LOG_REPO_MODEL).toConstantValue(ChildLogRepoModel)
         this.container.bind(Identifier.ENVIRONMENT_REPO_MODEL).toConstantValue(EnvironmentRepoModel)
         this.container.bind(Identifier.SLEEP_REPO_MODEL).toConstantValue(SleepRepoModel)
         this.container.bind(Identifier.MEASUREMENT_REPO_MODEL).toConstantValue(MeasurementRepoModel)
