@@ -135,6 +135,7 @@ export class LogService implements ILogService {
             const stepsArr: Array<Log> = new Array<Log>()
             const caloriesArr: Array<Log> = new Array<Log>()
             const activeMinutesArr: Array<Log> = new Array<Log>()
+            const lightlyActiveMinutesArr: Array<Log> = new Array<Log>()
             const sedentaryMinutesArr: Array<Log> = new Array<Log>()
 
             const logs: Array<Log> = await this._logRepository.find(query)
@@ -142,12 +143,14 @@ export class LogService implements ILogService {
                 if (item.type === LogType.STEPS) stepsArr.push(item)
                 else if (item.type === LogType.CALORIES) caloriesArr.push(item)
                 else if (item.type === LogType.ACTIVE_MINUTES) activeMinutesArr.push(item)
+                else if (item.type === LogType.LIGHTLY_ACTIVE_MINUTES) lightlyActiveMinutesArr.push(item)
                 else if (item.type === LogType.SEDENTARY_MINUTES) sedentaryMinutesArr.push(item)
             })
 
             childLog.steps = stepsArr
             childLog.calories = caloriesArr
             childLog.active_minutes = activeMinutesArr
+            childLog.lightly_active_minutes = lightlyActiveMinutesArr
             childLog.sedentary_minutes = sedentaryMinutesArr
 
             return Promise.resolve(childLog)

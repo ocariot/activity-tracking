@@ -3,7 +3,7 @@ import sinon from 'sinon'
 import { assert } from 'chai'
 import { LogMock } from '../../mocks/log.mock'
 import { Log, LogType } from '../../../src/application/domain/model/log'
-import { ChildLogRepoModel } from '../../../src/infrastructure/database/schema/activity.log.schema'
+import { LogRepoModel } from '../../../src/infrastructure/database/schema/log.schema'
 import { ILogRepository } from '../../../src/application/port/log.repository.interface'
 import { LogRepositoryMock } from '../../mocks/log.repository.mock'
 import { ILogService } from '../../../src/application/port/log.service.interface'
@@ -59,7 +59,7 @@ describe('Services: Log', () => {
     const multiStatusMixed: MultiStatus<Log> = new MultiStatusMock<Log>(mixedLogsArr) // Mixed MultiStatus
     const multiStatusIncorrect: MultiStatus<Log> = new MultiStatusMock<Log>(incorrectLogsArr) // Mixed MultiStatus
 
-    const modelFake = ChildLogRepoModel
+    const modelFake = LogRepoModel
     const logRepo: ILogRepository = new LogRepositoryMock()
 
     const logService: ILogService = new LogService(logRepo)
@@ -169,7 +169,8 @@ describe('Services: Log', () => {
                         assert.propertyVal(result.error[1], 'message',
                             'The name of type provided "step" is not supported...')
                         assert.propertyVal(result.error[1], 'description',
-                            'The names of the allowed types are: steps, calories, active_minutes, sedentary_minutes.')
+                            'The names of the allowed types are: ' +
+                            'steps, calories, active_minutes, lightly_active_minutes, sedentary_minutes.')
 
                         for (let i = 0; i < result.error.length; i++) {
                             assert.propertyVal(result.error[i], 'code', HttpStatus.BAD_REQUEST)
@@ -213,7 +214,8 @@ describe('Services: Log', () => {
                         assert.propertyVal(result.error[1], 'message',
                             'The name of type provided "step" is not supported...')
                         assert.propertyVal(result.error[1], 'description',
-                            'The names of the allowed types are: steps, calories, active_minutes, sedentary_minutes.')
+                            'The names of the allowed types are: ' +
+                            'steps, calories, active_minutes, lightly_active_minutes, sedentary_minutes.')
 
                         for (let i = 0; i < result.error.length; i++) {
                             assert.propertyVal(result.error[i], 'code', HttpStatus.BAD_REQUEST)
@@ -257,7 +259,8 @@ describe('Services: Log', () => {
                         assert.propertyVal(result.error[1], 'message',
                             'The name of type provided "step" is not supported...')
                         assert.propertyVal(result.error[1], 'description',
-                            'The names of the allowed types are: steps, calories, active_minutes, sedentary_minutes.')
+                            'The names of the allowed types are: ' +
+                            'steps, calories, active_minutes, lightly_active_minutes, sedentary_minutes.')
 
                         for (let i = 0; i < result.error.length; i++) {
                             assert.propertyVal(result.error[i], 'code', HttpStatus.BAD_REQUEST)
@@ -300,7 +303,8 @@ describe('Services: Log', () => {
                         assert.propertyVal(result.error[1], 'message',
                             'The name of type provided "step" is not supported...')
                         assert.propertyVal(result.error[1], 'description',
-                            'The names of the allowed types are: steps, calories, active_minutes, sedentary_minutes.')
+                            'The names of the allowed types are: ' +
+                            'steps, calories, active_minutes, lightly_active_minutes, sedentary_minutes.')
 
                         for (let i = 0; i < result.error.length; i++) {
                             assert.propertyVal(result.error[i], 'code', HttpStatus.BAD_REQUEST)
@@ -346,7 +350,8 @@ describe('Services: Log', () => {
                         assert.propertyVal(result.error[1], 'message',
                             'The name of type provided "step" is not supported...')
                         assert.propertyVal(result.error[1], 'description',
-                            'The names of the allowed types are: steps, calories, active_minutes, sedentary_minutes.')
+                            'The names of the allowed types are: ' +
+                            'steps, calories, active_minutes, lightly_active_minutes, sedentary_minutes.')
 
                         for (let i = 0; i < result.error.length; i++) {
                             assert.propertyVal(result.error[i], 'code', HttpStatus.BAD_REQUEST)
@@ -634,7 +639,8 @@ describe('Services: Log', () => {
                     assert.propertyVal(err, 'message',
                         'The name of type provided "step" is not supported...')
                     assert.propertyVal(err, 'description',
-                        'The names of the allowed types are: steps, calories, active_minutes, sedentary_minutes.')
+                        'The names of the allowed types are: ' +
+                        'steps, calories, active_minutes, lightly_active_minutes, sedentary_minutes.')
                 }
             })
         })

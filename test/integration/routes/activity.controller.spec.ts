@@ -13,7 +13,7 @@ import { PhysicalActivityEntityMapper } from '../../../src/infrastructure/entity
 import { ObjectID } from 'bson'
 import { Log, LogType } from '../../../src/application/domain/model/log'
 import { LogMock } from '../../mocks/log.mock'
-import { ChildLogRepoModel } from '../../../src/infrastructure/database/schema/activity.log.schema'
+import { LogRepoModel } from '../../../src/infrastructure/database/schema/log.schema'
 import { PhysicalActivityHeartRate } from '../../../src/application/domain/model/physical.activity.heart.rate'
 import { HeartRateZone } from '../../../src/application/domain/model/heart.rate.zone'
 
@@ -2657,7 +2657,8 @@ describe('Routes: users/children', () => {
                             expect(res.body.error[i].message)
                                 .to.eql('The name of type provided "step" is not supported...')
                             expect(res.body.error[i].description)
-                                .to.eql('The names of the allowed types are: steps, calories, active_minutes, sedentary_minutes.')
+                                .to.eql('The names of the allowed types are: ' +
+                                'steps, calories, active_minutes, lightly_active_minutes, sedentary_minutes.')
                             expect(res.body.error[i].item.date).to.eql(correctLogsArr[i].date)
                             expect(res.body.error[i].item.value).to.eql(correctLogsArr[i].value)
                         }
@@ -2960,7 +2961,8 @@ describe('Routes: users/children', () => {
                         expect(err.body.code).to.eql(400)
                         expect(err.body.message).to.eql('The name of type provided "step" is not supported...')
                         expect(err.body.description)
-                            .to.eql('The names of the allowed types are: steps, calories, active_minutes, sedentary_minutes.')
+                            .to.eql('The names of the allowed types are: ' +
+                            'steps, calories, active_minutes, lightly_active_minutes, sedentary_minutes.')
                     })
             })
         })
@@ -3099,7 +3101,8 @@ describe('Routes: users/children', () => {
                         expect(err.body.code).to.eql(400)
                         expect(err.body.message).to.eql('The name of type provided "calorie" is not supported...')
                         expect(err.body.description)
-                            .to.eql('The names of the allowed types are: steps, calories, active_minutes, sedentary_minutes.')
+                            .to.eql('The names of the allowed types are: ' +
+                            'steps, calories, active_minutes, lightly_active_minutes, sedentary_minutes.')
                     })
             })
         })
@@ -3193,7 +3196,7 @@ function deleteAllActivity(): void {
 }
 
 function deleteAllLogs(): void {
-    ChildLogRepoModel.deleteMany({}, err => {
+    LogRepoModel.deleteMany({}, err => {
         if (err) console.log(err)
     })
 }

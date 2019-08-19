@@ -4,7 +4,7 @@ import { EntityMapperMock } from '../../mocks/entity.mapper.mock'
 import { CustomLoggerMock } from '../../mocks/custom.logger.mock'
 import { Log } from '../../../src/application/domain/model/log'
 import { LogMock } from '../../mocks/log.mock'
-import { ChildLogRepoModel } from '../../../src/infrastructure/database/schema/activity.log.schema'
+import { LogRepoModel } from '../../../src/infrastructure/database/schema/log.schema'
 import { ILogRepository } from '../../../src/application/port/log.repository.interface'
 import { LogRepository } from '../../../src/infrastructure/repository/log.repository'
 
@@ -13,7 +13,7 @@ require('sinon-mongoose')
 describe('Repositories: LogRepository', () => {
     const defaultLog: Log = new LogMock()
 
-    const modelFake: any = ChildLogRepoModel
+    const modelFake: any = LogRepoModel
     const repo: ILogRepository = new LogRepository(modelFake, new EntityMapperMock(), new CustomLoggerMock())
 
     const queryMock: any = {

@@ -12,9 +12,11 @@ export class ChildLog implements IJSONSerializable, IJSONDeserializable<ChildLog
     private _steps!: Array<Log> // Logs of steps of a child
     private _calories!: Array<Log> // Logs of calories of a child
     private _active_minutes!: Array<Log> // Logs of active minutes of a child
+    private _lightly_active_minutes!: Array<Log> // Logs of lightly active minutes of a child
     private _sedentary_minutes!: Array<Log> // Logs of sedentary minutes of a child
 
-    constructor(steps?: Array<Log>, calories?: Array<Log>, active_minutes?: Array<Log>, sedentary_minutes?: Array<Log>) {
+    constructor(steps?: Array<Log>, calories?: Array<Log>, active_minutes?: Array<Log>, lightly_active_minutes?: Array<Log>,
+                sedentary_minutes?: Array<Log>) {
         if (steps) this.steps = steps
         if (calories) this.calories = calories
         if (active_minutes) this.active_minutes = active_minutes
@@ -45,6 +47,14 @@ export class ChildLog implements IJSONSerializable, IJSONDeserializable<ChildLog
         this._active_minutes = value
     }
 
+    get lightly_active_minutes(): Array<Log> {
+        return this._lightly_active_minutes
+    }
+
+    set lightly_active_minutes(value: Array<Log>) {
+        this._lightly_active_minutes = value
+    }
+
     get sedentary_minutes(): Array<Log> {
         return this._sedentary_minutes
     }
@@ -60,19 +70,24 @@ export class ChildLog implements IJSONSerializable, IJSONDeserializable<ChildLog
         }
 
         if (json.steps !== undefined && json.steps instanceof Array) {
-            this._steps = json.steps.map(steps => new Log().fromJSON(steps))
+            this.steps = json.steps.map(steps => new Log().fromJSON(steps))
         }
 
         if (json.calories !== undefined && json.calories instanceof Array) {
-            this._calories = json.calories.map(calories => new Log().fromJSON(calories))
+            this.calories = json.calories.map(calories => new Log().fromJSON(calories))
         }
 
         if (json.active_minutes !== undefined && json.active_minutes instanceof Array) {
-            this._active_minutes = json.active_minutes.map(activeMinutes => new Log().fromJSON(activeMinutes))
+            this.active_minutes = json.active_minutes.map(activeMinutes => new Log().fromJSON(activeMinutes))
+        }
+
+        if (json.lightly_active_minutes !== undefined && json.lightly_active_minutes instanceof Array) {
+            this.lightly_active_minutes =
+                json.lightly_active_minutes.map(lightlyActiveMinutes => new Log().fromJSON(lightlyActiveMinutes))
         }
 
         if (json.sedentary_minutes !== undefined && json.sedentary_minutes instanceof Array) {
-            this._sedentary_minutes = json.sedentary_minutes.map(sedentaryMinutes => new Log().fromJSON(sedentaryMinutes))
+            this.sedentary_minutes = json.sedentary_minutes.map(sedentaryMinutes => new Log().fromJSON(sedentaryMinutes))
         }
 
         return this
@@ -80,10 +95,13 @@ export class ChildLog implements IJSONSerializable, IJSONDeserializable<ChildLog
 
     public toJSON(): any {
         return {
-            steps: this._steps ? this._steps.map(item => item.toJSON()) : this._steps,
-            calories: this._calories ? this._calories.map(item => item.toJSON()) : this._calories,
-            active_minutes: this._active_minutes ? this._active_minutes.map(item => item.toJSON()) : this._active_minutes,
-            sedentary_minutes: this._sedentary_minutes ? this._sedentary_minutes.map(item => item.toJSON()) : this._sedentary_minutes
+            steps: this.steps ? this.steps.map(item => item.toJSON()) : this.steps,
+            calories: this.calories ? this.calories.map(item => item.toJSON()) : this.calories,
+            active_minutes: this.active_minutes ? this.active_minutes.map(item => item.toJSON()) : this.active_minutes,
+            lightly_active_minutes:
+                this.lightly_active_minutes ? this.lightly_active_minutes.map(item => item.toJSON()) : this.lightly_active_minutes,
+            sedentary_minutes:
+                this.sedentary_minutes ? this.sedentary_minutes.map(item => item.toJSON()) : this.sedentary_minutes
         }
     }
 }

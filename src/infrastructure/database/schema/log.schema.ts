@@ -1,9 +1,9 @@
 import Mongoose from 'mongoose'
 
-interface IChildLogModel extends Mongoose.Document {
+interface ILogModel extends Mongoose.Document {
 }
 
-const childLogSchema = new Mongoose.Schema({
+const logSchema = new Mongoose.Schema({
         type: {
             type: String,
             required: true
@@ -33,5 +33,5 @@ const childLogSchema = new Mongoose.Schema({
         }
     }
 )
-childLogSchema.index({ child_id: 1, type: 1, date: 1 }, { unique: true }) // define index at schema level
-export const ChildLogRepoModel = Mongoose.model<IChildLogModel>('ChildLog', childLogSchema)
+logSchema.index({ child_id: 1, type: 1, date: 1 }, { unique: true }) // define index at schema level
+export const LogRepoModel = Mongoose.model<ILogModel>('Log', logSchema)
