@@ -16,7 +16,7 @@ const backgroundServices: BackgroundService = DIContainer.get(Identifier.BACKGRO
 const app: App = DIContainer.get(Identifier.APP)
 const request = require('supertest')(app.getExpress())
 
-describe('Routes: children.weight', () => {
+describe('Routes: children.weights', () => {
 
     const defaultWeight: Weight = new WeightMock()
 
@@ -44,7 +44,7 @@ describe('Routes: children.weight', () => {
             deleteAllWeight()
             await backgroundServices.startServices()
         } catch (err) {
-            throw new Error('Failure on children.weight routes test: ' + err.message)
+            throw new Error('Failure on children.weights routes test: ' + err.message)
         }
     })
 
@@ -53,7 +53,7 @@ describe('Routes: children.weight', () => {
         try {
             deleteAllWeight()
         } catch (err) {
-            throw new Error('Failure on children.weight routes test: ' + err.message)
+            throw new Error('Failure on children.weights routes test: ' + err.message)
         }
     })
     /**
@@ -155,7 +155,7 @@ describe('Routes: children.weight', () => {
                 try {
                     deleteAllWeight()
                 } catch (err) {
-                    throw new Error('Failure on children.weight routes test: ' + err.message)
+                    throw new Error('Failure on children.weights routes test: ' + err.message)
                 }
             })
 
@@ -234,7 +234,7 @@ describe('Routes: children.weight', () => {
                 try {
                     deleteAllWeight()
                 } catch (err) {
-                    throw new Error('Failure on children.weight routes test: ' + err.message)
+                    throw new Error('Failure on children.weights routes test: ' + err.message)
                 }
             })
 
@@ -321,7 +321,7 @@ describe('Routes: children.weight', () => {
                 try {
                     deleteAllWeight()
                 } catch (err) {
-                    throw new Error('Failure on children.weight routes test: ' + err.message)
+                    throw new Error('Failure on children.weights routes test: ' + err.message)
                 }
             })
 
@@ -344,7 +344,7 @@ describe('Routes: children.weight', () => {
                 try {
                     deleteAllWeight()
                 } catch (err) {
-                    throw new Error('Failure on children.weight routes test: ' + err.message)
+                    throw new Error('Failure on children.weights routes test: ' + err.message)
                 }
             })
 
@@ -395,7 +395,7 @@ describe('Routes: children.weight', () => {
                             expect(res.body[0].body_fat).to.eql(result.value)
                         })
                 } catch (err) {
-                    throw new Error('Failure on children.weight routes test: ' + err.message)
+                    throw new Error('Failure on children.weights routes test: ' + err.message)
                 }
             })
         })
@@ -406,7 +406,7 @@ describe('Routes: children.weight', () => {
                 try {
                     deleteAllWeight()
                 } catch (err) {
-                    throw new Error('Failure on children.weight routes test: ' + err.message)
+                    throw new Error('Failure on children.weights routes test: ' + err.message)
                 }
             })
 
@@ -434,7 +434,7 @@ describe('Routes: children.weight', () => {
                 try {
                     deleteAllWeight()
                 } catch (err) {
-                    throw new Error('Failure on children.weight routes test: ' + err.message)
+                    throw new Error('Failure on children.weights routes test: ' + err.message)
                 }
             })
 
@@ -458,7 +458,7 @@ describe('Routes: children.weight', () => {
                         body_fat: bodyFat
                     })
                 } catch (err) {
-                    throw new Error('Failure on children.weight routes test: ' + err.message)
+                    throw new Error('Failure on children.weights routes test: ' + err.message)
                 }
 
                 return request
@@ -484,7 +484,7 @@ describe('Routes: children.weight', () => {
                 try {
                     deleteAllWeight()
                 } catch (err) {
-                    throw new Error('Failure on children.weight routes test: ' + err.message)
+                    throw new Error('Failure on children.weights routes test: ' + err.message)
                 }
             })
 
@@ -507,7 +507,7 @@ describe('Routes: children.weight', () => {
                 try {
                     deleteAllWeight()
                 } catch (err) {
-                    throw new Error('Failure on children.weight routes test: ' + err.message)
+                    throw new Error('Failure on children.weights routes test: ' + err.message)
                 }
             })
 
@@ -530,7 +530,7 @@ describe('Routes: children.weight', () => {
                         body_fat: bodyFat
                     })
                 } catch (err) {
-                    throw new Error('Failure on children.weight routes test: ' + err.message)
+                    throw new Error('Failure on children.weights routes test: ' + err.message)
                 }
 
                 return request
@@ -550,7 +550,7 @@ describe('Routes: children.weight', () => {
                 try {
                     deleteAllWeight()
                 } catch (err) {
-                    throw new Error('Failure on children.weight routes test: ' + err.message)
+                    throw new Error('Failure on children.weights routes test: ' + err.message)
                 }
             })
 
@@ -573,7 +573,7 @@ describe('Routes: children.weight', () => {
                         body_fat: bodyFat
                     })
                 } catch (err) {
-                    throw new Error('Failure on children.weight routes test: ' + err.message)
+                    throw new Error('Failure on children.weights routes test: ' + err.message)
                 }
 
                 return request
@@ -595,7 +595,7 @@ describe('Routes: children.weight', () => {
                 try {
                     deleteAllWeight()
                 } catch (err) {
-                    throw new Error('Failure on children.weight routes test: ' + err.message)
+                    throw new Error('Failure on children.weights routes test: ' + err.message)
                 }
             })
 
@@ -619,7 +619,7 @@ describe('Routes: children.weight', () => {
                         body_fat: bodyFat
                     })
                 } catch (err) {
-                    throw new Error('Failure on children.weight routes test: ' + err.message)
+                    throw new Error('Failure on children.weights routes test: ' + err.message)
                 }
 
                 const url = `/v1/children/${result.child_id}/weights/${result.id}?child_id=${result.child_id}
@@ -646,7 +646,7 @@ describe('Routes: children.weight', () => {
                 try {
                     deleteAllWeight()
                 } catch (err) {
-                    throw new Error('Failure on children.weight routes test: ' + err.message)
+                    throw new Error('Failure on children.weights routes test: ' + err.message)
                 }
             })
 
@@ -673,7 +673,7 @@ describe('Routes: children.weight', () => {
                 try {
                     deleteAllWeight()
                 } catch (err) {
-                    throw new Error('Failure on children.weight routes test: ' + err.message)
+                    throw new Error('Failure on children.weights routes test: ' + err.message)
                 }
             })
 
@@ -696,7 +696,7 @@ describe('Routes: children.weight', () => {
                         body_fat: bodyFat
                     })
                 } catch (err) {
-                    throw new Error('Failure on children.weight routes test: ' + err.message)
+                    throw new Error('Failure on children.weights routes test: ' + err.message)
                 }
 
                 const url = `/v1/children/123/weights/${result.id}?child_id=${result.child_id}
@@ -720,7 +720,7 @@ describe('Routes: children.weight', () => {
                 try {
                     deleteAllWeight()
                 } catch (err) {
-                    throw new Error('Failure on children.weight routes test: ' + err.message)
+                    throw new Error('Failure on children.weights routes test: ' + err.message)
                 }
             })
 
@@ -743,7 +743,7 @@ describe('Routes: children.weight', () => {
                         body_fat: bodyFat
                     })
                 } catch (err) {
-                    throw new Error('Failure on children.weight routes test: ' + err.message)
+                    throw new Error('Failure on children.weights routes test: ' + err.message)
                 }
 
                 const url = `/v1/children/${result.child_id}/weights/123?child_id=${result.child_id}
@@ -770,7 +770,7 @@ describe('Routes: children.weight', () => {
                 try {
                     deleteAllWeight()
                 } catch (err) {
-                    throw new Error('Failure on children.weight routes test: ' + err.message)
+                    throw new Error('Failure on children.weights routes test: ' + err.message)
                 }
             })
 
@@ -793,7 +793,7 @@ describe('Routes: children.weight', () => {
                         body_fat: bodyFat
                     })
                 } catch (err) {
-                    throw new Error('Failure on children.weight routes test: ' + err.message)
+                    throw new Error('Failure on children.weights routes test: ' + err.message)
                 }
 
                 return request
@@ -811,7 +811,7 @@ describe('Routes: children.weight', () => {
                 try {
                     deleteAllWeight()
                 } catch (err) {
-                    throw new Error('Failure on children.weight routes test: ' + err.message)
+                    throw new Error('Failure on children.weights routes test: ' + err.message)
                 }
             })
 
@@ -831,7 +831,7 @@ describe('Routes: children.weight', () => {
                 try {
                     deleteAllWeight()
                 } catch (err) {
-                    throw new Error('Failure on children.weight routes test: ' + err.message)
+                    throw new Error('Failure on children.weights routes test: ' + err.message)
                 }
             })
 
@@ -854,7 +854,7 @@ describe('Routes: children.weight', () => {
                         body_fat: bodyFat
                     })
                 } catch (err) {
-                    throw new Error('Failure on children.weight routes test: ' + err.message)
+                    throw new Error('Failure on children.weights routes test: ' + err.message)
                 }
 
                 return request
@@ -874,7 +874,7 @@ describe('Routes: children.weight', () => {
                 try {
                     deleteAllWeight()
                 } catch (err) {
-                    throw new Error('Failure on children.weight routes test: ' + err.message)
+                    throw new Error('Failure on children.weights routes test: ' + err.message)
                 }
             })
 
@@ -897,7 +897,7 @@ describe('Routes: children.weight', () => {
                         body_fat: bodyFat
                     })
                 } catch (err) {
-                    throw new Error('Failure on children.weight routes test: ' + err.message)
+                    throw new Error('Failure on children.weights routes test: ' + err.message)
                 }
 
                 return request
