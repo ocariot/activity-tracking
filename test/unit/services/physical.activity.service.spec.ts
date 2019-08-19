@@ -894,59 +894,6 @@ describe('Services: PhysicalActivityService', () => {
     })
 
     /**
-     * Method getAll(query: IQuery)
-     */
-    describe('getAll(query: IQuery)', () => {
-        context('when there is at least one physical activity object in the database that matches the query filters', () => {
-            it('should return an PhysicalActivity array', () => {
-                const query: IQuery = new Query()
-                query.filters = {
-                    _id: activity.id,
-                    child_id: activity.child_id
-                }
-
-                sinon
-                    .mock(modelFake)
-                    .expects('find')
-                    .withArgs(query)
-                    .chain('exec')
-                    .resolves(activitiesArr)
-
-                return activityService.getAll(query)
-                    .then(result => {
-                        assert.isArray(result)
-                        assert.isNotEmpty(result)
-                    })
-            })
-        })
-
-        context('when there is no physical activity object in the database that matches the query filters', () => {
-            it('should return an empty array', () => {
-                activity.child_id = '507f1f77bcf86cd799439011'          // Make mock return an empty array
-
-                const query: IQuery = new Query()
-                query.filters = {
-                    _id: activity.id,
-                    child_id: activity.child_id
-                }
-
-                sinon
-                    .mock(modelFake)
-                    .expects('find')
-                    .withArgs(query)
-                    .chain('exec')
-                    .resolves(new Array<PhysicalActivityMock>())
-
-                return activityService.getAll(query)
-                    .then(result => {
-                        assert.isArray(result)
-                        assert.isEmpty(result)
-                    })
-            })
-        })
-    })
-
-    /**
      * Method getByIdAndChild(activityId: string, childId: string, query: IQuery)
      */
     describe('getByIdAndChild(activityId: string, childId: string, query: IQuery)', () => {

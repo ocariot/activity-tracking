@@ -24,9 +24,9 @@ req_extensions = v3_req
 [req_distinguished_name]
 C  = UE
 ST = Bruxelas
-L  = OCARIoT
-O  = OCARIoT
-CN = ocariot.com
+L  = Bruxelas
+O  = OCARIoT CA
+CN = api.ocariot.com
 # Allow client and server auth. You may want to only allow server auth.
 # Link to SAN names.
 [v3_req]
@@ -56,7 +56,7 @@ openssl req \
   -days 120 \
   -nodes \
   -x509 \
-  -subj "//C=UE\ST=Bruxelas\L=OCARIoT\O=OCARIoT CA" \
+  -subj "//C=UE\ST=Bruxelas\L=Bruxelas\O=OCARIoT CA\CN=api.ocariot.com" \
   -keyout "${DIR}/ca.key" \
   -out "${DIR}/ca.crt"
 # For each server/service you want to secure with your CA, repeat the

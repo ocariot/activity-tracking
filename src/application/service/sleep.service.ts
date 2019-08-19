@@ -142,7 +142,7 @@ export class SleepService implements ISleepService {
      * @throws {RepositoryException}
      */
     public async getAll(query: IQuery): Promise<Array<Sleep>> {
-        return this._sleepRepository.find(query)
+        throw new Error('Unsupported feature!')
     }
 
     /**

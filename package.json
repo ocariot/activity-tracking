@@ -1,6 +1,6 @@
 {
   "name": "activity-tracking",
-  "version": "1.1.0",
+  "version": "2.0.0",
   "description": "Microservice responsible for tracking activities, sleep, environments and measurements on the OCARIoT platform",
   "main": "dist/server.js",
   "scripts": {
@@ -9,12 +9,11 @@
     "start": "node dist/server.js",
     "start:dev": "gulp dev",
     "tslint": "tslint -c tslint.json -p tsconfig.json",
-    "test": "nyc --clean --all --reporter=text mocha --opts test/mocha.opts test/**/*.spec.ts",
-    "test:integration": "mocha --opts test/mocha.opts test/integration/**/*.spec.ts",
-    "test:unit": "mocha --opts test/mocha.opts test/unit/**/*.spec.ts",
+    "test": "nyc --clean --all --reporter=text-summary mocha --opts test/mocha.opts test/**/*.spec.ts",
+    "test:unit": "nyc --clean --all --reporter=text-summary mocha --opts test/mocha.opts test/unit/**/*.spec.ts",
+    "test:integration": "nyc --clean --all --reporter=text-summary mocha --opts test/mocha.opts test/integration/**/*.spec.ts",
     "test:single": "mocha --opts test/mocha.opts",
-    "test:cov": "nyc --clean --all --reporter=html --reporter=text mocha --opts test/mocha.opts test/**/*.spec.ts",
-    "test:travis": "nyc mocha --opts test/mocha.opts test/**/*.spec.ts && nyc report --reporter=text-lcov | coveralls"
+    "test:cov": "nyc --clean --all --reporter=html --reporter=text mocha --opts test/mocha.opts test/**/*.spec.ts"
   },
   "repository": {
     "type": "git",
@@ -61,7 +60,7 @@
     "helmet": "^3.18.0",
     "inversify": "^5.0.1",
     "inversify-express-utils": "^6.3.2",
-    "ip-allowed": "git+https://github.com/nutes-uepb/ip-allowed",
+    "ip-allowed": "^1.1.1",
     "mongoose": "^5.6.4",
     "morgan": "^1.9.1",
     "query-strings-parser": "^2.0.0",
@@ -92,7 +91,7 @@
     "supertest": "^3.4.2",
     "ts-node": "^8.1.0",
     "tslint": "^5.13.1",
-    "typedoc": "^0.14.2",
+    "typedoc": "^0.15.0",
     "typescript": "^3.4.5"
   }
 }

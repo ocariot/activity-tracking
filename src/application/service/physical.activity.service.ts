@@ -143,7 +143,7 @@ export class PhysicalActivityService implements IPhysicalActivityService {
      * @throws {RepositoryException}
      */
     public async getAll(query: IQuery): Promise<Array<PhysicalActivity>> {
-        return this._activityRepository.find(query)
+        throw new Error('Unsupported feature!')
     }
 
     /**

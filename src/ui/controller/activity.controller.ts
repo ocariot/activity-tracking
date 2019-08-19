@@ -38,26 +38,6 @@ export class ActivityController {
     }
 
     /**
-     * Retrieve physical physicalactivity list of all children.
-     * For the query strings, the query-strings-parser middleware was used.
-     * @see {@link https://www.npmjs.com/package/query-strings-parser} for further information.
-     *
-     * @param {Request} req
-     * @param {Response} res
-     */
-    @httpGet('/physicalactivities')
-    public async getAllPhysicalActivities(@request() req: Request, @response() res: Response): Promise<Response> {
-        try {
-            const result = await this._activityService.getAll(new Query().fromJSON(req.query))
-            return res.status(HttpStatus.OK).send(result)
-        } catch (err) {
-            const handlerError = ApiExceptionManager.build(err)
-            return res.status(handlerError.code)
-                .send(handlerError.toJson())
-        }
-    }
-
-    /**
      * Add new physical physicalactivity or multiple new physical activities.
      *
      * @param {Request} req

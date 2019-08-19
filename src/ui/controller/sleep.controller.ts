@@ -33,26 +33,6 @@ export class SleepController {
     }
 
     /**
-     * Retrieve sleep list of all children.
-     * For the query strings, the query-strings-parser middleware was used.
-     * @see {@link https://www.npmjs.com/package/query-strings-parser} for further information.
-     *
-     * @param {Request} req
-     * @param {Response} res
-     */
-    @httpGet('/sleep')
-    public async getAllSleep(@request() req: Request, @response() res: Response): Promise<Response> {
-        try {
-            const result = await this._sleepService.getAll(new Query().fromJSON(req.query))
-            return res.status(HttpStatus.OK).send(result)
-        } catch (err) {
-            const handlerError = ApiExceptionManager.build(err)
-            return res.status(handlerError.code)
-                .send(handlerError.toJson())
-        }
-    }
-
-    /**
      * Add new sleep or multiple new sleep objects.
      *
      * @param {Request} req

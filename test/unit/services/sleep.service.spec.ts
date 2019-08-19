@@ -844,59 +844,6 @@ describe('Services: SleepService', () => {
     })
 
     /**
-     * Method: getAll(query: IQuery)
-     */
-    describe('getAll(query: IQuery)', () => {
-        context('when there is at least one sleep object in the database that matches the query filters', () => {
-            it('should return an Sleep array', () => {
-                const query: IQuery = new Query()
-                query.filters = {
-                    _id: sleep.id,
-                    child_id: sleep.child_id
-                }
-
-                sinon
-                    .mock(modelFake)
-                    .expects('find')
-                    .withArgs(query)
-                    .chain('exec')
-                    .resolves(sleepArr)
-
-                return sleepService.getAll(query)
-                    .then(result => {
-                        assert.isArray(result)
-                        assert.isNotEmpty(result)
-                    })
-            })
-        })
-
-        context('when there is no sleep object in the database that matches the query filters', () => {
-            it('should return an empty array', () => {
-                sleep.child_id = '507f1f77bcf86cd799439011'          // Make mock return an empty array
-
-                const query: IQuery = new Query()
-                query.filters = {
-                    _id: sleep.id,
-                    child_id: sleep.child_id
-                }
-
-                sinon
-                    .mock(modelFake)
-                    .expects('find')
-                    .withArgs(query)
-                    .chain('exec')
-                    .resolves(new Array<SleepMock>())
-
-                return sleepService.getAll(query)
-                    .then(result => {
-                        assert.isArray(result)
-                        assert.isEmpty(result)
-                    })
-            })
-        })
-    })
-
-    /**
      * Method: getByIdAndChild(sleepId: string, childId: string, query: IQuery)
      */
     describe('getByIdAndChild(sleepId: string, childId: string, query: IQuery)', () => {

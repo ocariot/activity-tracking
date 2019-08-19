@@ -1,4 +1,4 @@
-FROM node
+FROM node:10.16.3
 
 # Create app directory
 RUN mkdir -p /usr/src/ts/
