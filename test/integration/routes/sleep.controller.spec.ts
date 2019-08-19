@@ -17,7 +17,7 @@ const backgroundServices: BackgroundService = DIContainer.get(Identifier.BACKGRO
 const app: App = DIContainer.get(Identifier.APP)
 const request = require('supertest')(app.getExpress())
 
-describe('Routes: users.children.sleep', () => {
+describe('Routes: children.sleep', () => {
     const defaultSleep: Sleep = new SleepMock()
     const otherSleep: Sleep = new SleepMock()
     otherSleep.child_id = '5a62be07de34500146d9c542'
@@ -131,7 +131,7 @@ describe('Routes: users.children.sleep', () => {
             deleteAllSleep()
             await backgroundServices.startServices()
         } catch (err) {
-            throw new Error('Failure on users.children.sleep routes test: ' + err.message)
+            throw new Error('Failure on children.sleep routes test: ' + err.message)
         }
     })
 
@@ -140,13 +140,13 @@ describe('Routes: users.children.sleep', () => {
         try {
             deleteAllSleep()
         } catch (err) {
-            throw new Error('Failure on users.children.sleep routes test: ' + err.message)
+            throw new Error('Failure on children.sleep routes test: ' + err.message)
         }
     })
     /**
      * POST route with only one Sleep in the body
      */
-    describe('POST /v1/users/children/:child_id/sleep with only one Sleep in the body', () => {
+    describe('POST /v1/children/:child_id/sleep with only one Sleep in the body', () => {
         context('when posting a new Sleep with success', () => {
             it('should return status code 201 and the saved Sleep', () => {
                 const body = {
@@ -158,7 +158,7 @@ describe('Routes: users.children.sleep', () => {
                 }
 
                 return request
-                    .post(`/v1/users/children/${defaultSleep.child_id}/sleep`)
+                    .post(`/v1/children/${defaultSleep.child_id}/sleep`)
                     .send(body)
                     .set('Content-Type', 'application/json')
                     .expect(201)
@@ -187,7 +187,7 @@ describe('Routes: users.children.sleep', () => {
                 }
 
                 return request
-                    .post(`/v1/users/children/${defaultSleep.child_id}/sleep`)
+                    .post(`/v1/children/${defaultSleep.child_id}/sleep`)
                     .send(body)
                     .set('Content-Type', 'application/json')
                     .expect(409)
@@ -203,7 +203,7 @@ describe('Routes: users.children.sleep', () => {
                 const body = {}
 
                 return request
-                    .post(`/v1/users/children/${defaultSleep.child_id}/sleep`)
+                    .post(`/v1/children/${defaultSleep.child_id}/sleep`)
                     .send(body)
                     .set('Content-Type', 'application/json')
                     .expect(400)
@@ -224,7 +224,7 @@ describe('Routes: users.children.sleep', () => {
                 }
 
                 return request
-                    .post(`/v1/users/children/${defaultSleep.child_id}/sleep`)
+                    .post(`/v1/children/${defaultSleep.child_id}/sleep`)
                     .send(body)
                     .set('Content-Type', 'application/json')
                     .expect(400)
@@ -247,7 +247,7 @@ describe('Routes: users.children.sleep', () => {
                 }
 
                 return request
-                    .post(`/v1/users/children/${defaultSleep.child_id}/sleep`)
+                    .post(`/v1/children/${defaultSleep.child_id}/sleep`)
                     .send(body)
                     .set('Content-Type', 'application/json')
                     .expect(400)
@@ -271,7 +271,7 @@ describe('Routes: users.children.sleep', () => {
                 }
 
                 return request
-                    .post(`/v1/users/children/${defaultSleep.child_id}/sleep`)
+                    .post(`/v1/children/${defaultSleep.child_id}/sleep`)
                     .send(body)
                     .set('Content-Type', 'application/json')
                     .expect(400)
@@ -295,7 +295,7 @@ describe('Routes: users.children.sleep', () => {
                 }
 
                 return request
-                    .post(`/v1/users/children/${defaultSleep.child_id}/sleep`)
+                    .post(`/v1/children/${defaultSleep.child_id}/sleep`)
                     .send(body)
                     .set('Content-Type', 'application/json')
                     .expect(400)
@@ -318,7 +318,7 @@ describe('Routes: users.children.sleep', () => {
                 }
 
                 return request
-                    .post(`/v1/users/children/123/sleep`)
+                    .post(`/v1/children/123/sleep`)
                     .send(body)
                     .set('Content-Type', 'application/json')
                     .expect(400)
@@ -341,7 +341,7 @@ describe('Routes: users.children.sleep', () => {
                 }
 
                 return request
-                    .post(`/v1/users/children/${incorrectSleep6.child_id}/sleep`)
+                    .post(`/v1/children/${incorrectSleep6.child_id}/sleep`)
                     .send(body)
                     .set('Content-Type', 'application/json')
                     .expect(400)
@@ -364,7 +364,7 @@ describe('Routes: users.children.sleep', () => {
                 }
 
                 return request
-                    .post(`/v1/users/children/${defaultSleep.child_id}/sleep`)
+                    .post(`/v1/children/${defaultSleep.child_id}/sleep`)
                     .send(body)
                     .set('Content-Type', 'application/json')
                     .expect(400)
@@ -389,7 +389,7 @@ describe('Routes: users.children.sleep', () => {
                 }
 
                 return request
-                    .post(`/v1/users/children/${defaultSleep.child_id}/sleep`)
+                    .post(`/v1/children/${defaultSleep.child_id}/sleep`)
                     .send(body)
                     .set('Content-Type', 'application/json')
                     .expect(400)
@@ -416,7 +416,7 @@ describe('Routes: users.children.sleep', () => {
                 }
 
                 return request
-                    .post(`/v1/users/children/${defaultSleep.child_id}/sleep`)
+                    .post(`/v1/children/${defaultSleep.child_id}/sleep`)
                     .send(body)
                     .set('Content-Type', 'application/json')
                     .expect(400)
@@ -448,7 +448,7 @@ describe('Routes: users.children.sleep', () => {
                 }
 
                 return request
-                    .post(`/v1/users/children/${defaultSleep.child_id}/sleep`)
+                    .post(`/v1/children/${defaultSleep.child_id}/sleep`)
                     .send(body)
                     .set('Content-Type', 'application/json')
                     .expect(400)
@@ -472,7 +472,7 @@ describe('Routes: users.children.sleep', () => {
                 }
 
                 return request
-                    .post(`/v1/users/children/${incorrectSleep11.child_id}/sleep`)
+                    .post(`/v1/children/${incorrectSleep11.child_id}/sleep`)
                     .send(body)
                     .set('Content-Type', 'application/json')
                     .expect(400)
@@ -498,7 +498,7 @@ describe('Routes: users.children.sleep', () => {
                 }
 
                 return request
-                    .post(`/v1/users/children/${incorrectSleep12.child_id}/sleep`)
+                    .post(`/v1/children/${incorrectSleep12.child_id}/sleep`)
                     .send(body)
                     .set('Content-Type', 'application/json')
                     .expect(400)
@@ -513,13 +513,13 @@ describe('Routes: users.children.sleep', () => {
     /**
      * POST route with a Sleep array in the body
      */
-    describe('POST /v1/users/children/:child_id/sleep with a Sleep array in the body', () => {
+    describe('POST /v1/children/:child_id/sleep with a Sleep array in the body', () => {
         context('when all the sleep objects are correct and still do not exist in the repository', () => {
             before(() => {
                 try {
                     deleteAllSleep()
                 } catch (err) {
-                    throw new Error('Failure on users.children.sleep routes test: ' + err.message)
+                    throw new Error('Failure on children.sleep routes test: ' + err.message)
                 }
             })
 
@@ -539,7 +539,7 @@ describe('Routes: users.children.sleep', () => {
                 })
 
                 return request
-                    .post(`/v1/users/children/${defaultSleep.child_id}/sleep`)
+                    .post(`/v1/children/${defaultSleep.child_id}/sleep`)
                     .send(body)
                     .set('Content-Type', 'application/json')
                     .expect(201)
@@ -577,7 +577,7 @@ describe('Routes: users.children.sleep', () => {
                 })
 
                 return request
-                    .post(`/v1/users/children/${defaultSleep.child_id}/sleep`)
+                    .post(`/v1/children/${defaultSleep.child_id}/sleep`)
                     .send(body)
                     .set('Content-Type', 'application/json')
                     .expect(201)
@@ -604,7 +604,7 @@ describe('Routes: users.children.sleep', () => {
                 try {
                     deleteAllSleep()
                 } catch (err) {
-                    throw new Error('Failure on users.children.sleep routes test: ' + err.message)
+                    throw new Error('Failure on children.sleep routes test: ' + err.message)
                 }
             })
 
@@ -624,7 +624,7 @@ describe('Routes: users.children.sleep', () => {
                 })
 
                 return request
-                    .post(`/v1/users/children/${defaultSleep.child_id}/sleep`)
+                    .post(`/v1/children/${defaultSleep.child_id}/sleep`)
                     .send(body)
                     .set('Content-Type', 'application/json')
                     .expect(201)
@@ -653,7 +653,7 @@ describe('Routes: users.children.sleep', () => {
                 try {
                     deleteAllSleep()
                 } catch (err) {
-                    throw new Error('Failure on users.children.sleep routes test: ' + err.message)
+                    throw new Error('Failure on children.sleep routes test: ' + err.message)
                 }
             })
 
@@ -673,7 +673,7 @@ describe('Routes: users.children.sleep', () => {
                 })
 
                 return request
-                    .post(`/v1/users/children/${defaultSleep.child_id}/sleep`)
+                    .post(`/v1/children/${defaultSleep.child_id}/sleep`)
                     .send(body)
                     .set('Content-Type', 'application/json')
                     .expect(201)
@@ -737,13 +737,13 @@ describe('Routes: users.children.sleep', () => {
     /**
      * Route GET all sleep by child
      */
-    describe('GET /v1/users/children/:child_id/sleep', () => {
+    describe('GET /v1/children/:child_id/sleep', () => {
         context('when get all sleep of a specific child of the database successfully', () => {
             before(() => {
                 try {
                     deleteAllSleep()
                 } catch (err) {
-                    throw new Error('Failure on users.children.sleep routes test: ' + err.message)
+                    throw new Error('Failure on children.sleep routes test: ' + err.message)
                 }
             })
 
@@ -758,11 +758,11 @@ describe('Routes: users.children.sleep', () => {
                         child_id: defaultSleep.child_id
                     })
                 } catch (err) {
-                    throw new Error('Failure on users.children.sleep routes test: ' + err.message)
+                    throw new Error('Failure on children.sleep routes test: ' + err.message)
                 }
 
                 return request
-                    .get(`/v1/users/children/${defaultSleep.child_id}/sleep`)
+                    .get(`/v1/children/${defaultSleep.child_id}/sleep`)
                     .set('Content-Type', 'application/json')
                     .expect(200)
                     .then(res => {
@@ -789,13 +789,13 @@ describe('Routes: users.children.sleep', () => {
                 try {
                     deleteAllSleep()
                 } catch (err) {
-                    throw new Error('Failure on users.children.sleep routes test: ' + err.message)
+                    throw new Error('Failure on children.sleep routes test: ' + err.message)
                 }
             })
 
             it('should return status code 200 and an empty list', async () => {
                 return request
-                    .get(`/v1/users/children/${defaultSleep.child_id}/sleep`)
+                    .get(`/v1/children/${defaultSleep.child_id}/sleep`)
                     .set('Content-Type', 'application/json')
                     .expect(200)
                     .then(res => {
@@ -810,7 +810,7 @@ describe('Routes: users.children.sleep', () => {
                 try {
                     deleteAllSleep()
                 } catch (err) {
-                    throw new Error('Failure on users.children.sleep routes test: ' + err.message)
+                    throw new Error('Failure on children.sleep routes test: ' + err.message)
                 }
             })
 
@@ -825,11 +825,11 @@ describe('Routes: users.children.sleep', () => {
                         child_id: defaultSleep.child_id
                     })
                 } catch (err) {
-                    throw new Error('Failure on users.children.sleep routes test: ' + err.message)
+                    throw new Error('Failure on children.sleep routes test: ' + err.message)
                 }
 
                 return request
-                    .get(`/v1/users/children/123/sleep`)
+                    .get(`/v1/children/123/sleep`)
                     .set('Content-Type', 'application/json')
                     .expect(400)
                     .then(err => {
@@ -847,7 +847,7 @@ describe('Routes: users.children.sleep', () => {
                 try {
                     deleteAllSleep()
                 } catch (err) {
-                    throw new Error('Failure on users.children.sleep routes test: ' + err.message)
+                    throw new Error('Failure on children.sleep routes test: ' + err.message)
                 }
             })
 
@@ -862,10 +862,10 @@ describe('Routes: users.children.sleep', () => {
                         child_id: defaultSleep.child_id
                     })
                 } catch (err) {
-                    throw new Error('Failure on users.children.sleep routes test: ' + err.message)
+                    throw new Error('Failure on children.sleep routes test: ' + err.message)
                 }
 
-                const url = `/v1/users/children/${defaultSleep.child_id}/sleep?child_id=${defaultSleep.child_id}
+                const url = `/v1/children/${defaultSleep.child_id}/sleep?child_id=${defaultSleep.child_id}
                     &sort=child_id&page=1&limit=3`
 
                 return request
@@ -897,12 +897,12 @@ describe('Routes: users.children.sleep', () => {
                 try {
                     deleteAllSleep()
                 } catch (err) {
-                    throw new Error('Failure on users.children.sleep routes test: ' + err.message)
+                    throw new Error('Failure on children.sleep routes test: ' + err.message)
                 }
             })
 
             it('should return status code 200 and an empty list', async () => {
-                const url = `/v1/users/children/${defaultSleep.child_id}/sleep?child_id=${defaultSleep.child_id}
+                const url = `/v1/children/${defaultSleep.child_id}/sleep?child_id=${defaultSleep.child_id}
                     &sort=child_id&page=1&limit=3`
 
                 return request
@@ -922,7 +922,7 @@ describe('Routes: users.children.sleep', () => {
                 try {
                     deleteAllSleep()
                 } catch (err) {
-                    throw new Error('Failure on users.children.sleep routes test: ' + err.message)
+                    throw new Error('Failure on children.sleep routes test: ' + err.message)
                 }
             })
 
@@ -937,10 +937,10 @@ describe('Routes: users.children.sleep', () => {
                         child_id: defaultSleep.child_id
                     })
                 } catch (err) {
-                    throw new Error('Failure on users.children.sleep routes test: ' + err.message)
+                    throw new Error('Failure on children.sleep routes test: ' + err.message)
                 }
 
-                const url = `/v1/users/children/123/sleep?child_id=${defaultSleep.child_id}
+                const url = `/v1/children/123/sleep?child_id=${defaultSleep.child_id}
                     &sort=child_id&page=1&limit=3`
 
                 return request
@@ -958,13 +958,13 @@ describe('Routes: users.children.sleep', () => {
     /**
      * Route GET a sleep by child
      */
-    describe('GET /v1/users/children/:child_id/sleep/:sleep_id', () => {
+    describe('GET /v1/children/:child_id/sleep/:sleep_id', () => {
         context('when get a specific sleep of a child of the database successfully', () => {
             before(() => {
                 try {
                     deleteAllSleep()
                 } catch (err) {
-                    throw new Error('Failure on users.children.sleep routes test: ' + err.message)
+                    throw new Error('Failure on children.sleep routes test: ' + err.message)
                 }
             })
 
@@ -981,11 +981,11 @@ describe('Routes: users.children.sleep', () => {
                         child_id: defaultSleep.child_id
                     })
                 } catch (err) {
-                    throw new Error('Failure on users.children.sleep routes test: ' + err.message)
+                    throw new Error('Failure on children.sleep routes test: ' + err.message)
                 }
 
                 return request
-                    .get(`/v1/users/children/${result.child_id}/sleep/${result.id}`)
+                    .get(`/v1/children/${result.child_id}/sleep/${result.id}`)
                     .set('Content-Type', 'application/json')
                     .expect(200)
                     .then(res => {
@@ -1009,13 +1009,13 @@ describe('Routes: users.children.sleep', () => {
                 try {
                     deleteAllSleep()
                 } catch (err) {
-                    throw new Error('Failure on users.children.sleep routes test: ' + err.message)
+                    throw new Error('Failure on children.sleep routes test: ' + err.message)
                 }
             })
 
             it('should return status code 404 and an info message describing that sleep was not found', async () => {
                 return request
-                    .get(`/v1/users/children/${defaultSleep.child_id}/sleep/${defaultSleep.id}`)
+                    .get(`/v1/children/${defaultSleep.child_id}/sleep/${defaultSleep.id}`)
                     .set('Content-Type', 'application/json')
                     .expect(404)
                     .then(err => {
@@ -1032,7 +1032,7 @@ describe('Routes: users.children.sleep', () => {
                 try {
                     deleteAllSleep()
                 } catch (err) {
-                    throw new Error('Failure on users.children.sleep routes test: ' + err.message)
+                    throw new Error('Failure on children.sleep routes test: ' + err.message)
                 }
             })
 
@@ -1049,11 +1049,11 @@ describe('Routes: users.children.sleep', () => {
                         child_id: defaultSleep.child_id
                     })
                 } catch (err) {
-                    throw new Error('Failure on users.children.sleep routes test: ' + err.message)
+                    throw new Error('Failure on children.sleep routes test: ' + err.message)
                 }
 
                 return request
-                    .get(`/v1/users/children/123/sleep/${result.id}`)
+                    .get(`/v1/children/123/sleep/${result.id}`)
                     .set('Content-Type', 'application/json')
                     .expect(400)
                     .then(err => {
@@ -1069,7 +1069,7 @@ describe('Routes: users.children.sleep', () => {
                 try {
                     deleteAllSleep()
                 } catch (err) {
-                    throw new Error('Failure on users.children.sleep routes test: ' + err.message)
+                    throw new Error('Failure on children.sleep routes test: ' + err.message)
                 }
             })
 
@@ -1086,11 +1086,11 @@ describe('Routes: users.children.sleep', () => {
                         child_id: defaultSleep.child_id
                     })
                 } catch (err) {
-                    throw new Error('Failure on users.children.sleep routes test: ' + err.message)
+                    throw new Error('Failure on children.sleep routes test: ' + err.message)
                 }
 
                 return request
-                    .get(`/v1/users/children/${result.child_id}/sleep/123`)
+                    .get(`/v1/children/${result.child_id}/sleep/123`)
                     .set('Content-Type', 'application/json')
                     .expect(400)
                     .then(err => {
@@ -1108,7 +1108,7 @@ describe('Routes: users.children.sleep', () => {
                 try {
                     deleteAllSleep()
                 } catch (err) {
-                    throw new Error('Failure on users.children.sleep routes test: ' + err.message)
+                    throw new Error('Failure on children.sleep routes test: ' + err.message)
                 }
             })
 
@@ -1125,10 +1125,10 @@ describe('Routes: users.children.sleep', () => {
                         child_id: defaultSleep.child_id
                     })
                 } catch (err) {
-                    throw new Error('Failure on users.children.sleep routes test: ' + err.message)
+                    throw new Error('Failure on children.sleep routes test: ' + err.message)
                 }
 
-                const url = `/v1/users/children/${result.child_id}/sleep/${result.id}?child_id=${result.child_id}
+                const url = `/v1/children/${result.child_id}/sleep/${result.id}?child_id=${result.child_id}
                     &sort=child_id&page=1&limit=3`
 
                 return request
@@ -1154,12 +1154,12 @@ describe('Routes: users.children.sleep', () => {
                 try {
                     deleteAllSleep()
                 } catch (err) {
-                    throw new Error('Failure on users.children.sleep routes test: ' + err.message)
+                    throw new Error('Failure on children.sleep routes test: ' + err.message)
                 }
             })
 
             it('should return status code 404 and an info message describing that sleep was not found', async () => {
-                const url = `/v1/users/children/${defaultSleep.child_id}/sleep/${defaultSleep.id}?child_id=${defaultSleep.child_id}
+                const url = `/v1/children/${defaultSleep.child_id}/sleep/${defaultSleep.id}?child_id=${defaultSleep.child_id}
                     &sort=child_id&page=1&limit=3`
 
                 return request
@@ -1181,7 +1181,7 @@ describe('Routes: users.children.sleep', () => {
                 try {
                     deleteAllSleep()
                 } catch (err) {
-                    throw new Error('Failure on users.children.sleep routes test: ' + err.message)
+                    throw new Error('Failure on children.sleep routes test: ' + err.message)
                 }
             })
 
@@ -1198,10 +1198,10 @@ describe('Routes: users.children.sleep', () => {
                         child_id: defaultSleep.child_id
                     })
                 } catch (err) {
-                    throw new Error('Failure on users.children.sleep routes test: ' + err.message)
+                    throw new Error('Failure on children.sleep routes test: ' + err.message)
                 }
 
-                const url = `/v1/users/children/123/sleep/${result.id}?child_id=${result.child_id}
+                const url = `/v1/children/123/sleep/${result.id}?child_id=${result.child_id}
                     &sort=child_id&page=1&limit=3`
 
                 return request
@@ -1222,7 +1222,7 @@ describe('Routes: users.children.sleep', () => {
                 try {
                     deleteAllSleep()
                 } catch (err) {
-                    throw new Error('Failure on users.children.sleep routes test: ' + err.message)
+                    throw new Error('Failure on children.sleep routes test: ' + err.message)
                 }
             })
 
@@ -1239,10 +1239,10 @@ describe('Routes: users.children.sleep', () => {
                         child_id: defaultSleep.child_id
                     })
                 } catch (err) {
-                    throw new Error('Failure on users.children.sleep routes test: ' + err.message)
+                    throw new Error('Failure on children.sleep routes test: ' + err.message)
                 }
 
-                const url = `/v1/users/children/${result.child_id}/sleep/123?child_id=${result.child_id}
+                const url = `/v1/children/${result.child_id}/sleep/123?child_id=${result.child_id}
                     &sort=child_id&page=1&limit=3`
 
                 return request
@@ -1260,13 +1260,13 @@ describe('Routes: users.children.sleep', () => {
     /**
      * PATCH route
      */
-    describe('PATCH /v1/users/children/:child_id/sleep/:sleep_id', () => {
+    describe('PATCH /v1/children/:child_id/sleep/:sleep_id', () => {
         context('when this sleep exists in the database and is updated successfully', () => {
             before(() => {
                 try {
                     deleteAllSleep()
                 } catch (err) {
-                    throw new Error('Failure on users.children.sleep routes test: ' + err.message)
+                    throw new Error('Failure on children.sleep routes test: ' + err.message)
                 }
             })
 
@@ -1277,7 +1277,7 @@ describe('Routes: users.children.sleep', () => {
                     // Sleep to be updated
                     result = await createSleepToBeUpdated(defaultSleep)
                 } catch (err) {
-                    throw new Error('Failure on users.children.sleep routes test: ' + err.message)
+                    throw new Error('Failure on children.sleep routes test: ' + err.message)
                 }
 
                 // Sleep to update
@@ -1290,7 +1290,7 @@ describe('Routes: users.children.sleep', () => {
                 }
 
                 return request
-                    .patch(`/v1/users/children/${result.child_id}/sleep/${result.id}`)
+                    .patch(`/v1/children/${result.child_id}/sleep/${result.id}`)
                     .send(body)
                     .set('Content-Type', 'application/json')
                     .expect(200)
@@ -1313,7 +1313,7 @@ describe('Routes: users.children.sleep', () => {
                 try {
                     deleteAllSleep()
                 } catch (err) {
-                    throw new Error('Failure on users.children.sleep routes test: ' + err.message)
+                    throw new Error('Failure on children.sleep routes test: ' + err.message)
                 }
             })
 
@@ -1328,7 +1328,7 @@ describe('Routes: users.children.sleep', () => {
                 }
 
                 return request
-                    .patch(`/v1/users/children/${defaultSleep.child_id}/sleep/${defaultSleep.id}`)
+                    .patch(`/v1/children/${defaultSleep.child_id}/sleep/${defaultSleep.id}`)
                     .send(body)
                     .set('Content-Type', 'application/json')
                     .expect(404)
@@ -1346,7 +1346,7 @@ describe('Routes: users.children.sleep', () => {
                 try {
                     deleteAllSleep()
                 } catch (err) {
-                    throw new Error('Failure on users.children.sleep routes test: ' + err.message)
+                    throw new Error('Failure on children.sleep routes test: ' + err.message)
                 }
             })
 
@@ -1357,7 +1357,7 @@ describe('Routes: users.children.sleep', () => {
                     // Sleep to be updated
                     result = await createSleepToBeUpdated(defaultSleep)
                 } catch (err) {
-                    throw new Error('Failure on users.children.sleep routes test: ' + err.message)
+                    throw new Error('Failure on children.sleep routes test: ' + err.message)
                 }
 
                 // Sleep to update
@@ -1370,7 +1370,7 @@ describe('Routes: users.children.sleep', () => {
                 }
 
                 return request
-                    .patch(`/v1/users/children/123/sleep/${result.id}`)
+                    .patch(`/v1/children/123/sleep/${result.id}`)
                     .send(body)
                     .set('Content-Type', 'application/json')
                     .expect(400)
@@ -1387,7 +1387,7 @@ describe('Routes: users.children.sleep', () => {
                 try {
                     deleteAllSleep()
                 } catch (err) {
-                    throw new Error('Failure on users.children.sleep routes test: ' + err.message)
+                    throw new Error('Failure on children.sleep routes test: ' + err.message)
                 }
             })
 
@@ -1398,7 +1398,7 @@ describe('Routes: users.children.sleep', () => {
                     // Sleep to be updated
                     result = await createSleepToBeUpdated(defaultSleep)
                 } catch (err) {
-                    throw new Error('Failure on users.children.sleep routes test: ' + err.message)
+                    throw new Error('Failure on children.sleep routes test: ' + err.message)
                 }
 
                 // Sleep to update
@@ -1411,7 +1411,7 @@ describe('Routes: users.children.sleep', () => {
                 }
 
                 return request
-                    .patch(`/v1/users/children/${result.child_id}/sleep/123`)
+                    .patch(`/v1/children/${result.child_id}/sleep/123`)
                     .send(body)
                     .set('Content-Type', 'application/json')
                     .expect(400)
@@ -1428,7 +1428,7 @@ describe('Routes: users.children.sleep', () => {
                 try {
                     deleteAllSleep()
                 } catch (err) {
-                    throw new Error('Failure on users.children.sleep routes test: ' + err.message)
+                    throw new Error('Failure on children.sleep routes test: ' + err.message)
                 }
             })
 
@@ -1439,7 +1439,7 @@ describe('Routes: users.children.sleep', () => {
                     // Sleep to be updated
                     result = await createSleepToBeUpdated(defaultSleep)
                 } catch (err) {
-                    throw new Error('Failure on users.children.sleep routes test: ' + err.message)
+                    throw new Error('Failure on children.sleep routes test: ' + err.message)
                 }
 
                 // Sleep to update
@@ -1452,7 +1452,7 @@ describe('Routes: users.children.sleep', () => {
                 }
 
                 return request
-                    .patch(`/v1/users/children/${result.child_id}/sleep/${result.id}`)
+                    .patch(`/v1/children/${result.child_id}/sleep/${result.id}`)
                     .send(body)
                     .set('Content-Type', 'application/json')
                     .expect(400)
@@ -1469,7 +1469,7 @@ describe('Routes: users.children.sleep', () => {
                 try {
                     deleteAllSleep()
                 } catch (err) {
-                    throw new Error('Failure on users.children.sleep routes test: ' + err.message)
+                    throw new Error('Failure on children.sleep routes test: ' + err.message)
                 }
             })
 
@@ -1480,7 +1480,7 @@ describe('Routes: users.children.sleep', () => {
                     // Sleep to be updated
                     result = await createSleepToBeUpdated(defaultSleep)
                 } catch (err) {
-                    throw new Error('Failure on users.children.sleep routes test: ' + err.message)
+                    throw new Error('Failure on children.sleep routes test: ' + err.message)
                 }
 
                 // Sleep to update
@@ -1493,7 +1493,7 @@ describe('Routes: users.children.sleep', () => {
                 }
 
                 return request
-                    .patch(`/v1/users/children/${result.child_id}/sleep/${result.id}`)
+                    .patch(`/v1/children/${result.child_id}/sleep/${result.id}`)
                     .send(body)
                     .set('Content-Type', 'application/json')
                     .expect(400)
@@ -1510,7 +1510,7 @@ describe('Routes: users.children.sleep', () => {
                 try {
                     deleteAllSleep()
                 } catch (err) {
-                    throw new Error('Failure on users.children.sleep routes test: ' + err.message)
+                    throw new Error('Failure on children.sleep routes test: ' + err.message)
                 }
             })
 
@@ -1521,7 +1521,7 @@ describe('Routes: users.children.sleep', () => {
                     // Sleep to be updated
                     result = await createSleepToBeUpdated(defaultSleep)
                 } catch (err) {
-                    throw new Error('Failure on users.children.sleep routes test: ' + err.message)
+                    throw new Error('Failure on children.sleep routes test: ' + err.message)
                 }
 
                 // Sleep to update
@@ -1534,7 +1534,7 @@ describe('Routes: users.children.sleep', () => {
                 }
 
                 return request
-                    .patch(`/v1/users/children/${result.child_id}/sleep/${result.id}`)
+                    .patch(`/v1/children/${result.child_id}/sleep/${result.id}`)
                     .send(body)
                     .set('Content-Type', 'application/json')
                     .expect(400)
@@ -1551,7 +1551,7 @@ describe('Routes: users.children.sleep', () => {
                 try {
                     deleteAllSleep()
                 } catch (err) {
-                    throw new Error('Failure on users.children.sleep routes test: ' + err.message)
+                    throw new Error('Failure on children.sleep routes test: ' + err.message)
                 }
             })
 
@@ -1562,7 +1562,7 @@ describe('Routes: users.children.sleep', () => {
                     // Sleep to be updated
                     result = await createSleepToBeUpdated(defaultSleep)
                 } catch (err) {
-                    throw new Error('Failure on users.children.sleep routes test: ' + err.message)
+                    throw new Error('Failure on children.sleep routes test: ' + err.message)
                 }
 
                 // Sleep to update
@@ -1577,7 +1577,7 @@ describe('Routes: users.children.sleep', () => {
                 }
 
                 return request
-                    .patch(`/v1/users/children/${result.child_id}/sleep/${result.id}`)
+                    .patch(`/v1/children/${result.child_id}/sleep/${result.id}`)
                     .send(body)
                     .set('Content-Type', 'application/json')
                     .expect(400)
@@ -1594,7 +1594,7 @@ describe('Routes: users.children.sleep', () => {
                 try {
                     deleteAllSleep()
                 } catch (err) {
-                    throw new Error('Failure on users.children.sleep routes test: ' + err.message)
+                    throw new Error('Failure on children.sleep routes test: ' + err.message)
                 }
             })
 
@@ -1605,7 +1605,7 @@ describe('Routes: users.children.sleep', () => {
                     // Sleep to be updated
                     result = await createSleepToBeUpdated(defaultSleep)
                 } catch (err) {
-                    throw new Error('Failure on users.children.sleep routes test: ' + err.message)
+                    throw new Error('Failure on children.sleep routes test: ' + err.message)
                 }
 
                 // Sleep to update
@@ -1622,7 +1622,7 @@ describe('Routes: users.children.sleep', () => {
                 }
 
                 return request
-                    .patch(`/v1/users/children/${result.child_id}/sleep/${result.id}`)
+                    .patch(`/v1/children/${result.child_id}/sleep/${result.id}`)
                     .send(body)
                     .set('Content-Type', 'application/json')
                     .expect(400)
@@ -1640,7 +1640,7 @@ describe('Routes: users.children.sleep', () => {
                 try {
                     deleteAllSleep()
                 } catch (err) {
-                    throw new Error('Failure on users.children.sleep routes test: ' + err.message)
+                    throw new Error('Failure on children.sleep routes test: ' + err.message)
                 }
             })
 
@@ -1651,7 +1651,7 @@ describe('Routes: users.children.sleep', () => {
                     // Sleep to be updated
                     result = await createSleepToBeUpdated(defaultSleep)
                 } catch (err) {
-                    throw new Error('Failure on users.children.sleep routes test: ' + err.message)
+                    throw new Error('Failure on children.sleep routes test: ' + err.message)
                 }
 
                 // Sleep to update
@@ -1672,7 +1672,7 @@ describe('Routes: users.children.sleep', () => {
                 }
 
                 return request
-                    .patch(`/v1/users/children/${result.child_id}/sleep/${result.id}`)
+                    .patch(`/v1/children/${result.child_id}/sleep/${result.id}`)
                     .send(body)
                     .set('Content-Type', 'application/json')
                     .expect(400)
@@ -1690,7 +1690,7 @@ describe('Routes: users.children.sleep', () => {
                 try {
                     deleteAllSleep()
                 } catch (err) {
-                    throw new Error('Failure on users.children.sleep routes test: ' + err.message)
+                    throw new Error('Failure on children.sleep routes test: ' + err.message)
                 }
             })
 
@@ -1701,7 +1701,7 @@ describe('Routes: users.children.sleep', () => {
                     // Sleep to be updated
                     result = await createSleepToBeUpdated(defaultSleep)
                 } catch (err) {
-                    throw new Error('Failure on users.children.sleep routes test: ' + err.message)
+                    throw new Error('Failure on children.sleep routes test: ' + err.message)
                 }
 
                 // Sleep to update
@@ -1722,7 +1722,7 @@ describe('Routes: users.children.sleep', () => {
                 }
 
                 return request
-                    .patch(`/v1/users/children/${result.child_id}/sleep/${result.id}`)
+                    .patch(`/v1/children/${result.child_id}/sleep/${result.id}`)
                     .send(body)
                     .set('Content-Type', 'application/json')
                     .expect(400)
@@ -1740,7 +1740,7 @@ describe('Routes: users.children.sleep', () => {
                 try {
                     deleteAllSleep()
                 } catch (err) {
-                    throw new Error('Failure on users.children.sleep routes test: ' + err.message)
+                    throw new Error('Failure on children.sleep routes test: ' + err.message)
                 }
             })
 
@@ -1751,7 +1751,7 @@ describe('Routes: users.children.sleep', () => {
                     // Sleep to be updated
                     result = await createSleepToBeUpdated(defaultSleep)
                 } catch (err) {
-                    throw new Error('Failure on users.children.sleep routes test: ' + err.message)
+                    throw new Error('Failure on children.sleep routes test: ' + err.message)
                 }
 
                 // Sleep to update
@@ -1772,7 +1772,7 @@ describe('Routes: users.children.sleep', () => {
                 }
 
                 return request
-                    .patch(`/v1/users/children/${result.child_id}/sleep/${result.id}`)
+                    .patch(`/v1/children/${result.child_id}/sleep/${result.id}`)
                     .send(body)
                     .set('Content-Type', 'application/json')
                     .expect(400)
@@ -1787,13 +1787,13 @@ describe('Routes: users.children.sleep', () => {
     /**
      * DELETE route
      */
-    describe('DELETE /v1/users/children/:child_id/sleep/:sleep_id', () => {
+    describe('DELETE /v1/children/:child_id/sleep/:sleep_id', () => {
         context('when the sleep was deleted successfully', () => {
             before(() => {
                 try {
                     deleteAllSleep()
                 } catch (err) {
-                    throw new Error('Failure on users.children.sleep routes test: ' + err.message)
+                    throw new Error('Failure on children.sleep routes test: ' + err.message)
                 }
             })
 
@@ -1810,11 +1810,11 @@ describe('Routes: users.children.sleep', () => {
                         child_id: defaultSleep.child_id
                     })
                 } catch (err) {
-                    throw new Error('Failure on users.children.sleep routes test: ' + err.message)
+                    throw new Error('Failure on children.sleep routes test: ' + err.message)
                 }
 
                 return request
-                    .delete(`/v1/users/children/${result.child_id}/sleep/${result.id}`)
+                    .delete(`/v1/children/${result.child_id}/sleep/${result.id}`)
                     .set('Content-Type', 'application/json')
                     .expect(204)
                     .then(res => {
@@ -1828,13 +1828,13 @@ describe('Routes: users.children.sleep', () => {
                 try {
                     deleteAllSleep()
                 } catch (err) {
-                    throw new Error('Failure on users.children.sleep routes test: ' + err.message)
+                    throw new Error('Failure on children.sleep routes test: ' + err.message)
                 }
             })
 
             it('should return status code 204 and no content for sleep', async () => {
                 return request
-                    .delete(`/v1/users/children/${defaultSleep.child_id}/sleep/${defaultSleep.id}`)
+                    .delete(`/v1/children/${defaultSleep.child_id}/sleep/${defaultSleep.id}`)
                     .set('Content-Type', 'application/json')
                     .expect(204)
                     .then(res => {
@@ -1848,7 +1848,7 @@ describe('Routes: users.children.sleep', () => {
                 try {
                     deleteAllSleep()
                 } catch (err) {
-                    throw new Error('Failure on users.children.sleep routes test: ' + err.message)
+                    throw new Error('Failure on children.sleep routes test: ' + err.message)
                 }
             })
 
@@ -1865,11 +1865,11 @@ describe('Routes: users.children.sleep', () => {
                         child_id: defaultSleep.child_id
                     })
                 } catch (err) {
-                    throw new Error('Failure on users.children.sleep routes test: ' + err.message)
+                    throw new Error('Failure on children.sleep routes test: ' + err.message)
                 }
 
                 return request
-                    .delete(`/v1/users/children/123/sleep/${result.id}`)
+                    .delete(`/v1/children/123/sleep/${result.id}`)
                     .set('Content-Type', 'application/json')
                     .expect(400)
                     .then(err => {
@@ -1885,7 +1885,7 @@ describe('Routes: users.children.sleep', () => {
                 try {
                     deleteAllSleep()
                 } catch (err) {
-                    throw new Error('Failure on users.children.sleep routes test: ' + err.message)
+                    throw new Error('Failure on children.sleep routes test: ' + err.message)
                 }
             })
 
@@ -1902,11 +1902,11 @@ describe('Routes: users.children.sleep', () => {
                         child_id: defaultSleep.child_id
                     })
                 } catch (err) {
-                    throw new Error('Failure on users.children.sleep routes test: ' + err.message)
+                    throw new Error('Failure on children.sleep routes test: ' + err.message)
                 }
 
                 return request
-                    .delete(`/v1/users/children/${result.child_id}/sleep/123`)
+                    .delete(`/v1/children/${result.child_id}/sleep/123`)
                     .set('Content-Type', 'application/json')
                     .expect(400)
                     .then(err => {

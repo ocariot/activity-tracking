@@ -21,7 +21,7 @@ const backgroundServices: BackgroundService = DIContainer.get(Identifier.BACKGRO
 const app: App = DIContainer.get(Identifier.APP)
 const request = require('supertest')(app.getExpress())
 
-describe('Routes: users/children', () => {
+describe('Routes: /children', () => {
 
     // Mock objects for PhysicalActivity routes
     const defaultActivity: PhysicalActivity = new PhysicalActivityMock()
@@ -179,7 +179,7 @@ describe('Routes: users/children', () => {
             deleteAllLogs()
             await backgroundServices.startServices()
         } catch (err) {
-            throw new Error('Failure on users.children.physicalactivities routes test: ' + err.message)
+            throw new Error('Failure on children.physicalactivities routes test: ' + err.message)
         }
     })
 
@@ -188,13 +188,13 @@ describe('Routes: users/children', () => {
         try {
             deleteAllActivity()
         } catch (err) {
-            throw new Error('Failure on users.children.physicalactivities routes test: ' + err.message)
+            throw new Error('Failure on children.physicalactivities routes test: ' + err.message)
         }
     })
     /**
      * POST route to PhysicalActivity with only one item of this type in the body
      */
-    describe('POST /v1/users/children/:child_id/physicalactivities with only one PhysicalActivity in the body', () => {
+    describe('POST /v1/children/:child_id/physicalactivities with only one PhysicalActivity in the body', () => {
         context('when posting a new PhysicalActivity with success', () => {
             it('should return status code 201 and the saved PhysicalActivity', () => {
                 const body = {
@@ -209,7 +209,7 @@ describe('Routes: users/children', () => {
                 }
 
                 return request
-                    .post(`/v1/users/children/${defaultActivity.child_id}/physicalactivities`)
+                    .post(`/v1/children/${defaultActivity.child_id}/physicalactivities`)
                     .send(body)
                     .set('Content-Type', 'application/json')
                     .expect(201)
@@ -248,7 +248,7 @@ describe('Routes: users/children', () => {
                 }
 
                 return request
-                    .post(`/v1/users/children/${defaultActivity.child_id}/physicalactivities`)
+                    .post(`/v1/children/${defaultActivity.child_id}/physicalactivities`)
                     .send(body)
                     .set('Content-Type', 'application/json')
                     .expect(409)
@@ -264,7 +264,7 @@ describe('Routes: users/children', () => {
                 const body = {}
 
                 return request
-                    .post(`/v1/users/children/${defaultActivity.child_id}/physicalactivities`)
+                    .post(`/v1/children/${defaultActivity.child_id}/physicalactivities`)
                     .send(body)
                     .set('Content-Type', 'application/json')
                     .expect(400)
@@ -288,7 +288,7 @@ describe('Routes: users/children', () => {
                 }
 
                 return request
-                    .post(`/v1/users/children/${defaultActivity.child_id}/physicalactivities`)
+                    .post(`/v1/children/${defaultActivity.child_id}/physicalactivities`)
                     .send(body)
                     .set('Content-Type', 'application/json')
                     .expect(400)
@@ -314,7 +314,7 @@ describe('Routes: users/children', () => {
                 }
 
                 return request
-                    .post(`/v1/users/children/${defaultActivity.child_id}/physicalactivities`)
+                    .post(`/v1/children/${defaultActivity.child_id}/physicalactivities`)
                     .send(body)
                     .set('Content-Type', 'application/json')
                     .expect(400)
@@ -341,7 +341,7 @@ describe('Routes: users/children', () => {
                 }
 
                 return request
-                    .post(`/v1/users/children/${defaultActivity.child_id}/physicalactivities`)
+                    .post(`/v1/children/${defaultActivity.child_id}/physicalactivities`)
                     .send(body)
                     .set('Content-Type', 'application/json')
                     .expect(400)
@@ -368,7 +368,7 @@ describe('Routes: users/children', () => {
                 }
 
                 return request
-                    .post(`/v1/users/children/${defaultActivity.child_id}/physicalactivities`)
+                    .post(`/v1/children/${defaultActivity.child_id}/physicalactivities`)
                     .send(body)
                     .set('Content-Type', 'application/json')
                     .expect(400)
@@ -393,7 +393,7 @@ describe('Routes: users/children', () => {
                 }
 
                 return request
-                    .post(`/v1/users/children/123/physicalactivities`)
+                    .post(`/v1/children/123/physicalactivities`)
                     .send(body)
                     .set('Content-Type', 'application/json')
                     .expect(400)
@@ -419,7 +419,7 @@ describe('Routes: users/children', () => {
                 }
 
                 return request
-                    .post(`/v1/users/children/${defaultActivity.child_id}/physicalactivities`)
+                    .post(`/v1/children/${defaultActivity.child_id}/physicalactivities`)
                     .send(body)
                     .set('Content-Type', 'application/json')
                     .expect(400)
@@ -445,7 +445,7 @@ describe('Routes: users/children', () => {
                 }
 
                 return request
-                    .post(`/v1/users/children/${defaultActivity.child_id}/physicalactivities`)
+                    .post(`/v1/children/${defaultActivity.child_id}/physicalactivities`)
                     .send(body)
                     .set('Content-Type', 'application/json')
                     .expect(400)
@@ -489,7 +489,7 @@ describe('Routes: users/children', () => {
                 }
 
                 return request
-                    .post(`/v1/users/children/${defaultActivity.child_id}/physicalactivities`)
+                    .post(`/v1/children/${defaultActivity.child_id}/physicalactivities`)
                     .send(body)
                     .set('Content-Type', 'application/json')
                     .expect(400)
@@ -532,7 +532,7 @@ describe('Routes: users/children', () => {
                 }
 
                 return request
-                    .post(`/v1/users/children/${defaultActivity.child_id}/physicalactivities`)
+                    .post(`/v1/children/${defaultActivity.child_id}/physicalactivities`)
                     .send(body)
                     .set('Content-Type', 'application/json')
                     .expect(400)
@@ -576,7 +576,7 @@ describe('Routes: users/children', () => {
                 }
 
                 return request
-                    .post(`/v1/users/children/${defaultActivity.child_id}/physicalactivities`)
+                    .post(`/v1/children/${defaultActivity.child_id}/physicalactivities`)
                     .send(body)
                     .set('Content-Type', 'application/json')
                     .expect(400)
@@ -603,7 +603,7 @@ describe('Routes: users/children', () => {
                 }
 
                 return request
-                    .post(`/v1/users/children/${incorrectActivity11.child_id}/physicalactivities`)
+                    .post(`/v1/children/${incorrectActivity11.child_id}/physicalactivities`)
                     .send(body)
                     .set('Content-Type', 'application/json')
                     .expect(400)
@@ -630,7 +630,7 @@ describe('Routes: users/children', () => {
                 }
 
                 return request
-                    .post(`/v1/users/children/${incorrectActivity12.child_id}/physicalactivities`)
+                    .post(`/v1/children/${incorrectActivity12.child_id}/physicalactivities`)
                     .send(body)
                     .set('Content-Type', 'application/json')
                     .expect(400)
@@ -657,7 +657,7 @@ describe('Routes: users/children', () => {
                 }
 
                 return request
-                    .post(`/v1/users/children/${incorrectActivity13.child_id}/physicalactivities`)
+                    .post(`/v1/children/${incorrectActivity13.child_id}/physicalactivities`)
                     .send(body)
                     .set('Content-Type', 'application/json')
                     .expect(400)
@@ -685,7 +685,7 @@ describe('Routes: users/children', () => {
                 }
 
                 return request
-                    .post(`/v1/users/children/${incorrectActivity14.child_id}/physicalactivities`)
+                    .post(`/v1/children/${incorrectActivity14.child_id}/physicalactivities`)
                     .send(body)
                     .set('Content-Type', 'application/json')
                     .expect(400)
@@ -701,13 +701,13 @@ describe('Routes: users/children', () => {
     /**
      * POST route to PhysicalActivity with an array of such items in the body
      */
-    describe('POST /v1/users/children/:child_id/physicalactivities with an array of PhysicalActivity in the body', () => {
+    describe('POST /v1/children/:child_id/physicalactivities with an array of PhysicalActivity in the body', () => {
         context('when all the activities are correct and still do not exist in the repository', () => {
             before(() => {
                 try {
                     deleteAllActivity()
                 } catch (err) {
-                    throw new Error('Failure on users.children.physicalactivities routes test: ' + err.message)
+                    throw new Error('Failure on children.physicalactivities routes test: ' + err.message)
                 }
             })
 
@@ -730,7 +730,7 @@ describe('Routes: users/children', () => {
                 })
 
                 return request
-                    .post(`/v1/users/children/${defaultActivity.child_id}/physicalactivities`)
+                    .post(`/v1/children/${defaultActivity.child_id}/physicalactivities`)
                     .send(body)
                     .set('Content-Type', 'application/json')
                     .expect(201)
@@ -780,7 +780,7 @@ describe('Routes: users/children', () => {
                 })
 
                 return request
-                    .post(`/v1/users/children/${defaultActivity.child_id}/physicalactivities`)
+                    .post(`/v1/children/${defaultActivity.child_id}/physicalactivities`)
                     .send(body)
                     .set('Content-Type', 'application/json')
                     .expect(201)
@@ -816,7 +816,7 @@ describe('Routes: users/children', () => {
                 try {
                     deleteAllActivity()
                 } catch (err) {
-                    throw new Error('Failure on users.children.physicalactivities routes test: ' + err.message)
+                    throw new Error('Failure on children.physicalactivities routes test: ' + err.message)
                 }
             })
 
@@ -839,7 +839,7 @@ describe('Routes: users/children', () => {
                 })
 
                 return request
-                    .post(`/v1/users/children/${defaultActivity.child_id}/physicalactivities`)
+                    .post(`/v1/children/${defaultActivity.child_id}/physicalactivities`)
                     .send(body)
                     .set('Content-Type', 'application/json')
                     .expect(201)
@@ -877,7 +877,7 @@ describe('Routes: users/children', () => {
                 try {
                     deleteAllActivity()
                 } catch (err) {
-                    throw new Error('Failure on users.children.physicalactivities routes test: ' + err.message)
+                    throw new Error('Failure on children.physicalactivities routes test: ' + err.message)
                 }
             })
 
@@ -900,7 +900,7 @@ describe('Routes: users/children', () => {
                 })
 
                 return request
-                    .post(`/v1/users/children/${defaultActivity.child_id}/physicalactivities`)
+                    .post(`/v1/children/${defaultActivity.child_id}/physicalactivities`)
                     .send(body)
                     .set('Content-Type', 'application/json')
                     .expect(201)
@@ -992,13 +992,13 @@ describe('Routes: users/children', () => {
     /**
      * Route GET all physical activity by child
      */
-    describe('GET /v1/users/children/:child_id/physicalactivities', () => {
+    describe('GET /v1/children/:child_id/physicalactivities', () => {
         context('when get all physical activity of a specific child of the database successfully', () => {
             before(() => {
                 try {
                     deleteAllActivity()
                 } catch (err) {
-                    throw new Error('Failure on users.children.physicalactivities routes test: ' + err.message)
+                    throw new Error('Failure on children.physicalactivities routes test: ' + err.message)
                 }
             })
 
@@ -1016,11 +1016,11 @@ describe('Routes: users/children', () => {
                         child_id: defaultActivity.child_id
                     })
                 } catch (err) {
-                    throw new Error('Failure on users.children.physicalactivities routes test: ' + err.message)
+                    throw new Error('Failure on children.physicalactivities routes test: ' + err.message)
                 }
 
                 return request
-                    .get(`/v1/users/children/${defaultActivity.child_id}/physicalactivities`)
+                    .get(`/v1/children/${defaultActivity.child_id}/physicalactivities`)
                     .set('Content-Type', 'application/json')
                     .expect(200)
                     .then(res => {
@@ -1056,13 +1056,13 @@ describe('Routes: users/children', () => {
                 try {
                     deleteAllActivity()
                 } catch (err) {
-                    throw new Error('Failure on users.children.physicalactivities routes test: ' + err.message)
+                    throw new Error('Failure on children.physicalactivities routes test: ' + err.message)
                 }
             })
 
             it('should return status code 200 and an empty list', async () => {
                 return request
-                    .get(`/v1/users/children/${defaultActivity.child_id}/physicalactivities`)
+                    .get(`/v1/children/${defaultActivity.child_id}/physicalactivities`)
                     .set('Content-Type', 'application/json')
                     .expect(200)
                     .then(res => {
@@ -1077,7 +1077,7 @@ describe('Routes: users/children', () => {
                 try {
                     deleteAllActivity()
                 } catch (err) {
-                    throw new Error('Failure on users.children.physicalactivities routes test: ' + err.message)
+                    throw new Error('Failure on children.physicalactivities routes test: ' + err.message)
                 }
             })
 
@@ -1095,11 +1095,11 @@ describe('Routes: users/children', () => {
                         child_id: defaultActivity.child_id
                     })
                 } catch (err) {
-                    throw new Error('Failure on users.children.physicalactivities routes test: ' + err.message)
+                    throw new Error('Failure on children.physicalactivities routes test: ' + err.message)
                 }
 
                 return request
-                    .get(`/v1/users/children/123/physicalactivities`)
+                    .get(`/v1/children/123/physicalactivities`)
                     .set('Content-Type', 'application/json')
                     .expect(400)
                     .then(err => {
@@ -1117,7 +1117,7 @@ describe('Routes: users/children', () => {
                 try {
                     deleteAllActivity()
                 } catch (err) {
-                    throw new Error('Failure on users.children.physicalactivities routes test: ' + err.message)
+                    throw new Error('Failure on children.physicalactivities routes test: ' + err.message)
                 }
             })
 
@@ -1147,10 +1147,10 @@ describe('Routes: users/children', () => {
                         child_id: new ObjectID()
                     })
                 } catch (err) {
-                    throw new Error('Failure on users.children.physicalactivities routes test: ' + err.message)
+                    throw new Error('Failure on children.physicalactivities routes test: ' + err.message)
                 }
 
-                const url = `/v1/users/children/${defaultActivity.child_id}/physicalactivities?child_id=${defaultActivity.child_id}
+                const url = `/v1/children/${defaultActivity.child_id}/physicalactivities?child_id=${defaultActivity.child_id}
                     &sort=child_id&page=1&limit=3`
 
                 return request
@@ -1191,12 +1191,12 @@ describe('Routes: users/children', () => {
                 try {
                     deleteAllActivity()
                 } catch (err) {
-                    throw new Error('Failure on users.children.physicalactivities routes test: ' + err.message)
+                    throw new Error('Failure on children.physicalactivities routes test: ' + err.message)
                 }
             })
 
             it('should return status code 200 and an empty list', async () => {
-                const url = `/v1/users/children/${defaultActivity.child_id}/physicalactivities?child_id=${defaultActivity.child_id}
+                const url = `/v1/children/${defaultActivity.child_id}/physicalactivities?child_id=${defaultActivity.child_id}
                     &sort=child_id&page=1&limit=3`
 
                 return request
@@ -1216,7 +1216,7 @@ describe('Routes: users/children', () => {
                 try {
                     deleteAllActivity()
                 } catch (err) {
-                    throw new Error('Failure on users.children.physicalactivities routes test: ' + err.message)
+                    throw new Error('Failure on children.physicalactivities routes test: ' + err.message)
                 }
             })
 
@@ -1234,10 +1234,10 @@ describe('Routes: users/children', () => {
                         child_id: defaultActivity.child_id
                     })
                 } catch (err) {
-                    throw new Error('Failure on users.children.physicalactivities routes test: ' + err.message)
+                    throw new Error('Failure on children.physicalactivities routes test: ' + err.message)
                 }
 
-                const url = `/v1/users/children/123/physicalactivities?child_id=${defaultActivity.child_id}&fields=start_time,end_time,
+                const url = `/v1/children/123/physicalactivities?child_id=${defaultActivity.child_id}&fields=start_time,end_time,
                     &sort=child_id&page=1&limit=3`
 
                 return request
@@ -1255,13 +1255,13 @@ describe('Routes: users/children', () => {
     /**
      * Route GET a physical activity by child
      */
-    describe('GET /v1/users/children/:child_id/physicalactivities/:physicalactivity_id', () => {
+    describe('GET /v1/children/:child_id/physicalactivities/:physicalactivity_id', () => {
         context('when get a specific physical activity of a child of the database successfully', () => {
             before(() => {
                 try {
                     deleteAllActivity()
                 } catch (err) {
-                    throw new Error('Failure on users.children.physicalactivities routes test: ' + err.message)
+                    throw new Error('Failure on children.physicalactivities routes test: ' + err.message)
                 }
             })
 
@@ -1281,11 +1281,11 @@ describe('Routes: users/children', () => {
                         child_id: defaultActivity.child_id
                     })
                 } catch (err) {
-                    throw new Error('Failure on users.children.physicalactivities routes test: ' + err.message)
+                    throw new Error('Failure on children.physicalactivities routes test: ' + err.message)
                 }
 
                 return request
-                    .get(`/v1/users/children/${result.child_id}/physicalactivities/${result.id}`)
+                    .get(`/v1/children/${result.child_id}/physicalactivities/${result.id}`)
                     .set('Content-Type', 'application/json')
                     .expect(200)
                     .then(res => {
@@ -1318,13 +1318,13 @@ describe('Routes: users/children', () => {
                 try {
                     deleteAllActivity()
                 } catch (err) {
-                    throw new Error('Failure on users.children.physicalactivities routes test: ' + err.message)
+                    throw new Error('Failure on children.physicalactivities routes test: ' + err.message)
                 }
             })
 
             it('should return status code 404 and an info message describing that physical activity was not found', async () => {
                 return request
-                    .get(`/v1/users/children/${defaultActivity.child_id}/physicalactivities/${defaultActivity.id}`)
+                    .get(`/v1/children/${defaultActivity.child_id}/physicalactivities/${defaultActivity.id}`)
                     .set('Content-Type', 'application/json')
                     .expect(404)
                     .then(err => {
@@ -1341,7 +1341,7 @@ describe('Routes: users/children', () => {
                 try {
                     deleteAllActivity()
                 } catch (err) {
-                    throw new Error('Failure on users.children.physicalactivities routes test: ' + err.message)
+                    throw new Error('Failure on children.physicalactivities routes test: ' + err.message)
                 }
             })
 
@@ -1361,11 +1361,11 @@ describe('Routes: users/children', () => {
                         child_id: defaultActivity.child_id
                     })
                 } catch (err) {
-                    throw new Error('Failure on users.children.physicalactivities routes test: ' + err.message)
+                    throw new Error('Failure on children.physicalactivities routes test: ' + err.message)
                 }
 
                 return request
-                    .get(`/v1/users/children/123/physicalactivities/${result.id}`)
+                    .get(`/v1/children/123/physicalactivities/${result.id}`)
                     .set('Content-Type', 'application/json')
                     .expect(400)
                     .then(err => {
@@ -1381,7 +1381,7 @@ describe('Routes: users/children', () => {
                 try {
                     deleteAllActivity()
                 } catch (err) {
-                    throw new Error('Failure on users.children.physicalactivities routes test: ' + err.message)
+                    throw new Error('Failure on children.physicalactivities routes test: ' + err.message)
                 }
             })
 
@@ -1401,11 +1401,11 @@ describe('Routes: users/children', () => {
                         child_id: defaultActivity.child_id
                     })
                 } catch (err) {
-                    throw new Error('Failure on users.children.physicalactivities routes test: ' + err.message)
+                    throw new Error('Failure on children.physicalactivities routes test: ' + err.message)
                 }
 
                 return request
-                    .get(`/v1/users/children/${result.child_id}/physicalactivities/123`)
+                    .get(`/v1/children/${result.child_id}/physicalactivities/123`)
                     .set('Content-Type', 'application/json')
                     .expect(400)
                     .then(err => {
@@ -1423,7 +1423,7 @@ describe('Routes: users/children', () => {
                 try {
                     deleteAllActivity()
                 } catch (err) {
-                    throw new Error('Failure on users.children.physicalactivities routes test: ' + err.message)
+                    throw new Error('Failure on children.physicalactivities routes test: ' + err.message)
                 }
             })
 
@@ -1443,10 +1443,10 @@ describe('Routes: users/children', () => {
                         child_id: defaultActivity.child_id
                     })
                 } catch (err) {
-                    throw new Error('Failure on users.children.physicalactivities routes test: ' + err.message)
+                    throw new Error('Failure on children.physicalactivities routes test: ' + err.message)
                 }
 
-                const url = `/v1/users/children/${result.child_id}/physicalactivities/${result.id}?child_id=${result.child_id}
+                const url = `/v1/children/${result.child_id}/physicalactivities/${result.id}?child_id=${result.child_id}
                     &sort=child_id&page=1&limit=3`
 
                 return request
@@ -1481,7 +1481,7 @@ describe('Routes: users/children', () => {
                 try {
                     deleteAllActivity()
                 } catch (err) {
-                    throw new Error('Failure on users.children.physicalactivities routes test: ' + err.message)
+                    throw new Error('Failure on children.physicalactivities routes test: ' + err.message)
                 }
             })
 
@@ -1503,10 +1503,10 @@ describe('Routes: users/children', () => {
 
                     deleteAllActivity()
                 } catch (err) {
-                    throw new Error('Failure on users.children.physicalactivities routes test: ' + err.message)
+                    throw new Error('Failure on children.physicalactivities routes test: ' + err.message)
                 }
 
-                const url = `/v1/users/children/${result.child_id}/physicalactivities/${result.id}?child_id=${result.child_id}
+                const url = `/v1/children/${result.child_id}/physicalactivities/${result.id}?child_id=${result.child_id}
                     &sort=child_id&page=1&limit=3`
 
                 return request
@@ -1528,7 +1528,7 @@ describe('Routes: users/children', () => {
                 try {
                     deleteAllActivity()
                 } catch (err) {
-                    throw new Error('Failure on users.children.physicalactivities routes test: ' + err.message)
+                    throw new Error('Failure on children.physicalactivities routes test: ' + err.message)
                 }
             })
 
@@ -1548,10 +1548,10 @@ describe('Routes: users/children', () => {
                         child_id: defaultActivity.child_id
                     })
                 } catch (err) {
-                    throw new Error('Failure on users.children.physicalactivities routes test: ' + err.message)
+                    throw new Error('Failure on children.physicalactivities routes test: ' + err.message)
                 }
 
-                const url = `/v1/users/children/123/physicalactivities/${result.id}?child_id=${result.child_id}
+                const url = `/v1/children/123/physicalactivities/${result.id}?child_id=${result.child_id}
                     &sort=child_id&page=1&limit=3`
 
                 return request
@@ -1572,7 +1572,7 @@ describe('Routes: users/children', () => {
                 try {
                     deleteAllActivity()
                 } catch (err) {
-                    throw new Error('Failure on users.children.physicalactivities routes test: ' + err.message)
+                    throw new Error('Failure on children.physicalactivities routes test: ' + err.message)
                 }
             })
 
@@ -1592,10 +1592,10 @@ describe('Routes: users/children', () => {
                         child_id: defaultActivity.child_id
                     })
                 } catch (err) {
-                    throw new Error('Failure on users.children.physicalactivities routes test: ' + err.message)
+                    throw new Error('Failure on children.physicalactivities routes test: ' + err.message)
                 }
 
-                const url = `/v1/users/children/${result.child_id}/physicalactivities/123?child_id=${result.child_id}
+                const url = `/v1/children/${result.child_id}/physicalactivities/123?child_id=${result.child_id}
                     &sort=child_id&page=1&limit=3`
 
                 return request
@@ -1613,13 +1613,13 @@ describe('Routes: users/children', () => {
     /**
      * PATCH route for PhysicalActivity
      */
-    describe('PATCH /v1/users/children/:child_id/physicalactivities/:physicalactivity_id', () => {
+    describe('PATCH /v1/children/:child_id/physicalactivities/:physicalactivity_id', () => {
         context('when this physical activity exists in the database and is updated successfully', () => {
             before(() => {
                 try {
                     deleteAllActivity()
                 } catch (err) {
-                    throw new Error('Failure on users.children.physicalactivities routes test: ' + err.message)
+                    throw new Error('Failure on children.physicalactivities routes test: ' + err.message)
                 }
             })
 
@@ -1630,7 +1630,7 @@ describe('Routes: users/children', () => {
                     // physical activity to be updated
                     result = await createActivityToBeUpdated(defaultActivity)
                 } catch (err) {
-                    throw new Error('Failure on users.children.physicalactivities routes test: ' + err.message)
+                    throw new Error('Failure on children.physicalactivities routes test: ' + err.message)
                 }
 
                 // physical activity to update
@@ -1647,7 +1647,7 @@ describe('Routes: users/children', () => {
                 }
 
                 return request
-                    .patch(`/v1/users/children/${result.child_id}/physicalactivities/${result.id}`)
+                    .patch(`/v1/children/${result.child_id}/physicalactivities/${result.id}`)
                     .send(body)
                     .set('Content-Type', 'application/json')
                     .expect(200)
@@ -1678,7 +1678,7 @@ describe('Routes: users/children', () => {
                 try {
                     deleteAllActivity()
                 } catch (err) {
-                    throw new Error('Failure on users.children.physicalactivities routes test: ' + err.message)
+                    throw new Error('Failure on children.physicalactivities routes test: ' + err.message)
                 }
             })
 
@@ -1697,7 +1697,7 @@ describe('Routes: users/children', () => {
                 }
 
                 return request
-                    .patch(`/v1/users/children/${defaultActivity.child_id}/physicalactivities/${defaultActivity.id}`)
+                    .patch(`/v1/children/${defaultActivity.child_id}/physicalactivities/${defaultActivity.id}`)
                     .send(body)
                     .set('Content-Type', 'application/json')
                     .expect(404)
@@ -1715,7 +1715,7 @@ describe('Routes: users/children', () => {
                 try {
                     deleteAllActivity()
                 } catch (err) {
-                    throw new Error('Failure on users.children.physicalactivities routes test: ' + err.message)
+                    throw new Error('Failure on children.physicalactivities routes test: ' + err.message)
                 }
             })
 
@@ -1726,7 +1726,7 @@ describe('Routes: users/children', () => {
                     // physical activity to be updated
                     result = await createActivityToBeUpdated(defaultActivity)
                 } catch (err) {
-                    throw new Error('Failure on users.children.physicalactivities routes test: ' + err.message)
+                    throw new Error('Failure on children.physicalactivities routes test: ' + err.message)
                 }
 
                 // physical activity to update
@@ -1743,7 +1743,7 @@ describe('Routes: users/children', () => {
                 }
 
                 return request
-                    .patch(`/v1/users/children/123/physicalactivities/${result.id}`)
+                    .patch(`/v1/children/123/physicalactivities/${result.id}`)
                     .send(body)
                     .set('Content-Type', 'application/json')
                     .expect(400)
@@ -1760,7 +1760,7 @@ describe('Routes: users/children', () => {
                 try {
                     deleteAllActivity()
                 } catch (err) {
-                    throw new Error('Failure on users.children.physicalactivities routes test: ' + err.message)
+                    throw new Error('Failure on children.physicalactivities routes test: ' + err.message)
                 }
             })
 
@@ -1771,7 +1771,7 @@ describe('Routes: users/children', () => {
                     // physical activity to be updated
                     result = await createActivityToBeUpdated(defaultActivity)
                 } catch (err) {
-                    throw new Error('Failure on users.children.physicalactivities routes test: ' + err.message)
+                    throw new Error('Failure on children.physicalactivities routes test: ' + err.message)
                 }
 
                 // physical activity to update
@@ -1788,7 +1788,7 @@ describe('Routes: users/children', () => {
                 }
 
                 return request
-                    .patch(`/v1/users/children/${result.child_id}/physicalactivities/123`)
+                    .patch(`/v1/children/${result.child_id}/physicalactivities/123`)
                     .send(body)
                     .set('Content-Type', 'application/json')
                     .expect(400)
@@ -1805,7 +1805,7 @@ describe('Routes: users/children', () => {
                 try {
                     deleteAllActivity()
                 } catch (err) {
-                    throw new Error('Failure on users.children.physicalactivities routes test: ' + err.message)
+                    throw new Error('Failure on children.physicalactivities routes test: ' + err.message)
                 }
             })
 
@@ -1816,7 +1816,7 @@ describe('Routes: users/children', () => {
                     // physical activity to be updated
                     result = await createActivityToBeUpdated(defaultActivity)
                 } catch (err) {
-                    throw new Error('Failure on users.children.physicalactivities routes test: ' + err.message)
+                    throw new Error('Failure on children.physicalactivities routes test: ' + err.message)
                 }
 
                 // physical activity to update
@@ -1825,7 +1825,7 @@ describe('Routes: users/children', () => {
                 }
 
                 return request
-                    .patch(`/v1/users/children/${result.child_id}/physicalactivities/${result.id}`)
+                    .patch(`/v1/children/${result.child_id}/physicalactivities/${result.id}`)
                     .send(body)
                     .set('Content-Type', 'application/json')
                     .expect(400)
@@ -1843,7 +1843,7 @@ describe('Routes: users/children', () => {
                 try {
                     deleteAllActivity()
                 } catch (err) {
-                    throw new Error('Failure on users.children.physicalactivities routes test: ' + err.message)
+                    throw new Error('Failure on children.physicalactivities routes test: ' + err.message)
                 }
             })
 
@@ -1854,7 +1854,7 @@ describe('Routes: users/children', () => {
                     // physical activity to be updated
                     result = await createActivityToBeUpdated(defaultActivity)
                 } catch (err) {
-                    throw new Error('Failure on users.children.physicalactivities routes test: ' + err.message)
+                    throw new Error('Failure on children.physicalactivities routes test: ' + err.message)
                 }
 
                 // physical activity to update
@@ -1863,7 +1863,7 @@ describe('Routes: users/children', () => {
                 }
 
                 return request
-                    .patch(`/v1/users/children/${result.child_id}/physicalactivities/${result.id}`)
+                    .patch(`/v1/children/${result.child_id}/physicalactivities/${result.id}`)
                     .send(body)
                     .set('Content-Type', 'application/json')
                     .expect(400)
@@ -1881,7 +1881,7 @@ describe('Routes: users/children', () => {
                 try {
                     deleteAllActivity()
                 } catch (err) {
-                    throw new Error('Failure on users.children.physicalactivities routes test: ' + err.message)
+                    throw new Error('Failure on children.physicalactivities routes test: ' + err.message)
                 }
             })
 
@@ -1892,7 +1892,7 @@ describe('Routes: users/children', () => {
                     // physical activity to be updated
                     result = await createActivityToBeUpdated(defaultActivity)
                 } catch (err) {
-                    throw new Error('Failure on users.children.physicalactivities routes test: ' + err.message)
+                    throw new Error('Failure on children.physicalactivities routes test: ' + err.message)
                 }
 
                 // physical activity to update
@@ -1901,7 +1901,7 @@ describe('Routes: users/children', () => {
                 }
 
                 return request
-                    .patch(`/v1/users/children/${result.child_id}/physicalactivities/${result.id}`)
+                    .patch(`/v1/children/${result.child_id}/physicalactivities/${result.id}`)
                     .send(body)
                     .set('Content-Type', 'application/json')
                     .expect(400)
@@ -1919,7 +1919,7 @@ describe('Routes: users/children', () => {
                 try {
                     deleteAllActivity()
                 } catch (err) {
-                    throw new Error('Failure on users.children.physicalactivities routes test: ' + err.message)
+                    throw new Error('Failure on children.physicalactivities routes test: ' + err.message)
                 }
             })
 
@@ -1930,7 +1930,7 @@ describe('Routes: users/children', () => {
                     // physical activity to be updated
                     result = await createActivityToBeUpdated(defaultActivity)
                 } catch (err) {
-                    throw new Error('Failure on users.children.physicalactivities routes test: ' + err.message)
+                    throw new Error('Failure on children.physicalactivities routes test: ' + err.message)
                 }
 
                 // physical activity to update
@@ -1964,7 +1964,7 @@ describe('Routes: users/children', () => {
                 }
 
                 return request
-                    .patch(`/v1/users/children/${result.child_id}/physicalactivities/${result.id}`)
+                    .patch(`/v1/children/${result.child_id}/physicalactivities/${result.id}`)
                     .send(body)
                     .set('Content-Type', 'application/json')
                     .expect(400)
@@ -1981,7 +1981,7 @@ describe('Routes: users/children', () => {
                 try {
                     deleteAllActivity()
                 } catch (err) {
-                    throw new Error('Failure on users.children.physicalactivities routes test: ' + err.message)
+                    throw new Error('Failure on children.physicalactivities routes test: ' + err.message)
                 }
             })
 
@@ -1992,7 +1992,7 @@ describe('Routes: users/children', () => {
                     // physical activity to be updated
                     result = await createActivityToBeUpdated(defaultActivity)
                 } catch (err) {
-                    throw new Error('Failure on users.children.physicalactivities routes test: ' + err.message)
+                    throw new Error('Failure on children.physicalactivities routes test: ' + err.message)
                 }
 
                 // physical activity to update
@@ -2026,7 +2026,7 @@ describe('Routes: users/children', () => {
                 }
 
                 return request
-                    .patch(`/v1/users/children/${result.child_id}/physicalactivities/${result.id}`)
+                    .patch(`/v1/children/${result.child_id}/physicalactivities/${result.id}`)
                     .send(body)
                     .set('Content-Type', 'application/json')
                     .expect(400)
@@ -2044,7 +2044,7 @@ describe('Routes: users/children', () => {
                 try {
                     deleteAllActivity()
                 } catch (err) {
-                    throw new Error('Failure on users.children.physicalactivities routes test: ' + err.message)
+                    throw new Error('Failure on children.physicalactivities routes test: ' + err.message)
                 }
             })
 
@@ -2055,7 +2055,7 @@ describe('Routes: users/children', () => {
                     // physical activity to be updated
                     result = await createActivityToBeUpdated(defaultActivity)
                 } catch (err) {
-                    throw new Error('Failure on users.children.physicalactivities routes test: ' + err.message)
+                    throw new Error('Failure on children.physicalactivities routes test: ' + err.message)
                 }
 
                 // physical activity to update
@@ -2089,7 +2089,7 @@ describe('Routes: users/children', () => {
                 }
 
                 return request
-                    .patch(`/v1/users/children/${result.child_id}/physicalactivities/${result.id}`)
+                    .patch(`/v1/children/${result.child_id}/physicalactivities/${result.id}`)
                     .send(body)
                     .set('Content-Type', 'application/json')
                     .expect(400)
@@ -2107,7 +2107,7 @@ describe('Routes: users/children', () => {
                 try {
                     deleteAllActivity()
                 } catch (err) {
-                    throw new Error('Failure on users.children.physicalactivities routes test: ' + err.message)
+                    throw new Error('Failure on children.physicalactivities routes test: ' + err.message)
                 }
             })
 
@@ -2118,7 +2118,7 @@ describe('Routes: users/children', () => {
                     // physical activity to be updated
                     result = await createActivityToBeUpdated(defaultActivity)
                 } catch (err) {
-                    throw new Error('Failure on users.children.physicalactivities routes test: ' + err.message)
+                    throw new Error('Failure on children.physicalactivities routes test: ' + err.message)
                 }
 
                 const body = {
@@ -2133,7 +2133,7 @@ describe('Routes: users/children', () => {
                 }
 
                 return request
-                    .patch(`/v1/users/children/${result.child_id}/physicalactivities/${result.id}`)
+                    .patch(`/v1/children/${result.child_id}/physicalactivities/${result.id}`)
                     .send(body)
                     .set('Content-Type', 'application/json')
                     .expect(400)
@@ -2151,7 +2151,7 @@ describe('Routes: users/children', () => {
                 try {
                     deleteAllActivity()
                 } catch (err) {
-                    throw new Error('Failure on users.children.physicalactivities routes test: ' + err.message)
+                    throw new Error('Failure on children.physicalactivities routes test: ' + err.message)
                 }
             })
 
@@ -2162,7 +2162,7 @@ describe('Routes: users/children', () => {
                     // physical activity to be updated
                     result = await createActivityToBeUpdated(defaultActivity)
                 } catch (err) {
-                    throw new Error('Failure on users.children.physicalactivities routes test: ' + err.message)
+                    throw new Error('Failure on children.physicalactivities routes test: ' + err.message)
                 }
 
                 const body = {
@@ -2177,7 +2177,7 @@ describe('Routes: users/children', () => {
                 }
 
                 return request
-                    .patch(`/v1/users/children/${result.child_id}/physicalactivities/${result.id}`)
+                    .patch(`/v1/children/${result.child_id}/physicalactivities/${result.id}`)
                     .send(body)
                     .set('Content-Type', 'application/json')
                     .expect(400)
@@ -2195,7 +2195,7 @@ describe('Routes: users/children', () => {
                 try {
                     deleteAllActivity()
                 } catch (err) {
-                    throw new Error('Failure on users.children.physicalactivities routes test: ' + err.message)
+                    throw new Error('Failure on children.physicalactivities routes test: ' + err.message)
                 }
             })
 
@@ -2206,7 +2206,7 @@ describe('Routes: users/children', () => {
                     // physical activity to be updated
                     result = await createActivityToBeUpdated(defaultActivity)
                 } catch (err) {
-                    throw new Error('Failure on users.children.physicalactivities routes test: ' + err.message)
+                    throw new Error('Failure on children.physicalactivities routes test: ' + err.message)
                 }
 
                 const body = {
@@ -2221,7 +2221,7 @@ describe('Routes: users/children', () => {
                 }
 
                 return request
-                    .patch(`/v1/users/children/${result.child_id}/physicalactivities/${result.id}`)
+                    .patch(`/v1/children/${result.child_id}/physicalactivities/${result.id}`)
                     .send(body)
                     .set('Content-Type', 'application/json')
                     .expect(400)
@@ -2240,7 +2240,7 @@ describe('Routes: users/children', () => {
                 try {
                     deleteAllActivity()
                 } catch (err) {
-                    throw new Error('Failure on users.children.physicalactivities routes test: ' + err.message)
+                    throw new Error('Failure on children.physicalactivities routes test: ' + err.message)
                 }
             })
 
@@ -2251,7 +2251,7 @@ describe('Routes: users/children', () => {
                     // physical activity to be updated
                     result = await createActivityToBeUpdated(defaultActivity)
                 } catch (err) {
-                    throw new Error('Failure on users.children.physicalactivities routes test: ' + err.message)
+                    throw new Error('Failure on children.physicalactivities routes test: ' + err.message)
                 }
 
                 const body = {
@@ -2266,7 +2266,7 @@ describe('Routes: users/children', () => {
                 }
 
                 return request
-                    .patch(`/v1/users/children/${result.child_id}/physicalactivities/${result.id}`)
+                    .patch(`/v1/children/${result.child_id}/physicalactivities/${result.id}`)
                     .send(body)
                     .set('Content-Type', 'application/json')
                     .expect(400)
@@ -2282,13 +2282,13 @@ describe('Routes: users/children', () => {
     /**
      * DELETE route for PhysicalActivity
      */
-    describe('DELETE /v1/users/children/:child_id/physicalactivities/:physicalactivity_id', () => {
+    describe('DELETE /v1/children/:child_id/physicalactivities/:physicalactivity_id', () => {
         context('when the physical activity was deleted successfully', () => {
             before(() => {
                 try {
                     deleteAllActivity()
                 } catch (err) {
-                    throw new Error('Failure on users.children.physicalactivities routes test: ' + err.message)
+                    throw new Error('Failure on children.physicalactivities routes test: ' + err.message)
                 }
             })
 
@@ -2308,11 +2308,11 @@ describe('Routes: users/children', () => {
                         child_id: defaultActivity.child_id
                     })
                 } catch (err) {
-                    throw new Error('Failure on users.children.physicalactivities routes test: ' + err.message)
+                    throw new Error('Failure on children.physicalactivities routes test: ' + err.message)
                 }
 
                 return request
-                    .delete(`/v1/users/children/${result.child_id}/physicalactivities/${result.id}`)
+                    .delete(`/v1/children/${result.child_id}/physicalactivities/${result.id}`)
                     .set('Content-Type', 'application/json')
                     .expect(204)
                     .then(res => {
@@ -2326,13 +2326,13 @@ describe('Routes: users/children', () => {
                 try {
                     deleteAllActivity()
                 } catch (err) {
-                    throw new Error('Failure on users.children.physicalactivities routes test: ' + err.message)
+                    throw new Error('Failure on children.physicalactivities routes test: ' + err.message)
                 }
             })
 
             it('should return status code 204 and no content for physical activity', async () => {
                 return request
-                    .delete(`/v1/users/children/${defaultActivity.child_id}/physicalactivities/${defaultActivity.id}`)
+                    .delete(`/v1/children/${defaultActivity.child_id}/physicalactivities/${defaultActivity.id}`)
                     .set('Content-Type', 'application/json')
                     .expect(204)
                     .then(res => {
@@ -2346,7 +2346,7 @@ describe('Routes: users/children', () => {
                 try {
                     deleteAllActivity()
                 } catch (err) {
-                    throw new Error('Failure on users.children.physicalactivities routes test: ' + err.message)
+                    throw new Error('Failure on children.physicalactivities routes test: ' + err.message)
                 }
             })
 
@@ -2366,11 +2366,11 @@ describe('Routes: users/children', () => {
                         child_id: defaultActivity.child_id
                     })
                 } catch (err) {
-                    throw new Error('Failure on users.children.physicalactivities routes test: ' + err.message)
+                    throw new Error('Failure on children.physicalactivities routes test: ' + err.message)
                 }
 
                 return request
-                    .delete(`/v1/users/children/123/physicalactivities/${result.id}`)
+                    .delete(`/v1/children/123/physicalactivities/${result.id}`)
                     .set('Content-Type', 'application/json')
                     .expect(400)
                     .then(err => {
@@ -2386,7 +2386,7 @@ describe('Routes: users/children', () => {
                 try {
                     deleteAllActivity()
                 } catch (err) {
-                    throw new Error('Failure on users.children.physicalactivities routes test: ' + err.message)
+                    throw new Error('Failure on children.physicalactivities routes test: ' + err.message)
                 }
             })
 
@@ -2406,11 +2406,11 @@ describe('Routes: users/children', () => {
                         child_id: defaultActivity.child_id
                     })
                 } catch (err) {
-                    throw new Error('Failure on users.children.physicalactivities routes test: ' + err.message)
+                    throw new Error('Failure on children.physicalactivities routes test: ' + err.message)
                 }
 
                 return request
-                    .delete(`/v1/users/children/${result.child_id}/physicalactivities/123`)
+                    .delete(`/v1/children/${result.child_id}/physicalactivities/123`)
                     .set('Content-Type', 'application/json')
                     .expect(400)
                     .then(err => {
@@ -2424,13 +2424,13 @@ describe('Routes: users/children', () => {
     /**
      * POST route for Log
      */
-    describe('POST /v1/users/children/:child_id/logs/:resource', () => {
+    describe('POST /v1/children/:child_id/logs/:resource', () => {
         context('when all the logs in the body are correct and it still does not exist in the repository', () => {
             before(() => {
                 try {
                     deleteAllLogs()
                 } catch (err) {
-                    throw new Error('Failure on users.children.physicalactivities routes test: ' + err.message)
+                    throw new Error('Failure on children.physicalactivities routes test: ' + err.message)
                 }
             })
 
@@ -2447,7 +2447,7 @@ describe('Routes: users/children', () => {
                 })
 
                 return request
-                    .post(`/v1/users/children/${defaultActivity.child_id}/logs/${LogType.STEPS}`)
+                    .post(`/v1/children/${defaultActivity.child_id}/logs/${LogType.STEPS}`)
                     .send(body)
                     .set('Content-Type', 'application/json')
                     .expect(201)
@@ -2476,7 +2476,7 @@ describe('Routes: users/children', () => {
                 })
 
                 return request
-                    .post(`/v1/users/children/${defaultActivity.child_id}/logs/${LogType.STEPS}`)
+                    .post(`/v1/children/${defaultActivity.child_id}/logs/${LogType.STEPS}`)
                     .send(body)
                     .set('Content-Type', 'application/json')
                     .expect(201)
@@ -2510,7 +2510,7 @@ describe('Routes: users/children', () => {
                 })
 
                 return request
-                    .post(`/v1/users/children/${defaultActivity.child_id}/logs/${LogType.STEPS}`)
+                    .post(`/v1/children/${defaultActivity.child_id}/logs/${LogType.STEPS}`)
                     .send(body)
                     .set('Content-Type', 'application/json')
                     .expect(201)
@@ -2543,7 +2543,7 @@ describe('Routes: users/children', () => {
                 })
 
                 return request
-                    .post(`/v1/users/children/${defaultActivity.child_id}/logs/${LogType.STEPS}`)
+                    .post(`/v1/children/${defaultActivity.child_id}/logs/${LogType.STEPS}`)
                     .send(body)
                     .set('Content-Type', 'application/json')
                     .expect(201)
@@ -2573,7 +2573,7 @@ describe('Routes: users/children', () => {
                 })
 
                 return request
-                    .post(`/v1/users/children/${defaultActivity.child_id}/logs/${LogType.STEPS}`)
+                    .post(`/v1/children/${defaultActivity.child_id}/logs/${LogType.STEPS}`)
                     .send(body)
                     .set('Content-Type', 'application/json')
                     .expect(201)
@@ -2614,7 +2614,7 @@ describe('Routes: users/children', () => {
                 })
 
                 return request
-                    .post(`/v1/users/children/123/logs/${LogType.STEPS}`)
+                    .post(`/v1/children/123/logs/${LogType.STEPS}`)
                     .send(body)
                     .set('Content-Type', 'application/json')
                     .expect(201)
@@ -2646,7 +2646,7 @@ describe('Routes: users/children', () => {
                 })
 
                 return request
-                    .post(`/v1/users/children/${defaultActivity.child_id}/logs/step`)
+                    .post(`/v1/children/${defaultActivity.child_id}/logs/step`)
                     .send(body)
                     .set('Content-Type', 'application/json')
                     .expect(201)
@@ -2684,7 +2684,7 @@ describe('Routes: users/children', () => {
                 })
 
                 return request
-                    .post(`/v1/users/children/${defaultActivity.child_id}/logs/${LogType.CALORIES}`)
+                    .post(`/v1/children/${defaultActivity.child_id}/logs/${LogType.CALORIES}`)
                     .send(body)
                     .set('Content-Type', 'application/json')
                     .expect(201)
@@ -2704,10 +2704,10 @@ describe('Routes: users/children', () => {
     /**
      * GET route for Log
      */
-    describe('GET /v1/users/children/:child_id/logs/date/:date_start/:date_end', () => {
+    describe('GET /v1/children/:child_id/logs/date/:date_start/:date_end', () => {
         context('when the parameters are correct and there are corresponding logs with the query', () => {
             it('should return status code 200 and a ChildLog with steps and/or calories logs', async () => {
-                const basePath = `/v1/users/children/${defaultActivity.child_id}/logs`
+                const basePath = `/v1/children/${defaultActivity.child_id}/logs`
                 const specificPath = `/date/${correctLogsArr[0].date}/${correctLogsArr[0].date}`
                 const url = `${basePath}${specificPath}`
 
@@ -2724,7 +2724,7 @@ describe('Routes: users/children', () => {
 
         context('when the parameters are correct but there are no corresponding logs with the query', () => {
             it('should return status code 200 and an empty ChildLog', async () => {
-                const basePath = `/v1/users/children/${defaultActivity.child_id}/logs`
+                const basePath = `/v1/children/${defaultActivity.child_id}/logs`
                 const specificPath = `/date/2005-10-01/2005-10-10`
                 const url = `${basePath}${specificPath}`
 
@@ -2741,7 +2741,7 @@ describe('Routes: users/children', () => {
 
         context('when the parameters are incorrect (child_id is invalid)', () => {
             it('should return status code 400 and an info message about the invalid child_id', async () => {
-                const basePath = `/v1/users/children/123/logs`
+                const basePath = `/v1/children/123/logs`
                 const specificPath = `/date/${correctLogsArr[0].date}/${correctLogsArr[0].date}`
                 const url = `${basePath}${specificPath}`
 
@@ -2759,7 +2759,7 @@ describe('Routes: users/children', () => {
 
         context('when the parameters are incorrect (date_start is invalid)', () => {
             it('should return status code 400 and an info message about the invalid date_start', async () => {
-                const basePath = `/v1/users/children/${defaultActivity.child_id}/logs`
+                const basePath = `/v1/children/${defaultActivity.child_id}/logs`
                 const specificPath = `/date/20199-10-01/${correctLogsArr[0].date}`
                 const url = `${basePath}${specificPath}`
 
@@ -2777,7 +2777,7 @@ describe('Routes: users/children', () => {
 
         context('when the parameters are incorrect (date_end is invalid)', () => {
             it('should return status code 400 and an info message about the invalid date_end', async () => {
-                const basePath = `/v1/users/children/${defaultActivity.child_id}/logs`
+                const basePath = `/v1/children/${defaultActivity.child_id}/logs`
                 const specificPath = `/date/${correctLogsArr[0].date}/20199-10-01`
                 const url = `${basePath}${specificPath}`
 
@@ -2797,7 +2797,7 @@ describe('Routes: users/children', () => {
          */
         context('when get all logs in a time interval using the "query-strings-parser" library', () => {
             it('should return status code 200 and the result as needed in the query', async () => {
-                const basePath = `/v1/users/children/${defaultActivity.child_id}/logs`
+                const basePath = `/v1/children/${defaultActivity.child_id}/logs`
                 const specificPath = `/date/${correctLogsArr[0].date}/${correctLogsArr[0].date}`
                 let url = `${basePath}${specificPath}?date=${correctLogsArr[0].date}`
                 url += '&sort=date&page=1&limit=2'
@@ -2816,7 +2816,7 @@ describe('Routes: users/children', () => {
         context('when there is an attempt to get all logs in a time interval using the "query-strings-parser" library but there ' +
                 'are no corresponding logs with the query in the database', () => {
             it('should return status code 200 and an empty ChildLog', async () => {
-                const basePath = `/v1/users/children/${defaultActivity.child_id}/logs`
+                const basePath = `/v1/children/${defaultActivity.child_id}/logs`
                 const specificPath = `/date/2005-10-01/2005-10-10`
                 let url = `${basePath}${specificPath}?date=${correctLogsArr[0].date}`
                 url += '&sort=date&page=1&limit=2'
@@ -2835,7 +2835,7 @@ describe('Routes: users/children', () => {
         context('when there is an attempt to get all logs in a time interval using the "query-strings-parser" library ' +
                 'but the parameters are incorrect (child_id is invalid)', () => {
             it('should return status code 400 and an info message about the invalid child_id', async () => {
-                const basePath = `/v1/users/children/123/logs`
+                const basePath = `/v1/children/123/logs`
                 const specificPath = `/date/${correctLogsArr[0].date}/${correctLogsArr[0].date}`
                 let url = `${basePath}${specificPath}?date=${correctLogsArr[0].date}`
                 url += '&sort=date&page=1&limit=2'
@@ -2855,7 +2855,7 @@ describe('Routes: users/children', () => {
         context('when there is an attempt to get all logs in a time interval using the "query-strings-parser" library ' +
                 'but the parameters are incorrect (date_start is invalid)', () => {
             it('should return status code 400 and an info message about the invalid date_start', async () => {
-                const basePath = `/v1/users/children/${defaultActivity.child_id}/logs`
+                const basePath = `/v1/children/${defaultActivity.child_id}/logs`
                 const specificPath = `/date/20199-10-01/${correctLogsArr[0].date}`
                 let url = `${basePath}${specificPath}?date=${correctLogsArr[0].date}`
                 url += '&sort=date&page=1&limit=2'
@@ -2875,7 +2875,7 @@ describe('Routes: users/children', () => {
         context('when there is an attempt to get all logs in a time interval using the "query-strings-parser" library ' +
                 'but the parameters are incorrect (date_end is invalid)', () => {
             it('should return status code 400 and an info message about the invalid date_end', async () => {
-                const basePath = `/v1/users/children/${defaultActivity.child_id}/logs`
+                const basePath = `/v1/children/${defaultActivity.child_id}/logs`
                 const specificPath = `/date/${correctLogsArr[0].date}/20199-10-01`
                 let url = `${basePath}${specificPath}?date=${correctLogsArr[0].date}`
                 url += '&sort=date&page=1&limit=2'
@@ -2895,10 +2895,10 @@ describe('Routes: users/children', () => {
     /**
      * GET route for Log by resource
      */
-    describe('GET /v1/users/children/:child_id/logs/:resource/date/:date_start/:date_end', () => {
+    describe('GET /v1/children/:child_id/logs/:resource/date/:date_start/:date_end', () => {
         context('when the parameters are correct and there are corresponding logs with the query', () => {
             it('should return status code 200 and an array of Logs with steps and/or calories logs', async () => {
-                const basePath = `/v1/users/children/${defaultActivity.child_id}/logs/${LogType.CALORIES}`
+                const basePath = `/v1/children/${defaultActivity.child_id}/logs/${LogType.CALORIES}`
                 const specificPath = `/date/${correctLogsArr[0].date}/${correctLogsArr[0].date}`
                 const url = `${basePath}${specificPath}`
 
@@ -2915,7 +2915,7 @@ describe('Routes: users/children', () => {
 
         context('when the parameters are correct but there are no corresponding logs with the query', () => {
             it('should return status code 200 and an empty array of logs', async () => {
-                const basePath = `/v1/users/children/${defaultActivity.child_id}/logs/${correctLogsArr[0].type}`
+                const basePath = `/v1/children/${defaultActivity.child_id}/logs/${correctLogsArr[0].type}`
                 const specificPath = `/date/2005-10-01/2005-10-10`
                 const url = `${basePath}${specificPath}`
 
@@ -2931,7 +2931,7 @@ describe('Routes: users/children', () => {
 
         context('when the parameters are incorrect (child_id is invalid)', () => {
             it('should return status code 400 and an info message about the invalid child_id', async () => {
-                const basePath = `/v1/users/children/123/logs/${correctLogsArr[0].type}`
+                const basePath = `/v1/children/123/logs/${correctLogsArr[0].type}`
                 const specificPath = `/date/${correctLogsArr[0].date}/${correctLogsArr[0].date}`
                 const url = `${basePath}${specificPath}`
 
@@ -2949,7 +2949,7 @@ describe('Routes: users/children', () => {
 
         context('when the parameters are incorrect (resource is invalid)', () => {
             it('should return status code 400 and an info message about the invalid resource', async () => {
-                const basePath = `/v1/users/children/${defaultActivity.child_id}/logs/step`
+                const basePath = `/v1/children/${defaultActivity.child_id}/logs/step`
                 const specificPath = `/date/${correctLogsArr[0].date}/${correctLogsArr[0].date}`
                 const url = `${basePath}${specificPath}`
 
@@ -2969,7 +2969,7 @@ describe('Routes: users/children', () => {
 
         context('when the parameters are incorrect (date_start is invalid)', () => {
             it('should return status code 400 and an info message about the invalid date_start', async () => {
-                const basePath = `/v1/users/children/${defaultActivity.child_id}/logs/${correctLogsArr[0].type}`
+                const basePath = `/v1/children/${defaultActivity.child_id}/logs/${correctLogsArr[0].type}`
                 const specificPath = `/date/20199-10-01/${correctLogsArr[0].date}`
                 const url = `${basePath}${specificPath}`
 
@@ -2987,7 +2987,7 @@ describe('Routes: users/children', () => {
 
         context('when the parameters are incorrect (date_end is invalid)', () => {
             it('should return status code 400 and an info message about the invalid date_end', async () => {
-                const basePath = `/v1/users/children/${defaultActivity.child_id}/logs/${correctLogsArr[0].type}`
+                const basePath = `/v1/children/${defaultActivity.child_id}/logs/${correctLogsArr[0].type}`
                 const specificPath = `/date/${correctLogsArr[0].date}/20199-10-01`
                 const url = `${basePath}${specificPath}`
 
@@ -3007,7 +3007,7 @@ describe('Routes: users/children', () => {
          */
         context('when get all logs in a time interval using the "query-strings-parser" library', () => {
             it('should return status code 200 and the result as needed in the query', async () => {
-                const basePath = `/v1/users/children/${defaultActivity.child_id}/logs/${LogType.CALORIES}`
+                const basePath = `/v1/children/${defaultActivity.child_id}/logs/${LogType.CALORIES}`
                 const specificPath = `/date/${correctLogsArr[0].date}/${correctLogsArr[0].date}`
                 let url = `${basePath}${specificPath}?date=${correctLogsArr[0].date}`
                 url += '&sort=date&page=1&limit=2'
@@ -3029,12 +3029,12 @@ describe('Routes: users/children', () => {
                 try {
                     deleteAllLogs()
                 } catch (err) {
-                    throw new Error('Failure on users.children.physicalactivities routes test: ' + err.message)
+                    throw new Error('Failure on children.physicalactivities routes test: ' + err.message)
                 }
             })
 
             it('should return status code 200 and an empty array of logs', async () => {
-                const basePath = `/v1/users/children/${defaultActivity.child_id}/logs/${correctLogsArr[0].type}`
+                const basePath = `/v1/children/${defaultActivity.child_id}/logs/${correctLogsArr[0].type}`
                 const specificPath = `/date/2005-10-01/2005-10-10`
                 let url = `${basePath}${specificPath}?date=${correctLogsArr[0].date}`
                 url += '&sort=date&page=1&limit=2'
@@ -3055,12 +3055,12 @@ describe('Routes: users/children', () => {
                 try {
                     deleteAllLogs()
                 } catch (err) {
-                    throw new Error('Failure on users.children.physicalactivities routes test: ' + err.message)
+                    throw new Error('Failure on children.physicalactivities routes test: ' + err.message)
                 }
             })
 
             it('should return status code 400 and an info message about the invalid child_id', async () => {
-                const basePath = `/v1/users/children/123/logs/${correctLogsArr[0].type}`
+                const basePath = `/v1/children/123/logs/${correctLogsArr[0].type}`
                 const specificPath = `/date/${correctLogsArr[0].date}/${correctLogsArr[0].date}`
                 let url = `${basePath}${specificPath}?date=${correctLogsArr[0].date}`
                 url += '&sort=date&page=1&limit=2'
@@ -3083,12 +3083,12 @@ describe('Routes: users/children', () => {
                 try {
                     deleteAllLogs()
                 } catch (err) {
-                    throw new Error('Failure on users.children.physicalactivities routes test: ' + err.message)
+                    throw new Error('Failure on children.physicalactivities routes test: ' + err.message)
                 }
             })
 
             it('should return status code 400 and an info message about the invalid resource', async () => {
-                const basePath = `/v1/users/children/${defaultActivity.child_id}/logs/calorie`
+                const basePath = `/v1/children/${defaultActivity.child_id}/logs/calorie`
                 const specificPath = `/date/${correctLogsArr[0].date}/${correctLogsArr[0].date}`
                 let url = `${basePath}${specificPath}?date=${correctLogsArr[0].date}`
                 url += '&sort=date&page=1&limit=2'
@@ -3113,12 +3113,12 @@ describe('Routes: users/children', () => {
                 try {
                     deleteAllLogs()
                 } catch (err) {
-                    throw new Error('Failure on users.children.physicalactivities routes test: ' + err.message)
+                    throw new Error('Failure on children.physicalactivities routes test: ' + err.message)
                 }
             })
 
             it('should return status code 400 and an info message about the invalid date_start', async () => {
-                const basePath = `/v1/users/children/${defaultActivity.child_id}/logs/${correctLogsArr[0].type}`
+                const basePath = `/v1/children/${defaultActivity.child_id}/logs/${correctLogsArr[0].type}`
                 const specificPath = `/date/20199-10-01/${correctLogsArr[0].date}`
                 let url = `${basePath}${specificPath}?date=${correctLogsArr[0].date}`
                 url += '&sort=date&page=1&limit=2'
@@ -3141,12 +3141,12 @@ describe('Routes: users/children', () => {
                 try {
                     deleteAllLogs()
                 } catch (err) {
-                    throw new Error('Failure on users.children.physicalactivities routes test: ' + err.message)
+                    throw new Error('Failure on children.physicalactivities routes test: ' + err.message)
                 }
             })
 
             it('should return status code 400 and an info message about the invalid date_end', async () => {
-                const basePath = `/v1/users/children/${defaultActivity.child_id}/logs/${correctLogsArr[0].type}`
+                const basePath = `/v1/children/${defaultActivity.child_id}/logs/${correctLogsArr[0].type}`
                 const specificPath = `/date/${correctLogsArr[0].date}/20199-10-01`
                 let url = `${basePath}${specificPath}?date=${correctLogsArr[0].date}`
                 url += '&sort=date&page=1&limit=2'

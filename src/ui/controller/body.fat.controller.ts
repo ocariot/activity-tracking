@@ -17,7 +17,7 @@ import { BodyFat } from '../../application/domain/model/body.fat'
  * @remarks To define paths, we use library inversify-express-utils.
  * @see {@link https://github.com/inversify/inversify-express-utils} for further information.
  */
-@controller('/v1/users/children')
+@controller('/v1/children')
 export class BodyFatController {
 
     /**

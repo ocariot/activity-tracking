@@ -16,7 +16,7 @@ const backgroundServices: BackgroundService = DIContainer.get(Identifier.BACKGRO
 const app: App = DIContainer.get(Identifier.APP)
 const request = require('supertest')(app.getExpress())
 
-describe('Routes: users.children.weight', () => {
+describe('Routes: children.weight', () => {
 
     const defaultWeight: Weight = new WeightMock()
 
@@ -44,7 +44,7 @@ describe('Routes: users.children.weight', () => {
             deleteAllWeight()
             await backgroundServices.startServices()
         } catch (err) {
-            throw new Error('Failure on users.children.weight routes test: ' + err.message)
+            throw new Error('Failure on children.weight routes test: ' + err.message)
         }
     })
 
@@ -53,13 +53,13 @@ describe('Routes: users.children.weight', () => {
         try {
             deleteAllWeight()
         } catch (err) {
-            throw new Error('Failure on users.children.weight routes test: ' + err.message)
+            throw new Error('Failure on children.weight routes test: ' + err.message)
         }
     })
     /**
      * POST route with only one Weight in the body
      */
-    describe('POST /v1/users/children/:child_id/weights with only one Weight in the body', () => {
+    describe('POST /v1/children/:child_id/weights with only one Weight in the body', () => {
         context('when posting a new Weight with success', () => {
             it('should return status code 201 and the saved Weight', () => {
                 const body = {
@@ -70,7 +70,7 @@ describe('Routes: users.children.weight', () => {
                 }
 
                 return request
-                    .post(`/v1/users/children/${defaultWeight.child_id}/weights`)
+                    .post(`/v1/children/${defaultWeight.child_id}/weights`)
                     .send(body)
                     .set('Content-Type', 'application/json')
                     .expect(201)
@@ -96,7 +96,7 @@ describe('Routes: users.children.weight', () => {
                 }
 
                 return request
-                    .post(`/v1/users/children/${defaultWeight.child_id}/weights`)
+                    .post(`/v1/children/${defaultWeight.child_id}/weights`)
                     .send(body)
                     .set('Content-Type', 'application/json')
                     .expect(409)
@@ -112,7 +112,7 @@ describe('Routes: users.children.weight', () => {
                 const body = {}
 
                 return request
-                    .post(`/v1/users/children/${defaultWeight.child_id}/weights`)
+                    .post(`/v1/children/${defaultWeight.child_id}/weights`)
                     .send(body)
                     .set('Content-Type', 'application/json')
                     .expect(400)
@@ -134,7 +134,7 @@ describe('Routes: users.children.weight', () => {
                 }
 
                 return request
-                    .post(`/v1/users/children/123/weights`)
+                    .post(`/v1/children/123/weights`)
                     .send(body)
                     .set('Content-Type', 'application/json')
                     .expect(400)
@@ -149,13 +149,13 @@ describe('Routes: users.children.weight', () => {
     /**
      * POST route with a Weight array in the body
      */
-    describe('POST /v1/users/children/:child_id/weights with a Weight array in the body', () => {
+    describe('POST /v1/children/:child_id/weights with a Weight array in the body', () => {
         context('when all the Weight objects are correct and still do not exist in the repository', () => {
             before(() => {
                 try {
                     deleteAllWeight()
                 } catch (err) {
-                    throw new Error('Failure on users.children.weight routes test: ' + err.message)
+                    throw new Error('Failure on children.weight routes test: ' + err.message)
                 }
             })
 
@@ -174,7 +174,7 @@ describe('Routes: users.children.weight', () => {
                 })
 
                 return request
-                    .post(`/v1/users/children/${defaultWeight.child_id}/weights`)
+                    .post(`/v1/children/${defaultWeight.child_id}/weights`)
                     .send(body)
                     .set('Content-Type', 'application/json')
                     .expect(201)
@@ -209,7 +209,7 @@ describe('Routes: users.children.weight', () => {
                 })
 
                 return request
-                    .post(`/v1/users/children/${defaultWeight.child_id}/weights`)
+                    .post(`/v1/children/${defaultWeight.child_id}/weights`)
                     .send(body)
                     .set('Content-Type', 'application/json')
                     .expect(201)
@@ -234,7 +234,7 @@ describe('Routes: users.children.weight', () => {
                 try {
                     deleteAllWeight()
                 } catch (err) {
-                    throw new Error('Failure on users.children.weight routes test: ' + err.message)
+                    throw new Error('Failure on children.weight routes test: ' + err.message)
                 }
             })
 
@@ -253,7 +253,7 @@ describe('Routes: users.children.weight', () => {
                 })
 
                 return request
-                    .post(`/v1/users/children/${defaultWeight.child_id}/weights`)
+                    .post(`/v1/children/${defaultWeight.child_id}/weights`)
                     .send(body)
                     .set('Content-Type', 'application/json')
                     .expect(201)
@@ -277,7 +277,7 @@ describe('Routes: users.children.weight', () => {
     /**
      * Route GET all Weight
      */
-    describe('GET /v1/users/children/:child_id/weights', () => {
+    describe('GET /v1/children/:child_id/weights', () => {
         context('when get all Weight of a child successfully', () => {
             it('should return status code 200 and a list of all Weight objects found', async () => {
                 const result = await createBodyFat({
@@ -296,7 +296,7 @@ describe('Routes: users.children.weight', () => {
                 })
 
                 return request
-                    .get(`/v1/users/children/${defaultWeight.child_id}/weights`)
+                    .get(`/v1/children/${defaultWeight.child_id}/weights`)
                     .set('Content-Type', 'application/json')
                     .expect(200)
                     .then(res => {
@@ -321,13 +321,13 @@ describe('Routes: users.children.weight', () => {
                 try {
                     deleteAllWeight()
                 } catch (err) {
-                    throw new Error('Failure on users.children.weight routes test: ' + err.message)
+                    throw new Error('Failure on children.weight routes test: ' + err.message)
                 }
             })
 
             it('should return status code 200 and an empty list', async () => {
                 return request
-                    .get(`/v1/users/children/${defaultWeight.child_id}/weights`)
+                    .get(`/v1/children/${defaultWeight.child_id}/weights`)
                     .set('Content-Type', 'application/json')
                     .expect(200)
                     .then(res => {
@@ -344,7 +344,7 @@ describe('Routes: users.children.weight', () => {
                 try {
                     deleteAllWeight()
                 } catch (err) {
-                    throw new Error('Failure on users.children.weight routes test: ' + err.message)
+                    throw new Error('Failure on children.weight routes test: ' + err.message)
                 }
             })
 
@@ -373,7 +373,7 @@ describe('Routes: users.children.weight', () => {
                         body_fat: result
                     })
 
-                    const url = `/v1/users/children/${defaultWeight.child_id}/weights?child_id=${defaultWeight.child_id}
+                    const url = `/v1/children/${defaultWeight.child_id}/weights?child_id=${defaultWeight.child_id}
                         &sort=child_id&page=1&limit=3`
 
                     return request
@@ -395,7 +395,7 @@ describe('Routes: users.children.weight', () => {
                             expect(res.body[0].body_fat).to.eql(result.value)
                         })
                 } catch (err) {
-                    throw new Error('Failure on users.children.weight routes test: ' + err.message)
+                    throw new Error('Failure on children.weight routes test: ' + err.message)
                 }
             })
         })
@@ -406,12 +406,12 @@ describe('Routes: users.children.weight', () => {
                 try {
                     deleteAllWeight()
                 } catch (err) {
-                    throw new Error('Failure on users.children.weight routes test: ' + err.message)
+                    throw new Error('Failure on children.weight routes test: ' + err.message)
                 }
             })
 
             it('should return status code 200 and an empty list', async () => {
-                const url = `/v1/users/children/${defaultWeight.child_id}/weights?child_id=${defaultWeight.child_id}
+                const url = `/v1/children/${defaultWeight.child_id}/weights?child_id=${defaultWeight.child_id}
                     &sort=child_id&page=1&limit=3`
 
                 return request
@@ -428,13 +428,13 @@ describe('Routes: users.children.weight', () => {
     /**
      * Route GET a Weight by child
      */
-    describe('GET /v1/users/children/:child_id/weights/:weight_id', () => {
+    describe('GET /v1/children/:child_id/weights/:weight_id', () => {
         context('when get a specific Weight of a child of the database successfully', () => {
             before(() => {
                 try {
                     deleteAllWeight()
                 } catch (err) {
-                    throw new Error('Failure on users.children.weight routes test: ' + err.message)
+                    throw new Error('Failure on children.weight routes test: ' + err.message)
                 }
             })
 
@@ -458,11 +458,11 @@ describe('Routes: users.children.weight', () => {
                         body_fat: bodyFat
                     })
                 } catch (err) {
-                    throw new Error('Failure on users.children.weight routes test: ' + err.message)
+                    throw new Error('Failure on children.weight routes test: ' + err.message)
                 }
 
                 return request
-                    .get(`/v1/users/children/${result.child_id}/weights/${result.id}`)
+                    .get(`/v1/children/${result.child_id}/weights/${result.id}`)
                     .set('Content-Type', 'application/json')
                     .expect(200)
                     .then(res => {
@@ -484,13 +484,13 @@ describe('Routes: users.children.weight', () => {
                 try {
                     deleteAllWeight()
                 } catch (err) {
-                    throw new Error('Failure on users.children.weight routes test: ' + err.message)
+                    throw new Error('Failure on children.weight routes test: ' + err.message)
                 }
             })
 
             it('should return status code 404 and an info message describing that Weight was not found', async () => {
                 return request
-                    .get(`/v1/users/children/${defaultWeight.child_id}/weights/${defaultWeight.id}`)
+                    .get(`/v1/children/${defaultWeight.child_id}/weights/${defaultWeight.id}`)
                     .set('Content-Type', 'application/json')
                     .expect(404)
                     .then(err => {
@@ -507,7 +507,7 @@ describe('Routes: users.children.weight', () => {
                 try {
                     deleteAllWeight()
                 } catch (err) {
-                    throw new Error('Failure on users.children.weight routes test: ' + err.message)
+                    throw new Error('Failure on children.weight routes test: ' + err.message)
                 }
             })
 
@@ -530,11 +530,11 @@ describe('Routes: users.children.weight', () => {
                         body_fat: bodyFat
                     })
                 } catch (err) {
-                    throw new Error('Failure on users.children.weight routes test: ' + err.message)
+                    throw new Error('Failure on children.weight routes test: ' + err.message)
                 }
 
                 return request
-                    .get(`/v1/users/children/123/weights/${result.id}`)
+                    .get(`/v1/children/123/weights/${result.id}`)
                     .set('Content-Type', 'application/json')
                     .expect(400)
                     .then(err => {
@@ -550,7 +550,7 @@ describe('Routes: users.children.weight', () => {
                 try {
                     deleteAllWeight()
                 } catch (err) {
-                    throw new Error('Failure on users.children.weight routes test: ' + err.message)
+                    throw new Error('Failure on children.weight routes test: ' + err.message)
                 }
             })
 
@@ -573,11 +573,11 @@ describe('Routes: users.children.weight', () => {
                         body_fat: bodyFat
                     })
                 } catch (err) {
-                    throw new Error('Failure on users.children.weight routes test: ' + err.message)
+                    throw new Error('Failure on children.weight routes test: ' + err.message)
                 }
 
                 return request
-                    .get(`/v1/users/children/${result.child_id}/weights/123`)
+                    .get(`/v1/children/${result.child_id}/weights/123`)
                     .set('Content-Type', 'application/json')
                     .expect(400)
                     .then(err => {
@@ -595,7 +595,7 @@ describe('Routes: users.children.weight', () => {
                 try {
                     deleteAllWeight()
                 } catch (err) {
-                    throw new Error('Failure on users.children.weight routes test: ' + err.message)
+                    throw new Error('Failure on children.weight routes test: ' + err.message)
                 }
             })
 
@@ -619,10 +619,10 @@ describe('Routes: users.children.weight', () => {
                         body_fat: bodyFat
                     })
                 } catch (err) {
-                    throw new Error('Failure on users.children.weight routes test: ' + err.message)
+                    throw new Error('Failure on children.weight routes test: ' + err.message)
                 }
 
-                const url = `/v1/users/children/${result.child_id}/weights/${result.id}?child_id=${result.child_id}
+                const url = `/v1/children/${result.child_id}/weights/${result.id}?child_id=${result.child_id}
                     &sort=child_id&page=1&limit=3`
 
                 return request
@@ -646,12 +646,12 @@ describe('Routes: users.children.weight', () => {
                 try {
                     deleteAllWeight()
                 } catch (err) {
-                    throw new Error('Failure on users.children.weight routes test: ' + err.message)
+                    throw new Error('Failure on children.weight routes test: ' + err.message)
                 }
             })
 
             it('should return status code 404 and an info message describing that Weight was not found', async () => {
-                const url = `/v1/users/children/${defaultWeight.child_id}/weights/${defaultWeight.id}?child_id=${defaultWeight.child_id}
+                const url = `/v1/children/${defaultWeight.child_id}/weights/${defaultWeight.id}?child_id=${defaultWeight.child_id}
                     &sort=child_id&page=1&limit=3`
 
                 return request
@@ -673,7 +673,7 @@ describe('Routes: users.children.weight', () => {
                 try {
                     deleteAllWeight()
                 } catch (err) {
-                    throw new Error('Failure on users.children.weight routes test: ' + err.message)
+                    throw new Error('Failure on children.weight routes test: ' + err.message)
                 }
             })
 
@@ -696,10 +696,10 @@ describe('Routes: users.children.weight', () => {
                         body_fat: bodyFat
                     })
                 } catch (err) {
-                    throw new Error('Failure on users.children.weight routes test: ' + err.message)
+                    throw new Error('Failure on children.weight routes test: ' + err.message)
                 }
 
-                const url = `/v1/users/children/123/weights/${result.id}?child_id=${result.child_id}
+                const url = `/v1/children/123/weights/${result.id}?child_id=${result.child_id}
                     &sort=child_id&page=1&limit=3`
 
                 return request
@@ -720,7 +720,7 @@ describe('Routes: users.children.weight', () => {
                 try {
                     deleteAllWeight()
                 } catch (err) {
-                    throw new Error('Failure on users.children.weight routes test: ' + err.message)
+                    throw new Error('Failure on children.weight routes test: ' + err.message)
                 }
             })
 
@@ -743,10 +743,10 @@ describe('Routes: users.children.weight', () => {
                         body_fat: bodyFat
                     })
                 } catch (err) {
-                    throw new Error('Failure on users.children.weight routes test: ' + err.message)
+                    throw new Error('Failure on children.weight routes test: ' + err.message)
                 }
 
-                const url = `/v1/users/children/${result.child_id}/weights/123?child_id=${result.child_id}
+                const url = `/v1/children/${result.child_id}/weights/123?child_id=${result.child_id}
                     &sort=child_id&page=1&limit=3`
 
                 return request
@@ -764,13 +764,13 @@ describe('Routes: users.children.weight', () => {
     /**
      * DELETE route
      */
-    describe('DELETE /v1/users/children/:child_id/weights/:weight_id', () => {
+    describe('DELETE /v1/children/:child_id/weights/:weight_id', () => {
         context('when the Weight was deleted successfully', () => {
             before(() => {
                 try {
                     deleteAllWeight()
                 } catch (err) {
-                    throw new Error('Failure on users.children.weight routes test: ' + err.message)
+                    throw new Error('Failure on children.weight routes test: ' + err.message)
                 }
             })
 
@@ -793,11 +793,11 @@ describe('Routes: users.children.weight', () => {
                         body_fat: bodyFat
                     })
                 } catch (err) {
-                    throw new Error('Failure on users.children.weight routes test: ' + err.message)
+                    throw new Error('Failure on children.weight routes test: ' + err.message)
                 }
 
                 return request
-                    .delete(`/v1/users/children/${result.child_id}/weights/${result.id}`)
+                    .delete(`/v1/children/${result.child_id}/weights/${result.id}`)
                     .set('Content-Type', 'application/json')
                     .expect(204)
                     .then(res => {
@@ -811,13 +811,13 @@ describe('Routes: users.children.weight', () => {
                 try {
                     deleteAllWeight()
                 } catch (err) {
-                    throw new Error('Failure on users.children.weight routes test: ' + err.message)
+                    throw new Error('Failure on children.weight routes test: ' + err.message)
                 }
             })
 
             it('should return status code 204 and no content for Weight', async () => {
                 return request
-                    .delete(`/v1/users/children/${defaultWeight.child_id}/weights/${defaultWeight.id}`)
+                    .delete(`/v1/children/${defaultWeight.child_id}/weights/${defaultWeight.id}`)
                     .set('Content-Type', 'application/json')
                     .expect(204)
                     .then(res => {
@@ -831,7 +831,7 @@ describe('Routes: users.children.weight', () => {
                 try {
                     deleteAllWeight()
                 } catch (err) {
-                    throw new Error('Failure on users.children.weight routes test: ' + err.message)
+                    throw new Error('Failure on children.weight routes test: ' + err.message)
                 }
             })
 
@@ -854,11 +854,11 @@ describe('Routes: users.children.weight', () => {
                         body_fat: bodyFat
                     })
                 } catch (err) {
-                    throw new Error('Failure on users.children.weight routes test: ' + err.message)
+                    throw new Error('Failure on children.weight routes test: ' + err.message)
                 }
 
                 return request
-                    .delete(`/v1/users/children/123/weights/${result.id}`)
+                    .delete(`/v1/children/123/weights/${result.id}`)
                     .set('Content-Type', 'application/json')
                     .expect(400)
                     .then(err => {
@@ -874,7 +874,7 @@ describe('Routes: users.children.weight', () => {
                 try {
                     deleteAllWeight()
                 } catch (err) {
-                    throw new Error('Failure on users.children.weight routes test: ' + err.message)
+                    throw new Error('Failure on children.weight routes test: ' + err.message)
                 }
             })
 
@@ -897,11 +897,11 @@ describe('Routes: users.children.weight', () => {
                         body_fat: bodyFat
                     })
                 } catch (err) {
-                    throw new Error('Failure on users.children.weight routes test: ' + err.message)
+                    throw new Error('Failure on children.weight routes test: ' + err.message)
                 }
 
                 return request
-                    .delete(`/v1/users/children/${result.child_id}/weights/123`)
+                    .delete(`/v1/children/${result.child_id}/weights/123`)
                     .set('Content-Type', 'application/json')
                     .expect(400)
                     .then(err => {
