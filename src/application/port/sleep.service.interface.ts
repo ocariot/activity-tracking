@@ -55,4 +55,13 @@ export interface ISleepService extends IService<Sleep> {
      * @throws {ValidationException | RepositoryException}
      */
     removeByChild(sleepId: string, childId: string): Promise<boolean>
+
+    /**
+     * Returns the total of sleep objects of a child.
+     *
+     * @param childId Child id associated with Sleep objects.
+     * @return {Promise<number>}
+     * @throws {RepositoryException}
+     */
+    countSleep(childId: string): Promise<number>
 }

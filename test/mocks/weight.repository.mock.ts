@@ -13,6 +13,10 @@ export class WeightRepositoryMock implements IWeightRepository {
         return Promise.resolve(1)
     }
 
+    public countWeights(childId: string): Promise<number> {
+        return Promise.resolve(1)
+    }
+
     public create(item: Weight): Promise<Weight> {
         return Promise.resolve(item)
     }

@@ -74,6 +74,8 @@ export class EnvironmentController {
     public async getAllEnvironments(@request() req: Request, @response() res: Response): Promise<Response> {
         try {
             const result = await this._environmentService.getAll(new Query().fromJSON(req.query))
+            const count: number = await this._environmentService.count()
+            res.setHeader('X-Total-Count', count)
             return res.status(HttpStatus.OK).send(result)
         } catch (err) {
             const handlerError = ApiExceptionManager.build(err)

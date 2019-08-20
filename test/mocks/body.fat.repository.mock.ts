@@ -13,6 +13,10 @@ export class BodyFatRepositoryMock implements IBodyFatRepository {
         return Promise.resolve(1)
     }
 
+    public countBodyFats(childId: string): Promise<number> {
+        return Promise.resolve(1)
+    }
+
     public create(item: BodyFat): Promise<BodyFat> {
         return Promise.resolve(item)
     }

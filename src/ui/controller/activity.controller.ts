@@ -84,6 +84,8 @@ export class ActivityController {
         try {
             const result = await this._activityService
                 .getAllByChild(req.params.child_id, new Query().fromJSON(req.query))
+            const count: number = await this._activityService.countActivities(req.params.child_id)
+            res.setHeader('X-Total-Count', count)
             return res.status(HttpStatus.OK).send(result)
         } catch (err) {
             const handlerError = ApiExceptionManager.build(err)

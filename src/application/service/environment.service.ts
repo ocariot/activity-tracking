@@ -192,6 +192,9 @@ export class EnvironmentService implements IEnvironmentService {
         throw new Error('Unsupported feature!')
     }
 
+    public count(): Promise<number> {
+        return this._environmentRepository.count()
+    }
     /**
      * Saves the event to the database.
      * Useful when it is not possible to run the event and want to perform the

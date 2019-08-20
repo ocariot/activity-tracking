@@ -1282,8 +1282,8 @@ describe('Routes: children.sleep', () => {
 
                 // Sleep to update
                 const body = {
-                    start_time: defaultSleep.start_time,
-                    end_time: defaultSleep.end_time,
+                    start_time: otherSleep.start_time,
+                    end_time: otherSleep.end_time,
                     duration: defaultSleep.duration,
                     pattern: defaultSleep.pattern,
                     type: defaultSleep.type
@@ -1297,8 +1297,8 @@ describe('Routes: children.sleep', () => {
                     .then(res => {
                         defaultSleep.id = res.body.id
                         expect(res.body.id).to.eql(defaultSleep.id)
-                        expect(res.body.start_time).to.eql(defaultSleep.start_time!.toISOString())
-                        expect(res.body.end_time).to.eql(defaultSleep.end_time!.toISOString())
+                        expect(res.body.start_time).to.eql(otherSleep.start_time!.toISOString())
+                        expect(res.body.end_time).to.eql(otherSleep.end_time!.toISOString())
                         expect(res.body.duration).to.eql(defaultSleep.duration)
                         expect(res.body.pattern.data_set)
                             .to.eql(defaultSleep.pattern!.data_set.map((elem: SleepPatternDataSet) => elem.toJSON()))

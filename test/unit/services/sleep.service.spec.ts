@@ -31,6 +31,7 @@ require('sinon-mongoose')
 
 describe('Services: SleepService', () => {
     const sleep: Sleep = new SleepMock()
+    const otherSleep: Sleep = new SleepMock()
     let incorrectSleep: Sleep = new Sleep()
 
     // For GET route
@@ -1021,24 +1022,23 @@ describe('Services: SleepService', () => {
     describe('updateByChild(sleep: Sleep)', () => {
         context('when sleep exists in the database', () => {
             it('should return the Sleep that was updated', () => {
-                sleep.id = '507f1f77bcf86cd799439011'            // Make mock return a sleep
-                sleep.child_id = '5a62be07de34500146d9c544'      // Make child_id valid again
+                otherSleep.id = '507f1f77bcf86cd799439012'            // Make mock return a sleep
                 sinon
                     .mock(modelFake)
                     .expects('findOneAndUpdate')
-                    .withArgs(sleep)
+                    .withArgs(otherSleep)
                     .chain('exec')
-                    .resolves(sleep)
+                    .resolves(otherSleep)
 
-                return sleepService.updateByChild(sleep)
+                return sleepService.updateByChild(otherSleep)
                     .then(result => {
-                        assert.propertyVal(result, 'id', sleep.id)
-                        assert.propertyVal(result, 'start_time', sleep.start_time)
-                        assert.propertyVal(result, 'end_time', sleep.end_time)
-                        assert.propertyVal(result, 'duration', sleep.duration)
-                        assert.propertyVal(result, 'child_id', sleep.child_id)
-                        assert.propertyVal(result, 'pattern', sleep.pattern)
-                        assert.propertyVal(result, 'type', sleep.type)
+                        assert.propertyVal(result, 'id', otherSleep.id)
+                        assert.propertyVal(result, 'start_time', otherSleep.start_time)
+                        assert.propertyVal(result, 'end_time', otherSleep.end_time)
+                        assert.propertyVal(result, 'duration', otherSleep.duration)
+                        assert.propertyVal(result, 'child_id', otherSleep.child_id)
+                        assert.propertyVal(result, 'pattern', otherSleep.pattern)
+                        assert.propertyVal(result, 'type', otherSleep.type)
                     })
             })
         })
@@ -1046,6 +1046,7 @@ describe('Services: SleepService', () => {
         context('when sleep does not exist in the database', () => {
             it('should return undefined', () => {
                 sleep.id = '5a62be07de34500146d9c544'            // Make mock return undefined
+                sleep.child_id = '5a62be07de34500146d9c544'            // Make mock return undefined
                 sinon
                     .mock(modelFake)
                     .expects('findOneAndUpdate')
@@ -1063,24 +1064,23 @@ describe('Services: SleepService', () => {
         context('when sleep exists in the database but there is no connection to the RabbitMQ', () => {
             it('should return the Sleep that was updated and save the event that will report the update', () => {
                 connectionRabbitmqPub.isConnected = false
-                sleep.id = '507f1f77bcf86cd799439011'            // Make mock return a sleep
-                sleep.child_id = '5a62be07de34500146d9c544'      // Make child_id valid again
+                otherSleep.id = '507f1f77bcf86cd799439012'            // Make mock return a sleep
                 sinon
                     .mock(modelFake)
                     .expects('findOneAndUpdate')
-                    .withArgs(sleep)
+                    .withArgs(otherSleep)
                     .chain('exec')
-                    .resolves(sleep)
+                    .resolves(otherSleep)
 
-                return sleepService.updateByChild(sleep)
+                return sleepService.updateByChild(otherSleep)
                     .then(result => {
-                        assert.propertyVal(result, 'id', sleep.id)
-                        assert.propertyVal(result, 'start_time', sleep.start_time)
-                        assert.propertyVal(result, 'end_time', sleep.end_time)
-                        assert.propertyVal(result, 'duration', sleep.duration)
-                        assert.propertyVal(result, 'child_id', sleep.child_id)
-                        assert.propertyVal(result, 'pattern', sleep.pattern)
-                        assert.propertyVal(result, 'type', sleep.type)
+                        assert.propertyVal(result, 'id', otherSleep.id)
+                        assert.propertyVal(result, 'start_time', otherSleep.start_time)
+                        assert.propertyVal(result, 'end_time', otherSleep.end_time)
+                        assert.propertyVal(result, 'duration', otherSleep.duration)
+                        assert.propertyVal(result, 'child_id', otherSleep.child_id)
+                        assert.propertyVal(result, 'pattern', otherSleep.pattern)
+                        assert.propertyVal(result, 'type', otherSleep.type)
                     })
             })
         })

@@ -32,6 +32,7 @@ require('sinon-mongoose')
 
 describe('Services: PhysicalActivityService', () => {
     const activity: PhysicalActivity = new PhysicalActivityMock()
+    let otherActivity: PhysicalActivity = new PhysicalActivityMock()
     let incorrectActivity: PhysicalActivity = new PhysicalActivity()
 
     // Mock through JSON
@@ -1072,27 +1073,26 @@ describe('Services: PhysicalActivityService', () => {
     describe('updateByChild(activity: PhysicalActivity)', () => {
         context('when physical activity exists in the database', () => {
             it('should return the PhysicalActivity that was updated', () => {
-                activity.id = '507f1f77bcf86cd799439011'            // Make mock return an activity
-                activity.child_id = '5a62be07de34500146d9c544'      // Make child_id valid again
+                otherActivity.id = '507f1f77bcf86cd799439012'            // Make mock return an activity
                 sinon
                     .mock(modelFake)
                     .expects('findOneAndUpdate')
-                    .withArgs(activity)
+                    .withArgs(otherActivity)
                     .chain('exec')
-                    .resolves(activity)
+                    .resolves(otherActivity)
 
-                return activityService.updateByChild(activity)
+                return activityService.updateByChild(otherActivity)
                     .then(result => {
-                        assert.propertyVal(result, 'id', activity.id)
-                        assert.propertyVal(result, 'start_time', activity.start_time)
-                        assert.propertyVal(result, 'end_time', activity.end_time)
-                        assert.propertyVal(result, 'duration', activity.duration)
-                        assert.propertyVal(result, 'child_id', activity.child_id)
-                        assert.propertyVal(result, 'name', activity.name)
-                        assert.propertyVal(result, 'calories', activity.calories)
-                        assert.propertyVal(result, 'steps', activity.steps)
-                        assert.propertyVal(result, 'levels', activity.levels)
-                        assert.propertyVal(result, 'heart_rate', activity.heart_rate)
+                        assert.propertyVal(result, 'id', otherActivity.id)
+                        assert.propertyVal(result, 'start_time', otherActivity.start_time)
+                        assert.propertyVal(result, 'end_time', otherActivity.end_time)
+                        assert.propertyVal(result, 'duration', otherActivity.duration)
+                        assert.propertyVal(result, 'child_id', otherActivity.child_id)
+                        assert.propertyVal(result, 'name', otherActivity.name)
+                        assert.propertyVal(result, 'calories', otherActivity.calories)
+                        assert.propertyVal(result, 'steps', otherActivity.steps)
+                        assert.propertyVal(result, 'levels', otherActivity.levels)
+                        assert.propertyVal(result, 'heart_rate', otherActivity.heart_rate)
                     })
             })
         })
@@ -1100,6 +1100,7 @@ describe('Services: PhysicalActivityService', () => {
         context('when physical activity does not exist in the database', () => {
             it('should return undefined', () => {
                 activity.id = '5a62be07de34500146d9c544'            // Make mock return undefined
+                activity.child_id = '5a62be07de34500146d9c544'      // Make child_id valid again
                 sinon
                     .mock(modelFake)
                     .expects('findOneAndUpdate')
@@ -1117,27 +1118,27 @@ describe('Services: PhysicalActivityService', () => {
         context('when physical activity exists in the database but there is no connection to the RabbitMQ', () => {
             it('should return the PhysicalActivity that was updated and save the event that will report the update', () => {
                 connectionRabbitmqPub.isConnected = false
-                activity.id = '507f1f77bcf86cd799439011'            // Make mock return an activity
-                activity.child_id = '5a62be07de34500146d9c544'      // Make child_id valid again
+                otherActivity = new PhysicalActivityMock()
+                otherActivity.id = '507f1f77bcf86cd799439012'            // Make mock return an activity
                 sinon
                     .mock(modelFake)
                     .expects('findOneAndUpdate')
-                    .withArgs(activity)
+                    .withArgs(otherActivity)
                     .chain('exec')
-                    .resolves(activity)
+                    .resolves(otherActivity)
 
-                return activityService.updateByChild(activity)
+                return activityService.updateByChild(otherActivity)
                     .then(result => {
-                        assert.propertyVal(result, 'id', activity.id)
-                        assert.propertyVal(result, 'start_time', activity.start_time)
-                        assert.propertyVal(result, 'end_time', activity.end_time)
-                        assert.propertyVal(result, 'duration', activity.duration)
-                        assert.propertyVal(result, 'child_id', activity.child_id)
-                        assert.propertyVal(result, 'name', activity.name)
-                        assert.propertyVal(result, 'calories', activity.calories)
-                        assert.propertyVal(result, 'steps', activity.steps)
-                        assert.propertyVal(result, 'levels', activity.levels)
-                        assert.propertyVal(result, 'heart_rate', activity.heart_rate)
+                        assert.propertyVal(result, 'id', otherActivity.id)
+                        assert.propertyVal(result, 'start_time', otherActivity.start_time)
+                        assert.propertyVal(result, 'end_time', otherActivity.end_time)
+                        assert.propertyVal(result, 'duration', otherActivity.duration)
+                        assert.propertyVal(result, 'child_id', otherActivity.child_id)
+                        assert.propertyVal(result, 'name', otherActivity.name)
+                        assert.propertyVal(result, 'calories', otherActivity.calories)
+                        assert.propertyVal(result, 'steps', otherActivity.steps)
+                        assert.propertyVal(result, 'levels', otherActivity.levels)
+                        assert.propertyVal(result, 'heart_rate', otherActivity.heart_rate)
                     })
             })
         })

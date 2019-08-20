@@ -9,7 +9,7 @@ export class EnvironmentRepositoryMock implements IEnvironmentRepository {
         return Promise.resolve(false)
     }
 
-    public count(query: any): Promise<number> {
+    public count(): Promise<number> {
         return Promise.resolve(1)
     }
 

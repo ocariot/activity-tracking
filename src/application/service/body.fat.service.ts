@@ -242,6 +242,15 @@ export class BodyFatService implements IBodyFatService {
         throw new Error('Unsupported feature!')
     }
 
+    public countBodyFats(childId: string): Promise<number> {
+        try {
+            ObjectIdValidator.validate(childId)
+        } catch (err) {
+            return Promise.reject(err)
+        }
+        return this._bodyFatRepository.countBodyFats(childId)
+    }
+
     /**
      * Saves the event to the database.
      * Useful when it is not possible to run the event and want to perform the

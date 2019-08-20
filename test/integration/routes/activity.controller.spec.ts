@@ -21,7 +21,7 @@ const backgroundServices: BackgroundService = DIContainer.get(Identifier.BACKGRO
 const app: App = DIContainer.get(Identifier.APP)
 const request = require('supertest')(app.getExpress())
 
-describe('Routes: /children', () => {
+describe('Routes: children.physicalactivities', () => {
 
     // Mock objects for PhysicalActivity routes
     const defaultActivity: PhysicalActivity = new PhysicalActivityMock()
@@ -1636,8 +1636,8 @@ describe('Routes: /children', () => {
                 // physical activity to update
                 const body = {
                     name: defaultActivity.name,
-                    start_time: defaultActivity.start_time,
-                    end_time: defaultActivity.end_time,
+                    start_time: otherActivity.start_time,
+                    end_time: otherActivity.end_time,
                     duration: defaultActivity.duration,
                     calories: defaultActivity.calories,
                     steps: defaultActivity.steps ? defaultActivity.steps : undefined,
@@ -1654,8 +1654,8 @@ describe('Routes: /children', () => {
                     .then(res => {
                         defaultActivity.id = res.body.id
                         expect(res.body.id).to.eql(defaultActivity.id)
-                        expect(res.body.start_time).to.eql(defaultActivity.start_time!.toISOString())
-                        expect(res.body.end_time).to.eql(defaultActivity.end_time!.toISOString())
+                        expect(res.body.start_time).to.eql(otherActivity.start_time!.toISOString())
+                        expect(res.body.end_time).to.eql(otherActivity.end_time!.toISOString())
                         expect(res.body.duration).to.eql(defaultActivity.duration)
                         expect(res.body.calories).to.eql(defaultActivity.calories)
                         if (defaultActivity.steps) {

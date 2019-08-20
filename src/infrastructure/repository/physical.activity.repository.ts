@@ -113,4 +113,12 @@ export class PhysicalActivityRepository extends BaseRepository<PhysicalActivity,
                 .catch(err => reject(super.mongoDBErrorListener(err)))
         })
     }
+
+    public countActivities(childId: string): Promise<number> {
+        return new Promise<number>((resolve, reject) => {
+            super.find(new Query().fromJSON({ filters: { child_id: childId } }))
+                .then(result => resolve(result ? result.length : 0))
+                .catch(err => reject(this.mongoDBErrorListener(err)))
+        })
+    }
 }

@@ -47,4 +47,13 @@ export interface IWeightRepository extends IRepository<Weight> {
      * @throws {ValidationException | RepositoryException}
      */
     disassociateBodyFat(bodyFatId: string): Promise<boolean>
+
+    /**
+     * Returns the total of weights of a child.
+     *
+     * @param childId Child id associated with Weight objects.
+     * @return {Promise<number>}
+     * @throws {RepositoryException}
+     */
+    countWeights(childId: string): Promise<number>
 }

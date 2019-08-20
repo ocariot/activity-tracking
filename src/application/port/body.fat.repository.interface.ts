@@ -49,4 +49,13 @@ export interface IBodyFatRepository extends IRepository<BodyFat> {
      * @throws {ValidationException | RepositoryException}
      */
     removeAllBodyFatFromChild(childId: string): Promise<boolean>
+
+    /**
+     * Returns the total of body fats of a child.
+     *
+     * @param childId Child id associated with BodyFat objects.
+     * @return {Promise<number>}
+     * @throws {RepositoryException}
+     */
+    countBodyFats(childId: string): Promise<number>
 }

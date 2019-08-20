@@ -81,6 +81,8 @@ export class WeightController {
         try {
             const result = await this._weightService
                 .getAllByChild(req.params.child_id, new Query().fromJSON(req.query))
+            const count: number = await this._weightService.countWeights(req.params.child_id)
+            res.setHeader('X-Total-Count', count)
             return res.status(HttpStatus.OK).send(result)
         } catch (err) {
             const handlerError = ApiExceptionManager.build(err)

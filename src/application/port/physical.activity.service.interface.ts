@@ -55,4 +55,13 @@ export interface IPhysicalActivityService extends IService<PhysicalActivity> {
      * @throws {ValidationException | RepositoryException}
      */
     removeByChild(activityId: string, childId: string): Promise<boolean>
+
+    /**
+     * Returns the total of activities of a child.
+     *
+     * @param childId Child id associated with physical activities.
+     * @return {Promise<number>}
+     * @throws {RepositoryException}
+     */
+    countActivities(childId: string): Promise<number>
 }

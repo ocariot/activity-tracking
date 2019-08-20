@@ -27,4 +27,12 @@ export interface IEnvironmentRepository extends IRepository<Environment> {
      * @throws {ValidationException | RepositoryException}
      */
     removeAllEnvironmentsFromInstitution(institutionID: string): Promise<boolean>
+
+    /**
+     * Returns the total of environments.
+     *
+     * @return {Promise<number>}
+     * @throws {RepositoryException}
+     */
+    count(): Promise<number>
 }

@@ -15,4 +15,12 @@ export interface IEnvironmentService extends IService<Environment> {
      * @throws {ValidationException | ConflictException | RepositoryException}
      */
     add(environment: Environment | Array<Environment>): Promise<Environment | any>
+
+    /**
+     * Returns the total of environments.
+     *
+     * @return {Promise<number>}
+     * @throws {RepositoryException}
+     */
+    count(): Promise<number>
 }

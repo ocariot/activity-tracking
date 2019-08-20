@@ -165,4 +165,12 @@ export class WeightRepository extends BaseRepository<Weight, WeightEntity> imple
                 .catch(err => reject(super.mongoDBErrorListener(err)))
         })
     }
+
+    public countWeights(childId: string): Promise<number> {
+        return new Promise<number>((resolve, reject) => {
+            super.find(new Query().fromJSON({ filters: { child_id: childId, type: MeasurementType.WEIGHT } }))
+                .then(result => resolve(result ? result.length : 0))
+                .catch(err => reject(this.mongoDBErrorListener(err)))
+        })
+    }
 }

@@ -74,4 +74,8 @@ export class EnvironmentRepository extends BaseRepository<Environment, Environme
                 .catch(err => reject(super.mongoDBErrorListener(err)))
         })
     }
+
+    public count(): Promise<number> {
+        return super.count(new Query())
+    }
 }

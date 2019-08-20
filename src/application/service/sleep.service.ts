@@ -201,21 +201,25 @@ export class SleepService implements ISleepService {
             // 1. Validate the object.
             UpdateSleepValidator.validate(sleep)
 
-            // 2. Update the sleep and save it in a variable.
+            // 2. Checks if sleep already exists.
+            const sleepExist = await this._sleepRepository.checkExist(sleep)
+            if (sleepExist) throw new ConflictException('Sleep is already registered...')
+
+            // 3. Update the sleep and save it in a variable.
             const sleepUpdated: Sleep = await this._sleepRepository.updateByChild(sleep)
 
-            // 3. If updated successfully, the object is published on the message bus.
+            // 4. If updated successfully, the object is published on the message bus.
             if (sleepUpdated) {
                 const event: SleepEvent = new SleepEvent('SleepUpdateEvent',
                     new Date(), sleepUpdated)
                 if (!(await this._eventBus.publish(event, 'sleep.update'))) {
-                    // 4. Save Event for submission attempt later when there is connection to message channel.
+                    // 5. Save Event for submission attempt later when there is connection to message channel.
                     this.saveEvent(event)
                 } else {
                     this._logger.info(`Sleep with ID: ${sleepUpdated.id} was updated...`)
                 }
             }
-            // 5. Returns the updated object.
+            // 6. Returns the updated object.
             return Promise.resolve(sleepUpdated)
         } catch (err) {
             return Promise.reject(err)
@@ -269,6 +273,15 @@ export class SleepService implements ISleepService {
 
     public async remove(id: string): Promise<boolean> {
         throw new Error('Unsupported feature!')
+    }
+
+    public countSleep(childId: string): Promise<number> {
+        try {
+            ObjectIdValidator.validate(childId)
+        } catch (err) {
+            return Promise.reject(err)
+        }
+        return this._sleepRepository.countSleep(childId)
     }
 
     /**

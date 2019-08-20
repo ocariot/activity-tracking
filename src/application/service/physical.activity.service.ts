@@ -202,21 +202,25 @@ export class PhysicalActivityService implements IPhysicalActivityService {
             // 1. Validate the object.
             UpdatePhysicalActivityValidator.validate(activity)
 
-            // 2. Update the activity and save it in a variable.
+            // 2. Checks if physical activity already exists.
+            const activityExist = await this._activityRepository.checkExist(activity)
+            if (activityExist) throw new ConflictException('Physical Activity is already registered...')
+
+            // 3. Update the activity and save it in a variable.
             const activityUpdated: PhysicalActivity = await this._activityRepository.updateByChild(activity)
 
-            // 3. If updated successfully, the object is published on the message bus.
+            // 4. If updated successfully, the object is published on the message bus.
             if (activityUpdated) {
                 const event: PhysicalActivityEvent = new PhysicalActivityEvent('PhysicalActivityUpdateEvent',
                     new Date(), activityUpdated)
                 if (!(await this._eventBus.publish(event, 'activities.update'))) {
-                    // 4. Save Event for submission attempt later when there is connection to message channel.
+                    // 5. Save Event for submission attempt later when there is connection to message channel.
                     this.saveEvent(event)
                 } else {
                     this._logger.info(`Physical Activity with ID: ${activityUpdated.id} was updated...`)
                 }
             }
-            // 5. Returns the updated object.
+            // 6. Returns the updated object.
             return Promise.resolve(activityUpdated)
         } catch (err) {
             return Promise.reject(err)
@@ -271,6 +275,15 @@ export class PhysicalActivityService implements IPhysicalActivityService {
 
     public async remove(id: string): Promise<boolean> {
         throw new Error('Unsupported feature!')
+    }
+
+    public countActivities(childId: string): Promise<number> {
+        try {
+            ObjectIdValidator.validate(childId)
+        } catch (err) {
+            return Promise.reject(err)
+        }
+        return this._activityRepository.countActivities(childId)
     }
 
     /**

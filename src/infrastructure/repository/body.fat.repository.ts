@@ -8,6 +8,7 @@ import { IQuery } from '../../application/port/query.interface'
 import { BodyFat } from '../../application/domain/model/body.fat'
 import { BodyFatEntity } from '../entity/body.fat.entity'
 import { IBodyFatRepository } from '../../application/port/body.fat.repository.interface'
+import { MeasurementType } from '../../application/domain/model/measurement'
 
 /**
  * Implementation of the BodyFat repository.
@@ -117,6 +118,21 @@ export class BodyFatRepository extends BaseRepository<BodyFat, BodyFatEntity> im
                     return resolve(true)
                 })
                 .catch(err => reject(super.mongoDBErrorListener(err)))
+        })
+    }
+
+    /**
+     * Returns the total of body fats of a child.
+     *
+     * @param childId Child id associated with BodyFat objects.
+     * @return {Promise<number>}
+     * @throws {RepositoryException}
+     */
+    public countBodyFats(childId: string): Promise<number> {
+        return new Promise<number>((resolve, reject) => {
+            super.find(new Query().fromJSON({ filters: { child_id: childId, type: MeasurementType.BODY_FAT } }))
+                .then(result => resolve(result ? result.length : 0))
+                .catch(err => reject(this.mongoDBErrorListener(err)))
         })
     }
 }
