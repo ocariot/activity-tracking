@@ -59,11 +59,9 @@ describe('Services: Environment', () => {
     const incorrectEnv4: Environment = new EnvironmentMock()   // Measurement invalid (empty array)
     incorrectEnv4.measurements = new Array<Measurement>()
 
-    const incorrectEnv5: Environment = new EnvironmentMock()   // Measurement invalid (type)
-    incorrectEnv5.measurements![1].type = 'temperatures'
 
-    const incorrectEnv6: Environment = new EnvironmentMock()   // Measurement invalid (missing fields)
-    incorrectEnv6.measurements![2] = new Measurement()
+    const incorrectEnv5: Environment = new EnvironmentMock()   // Measurement invalid (missing fields)
+    incorrectEnv5.measurements![2] = new Measurement()
 
     // Array with correct and incorrect environments
     const mixedEnvironmentsArr: Array<Environment> = new Array<EnvironmentMock>()
@@ -77,7 +75,6 @@ describe('Services: Environment', () => {
     incorrectEnvironmentsArr.push(incorrectEnv3)
     incorrectEnvironmentsArr.push(incorrectEnv4)
     incorrectEnvironmentsArr.push(incorrectEnv5)
-    incorrectEnvironmentsArr.push(incorrectEnv6)
 
     /**
      * Mock MultiStatus responses
@@ -531,14 +528,9 @@ describe('Services: Environment', () => {
                         assert.propertyVal(result.error[3], 'description',
                             'The measurements collection must not be empty!')
                         assert.propertyVal(result.error[4], 'message',
-                            'The type of measurement provided "temperatures" is not supported...')
-                        assert.propertyVal(result.error[4], 'description',
-                            'The types allowed are: temperature, humidity, pm1, pm2.5, pm10, body_fat, weight.')
-                        assert.propertyVal(result.error[5], 'message',
                             'Required fields were not provided...')
-                        assert.propertyVal(result.error[5], 'description',
-                            'Validation of environment failed: ' +
-                            'measurement type, measurement value, measurement unit required!')
+                        assert.propertyVal(result.error[4], 'description',
+                            'Validation of environment failed: measurement type, measurement value, measurement unit required!')
 
                         for (let i = 0; i < result.error.length; i++) {
                             assert.propertyVal(result.error[i], 'code', HttpStatus.BAD_REQUEST)

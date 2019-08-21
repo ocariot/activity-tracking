@@ -43,11 +43,8 @@ describe('Routes: environments', () => {
     const incorrectEnv4: Environment = new EnvironmentMock()   // Measurement invalid (empty array)
     incorrectEnv4.measurements = new Array<Measurement>()
 
-    const incorrectEnv5: Environment = new EnvironmentMock()   // Measurement invalid (type)
-    incorrectEnv5.measurements![1].type = 'temperatures'
-
-    const incorrectEnv6: Environment = new EnvironmentMock()   // Measurement invalid (missing fields)
-    incorrectEnv6.measurements![2] = new Measurement()
+    const incorrectEnv5: Environment = new EnvironmentMock()   // Measurement invalid (missing fields)
+    incorrectEnv5.measurements![2] = new Measurement()
 
     // Array with correct and incorrect environments
     const mixedEnvironmentsArr: Array<Environment> = new Array<EnvironmentMock>()
@@ -61,7 +58,6 @@ describe('Routes: environments', () => {
     incorrectEnvironmentsArr.push(incorrectEnv3)
     incorrectEnvironmentsArr.push(incorrectEnv4)
     incorrectEnvironmentsArr.push(incorrectEnv5)
-    incorrectEnvironmentsArr.push(incorrectEnv6)
 
     // Start services
     before(async () => {
@@ -219,32 +215,6 @@ describe('Routes: environments', () => {
                         expect(err.body.code).to.eql(400)
                         expect(err.body.message).to.eql('Measurement are not in a format that is supported!')
                         expect(err.body.description).to.eql('The measurements collection must not be empty!')
-                    })
-            })
-        })
-
-        context('when a validation error occurs (measurements array has an item with invalid type)', () => {
-            it('should return status code 400 and info message about the invalid measurements array', () => {
-                defaultMeasurements[1].type = 'temperatures'
-                const body = {
-                    institution_id: defaultEnvironment.institution_id,
-                    location: defaultEnvironment.location,
-                    measurements: defaultMeasurements,
-                    climatized: defaultEnvironment.climatized,
-                    timestamp: defaultEnvironment.timestamp
-                }
-
-                return request
-                    .post('/v1/environments')
-                    .send(body)
-                    .set('Content-Type', 'application/json')
-                    .expect(400)
-                    .then(err => {
-                        expect(err.body.code).to.eql(400)
-                        expect(err.body.message).to.eql(
-                            'The type of measurement provided "temperatures" is not supported...')
-                        expect(err.body.description).to.eql(
-                            'The types allowed are: temperature, humidity, pm1, pm2.5, pm10, body_fat, weight.')
                     })
             })
         })
@@ -489,14 +459,10 @@ describe('Routes: environments', () => {
                         expect(res.body.error[3].description)
                             .to.eql('The measurements collection must not be empty!')
                         expect(res.body.error[4].message)
-                            .to.eql('The type of measurement provided "temperatures" is not supported...')
-                        expect(res.body.error[4].description)
-                            .to.eql('The types allowed are: temperature, humidity, pm1, pm2.5, pm10, body_fat, weight.')
-                        expect(res.body.error[5].message)
                             .to.eql('Required fields were not provided...')
-                        expect(res.body.error[5].description)
+                        expect(res.body.error[4].description)
                             .to.eql('Validation of environment failed: ' +
-                            'measurement type, measurement value, measurement unit required!')
+                                          'measurement type, measurement value, measurement unit required!')
 
                         for (let i = 0; i < res.body.error.length; i++) {
                             expect(res.body.error[i].code).to.eql(HttpStatus.BAD_REQUEST)

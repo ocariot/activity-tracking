@@ -2,13 +2,12 @@ import { ValidationException } from '../exception/validation.exception'
 import { Environment } from '../model/environment'
 import { LocationValidator } from './location.validator'
 import { ObjectIdValidator } from './object.id.validator'
-import { Measurement, MeasurementType } from '../model/measurement'
+import { Measurement } from '../model/measurement'
 
 export class CreateEnvironmentValidator {
     public static validate(environment: Environment): void | ValidationException {
         const fields: Array<string> = []
         const message: string = 'Measurement are not in a format that is supported!'
-        const measurementTypes = Object.values(MeasurementType)
 
         // validate null
         if (!environment.timestamp) fields.push('timestamp')
@@ -24,10 +23,6 @@ export class CreateEnvironmentValidator {
             environment.measurements.forEach((measurement: Measurement) => {
                 // validate null
                 if (!measurement.type) fields.push('measurement type')
-                else if (!measurementTypes.includes(measurement.type)) {
-                    throw new ValidationException(`The type of measurement provided "${measurement.type}" is not supported...`,
-                        'The types allowed are: '.concat(Object.values(MeasurementType).join(', '), '.'))
-                }
                 if (measurement.value === undefined) fields.push('measurement value')
                 if (!measurement.unit) fields.push('measurement unit')
             })
