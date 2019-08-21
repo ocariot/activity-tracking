@@ -1,5 +1,4 @@
 import HttpStatus from 'http-status-codes'
-import sinon from 'sinon'
 import { assert } from 'chai'
 import { CustomLoggerMock } from '../../mocks/custom.logger.mock'
 import { EventBusRabbitmqMock } from '../../mocks/event.bus.rabbitmq.mock'
@@ -15,8 +14,6 @@ import { Strings } from '../../../src/utils/strings'
 import { IEventBus } from '../../../src/infrastructure/port/event.bus.interface'
 import { ILogger } from '../../../src/utils/custom.logger'
 import { MultiStatus } from '../../../src/application/domain/model/multi.status'
-import { MultiStatusMock } from '../../mocks/multi.status.mock'
-import { MeasurementRepoModel } from '../../../src/infrastructure/database/schema/measurement.schema'
 import { IWeightRepository } from '../../../src/application/port/weight.repository.interface'
 import { WeightRepositoryMock } from '../../mocks/weight.repository.mock'
 import { IWeightService } from '../../../src/application/port/weight.service.interface'
@@ -28,8 +25,6 @@ import { BodyFatMock } from '../../mocks/body.fat.mock'
 import { IBodyFatRepository } from '../../../src/application/port/body.fat.repository.interface'
 import { BodyFatRepositoryMock } from '../../mocks/body.fat.repository.mock'
 import { MeasurementType } from '../../../src/application/domain/model/measurement'
-
-require('sinon-mongoose')
 
 describe('Services: WeightService', () => {
     const weight: Weight = new WeightMock()
@@ -89,17 +84,6 @@ describe('Services: WeightService', () => {
     incorrectWeightArr.push(incorrectWeight5)
     incorrectWeightArr.push(incorrectWeight6)
 
-    /**
-     * Mock MultiStatus responses
-     */
-        // MultiStatus totally correct
-    const multiStatusCorrect: MultiStatus<Weight> = new MultiStatusMock<Weight>(correctWeightArr)
-    // Mixed MultiStatus
-    const multiStatusMixed: MultiStatus<Weight> = new MultiStatusMock<Weight>(mixedWeightArr)
-    // MultiStatus totally incorrect
-    const multiStatusIncorrect: MultiStatus<Weight> = new MultiStatusMock<Weight>(incorrectWeightArr)
-
-    const modelFake: any = MeasurementRepoModel
     const weightRepo: IWeightRepository = new WeightRepositoryMock()
     const bodyFatRepo: IBodyFatRepository = new BodyFatRepositoryMock()
     const integrationRepo: IIntegrationEventRepository = new IntegrationEventRepositoryMock()
@@ -121,10 +105,6 @@ describe('Services: WeightService', () => {
         }
     })
 
-    afterEach(() => {
-        sinon.restore()
-    })
-
     /**
      * Method: add(weight: Weight | Array<Weight>) with Weight argument)
      */
@@ -132,13 +112,6 @@ describe('Services: WeightService', () => {
         context('when the Weight is correct, it still does not exist in the repository and there is a connection ' +
             'to the RabbitMQ', () => {
             it('should return the Weight that was added', () => {
-                sinon
-                    .mock(modelFake)
-                    .expects('create')
-                    .withArgs(weight)
-                    .chain('exec')
-                    .resolves(weight)
-
                 return weightService.add(weight)
                     .then((result: Weight | Array<Weight>) => {
                         result = result as Weight
@@ -156,12 +129,6 @@ describe('Services: WeightService', () => {
         context('when the Weight is correct, your body_fat already exists and will be associated with the Weight object)', () => {
             it('should return the Weight that was added', () => {
                 weight.body_fat!.child_id = '507f1f77bcf86cd799439011'
-                sinon
-                    .mock(modelFake)
-                    .expects('create')
-                    .withArgs(weight)
-                    .chain('exec')
-                    .resolves(weight)
 
                 return weightService.add(weight)
                     .then((result: Weight | Array<Weight>) => {
@@ -181,12 +148,6 @@ describe('Services: WeightService', () => {
             'to the RabbitMQ', () => {
             it('should return the Weight that was saved', () => {
                 connectionRabbitmqPub.isConnected = false
-                sinon
-                    .mock(modelFake)
-                    .expects('create')
-                    .withArgs(weight)
-                    .chain('exec')
-                    .resolves(weight)
 
                 return weightService.add(weight)
                     .then((result: Weight | Array<Weight>) => {
@@ -206,12 +167,6 @@ describe('Services: WeightService', () => {
             'to the RabbitMQ but the event could not be saved', () => {
             it('should return the Weight because the current implementation does not throw an exception, it just prints a log', () => {
                 weight.id = '507f1f77bcf86cd799439012'           // Make mock throw an error in IntegrationEventRepository
-                sinon
-                    .mock(modelFake)
-                    .expects('create')
-                    .withArgs(weight)
-                    .chain('exec')
-                    .resolves(weight)
 
                 return weightService.add(weight)
                     .then((result: Weight | Array<Weight>) => {
@@ -231,12 +186,6 @@ describe('Services: WeightService', () => {
             it('should throw a ConflictException', () => {
                 connectionRabbitmqPub.isConnected = true
                 weight.id = '507f1f77bcf86cd799439011'
-                sinon
-                    .mock(modelFake)
-                    .expects('create')
-                    .withArgs(weight)
-                    .chain('exec')
-                    .rejects({ message: 'Weight is already registered...' })
 
                 return weightService.add(weight)
                     .catch(error => {
@@ -247,14 +196,6 @@ describe('Services: WeightService', () => {
 
         context('when the Weight is incorrect (missing all fields)', () => {
             it('should throw a ValidationException', async () => {
-                sinon
-                    .mock(modelFake)
-                    .expects('create')
-                    .withArgs(incorrectWeight1)
-                    .chain('exec')
-                    .rejects({ message: 'Required fields were not provided...',
-                               description: 'Measurement validation failed: type, timestamp, value, unit, child_id is required!' })
-
                 try {
                     return await weightService.add(incorrectWeight1)
                 } catch (err) {
@@ -267,14 +208,6 @@ describe('Services: WeightService', () => {
 
         context('when the Weight is incorrect (child_id is invalid)', () => {
             it('should throw a ValidationException', async () => {
-                sinon
-                    .mock(modelFake)
-                    .expects('create')
-                    .withArgs(incorrectWeight2)
-                    .chain('exec')
-                    .rejects({ message: Strings.CHILD.PARAM_ID_NOT_VALID_FORMAT,
-                               description: Strings.ERROR_MESSAGE.UUID_NOT_VALID_FORMAT_DESC })
-
                 try {
                     return await weightService.add(incorrectWeight2)
                 } catch (err) {
@@ -286,14 +219,6 @@ describe('Services: WeightService', () => {
 
         context('when the Weight is incorrect (type is invalid)', () => {
             it('should throw a ValidationException', async () => {
-                sinon
-                    .mock(modelFake)
-                    .expects('create')
-                    .withArgs(incorrectWeight3)
-                    .chain('exec')
-                    .rejects({ message: 'The type of measurement provided "invalidtype" is not supported...',
-                               description: 'The allowed types are: temperature, humidity, body_fat, weight.' })
-
                 try {
                     return await weightService.add(incorrectWeight3)
                 } catch (err) {
@@ -307,14 +232,6 @@ describe('Services: WeightService', () => {
 
         context('when the Weight is incorrect (body_fat of the Weight without all required fields)', () => {
             it('should throw a ValidationException', async () => {
-                sinon
-                    .mock(modelFake)
-                    .expects('create')
-                    .withArgs(incorrectWeight4)
-                    .chain('exec')
-                    .rejects({ message: 'Required fields were not provided...',
-                               description: 'Measurement validation failed: type, timestamp, value, unit, child_id is required!' })
-
                 try {
                     return await weightService.add(incorrectWeight4)
                 } catch (err) {
@@ -327,14 +244,6 @@ describe('Services: WeightService', () => {
 
         context('when the Weight is incorrect (body_fat of the Weight with an invalid child_id)', () => {
             it('should throw a ValidationException', async () => {
-                sinon
-                    .mock(modelFake)
-                    .expects('create')
-                    .withArgs(incorrectWeight5)
-                    .chain('exec')
-                    .rejects({ message: Strings.CHILD.PARAM_ID_NOT_VALID_FORMAT,
-                               description: Strings.ERROR_MESSAGE.UUID_NOT_VALID_FORMAT_DESC })
-
                 try {
                     return await weightService.add(incorrectWeight5)
                 } catch (err) {
@@ -346,14 +255,6 @@ describe('Services: WeightService', () => {
 
         context('when the Weight is incorrect (body_fat of the Weight with an invalid type)', () => {
             it('should throw a ValidationException', async () => {
-                sinon
-                    .mock(modelFake)
-                    .expects('create')
-                    .withArgs(incorrectWeight6)
-                    .chain('exec')
-                    .rejects({ message: 'The type of measurement provided "invalidtype" is not supported...',
-                               description: 'The allowed types are: temperature, humidity, body_fat, weight.' })
-
                 try {
                     return await weightService.add(incorrectWeight6)
                 } catch (err) {
@@ -374,13 +275,6 @@ describe('Services: WeightService', () => {
             'a connection to the RabbitMQ', () => {
             it('should create each Weight and return a response of type MultiStatus<Weight> with the description ' +
                 'of success in sending each one of them', () => {
-                sinon
-                    .mock(modelFake)
-                    .expects('create')
-                    .withArgs(correctWeightArr)
-                    .chain('exec')
-                    .resolves(multiStatusCorrect)
-
                 return weightService.add(correctWeightArr)
                     .then((result: Weight | MultiStatus<Weight>) => {
                         result = result as MultiStatus<Weight>
@@ -406,12 +300,6 @@ describe('Services: WeightService', () => {
             it('should create each Weight and return a response of type MultiStatus<Weight> with the description ' +
                 'of success in sending each one of them', () => {
                 correctWeightArr[0].body_fat!.child_id = '507f1f77bcf86cd799439011'
-                sinon
-                    .mock(modelFake)
-                    .expects('create')
-                    .withArgs(correctWeightArr)
-                    .chain('exec')
-                    .resolves(multiStatusCorrect)
 
                 return weightService.add(correctWeightArr)
                     .then((result: Weight | MultiStatus<Weight>) => {
@@ -438,13 +326,6 @@ describe('Services: WeightService', () => {
             it('should save each Weight for submission attempt later to the bus and return a response of type ' +
                 'MultiStatus<Weight> with the description of success in each one of them', () => {
                 connectionRabbitmqPub.isConnected = false
-
-                sinon
-                    .mock(modelFake)
-                    .expects('create')
-                    .withArgs(correctWeightArr)
-                    .chain('exec')
-                    .resolves(multiStatusCorrect)
 
                 return weightService.add(correctWeightArr)
                     .then((result: Weight | MultiStatus<Weight>) => {
@@ -473,13 +354,6 @@ describe('Services: WeightService', () => {
                 correctWeightArr.forEach(elem => {
                     elem.id = '507f1f77bcf86cd799439012'            // Make mock throw an error in IntegrationEventRepository
                 })
-
-                sinon
-                    .mock(modelFake)
-                    .expects('create')
-                    .withArgs(correctWeightArr)
-                    .chain('exec')
-                    .resolves(multiStatusCorrect)
 
                 return weightService.add(correctWeightArr)
                     .then((result: Weight | MultiStatus<Weight>) => {
@@ -510,13 +384,6 @@ describe('Services: WeightService', () => {
                     elem.id = '507f1f77bcf86cd799439011'
                 })
 
-                sinon
-                    .mock(modelFake)
-                    .expects('create')
-                    .withArgs(correctWeightArr)
-                    .chain('exec')
-                    .resolves(multiStatusIncorrect)
-
                 return weightService.add(correctWeightArr)
                     .then((result: Weight | MultiStatus<Weight>) => {
                         result = result as MultiStatus<Weight>
@@ -541,13 +408,6 @@ describe('Services: WeightService', () => {
         context('when there are correct and incorrect Weight objects in the array and there is a connection to the RabbitMQ', () => {
             it('should create each correct Weight and return a response of type MultiStatus<Weight> with the description of success ' +
                 'and error in each one of them', () => {
-                sinon
-                    .mock(modelFake)
-                    .expects('create')
-                    .withArgs(mixedWeightArr)
-                    .chain('exec')
-                    .resolves(multiStatusMixed)
-
                 return weightService.add(mixedWeightArr)
                     .then((result: Weight | MultiStatus<Weight>) => {
                         result = result as MultiStatus<Weight>
@@ -571,13 +431,6 @@ describe('Services: WeightService', () => {
 
         context('when all the Weight objects of the array are incorrect', () => {
             it('should return a response of type MultiStatus<Weight> with the description of error in each one of them', () => {
-                sinon
-                    .mock(modelFake)
-                    .expects('create')
-                    .withArgs(incorrectWeightArr)
-                    .chain('exec')
-                    .resolves(multiStatusIncorrect)
-
                 return weightService.add(incorrectWeightArr)
                     .then((result: Weight | MultiStatus<Weight>) => {
                         result = result as MultiStatus<Weight>
@@ -636,12 +489,6 @@ describe('Services: WeightService', () => {
                     _id: weight.id,
                     child_id: weight.child_id
                 }
-                sinon
-                    .mock(modelFake)
-                    .expects('findOne')
-                    .withArgs(query)
-                    .chain('exec')
-                    .resolves(weight)
 
                 return weightService.getByIdAndChild(weight.id, weight.child_id!, query)
                     .then(result => {
@@ -658,12 +505,6 @@ describe('Services: WeightService', () => {
                     _id: weight.id,
                     child_id: weight.child_id
                 }
-                sinon
-                    .mock(modelFake)
-                    .expects('findOne')
-                    .withArgs(query)
-                    .chain('exec')
-                    .resolves(undefined)
 
                 return weightService.getByIdAndChild(weight.id, weight.child_id!, query)
                     .then(result => {
@@ -680,13 +521,6 @@ describe('Services: WeightService', () => {
                     _id: weight.id,
                     child_id: weight.child_id
                 }
-                sinon
-                    .mock(modelFake)
-                    .expects('findOne')
-                    .withArgs(query)
-                    .chain('exec')
-                    .rejects({ message: Strings.WEIGHT.PARAM_ID_NOT_VALID_FORMAT,
-                               description: Strings.ERROR_MESSAGE.UUID_NOT_VALID_FORMAT_DESC })
 
                 try {
                     return weightService.getByIdAndChild(weight.id, weight.child_id!, query)
@@ -706,13 +540,6 @@ describe('Services: WeightService', () => {
                     _id: weight.id,
                     child_id: weight.child_id
                 }
-                sinon
-                    .mock(modelFake)
-                    .expects('findOne')
-                    .withArgs(query)
-                    .chain('exec')
-                    .rejects({ message: Strings.CHILD.PARAM_ID_NOT_VALID_FORMAT,
-                               description: Strings.ERROR_MESSAGE.UUID_NOT_VALID_FORMAT_DESC })
 
                 try {
                     return weightService.getByIdAndChild(weight.id, weight.child_id, query)
@@ -736,12 +563,6 @@ describe('Services: WeightService', () => {
                     child_id: weight.child_id,
                     type: MeasurementType.WEIGHT
                 }
-                sinon
-                    .mock(modelFake)
-                    .expects('find')
-                    .withArgs(query)
-                    .chain('exec')
-                    .resolves(weightArr)
 
                 return weightService.getAllByChild(weight.child_id, query)
                     .then(result => {
@@ -758,12 +579,6 @@ describe('Services: WeightService', () => {
                     child_id: weight.child_id,
                     type: MeasurementType.WEIGHT
                 }
-                sinon
-                    .mock(modelFake)
-                    .expects('find')
-                    .withArgs(query)
-                    .chain('exec')
-                    .resolves(new Array<WeightMock>())
 
                 return weightService.getAllByChild(weight.child_id, query)
                     .then(result => {
@@ -781,13 +596,6 @@ describe('Services: WeightService', () => {
                     child_id: weight.child_id,
                     type: MeasurementType.WEIGHT
                 }
-                sinon
-                    .mock(modelFake)
-                    .expects('find')
-                    .withArgs(query)
-                    .chain('exec')
-                    .rejects({ message: Strings.CHILD.PARAM_ID_NOT_VALID_FORMAT,
-                               description: Strings.ERROR_MESSAGE.UUID_NOT_VALID_FORMAT_DESC })
 
                 try {
                     return weightService.getAllByChild(weight.child_id, query)
@@ -807,12 +615,6 @@ describe('Services: WeightService', () => {
             it('should return true', () => {
                 weight.child_id = '5a62be07de34500146d9c544'     // Make child_id valid again
                 weight.id = '507f1f77bcf86cd799439011'            // Make mock return true
-                sinon
-                    .mock(modelFake)
-                    .expects('findOneAndDelete')
-                    .withArgs({ child_id: weight.child_id, _id: weight.id, type: weight.type })
-                    .chain('exec')
-                    .resolves(true)
 
                 return weightService.removeByChild(weight.id, weight.child_id)
                     .then(result => {
@@ -824,12 +626,6 @@ describe('Services: WeightService', () => {
         context('when there is no Weight with the received parameters', () => {
             it('should return false', () => {
                 weight.id = '5a62be07de34500146d9c544'            // Make mock return false
-                sinon
-                    .mock(modelFake)
-                    .expects('findOneAndDelete')
-                    .withArgs({ child_id: weight.child_id, _id: weight.id, type: weight.type })
-                    .chain('exec')
-                    .resolves(false)
 
                 return weightService.removeByChild(weight.id, weight.child_id!)
                     .then(result => {
@@ -842,12 +638,6 @@ describe('Services: WeightService', () => {
             it('should return true and save the event that will report the removal of the resource', () => {
                 connectionRabbitmqPub.isConnected = false
                 weight.id = '507f1f77bcf86cd799439011'            // Make mock return true
-                sinon
-                    .mock(modelFake)
-                    .expects('findOneAndDelete')
-                    .withArgs({ child_id: weight.child_id, _id: weight.id, type: weight.type })
-                    .chain('exec')
-                    .resolves(true)
 
                 return weightService.removeByChild(weight.id!, weight.child_id!)
                     .then(result => {
@@ -859,13 +649,6 @@ describe('Services: WeightService', () => {
         context('when the Weight is incorrect (child_id is invalid)', () => {
             it('should throw a ValidationException', () => {
                 connectionRabbitmqPub.isConnected = true
-                sinon
-                    .mock(modelFake)
-                    .expects('findOneAndDelete')
-                    .withArgs({ child_id: incorrectWeight2.child_id, _id: incorrectWeight2.id, type: incorrectWeight2.type })
-                    .chain('exec')
-                    .rejects({ message: Strings.CHILD.PARAM_ID_NOT_VALID_FORMAT,
-                               description: Strings.ERROR_MESSAGE.UUID_NOT_VALID_FORMAT_DESC })
 
                 return weightService.removeByChild(incorrectWeight2.id!, incorrectWeight2.child_id!)
                     .catch (err => {
@@ -879,13 +662,6 @@ describe('Services: WeightService', () => {
             it('should throw a ValidationException', () => {
                 incorrectWeight2.id = '507f1f77bcf86cd7994390112'
                 incorrectWeight2.child_id = '5a62be07de34500146d9c544'
-                sinon
-                    .mock(modelFake)
-                    .expects('deleteOne')
-                    .withArgs({ child_id: incorrectWeight2.child_id, _id: incorrectWeight2.id, type: incorrectWeight2.type })
-                    .chain('exec')
-                    .rejects({ message: Strings.WEIGHT.PARAM_ID_NOT_VALID_FORMAT,
-                               description: Strings.ERROR_MESSAGE.UUID_NOT_VALID_FORMAT_DESC })
 
                 return weightService.removeByChild(incorrectWeight2.id!, incorrectWeight2.child_id!)
                     .catch (err => {

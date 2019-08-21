@@ -1,5 +1,4 @@
 import HttpStatus from 'http-status-codes'
-import sinon from 'sinon'
 import { assert } from 'chai'
 import { CustomLoggerMock } from '../../mocks/custom.logger.mock'
 import { EventBusRabbitmqMock } from '../../mocks/event.bus.rabbitmq.mock'
@@ -15,10 +14,8 @@ import { Strings } from '../../../src/utils/strings'
 import { IEventBus } from '../../../src/infrastructure/port/event.bus.interface'
 import { ILogger } from '../../../src/utils/custom.logger'
 import { MultiStatus } from '../../../src/application/domain/model/multi.status'
-import { MultiStatusMock } from '../../mocks/multi.status.mock'
 import { BodyFat } from '../../../src/application/domain/model/body.fat'
 import { BodyFatMock } from '../../mocks/body.fat.mock'
-import { MeasurementRepoModel } from '../../../src/infrastructure/database/schema/measurement.schema'
 import { IBodyFatRepository } from '../../../src/application/port/body.fat.repository.interface'
 import { BodyFatRepositoryMock } from '../../mocks/body.fat.repository.mock'
 import { IBodyFatService } from '../../../src/application/port/body.fat.service.interface'
@@ -26,8 +23,6 @@ import { BodyFatService } from '../../../src/application/service/body.fat.servic
 import { IWeightRepository } from '../../../src/application/port/weight.repository.interface'
 import { WeightRepositoryMock } from '../../mocks/weight.repository.mock'
 import { MeasurementType } from '../../../src/application/domain/model/measurement'
-
-require('sinon-mongoose')
 
 describe('Services: BodyFatService', () => {
     const bodyFat: BodyFat = new BodyFatMock()
@@ -69,17 +64,6 @@ describe('Services: BodyFatService', () => {
     incorrectBodyFatArr.push(incorrectBodyFat2)
     incorrectBodyFatArr.push(incorrectBodyFat3)
 
-    /**
-     * Mock MultiStatus responses
-     */
-        // MultiStatus totally correct
-    const multiStatusCorrect: MultiStatus<BodyFat> = new MultiStatusMock<BodyFat>(correctBodyFatArr)
-    // Mixed MultiStatus
-    const multiStatusMixed: MultiStatus<BodyFat> = new MultiStatusMock<BodyFat>(mixedBodyFatArr)
-    // MultiStatus totally incorrect
-    const multiStatusIncorrect: MultiStatus<BodyFat> = new MultiStatusMock<BodyFat>(incorrectBodyFatArr)
-
-    const modelFake: any = MeasurementRepoModel
     const bodyFatRepo: IBodyFatRepository = new BodyFatRepositoryMock()
     const weightRepo: IWeightRepository = new WeightRepositoryMock()
     const integrationRepo: IIntegrationEventRepository = new IntegrationEventRepositoryMock()
@@ -101,10 +85,6 @@ describe('Services: BodyFatService', () => {
         }
     })
 
-    afterEach(() => {
-        sinon.restore()
-    })
-
     /**
      * Method: add(bodyFat: BodyFat | Array<BodyFat>) with BodyFat argument)
      */
@@ -112,13 +92,6 @@ describe('Services: BodyFatService', () => {
         context('when the BodyFat is correct, it still does not exist in the repository and there is a connection ' +
             'to the RabbitMQ', () => {
             it('should return the BodyFat that was added', () => {
-                sinon
-                    .mock(modelFake)
-                    .expects('create')
-                    .withArgs(bodyFat)
-                    .chain('exec')
-                    .resolves(bodyFat)
-
                 return bodyFatService.add(bodyFat)
                     .then((result: BodyFat | Array<BodyFat>) => {
                         result = result as BodyFat
@@ -136,12 +109,6 @@ describe('Services: BodyFatService', () => {
             'to the RabbitMQ', () => {
             it('should return the BodyFat that was saved', () => {
                 connectionRabbitmqPub.isConnected = false
-                sinon
-                    .mock(modelFake)
-                    .expects('create')
-                    .withArgs(bodyFat)
-                    .chain('exec')
-                    .resolves(bodyFat)
 
                 return bodyFatService.add(bodyFat)
                     .then((result: BodyFat | Array<BodyFat>) => {
@@ -160,12 +127,6 @@ describe('Services: BodyFatService', () => {
             'to the RabbitMQ but the event could not be saved', () => {
             it('should return the BodyFat because the current implementation does not throw an exception, it just prints a log', () => {
                 bodyFat.id = '507f1f77bcf86cd799439012'           // Make mock throw an error in IntegrationEventRepository
-                sinon
-                    .mock(modelFake)
-                    .expects('create')
-                    .withArgs(bodyFat)
-                    .chain('exec')
-                    .resolves(bodyFat)
 
                 return bodyFatService.add(bodyFat)
                     .then((result: BodyFat | Array<BodyFat>) => {
@@ -184,12 +145,6 @@ describe('Services: BodyFatService', () => {
             it('should throw a ConflictException', () => {
                 connectionRabbitmqPub.isConnected = true
                 bodyFat.id = '507f1f77bcf86cd799439011'
-                sinon
-                    .mock(modelFake)
-                    .expects('create')
-                    .withArgs(bodyFat)
-                    .chain('exec')
-                    .rejects({ message: 'BodyFat is already registered...' })
 
                 return bodyFatService.add(bodyFat)
                     .catch(error => {
@@ -200,14 +155,6 @@ describe('Services: BodyFatService', () => {
 
         context('when the BodyFat is incorrect (missing all fields)', () => {
             it('should throw a ValidationException', async () => {
-                sinon
-                    .mock(modelFake)
-                    .expects('create')
-                    .withArgs(incorrectBodyFat)
-                    .chain('exec')
-                    .rejects({ message: 'Required fields were not provided...',
-                               description: 'Measurement validation failed: type, timestamp, value, unit, child_id is required!' })
-
                 try {
                     return await bodyFatService.add(incorrectBodyFat)
                 } catch (err) {
@@ -222,13 +169,6 @@ describe('Services: BodyFatService', () => {
             it('should throw a ValidationException', async () => {
                 incorrectBodyFat = new BodyFatMock()
                 incorrectBodyFat.child_id = '5a62be07de34500146d9c5442'           // Make child_id invalid
-                sinon
-                    .mock(modelFake)
-                    .expects('create')
-                    .withArgs(incorrectBodyFat)
-                    .chain('exec')
-                    .rejects({ message: Strings.CHILD.PARAM_ID_NOT_VALID_FORMAT,
-                               description: Strings.ERROR_MESSAGE.UUID_NOT_VALID_FORMAT_DESC })
 
                 try {
                     return await bodyFatService.add(incorrectBodyFat)
@@ -243,14 +183,6 @@ describe('Services: BodyFatService', () => {
             it('should throw a ValidationException', async () => {
                 incorrectBodyFat.child_id = '5a62be07de34500146d9c544'           // Make child_id valid
                 incorrectBodyFat.type = 'invalidType'
-                sinon
-                    .mock(modelFake)
-                    .expects('create')
-                    .withArgs(incorrectBodyFat)
-                    .chain('exec')
-                    .rejects({ message: 'The type of measurement provided "invalidtype" is not supported...',
-                               description:
-                                   'The allowed types are: temperature, humidity, pm1, pm2.5, pm10, body_fat, weight.' })
 
                 try {
                     return await bodyFatService.add(incorrectBodyFat)
@@ -273,13 +205,6 @@ describe('Services: BodyFatService', () => {
             'a connection to the RabbitMQ', () => {
             it('should create each BodyFat and return a response of type MultiStatus<BodyFat> with the description ' +
                 'of success in sending each one of them', () => {
-                sinon
-                    .mock(modelFake)
-                    .expects('create')
-                    .withArgs(correctBodyFatArr)
-                    .chain('exec')
-                    .resolves(multiStatusCorrect)
-
                 return bodyFatService.add(correctBodyFatArr)
                     .then((result: BodyFat | MultiStatus<BodyFat>) => {
                         result = result as MultiStatus<BodyFat>
@@ -304,13 +229,6 @@ describe('Services: BodyFatService', () => {
             it('should save each BodyFat for submission attempt later to the bus and return a response of type ' +
                 'MultiStatus<BodyFat> with the description of success in each one of them', () => {
                 connectionRabbitmqPub.isConnected = false
-
-                sinon
-                    .mock(modelFake)
-                    .expects('create')
-                    .withArgs(correctBodyFatArr)
-                    .chain('exec')
-                    .resolves(multiStatusCorrect)
 
                 return bodyFatService.add(correctBodyFatArr)
                     .then((result: BodyFat | MultiStatus<BodyFat>) => {
@@ -338,13 +256,6 @@ describe('Services: BodyFatService', () => {
                 correctBodyFatArr.forEach(elem => {
                     elem.id = '507f1f77bcf86cd799439012'            // Make mock throw an error in IntegrationEventRepository
                 })
-
-                sinon
-                    .mock(modelFake)
-                    .expects('create')
-                    .withArgs(correctBodyFatArr)
-                    .chain('exec')
-                    .resolves(multiStatusCorrect)
 
                 return bodyFatService.add(correctBodyFatArr)
                     .then((result: BodyFat | MultiStatus<BodyFat>) => {
@@ -374,13 +285,6 @@ describe('Services: BodyFatService', () => {
                     elem.id = '507f1f77bcf86cd799439011'
                 })
 
-                sinon
-                    .mock(modelFake)
-                    .expects('create')
-                    .withArgs(correctBodyFatArr)
-                    .chain('exec')
-                    .resolves(multiStatusIncorrect)
-
                 return bodyFatService.add(correctBodyFatArr)
                     .then((result: BodyFat | MultiStatus<BodyFat>) => {
                         result = result as MultiStatus<BodyFat>
@@ -404,13 +308,6 @@ describe('Services: BodyFatService', () => {
         context('when there are correct and incorrect BodyFat objects in the array and there is a connection to the RabbitMQ', () => {
             it('should create each correct BodyFat and return a response of type MultiStatus<BodyFat> with the description of success ' +
                 'and error in each one of them', () => {
-                sinon
-                    .mock(modelFake)
-                    .expects('create')
-                    .withArgs(mixedBodyFatArr)
-                    .chain('exec')
-                    .resolves(multiStatusMixed)
-
                 return bodyFatService.add(mixedBodyFatArr)
                     .then((result: BodyFat | MultiStatus<BodyFat>) => {
                         result = result as MultiStatus<BodyFat>
@@ -433,13 +330,6 @@ describe('Services: BodyFatService', () => {
 
         context('when all the BodyFat objects of the array are incorrect', () => {
             it('should return a response of type MultiStatus<BodyFat> with the description of error in each one of them', () => {
-                sinon
-                    .mock(modelFake)
-                    .expects('create')
-                    .withArgs(incorrectBodyFatArr)
-                    .chain('exec')
-                    .resolves(multiStatusIncorrect)
-
                 return bodyFatService.add(incorrectBodyFatArr)
                     .then((result: BodyFat | MultiStatus<BodyFat>) => {
                         result = result as MultiStatus<BodyFat>
@@ -485,12 +375,6 @@ describe('Services: BodyFatService', () => {
                     _id: bodyFat.id,
                     child_id: bodyFat.child_id
                 }
-                sinon
-                    .mock(modelFake)
-                    .expects('findOne')
-                    .withArgs(query)
-                    .chain('exec')
-                    .resolves(bodyFat)
 
                 return bodyFatService.getByIdAndChild(bodyFat.id!, bodyFat.child_id!, query)
                     .then(result => {
@@ -507,12 +391,6 @@ describe('Services: BodyFatService', () => {
                     _id: bodyFat.id,
                     child_id: bodyFat.child_id
                 }
-                sinon
-                    .mock(modelFake)
-                    .expects('findOne')
-                    .withArgs(query)
-                    .chain('exec')
-                    .resolves(undefined)
 
                 return bodyFatService.getByIdAndChild(bodyFat.id!, bodyFat.child_id!, query)
                     .then(result => {
@@ -529,13 +407,6 @@ describe('Services: BodyFatService', () => {
                     _id: bodyFat.id,
                     child_id: bodyFat.child_id
                 }
-                sinon
-                    .mock(modelFake)
-                    .expects('findOne')
-                    .withArgs(query)
-                    .chain('exec')
-                    .rejects({ message: Strings.BODY_FAT.PARAM_ID_NOT_VALID_FORMAT,
-                               description: Strings.ERROR_MESSAGE.UUID_NOT_VALID_FORMAT_DESC })
 
                 try {
                     return bodyFatService.getByIdAndChild(bodyFat.id!, bodyFat.child_id!, query)
@@ -555,13 +426,6 @@ describe('Services: BodyFatService', () => {
                     _id: bodyFat.id,
                     child_id: bodyFat.child_id
                 }
-                sinon
-                    .mock(modelFake)
-                    .expects('findOne')
-                    .withArgs(query)
-                    .chain('exec')
-                    .rejects({ message: Strings.CHILD.PARAM_ID_NOT_VALID_FORMAT,
-                               description: Strings.ERROR_MESSAGE.UUID_NOT_VALID_FORMAT_DESC })
 
                 try {
                     return bodyFatService.getByIdAndChild(bodyFat.id!, bodyFat.child_id, query)
@@ -585,12 +449,6 @@ describe('Services: BodyFatService', () => {
                     child_id: bodyFat.child_id,
                     type: MeasurementType.BODY_FAT
                 }
-                sinon
-                    .mock(modelFake)
-                    .expects('find')
-                    .withArgs(query)
-                    .chain('exec')
-                    .resolves(bodyFatArr)
 
                 return bodyFatService.getAllByChild(bodyFat.child_id, query)
                     .then(result => {
@@ -607,12 +465,6 @@ describe('Services: BodyFatService', () => {
                     child_id: bodyFat.child_id,
                     type: MeasurementType.BODY_FAT
                 }
-                sinon
-                    .mock(modelFake)
-                    .expects('find')
-                    .withArgs(query)
-                    .chain('exec')
-                    .resolves(new Array<BodyFatMock>())
 
                 return bodyFatService.getAllByChild(bodyFat.child_id, query)
                     .then(result => {
@@ -630,13 +482,6 @@ describe('Services: BodyFatService', () => {
                     child_id: bodyFat.child_id,
                     type: MeasurementType.BODY_FAT
                 }
-                sinon
-                    .mock(modelFake)
-                    .expects('find')
-                    .withArgs(query)
-                    .chain('exec')
-                    .rejects({ message: Strings.CHILD.PARAM_ID_NOT_VALID_FORMAT,
-                               description: Strings.ERROR_MESSAGE.UUID_NOT_VALID_FORMAT_DESC })
 
                 try {
                     return bodyFatService.getAllByChild(bodyFat.child_id, query)
@@ -656,12 +501,6 @@ describe('Services: BodyFatService', () => {
             it('should return true', () => {
                 bodyFat.child_id = '5a62be07de34500146d9c544'     // Make child_id valid again
                 bodyFat.id = '507f1f77bcf86cd799439011'            // Make mock return true
-                sinon
-                    .mock(modelFake)
-                    .expects('findOneAndDelete')
-                    .withArgs({ child_id: bodyFat.child_id, _id: bodyFat.id, type: bodyFat.type })
-                    .chain('exec')
-                    .resolves(true)
 
                 weightRepo.disassociateBodyFat(bodyFat.id)   // Disassociate BodyFat from Weight object
                     .then(result => {
@@ -678,12 +517,6 @@ describe('Services: BodyFatService', () => {
         context('when there is no BodyFat with the received parameters', () => {
             it('should return false', () => {
                 bodyFat.id = '5a62be07de34500146d9c544'            // Make mock return false
-                sinon
-                    .mock(modelFake)
-                    .expects('findOneAndDelete')
-                    .withArgs({ child_id: bodyFat.child_id, _id: bodyFat.id, type: bodyFat.type })
-                    .chain('exec')
-                    .resolves(false)
 
                 return bodyFatService.removeByChild(bodyFat.id, bodyFat.child_id!)
                     .then(result => {
@@ -697,12 +530,6 @@ describe('Services: BodyFatService', () => {
                 connectionRabbitmqPub.isConnected = false
                 bodyFat.id = '507f1f77bcf86cd799439011'            // Make mock return true
                 bodyFat.child_id = '5a62be07de34500146d9c544'     // Make child_id valid again
-                sinon
-                    .mock(modelFake)
-                    .expects('findOneAndDelete')
-                    .withArgs({ child_id: bodyFat.child_id, _id: bodyFat.id, type: bodyFat.type })
-                    .chain('exec')
-                    .resolves(true)
 
                 return bodyFatService.removeByChild(bodyFat.id!, bodyFat.child_id)
                     .then(result => {
@@ -715,13 +542,6 @@ describe('Services: BodyFatService', () => {
             it('should throw a ValidationException', () => {
                 connectionRabbitmqPub.isConnected = true
                 incorrectBodyFat.child_id = '5a62be07de34500146d9c5442'     // Make child_id invalid
-                sinon
-                    .mock(modelFake)
-                    .expects('findOneAndDelete')
-                    .withArgs({ child_id: incorrectBodyFat.child_id, _id: incorrectBodyFat.id, type: incorrectBodyFat.type })
-                    .chain('exec')
-                    .rejects({ message: Strings.CHILD.PARAM_ID_NOT_VALID_FORMAT,
-                               description: Strings.ERROR_MESSAGE.UUID_NOT_VALID_FORMAT_DESC })
 
                 return bodyFatService.removeByChild(incorrectBodyFat.id!, incorrectBodyFat.child_id)
                     .catch (err => {
@@ -735,13 +555,6 @@ describe('Services: BodyFatService', () => {
             it('should throw a ValidationException', () => {
                 incorrectBodyFat = new BodyFatMock()
                 incorrectBodyFat.id = '5a62be07de34500146d9c5442'       // Make bodyFat id invalid
-                sinon
-                    .mock(modelFake)
-                    .expects('deleteOne')
-                    .withArgs({ child_id: incorrectBodyFat.child_id, _id: incorrectBodyFat.id, type: incorrectBodyFat.type })
-                    .chain('exec')
-                    .rejects({ message: Strings.BODY_FAT.PARAM_ID_NOT_VALID_FORMAT,
-                               description: Strings.ERROR_MESSAGE.UUID_NOT_VALID_FORMAT_DESC })
 
                 return bodyFatService.removeByChild(incorrectBodyFat.id!, incorrectBodyFat.child_id!)
                     .catch (err => {

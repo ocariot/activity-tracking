@@ -1,5 +1,4 @@
 import HttpStatus from 'http-status-codes'
-import sinon from 'sinon'
 import { assert } from 'chai'
 import { CustomLoggerMock } from '../../mocks/custom.logger.mock'
 import { EventBusRabbitmqMock } from '../../mocks/event.bus.rabbitmq.mock'
@@ -14,7 +13,6 @@ import { Query } from '../../../src/infrastructure/repository/query/query'
 import { Strings } from '../../../src/utils/strings'
 import { SleepMock } from '../../mocks/sleep.mock'
 import { Sleep, SleepType } from '../../../src/application/domain/model/sleep'
-import { SleepRepoModel } from '../../../src/infrastructure/database/schema/sleep.schema'
 import { ISleepService } from '../../../src/application/port/sleep.service.interface'
 import { SleepService } from '../../../src/application/service/sleep.service'
 import { ISleepRepository } from '../../../src/application/port/sleep.repository.interface'
@@ -24,10 +22,7 @@ import { SleepPatternDataSet } from '../../../src/application/domain/model/sleep
 import { IEventBus } from '../../../src/infrastructure/port/event.bus.interface'
 import { ILogger } from '../../../src/utils/custom.logger'
 import { MultiStatus } from '../../../src/application/domain/model/multi.status'
-import { MultiStatusMock } from '../../mocks/multi.status.mock'
 import { ObjectID } from 'bson'
-
-require('sinon-mongoose')
 
 describe('Services: SleepService', () => {
     const sleep: Sleep = new SleepMock()
@@ -146,17 +141,6 @@ describe('Services: SleepService', () => {
     incorrectSleepArr.push(incorrectSleep12)
     incorrectSleepArr.push(incorrectSleep13)
 
-    /**
-     * Mock MultiStatus responses
-     */
-    // MultiStatus totally correct
-    const multiStatusCorrect: MultiStatus<Sleep> = new MultiStatusMock<Sleep>(correctSleepArr)
-    // Mixed MultiStatus
-    const multiStatusMixed: MultiStatus<Sleep> = new MultiStatusMock<Sleep>(mixedSleepArr)
-    // MultiStatus totally incorrect
-    const multiStatusIncorrect: MultiStatus<Sleep> = new MultiStatusMock<Sleep>(incorrectSleepArr)
-
-    const modelFake: any = SleepRepoModel
     const sleepRepo: ISleepRepository = new SleepRepositoryMock()
     const integrationRepo: IIntegrationEventRepository = new IntegrationEventRepositoryMock()
 
@@ -177,10 +161,6 @@ describe('Services: SleepService', () => {
         }
     })
 
-    afterEach(() => {
-        sinon.restore()
-    })
-
     /**
      * Method: add(sleep: Sleep | Array<Sleep>) with Sleep argument)
      */
@@ -188,13 +168,6 @@ describe('Services: SleepService', () => {
         context('when the Sleep is correct, it still does not exist in the repository and there is a connection ' +
             'to the RabbitMQ', () => {
             it('should return the Sleep that was added', () => {
-                sinon
-                    .mock(modelFake)
-                    .expects('create')
-                    .withArgs(sleep)
-                    .chain('exec')
-                    .resolves(sleep)
-
                 return sleepService.add(sleep)
                     .then((result: Sleep | Array<Sleep>) => {
                         result = result as Sleep
@@ -213,12 +186,6 @@ describe('Services: SleepService', () => {
             'to the RabbitMQ', () => {
             it('should return the Sleep that was saved', () => {
                 connectionRabbitmqPub.isConnected = false
-                sinon
-                    .mock(modelFake)
-                    .expects('create')
-                    .withArgs(sleep)
-                    .chain('exec')
-                    .resolves(sleep)
 
                 return sleepService.add(sleep)
                     .then((result: Sleep | Array<Sleep>) => {
@@ -238,12 +205,6 @@ describe('Services: SleepService', () => {
             'to the RabbitMQ but the event could not be saved', () => {
             it('should return the Sleep because the current implementation does not throw an exception, it just prints a log', () => {
                 sleep.id = '507f1f77bcf86cd799439012'           // Make mock throw an error in IntegrationEventRepository
-                sinon
-                    .mock(modelFake)
-                    .expects('create')
-                    .withArgs(sleep)
-                    .chain('exec')
-                    .resolves(sleep)
 
                 return sleepService.add(sleep)
                     .then((result: Sleep | Array<Sleep>) => {
@@ -263,12 +224,6 @@ describe('Services: SleepService', () => {
             it('should throw a ConflictException', () => {
                 connectionRabbitmqPub.isConnected = true
                 sleep.id = '507f1f77bcf86cd799439011'
-                sinon
-                    .mock(modelFake)
-                    .expects('create')
-                    .withArgs(sleep)
-                    .chain('exec')
-                    .rejects({ message: 'Sleep is already registered...' })
 
                 return sleepService.add(sleep)
                     .catch(error => {
@@ -279,14 +234,6 @@ describe('Services: SleepService', () => {
 
         context('when the Sleep is incorrect (missing all fields)', () => {
             it('should throw a ValidationException', async () => {
-                sinon
-                    .mock(modelFake)
-                    .expects('create')
-                    .withArgs(incorrectSleep)
-                    .chain('exec')
-                    .rejects({ message: 'Required fields were not provided...',
-                               description: 'Activity validation failed: start_time, end_time, duration, child_id is required!' })
-
                 try {
                     return await sleepService.add(incorrectSleep)
                 } catch (err) {
@@ -309,13 +256,6 @@ describe('Services: SleepService', () => {
                     child_id: new ObjectID()
                 }
                 incorrectSleep = new Sleep().fromJSON(sleepJSON)
-                sinon
-                    .mock(modelFake)
-                    .expects('create')
-                    .withArgs(incorrectSleep)
-                    .chain('exec')
-                    .rejects({ message: 'Required fields were not provided...',
-                               description: 'Sleep validation failed: type, pattern is required!' })
 
                 try {
                     return await sleepService.add(incorrectSleep)
@@ -331,14 +271,6 @@ describe('Services: SleepService', () => {
                 incorrectSleep = new SleepMock()
                 incorrectSleep.start_time = new Date('2018-12-15T12:52:59Z')
                 incorrectSleep.end_time = new Date('2018-12-14T13:12:37Z')
-                sinon
-                    .mock(modelFake)
-                    .expects('create')
-                    .withArgs(incorrectSleep)
-                    .chain('exec')
-                    .rejects({ message: 'Date field is invalid...',
-                               description: 'Date validation failed: The end_time parameter can not contain ' +
-                                   'a older date than that the start_time parameter!' })
 
                 try {
                     return await sleepService.add(incorrectSleep)
@@ -354,14 +286,6 @@ describe('Services: SleepService', () => {
             it('should throw a ValidationException', async () => {
                 incorrectSleep = new SleepMock()
                 incorrectSleep.duration = 11780000
-                sinon
-                    .mock(modelFake)
-                    .expects('create')
-                    .withArgs(incorrectSleep)
-                    .chain('exec')
-                    .rejects({ message: 'Duration field is invalid...',
-                               description: 'Duration validation failed: Activity duration value does not ' +
-                                   'match values passed in start_time and end_time parameters!' })
 
                 try {
                     return await sleepService.add(incorrectSleep)
@@ -377,13 +301,6 @@ describe('Services: SleepService', () => {
             it('should throw a ValidationException', async () => {
                 incorrectSleep = new SleepMock()
                 incorrectSleep.duration = -11780000
-                sinon
-                    .mock(modelFake)
-                    .expects('create')
-                    .withArgs(incorrectSleep)
-                    .chain('exec')
-                    .rejects({ message: 'Duration field is invalid...',
-                               description: 'Activity validation failed: The value provided has a negative value!' })
 
                 try {
                     return await sleepService.add(incorrectSleep)
@@ -398,13 +315,6 @@ describe('Services: SleepService', () => {
             it('should throw a ValidationException', async () => {
                 incorrectSleep = new SleepMock()
                 incorrectSleep.child_id = '5a62be07de34500146d9c5442'           // Make child_id invalid
-                sinon
-                    .mock(modelFake)
-                    .expects('create')
-                    .withArgs(incorrectSleep)
-                    .chain('exec')
-                    .rejects({ message: Strings.CHILD.PARAM_ID_NOT_VALID_FORMAT,
-                               description: Strings.ERROR_MESSAGE.UUID_NOT_VALID_FORMAT_DESC })
 
                 try {
                     return await sleepService.add(incorrectSleep)
@@ -427,13 +337,6 @@ describe('Services: SleepService', () => {
                     child_id: new ObjectID()
                 }
                 incorrectSleep = new Sleep().fromJSON(sleepJSON)
-                sinon
-                    .mock(modelFake)
-                    .expects('create')
-                    .withArgs(incorrectSleep)
-                    .chain('exec')
-                    .rejects({ message: 'The type provided "classics" is not supported...',
-                               description: 'The allowed Sleep Pattern types are: classic, stages.' })
 
                 try {
                     return await sleepService.add(incorrectSleep)
@@ -449,13 +352,6 @@ describe('Services: SleepService', () => {
                 incorrectSleep = new SleepMock()
                 incorrectSleep.child_id = '5a62be07de34500146d9c544'           // Make child_id valid
                 incorrectSleep.pattern = new SleepPattern()
-                sinon
-                    .mock(modelFake)
-                    .expects('create')
-                    .withArgs(incorrectSleep)
-                    .chain('exec')
-                    .rejects({ message: 'Pattern are not in a format that is supported...',
-                               description: 'Validation of the standard of sleep failed: data_set is required!' })
 
                 try {
                     return await sleepService.add(incorrectSleep)
@@ -469,13 +365,6 @@ describe('Services: SleepService', () => {
         context('when the Sleep is incorrect (the pattern has an empty data_set array)', () => {
             it('should throw a ValidationException', async () => {
                 incorrectSleep.pattern!.data_set = new Array<SleepPatternDataSet>()
-                sinon
-                    .mock(modelFake)
-                    .expects('create')
-                    .withArgs(incorrectSleep)
-                    .chain('exec')
-                    .rejects({ message: 'Dataset are not in a format that is supported!',
-                               description: 'The data_set collection must not be empty!' })
 
                 try {
                     return await sleepService.add(incorrectSleep)
@@ -491,14 +380,6 @@ describe('Services: SleepService', () => {
                 const dataSetItemTest: SleepPatternDataSet = new SleepPatternDataSet()
 
                 incorrectSleep.pattern!.data_set = [dataSetItemTest]
-                sinon
-                    .mock(modelFake)
-                    .expects('create')
-                    .withArgs(incorrectSleep)
-                    .chain('exec')
-                    .rejects({ message: 'Dataset are not in a format that is supported!',
-                               description: 'Validation of the sleep pattern dataset failed: ' +
-                                   'data_set start_time, data_set name, data_set duration is required!' })
 
                 try {
                     return await sleepService.add(incorrectSleep)
@@ -517,14 +398,6 @@ describe('Services: SleepService', () => {
                 dataSetItemTest.name = incorrectSleep.pattern!.data_set[0].name
                 dataSetItemTest.duration = -(Math.floor(Math.random() * 5 + 1) * 60000)
                 incorrectSleep.pattern!.data_set = [dataSetItemTest]
-                sinon
-                    .mock(modelFake)
-                    .expects('create')
-                    .withArgs(incorrectSleep)
-                    .chain('exec')
-                    .rejects({ message: 'Some (or several) duration field of sleep pattern is invalid...',
-                               description: 'Sleep Pattern dataset validation failed: The value provided ' +
-                                   'has a negative value!' })
 
                 try {
                     return await sleepService.add(incorrectSleep)
@@ -544,13 +417,6 @@ describe('Services: SleepService', () => {
                     duration : Math.floor(Math.random() * 5 + 1) * 60000 // 1-5min
                 }
                 incorrectSleep.pattern!.data_set = [new SleepPatternDataSet().fromJSON(dataSetItemJSON)]
-                sinon
-                    .mock(modelFake)
-                    .expects('create')
-                    .withArgs(incorrectSleep)
-                    .chain('exec')
-                    .rejects({ message: 'The sleep pattern name provided "restlesss" is not supported...',
-                               description: 'The names of the allowed patterns are: asleep, restless, awake.' })
 
                 try {
                     return await sleepService.add(incorrectSleep)
@@ -584,13 +450,6 @@ describe('Services: SleepService', () => {
                 }
                 incorrectSleep.pattern!.data_set = new Array<SleepPatternDataSet>()
                 incorrectSleep.pattern!.data_set[0] = new SleepPatternDataSet().fromJSON(dataSetItemJSON)
-                sinon
-                    .mock(modelFake)
-                    .expects('create')
-                    .withArgs(incorrectSleep)
-                    .chain('exec')
-                    .rejects({ message: 'The sleep pattern name provided "deeps" is not supported...',
-                               description: 'The names of the allowed patterns are: deep, light, rem, wake.' })
 
                 try {
                     return await sleepService.add(incorrectSleep)
@@ -610,13 +469,6 @@ describe('Services: SleepService', () => {
             'a connection to the RabbitMQ', () => {
             it('should create each Sleep and return a response of type MultiStatus<Sleep> with the description ' +
                 'of success in sending each one of them', () => {
-                sinon
-                    .mock(modelFake)
-                    .expects('create')
-                    .withArgs(correctSleepArr)
-                    .chain('exec')
-                    .resolves(multiStatusCorrect)
-
                 return sleepService.add(correctSleepArr)
                     .then((result: Sleep | MultiStatus<Sleep>) => {
                         result = result as MultiStatus<Sleep>
@@ -642,13 +494,6 @@ describe('Services: SleepService', () => {
             it('should save each Sleep for submission attempt later to the bus and return a response of type ' +
                 'MultiStatus<Sleep> with the description of success in each one of them', () => {
                 connectionRabbitmqPub.isConnected = false
-
-                sinon
-                    .mock(modelFake)
-                    .expects('create')
-                    .withArgs(correctSleepArr)
-                    .chain('exec')
-                    .resolves(multiStatusCorrect)
 
                 return sleepService.add(correctSleepArr)
                     .then((result: Sleep | MultiStatus<Sleep>) => {
@@ -677,13 +522,6 @@ describe('Services: SleepService', () => {
                 correctSleepArr.forEach(elem => {
                     elem.id = '507f1f77bcf86cd799439012'            // Make mock throw an error in IntegrationEventRepository
                 })
-
-                sinon
-                    .mock(modelFake)
-                    .expects('create')
-                    .withArgs(correctSleepArr)
-                    .chain('exec')
-                    .resolves(multiStatusCorrect)
 
                 return sleepService.add(correctSleepArr)
                     .then((result: Sleep | MultiStatus<Sleep>) => {
@@ -714,13 +552,6 @@ describe('Services: SleepService', () => {
                     elem.id = '507f1f77bcf86cd799439011'
                 })
 
-                sinon
-                    .mock(modelFake)
-                    .expects('create')
-                    .withArgs(correctSleepArr)
-                    .chain('exec')
-                    .resolves(multiStatusIncorrect)
-
                 return sleepService.add(correctSleepArr)
                     .then((result: Sleep | MultiStatus<Sleep>) => {
                         result = result as MultiStatus<Sleep>
@@ -745,13 +576,6 @@ describe('Services: SleepService', () => {
         context('when there are correct and incorrect sleep objects in the array and there is a connection to the RabbitMQ', () => {
             it('should create each correct Sleep and return a response of type MultiStatus<Sleep> with the description of success ' +
                 'and error in each one of them', () => {
-                sinon
-                    .mock(modelFake)
-                    .expects('create')
-                    .withArgs(mixedSleepArr)
-                    .chain('exec')
-                    .resolves(multiStatusMixed)
-
                 return sleepService.add(mixedSleepArr)
                     .then((result: Sleep | MultiStatus<Sleep>) => {
                         result = result as MultiStatus<Sleep>
@@ -775,13 +599,6 @@ describe('Services: SleepService', () => {
 
         context('when all the sleep objects of the array are incorrect', () => {
             it('should return a response of type MultiStatus<Sleep> with the description of error in each one of them', () => {
-                sinon
-                    .mock(modelFake)
-                    .expects('create')
-                    .withArgs(incorrectSleepArr)
-                    .chain('exec')
-                    .resolves(multiStatusIncorrect)
-
                 return sleepService.add(incorrectSleepArr)
                     .then((result: Sleep | MultiStatus<Sleep>) => {
                         result = result as MultiStatus<Sleep>
@@ -856,12 +673,6 @@ describe('Services: SleepService', () => {
                     _id: sleep.id,
                     child_id: sleep.child_id
                 }
-                sinon
-                    .mock(modelFake)
-                    .expects('findOne')
-                    .withArgs(query)
-                    .chain('exec')
-                    .resolves(sleep)
 
                 return sleepService.getByIdAndChild(sleep.id!, sleep.child_id, query)
                     .then(result => {
@@ -878,12 +689,6 @@ describe('Services: SleepService', () => {
                     _id: sleep.id,
                     child_id: sleep.child_id
                 }
-                sinon
-                    .mock(modelFake)
-                    .expects('findOne')
-                    .withArgs(query)
-                    .chain('exec')
-                    .resolves(undefined)
 
                 return sleepService.getByIdAndChild(sleep.id!, sleep.child_id, query)
                     .then(result => {
@@ -900,13 +705,6 @@ describe('Services: SleepService', () => {
                     _id: sleep.id,
                     child_id: sleep.child_id
                 }
-                sinon
-                    .mock(modelFake)
-                    .expects('findOne')
-                    .withArgs(query)
-                    .chain('exec')
-                    .rejects({ message: Strings.SLEEP.PARAM_ID_NOT_VALID_FORMAT,
-                               description: Strings.ERROR_MESSAGE.UUID_NOT_VALID_FORMAT_DESC })
 
                 try {
                     return sleepService.getByIdAndChild(sleep.id!, sleep.child_id, query)
@@ -925,13 +723,6 @@ describe('Services: SleepService', () => {
                     _id: sleep.id,
                     child_id: sleep.child_id
                 }
-                sinon
-                    .mock(modelFake)
-                    .expects('findOne')
-                    .withArgs(query)
-                    .chain('exec')
-                    .rejects({ message: Strings.CHILD.PARAM_ID_NOT_VALID_FORMAT,
-                               description: Strings.ERROR_MESSAGE.UUID_NOT_VALID_FORMAT_DESC })
 
                 try {
                     return sleepService.getByIdAndChild(sleep.id!, sleep.child_id, query)
@@ -954,12 +745,6 @@ describe('Services: SleepService', () => {
                 query.filters = {
                     child_id: sleep.child_id
                 }
-                sinon
-                    .mock(modelFake)
-                    .expects('find')
-                    .withArgs(query)
-                    .chain('exec')
-                    .resolves(sleepArr)
 
                 return sleepService.getAllByChild(sleep.child_id, query)
                     .then(result => {
@@ -975,12 +760,6 @@ describe('Services: SleepService', () => {
                 query.filters = {
                     child_id: sleep.child_id
                 }
-                sinon
-                    .mock(modelFake)
-                    .expects('find')
-                    .withArgs(query)
-                    .chain('exec')
-                    .resolves(new Array<SleepMock>())
 
                 return sleepService.getAllByChild(sleep.child_id, query)
                     .then(result => {
@@ -998,13 +777,6 @@ describe('Services: SleepService', () => {
                     _id: sleep.id,
                     child_id: sleep.child_id
                 }
-                sinon
-                    .mock(modelFake)
-                    .expects('find')
-                    .withArgs(query)
-                    .chain('exec')
-                    .rejects({ message: Strings.CHILD.PARAM_ID_NOT_VALID_FORMAT,
-                               description: Strings.ERROR_MESSAGE.UUID_NOT_VALID_FORMAT_DESC })
 
                 try {
                     return sleepService.getAllByChild(sleep.child_id, query)
@@ -1023,12 +795,6 @@ describe('Services: SleepService', () => {
         context('when sleep exists in the database', () => {
             it('should return the Sleep that was updated', () => {
                 otherSleep.id = '507f1f77bcf86cd799439012'            // Make mock return a sleep
-                sinon
-                    .mock(modelFake)
-                    .expects('findOneAndUpdate')
-                    .withArgs(otherSleep)
-                    .chain('exec')
-                    .resolves(otherSleep)
 
                 return sleepService.updateByChild(otherSleep)
                     .then(result => {
@@ -1047,12 +813,6 @@ describe('Services: SleepService', () => {
             it('should return undefined', () => {
                 sleep.id = '5a62be07de34500146d9c544'            // Make mock return undefined
                 sleep.child_id = '5a62be07de34500146d9c544'            // Make mock return undefined
-                sinon
-                    .mock(modelFake)
-                    .expects('findOneAndUpdate')
-                    .withArgs(sleep)
-                    .chain('exec')
-                    .resolves(undefined)
 
                 return sleepService.updateByChild(sleep)
                     .then(result => {
@@ -1065,12 +825,6 @@ describe('Services: SleepService', () => {
             it('should return the Sleep that was updated and save the event that will report the update', () => {
                 connectionRabbitmqPub.isConnected = false
                 otherSleep.id = '507f1f77bcf86cd799439012'            // Make mock return a sleep
-                sinon
-                    .mock(modelFake)
-                    .expects('findOneAndUpdate')
-                    .withArgs(otherSleep)
-                    .chain('exec')
-                    .resolves(otherSleep)
 
                 return sleepService.updateByChild(otherSleep)
                     .then(result => {
@@ -1089,13 +843,6 @@ describe('Services: SleepService', () => {
             it('should throw a ValidationException', () => {
                 connectionRabbitmqPub.isConnected = true
                 incorrectSleep.id = '5a62be07de34500146d9c5442'           // Make sleep id invalid
-                sinon
-                    .mock(modelFake)
-                    .expects('findOneAndUpdate')
-                    .withArgs(incorrectSleep)
-                    .chain('exec')
-                    .rejects({ message: Strings.SLEEP.PARAM_ID_NOT_VALID_FORMAT,
-                               description: Strings.ERROR_MESSAGE.UUID_NOT_VALID_FORMAT_DESC })
 
                 return sleepService.updateByChild(incorrectSleep)
                     .catch (err => {
@@ -1109,13 +856,6 @@ describe('Services: SleepService', () => {
             it('should throw a ValidationException', () => {
                 incorrectSleep.id = '5a62be07de34500146d9c544'           // Make sleep id valid
                 incorrectSleep.child_id = '5a62be07de34500146d9c5442'           // Make sleep child_id invalid
-                sinon
-                    .mock(modelFake)
-                    .expects('findOneAndUpdate')
-                    .withArgs(incorrectSleep)
-                    .chain('exec')
-                    .rejects({ message: Strings.CHILD.PARAM_ID_NOT_VALID_FORMAT,
-                               description: Strings.ERROR_MESSAGE.UUID_NOT_VALID_FORMAT_DESC })
 
                 return sleepService.updateByChild(incorrectSleep)
                     .catch (err => {
@@ -1129,13 +869,6 @@ describe('Services: SleepService', () => {
             it('should throw a ValidationException', () => {
                 incorrectSleep.child_id = '5a62be07de34500146d9c544'     // Make child_id valid again
                 incorrectSleep.duration = -11780000
-                sinon
-                    .mock(modelFake)
-                    .expects('findOneAndUpdate')
-                    .withArgs(incorrectSleep)
-                    .chain('exec')
-                    .rejects({ message: 'Duration field is invalid...',
-                               description: 'Sleep validation failed: The value provided has a negative value!' })
 
                 return sleepService.updateByChild(incorrectSleep)
                     .catch (err => {
@@ -1157,13 +890,6 @@ describe('Services: SleepService', () => {
                     child_id: new ObjectID()
                 }
                 incorrectSleep = new Sleep().fromJSON(sleepJSON)
-                sinon
-                    .mock(modelFake)
-                    .expects('findOneAndUpdate')
-                    .withArgs(incorrectSleep)
-                    .chain('exec')
-                    .rejects({ message: 'The type provided "classics" is not supported...',
-                               description: 'The allowed Sleep Pattern types are: classic, stages.' })
 
                 try {
                     return await sleepService.updateByChild(incorrectSleep)
@@ -1178,13 +904,6 @@ describe('Services: SleepService', () => {
             it('should throw a ValidationException', () => {
                 incorrectSleep = new SleepMock()
                 incorrectSleep.pattern = new SleepPattern()
-                sinon
-                    .mock(modelFake)
-                    .expects('findOneAndUpdate')
-                    .withArgs(incorrectSleep)
-                    .chain('exec')
-                    .rejects({ message: 'Pattern are not in a format that is supported...',
-                               description: 'Validation of the standard of sleep failed: data_set is required!' })
 
                 return sleepService.updateByChild(incorrectSleep)
                     .catch (err => {
@@ -1197,13 +916,6 @@ describe('Services: SleepService', () => {
         context('when the sleep is incorrect (the pattern has an empty data_set array)', () => {
             it('should throw a ValidationException', () => {
                 incorrectSleep.pattern!.data_set = new Array<SleepPatternDataSet>()
-                sinon
-                    .mock(modelFake)
-                    .expects('findOneAndUpdate')
-                    .withArgs(incorrectSleep)
-                    .chain('exec')
-                    .rejects({ message: 'Dataset are not in a format that is supported!',
-                               description: 'The data_set collection must not be empty!' })
 
                 return sleepService.updateByChild(incorrectSleep)
                     .catch (err => {
@@ -1218,14 +930,6 @@ describe('Services: SleepService', () => {
                 const dataSetItemTest: SleepPatternDataSet = new SleepPatternDataSet()
 
                 incorrectSleep.pattern!.data_set = [dataSetItemTest]
-                sinon
-                    .mock(modelFake)
-                    .expects('findOneAndUpdate')
-                    .withArgs(incorrectSleep)
-                    .chain('exec')
-                    .rejects({ message: 'Dataset are not in a format that is supported!',
-                               description: 'Validation of the sleep pattern dataset failed: ' +
-                                   'data_set start_time, data_set name, data_set duration is required!' })
 
                 return sleepService.updateByChild(incorrectSleep)
                     .catch (err => {
@@ -1243,14 +947,6 @@ describe('Services: SleepService', () => {
                 dataSetItemTest.name = incorrectSleep.pattern!.data_set[0].name
                 dataSetItemTest.duration = -(Math.floor(Math.random() * 5 + 1) * 60000)
                 incorrectSleep.pattern!.data_set = [dataSetItemTest]
-                sinon
-                    .mock(modelFake)
-                    .expects('findOneAndUpdate')
-                    .withArgs(incorrectSleep)
-                    .chain('exec')
-                    .rejects({ message: 'Some (or several) duration field of sleep pattern is invalid...',
-                               description: 'Sleep Pattern dataset validation failed: The value provided ' +
-                                   'has a negative value!' })
 
                 return sleepService.updateByChild(incorrectSleep)
                     .catch (err => {
@@ -1269,13 +965,6 @@ describe('Services: SleepService', () => {
                     duration : Math.floor(Math.random() * 5 + 1) * 60000 // 1-5min
                 }
                 incorrectSleep.pattern!.data_set = [new SleepPatternDataSet().fromJSON(dataSetItemJSON)]
-                sinon
-                    .mock(modelFake)
-                    .expects('findOneAndUpdate')
-                    .withArgs(incorrectSleep)
-                    .chain('exec')
-                    .rejects({ message: 'The sleep pattern name provided "restlesss" is not supported...',
-                               description: 'The names of the allowed patterns are: asleep, restless, awake.' })
 
                 return sleepService.updateByChild(incorrectSleep)
                     .catch (err => {
@@ -1308,13 +997,6 @@ describe('Services: SleepService', () => {
                 }
                 incorrectSleep.pattern!.data_set = new Array<SleepPatternDataSet>()
                 incorrectSleep.pattern!.data_set[0] = new SleepPatternDataSet().fromJSON(dataSetItemJSON)
-                sinon
-                    .mock(modelFake)
-                    .expects('findOneAndUpdate')
-                    .withArgs(incorrectSleep)
-                    .chain('exec')
-                    .rejects({ message: 'The sleep pattern name provided "deeps" is not supported...',
-                               description: 'The names of the allowed patterns are: deep, light, rem, wake.' })
 
                 return sleepService.updateByChild(incorrectSleep)
                     .catch (err => {
@@ -1333,12 +1015,6 @@ describe('Services: SleepService', () => {
             it('should return true', () => {
                 sleep.id = '507f1f77bcf86cd799439011'            // Make mock return true
                 sleep.child_id = '5a62be07de34500146d9c544'     // Make child_id valid again
-                sinon
-                    .mock(modelFake)
-                    .expects('findOneAndDelete')
-                    .withArgs({ child_id: sleep.child_id, _id: sleep.id })
-                    .chain('exec')
-                    .resolves(true)
 
                 return sleepService.removeByChild(sleep.id!, sleep.child_id)
                     .then(result => {
@@ -1350,12 +1026,6 @@ describe('Services: SleepService', () => {
         context('when there is no sleep with the received parameters', () => {
             it('should return false', () => {
                 sleep.id = '5a62be07de34500146d9c544'            // Make mock return false
-                sinon
-                    .mock(modelFake)
-                    .expects('findOneAndDelete')
-                    .withArgs({ child_id: sleep.child_id, _id: sleep.id })
-                    .chain('exec')
-                    .resolves(false)
 
                 return sleepService.removeByChild(sleep.id!, sleep.child_id)
                     .then(result => {
@@ -1369,12 +1039,6 @@ describe('Services: SleepService', () => {
                 connectionRabbitmqPub.isConnected = false
                 sleep.id = '507f1f77bcf86cd799439011'            // Make mock return true
                 sleep.child_id = '5a62be07de34500146d9c544'     // Make child_id valid again
-                sinon
-                    .mock(modelFake)
-                    .expects('findOneAndDelete')
-                    .withArgs({ child_id: sleep.child_id, _id: sleep.id })
-                    .chain('exec')
-                    .resolves(true)
 
                 return sleepService.removeByChild(sleep.id!, sleep.child_id)
                     .then(result => {
@@ -1387,13 +1051,6 @@ describe('Services: SleepService', () => {
             it('should throw a ValidationException', () => {
                 connectionRabbitmqPub.isConnected = true
                 incorrectSleep.child_id = '5a62be07de34500146d9c5442'     // Make child_id invalid
-                sinon
-                    .mock(modelFake)
-                    .expects('findOneAndDelete')
-                    .withArgs({ child_id: incorrectSleep.child_id, _id: incorrectSleep.id })
-                    .chain('exec')
-                    .rejects({ message: Strings.CHILD.PARAM_ID_NOT_VALID_FORMAT,
-                               description: Strings.ERROR_MESSAGE.UUID_NOT_VALID_FORMAT_DESC })
 
                 return sleepService.removeByChild(incorrectSleep.id!, incorrectSleep.child_id)
                     .catch (err => {
@@ -1407,13 +1064,6 @@ describe('Services: SleepService', () => {
             it('should throw a ValidationException', () => {
                 incorrectSleep = new SleepMock()
                 incorrectSleep.id = '5a62be07de34500146d9c5442'       // Make sleep id invalid
-                sinon
-                    .mock(modelFake)
-                    .expects('findOneAndDelete')
-                    .withArgs({ child_id: incorrectSleep.child_id, _id: incorrectSleep.id })
-                    .chain('exec')
-                    .rejects({ message: Strings.SLEEP.PARAM_ID_NOT_VALID_FORMAT,
-                               description: Strings.ERROR_MESSAGE.UUID_NOT_VALID_FORMAT_DESC })
 
                 return sleepService.removeByChild(incorrectSleep.id!, incorrectSleep.child_id)
                     .catch (err => {

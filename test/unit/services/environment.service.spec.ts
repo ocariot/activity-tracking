@@ -1,11 +1,9 @@
 import HttpStatus from 'http-status-codes'
-import sinon from 'sinon'
 import { assert } from 'chai'
 import { EnvironmentMock } from '../../mocks/environment.mock'
 import { EnvironmentService } from '../../../src/application/service/environment.service'
 import { CustomLoggerMock } from '../../mocks/custom.logger.mock'
 import { EventBusRabbitmqMock } from '../../mocks/event.bus.rabbitmq.mock'
-import { EnvironmentRepoModel } from '../../../src/infrastructure/database/schema/environment.schema'
 import { IEnvironmentRepository } from '../../../src/application/port/environment.repository.interface'
 import { IIntegrationEventRepository } from '../../../src/application/port/integration.event.repository.interface'
 import { IConnectionEventBus } from '../../../src/infrastructure/port/connection.event.bus.interface'
@@ -21,10 +19,7 @@ import { Environment } from '../../../src/application/domain/model/environment'
 import { IEventBus } from '../../../src/infrastructure/port/event.bus.interface'
 import { ILogger } from '../../../src/utils/custom.logger'
 import { MultiStatus } from '../../../src/application/domain/model/multi.status'
-import { MultiStatusMock } from '../../mocks/multi.status.mock'
 import { Measurement } from '../../../src/application/domain/model/measurement'
-
-require('sinon-mongoose')
 
 describe('Services: Environment', () => {
     // Environment Mock
@@ -59,7 +54,6 @@ describe('Services: Environment', () => {
     const incorrectEnv4: Environment = new EnvironmentMock()   // Measurement invalid (empty array)
     incorrectEnv4.measurements = new Array<Measurement>()
 
-
     const incorrectEnv5: Environment = new EnvironmentMock()   // Measurement invalid (missing fields)
     incorrectEnv5.measurements![2] = new Measurement()
 
@@ -76,16 +70,6 @@ describe('Services: Environment', () => {
     incorrectEnvironmentsArr.push(incorrectEnv4)
     incorrectEnvironmentsArr.push(incorrectEnv5)
 
-    /**
-     * Mock MultiStatus responses
-     */
-    // MultiStatus totally correct
-    const multiStatusCorrect: MultiStatus<Environment> = new MultiStatusMock<Environment>(correctEnvironmentsArr)
-    const multiStatusMixed: MultiStatus<Environment> = new MultiStatusMock<Environment>(mixedEnvironmentsArr)    // Mixed MultiStatus
-    // MultiStatus totally incorrect
-    const multiStatusIncorrect: MultiStatus<Environment> = new MultiStatusMock<Environment>(incorrectEnvironmentsArr)
-
-    const modelFake: any = EnvironmentRepoModel
     const environmentRepo: IEnvironmentRepository = new EnvironmentRepositoryMock()
     const integrationRepo: IIntegrationEventRepository = new IntegrationEventRepositoryMock()
 
@@ -107,10 +91,6 @@ describe('Services: Environment', () => {
         }
     })
 
-    afterEach(() => {
-        sinon.restore()
-    })
-
     /**
      * Method "add(environment: Environment | Array<Environment>)" with Environment argument
      */
@@ -118,13 +98,6 @@ describe('Services: Environment', () => {
         context('when the Environment is correct, it still does not exist in the repository and there is a connection ' +
             'to the RabbitMQ', () => {
             it('should return the Environment that was added', () => {
-                sinon
-                    .mock(modelFake)
-                    .expects('create')
-                    .withArgs(environment)
-                    .chain('exec')
-                    .resolves(environment)
-
                 return environmentService.add(environment)
                     .then((result: Environment | MultiStatus<Environment>) => {
                         result = result as Environment
@@ -142,12 +115,6 @@ describe('Services: Environment', () => {
             'to the RabbitMQ', () => {
             it('should return the Environment that was saved', () => {
                 connectionRabbitmqPub.isConnected = false
-                sinon
-                    .mock(modelFake)
-                    .expects('create')
-                    .withArgs(environment)
-                    .chain('exec')
-                    .resolves(environment)
 
                 return environmentService.add(environment)
                     .then((result: Environment | MultiStatus<Environment>) => {
@@ -166,12 +133,6 @@ describe('Services: Environment', () => {
             'to the RabbitMQ but the event could not be saved', () => {
             it('should return the environment because the current implementation does not throw an exception, it just prints a log', () => {
                 environment.id = '507f1f77bcf86cd799439012'         // Make mock throw an error in IntegrationEventRepository
-                sinon
-                    .mock(modelFake)
-                    .expects('create')
-                    .withArgs(environment)
-                    .chain('exec')
-                    .resolves(environment)
 
                 return environmentService.add(environment)
                     .then((result: Environment | MultiStatus<Environment>) => {
@@ -190,12 +151,6 @@ describe('Services: Environment', () => {
             it('should throw a ConflictException', () => {
                 connectionRabbitmqPub.isConnected = true
                 environment.id = '507f1f77bcf86cd799439011'         // Make mock return true
-                sinon
-                    .mock(modelFake)
-                    .expects('create')
-                    .withArgs(environment)
-                    .chain('exec')
-                    .rejects({ message: 'Measurement of environment is already registered...' })
 
                 return environmentService.add(environment)
                     .catch(err => {
@@ -206,15 +161,6 @@ describe('Services: Environment', () => {
 
         context('when the Environment is incorrect (missing fields)', () => {
             it('should throw a ValidationException', () => {
-                sinon
-                    .mock(modelFake)
-                    .expects('create')
-                    .withArgs(incorrectEnvironment)
-                    .chain('exec')
-                    .rejects({ message: 'Required fields were not provided...',
-                               description: 'Validation of environment failed: timestamp, institution_id, location, ' +
-                                   'measurements required!' })
-
                 return environmentService.add(incorrectEnvironment)
                     .catch(err => {
                         assert.propertyVal(err, 'message', 'Required fields were not provided...')
@@ -228,13 +174,6 @@ describe('Services: Environment', () => {
             it('should throw a ValidationException', () => {
                 incorrectEnvironment = new EnvironmentMock()
                 incorrectEnvironment.institution_id = '507f1f77bcf86cd7994390112'
-                sinon
-                    .mock(modelFake)
-                    .expects('create')
-                    .withArgs(incorrectEnvironment)
-                    .chain('exec')
-                    .rejects({ message: Strings.ERROR_MESSAGE.UUID_NOT_VALID_FORMAT,
-                               description: Strings.ERROR_MESSAGE.UUID_NOT_VALID_FORMAT_DESC })
 
                 return environmentService.add(incorrectEnvironment)
                     .catch(err => {
@@ -249,13 +188,6 @@ describe('Services: Environment', () => {
                 incorrectEnvironment.institution_id = '507f1f77bcf86cd799439011'
                 incorrectEnvironment.location!.local = ''
                 incorrectEnvironment.location!.room = ''
-                sinon
-                    .mock(modelFake)
-                    .expects('create')
-                    .withArgs(incorrectEnvironment)
-                    .chain('exec')
-                    .rejects({ message: 'Location are not in a format that is supported...',
-                               description: 'Validation of location failed: location local, location room is required!' })
 
                 return environmentService.add(incorrectEnvironment)
                     .catch(err => {
@@ -270,13 +202,6 @@ describe('Services: Environment', () => {
                 incorrectEnvironment.location!.local = 'Indoor'
                 incorrectEnvironment.location!.room = 'Room 01'
                 incorrectEnvironment.measurements = new Array<Measurement>()
-                sinon
-                    .mock(modelFake)
-                    .expects('create')
-                    .withArgs(incorrectEnvironment)
-                    .chain('exec')
-                    .rejects({ message: 'Measurement are not in a format that is supported!',
-                               description: 'The measurements collection must not be empty!' })
 
                 return environmentService.add(incorrectEnvironment)
                     .catch(err => {
@@ -290,13 +215,6 @@ describe('Services: Environment', () => {
             it('should throw a ValidationException', () => {
                 incorrectEnvironment.measurements = environment.measurements
                 incorrectEnvironment.measurements![1].type = 'temperatures'
-                sinon
-                    .mock(modelFake)
-                    .expects('create')
-                    .withArgs(incorrectEnvironment)
-                    .chain('exec')
-                    .rejects({ message: 'The type of measurement provided "temperatures" is not supported...',
-                        description: 'The types allowed are: temperature, humidity.' })
 
                 return environmentService.add(incorrectEnvironment)
                     .catch(err => {
@@ -311,14 +229,6 @@ describe('Services: Environment', () => {
         context('when the Environment is incorrect (the measurements array has an item with empty fields)', () => {
             it('should throw a ValidationException', () => {
                 incorrectEnvironment.measurements![1] = new Measurement()
-                sinon
-                    .mock(modelFake)
-                    .expects('create')
-                    .withArgs(incorrectEnvironment)
-                    .chain('exec')
-                    .rejects({ message: 'Measurement are not in a format that is supported!',
-                        description: 'Validation of measurements failed: measurement type, measurement value, ' +
-                            'measurement unit is required!' })
 
                 return environmentService.add(incorrectEnvironment)
                     .catch(err => {
@@ -338,13 +248,6 @@ describe('Services: Environment', () => {
             'a connection to the RabbitMQ', () => {
             it('should create each environment and return a response of type MultiStatus<Environment> with the description of success' +
                 ' in sending each one of them', () => {
-                sinon
-                    .mock(modelFake)
-                    .expects('create')
-                    .withArgs(correctEnvironmentsArr)
-                    .chain('exec')
-                    .resolves(multiStatusCorrect)
-
                 return environmentService.add(correctEnvironmentsArr)
                     .then((result: Environment | MultiStatus<Environment>) => {
                         result = result as MultiStatus<Environment>
@@ -370,12 +273,6 @@ describe('Services: Environment', () => {
             it('should save each environment for submission attempt later to the bus and return a response of type ' +
                 'MultiStatus<Environment> with the description of success in each one of them', () => {
                 connectionRabbitmqPub.isConnected = false
-                sinon
-                    .mock(modelFake)
-                    .expects('create')
-                    .withArgs(correctEnvironmentsArr)
-                    .chain('exec')
-                    .resolves(multiStatusCorrect)
 
                 return environmentService.add(correctEnvironmentsArr)
                     .then((result: Environment | MultiStatus<Environment>) => {
@@ -404,12 +301,6 @@ describe('Services: Environment', () => {
                 correctEnvironmentsArr.forEach(elem => {
                     elem.id = '507f1f77bcf86cd799439012'                // Make mock throw an error in IntegrationEventRepository
                 })
-                sinon
-                    .mock(modelFake)
-                    .expects('create')
-                    .withArgs(correctEnvironmentsArr)
-                    .chain('exec')
-                    .resolves(multiStatusCorrect)
 
                 return environmentService.add(correctEnvironmentsArr)
                     .then((result: Environment | MultiStatus<Environment>) => {
@@ -439,13 +330,6 @@ describe('Services: Environment', () => {
                     elem.id = '507f1f77bcf86cd799439011'
                 })
 
-                sinon
-                    .mock(modelFake)
-                    .expects('create')
-                    .withArgs(correctEnvironmentsArr)
-                    .chain('exec')
-                    .resolves(multiStatusIncorrect)
-
                 return environmentService.add(correctEnvironmentsArr)
                     .then((result: Environment | MultiStatus<Environment>) => {
                         result = result as MultiStatus<Environment>
@@ -470,12 +354,6 @@ describe('Services: Environment', () => {
         context('when there are correct and incorrect Enviroments in the array and there is a connection to the RabbitMQ', () => {
             it('should create each correct Environment and return a response of type MultiStatus<Environment> with the ' +
                 'description of success and error in each one of them', () => {
-                sinon
-                    .mock(modelFake)
-                    .expects('create')
-                    .withArgs(mixedEnvironmentsArr)
-                    .chain('exec')
-                    .resolves(multiStatusMixed)
 
                 return environmentService.add(mixedEnvironmentsArr)
                     .then((result: Environment | MultiStatus<Environment>) => {
@@ -500,13 +378,6 @@ describe('Services: Environment', () => {
 
         context('when all the Environments of the array are incorrect', () => {
             it('should return a response of type MultiStatus<Environment> with the description of error in each one of them', () => {
-                sinon
-                    .mock(modelFake)
-                    .expects('create')
-                    .withArgs(incorrectEnvironmentsArr)
-                    .chain('exec')
-                    .resolves(multiStatusIncorrect)
-
                 return environmentService.add(incorrectEnvironmentsArr)
                     .then((result: Environment | MultiStatus<Environment>) => {
                         result = result as MultiStatus<Environment>
@@ -564,13 +435,6 @@ describe('Services: Environment', () => {
                     'location.longitude': environment.location ? environment.location.longitude : undefined
                 }
 
-                sinon
-                    .mock(modelFake)
-                    .expects('find')
-                    .withArgs(query)
-                    .chain('exec')
-                    .resolves(environmentsArrGet)
-
                 return environmentService.getAll(query)
                     .then(result => {
                         assert.isArray(result)
@@ -591,13 +455,6 @@ describe('Services: Environment', () => {
                     'location.longitude': environment.location ? environment.location.longitude : undefined
                 }
 
-                sinon
-                    .mock(modelFake)
-                    .expects('find')
-                    .withArgs(query)
-                    .chain('exec')
-                    .resolves(new Array<EnvironmentMock>())
-
                 return environmentService.getAll(query)
                     .then(result => {
                         assert.isArray(result)
@@ -614,12 +471,6 @@ describe('Services: Environment', () => {
         context('when there is an environment with the id used as parameter', () => {
             it('should return true', () => {
                 environment.id = '507f1f77bcf86cd799439011'
-                sinon
-                    .mock(modelFake)
-                    .expects('findOneAndDelete')
-                    .withArgs(environment.id)
-                    .chain('exec')
-                    .resolves(true)
 
                 return environmentService.remove(environment.id!)
                     .then(result => {
@@ -631,12 +482,6 @@ describe('Services: Environment', () => {
         context('when there is no environment with the id used as parameter', () => {
             it('should return false', () => {
                 environment.id = '5c6dd16ea1a67d0034e6108b'
-                sinon
-                    .mock(modelFake)
-                    .expects('findOneAndDelete')
-                    .withArgs(environment.id)
-                    .chain('exec')
-                    .resolves(false)
 
                 return environmentService.remove(environment.id!)
                     .then(result => {
@@ -649,12 +494,6 @@ describe('Services: Environment', () => {
             it('should return true and save the event that will report the removal of the resource', () => {
                 connectionRabbitmqPub.isConnected = false
                 environment.id = '507f1f77bcf86cd799439011'
-                sinon
-                    .mock(modelFake)
-                    .expects('findOneAndDelete')
-                    .withArgs(environment.id)
-                    .chain('exec')
-                    .resolves(true)
 
                 return environmentService.remove(environment.id!)
                     .then(result => {
@@ -667,13 +506,6 @@ describe('Services: Environment', () => {
             it('should throw a ValidationException', () => {
                 connectionRabbitmqPub.isConnected = true
                 environment.id = '5c6dd16ea1a67d0034e6108b2'
-                sinon
-                    .mock(modelFake)
-                    .expects('findOneAndDelete')
-                    .withArgs(environment.id)
-                    .chain('exec')
-                    .rejects({ message: Strings.ENVIRONMENT.PARAM_ID_NOT_VALID_FORMAT,
-                               description: Strings.ERROR_MESSAGE.UUID_NOT_VALID_FORMAT_DESC })
 
                 return environmentService.remove(environment.id!)
                     .catch (err => {
