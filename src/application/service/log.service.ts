@@ -15,6 +15,7 @@ import { StatusError } from '../domain/model/status.error'
 import { ValidationException } from '../domain/exception/validation.exception'
 import { ObjectIdValidator } from '../domain/validator/object.id.validator'
 import { LogTypeValidator } from '../domain/validator/log.type.validator'
+import { LogDateRangeValidator } from '../domain/validator/log.date.range.validator'
 
 /**
  * Implementing log service
@@ -120,6 +121,7 @@ export class LogService implements ILogService {
         ObjectIdValidator.validate(childId, Strings.CHILD.PARAM_ID_NOT_VALID_FORMAT)
         DateValidator.validate(dateStart)
         DateValidator.validate(dateEnd)
+        LogDateRangeValidator.validate(dateStart, dateEnd)
 
         query.addFilter({
             child_id: childId,
@@ -128,6 +130,7 @@ export class LogService implements ILogService {
                 { date: { $gte: dateStart.toString().concat('T00:00:00') } }
             ]
         })
+        query.pagination.limit = Number.MAX_SAFE_INTEGER
 
         try {
             // Creates a ChildLog object with all the resources listed with arrays.
@@ -177,6 +180,7 @@ export class LogService implements ILogService {
         LogTypeValidator.validate(desiredResource)
         DateValidator.validate(dateStart)
         DateValidator.validate(dateEnd)
+        LogDateRangeValidator.validate(dateStart, dateEnd)
 
         query.addFilter({
             child_id: childId,

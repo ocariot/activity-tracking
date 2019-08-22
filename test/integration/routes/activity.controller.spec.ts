@@ -60,7 +60,7 @@ describe('Routes: children.physicalactivities', () => {
     /**
      * Mock objects for POST route with multiple activities
      */
-    // Mock through JSON
+        // Mock through JSON
     const incorrectActivityJSON: any = {
             id: new ObjectID(),
             start_time: new Date('2018-12-14T12:52:59Z').toISOString(),
@@ -2562,143 +2562,143 @@ describe('Routes: children.physicalactivities', () => {
             it('should return status code 201, perform the operations of creating and updating normally for the correct logs ' +
                 'and returning a response of type MultiStatus<Log> with the description of success and error cases of each log',
                 async () => {
-                const body: any = []
+                    const body: any = []
 
-                mixedLogsArr.forEach(log => {
-                    const bodyElem = {
-                        date: log.date,
-                        value: log.value,
-                    }
-                    body.push(bodyElem)
-                })
-
-                return request
-                    .post(`/v1/children/${defaultActivity.child_id}/logs/${LogType.STEPS}`)
-                    .send(body)
-                    .set('Content-Type', 'application/json')
-                    .expect(201)
-                    .then(res => {
-                        for (let i = 0; i < res.body.success.length; i++) {
-                            expect(res.body.success[i].code).to.eql(HttpStatus.CREATED)
-                            expect(res.body.success[i].item.date).to.eql(mixedLogsArr[i].date)
-                            expect(res.body.success[i].item.value).to.eql(mixedLogsArr[i].value)
+                    mixedLogsArr.forEach(log => {
+                        const bodyElem = {
+                            date: log.date,
+                            value: log.value,
                         }
-
-                        expect(res.body.error[0].message).to.eql('Date parameter: 20199-03-08, is not in valid ISO 8601 format.')
-                        expect(res.body.error[0].description).to.eql('Date must be in the format: yyyy-MM-dd')
-                        expect(res.body.error[1].message).to.eql('Value field is invalid...')
-                        expect(res.body.error[1].description).to.eql('Child log validation failed: The value ' +
-                            'provided has a negative value!')
-
-                        for (let i = 0; i < res.body.error.length; i++) {
-                            expect(res.body.error[i].code).to.eql(HttpStatus.BAD_REQUEST)
-                            expect(res.body.error[i].item.date).to.eql(mixedLogsArr[i + 3].date)
-                            expect(res.body.error[i].item.value).to.eql(mixedLogsArr[i + 3].value)
-                        }
+                        body.push(bodyElem)
                     })
-            })
+
+                    return request
+                        .post(`/v1/children/${defaultActivity.child_id}/logs/${LogType.STEPS}`)
+                        .send(body)
+                        .set('Content-Type', 'application/json')
+                        .expect(201)
+                        .then(res => {
+                            for (let i = 0; i < res.body.success.length; i++) {
+                                expect(res.body.success[i].code).to.eql(HttpStatus.CREATED)
+                                expect(res.body.success[i].item.date).to.eql(mixedLogsArr[i].date)
+                                expect(res.body.success[i].item.value).to.eql(mixedLogsArr[i].value)
+                            }
+
+                            expect(res.body.error[0].message).to.eql('Date parameter: 20199-03-08, is not in valid ISO 8601 format.')
+                            expect(res.body.error[0].description).to.eql('Date must be in the format: yyyy-MM-dd')
+                            expect(res.body.error[1].message).to.eql('Value field is invalid...')
+                            expect(res.body.error[1].description).to.eql('Child log validation failed: The value ' +
+                                'provided has a negative value!')
+
+                            for (let i = 0; i < res.body.error.length; i++) {
+                                expect(res.body.error[i].code).to.eql(HttpStatus.BAD_REQUEST)
+                                expect(res.body.error[i].item.date).to.eql(mixedLogsArr[i + 3].date)
+                                expect(res.body.error[i].item.value).to.eql(mixedLogsArr[i + 3].value)
+                            }
+                        })
+                })
         })
 
         context('when some of the logs in the body are incorrect (the child_id is invalid)', () => {
             it('should return status code 201, perform the operations of creating and updating normally for the correct logs ' +
                 'and returning a response of type MultiStatus<Log> with the description of success and error cases of each log',
                 async () => {
-                const body: any = []
+                    const body: any = []
 
-                correctLogsArr.forEach(log => {
-                    const bodyElem = {
-                        date: log.date,
-                        value: log.value,
-                    }
-                    body.push(bodyElem)
-                })
-
-                return request
-                    .post(`/v1/children/123/logs/${LogType.STEPS}`)
-                    .send(body)
-                    .set('Content-Type', 'application/json')
-                    .expect(201)
-                    .then(res => {
-                        expect(res.body.success.length).to.eql(0)
-                        for (let i = 0; i < res.body.error.length; i++) {
-                            expect(res.body.error[i].code).to.eql(HttpStatus.BAD_REQUEST)
-                            expect(res.body.error[i].message).to.eql(Strings.CHILD.PARAM_ID_NOT_VALID_FORMAT)
-                            expect(res.body.error[i].description).to.eql(Strings.ERROR_MESSAGE.UUID_NOT_VALID_FORMAT_DESC)
-                            expect(res.body.error[i].item.date).to.eql(correctLogsArr[i].date)
-                            expect(res.body.error[i].item.value).to.eql(correctLogsArr[i].value)
+                    correctLogsArr.forEach(log => {
+                        const bodyElem = {
+                            date: log.date,
+                            value: log.value,
                         }
+                        body.push(bodyElem)
                     })
-            })
+
+                    return request
+                        .post(`/v1/children/123/logs/${LogType.STEPS}`)
+                        .send(body)
+                        .set('Content-Type', 'application/json')
+                        .expect(201)
+                        .then(res => {
+                            expect(res.body.success.length).to.eql(0)
+                            for (let i = 0; i < res.body.error.length; i++) {
+                                expect(res.body.error[i].code).to.eql(HttpStatus.BAD_REQUEST)
+                                expect(res.body.error[i].message).to.eql(Strings.CHILD.PARAM_ID_NOT_VALID_FORMAT)
+                                expect(res.body.error[i].description).to.eql(Strings.ERROR_MESSAGE.UUID_NOT_VALID_FORMAT_DESC)
+                                expect(res.body.error[i].item.date).to.eql(correctLogsArr[i].date)
+                                expect(res.body.error[i].item.value).to.eql(correctLogsArr[i].value)
+                            }
+                        })
+                })
         })
 
         context('when some of the logs in the body are incorrect (the type is invalid)', () => {
             it('should return status code 201, perform the operations of creating and updating normally for the correct logs ' +
                 'and returning a response of type MultiStatus<Log> with the description of success and error cases of each log',
                 async () => {
-                const body: any = []
+                    const body: any = []
 
-                correctLogsArr.forEach(log => {
-                    const bodyElem = {
-                        date: log.date,
-                        value: log.value,
-                    }
-                    body.push(bodyElem)
-                })
-
-                return request
-                    .post(`/v1/children/${defaultActivity.child_id}/logs/step`)
-                    .send(body)
-                    .set('Content-Type', 'application/json')
-                    .expect(201)
-                    .then(res => {
-                        expect(res.body.success.length).to.eql(0)
-                        for (let i = 0; i < res.body.error.length; i++) {
-                            expect(res.body.error[i].code).to.eql(HttpStatus.BAD_REQUEST)
-                            expect(res.body.error[i].message)
-                                .to.eql('The name of type provided "step" is not supported...')
-                            expect(res.body.error[i].description)
-                                .to.eql('The names of the allowed types are: ' +
-                                'steps, calories, active_minutes, lightly_active_minutes, sedentary_minutes.')
-                            expect(res.body.error[i].item.date).to.eql(correctLogsArr[i].date)
-                            expect(res.body.error[i].item.value).to.eql(correctLogsArr[i].value)
+                    correctLogsArr.forEach(log => {
+                        const bodyElem = {
+                            date: log.date,
+                            value: log.value,
                         }
+                        body.push(bodyElem)
                     })
-            })
+
+                    return request
+                        .post(`/v1/children/${defaultActivity.child_id}/logs/step`)
+                        .send(body)
+                        .set('Content-Type', 'application/json')
+                        .expect(201)
+                        .then(res => {
+                            expect(res.body.success.length).to.eql(0)
+                            for (let i = 0; i < res.body.error.length; i++) {
+                                expect(res.body.error[i].code).to.eql(HttpStatus.BAD_REQUEST)
+                                expect(res.body.error[i].message)
+                                    .to.eql('The name of type provided "step" is not supported...')
+                                expect(res.body.error[i].description)
+                                    .to.eql('The names of the allowed types are: ' +
+                                    'steps, calories, active_minutes, lightly_active_minutes, sedentary_minutes.')
+                                expect(res.body.error[i].item.date).to.eql(correctLogsArr[i].date)
+                                expect(res.body.error[i].item.value).to.eql(correctLogsArr[i].value)
+                            }
+                        })
+                })
         })
 
         context('when some of the logs in the array are incorrect (missing fields)', () => {
             it('should return status code 201, perform the operations of creating and updating normally for the correct logs ' +
                 'and returning a response of type MultiStatus<Log> with the description of success and error cases of each log',
                 async () => {
-                const emptyLog: Log = new Log()
-                correctLogsArr.push(emptyLog)
+                    const emptyLog: Log = new Log()
+                    correctLogsArr.push(emptyLog)
 
-                const body: any = []
+                    const body: any = []
 
-                correctLogsArr.forEach(log => {
-                    const bodyElem = {
-                        date: log.date,
-                        value: log.value,
-                    }
-                    body.push(bodyElem)
-                })
-
-                return request
-                    .post(`/v1/children/${defaultActivity.child_id}/logs/${LogType.CALORIES}`)
-                    .send(body)
-                    .set('Content-Type', 'application/json')
-                    .expect(201)
-                    .then(res => {
-                        for (let i = 0; i < res.body.success.length; i++) {
-                            expect(res.body.success[i].code).to.eql(HttpStatus.CREATED)
-                            expect(res.body.success[i].item.date).to.eql(correctLogsArr[i].date)
-                            expect(res.body.success[i].item.value).to.eql(correctLogsArr[i].value)
+                    correctLogsArr.forEach(log => {
+                        const bodyElem = {
+                            date: log.date,
+                            value: log.value,
                         }
-                        expect(res.body.error[0].code).to.eql(HttpStatus.BAD_REQUEST)
-                        expect(res.body.error[0].message).to.eql('Required fields were not provided...')
-                        expect(res.body.error[0].description).to.eql('Child log validation failed: date, value is required!')
+                        body.push(bodyElem)
                     })
-            })
+
+                    return request
+                        .post(`/v1/children/${defaultActivity.child_id}/logs/${LogType.CALORIES}`)
+                        .send(body)
+                        .set('Content-Type', 'application/json')
+                        .expect(201)
+                        .then(res => {
+                            for (let i = 0; i < res.body.success.length; i++) {
+                                expect(res.body.success[i].code).to.eql(HttpStatus.CREATED)
+                                expect(res.body.success[i].item.date).to.eql(correctLogsArr[i].date)
+                                expect(res.body.success[i].item.value).to.eql(correctLogsArr[i].value)
+                            }
+                            expect(res.body.error[0].code).to.eql(HttpStatus.BAD_REQUEST)
+                            expect(res.body.error[0].message).to.eql('Required fields were not provided...')
+                            expect(res.body.error[0].description).to.eql('Child log validation failed: date, value is required!')
+                        })
+                })
         })
     })
     /**
@@ -2814,7 +2814,7 @@ describe('Routes: children.physicalactivities', () => {
         })
 
         context('when there is an attempt to get all logs in a time interval using the "query-strings-parser" library but there ' +
-                'are no corresponding logs with the query in the database', () => {
+            'are no corresponding logs with the query in the database', () => {
             it('should return status code 200 and an empty ChildLog', async () => {
                 const basePath = `/v1/children/${defaultActivity.child_id}/logs`
                 const specificPath = `/date/2005-10-01/2005-10-10`
@@ -2833,7 +2833,7 @@ describe('Routes: children.physicalactivities', () => {
         })
 
         context('when there is an attempt to get all logs in a time interval using the "query-strings-parser" library ' +
-                'but the parameters are incorrect (child_id is invalid)', () => {
+            'but the parameters are incorrect (child_id is invalid)', () => {
             it('should return status code 400 and an info message about the invalid child_id', async () => {
                 const basePath = `/v1/children/123/logs`
                 const specificPath = `/date/${correctLogsArr[0].date}/${correctLogsArr[0].date}`
@@ -2853,7 +2853,7 @@ describe('Routes: children.physicalactivities', () => {
         })
 
         context('when there is an attempt to get all logs in a time interval using the "query-strings-parser" library ' +
-                'but the parameters are incorrect (date_start is invalid)', () => {
+            'but the parameters are incorrect (date_start is invalid)', () => {
             it('should return status code 400 and an info message about the invalid date_start', async () => {
                 const basePath = `/v1/children/${defaultActivity.child_id}/logs`
                 const specificPath = `/date/20199-10-01/${correctLogsArr[0].date}`
@@ -2873,7 +2873,7 @@ describe('Routes: children.physicalactivities', () => {
         })
 
         context('when there is an attempt to get all logs in a time interval using the "query-strings-parser" library ' +
-                'but the parameters are incorrect (date_end is invalid)', () => {
+            'but the parameters are incorrect (date_end is invalid)', () => {
             it('should return status code 400 and an info message about the invalid date_end', async () => {
                 const basePath = `/v1/children/${defaultActivity.child_id}/logs`
                 const specificPath = `/date/${correctLogsArr[0].date}/20199-10-01`
@@ -3024,7 +3024,7 @@ describe('Routes: children.physicalactivities', () => {
         })
 
         context('when there is an attempt to get all logs in a time interval using the "query-strings-parser" library but there ' +
-                'is no corresponding logs with the query in the database', () => {
+            'is no corresponding logs with the query in the database', () => {
             before(() => {
                 try {
                     deleteAllLogs()
@@ -3050,7 +3050,7 @@ describe('Routes: children.physicalactivities', () => {
         })
 
         context('when there is an attempt to get all logs in a time interval using the "query-strings-parser" library ' +
-                'but the parameters are incorrect (child_id is invalid)', () => {
+            'but the parameters are incorrect (child_id is invalid)', () => {
             before(() => {
                 try {
                     deleteAllLogs()
@@ -3078,7 +3078,7 @@ describe('Routes: children.physicalactivities', () => {
         })
 
         context('when there is an attempt to get all logs in a time interval using the "query-strings-parser" library ' +
-                'but the parameters are incorrect (resource is invalid)', () => {
+            'but the parameters are incorrect (resource is invalid)', () => {
             before(() => {
                 try {
                     deleteAllLogs()
@@ -3108,7 +3108,7 @@ describe('Routes: children.physicalactivities', () => {
         })
 
         context('when there is an attempt to get all logs in a time interval using the "query-strings-parser" library ' +
-                'but the parameters are incorrect (date_start is invalid)', () => {
+            'but the parameters are incorrect (date_start is invalid)', () => {
             before(() => {
                 try {
                     deleteAllLogs()
@@ -3136,7 +3136,7 @@ describe('Routes: children.physicalactivities', () => {
         })
 
         context('when there is an attempt to get all logs in a time interval using the "query-strings-parser" library ' +
-                'but the parameters are incorrect (date_end is invalid)', () => {
+            'but the parameters are incorrect (date_end is invalid)', () => {
             before(() => {
                 try {
                     deleteAllLogs()

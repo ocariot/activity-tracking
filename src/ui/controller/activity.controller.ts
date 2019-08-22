@@ -166,14 +166,14 @@ export class ActivityController {
     @httpPost('/:child_id/logs/:resource')
     public async saveLog(@request() req: Request, @response() res: Response) {
         try {
-
-            const activityLogs: Array<Log> = []
+            let activityLogs: Array<Log> = []
             if (req.body instanceof Array) {
-                req.body.forEach(item => {
+                activityLogs = req.body.map(item => {
                     const log: Log = new Log().fromJSON(item)
                     log.type = req.params.resource
                     log.child_id = req.params.child_id
                     activityLogs.push(log)
+                    return log
                 })
             }
 
