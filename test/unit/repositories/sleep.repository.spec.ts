@@ -274,12 +274,12 @@ describe('Repositories: SleepRepository', () => {
             it('should return how many sleep objects are associated with such child in the database', () => {
                 sinon
                     .mock(modelFake)
-                    .expects('find')
+                    .expects('countDocuments')
                     .withArgs({ child_id: defaultSleep.child_id })
                     .chain('exec')
-                    .resolves([ defaultSleep, new SleepMock() ])
+                    .resolves(2)
 
-                return sleepRepo.countSleep(defaultSleep.child_id!)
+                return sleepRepo.countSleep(defaultSleep.child_id)
                     .then((countSleep: number) => {
                         assert.equal(countSleep, 2)
                     })
@@ -290,12 +290,12 @@ describe('Repositories: SleepRepository', () => {
             it('should return 0', () => {
                 sinon
                     .mock(modelFake)
-                    .expects('find')
+                    .expects('countDocuments')
                     .withArgs({ child_id: defaultSleep.child_id })
                     .chain('exec')
-                    .resolves([])
+                    .resolves(0)
 
-                return sleepRepo.countSleep(defaultSleep.child_id!)
+                return sleepRepo.countSleep(defaultSleep.child_id)
                     .then((countSleep: number) => {
                         assert.equal(countSleep, 0)
                     })
@@ -306,13 +306,13 @@ describe('Repositories: SleepRepository', () => {
             it('should throw a RepositoryException', () => {
                 sinon
                     .mock(modelFake)
-                    .expects('find')
-                    .withArgs({ child_id: 'invalid_child_id' })
+                    .expects('countDocuments')
+                    .withArgs({ child_id: defaultSleep.child_id })
                     .chain('exec')
                     .rejects({ message: 'An internal error has occurred in the database!',
                                description: 'Please try again later...' })
 
-                return sleepRepo.countSleep(defaultSleep.child_id!)
+                return sleepRepo.countSleep(defaultSleep.child_id)
                     .catch (err => {
                         assert.propertyVal(err, 'message', 'An internal error has occurred in the database!')
                         assert.propertyVal(err, 'description', 'Please try again later...')

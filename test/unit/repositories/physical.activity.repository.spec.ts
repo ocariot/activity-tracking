@@ -280,12 +280,12 @@ describe('Repositories: PhysicalActivityRepository', () => {
             it('should return how many physical activities are associated with such child in the database', () => {
                 sinon
                     .mock(modelFake)
-                    .expects('find')
+                    .expects('countDocuments')
                     .withArgs({ child_id: defaultActivity.child_id })
                     .chain('exec')
-                    .resolves([ defaultActivity, new PhysicalActivityMock() ])
+                    .resolves(2)
 
-                return activityRepo.countActivities(defaultActivity.child_id!)
+                return activityRepo.countActivities(defaultActivity.child_id)
                     .then((countActivities: number) => {
                         assert.equal(countActivities, 2)
                     })
@@ -296,12 +296,12 @@ describe('Repositories: PhysicalActivityRepository', () => {
             it('should return 0', () => {
                 sinon
                     .mock(modelFake)
-                    .expects('find')
+                    .expects('countDocuments')
                     .withArgs({ child_id: defaultActivity.child_id })
                     .chain('exec')
-                    .resolves([])
+                    .resolves(0)
 
-                return activityRepo.countActivities(defaultActivity.child_id!)
+                return activityRepo.countActivities(defaultActivity.child_id)
                     .then((countActivities: number) => {
                         assert.equal(countActivities, 0)
                     })
@@ -312,13 +312,13 @@ describe('Repositories: PhysicalActivityRepository', () => {
             it('should throw a RepositoryException', () => {
                 sinon
                     .mock(modelFake)
-                    .expects('find')
-                    .withArgs({ child_id: 'invalid_child_id' })
+                    .expects('countDocuments')
+                    .withArgs({ child_id: defaultActivity.child_id })
                     .chain('exec')
                     .rejects({ message: 'An internal error has occurred in the database!',
                                description: 'Please try again later...' })
 
-                return activityRepo.countActivities(defaultActivity.id!)
+                return activityRepo.countActivities(defaultActivity.child_id)
                     .catch (err => {
                         assert.propertyVal(err, 'message', 'An internal error has occurred in the database!')
                         assert.propertyVal(err, 'description', 'Please try again later...')

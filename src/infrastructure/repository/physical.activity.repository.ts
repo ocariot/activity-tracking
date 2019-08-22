@@ -115,10 +115,6 @@ export class PhysicalActivityRepository extends BaseRepository<PhysicalActivity,
     }
 
     public countActivities(childId: string): Promise<number> {
-        return new Promise<number>((resolve, reject) => {
-            super.find(new Query().fromJSON({ filters: { child_id: childId } }))
-                .then(result => resolve(result ? result.length : 0))
-                .catch(err => reject(this.mongoDBErrorListener(err)))
-        })
+        return super.count(new Query().fromJSON({ filters: { child_id: childId } }))
     }
 }

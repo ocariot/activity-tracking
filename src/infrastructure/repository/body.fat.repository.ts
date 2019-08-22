@@ -129,10 +129,6 @@ export class BodyFatRepository extends BaseRepository<BodyFat, BodyFatEntity> im
      * @throws {RepositoryException}
      */
     public countBodyFats(childId: string): Promise<number> {
-        return new Promise<number>((resolve, reject) => {
-            super.find(new Query().fromJSON({ filters: { child_id: childId, type: MeasurementType.BODY_FAT } }))
-                .then(result => resolve(result ? result.length : 0))
-                .catch(err => reject(this.mongoDBErrorListener(err)))
-        })
+        return super.count(new Query().fromJSON({ filters: { child_id: childId, type: MeasurementType.BODY_FAT } }))
     }
 }

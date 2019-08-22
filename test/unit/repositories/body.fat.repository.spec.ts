@@ -256,10 +256,10 @@ describe('Repositories: BodyFatRepository', () => {
             it('should return how many body fats are associated with such child in the database', () => {
                 sinon
                     .mock(modelFake)
-                    .expects('find')
+                    .expects('countDocuments')
                     .withArgs({ child_id: defaultBodyFat.child_id, type: MeasurementType.BODY_FAT })
                     .chain('exec')
-                    .resolves([ defaultBodyFat, new BodyFatMock() ])
+                    .resolves(2)
 
                 return bodyFatRepo.countBodyFats(defaultBodyFat.child_id!)
                     .then((countBodyFats: number) => {
@@ -272,10 +272,10 @@ describe('Repositories: BodyFatRepository', () => {
             it('should return 0', () => {
                 sinon
                     .mock(modelFake)
-                    .expects('find')
+                    .expects('countDocuments')
                     .withArgs({ child_id: defaultBodyFat.child_id, type: MeasurementType.BODY_FAT })
                     .chain('exec')
-                    .resolves([])
+                    .resolves(0)
 
                 return bodyFatRepo.countBodyFats(defaultBodyFat.child_id!)
                     .then((countBodyFats: number) => {
@@ -288,13 +288,13 @@ describe('Repositories: BodyFatRepository', () => {
             it('should throw a RepositoryException', () => {
                 sinon
                     .mock(modelFake)
-                    .expects('find')
-                    .withArgs({ child_id: 'invalid_child_id', type: MeasurementType.BODY_FAT })
+                    .expects('countDocuments')
+                    .withArgs({ child_id: defaultBodyFat.child_id, type: MeasurementType.BODY_FAT })
                     .chain('exec')
                     .rejects({ message: 'An internal error has occurred in the database!',
                                description: 'Please try again later...' })
 
-                return bodyFatRepo.countBodyFats(defaultBodyFat.id!)
+                return bodyFatRepo.countBodyFats(defaultBodyFat.child_id!)
                     .catch (err => {
                         assert.propertyVal(err, 'message', 'An internal error has occurred in the database!')
                         assert.propertyVal(err, 'description', 'Please try again later...')

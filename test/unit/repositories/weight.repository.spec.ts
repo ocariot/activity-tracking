@@ -452,10 +452,10 @@ describe('Repositories: WeightRepository', () => {
             it('should return how many weights are associated with such child in the database', () => {
                 sinon
                     .mock(modelFake)
-                    .expects('find')
+                    .expects('countDocuments')
                     .withArgs({ child_id: defaultWeight.child_id, type: MeasurementType.WEIGHT })
                     .chain('exec')
-                    .resolves([ defaultWeight, new WeightMock() ])
+                    .resolves(2)
 
                 return weightRepo.countWeights(defaultWeight.child_id!)
                     .then((countWeights: number) => {
@@ -468,10 +468,10 @@ describe('Repositories: WeightRepository', () => {
             it('should return 0', () => {
                 sinon
                     .mock(modelFake)
-                    .expects('find')
+                    .expects('countDocuments')
                     .withArgs({ child_id: defaultWeight.child_id, type: MeasurementType.WEIGHT })
                     .chain('exec')
-                    .resolves([])
+                    .resolves(0)
 
                 return weightRepo.countWeights(defaultWeight.child_id!)
                     .then((countWeights: number) => {
@@ -484,8 +484,8 @@ describe('Repositories: WeightRepository', () => {
             it('should throw a RepositoryException', () => {
                 sinon
                     .mock(modelFake)
-                    .expects('find')
-                    .withArgs({ child_id: 'invalid_child_id', type: MeasurementType.WEIGHT })
+                    .expects('countDocuments')
+                    .withArgs({ child_id: defaultWeight.child_id, type: MeasurementType.WEIGHT })
                     .chain('exec')
                     .rejects({ message: 'An internal error has occurred in the database!',
                                description: 'Please try again later...' })
