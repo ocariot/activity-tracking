@@ -190,6 +190,7 @@ export class LogService implements ILogService {
                 { date: { $gte: dateStart.concat('T00:00:00') } }
             ]
         })
+        query.pagination.limit = Number.MAX_SAFE_INTEGER
 
         return this._logRepository.find(query)
     }
