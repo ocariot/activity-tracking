@@ -1073,4 +1073,25 @@ describe('Services: SleepService', () => {
             })
         })
     })
+
+    describe('countSleep(childId: string)', () => {
+        context('when there is at least one sleep object associated with the child received', () => {
+            it('should return how many sleep objects are associated with such child in the database', () => {
+                return sleepService.countSleep(sleep.child_id!)
+                    .then(res => {
+                        assert.equal(res, 1)
+                    })
+            })
+        })
+
+        context('when the childId is invalid', () => {
+            it('should throw a ValidationException', () => {
+                return sleepService.countSleep('123')
+                    .catch(err => {
+                        assert.propertyVal(err, 'message', Strings.ERROR_MESSAGE.UUID_NOT_VALID_FORMAT)
+                        assert.propertyVal(err, 'description', Strings.ERROR_MESSAGE.UUID_NOT_VALID_FORMAT_DESC)
+                    })
+            })
+        })
+    })
 })

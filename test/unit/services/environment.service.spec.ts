@@ -515,4 +515,15 @@ describe('Services: Environment', () => {
             })
         })
     })
+
+    describe('count()', () => {
+        context('when want count environments', () => {
+            it('should return the number of environments', () => {
+                return environmentService.count()
+                    .then(res => {
+                        assert.equal(res, 1)
+                    })
+            })
+        })
+    })
 })

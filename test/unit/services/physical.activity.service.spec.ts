@@ -1098,4 +1098,25 @@ describe('Services: PhysicalActivityService', () => {
             })
         })
     })
+
+    describe('countActivities(childId: string)', () => {
+        context('when there is at least one physical activity associated with the child received', () => {
+            it('should return how many physical activities are associated with such child in the database', () => {
+                return activityService.countActivities(activity.child_id!)
+                    .then(res => {
+                        assert.equal(res, 1)
+                    })
+            })
+        })
+
+        context('when the childId is invalid', () => {
+            it('should throw a ValidationException', () => {
+                return activityService.countActivities('123')
+                    .catch(err => {
+                        assert.propertyVal(err, 'message', Strings.ERROR_MESSAGE.UUID_NOT_VALID_FORMAT)
+                        assert.propertyVal(err, 'description', Strings.ERROR_MESSAGE.UUID_NOT_VALID_FORMAT_DESC)
+                    })
+            })
+        })
+    })
 })

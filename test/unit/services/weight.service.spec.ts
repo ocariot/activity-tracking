@@ -671,4 +671,25 @@ describe('Services: WeightService', () => {
             })
         })
     })
+
+    describe('countWeights(childId: string)', () => {
+        context('when there is at least one weight associated with the child received', () => {
+            it('should return how many weights are associated with such child in the database', () => {
+                return weightService.countWeights(weight.child_id!)
+                    .then(res => {
+                        assert.equal(res, 1)
+                    })
+            })
+        })
+
+        context('when the childId is invalid', () => {
+            it('should throw a ValidationException', () => {
+                return weightService.countWeights('123')
+                    .catch(err => {
+                        assert.propertyVal(err, 'message', Strings.ERROR_MESSAGE.UUID_NOT_VALID_FORMAT)
+                        assert.propertyVal(err, 'description', Strings.ERROR_MESSAGE.UUID_NOT_VALID_FORMAT_DESC)
+                    })
+            })
+        })
+    })
 })

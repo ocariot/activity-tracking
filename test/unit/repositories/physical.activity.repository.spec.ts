@@ -15,7 +15,8 @@ describe('Repositories: PhysicalActivityRepository', () => {
     const defaultActivity: PhysicalActivity = new PhysicalActivityMock()
 
     const modelFake: any = ActivityRepoModel
-    const repo: IPhysicalActivityRepository = new PhysicalActivityRepository(modelFake, new EntityMapperMock(), new CustomLoggerMock())
+    const activityRepo: IPhysicalActivityRepository =
+        new PhysicalActivityRepository(modelFake, new EntityMapperMock(), new CustomLoggerMock())
 
     const queryMock: any = {
         toJSON: () => {
@@ -43,7 +44,7 @@ describe('Repositories: PhysicalActivityRepository', () => {
                     .chain('exec')
                     .resolves(true)
 
-                return repo.checkExist(defaultActivity)
+                return activityRepo.checkExist(defaultActivity)
                     .then(result => {
                         assert.isTrue(result)
                     })
@@ -59,7 +60,7 @@ describe('Repositories: PhysicalActivityRepository', () => {
                     .chain('exec')
                     .resolves(false)
 
-                return repo.checkExist(defaultActivity)
+                return activityRepo.checkExist(defaultActivity)
                     .then(result => {
                         assert.isFalse(result)
                     })
@@ -76,7 +77,7 @@ describe('Repositories: PhysicalActivityRepository', () => {
                     .rejects({ message: 'An internal error has occurred in the database!',
                                description: 'Please try again later...' })
 
-                return repo.checkExist(defaultActivity)
+                return activityRepo.checkExist(defaultActivity)
                     .catch((err: any) => {
                         assert.propertyVal(err, 'message', 'An internal error has occurred in the database!')
                         assert.propertyVal(err, 'description', 'Please try again later...')
@@ -110,7 +111,7 @@ describe('Repositories: PhysicalActivityRepository', () => {
                     .chain('exec')
                     .resolves(defaultActivity)
 
-                return repo.updateByChild(defaultActivity)
+                return activityRepo.updateByChild(defaultActivity)
                     .then(activity => {
                         activity = activity.toJSON()
 
@@ -137,7 +138,7 @@ describe('Repositories: PhysicalActivityRepository', () => {
                     .chain('exec')
                     .resolves(undefined)
 
-                return repo.updateByChild(defaultActivity)
+                return activityRepo.updateByChild(defaultActivity)
                     .then((result: any) => {
                         assert.isUndefined(result)
                     })
@@ -154,7 +155,7 @@ describe('Repositories: PhysicalActivityRepository', () => {
                     .rejects({ message: 'An internal error has occurred in the database!',
                                description: 'Please try again later...' })
 
-                return repo.updateByChild(defaultActivity)
+                return activityRepo.updateByChild(defaultActivity)
                     .catch((err) => {
                         assert.propertyVal(err, 'message', 'An internal error has occurred in the database!')
                         assert.propertyVal(err, 'description', 'Please try again later...')
@@ -175,7 +176,7 @@ describe('Repositories: PhysicalActivityRepository', () => {
                     .chain('exec')
                     .resolves(true)
 
-                return repo.removeByChild(defaultActivity.id!, defaultActivity.child_id)
+                return activityRepo.removeByChild(defaultActivity.id!, defaultActivity.child_id)
                     .then((result: boolean) => {
                         assert.isTrue(result)
                     })
@@ -194,7 +195,7 @@ describe('Repositories: PhysicalActivityRepository', () => {
                     .chain('exec')
                     .resolves(false)
 
-                return repo.removeByChild(randomId, randomChildId)
+                return activityRepo.removeByChild(randomId, randomChildId)
                     .then((result: boolean) => {
                         assert.isFalse(result)
                     })
@@ -213,7 +214,7 @@ describe('Repositories: PhysicalActivityRepository', () => {
                     .rejects({ message: 'An internal error has occurred in the database!',
                                description: 'Please try again later...' })
 
-                return repo.removeByChild(defaultActivity.id, defaultActivity.child_id)
+                return activityRepo.removeByChild(defaultActivity.id, defaultActivity.child_id)
                     .catch (err => {
                         assert.propertyVal(err, 'message', 'An internal error has occurred in the database!')
                         assert.propertyVal(err, 'description', 'Please try again later...')
@@ -232,7 +233,7 @@ describe('Repositories: PhysicalActivityRepository', () => {
                     .withArgs({ child_id: defaultActivity.child_id })
                     .resolves(true)
 
-                return repo.removeAllActivitiesFromChild(defaultActivity.child_id)
+                return activityRepo.removeAllActivitiesFromChild(defaultActivity.child_id)
                     .then((result: boolean) => {
                         assert.isTrue(result)
                     })
@@ -249,7 +250,7 @@ describe('Repositories: PhysicalActivityRepository', () => {
                     .withArgs({ child_id: randomChildId })
                     .resolves(false)
 
-                return repo.removeAllActivitiesFromChild(randomChildId)
+                return activityRepo.removeAllActivitiesFromChild(randomChildId)
                     .then((result: boolean) => {
                         assert.isFalse(result)
                     })
@@ -265,7 +266,59 @@ describe('Repositories: PhysicalActivityRepository', () => {
                     .rejects({ message: 'An internal error has occurred in the database!',
                                description: 'Please try again later...' })
 
-                return repo.removeAllActivitiesFromChild(defaultActivity.child_id)
+                return activityRepo.removeAllActivitiesFromChild(defaultActivity.child_id)
+                    .catch (err => {
+                        assert.propertyVal(err, 'message', 'An internal error has occurred in the database!')
+                        assert.propertyVal(err, 'description', 'Please try again later...')
+                    })
+            })
+        })
+    })
+
+    describe('countActivities(childId: string)', () => {
+        context('when there is at least one physical activity associated with the child received', () => {
+            it('should return how many physical activities are associated with such child in the database', () => {
+                sinon
+                    .mock(modelFake)
+                    .expects('find')
+                    .withArgs({ child_id: defaultActivity.child_id })
+                    .chain('exec')
+                    .resolves([ defaultActivity, new PhysicalActivityMock() ])
+
+                return activityRepo.countActivities(defaultActivity.child_id!)
+                    .then((countActivities: number) => {
+                        assert.equal(countActivities, 2)
+                    })
+            })
+        })
+
+        context('when there are no physical activities associated with the child received', () => {
+            it('should return 0', () => {
+                sinon
+                    .mock(modelFake)
+                    .expects('find')
+                    .withArgs({ child_id: defaultActivity.child_id })
+                    .chain('exec')
+                    .resolves([])
+
+                return activityRepo.countActivities(defaultActivity.child_id!)
+                    .then((countActivities: number) => {
+                        assert.equal(countActivities, 0)
+                    })
+            })
+        })
+
+        context('when a database error occurs', () => {
+            it('should throw a RepositoryException', () => {
+                sinon
+                    .mock(modelFake)
+                    .expects('find')
+                    .withArgs({ child_id: 'invalid_child_id' })
+                    .chain('exec')
+                    .rejects({ message: 'An internal error has occurred in the database!',
+                               description: 'Please try again later...' })
+
+                return activityRepo.countActivities(defaultActivity.id!)
                     .catch (err => {
                         assert.propertyVal(err, 'message', 'An internal error has occurred in the database!')
                         assert.propertyVal(err, 'description', 'Please try again later...')

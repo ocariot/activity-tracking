@@ -8,6 +8,7 @@ import { BodyFatMock } from '../../mocks/body.fat.mock'
 import { MeasurementRepoModel } from '../../../src/infrastructure/database/schema/measurement.schema'
 import { IBodyFatRepository } from '../../../src/application/port/body.fat.repository.interface'
 import { BodyFatRepository } from '../../../src/infrastructure/repository/body.fat.repository'
+import { MeasurementType } from '../../../src/application/domain/model/measurement'
 
 require('sinon-mongoose')
 
@@ -15,7 +16,7 @@ describe('Repositories: BodyFatRepository', () => {
     const defaultBodyFat: BodyFat = new BodyFatMock()
 
     const modelFake: any = MeasurementRepoModel
-    const repo: IBodyFatRepository = new BodyFatRepository(modelFake, new EntityMapperMock(), new CustomLoggerMock())
+    const bodyFatRepo: IBodyFatRepository = new BodyFatRepository(modelFake, new EntityMapperMock(), new CustomLoggerMock())
 
     const queryMock: any = {
         toJSON: () => {
@@ -44,7 +45,7 @@ describe('Repositories: BodyFatRepository', () => {
                     .chain('exec')
                     .resolves(true)
 
-                return repo.checkExist(defaultBodyFat)
+                return bodyFatRepo.checkExist(defaultBodyFat)
                     .then(result => {
                         assert.isTrue(result)
                     })
@@ -60,7 +61,7 @@ describe('Repositories: BodyFatRepository', () => {
                     .chain('exec')
                     .resolves(false)
 
-                return repo.checkExist(defaultBodyFat)
+                return bodyFatRepo.checkExist(defaultBodyFat)
                     .then(result => {
                         assert.isFalse(result)
                     })
@@ -77,7 +78,7 @@ describe('Repositories: BodyFatRepository', () => {
                     .rejects({ message: 'An internal error has occurred in the database!',
                                description: 'Please try again later...' })
 
-                return repo.checkExist(defaultBodyFat)
+                return bodyFatRepo.checkExist(defaultBodyFat)
                     .catch((err: any) => {
                         assert.propertyVal(err, 'message', 'An internal error has occurred in the database!')
                         assert.propertyVal(err, 'description', 'Please try again later...')
@@ -96,7 +97,7 @@ describe('Repositories: BodyFatRepository', () => {
                     .chain('exec')
                     .resolves(defaultBodyFat)
 
-                return repo.selectByChild(defaultBodyFat.timestamp!, defaultBodyFat.child_id!, defaultBodyFat.type!)
+                return bodyFatRepo.selectByChild(defaultBodyFat.timestamp!, defaultBodyFat.child_id!, defaultBodyFat.type!)
                     .then(result => {
                         assert.propertyVal(result, 'id', defaultBodyFat.id)
                         assert.propertyVal(result, 'type', defaultBodyFat.type)
@@ -119,7 +120,7 @@ describe('Repositories: BodyFatRepository', () => {
                     .chain('exec')
                     .resolves(undefined)
 
-                return repo.selectByChild(defaultBodyFat.timestamp!, defaultBodyFat.child_id!, defaultBodyFat.type!)
+                return bodyFatRepo.selectByChild(defaultBodyFat.timestamp!, defaultBodyFat.child_id!, defaultBodyFat.type!)
                     .then(result => {
                         assert.equal(result, undefined)
                     })
@@ -136,7 +137,7 @@ describe('Repositories: BodyFatRepository', () => {
                     .rejects({ message: 'An internal error has occurred in the database!',
                                description: 'Please try again later...' })
 
-                return repo.selectByChild(defaultBodyFat.timestamp!, defaultBodyFat.child_id!, defaultBodyFat.type!)
+                return bodyFatRepo.selectByChild(defaultBodyFat.timestamp!, defaultBodyFat.child_id!, defaultBodyFat.type!)
                     .catch((err: any) => {
                         assert.propertyVal(err, 'message', 'An internal error has occurred in the database!')
                         assert.propertyVal(err, 'description', 'Please try again later...')
@@ -155,7 +156,7 @@ describe('Repositories: BodyFatRepository', () => {
                     .chain('exec')
                     .resolves(true)
 
-                return repo.removeByChild(defaultBodyFat.id!, defaultBodyFat.child_id!, defaultBodyFat.type!)
+                return bodyFatRepo.removeByChild(defaultBodyFat.id!, defaultBodyFat.child_id!, defaultBodyFat.type!)
                     .then((result: boolean) => {
                         assert.isTrue(result)
                     })
@@ -173,7 +174,7 @@ describe('Repositories: BodyFatRepository', () => {
                     .chain('exec')
                     .resolves(false)
 
-                return repo.removeByChild(defaultBodyFat.id!, randomChildId, defaultBodyFat.type!)
+                return bodyFatRepo.removeByChild(defaultBodyFat.id!, randomChildId, defaultBodyFat.type!)
                     .then((result: boolean) => {
                         assert.isFalse(result)
                     })
@@ -190,7 +191,7 @@ describe('Repositories: BodyFatRepository', () => {
                     .rejects({ message: 'An internal error has occurred in the database!',
                                description: 'Please try again later...' })
 
-                return repo.removeByChild(defaultBodyFat.id!, defaultBodyFat.child_id!, defaultBodyFat.type!)
+                return bodyFatRepo.removeByChild(defaultBodyFat.id!, defaultBodyFat.child_id!, defaultBodyFat.type!)
                     .catch (err => {
                         assert.propertyVal(err, 'message', 'An internal error has occurred in the database!')
                         assert.propertyVal(err, 'description', 'Please try again later...')
@@ -208,7 +209,7 @@ describe('Repositories: BodyFatRepository', () => {
                     .withArgs({ child_id: defaultBodyFat.child_id })
                     .resolves(true)
 
-                return repo.removeAllBodyFatFromChild(defaultBodyFat.child_id!)
+                return bodyFatRepo.removeAllBodyFatFromChild(defaultBodyFat.child_id!)
                     .then((result: boolean) => {
                         assert.isTrue(result)
                     })
@@ -225,7 +226,7 @@ describe('Repositories: BodyFatRepository', () => {
                     .withArgs({ child_id: randomChildId })
                     .resolves(false)
 
-                return repo.removeAllBodyFatFromChild(randomChildId)
+                return bodyFatRepo.removeAllBodyFatFromChild(randomChildId)
                     .then((result: boolean) => {
                         assert.isFalse(result)
                     })
@@ -241,7 +242,59 @@ describe('Repositories: BodyFatRepository', () => {
                     .rejects({ message: 'An internal error has occurred in the database!',
                                description: 'Please try again later...' })
 
-                return repo.removeAllBodyFatFromChild(defaultBodyFat.child_id!)
+                return bodyFatRepo.removeAllBodyFatFromChild(defaultBodyFat.child_id!)
+                    .catch (err => {
+                        assert.propertyVal(err, 'message', 'An internal error has occurred in the database!')
+                        assert.propertyVal(err, 'description', 'Please try again later...')
+                    })
+            })
+        })
+    })
+
+    describe('countBodyFats(childId: string)', () => {
+        context('when there is at least one body fat associated with the child received', () => {
+            it('should return how many body fats are associated with such child in the database', () => {
+                sinon
+                    .mock(modelFake)
+                    .expects('find')
+                    .withArgs({ child_id: defaultBodyFat.child_id, type: MeasurementType.BODY_FAT })
+                    .chain('exec')
+                    .resolves([ defaultBodyFat, new BodyFatMock() ])
+
+                return bodyFatRepo.countBodyFats(defaultBodyFat.child_id!)
+                    .then((countBodyFats: number) => {
+                        assert.equal(countBodyFats, 2)
+                    })
+            })
+        })
+
+        context('when there are no body fats associated with the child received', () => {
+            it('should return 0', () => {
+                sinon
+                    .mock(modelFake)
+                    .expects('find')
+                    .withArgs({ child_id: defaultBodyFat.child_id, type: MeasurementType.BODY_FAT })
+                    .chain('exec')
+                    .resolves([])
+
+                return bodyFatRepo.countBodyFats(defaultBodyFat.child_id!)
+                    .then((countBodyFats: number) => {
+                        assert.equal(countBodyFats, 0)
+                    })
+            })
+        })
+
+        context('when a database error occurs', () => {
+            it('should throw a RepositoryException', () => {
+                sinon
+                    .mock(modelFake)
+                    .expects('find')
+                    .withArgs({ child_id: 'invalid_child_id', type: MeasurementType.BODY_FAT })
+                    .chain('exec')
+                    .rejects({ message: 'An internal error has occurred in the database!',
+                               description: 'Please try again later...' })
+
+                return bodyFatRepo.countBodyFats(defaultBodyFat.id!)
                     .catch (err => {
                         assert.propertyVal(err, 'message', 'An internal error has occurred in the database!')
                         assert.propertyVal(err, 'description', 'Please try again later...')

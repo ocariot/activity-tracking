@@ -564,4 +564,25 @@ describe('Services: BodyFatService', () => {
             })
         })
     })
+
+    describe('countBodyFats(childId: string)', () => {
+        context('when there is at least one body fat associated with the child received', () => {
+            it('should return how many body fats are associated with such child in the database', () => {
+                return bodyFatService.countBodyFats(bodyFat.child_id!)
+                    .then(res => {
+                        assert.equal(res, 1)
+                    })
+            })
+        })
+
+        context('when the childId is invalid', () => {
+            it('should throw a ValidationException', () => {
+                return bodyFatService.countBodyFats('123')
+                    .catch(err => {
+                        assert.propertyVal(err, 'message', Strings.ERROR_MESSAGE.UUID_NOT_VALID_FORMAT)
+                        assert.propertyVal(err, 'description', Strings.ERROR_MESSAGE.UUID_NOT_VALID_FORMAT_DESC)
+                    })
+            })
+        })
+    })
 })
