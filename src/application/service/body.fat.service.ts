@@ -243,11 +243,6 @@ export class BodyFatService implements IBodyFatService {
     }
 
     public countBodyFats(childId: string): Promise<number> {
-        try {
-            ObjectIdValidator.validate(childId)
-        } catch (err) {
-            return Promise.reject(err)
-        }
         return this._bodyFatRepository.countBodyFats(childId)
     }
 

@@ -278,11 +278,6 @@ export class PhysicalActivityService implements IPhysicalActivityService {
     }
 
     public countActivities(childId: string): Promise<number> {
-        try {
-            ObjectIdValidator.validate(childId)
-        } catch (err) {
-            return Promise.reject(err)
-        }
         return this._activityRepository.countActivities(childId)
     }
 

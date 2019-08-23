@@ -276,11 +276,6 @@ export class SleepService implements ISleepService {
     }
 
     public countSleep(childId: string): Promise<number> {
-        try {
-            ObjectIdValidator.validate(childId)
-        } catch (err) {
-            return Promise.reject(err)
-        }
         return this._sleepRepository.countSleep(childId)
     }
 

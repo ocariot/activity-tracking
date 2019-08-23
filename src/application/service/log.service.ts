@@ -32,16 +32,16 @@ export class LogService implements ILogService {
     /**
      * Adds a new log array.
      *
-     * @param {Array<Log>} activityLogs
+     * @param {Array<Log>} logs
      * @returns {Promise<Array<Log>>}
      * @throws { RepositoryException}
      */
-    public async addLogs(activityLogs: Array<Log>): Promise<MultiStatus<Log>> {
+    public async addLogs(logs: Array<Log>): Promise<MultiStatus<Log>> {
         const multiStatus: MultiStatus<Log> = new MultiStatus<Log>()
         const statusSuccessArr: Array<StatusSuccess<Log>> = new Array<StatusSuccess<Log>>()
         const statusErrorArr: Array<StatusError<Log>> = new Array<StatusError<Log>>()
 
-        for (const elem of activityLogs) {
+        for (const elem of logs) {
             try {
                 // 1. Validate the object.
                 CreateLogValidator.validate(elem)
@@ -208,5 +208,9 @@ export class LogService implements ILogService {
 
     public async remove(id: string): Promise<boolean> {
         throw new Error('Unsupported feature!')
+    }
+
+    public countLogsByResource(childId: string, desiredResource: string, dateStart: string, dateEnd: string): Promise<number> {
+        return this._logRepository.countLogsByResource(childId, desiredResource, dateStart, dateEnd)
     }
 }

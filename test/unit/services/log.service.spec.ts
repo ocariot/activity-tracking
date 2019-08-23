@@ -51,9 +51,9 @@ describe('Services: Log', () => {
     const logService: ILogService = new LogService(logRepo)
 
     /**
-     * Method: addLogs(activityLogs: Array<Log>)
+     * Method: addLogs(logs: Array<Log>)
      */
-    describe('addLogs(activityLogs: Array<Log>)', () => {
+    describe('addLogs(logs: Array<Log>)', () => {
         context('when all the logs in the array are correct and it still does not exist in the repository', () => {
             it('should return a response of type MultiStatus<Log> with the description of success in sending each log',  () => {
                 return  logService.addLogs(correctLogsArr)
@@ -511,6 +511,18 @@ describe('Services: Log', () => {
                     assert.propertyVal(err, 'description', 'Log dates range validation failed: ' +
                         'The period between the received dates is longer than one year')
                 }
+            })
+        })
+    })
+
+    describe('countLogsByResource(childId: string, desiredResource: string, dateStart: string, dateEnd: string)', () => {
+        context('when there is at least one log of the received type associated with the received child', () => {
+            it('should return how many logs of the received type are associated with such child in the database', () => {
+                return logService.countLogsByResource(correctLogsArr[0].child_id, correctLogsArr[0].type,
+                    correctLogsArr[0].date, correctLogsArr[1].date)
+                    .then(res => {
+                        assert.equal(res, 1)
+                    })
             })
         })
     })

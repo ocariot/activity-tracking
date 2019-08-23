@@ -12,6 +12,10 @@ export class LogRepositoryMock implements ILogRepository {
         return Promise.resolve(item)
     }
 
+    public countLogsByResource(childId: string, dateStart: string, dateEnd: string): Promise<number> {
+        return Promise.resolve(1)
+    }
+
     public delete(id: string | number): Promise<boolean> {
         return Promise.resolve(true)
     }

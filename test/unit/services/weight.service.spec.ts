@@ -681,15 +681,5 @@ describe('Services: WeightService', () => {
                     })
             })
         })
-
-        context('when the childId is invalid', () => {
-            it('should throw a ValidationException', () => {
-                return weightService.countWeights('123')
-                    .catch(err => {
-                        assert.propertyVal(err, 'message', Strings.ERROR_MESSAGE.UUID_NOT_VALID_FORMAT)
-                        assert.propertyVal(err, 'description', Strings.ERROR_MESSAGE.UUID_NOT_VALID_FORMAT_DESC)
-                    })
-            })
-        })
     })
 })

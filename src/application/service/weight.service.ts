@@ -268,11 +268,6 @@ export class WeightService implements IWeightService {
     }
 
     public countWeights(childId: string): Promise<number> {
-        try {
-            ObjectIdValidator.validate(childId)
-        } catch (err) {
-            return Promise.reject(err)
-        }
         return this._weightRepository.countWeights(childId)
     }
 

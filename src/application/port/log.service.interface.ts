@@ -12,16 +12,17 @@ import { ChildLog } from '../domain/model/child.log'
 export interface ILogService extends IService<Log> {
 
     /**
-     * Add a new child log.
+     * Add a new child logs.
      *
-     * @param activityLog Log to insert.
+     * @param log Array<Log> to insert.
      * @return {Promise<Log>}
      * @throws {ValidationException | ConflictException | RepositoryException}
      */
-    addLogs(activityLog: Array<Log>): Promise<MultiStatus<Log>>
+    addLogs(log: Array<Log>): Promise<MultiStatus<Log>>
 
     /**
-     * List the child logs with information on the total steps and calories of a child in a given period.
+     * List the child logs with information on the total steps, calories, active_minutes, lightly_active_minutes
+     * and sedentary_minutes of a child in a given period.
      *
      * @param childId Child ID.
      * @param dateStart Range start date.
@@ -33,7 +34,8 @@ export interface ILogService extends IService<Log> {
     getByChildAndDate(childId: string, dateStart: string, dateEnd: string, query: IQuery): Promise<ChildLog>
 
     /**
-     * List the child logs with information on the total steps or calories of a child in a given period
+     * List the child logs with information on the total steps, calories, active_minutes, lightly_active_minutes,
+     * or sedentary_minutes of a child in a given period
      *
      * @param childId Child ID.
      * @param desiredResource Desired resource.
@@ -45,4 +47,16 @@ export interface ILogService extends IService<Log> {
      */
     getByChildResourceAndDate(childId: string, desiredResource: string, dateStart: string,
                               dateEnd: string, query: IQuery): Promise<Array<Log>>
+
+    /**
+     * Returns the total of logs of a child in a period by resource.
+     *
+     * @param childId Child id associated with logs.
+     * @param desiredResource Desired resource.
+     * @param dateStart Range start date.
+     * @param dateEnd Range end date.
+     * @return {Promise<number>}
+     * @throws {RepositoryException}
+     */
+    countLogsByResource(childId: string, desiredResource: string, dateStart: string, dateEnd: string): Promise<number>
 }
