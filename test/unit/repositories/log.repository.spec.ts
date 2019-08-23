@@ -33,7 +33,7 @@ describe('Repositories: LogRepository', () => {
         sinon.restore()
     })
 
-    describe('findOneByChild(childId: string, logType: LogType, dateLog: string)', () => {
+    describe('selectByChild(childId: string, logType: string, dateLog: string)', () => {
         context('when the log is found', () => {
             it('should return the log found', () => {
                 sinon

@@ -14,7 +14,7 @@ export class LogRepository extends BaseRepository<Log, LogEntity>
     implements ILogRepository {
 
     constructor(
-        @inject(Identifier.ACTIVITY_LOG_REPO_MODEL) readonly logModel: any,
+        @inject(Identifier.LOG_REPO_MODEL) readonly logModel: any,
         @inject(Identifier.LOG_ENTITY_MAPPER) readonly logMapper:
             IEntityMapper<Log, LogEntity>,
         @inject(Identifier.LOGGER) readonly logger: ILogger

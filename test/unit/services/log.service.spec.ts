@@ -302,16 +302,18 @@ describe('Services: Log', () => {
      * Method: getByChildAndDate(childId: string, dateStart: Date, dateEnd: Date, query: IQuery)
      */
     describe('getByChildAndDate(childId: string, dateStart: Date, dateEnd: Date, query: IQuery)', () => {
+
+        const query: IQuery = new Query()
+        query.filters = {
+            child_id: correctLogsArr[0].child_id,
+            $and: [
+                { date: { $lte: correctLogsArr[0].date.toString().concat('T00:00:00') } },
+                { date: { $gte: correctLogsArr[1].date.toString().concat('T00:00:00') } }
+            ]
+        }
+
         context('when the parameters are correct and there are corresponding logs with the query', () => {
             it('should return a ChildLog with steps and/or calories logs',  () => {
-                const query: IQuery = new Query()
-                query.filters = {
-                    child_id: correctLogsArr[0].child_id,
-                    $and: [
-                        { date: { $lte: correctLogsArr[0].date.toString().concat('T00:00:00') } },
-                        { date: { $gte: correctLogsArr[1].date.toString().concat('T00:00:00') } }
-                    ]
-                }
 
                 return  logService.getByChildAndDate(correctLogsArr[0].child_id, correctLogsArr[0].date,
                     correctLogsArr[1].date, query)
@@ -325,14 +327,6 @@ describe('Services: Log', () => {
         context('when the parameters are correct but there are no corresponding logs with the query', () => {
             it('should return an empty ChildLog',  () => {
                 correctLogsArr[0].child_id = '507f1f77bcf86cd799439011'
-                const query: IQuery = new Query()
-                query.filters = {
-                    child_id: correctLogsArr[0].child_id,
-                    $and: [
-                        { date: { $lte: correctLogsArr[0].date.toString().concat('T00:00:00') } },
-                        { date: { $gte: correctLogsArr[1].date.toString().concat('T00:00:00') } }
-                    ]
-                }
 
                 return  logService.getByChildAndDate(correctLogsArr[0].child_id, correctLogsArr[0].date,
                     correctLogsArr[1].date, query)
@@ -346,14 +340,6 @@ describe('Services: Log', () => {
         context('when the parameters are incorrect (child_id is invalid)', () => {
             it('should throw a ValidationException', async () => {
                 correctLogsArr[0].child_id = '507f1f77bcf86cd7994390112'
-                const query: IQuery = new Query()
-                query.filters = {
-                    child_id: correctLogsArr[0].child_id,
-                    $and: [
-                        { date: { $lte: correctLogsArr[0].date.toString().concat('T00:00:00') } },
-                        { date: { $gte: correctLogsArr[1].date.toString().concat('T00:00:00') } }
-                    ]
-                }
 
                 try {
                     return await logService.getByChildAndDate(correctLogsArr[0].child_id, correctLogsArr[0].date,
@@ -369,14 +355,6 @@ describe('Services: Log', () => {
             it('should throw a ValidationException', async () => {
                 correctLogsArr[0].child_id = '507f1f77bcf86cd799439011'
                 correctLogsArr[0].date = '20199-03-18'
-                const query: IQuery = new Query()
-                query.filters = {
-                    child_id: correctLogsArr[0].child_id,
-                    $and: [
-                        { date: { $lte: correctLogsArr[0].date.toString().concat('T00:00:00') } },
-                        { date: { $gte: correctLogsArr[1].date.toString().concat('T00:00:00') } }
-                    ]
-                }
 
                 try {
                     return await logService.getByChildAndDate(correctLogsArr[0].child_id, correctLogsArr[0].date,
@@ -393,14 +371,6 @@ describe('Services: Log', () => {
                 correctLogsArr[0].child_id = '507f1f77bcf86cd799439011'
                 correctLogsArr[0].date = '2019-03-18'
                 correctLogsArr[1].date = '20199-03-18'
-                const query: IQuery = new Query()
-                query.filters = {
-                    child_id: correctLogsArr[0].child_id,
-                    $and: [
-                        { date: { $lte: correctLogsArr[0].date.toString().concat('T00:00:00') } },
-                        { date: { $gte: correctLogsArr[1].date.toString().concat('T00:00:00') } }
-                    ]
-                }
 
                 try {
                     return await logService.getByChildAndDate(correctLogsArr[0].child_id, correctLogsArr[0].date,
@@ -411,6 +381,20 @@ describe('Services: Log', () => {
                 }
             })
         })
+
+        context('when the parameters are invalid (date range is invalid)', () => {
+            it('should throw a ValidationException', async () => {
+
+                try {
+                    return await logService.getByChildAndDate(correctLogsArr[0].child_id, '2018-03-18',
+                        '2019-03-27', query)
+                } catch (err) {
+                    assert.propertyVal(err, 'message', 'Date range is invalid...')
+                    assert.propertyVal(err, 'description', 'Log dates range validation failed: ' +
+                        'The period between the received dates is longer than one year')
+                }
+            })
+        })
     })
 
     /**
@@ -418,19 +402,21 @@ describe('Services: Log', () => {
      */
     describe('getByChildResourceAndDate(childId: string, desiredResource: LogType, dateStart: string, dateEnd: string, ' +
         'query: IQuery)', () => {
+
+        const query: IQuery = new Query()
+        query.filters = {
+            child_id: correctLogsArr[0].child_id,
+            type: correctLogsArr[0].type,
+            $and: [
+                { date: { $lte: correctLogsArr[0].date.toString().concat('T00:00:00') } },
+                { date: { $gte: correctLogsArr[1].date.toString().concat('T00:00:00') } }
+            ]
+        }
+
         context('when the parameters are correct and there are corresponding logs with the query', () => {
             it('should return the logs array', () => {
                 correctLogsArr[0].child_id = '507f1f77bcf86cd799439012'
-                correctLogsArr[1] = new LogMock()
-                const query: IQuery = new Query()
-                query.filters = {
-                    child_id: correctLogsArr[0].child_id,
-                    type: correctLogsArr[0].type,
-                    $and: [
-                        { date: { $lte: correctLogsArr[0].date.toString().concat('T00:00:00') } },
-                        { date: { $gte: correctLogsArr[1].date.toString().concat('T00:00:00') } }
-                    ]
-                }
+                correctLogsArr[1].date = '2019-03-20'
 
                 return logService.getByChildResourceAndDate(correctLogsArr[0].child_id, correctLogsArr[0].type,
                     correctLogsArr[0].date, correctLogsArr[1].date, query)
@@ -444,14 +430,6 @@ describe('Services: Log', () => {
         context('when the parameters are correct but there are no corresponding logs with the query', () => {
             it('should return an empty log array', () => {
                 correctLogsArr[0].child_id = '507f1f77bcf86cd799439011'
-                const query: IQuery = new Query()
-                query.filters = {
-                    child_id: correctLogsArr[0].child_id,
-                    $and: [
-                        { date: { $lte: correctLogsArr[0].date.toString().concat('T00:00:00') } },
-                        { date: { $gte: correctLogsArr[1].date.toString().concat('T00:00:00') } }
-                    ]
-                }
 
                 return logService.getByChildResourceAndDate(correctLogsArr[0].child_id, correctLogsArr[0].type,
                     correctLogsArr[0].date, correctLogsArr[1].date, query)
@@ -465,14 +443,6 @@ describe('Services: Log', () => {
         context('when the parameters are incorrect (child_id is invalid)', () => {
             it('should throw a ValidationException', () => {
                 correctLogsArr[0].child_id = '507f1f77bcf86cd7994390112'
-                const query: IQuery = new Query()
-                query.filters = {
-                    child_id: correctLogsArr[0].child_id,
-                    $and: [
-                        { date: { $lte: correctLogsArr[0].date.toString().concat('T00:00:00') } },
-                        { date: { $gte: correctLogsArr[1].date.toString().concat('T00:00:00') } }
-                    ]
-                }
 
                 try {
                     return logService.getByChildResourceAndDate(correctLogsArr[0].child_id, correctLogsArr[0].type,
@@ -487,14 +457,6 @@ describe('Services: Log', () => {
         context('when the parameters are incorrect (type is invalid)', () => {
             it('should throw a ValidationException', () => {
                 correctLogsArr[0].child_id = '507f1f77bcf86cd799439011'
-                const query: IQuery = new Query()
-                query.filters = {
-                    child_id: correctLogsArr[0].child_id,
-                    $and: [
-                        { date: { $lte: correctLogsArr[0].date.toString().concat('T00:00:00') } },
-                        { date: { $gte: correctLogsArr[1].date.toString().concat('T00:00:00') } }
-                    ]
-                }
 
                 try {
                     return logService.getByChildResourceAndDate(correctLogsArr[0].child_id, otherIncorrectLog.type,
@@ -512,14 +474,6 @@ describe('Services: Log', () => {
         context('when the parameters are incorrect (dateStart is invalid)', () => {
             it('should throw a ValidationException', () => {
                 correctLogsArr[0].date = '20199-03-18'
-                const query: IQuery = new Query()
-                query.filters = {
-                    child_id: correctLogsArr[0].child_id,
-                    $and: [
-                        { date: { $lte: correctLogsArr[0].date.toString().concat('T00:00:00') } },
-                        { date: { $gte: correctLogsArr[1].date.toString().concat('T00:00:00') } }
-                    ]
-                }
 
                 try {
                     return logService.getByChildResourceAndDate(correctLogsArr[0].child_id, correctLogsArr[0].type,
@@ -535,14 +489,6 @@ describe('Services: Log', () => {
             it('should throw a ValidationException', () => {
                 correctLogsArr[0].date = '2019-03-18'
                 correctLogsArr[1].date = '20199-03-18'
-                const query: IQuery = new Query()
-                query.filters = {
-                    child_id: correctLogsArr[0].child_id,
-                    $and: [
-                        { date: { $lte: correctLogsArr[0].date.toString().concat('T00:00:00') } },
-                        { date: { $gte: correctLogsArr[1].date.toString().concat('T00:00:00') } }
-                    ]
-                }
 
                 try {
                     return logService.getByChildResourceAndDate(correctLogsArr[0].child_id, correctLogsArr[0].type,
@@ -550,6 +496,20 @@ describe('Services: Log', () => {
                 } catch (err) {
                     assert.propertyVal(err, 'message', 'Date parameter: 20199-03-18, is not in valid ISO 8601 format.')
                     assert.propertyVal(err, 'description', 'Date must be in the format: yyyy-MM-dd')
+                }
+            })
+        })
+
+        context('when the parameters are invalid (date range is invalid)', () => {
+            it('should throw a ValidationException', () => {
+
+                try {
+                    return logService.getByChildResourceAndDate(correctLogsArr[0].child_id, correctLogsArr[0].type,
+                        '2018-03-18', '2019-03-27', query)
+                } catch (err) {
+                    assert.propertyVal(err, 'message', 'Date range is invalid...')
+                    assert.propertyVal(err, 'description', 'Log dates range validation failed: ' +
+                        'The period between the received dates is longer than one year')
                 }
             })
         })

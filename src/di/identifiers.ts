@@ -9,6 +9,7 @@ export abstract class Identifier {
     // Controllers
     public static readonly HOME_CONTROLLER: any = Symbol.for('HomeController')
     public static readonly ACTIVITY_CONTROLLER: any = Symbol.for('ActivityController')
+    public static readonly LOG_CONTROLLER: any = Symbol.for('LogController')
     public static readonly SLEEP_CONTROLLER: any = Symbol.for('SleepController')
     public static readonly BODY_FAT_CONTROLLER: any = Symbol.for('BodyFatController')
     public static readonly WEIGHT_CONTROLLER: any = Symbol.for('WeightController')
@@ -16,7 +17,7 @@ export abstract class Identifier {
 
     // Services
     public static readonly ACTIVITY_SERVICE: any = Symbol.for('PhysicalActivityService')
-    public static readonly ACTIVITY_LOG_SERVICE: any = Symbol.for('LogService')
+    public static readonly LOG_SERVICE: any = Symbol.for('LogService')
     public static readonly SLEEP_SERVICE: any = Symbol.for('SleepService')
     public static readonly BODY_FAT_SERVICE: any = Symbol.for('BodyFatService')
     public static readonly WEIGHT_SERVICE: any = Symbol.for('WeightService')
@@ -33,7 +34,7 @@ export abstract class Identifier {
 
     // Models
     public static readonly ACTIVITY_REPO_MODEL: any = Symbol.for('ActivityRepoModel')
-    public static readonly ACTIVITY_LOG_REPO_MODEL: any = Symbol.for('ActivityLogRepoModel')
+    public static readonly LOG_REPO_MODEL: any = Symbol.for('LogRepoModel')
     public static readonly SLEEP_REPO_MODEL: any = Symbol.for('SleepRepoModel')
     public static readonly MEASUREMENT_REPO_MODEL: any = Symbol.for('MeasurementRepoModel')
     public static readonly ENVIRONMENT_REPO_MODEL: any = Symbol.for('EnvironmentRepoModel')
@@ -41,7 +42,6 @@ export abstract class Identifier {
 
     // Mappers
     public static readonly ACTIVITY_ENTITY_MAPPER: any = Symbol.for('PhysicalActivityEntityMapper')
-    public static readonly ACTIVITY_LOG_ENTITY_MAPPER: any = Symbol.for('PhysicalActivityLogEntityMapper')
     public static readonly LOG_ENTITY_MAPPER: any = Symbol.for('LogEntityMapper')
     public static readonly ENVIRONMENT_ENTITY_MAPPER: any = Symbol.for('EnvironmentEntityMapper')
     public static readonly SLEEP_ENTITY_MAPPER: any = Symbol.for('SleepEntityMapper')

@@ -9,10 +9,7 @@ import { ApiException } from '../exception/api.exception'
 import { PhysicalActivity } from '../../application/domain/model/physical.activity'
 import { IPhysicalActivityService } from '../../application/port/physical.activity.service.interface'
 import { ILogger } from '../../utils/custom.logger'
-import { ILogService } from '../../application/port/log.service.interface'
-import { Log } from '../../application/domain/model/log'
 import { MultiStatus } from '../../application/domain/model/multi.status'
-import { ChildLog } from '../../application/domain/model/child.log'
 
 /**
  * Controller that implements PhysicalActivity feature operations.
@@ -27,12 +24,10 @@ export class ActivityController {
      * Creates an instance of PhysicalActivity controller.
      *
      * @param {IPhysicalActivityService} _activityService
-     * @param {ILogService} _activityLogService
      * @param {ILogger} _logger
      */
     constructor(
         @inject(Identifier.ACTIVITY_SERVICE) private readonly _activityService: IPhysicalActivityService,
-        @inject(Identifier.ACTIVITY_LOG_SERVICE) private readonly _activityLogService: ILogService,
         @inject(Identifier.LOGGER) readonly _logger: ILogger
     ) {
     }
@@ -150,78 +145,6 @@ export class ActivityController {
         try {
             await this._activityService.removeByChild(req.params.physicalactivity_id, req.params.child_id)
             return res.status(HttpStatus.NO_CONTENT).send()
-        } catch (err) {
-            const handlerError = ApiExceptionManager.build(err)
-            return res.status(handlerError.code)
-                .send(handlerError.toJson())
-        }
-    }
-
-    /**
-     * Add new child log.
-     *
-     * @param {Request} req
-     * @param {Response} res
-     */
-    @httpPost('/:child_id/logs/:resource')
-    public async saveLog(@request() req: Request, @response() res: Response) {
-        try {
-            let activityLogs: Array<Log> = []
-            if (req.body instanceof Array) {
-                activityLogs = req.body.map(item => {
-                    const log: Log = new Log().fromJSON(item)
-                    log.type = req.params.resource
-                    log.child_id = req.params.child_id
-                    activityLogs.push(log)
-                    return log
-                })
-            }
-
-            const result: MultiStatus<Log> = await this._activityLogService.addLogs(activityLogs)
-            return res.status(HttpStatus.CREATED).send(result)
-        } catch (err) {
-            const handlerError = ApiExceptionManager.build(err)
-            return res.status(handlerError.code)
-                .send(handlerError.toJson())
-        }
-    }
-
-    /**
-     * Recover the logs.
-     * For the query strings, the query-strings-parser middleware was used.
-     * @see {@link https://www.npmjs.com/package/query-strings-parser} for further information.
-     *
-     * @param {Request} req
-     * @param {Response} res
-     */
-    @httpGet('/:child_id/logs/date/:date_start/:date_end')
-    public async getLogs(@request() req: Request, @response() res: Response): Promise<Response> {
-        try {
-            const result: ChildLog = await this._activityLogService
-                .getByChildAndDate(req.params.child_id, req.params.date_start, req.params.date_end, new Query().fromJSON(req.query))
-            return res.status(HttpStatus.OK).send(result)
-        } catch (err) {
-            const handlerError = ApiExceptionManager.build(err)
-            return res.status(handlerError.code)
-                .send(handlerError.toJson())
-        }
-    }
-
-    /**
-     * Recover the logs.
-     * For the query strings, the query-strings-parser middleware was used.
-     * @see {@link https://www.npmjs.com/package/query-strings-parser} for further information.
-     *
-     * @param {Request} req
-     * @param {Response} res
-     */
-    @httpGet('/:child_id/logs/:resource/date/:date_start/:date_end')
-    public async getLogByResource(@request() req: Request, @response() res: Response): Promise<Response> {
-        try {
-            const result: Array<Log> = await this._activityLogService
-                .getByChildResourceAndDate(req.params.child_id, req.params.resource, req.params.date_start, req.params.date_end,
-                    new Query().fromJSON(req.query))
-            return res.status(HttpStatus.OK).send(result)
         } catch (err) {
             const handlerError = ApiExceptionManager.build(err)
             return res.status(handlerError.code)

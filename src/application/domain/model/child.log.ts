@@ -20,6 +20,7 @@ export class ChildLog implements IJSONSerializable, IJSONDeserializable<ChildLog
         if (steps) this.steps = steps
         if (calories) this.calories = calories
         if (active_minutes) this.active_minutes = active_minutes
+        if (lightly_active_minutes) this.lightly_active_minutes = lightly_active_minutes
         if (sedentary_minutes) this.sedentary_minutes = sedentary_minutes
     }
 
