@@ -481,7 +481,7 @@ describe('Routes: children.sleep', () => {
                         expect(err.body.message).to.eql('The sleep pattern name provided "restlesss" is not supported...')
                         if (incorrectSleep11.type === SleepType.CLASSIC)
                             expect(err.body.description).to.eql('The names of the allowed patterns are: asleep, restless, awake.')
-                        else expect(err.body.description).to.eql('The names of the allowed patterns are: deep, light, rem, wake.')
+                        else expect(err.body.description).to.eql('The names of the allowed patterns are: deep, light, rem, awake.')
                     })
             })
         })
@@ -505,7 +505,7 @@ describe('Routes: children.sleep', () => {
                     .then(err => {
                         expect(err.body.code).to.eql(400)
                         expect(err.body.message).to.eql('The sleep pattern name provided "deeps" is not supported...')
-                        expect(err.body.description).to.eql('The names of the allowed patterns are: deep, light, rem, wake.')
+                        expect(err.body.description).to.eql('The names of the allowed patterns are: deep, light, rem, awake.')
                     })
             })
         })
@@ -707,9 +707,9 @@ describe('Routes: children.sleep', () => {
                         if (incorrectSleep11.type === SleepType.CLASSIC)
                             expect(res.body.error[10].description).to.eql('The names of the allowed patterns are: asleep, restless, awake.')
                         else
-                            expect(res.body.error[10].description).to.eql('The names of the allowed patterns are: deep, light, rem, wake.')
+                            expect(res.body.error[10].description).to.eql('The names of the allowed patterns are: deep, light, rem, awake.')
                         expect(res.body.error[11].message).to.eql('The sleep pattern name provided "deeps" is not supported...')
-                        expect(res.body.error[11].description).to.eql('The names of the allowed patterns are: deep, light, rem, wake.')
+                        expect(res.body.error[11].description).to.eql('The names of the allowed patterns are: deep, light, rem, awake.')
 
                         for (let i = 0; i < res.body.error.length; i++) {
                             expect(res.body.error[i].code).to.eql(HttpStatus.BAD_REQUEST)
@@ -1308,6 +1308,38 @@ describe('Routes: children.sleep', () => {
             })
         })
 
+        context('when this sleep already exists in the database', () => {
+            it('should return status status code 404 and an info message about the conflict', async () => {
+                let result
+
+                try {
+                    // Sleep to be updated
+                    result = await createSleepToBeUpdated(defaultSleep)
+                } catch (err) {
+                    throw new Error('Failure on children.sleep routes test: ' + err.message)
+                }
+
+                // Sleep to update
+                const body = {
+                    start_time: otherSleep.start_time,
+                    end_time: otherSleep.end_time,
+                    duration: defaultSleep.duration,
+                    pattern: defaultSleep.pattern,
+                    type: defaultSleep.type
+                }
+
+                return request
+                    .patch(`/v1/children/${result.child_id}/sleep/${result.id}`)
+                    .send(body)
+                    .set('Content-Type', 'application/json')
+                    .expect(409)
+                    .then(err => {
+                        expect(err.body.code).to.eql(409)
+                        expect(err.body.message).to.eql('Sleep is already registered...')
+                    })
+            })
+        })
+
         context('when sleep does not exist in the database', () => {
             before(() => {
                 try {
@@ -1779,7 +1811,7 @@ describe('Routes: children.sleep', () => {
                     .then(err => {
                         expect(err.body.code).to.eql(400)
                         expect(err.body.message).to.eql('The sleep pattern name provided "deeps" is not supported...')
-                        expect(err.body.description).to.eql('The names of the allowed patterns are: deep, light, rem, wake.')
+                        expect(err.body.description).to.eql('The names of the allowed patterns are: deep, light, rem, awake.')
                     })
             })
         })

@@ -1,7 +1,6 @@
 import { SleepPatternSummaryData } from './sleep.pattern.summary.data'
 import { IJSONSerializable } from '../utils/json.serializable.interface'
 import { IJSONDeserializable } from '../utils/json.deserializable.interface'
-import { JsonUtils } from '../utils/json.utils'
 
 /**
  * The implementation of the summary entity of sleep pattern.
@@ -43,18 +42,8 @@ export class SleepPatternPhasesSummary implements IJSONSerializable, IJSONDeseri
         this._restless = value
     }
 
+    // Not implemented!
     public fromJSON(json: any): SleepPatternPhasesSummary {
-        if (!json) return this
-        if (typeof json === 'string' && JsonUtils.isJsonString(json)) {
-            json = JSON.parse(json)
-        }
-
-        if (json.awake !== undefined) this.awake = new SleepPatternSummaryData(json.awake.count, json.awake.duration)
-        if (json.asleep !== undefined) this.asleep = new SleepPatternSummaryData(json.asleep.count, json.asleep.duration)
-        if (json.restless !== undefined) {
-            this.restless = new SleepPatternSummaryData(json.restless.count, json.restless.duration)
-        }
-
         return this
     }
 

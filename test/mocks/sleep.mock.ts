@@ -80,7 +80,7 @@ export class SleepMock extends Sleep {
                     dataSetItem.duration = Math.floor(Math.random() * 3 + 1) * 60000 // 1-3min in milliseconds
                     return dataSetItem
                 default: {
-                    dataSetItem.name = StagesPatternType.WAKE
+                    dataSetItem.name = StagesPatternType.AWAKE
                     dataSetItem.duration = Math.floor(Math.random() * 120 + 1) * 60000 // 1-180min in milliseconds
                     return dataSetItem
                 }

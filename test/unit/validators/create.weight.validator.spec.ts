@@ -13,11 +13,21 @@ const unit_aux: string = weight.unit!
 const child_id_aux: string = weight.child_id!
 const body_fat_aux: BodyFat = weight.body_fat!
 
+const incompleteWeight: Weight = new WeightMock()
+incompleteWeight.body_fat = undefined
+
 describe('Validators: CreateWeightValidator', () => {
     describe('validate(weight: Weight)', () => {
         context('when the weight has all the required parameters, and that they have valid values', () => {
             it('should return undefined representing the success of the validation', () => {
                 const result = CreateWeightValidator.validate(weight)
+                assert.equal(result, undefined)
+            })
+        })
+
+        context('when the weight has all the required parameters with valid values, and does not have the optional parameter', () => {
+            it('should return undefined representing the success of the validation', () => {
+                const result = CreateWeightValidator.validate(incompleteWeight)
                 assert.equal(result, undefined)
             })
         })

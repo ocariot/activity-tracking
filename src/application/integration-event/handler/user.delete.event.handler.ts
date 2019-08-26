@@ -30,7 +30,7 @@ export class UserDeleteEventHandler implements IIntegrationEventHandler<UserEven
 
     public async handle(event: UserEvent): Promise<void> {
         try {
-            if (!event.user) return await Promise.reject()
+            if (!event.user) return Promise.reject()
             const childId: string = event.user.id!
 
             // Validate childId.

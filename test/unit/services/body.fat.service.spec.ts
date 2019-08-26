@@ -141,10 +141,21 @@ describe('Services: BodyFatService', () => {
             })
         })
 
+        context('when the BodyFat is correct but is not successfully created in the database', () => {
+            it('should return undefined', () => {
+                connectionRabbitmqPub.isConnected = true
+                bodyFat.id = '507f1f77bcf86cd799439013'             // Make return undefined in create method
+
+                return bodyFatService.add(bodyFat)
+                    .then((result) => {
+                        assert.equal(result, undefined)
+                    })
+            })
+        })
+
         context('when the BodyFat is correct but already exists in the repository', () => {
             it('should throw a ConflictException', () => {
-                connectionRabbitmqPub.isConnected = true
-                bodyFat.id = '507f1f77bcf86cd799439011'
+                bodyFat.id = '507f1f77bcf86cd799439011'         // Make mock return true in checkExist method
 
                 return bodyFatService.add(bodyFat)
                     .catch(error => {

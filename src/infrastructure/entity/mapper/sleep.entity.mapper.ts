@@ -49,17 +49,6 @@ export class SleepEntityMapper implements IEntityMapper<Sleep, SleepEntity> {
     }
 
     /**
-     * Convert {SleepEntity} for {Sleep}.
-     *
-     * @see Each attribute must be mapped only if it contains an assigned value,
-     * because at some point the attribute accessed may not exist.
-     * @param item
-     */
-    public modelEntityToModel(item: SleepEntity): Sleep {
-        throw Error('Not Implemented!')
-    }
-
-    /**
      * Convert JSON for Sleep.
      *
      * @see Each attribute must be mapped only if it contains an assigned value,
@@ -109,16 +98,16 @@ export class SleepEntityMapper implements IEntityMapper<Sleep, SleepEntity> {
             const countDeep = this.countOfPattern(StagesPatternType.DEEP, pattern)
             const countLight = this.countOfPattern(StagesPatternType.LIGHT, pattern)
             const countRem = this.countOfPattern(StagesPatternType.REM, pattern)
-            const countWake = this.countOfPattern(StagesPatternType.WAKE, pattern)
+            const countAwake = this.countOfPattern(StagesPatternType.AWAKE, pattern)
             const durationDeep = this.countDurationOfPattern(StagesPatternType.DEEP, pattern)
             const durationLight = this.countDurationOfPattern(StagesPatternType.LIGHT, pattern)
             const durationRem = this.countDurationOfPattern(StagesPatternType.REM, pattern)
-            const durationWake = this.countDurationOfPattern(StagesPatternType.WAKE, pattern)
+            const durationAwake = this.countDurationOfPattern(StagesPatternType.AWAKE, pattern)
 
             summary.deep = new SleepPatternSummaryData(countDeep, durationDeep)
             summary.light = new SleepPatternSummaryData(countLight, durationLight)
             summary.rem = new SleepPatternSummaryData(countRem, durationRem)
-            summary.wake = new SleepPatternSummaryData(countWake, durationWake)
+            summary.awake = new SleepPatternSummaryData(countAwake, durationAwake)
 
             sleepPattern.data_set = sleepPatternDataSet
             sleepPattern.summary = summary

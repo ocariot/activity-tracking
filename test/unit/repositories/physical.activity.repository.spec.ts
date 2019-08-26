@@ -51,6 +51,25 @@ describe('Repositories: PhysicalActivityRepository', () => {
             })
         })
 
+        context('when the physical activity is not found in search without filters', () => {
+            it('should return false', () => {
+                const otherActivity: PhysicalActivity = new PhysicalActivityMock()
+                otherActivity.start_time = undefined
+                otherActivity.child_id = ''
+                sinon
+                    .mock(modelFake)
+                    .expects('findOne')
+                    .withArgs()
+                    .chain('exec')
+                    .resolves(false)
+
+                return activityRepo.checkExist(otherActivity)
+                    .then(result => {
+                        assert.isFalse(result)
+                    })
+            })
+        })
+
         context('when the physical activity is not found', () => {
             it('should return false', () => {
                 sinon

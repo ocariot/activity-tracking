@@ -10,6 +10,7 @@ describe('Models: ChildLog', () => {
         steps: [(new LogMock(LogType.STEPS)).toJSON()],
         calories: [(new LogMock(LogType.CALORIES)).toJSON()],
         active_minutes: [(new LogMock(LogType.ACTIVE_MINUTES)).toJSON()],
+        lightly_active_minutes: [(new LogMock(LogType.LIGHTLY_ACTIVE_MINUTES)).toJSON()],
         sedentary_minutes: [(new LogMock(LogType.SEDENTARY_MINUTES)).toJSON()]
     }
 
@@ -23,6 +24,8 @@ describe('Models: ChildLog', () => {
                 assert.deepPropertyVal(result.calories[0], 'value', activityLogJSON.calories[0].value)
                 assert.deepPropertyVal(result.active_minutes[0], 'date', activityLogJSON.active_minutes[0].date)
                 assert.deepPropertyVal(result.active_minutes[0], 'value', activityLogJSON.active_minutes[0].value)
+                assert.deepPropertyVal(result.lightly_active_minutes[0], 'date', activityLogJSON.lightly_active_minutes[0].date)
+                assert.deepPropertyVal(result.lightly_active_minutes[0], 'value', activityLogJSON.lightly_active_minutes[0].value)
                 assert.deepPropertyVal(result.sedentary_minutes[0], 'date', activityLogJSON.sedentary_minutes[0].date)
                 assert.deepPropertyVal(result.sedentary_minutes[0], 'value', activityLogJSON.sedentary_minutes[0].value)
             })
@@ -34,6 +37,7 @@ describe('Models: ChildLog', () => {
                 assert.isUndefined(result.steps)
                 assert.isUndefined(result.calories)
                 assert.isUndefined(result.active_minutes)
+                assert.isUndefined(result.lightly_active_minutes)
                 assert.isUndefined(result.sedentary_minutes)
             })
         })
@@ -47,6 +51,8 @@ describe('Models: ChildLog', () => {
                 assert.deepPropertyVal(result.calories[0], 'value', activityLogJSON.calories[0].value)
                 assert.deepPropertyVal(result.active_minutes[0], 'date', activityLogJSON.active_minutes[0].date)
                 assert.deepPropertyVal(result.active_minutes[0], 'value', activityLogJSON.active_minutes[0].value)
+                assert.deepPropertyVal(result.lightly_active_minutes[0], 'date', activityLogJSON.lightly_active_minutes[0].date)
+                assert.deepPropertyVal(result.lightly_active_minutes[0], 'value', activityLogJSON.lightly_active_minutes[0].value)
                 assert.deepPropertyVal(result.sedentary_minutes[0], 'date', activityLogJSON.sedentary_minutes[0].date)
                 assert.deepPropertyVal(result.sedentary_minutes[0], 'value', activityLogJSON.sedentary_minutes[0].value)
             })
@@ -61,6 +67,7 @@ describe('Models: ChildLog', () => {
                 assert.deepPropertyVal(result, 'steps', activityLogJSON.steps)
                 assert.deepPropertyVal(result, 'calories', activityLogJSON.calories)
                 assert.deepPropertyVal(result, 'active_minutes', activityLogJSON.active_minutes)
+                assert.deepPropertyVal(result, 'lightly_active_minutes', activityLogJSON.lightly_active_minutes)
                 assert.deepPropertyVal(result, 'sedentary_minutes', activityLogJSON.sedentary_minutes)
             })
         })

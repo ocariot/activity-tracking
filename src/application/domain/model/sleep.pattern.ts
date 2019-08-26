@@ -39,11 +39,6 @@ export class SleepPattern implements IJSONSerializable, IJSONDeserializable<Slee
         if (json.data_set !== undefined && json.data_set instanceof Array) {
             this.data_set = json.data_set.map(patternDataSet => new SleepPatternDataSet().fromJSON(patternDataSet))
         }
-        if (json.summary !== undefined) {
-            if (json.summary instanceof SleepPatternPhasesSummary || json.summary.awake || json.summary.asleep || json.summary.restless)
-                this.summary = new SleepPatternPhasesSummary().fromJSON(json.summary)
-            else this.summary = new SleepPatternStagesSummary().fromJSON(json.summary)
-        }
 
         return this
     }

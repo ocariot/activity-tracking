@@ -315,11 +315,14 @@ describe('Services: Log', () => {
         context('when the parameters are correct and there are corresponding logs with the query', () => {
             it('should return a ChildLog with steps and/or calories logs',  () => {
 
-                return  logService.getByChildAndDate(correctLogsArr[0].child_id, correctLogsArr[0].date,
+                return logService.getByChildAndDate(correctLogsArr[0].child_id, correctLogsArr[0].date,
                     correctLogsArr[1].date, query)
                     .then(result => {
                         assert.property(result, 'steps')
                         assert.property(result, 'calories')
+                        assert.property(result, 'active_minutes')
+                        assert.property(result, 'lightly_active_minutes')
+                        assert.property(result, 'sedentary_minutes')
                     })
             })
         })
@@ -328,7 +331,7 @@ describe('Services: Log', () => {
             it('should return an empty ChildLog',  () => {
                 correctLogsArr[0].child_id = '507f1f77bcf86cd799439011'
 
-                return  logService.getByChildAndDate(correctLogsArr[0].child_id, correctLogsArr[0].date,
+                return logService.getByChildAndDate(correctLogsArr[0].child_id, correctLogsArr[0].date,
                     correctLogsArr[1].date, query)
                     .then(result => {
                         assert.isEmpty(result.steps)
@@ -341,13 +344,12 @@ describe('Services: Log', () => {
             it('should throw a ValidationException', async () => {
                 correctLogsArr[0].child_id = '507f1f77bcf86cd7994390112'
 
-                try {
-                    return await logService.getByChildAndDate(correctLogsArr[0].child_id, correctLogsArr[0].date,
+                return logService.getByChildAndDate(correctLogsArr[0].child_id, correctLogsArr[0].date,
                         correctLogsArr[1].date, query)
-                } catch (err) {
-                    assert.propertyVal(err, 'message', Strings.CHILD.PARAM_ID_NOT_VALID_FORMAT)
-                    assert.propertyVal(err, 'description', Strings.ERROR_MESSAGE.UUID_NOT_VALID_FORMAT_DESC)
-                }
+                    .catch (err => {
+                        assert.propertyVal(err, 'message', Strings.CHILD.PARAM_ID_NOT_VALID_FORMAT)
+                        assert.propertyVal(err, 'description', Strings.ERROR_MESSAGE.UUID_NOT_VALID_FORMAT_DESC)
+                    })
             })
         })
 

@@ -144,6 +144,60 @@ describe('Services: WeightService', () => {
             })
         })
 
+        context('when the Weight is correct, your body_fat does not exist and will be created)', () => {
+            it('should return the Weight that was added', () => {
+                weight.body_fat!.child_id = '507f1f77bcf86cd799439012'
+
+                return weightService.add(weight)
+                    .then((result: Weight | Array<Weight>) => {
+                        result = result as Weight
+                        assert.property(result, 'id')
+                        assert.propertyVal(result, 'type', weight.type)
+                        assert.propertyVal(result, 'timestamp', weight.timestamp)
+                        assert.propertyVal(result, 'value', weight.value)
+                        assert.propertyVal(result, 'unit', weight.unit)
+                        assert.propertyVal(result, 'child_id', weight.child_id)
+                        assert.propertyVal(result, 'body_fat', weight.body_fat)
+                    })
+            })
+        })
+
+        context('when the Weight is correct, your body_fat does not exist but is not successfully created in the database)', () => {
+            it('should return the Weight that was added', () => {
+                weight.body_fat!.id = '507f1f77bcf86cd799439013'            // Make return undefined in create method
+
+                return weightService.add(weight)
+                    .then((result: Weight | Array<Weight>) => {
+                        result = result as Weight
+                        assert.property(result, 'id')
+                        assert.propertyVal(result, 'type', weight.type)
+                        assert.propertyVal(result, 'timestamp', weight.timestamp)
+                        assert.propertyVal(result, 'value', weight.value)
+                        assert.propertyVal(result, 'unit', weight.unit)
+                        assert.propertyVal(result, 'child_id', weight.child_id)
+                        assert.propertyVal(result, 'body_fat', weight.body_fat)
+                    })
+            })
+        })
+
+        context('when the Weight is correct and does not have the body_fat attribute)', () => {
+            it('should return the Weight that was added', () => {
+                weight.body_fat = undefined
+
+                return weightService.add(weight)
+                    .then((result: Weight | Array<Weight>) => {
+                        result = result as Weight
+                        assert.property(result, 'id')
+                        assert.propertyVal(result, 'type', weight.type)
+                        assert.propertyVal(result, 'timestamp', weight.timestamp)
+                        assert.propertyVal(result, 'value', weight.value)
+                        assert.propertyVal(result, 'unit', weight.unit)
+                        assert.propertyVal(result, 'child_id', weight.child_id)
+                        assert.propertyVal(result, 'body_fat', weight.body_fat)
+                    })
+            })
+        })
+
         context('when the Weight is correct and it still does not exist in the repository but there is no connection ' +
             'to the RabbitMQ', () => {
             it('should return the Weight that was saved', () => {
@@ -182,10 +236,21 @@ describe('Services: WeightService', () => {
             })
         })
 
+        context('when the Weight is correct but is not successfully created in the database', () => {
+            it('should return undefined', () => {
+                connectionRabbitmqPub.isConnected = true
+                weight.id = '507f1f77bcf86cd799439013'          // Make return undefined in create method
+
+                return weightService.add(weight)
+                    .then((result) => {
+                        assert.equal(result, undefined)
+                    })
+            })
+        })
+
         context('when the Weight is correct but already exists in the repository', () => {
             it('should throw a ConflictException', () => {
-                connectionRabbitmqPub.isConnected = true
-                weight.id = '507f1f77bcf86cd799439011'
+                weight.id = '507f1f77bcf86cd799439011'          // Make mock return true in checkExist method
 
                 return weightService.add(weight)
                     .catch(error => {

@@ -97,7 +97,7 @@ describe('Validators: SleepPatternValidator', () => {
                     SleepPatternValidator.validate(sleepPattern, SleepType.STAGES)
                 } catch (err) {
                     assert.equal(err.message, 'The sleep pattern name provided "deeps" is not supported...')
-                    assert.equal(err.description, 'The names of the allowed patterns are: deep, light, rem, wake.')
+                    assert.equal(err.description, 'The names of the allowed patterns are: deep, light, rem, awake.')
                 }
                 sleepPattern.data_set[0] = dataSetItem
             })

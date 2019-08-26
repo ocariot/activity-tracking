@@ -37,17 +37,6 @@ export class EnvironmentEntityMapper implements IEntityMapper<Environment, Envir
     }
 
     /**
-     * Convert {EnvironmentEntity} for {Environment}.
-     *
-     * @see Each attribute must be mapped only if it contains an assigned value,
-     * because at some point the attribute accessed may not exist.
-     * @param item
-     */
-    public modelEntityToModel(item: EnvironmentEntity): Environment {
-        throw Error('Not implemented!')
-    }
-
-    /**
      * Convert JSON for Environment.
      *
      * @see Each attribute must be mapped only if it contains an assigned value,

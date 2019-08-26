@@ -12,6 +12,10 @@ import { HeartRateZone } from '../../../src/application/domain/model/heart.rate.
 const activity: PhysicalActivityMock = new PhysicalActivityMock()
 const fat_burn_zone_aux = activity.heart_rate!.fat_burn_zone
 
+const incompleteActivity: PhysicalActivityMock = new PhysicalActivityMock()
+incompleteActivity.levels = undefined
+incompleteActivity.heart_rate = undefined
+
 describe('Validators: CreatePhysicalActivityValidator', () => {
     describe('validate(activity: PhysicalActivity)', () => {
         /**
@@ -20,6 +24,14 @@ describe('Validators: CreatePhysicalActivityValidator', () => {
         context('when the physical activity has all the required parameters, and that they have valid values', () => {
             it('should return undefined representing the success of the validation', () => {
                 const result = CreatePhysicalActivityValidator.validate(activity)
+                assert.equal(result, undefined)
+            })
+        })
+
+        context('when the physical activity has all the required parameters with valid values, and does not have the optional parameters',
+            () => {
+            it('should return undefined representing the success of the validation', () => {
+                const result = CreatePhysicalActivityValidator.validate(incompleteActivity)
                 assert.equal(result, undefined)
             })
         })

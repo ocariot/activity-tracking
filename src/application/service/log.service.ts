@@ -118,21 +118,21 @@ export class LogService implements ILogService {
      * @throws {RepositoryException}
      */
     public async getByChildAndDate(childId: string, dateStart: string, dateEnd: string, query: IQuery): Promise<ChildLog> {
-        ObjectIdValidator.validate(childId, Strings.CHILD.PARAM_ID_NOT_VALID_FORMAT)
-        DateValidator.validate(dateStart)
-        DateValidator.validate(dateEnd)
-        LogDateRangeValidator.validate(dateStart, dateEnd)
-
-        query.addFilter({
-            child_id: childId,
-            $and: [
-                { date: { $lte: dateEnd.toString().concat('T00:00:00') } },
-                { date: { $gte: dateStart.toString().concat('T00:00:00') } }
-            ]
-        })
-        query.pagination.limit = Number.MAX_SAFE_INTEGER
-
         try {
+            ObjectIdValidator.validate(childId, Strings.CHILD.PARAM_ID_NOT_VALID_FORMAT)
+            DateValidator.validate(dateStart)
+            DateValidator.validate(dateEnd)
+            LogDateRangeValidator.validate(dateStart, dateEnd)
+
+            query.addFilter({
+                child_id: childId,
+                $and: [
+                    { date: { $lte: dateEnd.toString().concat('T00:00:00') } },
+                    { date: { $gte: dateStart.toString().concat('T00:00:00') } }
+                ]
+            })
+            query.pagination.limit = Number.MAX_SAFE_INTEGER
+
             // Creates a ChildLog object with all the resources listed with arrays.
             const childLog: ChildLog = new ChildLog()
             const stepsArr: Array<Log> = new Array<Log>()

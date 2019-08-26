@@ -22,15 +22,15 @@ describe('Models: SleepPattern', () => {
 
     const dataSetItem4: SleepPatternDataSet = new SleepPatternDataSet()
     dataSetItem4.start_time = new Date('2018-08-18T02:45:30Z')
-    dataSetItem4.name = StagesPatternType.WAKE
+    dataSetItem4.name = StagesPatternType.AWAKE
     dataSetItem4.duration = Math.floor(Math.random() * 120 + 1) * 60000 // 1-180min in milliseconds
 
     const summaryDataJSON: any = {
         data_set: [dataSetItem, dataSetItem2, dataSetItem3, dataSetItem4],
         summary: new SleepPatternStagesSummary(new SleepPatternSummaryData(2, 10000),
-                                         new SleepPatternSummaryData(3, 20000),
-                                         new SleepPatternSummaryData(4, 30000),
-                                         new SleepPatternSummaryData(5, 40000))
+            new SleepPatternSummaryData(3, 20000),
+            new SleepPatternSummaryData(4, 30000),
+            new SleepPatternSummaryData(5, 40000))
     }
 
     describe('fromJSON(json: any)', () => {
@@ -39,7 +39,6 @@ describe('Models: SleepPattern', () => {
                 const result = new SleepPattern().fromJSON(summaryDataJSON)
 
                 assert.deepPropertyVal(result, 'data_set', summaryDataJSON.data_set)
-                assert.deepPropertyVal(result, 'summary', summaryDataJSON.summary)
             })
         })
 
@@ -56,7 +55,6 @@ describe('Models: SleepPattern', () => {
                 const result = new SleepPattern().fromJSON(JSON.stringify(summaryDataJSON))
 
                 assert.deepPropertyVal(result, 'data_set', summaryDataJSON.data_set)
-                assert.deepPropertyVal(result, 'summary', summaryDataJSON.summary)
             })
         })
     })
@@ -66,7 +64,6 @@ describe('Models: SleepPattern', () => {
             it('should return a JSON from SleepPattern model', () => {
                 let result = new SleepPattern().fromJSON(summaryDataJSON)
                 result = result.toJSON()
-                const summary = new SleepPatternStagesSummary().fromJSON(result.summary)
                 // Pattern data_set
                 assert.propertyVal(result.data_set[0], 'start_time', summaryDataJSON.data_set[0].start_time.toISOString())
                 assert.propertyVal(result.data_set[0], 'name', summaryDataJSON.data_set[0].name)
@@ -77,11 +74,6 @@ describe('Models: SleepPattern', () => {
                 assert.propertyVal(result.data_set[2], 'start_time', summaryDataJSON.data_set[2].start_time.toISOString())
                 assert.propertyVal(result.data_set[2], 'name', summaryDataJSON.data_set[2].name)
                 assert.propertyVal(result.data_set[2], 'duration', summaryDataJSON.data_set[2].duration)
-                // Pattern summary
-                assert.deepPropertyVal(summary, 'deep', summaryDataJSON.summary.deep)
-                assert.deepPropertyVal(summary, 'light', summaryDataJSON.summary.light)
-                assert.deepPropertyVal(summary, 'rem', summaryDataJSON.summary.rem)
-                assert.deepPropertyVal(summary, 'wake', summaryDataJSON.summary.wake)
             })
         })
     })

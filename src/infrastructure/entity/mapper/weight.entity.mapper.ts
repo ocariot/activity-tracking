@@ -35,17 +35,6 @@ export class WeightEntityMapper implements IEntityMapper<Weight, WeightEntity> {
     }
 
     /**
-     * Convert {WeightEntity} for {Weight}.
-     *
-     * @see Each attribute must be mapped only if it contains an assigned value,
-     * because at some point the attribute accessed may not exist.
-     * @param item
-     */
-    public modelEntityToModel(item: WeightEntity): Weight {
-        throw Error('Not implemented!')
-    }
-
-    /**
      * Convert JSON for Weight.
      *
      * @see Each attribute must be mapped only if it contains an assigned value,

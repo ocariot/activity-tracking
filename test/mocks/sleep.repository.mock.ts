@@ -18,6 +18,8 @@ export class SleepRepositoryMock implements ISleepRepository {
     }
 
     public create(item: Sleep): Promise<Sleep> {
+        if (item.id === '507f1f77bcf86cd799439013')
+            return Promise.resolve(undefined!)
         return Promise.resolve(item)
     }
 

@@ -4,8 +4,6 @@ import { ValidationException } from '../../../src/application/domain/exception/v
 import { Sleep } from '../../../src/application/domain/model/sleep'
 import { SleepPattern } from '../../../src/application/domain/model/sleep.pattern'
 import { PhasesPatternType, SleepPatternDataSet } from '../../../src/application/domain/model/sleep.pattern.data.set'
-import { SleepPatternPhasesSummary } from '../../../src/application/domain/model/sleep.pattern.phases.summary'
-import { SleepPatternSummaryData } from '../../../src/application/domain/model/sleep.pattern.summary.data'
 
 describe('Models: Sleep', () => {
     // Creating a sleepPattern
@@ -31,9 +29,6 @@ describe('Models: Sleep', () => {
 
     const sleepPattern: SleepPattern = new SleepPattern()
     sleepPattern.data_set = dataSet
-    sleepPattern.summary = new SleepPatternPhasesSummary(new SleepPatternSummaryData(2, 10000),
-        new SleepPatternSummaryData(3, 20000),
-        new SleepPatternSummaryData(4, 30000))
 
     const sleepJSON: any = {
         id: new ObjectID(),

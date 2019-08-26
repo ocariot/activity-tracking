@@ -15,6 +15,12 @@ const fat_burn_zone_aux = activity.heart_rate!.fat_burn_zone
 const cardio_zone_aux = activity.heart_rate!.cardio_zone
 const peak_zone_aux = activity.heart_rate!.peak_zone
 
+const incompleteActivity: PhysicalActivityMock = new PhysicalActivityMock()
+incompleteActivity.id = undefined
+incompleteActivity.child_id = ''
+incompleteActivity.levels = undefined
+incompleteActivity.heart_rate = undefined
+
 describe('Validators: UpdatePhysicalActivityValidator', () => {
     describe('validate(physicalActivity: PhysicalActivity)', () => {
         /**
@@ -23,6 +29,13 @@ describe('Validators: UpdatePhysicalActivityValidator', () => {
         context('when the physical activity has all the required parameters, and that they have valid values', () => {
             it('should return undefined representing the success of the validation', () => {
                 const result = UpdatePhysicalActivityValidator.validate(activity)
+                assert.equal(result, undefined)
+            })
+        })
+
+        context('when the physical activity has not all the parameters', () => {
+            it('should return undefined representing the success of the validation', () => {
+                const result = UpdatePhysicalActivityValidator.validate(incompleteActivity)
                 assert.equal(result, undefined)
             })
         })

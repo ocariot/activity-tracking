@@ -9,7 +9,7 @@ import { JsonUtils } from '../utils/json.utils'
  */
 export class SleepPatternDataSet implements IJSONSerializable, IJSONDeserializable<SleepPatternDataSet> {
     private _start_time!: Date // Date and time of the start of the pattern according to the UTC.
-    private _name!: PhasesPatternType | StagesPatternType // Sleep pattern name (asleep, restless or awake) or (deep, light, rem or wake).
+    private _name!: PhasesPatternType | StagesPatternType // Sleep pattern name (asleep, restless or awake) or (deep, light, rem or awake).
     private _duration!: number // Total in milliseconds of the time spent on the pattern.
 
     get start_time(): Date {
@@ -74,5 +74,5 @@ export enum StagesPatternType {
     DEEP = 'deep',
     LIGHT = 'light',
     REM = 'rem',
-    WAKE = 'wake'
+    AWAKE = 'awake'
 }

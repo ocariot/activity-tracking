@@ -52,8 +52,8 @@ export class Sleep extends Activity implements IJSONSerializable, IJSONDeseriali
         return {
             ...super.toJSON(),
             ...{
-                pattern: this.pattern ? this.pattern.toJSON() : this.pattern,
-                type: this.type
+                type: this.type,
+                pattern: this.pattern ? this.pattern.toJSON() : this.pattern
             }
         }
     }

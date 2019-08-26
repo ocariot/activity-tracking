@@ -39,15 +39,22 @@ describe('Routes: children.logs', () => {
     incorrectLog.id = '507f1f77bcf86cd799439011'
     mixedLogsArr.push(incorrectLog)
 
-    // Mock other incorrect log with invalid type
+    // Mock other incorrect log with negative value
     const logJSON: any = {
         date: '2019-03-18',
         value: -1000,
     }
 
-    let otherLogIncorrect: Log = new Log()
-    otherLogIncorrect = otherLogIncorrect.fromJSON(logJSON)
-    mixedLogsArr.push(otherLogIncorrect)
+    // Mock other incorrect log with invalid value
+    const otherLogJSON: any = {
+        date: '2019-03-18',
+        value: 'invalid_value',
+    }
+
+    const incorrectLog2: Log = new Log().fromJSON(logJSON)
+    const incorrectLog3: Log = new Log().fromJSON(otherLogJSON)
+    mixedLogsArr.push(incorrectLog2)
+    mixedLogsArr.push(incorrectLog3)
 
     // Start services
     before(async () => {
@@ -235,6 +242,9 @@ describe('Routes: children.logs', () => {
                             expect(res.body.error[1].message).to.eql('Value field is invalid...')
                             expect(res.body.error[1].description).to.eql('Child log validation failed: The value ' +
                                 'provided has a negative value!')
+                            expect(res.body.error[2].message).to.eql('Value field is invalid...')
+                            expect(res.body.error[2].description).to.eql('Child log validation failed: ' +
+                                'The value received is not a number')
 
                             for (let i = 0; i < res.body.error.length; i++) {
                                 expect(res.body.error[i].code).to.eql(HttpStatus.BAD_REQUEST)

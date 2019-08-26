@@ -65,6 +65,28 @@ describe('Validators: CreateLogValidator', () => {
             })
         })
 
+        context('When the log has a invalid value (the value received is not a number)', () => {
+            it('should throw a ValidationException', () => {
+                // Mock through JSON
+                const logJSON: any = {
+                    date: '2019-03-11',
+                    value: 'wrong_value',
+                    type: LogType.STEPS,
+                    child_id: '5a62be07de34500146d9c544',
+                }
+
+                let logTest: Log = new Log()
+                logTest = logTest.fromJSON(logJSON)
+
+                try {
+                    CreateLogValidator.validate(logTest)
+                } catch (err) {
+                    assert.equal(err.message, 'Value field is invalid...')
+                    assert.equal(err.description, 'Child log validation failed: The value received is not a number')
+                }
+            })
+        })
+
         context('When the log has a invalid date', () => {
             it('should throw a ValidationException', () => {
                 // Mock through JSON

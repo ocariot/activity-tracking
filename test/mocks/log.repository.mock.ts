@@ -1,5 +1,5 @@
 import { ILogRepository } from '../../src/application/port/log.repository.interface'
-import { Log } from '../../src/application/domain/model/log'
+import { Log, LogType } from '../../src/application/domain/model/log'
 import { LogMock } from './log.mock'
 
 export class LogRepositoryMock implements ILogRepository {
@@ -29,6 +29,11 @@ export class LogRepositoryMock implements ILogRepository {
             for (let i = 0; i < 5; i++ ) {
                 logsArr.push(new LogMock(query.filters.type))
             }
+            logsArr[0].type = LogType.STEPS
+            logsArr[1].type = LogType.CALORIES
+            logsArr[2].type = LogType.ACTIVE_MINUTES
+            logsArr[3].type = LogType.LIGHTLY_ACTIVE_MINUTES
+            logsArr[4].type = LogType.SEDENTARY_MINUTES
         }
         return Promise.resolve(logsArr)
     }

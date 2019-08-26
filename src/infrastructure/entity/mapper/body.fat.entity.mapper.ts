@@ -33,17 +33,6 @@ export class BodyFatEntityMapper implements IEntityMapper<BodyFat, BodyFatEntity
     }
 
     /**
-     * Convert {BodyFatEntity} for {BodyFat}.
-     *
-     * @see Each attribute must be mapped only if it contains an assigned value,
-     * because at some point the attribute accessed may not exist.
-     * @param item
-     */
-    public modelEntityToModel(item: BodyFatEntity): BodyFat {
-        throw Error('Not implemented!')
-    }
-
-    /**
      * Convert JSON for BodyFat.
      *
      * @see Each attribute must be mapped only if it contains an assigned value,

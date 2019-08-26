@@ -7,7 +7,12 @@ import { BodyFatEntity } from '../../../src/infrastructure/entity/body.fat.entit
 import { BodyFat } from '../../../src/application/domain/model/body.fat'
 
 describe('Mappers: BodyFatEntityMapper', () => {
-    const body_fat: BodyFatMock = new BodyFatMock()
+    const bodyFat: BodyFat = new BodyFatMock()
+
+    // To test how mapper works with an object without any attributes
+    const otherBodyFat: BodyFat = new BodyFat()
+    otherBodyFat.type = ''
+    otherBodyFat.unit = undefined
 
     // Create BodyFat JSON
     const bodyFatJSON: any = {
@@ -19,16 +24,26 @@ describe('Mappers: BodyFatEntityMapper', () => {
         child_id: '5a62be07de34500146d9c544'
     }
 
+    // To test how mapper works with an object without any attributes (JSON)
+    const otherBodyFatJSON: any = {}
+
     describe('transform(item: any)', () => {
         context('when the parameter is of type BodyFat', () => {
             it('should normally execute the method, returning a BodyFatEntity as a result of the transformation', () => {
-                const result: BodyFatEntity = new BodyFatEntityMapper().transform(body_fat)
-                assert.propertyVal(result, 'id', body_fat.id)
-                assert.propertyVal(result, 'type', body_fat.type)
-                assert.propertyVal(result, 'timestamp', body_fat.timestamp)
-                assert.propertyVal(result, 'value', body_fat.value)
-                assert.propertyVal(result, 'unit', body_fat.unit)
-                assert.propertyVal(result, 'child_id', body_fat.child_id)
+                const result: BodyFatEntity = new BodyFatEntityMapper().transform(bodyFat)
+                assert.propertyVal(result, 'id', bodyFat.id)
+                assert.propertyVal(result, 'type', bodyFat.type)
+                assert.propertyVal(result, 'timestamp', bodyFat.timestamp)
+                assert.propertyVal(result, 'value', bodyFat.value)
+                assert.propertyVal(result, 'unit', bodyFat.unit)
+                assert.propertyVal(result, 'child_id', bodyFat.child_id)
+            })
+        })
+
+        context('when the parameter is of type BodyFat and does not contain any attributes', () => {
+            it('should normally execute the method, returning an empty BodyFatEntity', () => {
+                const result: BodyFatEntity = new BodyFatEntityMapper().transform(otherBodyFat)
+                assert.isEmpty(result)
             })
         })
 
@@ -41,6 +56,18 @@ describe('Mappers: BodyFatEntityMapper', () => {
                 assert.propertyVal(result, 'value', bodyFatJSON.value)
                 assert.propertyVal(result, 'unit', bodyFatJSON.unit)
                 assert.propertyVal(result, 'child_id', bodyFatJSON.child_id)
+            })
+        })
+
+        context('when the parameter is a JSON and does not contain any attributes', () => {
+            it('should normally execute the method, returning a BodyFat as a result of the transformation', () => {
+                const result: BodyFat = new BodyFatEntityMapper().transform(otherBodyFatJSON)
+                assert.propertyVal(result, 'id', otherBodyFatJSON.id)
+                assert.propertyVal(result, 'type', MeasurementType.BODY_FAT)
+                assert.propertyVal(result, 'timestamp', otherBodyFatJSON.timestamp)
+                assert.propertyVal(result, 'value', otherBodyFatJSON.value)
+                assert.propertyVal(result, 'unit', '%')
+                assert.propertyVal(result, 'child_id', otherBodyFatJSON.child_id)
             })
         })
 

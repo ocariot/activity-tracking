@@ -1,7 +1,6 @@
 import { SleepPatternSummaryData } from './sleep.pattern.summary.data'
 import { IJSONSerializable } from '../utils/json.serializable.interface'
 import { IJSONDeserializable } from '../utils/json.deserializable.interface'
-import { JsonUtils } from '../utils/json.utils'
 
 /**
  * The implementation of the summary entity of sleep pattern.
@@ -12,14 +11,14 @@ export class SleepPatternStagesSummary implements IJSONSerializable, IJSONDeseri
     private _deep!: SleepPatternSummaryData
     private _light!: SleepPatternSummaryData
     private _rem!: SleepPatternSummaryData
-    private _wake!: SleepPatternSummaryData
+    private _awake!: SleepPatternSummaryData
 
     constructor(deep?: SleepPatternSummaryData, light?: SleepPatternSummaryData, rem?: SleepPatternSummaryData,
-                wake?: SleepPatternSummaryData) {
+                awake?: SleepPatternSummaryData) {
         if (deep) this.deep = deep
         if (light) this.light = light
         if (rem) this.rem = rem
-        if (wake) this.wake = wake
+        if (awake) this.awake = awake
     }
 
     get deep(): SleepPatternSummaryData {
@@ -46,25 +45,16 @@ export class SleepPatternStagesSummary implements IJSONSerializable, IJSONDeseri
         this._rem = value
     }
 
-    get wake(): SleepPatternSummaryData {
-        return this._wake
+    get awake(): SleepPatternSummaryData {
+        return this._awake
     }
 
-    set wake(value: SleepPatternSummaryData) {
-        this._wake = value
+    set awake(value: SleepPatternSummaryData) {
+        this._awake = value
     }
 
+    // Not implemented!
     public fromJSON(json: any): SleepPatternStagesSummary {
-        if (!json) return this
-        if (typeof json === 'string' && JsonUtils.isJsonString(json)) {
-            json = JSON.parse(json)
-        }
-
-        if (json.deep !== undefined) this.deep = new SleepPatternSummaryData(json.deep.count, json.deep.duration)
-        if (json.light !== undefined) this.light = new SleepPatternSummaryData(json.light.count, json.light.duration)
-        if (json.rem !== undefined) this.rem = new SleepPatternSummaryData(json.rem.count, json.rem.duration)
-        if (json.wake !== undefined) this.wake = new SleepPatternSummaryData(json.wake.count, json.wake.duration)
-
         return this
     }
 
@@ -73,7 +63,7 @@ export class SleepPatternStagesSummary implements IJSONSerializable, IJSONDeseri
             deep: this.deep,
             light: this.light,
             rem: this.rem,
-            wake: this.wake
+            awake: this.awake
         }
     }
 }

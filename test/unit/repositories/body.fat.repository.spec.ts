@@ -52,6 +52,26 @@ describe('Repositories: BodyFatRepository', () => {
             })
         })
 
+        context('when the BodyFat is not found in search without filters', () => {
+            it('should return false', () => {
+                const otherBodyFat: BodyFat = new BodyFatMock()
+                otherBodyFat.type = undefined
+                otherBodyFat.timestamp = undefined
+                otherBodyFat.child_id = undefined
+                sinon
+                    .mock(modelFake)
+                    .expects('findOne')
+                    .withArgs()
+                    .chain('exec')
+                    .resolves(false)
+
+                return bodyFatRepo.checkExist(otherBodyFat)
+                    .then(result => {
+                        assert.isFalse(result)
+                    })
+            })
+        })
+
         context('when the BodyFat is not found', () => {
             it('should return false', () => {
                 sinon

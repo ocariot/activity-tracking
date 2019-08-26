@@ -220,10 +220,21 @@ describe('Services: SleepService', () => {
             })
         })
 
+        context('when the Sleep is correct but is not successfully created in the database', () => {
+            it('should return undefined', () => {
+                connectionRabbitmqPub.isConnected = true
+                sleep.id = '507f1f77bcf86cd799439013'           // Make return undefined in create method
+
+                return sleepService.add(sleep)
+                    .then((result) => {
+                        assert.equal(result, undefined)
+                    })
+            })
+        })
+
         context('when the Sleep is correct but already exists in the repository', () => {
             it('should throw a ConflictException', () => {
-                connectionRabbitmqPub.isConnected = true
-                sleep.id = '507f1f77bcf86cd799439011'
+                sleep.id = '507f1f77bcf86cd799439011'            // Make return true in checkExist method
 
                 return sleepService.add(sleep)
                     .catch(error => {
@@ -425,7 +436,7 @@ describe('Services: SleepService', () => {
                     if (incorrectSleep.type === SleepType.CLASSIC)
                         assert.propertyVal(err, 'description', 'The names of the allowed patterns are: asleep, restless, awake.')
                     else
-                        assert.propertyVal(err, 'description', 'The names of the allowed patterns are: deep, light, rem, wake.')
+                        assert.propertyVal(err, 'description', 'The names of the allowed patterns are: deep, light, rem, awake.')
                 }
             })
         })
@@ -455,7 +466,7 @@ describe('Services: SleepService', () => {
                     return await sleepService.add(incorrectSleep)
                 } catch (err) {
                     assert.propertyVal(err, 'message', 'The sleep pattern name provided "deeps" is not supported...')
-                    assert.propertyVal(err, 'description', 'The names of the allowed patterns are: deep, light, rem, wake.')
+                    assert.propertyVal(err, 'description', 'The names of the allowed patterns are: deep, light, rem, awake.')
                 }
             })
         })
@@ -638,11 +649,11 @@ describe('Services: SleepService', () => {
                                 'asleep, restless, awake.')
                         } else {
                             assert.propertyVal(result.error[11], 'description', 'The names of the allowed patterns are: ' +
-                                'deep, light, rem, wake.')
+                                'deep, light, rem, awake.')
                         }
                         assert.propertyVal(result.error[12], 'message', 'The sleep pattern name provided "deeps" is not supported...')
                         assert.propertyVal(result.error[12], 'description', 'The names of the allowed patterns are: ' +
-                            'deep, light, rem, wake.')
+                            'deep, light, rem, awake.')
 
                         for (let i = 0; i < result.error.length; i++) {
                             assert.propertyVal(result.error[i], 'code', HttpStatus.BAD_REQUEST)
@@ -792,7 +803,7 @@ describe('Services: SleepService', () => {
      * Method: updateByChild(sleep: Sleep)
      */
     describe('updateByChild(sleep: Sleep)', () => {
-        context('when sleep exists in the database', () => {
+        context('when sleep can be successfully updated', () => {
             it('should return the Sleep that was updated', () => {
                 otherSleep.id = '507f1f77bcf86cd799439012'            // Make mock return a sleep
 
@@ -805,6 +816,17 @@ describe('Services: SleepService', () => {
                         assert.propertyVal(result, 'child_id', otherSleep.child_id)
                         assert.propertyVal(result, 'pattern', otherSleep.pattern)
                         assert.propertyVal(result, 'type', otherSleep.type)
+                    })
+            })
+        })
+
+        context('when sleep already exists in the database', () => {
+            it('should return the Sleep that was updated', () => {
+                otherSleep.id = '507f1f77bcf86cd799439011'            // Make mock return a sleep
+
+                return sleepService.updateByChild(otherSleep)
+                    .catch(err => {
+                        assert.propertyVal(err, 'message', 'Sleep is already registered...')
                     })
             })
         })
@@ -972,7 +994,7 @@ describe('Services: SleepService', () => {
                         if (incorrectSleep.type === SleepType.CLASSIC)
                             assert.propertyVal(err, 'description', 'The names of the allowed patterns are: asleep, restless, awake.')
                         else
-                            assert.propertyVal(err, 'description', 'The names of the allowed patterns are: deep, light, rem, wake.')
+                            assert.propertyVal(err, 'description', 'The names of the allowed patterns are: deep, light, rem, awake.')
                     })
             })
         })
@@ -1001,7 +1023,7 @@ describe('Services: SleepService', () => {
                 return sleepService.updateByChild(incorrectSleep)
                     .catch (err => {
                         assert.propertyVal(err, 'message', 'The sleep pattern name provided "deeps" is not supported...')
-                        assert.propertyVal(err, 'description', 'The names of the allowed patterns are: deep, light, rem, wake.')
+                        assert.propertyVal(err, 'description', 'The names of the allowed patterns are: deep, light, rem, awake.')
                     })
             })
         })

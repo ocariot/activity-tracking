@@ -1581,7 +1581,7 @@ describe('Routes: children.physicalactivities', () => {
      * PATCH route for PhysicalActivity
      */
     describe('PATCH /v1/children/:child_id/physicalactivities/:physicalactivity_id', () => {
-        context('when this physical activity exists in the database and is updated successfully', () => {
+        context('when this physical activity is updated successfully', () => {
             before(() => {
                 try {
                     deleteAllActivity()
@@ -1636,6 +1636,42 @@ describe('Routes: children.physicalactivities', () => {
                             expect(res.body.heart_rate).to.eql(defaultActivity.heart_rate.toJSON())
                         }
                         expect(res.body.child_id).to.eql(defaultActivity.child_id)
+                    })
+            })
+        })
+
+        context('when physical activity already exists in the database', () => {
+            it('should return status status code 404 and an info message about the conflict', async () => {
+                let result
+
+                try {
+                    // physical activity to be updated
+                    result = await createActivityToBeUpdated(defaultActivity)
+                } catch (err) {
+                    throw new Error('Failure on children.physicalactivities routes test: ' + err.message)
+                }
+
+                // physical activity to update
+                const body = {
+                    name: defaultActivity.name,
+                    start_time: otherActivity.start_time,
+                    end_time: otherActivity.end_time,
+                    duration: defaultActivity.duration,
+                    calories: defaultActivity.calories,
+                    steps: defaultActivity.steps ? defaultActivity.steps : undefined,
+                    levels: defaultActivity.levels ? defaultActivity.levels : undefined,
+                    heart_rate: defaultActivity.heart_rate ? defaultActivity.heart_rate : undefined,
+                    child_id: defaultActivity.child_id
+                }
+
+                return request
+                    .patch(`/v1/children/${result.child_id}/physicalactivities/${result.id}`)
+                    .send(body)
+                    .set('Content-Type', 'application/json')
+                    .expect(409)
+                    .then(err => {
+                        expect(err.body.code).to.eql(409)
+                        expect(err.body.message).to.eql('Physical Activity is already registered...')
                     })
             })
         })

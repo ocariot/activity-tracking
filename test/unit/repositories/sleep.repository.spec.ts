@@ -50,6 +50,25 @@ describe('Repositories: SleepRepository', () => {
             })
         })
 
+        context('when the sleep is not found in search without filters', () => {
+            it('should return false', () => {
+                const otherSleep: Sleep = new SleepMock()
+                otherSleep.start_time = undefined
+                otherSleep.child_id = ''
+                sinon
+                    .mock(modelFake)
+                    .expects('findOne')
+                    .withArgs()
+                    .chain('exec')
+                    .resolves(false)
+
+                return sleepRepo.checkExist(otherSleep)
+                    .then(result => {
+                        assert.isFalse(result)
+                    })
+            })
+        })
+
         context('when the sleep is not found', () => {
             it('should return false', () => {
                 sinon

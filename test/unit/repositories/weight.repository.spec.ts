@@ -107,6 +107,26 @@ describe('Repositories: WeightRepository', () => {
             })
         })
 
+        context('when the Weight is not found in search without filters', () => {
+            it('should return false', () => {
+                const otherWeight: Weight = new WeightMock()
+                otherWeight.type = undefined
+                otherWeight.timestamp = undefined
+                otherWeight.child_id = undefined
+                sinon
+                    .mock(modelFake)
+                    .expects('findOne')
+                    .withArgs()
+                    .chain('exec')
+                    .resolves(false)
+
+                return weightRepo.checkExist(otherWeight)
+                    .then(result => {
+                        assert.isFalse(result)
+                    })
+            })
+        })
+
         context('when the Weight is not found', () => {
             it('should return false', () => {
                 sinon

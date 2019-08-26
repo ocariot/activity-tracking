@@ -10,6 +10,11 @@ import { Sleep, SleepType } from '../../../src/application/domain/model/sleep'
 const sleep: SleepMock = new SleepMock()
 const phase_name_aux = sleep.pattern!.data_set[0].name
 
+const incompleteSleep: SleepMock = new SleepMock()
+incompleteSleep.id = undefined
+incompleteSleep.child_id = ''
+incompleteSleep.pattern = undefined
+
 describe('Validators: UpdateSleepValidator', () => {
     describe('validate(sleep: Sleep)', () => {
         /**
@@ -18,6 +23,13 @@ describe('Validators: UpdateSleepValidator', () => {
         context('when the sleep has all the required parameters, and that they have valid values', () => {
             it('should return undefined representing the success of the validation', () => {
                 const result = UpdateSleepValidator.validate(sleep)
+                assert.equal(result, undefined)
+            })
+        })
+
+        context('when the sleep does not have the parameters', () => {
+            it('should return undefined representing the success of the validation', () => {
+                const result = UpdateSleepValidator.validate(incompleteSleep)
                 assert.equal(result, undefined)
             })
         })
@@ -175,7 +187,7 @@ describe('Validators: UpdateSleepValidator', () => {
                     if (sleep.type === SleepType.CLASSIC)
                         assert.equal(err.description, 'The names of the allowed patterns are: asleep, restless, awake.')
                     else
-                        assert.equal(err.description, 'The names of the allowed patterns are: deep, light, rem, wake.')
+                        assert.equal(err.description, 'The names of the allowed patterns are: deep, light, rem, awake.')
                 }
             })
         })
@@ -203,7 +215,7 @@ describe('Validators: UpdateSleepValidator', () => {
                     UpdateSleepValidator.validate(invalidSleep)
                 } catch (err) {
                     assert.equal(err.message, 'The sleep pattern name provided "deeps" is not supported...')
-                    assert.equal(err.description, 'The names of the allowed patterns are: deep, light, rem, wake.')
+                    assert.equal(err.description, 'The names of the allowed patterns are: deep, light, rem, awake.')
                 }
             })
         })

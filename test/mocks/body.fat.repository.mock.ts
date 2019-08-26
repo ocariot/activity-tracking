@@ -18,6 +18,8 @@ export class BodyFatRepositoryMock implements IBodyFatRepository {
     }
 
     public create(item: BodyFat): Promise<BodyFat> {
+        if (item.id === '507f1f77bcf86cd799439013')
+            return Promise.resolve(undefined!)
         return Promise.resolve(item)
     }
 

@@ -86,6 +86,39 @@ describe('Routes: children.weights', () => {
             })
         })
 
+        context('when posting a new Weight (without body_fat) with success', () => {
+            before(() => {
+                try {
+                    deleteAllWeight()
+                } catch (err) {
+                    throw new Error('Failure on children.weights routes test: ' + err.message)
+                }
+            })
+
+            it('should return status code 201 and the saved Weight', () => {
+                const body = {
+                    timestamp: defaultWeight.timestamp,
+                    value: defaultWeight.value,
+                    unit: defaultWeight.unit
+                }
+
+                return request
+                    .post(`/v1/children/${defaultWeight.child_id}/weights`)
+                    .send(body)
+                    .set('Content-Type', 'application/json')
+                    .expect(201)
+                    .then(res => {
+                        defaultWeight.id = res.body.id
+                        expect(res.body.id).to.eql(defaultWeight.id)
+                        expect(res.body.timestamp).to.eql(defaultWeight.timestamp!.toISOString())
+                        expect(res.body.value).to.eql(defaultWeight.value)
+                        expect(res.body.unit).to.eql(defaultWeight.unit)
+                        expect(res.body.child_id).to.eql(defaultWeight.child_id)
+                        expect(res.body.body_fat).to.eql(undefined)
+                    })
+            })
+        })
+
         context('when a duplicate error occurs', () => {
             it('should return status code 409 and an info message about duplicate items', () => {
                 const body = {

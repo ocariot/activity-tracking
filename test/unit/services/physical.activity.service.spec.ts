@@ -245,10 +245,21 @@ describe('Services: PhysicalActivityService', () => {
             })
         })
 
+        context('when the physical activity is correct but is not successfully created in the database', () => {
+            it('should return undefined', () => {
+                connectionRabbitmqPub.isConnected = true
+                activity.id = '507f1f77bcf86cd799439013'            // Make return undefined in create method
+
+                return activityService.add(activity)
+                    .then((result) => {
+                        assert.equal(result, undefined)
+                    })
+            })
+        })
+
         context('when the physical activity is correct but already exists in the repository', () => {
             it('should throw a ConflictException', () => {
-                connectionRabbitmqPub.isConnected = true
-                activity.id = '507f1f77bcf86cd799439011'            // Make mock return true
+                activity.id = '507f1f77bcf86cd799439011'            // Make mock return true in checkExist method
 
                 return activityService.add(activity)
                     .catch(error => {
@@ -821,7 +832,7 @@ describe('Services: PhysicalActivityService', () => {
      * Method updateByChild(activity: PhysicalActivity)
      */
     describe('updateByChild(activity: PhysicalActivity)', () => {
-        context('when physical activity exists in the database', () => {
+        context('when physical activity can be successfully updated', () => {
             it('should return the PhysicalActivity that was updated', () => {
                 otherActivity.id = '507f1f77bcf86cd799439012'            // Make mock return an activity
 
@@ -837,6 +848,17 @@ describe('Services: PhysicalActivityService', () => {
                         assert.propertyVal(result, 'steps', otherActivity.steps)
                         assert.propertyVal(result, 'levels', otherActivity.levels)
                         assert.propertyVal(result, 'heart_rate', otherActivity.heart_rate)
+                    })
+            })
+        })
+
+        context('when physical activity already exists in the database', () => {
+            it('should return the PhysicalActivity that was updated', () => {
+                otherActivity.id = '507f1f77bcf86cd799439011'            // Make mock return true for checkExist
+
+                return activityService.updateByChild(otherActivity)
+                    .catch(err => {
+                        assert.propertyVal(err, 'message', 'Physical Activity is already registered...')
                     })
             })
         })

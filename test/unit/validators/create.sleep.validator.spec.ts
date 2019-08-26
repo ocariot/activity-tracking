@@ -255,7 +255,7 @@ describe('Validators: CreateSleepValidator', () => {
                     if (sleep.type === SleepType.CLASSIC)
                         assert.equal(err.description, 'The names of the allowed patterns are: asleep, restless, awake.')
                     else
-                        assert.equal(err.description, 'The names of the allowed patterns are: deep, light, rem, wake.')
+                        assert.equal(err.description, 'The names of the allowed patterns are: deep, light, rem, awake.')
                 }
             })
         })
@@ -283,7 +283,7 @@ describe('Validators: CreateSleepValidator', () => {
                     CreateSleepValidator.validate(invalidSleep)
                 } catch (err) {
                     assert.equal(err.message, 'The sleep pattern name provided "deeps" is not supported...')
-                    assert.equal(err.description, 'The names of the allowed patterns are: deep, light, rem, wake.')
+                    assert.equal(err.description, 'The names of the allowed patterns are: deep, light, rem, awake.')
                 }
             })
         })
