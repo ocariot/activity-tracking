@@ -1,6 +1,4 @@
 import { IJSONSerializable } from '../utils/json.serializable.interface'
-import { IJSONDeserializable } from '../utils/json.deserializable.interface'
-import { JsonUtils } from '../utils/json.utils'
 
 /**
  * Implementation of a class to represent the 'success' item of a MultiStatus
@@ -8,7 +6,7 @@ import { JsonUtils } from '../utils/json.utils'
  * @implements {IJSONSerializable, IJSONDeserializable}
  * @template T
  */
-export class StatusSuccess<T> implements IJSONSerializable, IJSONDeserializable<StatusSuccess<T>> {
+export class StatusSuccess<T> implements IJSONSerializable {
     private _code!: number
     private _item!: T
 
@@ -31,18 +29,6 @@ export class StatusSuccess<T> implements IJSONSerializable, IJSONDeserializable<
 
     set item(value: T) {
         this._item = value
-    }
-
-    public fromJSON(json: any): StatusSuccess<T> {
-        if (!json) return this
-        if (typeof json === 'string' && JsonUtils.isJsonString(json)) {
-            json = JSON.parse(json)
-        }
-
-        if (json.code !== undefined) this.code = json.code
-        if (json.item !== undefined) this.item = json.item
-
-        return this
     }
 
     public toJSON(): any {

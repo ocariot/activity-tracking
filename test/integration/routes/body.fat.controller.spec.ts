@@ -269,12 +269,16 @@ describe('Routes: children.bodyfats', () => {
     describe('GET /v1/children/:child_id/bodyfats', () => {
         context('when get all BodyFat of a child successfully', () => {
             it('should return status code 200 and a list of all BodyFat objects found', async () => {
-                await createBodyFat({
-                    timestamp: defaultBodyFat.timestamp,
-                    value: defaultBodyFat.value,
-                    unit: defaultBodyFat.unit,
-                    child_id: defaultBodyFat.child_id
-                })
+                try{
+                    await createBodyFat({
+                        timestamp: defaultBodyFat.timestamp,
+                        value: defaultBodyFat.value,
+                        unit: defaultBodyFat.unit,
+                        child_id: defaultBodyFat.child_id
+                    })
+                } catch (err) {
+                    throw new Error('Failure on children.bodyfats routes test: ' + err.message)
+                }
 
                 return request
                     .get(`/v1/children/${defaultBodyFat.child_id}/bodyfats`)
@@ -313,6 +317,39 @@ describe('Routes: children.bodyfats', () => {
                     .then(res => {
                         expect(res.body).is.an.instanceOf(Array)
                         expect(res.body.length).to.eql(0)
+                    })
+            })
+        })
+
+        context('when the child_id is invalid', () => {
+            before(() => {
+                try {
+                    deleteAllBodyFat()
+                } catch (err) {
+                    throw new Error('Failure on children.bodyfats routes test: ' + err.message)
+                }
+            })
+
+            it('should return status code 400 and an info message about the invalid child_id', async () => {
+                try {
+                    await createBodyFat({
+                        timestamp: defaultBodyFat.timestamp,
+                        value: defaultBodyFat.value,
+                        unit: defaultBodyFat.unit,
+                        child_id: defaultBodyFat.child_id
+                    })
+                } catch (err) {
+                    throw new Error('Failure on children.bodyfats routes test: ' + err.message)
+                }
+
+                return request
+                    .get(`/v1/children/123/bodyfats`)
+                    .set('Content-Type', 'application/json')
+                    .expect(400)
+                    .then(err => {
+                        expect(err.body.code).to.eql(400)
+                        expect(err.body.message).to.eql(Strings.CHILD.PARAM_ID_NOT_VALID_FORMAT)
+                        expect(err.body.description).to.eql(Strings.ERROR_MESSAGE.UUID_NOT_VALID_FORMAT_DESC)
                     })
             })
         })
@@ -391,6 +428,42 @@ describe('Routes: children.bodyfats', () => {
                     .then(res => {
                         expect(res.body).is.an.instanceOf(Array)
                         expect(res.body.length).to.eql(0)
+                    })
+            })
+        })
+
+        context('when there is an attempt to get BodyFat of a child using the "query-strings-parser" library ' +
+            'but the child_id is invalid', () => {
+            before(() => {
+                try {
+                    deleteAllBodyFat()
+                } catch (err) {
+                    throw new Error('Failure on children.bodyfats routes test: ' + err.message)
+                }
+            })
+
+            it('should return status code 400 and an info message about the invalid child_id', async () => {
+                try {
+                    await createBodyFat({
+                        timestamp: defaultBodyFat.timestamp,
+                        value: defaultBodyFat.value,
+                        unit: defaultBodyFat.unit,
+                        child_id: defaultBodyFat.child_id
+                    })
+                } catch (err) {
+                    throw new Error('Failure on children.bodyfats routes test: ' + err.message)
+                }
+
+                const url = `/v1/children/123/bodyfats?child_id=${defaultBodyFat.child_id}&sort=child_id&page=1&limit=3`
+
+                return request
+                    .get(url)
+                    .set('Content-Type', 'application/json')
+                    .expect(400)
+                    .then(err => {
+                        expect(err.body.code).to.eql(400)
+                        expect(err.body.message).to.eql(Strings.CHILD.PARAM_ID_NOT_VALID_FORMAT)
+                        expect(err.body.description).to.eql(Strings.ERROR_MESSAGE.UUID_NOT_VALID_FORMAT_DESC)
                     })
             })
         })

@@ -8,7 +8,10 @@ import { Environment } from '../../../src/application/domain/model/environment'
 import { Measurement } from '../../../src/application/domain/model/measurement'
 
 describe('Mappers: EnvironmentEntityMapper', () => {
-    const environment: EnvironmentMock = new EnvironmentMock()
+    const environment: Environment = new EnvironmentMock()
+
+    // To test how mapper works with an object without any attributes
+    const emptyEnvironment: Environment = new Environment()
 
     // Create environment JSON
     const environmentJSON: any = {
@@ -19,6 +22,9 @@ describe('Mappers: EnvironmentEntityMapper', () => {
         climatized: true,
         timestamp: new Date().toISOString()
     }
+
+    // To test how mapper works with an object without any attributes (JSON)
+    const emptyEnvironmentJSON: any = {}
 
     describe('transform(item: any)', () => {
         context('when the parameter is of type Environment', () => {
@@ -34,6 +40,13 @@ describe('Mappers: EnvironmentEntityMapper', () => {
             })
         })
 
+        context('when the parameter is of type Environment and does not contain any attributes', () => {
+            it('should normally execute the method, returning an empty EnvironmentEntity', () => {
+                const result: EnvironmentEntity = new EnvironmentEntityMapper().transform(emptyEnvironment)
+                assert.isEmpty(result)
+            })
+        })
+
         context('when the parameter is a JSON', () => {
             it('should normally execute the method, returning an Environment as a result of the transformation', () => {
                 const result: Environment = new EnvironmentEntityMapper().transform(environmentJSON)
@@ -42,6 +55,17 @@ describe('Mappers: EnvironmentEntityMapper', () => {
                 assert.deepEqual(result.location, environmentJSON.location)
                 assert.deepPropertyVal(result, 'measurements', environmentJSON.measurements)
                 assert.propertyVal(result, 'timestamp', environmentJSON.timestamp)
+            })
+        })
+
+        context('when the parameter is a JSON and does not contain any attributes', () => {
+            it('should normally execute the method, returning an Environment as a result of the transformation', () => {
+                const result: Environment = new EnvironmentEntityMapper().transform(emptyEnvironmentJSON)
+                assert.propertyVal(result, 'id', emptyEnvironmentJSON.id)
+                assert.propertyVal(result, 'institution_id', emptyEnvironmentJSON.institution_id)
+                assert.propertyVal(result, 'location', emptyEnvironmentJSON.location)
+                assert.propertyVal(result, 'measurements', emptyEnvironmentJSON.measurements)
+                assert.propertyVal(result, 'timestamp', emptyEnvironmentJSON.timestamp)
             })
         })
 

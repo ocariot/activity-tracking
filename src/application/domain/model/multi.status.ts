@@ -42,10 +42,10 @@ export class MultiStatus<T> implements IJSONSerializable, IJSONDeserializable<Mu
         }
 
         if (json.success !== undefined && json.success instanceof Array)  {
-            this.success = json.success.map(item => new StatusSuccess<T>().fromJSON(item))
+            this.success = json.success.map((item: StatusSuccess<T>) => new StatusSuccess<T>(item.code, item.item))
         }
         if (json.error !== undefined && json.error instanceof Array) {
-            this.error = json.error.map(item => new StatusError<T>().fromJSON(item))
+            this.error = json.error.map((item: StatusError<T>) => new StatusError<T>(item.code, item.message, item.description, item.item))
         }
 
         return this

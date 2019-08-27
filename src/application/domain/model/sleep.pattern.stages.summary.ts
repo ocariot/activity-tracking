@@ -1,13 +1,12 @@
 import { SleepPatternSummaryData } from './sleep.pattern.summary.data'
 import { IJSONSerializable } from '../utils/json.serializable.interface'
-import { IJSONDeserializable } from '../utils/json.deserializable.interface'
 
 /**
  * The implementation of the summary entity of sleep pattern.
  *
  * @implements {IJSONSerializable, IJSONDeserializable<SleepPatternPhasesSummary>}
  */
-export class SleepPatternStagesSummary implements IJSONSerializable, IJSONDeserializable<SleepPatternStagesSummary> {
+export class SleepPatternStagesSummary implements IJSONSerializable {
     private _deep!: SleepPatternSummaryData
     private _light!: SleepPatternSummaryData
     private _rem!: SleepPatternSummaryData
@@ -51,11 +50,6 @@ export class SleepPatternStagesSummary implements IJSONSerializable, IJSONDeseri
 
     set awake(value: SleepPatternSummaryData) {
         this._awake = value
-    }
-
-    // Not implemented!
-    public fromJSON(json: any): SleepPatternStagesSummary {
-        return this
     }
 
     public toJSON(): any {

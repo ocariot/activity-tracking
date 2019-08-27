@@ -4,8 +4,11 @@ import { LogEntityMapper } from '../../../src/infrastructure/entity/mapper/log.e
 import { LogEntity } from '../../../src/infrastructure/entity/log.entity'
 
 describe('Mappers: LogEntityMapper', () => {
-    const log: Log = new Log('2019-03-1', 1000, LogType.CALORIES, '5a62be07de34500146d9c544')
+    const log: Log = new Log('2019/3/1', 1000, LogType.CALORIES, '5a62be07de34500146d9c544')
     log.id = '5a62be07de34500146d9c544'
+
+    // To test how mapper works with an object without any attributes
+    const emptyLog: Log = new Log()
 
     // Create log JSON
     const logJSON: any = {
@@ -15,6 +18,9 @@ describe('Mappers: LogEntityMapper', () => {
         type: LogType.CALORIES,
         child_id: '5a62be07de34500146d9c544'
     }
+
+    // To test how mapper works with an object without any attributes (JSON)
+    const emptyLogJSON: any = {}
 
     describe('transform(item: any)', () => {
         context('when the parameter is of type Log', () => {
@@ -28,6 +34,13 @@ describe('Mappers: LogEntityMapper', () => {
             })
         })
 
+        context('when the parameter is of type Log and does not contain any attributes', () => {
+            it('should normally execute the method, returning an empty LogEntity', () => {
+                const result: LogEntity = new LogEntityMapper().transform(emptyLog)
+                assert.isEmpty(result)
+            })
+        })
+
         context('when the parameter is a JSON', () => {
             it('should normally execute the method, returning a Log as a result of the transformation', () => {
                 const result: Log = new LogEntityMapper().transform(logJSON)
@@ -36,6 +49,17 @@ describe('Mappers: LogEntityMapper', () => {
                 assert.propertyVal(result, 'value', logJSON.value)
                 assert.propertyVal(result, 'type', logJSON.type)
                 assert.propertyVal(result, 'child_id', logJSON.child_id)
+            })
+        })
+
+        context('when the parameter is a JSON and does not contain any attributes', () => {
+            it('should normally execute the method, returning a Log as a result of the transformation', () => {
+                const result: Log = new LogEntityMapper().transform(emptyLogJSON)
+                assert.propertyVal(result, 'id', emptyLogJSON.id)
+                assert.propertyVal(result, 'date', emptyLogJSON.date)
+                assert.propertyVal(result, 'value', emptyLogJSON.value)
+                assert.propertyVal(result, 'type', emptyLogJSON.type)
+                assert.propertyVal(result, 'child_id', emptyLogJSON.child_id)
             })
         })
 

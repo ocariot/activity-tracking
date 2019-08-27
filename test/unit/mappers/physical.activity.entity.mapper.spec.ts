@@ -7,7 +7,10 @@ import { PhysicalActivityLevel } from '../../../src/application/domain/model/phy
 import { PhysicalActivityHeartRate } from '../../../src/application/domain/model/physical.activity.heart.rate'
 
 describe('Mappers: PhysicalActivityEntityMapper', () => {
-    const activity: PhysicalActivityMock = new PhysicalActivityMock()
+    const activity: PhysicalActivity = new PhysicalActivityMock()
+
+    // To test how mapper works with an object without any attributes
+    const emptyActivity: PhysicalActivity = new PhysicalActivity()
 
     // Create physical activity JSON
     const activityJSON: any = {
@@ -62,6 +65,9 @@ describe('Mappers: PhysicalActivityEntityMapper', () => {
         }
     }
 
+    // To test how mapper works with an object without any attributes (JSON)
+    const emptyActivityJSON: any = {}
+
     describe('transform(item: any)', () => {
         context('when the parameter is of type PhysicalActivity', () => {
             it('should normally execute the method, returning a PhysicalActivityEntity as a result of the transformation', () => {
@@ -73,13 +79,18 @@ describe('Mappers: PhysicalActivityEntityMapper', () => {
                 assert.propertyVal(result, 'child_id', activity.child_id)
                 assert.propertyVal(result, 'name', activity.name)
                 assert.propertyVal(result, 'calories', activity.calories)
-                try {
+                if (activity.steps)
                     assert.propertyVal(result, 'steps', activity.steps)
-                } catch (e) { //
-                }
                 if (activity.levels)
                     assert.deepPropertyVal(result, 'levels', activity.levels.map((elem: PhysicalActivityLevel) => elem.toJSON()))
                 assert.deepPropertyVal(result, 'heart_rate', activity.heart_rate!.toJSON())
+            })
+        })
+
+        context('when the parameter is of type PhysicalActivity and does not contain any attributes', () => {
+            it('should normally execute the method, returning an empty PhysicalActivityEntity', () => {
+                const result: PhysicalActivityEntity = new PhysicalActivityEntityMapper().transform(emptyActivity)
+                assert.deepPropertyVal(result, 'levels', [])
             })
         })
 
@@ -93,13 +104,27 @@ describe('Mappers: PhysicalActivityEntityMapper', () => {
                 assert.propertyVal(result, 'child_id', activityJSON.child_id)
                 assert.propertyVal(result, 'name', activityJSON.name)
                 assert.propertyVal(result, 'calories', activityJSON.calories)
-                try {
+                if (activity.steps)
                     assert.propertyVal(result, 'steps', activityJSON.steps)
-                } catch (e) { //
-                }
                 if (activity.levels)
                     assert.deepEqual(result.levels!.map((elem: PhysicalActivityLevel) => elem.toJSON()), activityJSON.levels)
                 assert.deepPropertyVal(result, 'heart_rate', new PhysicalActivityHeartRate().fromJSON(activityJSON.heart_rate))
+            })
+        })
+
+        context('when the parameter is a JSON and does not contain any attributes', () => {
+            it('should normally execute the method, returning a PhysicalActivity as a result of the transformation', () => {
+                const result: PhysicalActivity = new PhysicalActivityEntityMapper().transform(emptyActivityJSON)
+                assert.propertyVal(result, 'id', emptyActivityJSON.id)
+                assert.propertyVal(result, 'start_time', emptyActivityJSON.start_time)
+                assert.propertyVal(result, 'end_time', emptyActivityJSON.end_time)
+                assert.propertyVal(result, 'duration', emptyActivityJSON.duration)
+                assert.propertyVal(result, 'child_id', emptyActivityJSON.child_id)
+                assert.propertyVal(result, 'name', emptyActivityJSON.name)
+                assert.propertyVal(result, 'calories', emptyActivityJSON.calories)
+                assert.propertyVal(result, 'steps', emptyActivityJSON.steps)
+                assert.propertyVal(result, 'levels', emptyActivityJSON.levels)
+                assert.propertyVal(result, 'heart_rate', emptyActivityJSON.heart_rate)
             })
         })
 

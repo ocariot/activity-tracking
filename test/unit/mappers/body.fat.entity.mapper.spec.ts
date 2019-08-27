@@ -10,9 +10,9 @@ describe('Mappers: BodyFatEntityMapper', () => {
     const bodyFat: BodyFat = new BodyFatMock()
 
     // To test how mapper works with an object without any attributes
-    const otherBodyFat: BodyFat = new BodyFat()
-    otherBodyFat.type = ''
-    otherBodyFat.unit = undefined
+    const emptyBodyFat: BodyFat = new BodyFat()
+    emptyBodyFat.type = ''
+    emptyBodyFat.unit = undefined
 
     // Create BodyFat JSON
     const bodyFatJSON: any = {
@@ -25,7 +25,7 @@ describe('Mappers: BodyFatEntityMapper', () => {
     }
 
     // To test how mapper works with an object without any attributes (JSON)
-    const otherBodyFatJSON: any = {}
+    const emptyBodyFatJSON: any = {}
 
     describe('transform(item: any)', () => {
         context('when the parameter is of type BodyFat', () => {
@@ -42,7 +42,7 @@ describe('Mappers: BodyFatEntityMapper', () => {
 
         context('when the parameter is of type BodyFat and does not contain any attributes', () => {
             it('should normally execute the method, returning an empty BodyFatEntity', () => {
-                const result: BodyFatEntity = new BodyFatEntityMapper().transform(otherBodyFat)
+                const result: BodyFatEntity = new BodyFatEntityMapper().transform(emptyBodyFat)
                 assert.isEmpty(result)
             })
         })
@@ -61,13 +61,13 @@ describe('Mappers: BodyFatEntityMapper', () => {
 
         context('when the parameter is a JSON and does not contain any attributes', () => {
             it('should normally execute the method, returning a BodyFat as a result of the transformation', () => {
-                const result: BodyFat = new BodyFatEntityMapper().transform(otherBodyFatJSON)
-                assert.propertyVal(result, 'id', otherBodyFatJSON.id)
+                const result: BodyFat = new BodyFatEntityMapper().transform(emptyBodyFatJSON)
+                assert.propertyVal(result, 'id', emptyBodyFatJSON.id)
                 assert.propertyVal(result, 'type', MeasurementType.BODY_FAT)
-                assert.propertyVal(result, 'timestamp', otherBodyFatJSON.timestamp)
-                assert.propertyVal(result, 'value', otherBodyFatJSON.value)
+                assert.propertyVal(result, 'timestamp', emptyBodyFatJSON.timestamp)
+                assert.propertyVal(result, 'value', emptyBodyFatJSON.value)
                 assert.propertyVal(result, 'unit', '%')
-                assert.propertyVal(result, 'child_id', otherBodyFatJSON.child_id)
+                assert.propertyVal(result, 'child_id', emptyBodyFatJSON.child_id)
             })
         })
 

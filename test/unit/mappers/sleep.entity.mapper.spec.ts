@@ -4,9 +4,13 @@ import { SleepMock } from '../../mocks/sleep.mock'
 import { Sleep, SleepType } from '../../../src/application/domain/model/sleep'
 import { SleepPatternDataSet } from '../../../src/application/domain/model/sleep.pattern.data.set'
 import { SleepEntity } from '../../../src/infrastructure/entity/sleep.entity'
+// import { SleepPattern } from '../../../src/application/domain/model/sleep.pattern'
 
 describe('Mappers: SleepEntityMapper', () => {
-    const sleep: SleepMock = new SleepMock()
+    const sleep: Sleep = new SleepMock()
+
+    // To test how mapper works with an object without any attributes
+    const emptySleep: Sleep = new Sleep()
 
     // Create sleep JSON
     const sleepJSON: any = {
@@ -35,6 +39,11 @@ describe('Mappers: SleepEntityMapper', () => {
         type: SleepType.CLASSIC
     }
 
+    // To test how mapper works with an object without any attributes (JSON)
+    const emptySleepJSON: any = {
+        // pattern: new SleepPattern()
+    }
+
     describe('transform(item: any)', () => {
         context('when the parameter is of type Sleep', () => {
             it('should normally execute the method, returning a SleepEntity as a result of the transformation', () => {
@@ -50,6 +59,13 @@ describe('Mappers: SleepEntityMapper', () => {
             })
         })
 
+        context('when the parameter is of type Sleep and does not contain any attributes', () => {
+            it('should normally execute the method, returning an empty SleepEntity', () => {
+                const result: SleepEntity = new SleepEntityMapper().transform(emptySleep)
+                assert.isEmpty(result)
+            })
+        })
+
         context('when the parameter is a JSON', () => {
             it('should normally execute the method, returning a Sleep as a result of the transformation', () => {
                 const result: Sleep = new SleepEntityMapper().transform(sleepJSON)
@@ -60,6 +76,19 @@ describe('Mappers: SleepEntityMapper', () => {
                 assert.propertyVal(result, 'child_id', sleepJSON.child_id)
                 assert.propertyVal(result, 'type', sleepJSON.type)
                 assert.deepPropertyVal(result.pattern!.toJSON(), 'data_set', sleepJSON.pattern)
+            })
+        })
+
+        context('when the parameter is a JSON and does not contain any attributes', () => {
+            it('should normally execute the method, returning a Sleep as a result of the transformation', () => {
+                const result: Sleep = new SleepEntityMapper().transform(emptySleepJSON)
+                assert.propertyVal(result, 'id', emptySleepJSON.id)
+                assert.propertyVal(result, 'start_time', emptySleepJSON.start_time)
+                assert.propertyVal(result, 'end_time', emptySleepJSON.end_time)
+                assert.propertyVal(result, 'duration', emptySleepJSON.duration)
+                assert.propertyVal(result, 'child_id', emptySleepJSON.child_id)
+                assert.propertyVal(result, 'type', emptySleepJSON.type)
+                assert.propertyVal(result, 'pattern', emptySleepJSON.pattern)
             })
         })
 

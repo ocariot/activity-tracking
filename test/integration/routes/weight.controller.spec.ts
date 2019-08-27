@@ -313,20 +313,25 @@ describe('Routes: children.weights', () => {
     describe('GET /v1/children/:child_id/weights', () => {
         context('when get all Weight of a child successfully', () => {
             it('should return status code 200 and a list of all Weight objects found', async () => {
-                const result = await createBodyFat({
-                    timestamp: defaultWeight.timestamp,
-                    value: defaultWeight.value,
-                    unit: defaultWeight.unit,
-                    child_id: defaultWeight.child_id
-                })
+                let result
+                try {
+                    result = await createBodyFat({
+                        timestamp: defaultWeight.timestamp,
+                        value: defaultWeight.value,
+                        unit: defaultWeight.unit,
+                        child_id: defaultWeight.child_id
+                    })
 
-                await createWeight({
-                    timestamp: defaultWeight.timestamp,
-                    value: defaultWeight.value,
-                    unit: defaultWeight.unit,
-                    child_id: defaultWeight.child_id,
-                    body_fat: result
-                })
+                    await createWeight({
+                        timestamp: defaultWeight.timestamp,
+                        value: defaultWeight.value,
+                        unit: defaultWeight.unit,
+                        child_id: defaultWeight.child_id,
+                        body_fat: result
+                    })
+                } catch (err) {
+                    throw new Error('Failure on children.weights routes test: ' + err.message)
+                }
 
                 return request
                     .get(`/v1/children/${defaultWeight.child_id}/weights`)
@@ -366,6 +371,48 @@ describe('Routes: children.weights', () => {
                     .then(res => {
                         expect(res.body).is.an.instanceOf(Array)
                         expect(res.body.length).to.eql(0)
+                    })
+            })
+        })
+
+        context('when the child_id is invalid', () => {
+            before(() => {
+                try {
+                    deleteAllWeight()
+                } catch (err) {
+                    throw new Error('Failure on children.weights routes test: ' + err.message)
+                }
+            })
+
+            it('should return status code 400 and an info message about the invalid child_id', async () => {
+                let result
+                try {
+                    result = await createBodyFat({
+                        timestamp: defaultWeight.timestamp,
+                        value: defaultWeight.value,
+                        unit: defaultWeight.unit,
+                        child_id: defaultWeight.child_id
+                    })
+
+                    await createWeight({
+                        timestamp: defaultWeight.timestamp,
+                        value: defaultWeight.value,
+                        unit: defaultWeight.unit,
+                        child_id: defaultWeight.child_id,
+                        body_fat: result
+                    })
+                } catch (err) {
+                    throw new Error('Failure on children.weights routes test: ' + err.message)
+                }
+
+                return request
+                    .get(`/v1/children/123/weights`)
+                    .set('Content-Type', 'application/json')
+                    .expect(400)
+                    .then(err => {
+                        expect(err.body.code).to.eql(400)
+                        expect(err.body.message).to.eql(Strings.CHILD.PARAM_ID_NOT_VALID_FORMAT)
+                        expect(err.body.description).to.eql(Strings.ERROR_MESSAGE.UUID_NOT_VALID_FORMAT_DESC)
                     })
             })
         })
@@ -455,6 +502,50 @@ describe('Routes: children.weights', () => {
                         expect(res.body).is.an.instanceOf(Array)
                         expect(res.body.length).to.eql(0)
                     })
+            })
+        })
+
+        context('when there is an attempt to get Weight of a child using the "query-strings-parser" library ' +
+            'but the child_id is invalid', () => {
+            before(() => {
+                try {
+                    deleteAllWeight()
+                } catch (err) {
+                    throw new Error('Failure on children.weights routes test: ' + err.message)
+                }
+            })
+
+            it('should return status code 400 and an info message about the invalid child_id', async () => {
+                try {
+                    const result = await createBodyFat({
+                        timestamp: defaultWeight.timestamp,
+                        value: defaultWeight.value,
+                        unit: defaultWeight.unit,
+                        child_id: defaultWeight.child_id
+                    })
+
+                    await createWeight({
+                        timestamp: defaultWeight.timestamp,
+                        value: defaultWeight.value,
+                        unit: defaultWeight.unit,
+                        child_id: defaultWeight.child_id,
+                        body_fat: result
+                    })
+
+                    const url = `/v1/children/123/weights?child_id=${defaultWeight.child_id}&sort=child_id&page=1&limit=3`
+
+                    return request
+                        .get(url)
+                        .set('Content-Type', 'application/json')
+                        .expect(400)
+                        .then(err => {
+                            expect(err.body.code).to.eql(400)
+                            expect(err.body.message).to.eql(Strings.CHILD.PARAM_ID_NOT_VALID_FORMAT)
+                            expect(err.body.description).to.eql(Strings.ERROR_MESSAGE.UUID_NOT_VALID_FORMAT_DESC)
+                        })
+                } catch (err) {
+                    throw new Error('Failure on children.weights routes test: ' + err.message)
+                }
             })
         })
     })

@@ -72,7 +72,6 @@ export class SleepEntityMapper implements IEntityMapper<Sleep, SleepEntity> {
 
     private deserializeSleepPattern(pattern: any, sleepType: string): SleepPattern {
         const sleepPattern: SleepPattern = new SleepPattern()
-        if (!pattern) return sleepPattern
 
         const sleepPatternDataSet: Array<SleepPatternDataSet> = pattern.map(elem => new SleepPatternDataSet().fromJSON(elem))
         if (sleepType === SleepType.CLASSIC) {

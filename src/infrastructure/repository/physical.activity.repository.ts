@@ -2,12 +2,12 @@ import { inject, injectable } from 'inversify'
 import { Identifier } from '../../di/identifiers'
 import { IPhysicalActivityRepository } from '../../application/port/physical.activity.repository.interface'
 import { PhysicalActivity } from '../../application/domain/model/physical.activity'
-import { ActivityEntity } from '../entity/activity.entity'
 import { BaseRepository } from './base/base.repository'
 import { Query } from './query/query'
 import { ILogger } from '../../utils/custom.logger'
 import { IEntityMapper } from '../port/entity.mapper.interface'
 import { IQuery } from '../../application/port/query.interface'
+import { PhysicalActivityEntity } from '../entity/physical.activity.entity'
 
 /**
  * Implementation of the physicalactivity repository.
@@ -15,11 +15,11 @@ import { IQuery } from '../../application/port/query.interface'
  * @implements {IPhysicalActivityRepository}
  */
 @injectable()
-export class PhysicalActivityRepository extends BaseRepository<PhysicalActivity, ActivityEntity>
+export class PhysicalActivityRepository extends BaseRepository<PhysicalActivity, PhysicalActivityEntity>
     implements IPhysicalActivityRepository {
     constructor(
         @inject(Identifier.ACTIVITY_REPO_MODEL) readonly activityModel: any,
-        @inject(Identifier.ACTIVITY_ENTITY_MAPPER) readonly activityMapper: IEntityMapper<PhysicalActivity, ActivityEntity>,
+        @inject(Identifier.ACTIVITY_ENTITY_MAPPER) readonly activityMapper: IEntityMapper<PhysicalActivity, PhysicalActivityEntity>,
         @inject(Identifier.LOGGER) readonly logger: ILogger
     ) {
         super(activityModel, activityMapper, logger)
@@ -56,7 +56,7 @@ export class PhysicalActivityRepository extends BaseRepository<PhysicalActivity,
      * @throws {ValidationException | ConflictException | RepositoryException}
      */
     public updateByChild(activity: PhysicalActivity): Promise<PhysicalActivity> {
-        const itemUp: ActivityEntity = this.activityMapper.transform(activity)
+        const itemUp: PhysicalActivityEntity = this.activityMapper.transform(activity)
         return new Promise<PhysicalActivity>((resolve, reject) => {
             this.activityModel.findOneAndUpdate({
                     child_id: itemUp.child_id,

@@ -479,7 +479,7 @@ describe('Routes: children.physicalactivities', () => {
                     steps: defaultActivity.steps ? defaultActivity.steps : undefined,
                     levels: [
                         {
-                            name: '',
+                            name: undefined,
                             duration: undefined
                         },
                         {

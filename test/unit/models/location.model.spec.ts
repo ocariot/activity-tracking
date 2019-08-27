@@ -44,7 +44,7 @@ describe('Models: Location', () => {
     describe('toJSON()', () => {
         context('when the Location model is correct', () => {
             it('should return a JSON from Location model', () => {
-                let result = new Location().fromJSON(locationJSON)
+                let result = new Location(locationJSON.local, locationJSON.room, locationJSON.latitude, locationJSON.longitude)
                 result = result.toJSON()
                 assert.propertyVal(result, 'local', locationJSON.local)
                 assert.propertyVal(result, 'room', locationJSON.room)

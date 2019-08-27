@@ -8,7 +8,11 @@ import { WeightEntity } from '../../../src/infrastructure/entity/weight.entity'
 import { Weight } from '../../../src/application/domain/model/weight'
 
 describe('Mappers: WeightEntityMapper', () => {
-    const weight: WeightMock = new WeightMock()
+    const weight: Weight = new WeightMock()
+
+    // To test how mapper works with an object without any attributes
+    const emptyWeight: Weight = new Weight()
+    emptyWeight.type = ''
 
     // Create Weight JSON
     const weightJSON: any = {
@@ -21,6 +25,9 @@ describe('Mappers: WeightEntityMapper', () => {
         body_fat: new BodyFatMock()
     }
 
+    // To test how mapper works with an object without any attributes (JSON)
+    const emptyWeightJSON: any = {}
+
     describe('transform(item: any)', () => {
         context('when the parameter is of type Weight', () => {
             it('should normally execute the method, returning an WeightEntity as a result of the transformation', () => {
@@ -32,6 +39,13 @@ describe('Mappers: WeightEntityMapper', () => {
                 assert.propertyVal(result, 'unit', weight.unit)
                 assert.propertyVal(result, 'child_id', weight.child_id)
                 assert.propertyVal(result, 'body_fat', weight.body_fat!.id)
+            })
+        })
+
+        context('when the parameter is of type Weight and does not contain any attributes', () => {
+            it('should normally execute the method, returning an empty WeightEntity', () => {
+                const result: WeightEntity = new WeightEntityMapper().transform(emptyWeight)
+                assert.isEmpty(result)
             })
         })
 
@@ -49,6 +63,20 @@ describe('Mappers: WeightEntityMapper', () => {
                 assert.propertyVal(result.body_fat, 'value', weightJSON.body_fat.value)
                 assert.propertyVal(result.body_fat, 'unit', weightJSON.body_fat.unit)
                 assert.propertyVal(result.body_fat, 'child_id', weightJSON.body_fat.child_id)
+
+            })
+        })
+
+        context('when the parameter is a JSON and does not contain any attributes', () => {
+            it('should normally execute the method, returning a Weight as a result of the transformation', () => {
+                const result: Weight = new WeightEntityMapper().transform(emptyWeightJSON)
+                assert.propertyVal(result, 'id', emptyWeightJSON.id)
+                assert.propertyVal(result, 'type', MeasurementType.WEIGHT)
+                assert.propertyVal(result, 'timestamp', emptyWeightJSON.timestamp)
+                assert.propertyVal(result, 'value', emptyWeightJSON.value)
+                assert.propertyVal(result, 'unit', emptyWeightJSON.unit)
+                assert.propertyVal(result, 'child_id', emptyWeightJSON.child_id)
+                assert.propertyVal(result, 'body_fat', emptyWeightJSON.body_fat)
 
             })
         })
