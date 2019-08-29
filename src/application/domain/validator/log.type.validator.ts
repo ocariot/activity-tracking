@@ -3,7 +3,7 @@ import { LogType } from '../model/log'
 
 export class LogTypeValidator {
     public static validate(type: string): void | ValidationException {
-        const typesLog = Object.values(LogType)
+        const typesLog: Array<string> = Object.values(LogType)
 
         if (!typesLog.includes(type)) {
             throw new ValidationException(`The name of type provided "${type}" is not supported...`,

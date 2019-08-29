@@ -7,8 +7,8 @@ export class SleepPatternDataSetValidator {
     public static validate(dataset: Array<SleepPatternDataSet>, sleepType: SleepType): void | ValidationException {
         const fields: Array<string> = []
         const message: string = 'Dataset are not in a format that is supported!'
-        const phasesPatternTypes = Object.values(PhasesPatternType)
-        const stagesPatternTypes = Object.values(StagesPatternType)
+        const phasesPatternTypes: Array<string> = Object.values(PhasesPatternType)
+        const stagesPatternTypes: Array<string> = Object.values(StagesPatternType)
 
         if (!dataset.length) {
             throw new ValidationException(message, 'The data_set collection must not be empty!')

@@ -6,7 +6,7 @@ import { Measurement, MeasurementType } from '../model/measurement'
 export class CreateMeasurementValidator {
     public static validate(measurement: Measurement): void | ValidationException {
         const fields: Array<string> = []
-        const measurementTypes = Object.values(MeasurementType)
+        const measurementTypes: Array<string> = Object.values(MeasurementType)
 
         // validate null.
         if (!measurement.type) fields.push('type')
