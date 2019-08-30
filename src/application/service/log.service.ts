@@ -33,8 +33,8 @@ export class LogService implements ILogService {
      * Adds a new log array.
      *
      * @param {Array<Log>} logs
-     * @returns {Promise<Array<Log>>}
-     * @throws { RepositoryException}
+     * @returns {Promise<MultiStatus<Log>>}
+     * @throws {ValidationException | RepositoryException}
      */
     public async addLogs(logs: Array<Log>): Promise<MultiStatus<Log>> {
         const multiStatus: MultiStatus<Log> = new MultiStatus<Log>()
@@ -87,7 +87,7 @@ export class LogService implements ILogService {
      * Get the data of all logs in the infrastructure.
      *
      * @param query Defines object to be used for queries.
-     * @return {Promise<Array<ChildLog>>}
+     * @return {Promise<Array<Log>>}
      * @throws {RepositoryException}
      */
     public async getAll(query: IQuery): Promise<Array<Log>> {
@@ -99,7 +99,7 @@ export class LogService implements ILogService {
      *
      * @param id Unique identifier.
      * @param query Defines object to be used for queries.
-     * @return {Promise<ChildLog>}
+     * @return {Promise<Log>}
      * @throws {RepositoryException}
      */
     public async getById(id: string, query: IQuery): Promise<Log> {

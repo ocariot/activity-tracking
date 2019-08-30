@@ -29,5 +29,16 @@ describe('Models: StatusError', () => {
                 assert.propertyVal(result.item, 'child_id', statusErrorJSON.item.child_id)
             })
         })
+
+        context('when the StatusError model is empty', () => {
+            it('should return a JSON from StatusError model with undefined as the value of all attributes', () => {
+                let result = new StatusError()
+                result = result.toJSON()
+                assert.propertyVal(result, 'code', undefined)
+                assert.propertyVal(result, 'message', undefined)
+                assert.propertyVal(result, 'description', undefined)
+                assert.propertyVal(result, 'item', undefined)
+            })
+        })
     })
 })

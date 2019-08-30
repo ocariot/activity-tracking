@@ -1,6 +1,4 @@
 import { IJSONSerializable } from '../utils/json.serializable.interface'
-import { IJSONDeserializable } from '../utils/json.deserializable.interface'
-import { JsonUtils } from '../utils/json.utils'
 import { StatusSuccess } from './status.success'
 import { StatusError } from './status.error'
 
@@ -10,7 +8,7 @@ import { StatusError } from './status.error'
  * @implements {IJSONSerializable, IJSONDeserializable}
  * @template T
  */
-export class MultiStatus<T> implements IJSONSerializable, IJSONDeserializable<MultiStatus<T>> {
+export class MultiStatus<T> implements IJSONSerializable {
     private _success!: Array<StatusSuccess<T>>
     private _error!: Array<StatusError<T>>
 
@@ -33,22 +31,6 @@ export class MultiStatus<T> implements IJSONSerializable, IJSONDeserializable<Mu
 
     set error(value: Array<StatusError<T>>) {
         this._error = value
-    }
-
-    public fromJSON(json: any): MultiStatus<T> {
-        if (!json) return this
-        if (typeof json === 'string' && JsonUtils.isJsonString(json)) {
-            json = JSON.parse(json)
-        }
-
-        if (json.success !== undefined && json.success instanceof Array)  {
-            this.success = json.success.map((item: StatusSuccess<T>) => new StatusSuccess<T>(item.code, item.item))
-        }
-        if (json.error !== undefined && json.error instanceof Array) {
-            this.error = json.error.map((item: StatusError<T>) => new StatusError<T>(item.code, item.message, item.description, item.item))
-        }
-
-        return this
     }
 
     public toJSON(): any {

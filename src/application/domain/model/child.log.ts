@@ -1,6 +1,4 @@
 import { IJSONSerializable } from '../utils/json.serializable.interface'
-import { IJSONDeserializable } from '../utils/json.deserializable.interface'
-import { JsonUtils } from '../utils/json.utils'
 import { Log } from './log'
 
 /**
@@ -8,7 +6,7 @@ import { Log } from './log'
  *
  * @implements {IJSONSerializable, IJSONDeserializable<Log>}
  */
-export class ChildLog implements IJSONSerializable, IJSONDeserializable<ChildLog> {
+export class ChildLog implements IJSONSerializable {
     private _steps!: Array<Log> // Logs of steps of a child
     private _calories!: Array<Log> // Logs of calories of a child
     private _active_minutes!: Array<Log> // Logs of active minutes of a child
@@ -62,36 +60,6 @@ export class ChildLog implements IJSONSerializable, IJSONDeserializable<ChildLog
 
     set sedentary_minutes(value: Array<Log>) {
         this._sedentary_minutes = value
-    }
-
-    public fromJSON(json: any): ChildLog {
-        if (!json) return this
-        if (typeof json === 'string' && JsonUtils.isJsonString(json)) {
-            json = JSON.parse(json)
-        }
-
-        if (json.steps !== undefined && json.steps instanceof Array) {
-            this.steps = json.steps.map(steps => new Log().fromJSON(steps))
-        }
-
-        if (json.calories !== undefined && json.calories instanceof Array) {
-            this.calories = json.calories.map(calories => new Log().fromJSON(calories))
-        }
-
-        if (json.active_minutes !== undefined && json.active_minutes instanceof Array) {
-            this.active_minutes = json.active_minutes.map(activeMinutes => new Log().fromJSON(activeMinutes))
-        }
-
-        if (json.lightly_active_minutes !== undefined && json.lightly_active_minutes instanceof Array) {
-            this.lightly_active_minutes =
-                json.lightly_active_minutes.map(lightlyActiveMinutes => new Log().fromJSON(lightlyActiveMinutes))
-        }
-
-        if (json.sedentary_minutes !== undefined && json.sedentary_minutes instanceof Array) {
-            this.sedentary_minutes = json.sedentary_minutes.map(sedentaryMinutes => new Log().fromJSON(sedentaryMinutes))
-        }
-
-        return this
     }
 
     public toJSON(): any {

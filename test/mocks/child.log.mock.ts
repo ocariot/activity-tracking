@@ -19,6 +19,9 @@ export class ChildLogMock extends ChildLog {
         super.active_minutes = [  new LogMock(LogType.ACTIVE_MINUTES),
                                   new LogMock(LogType.ACTIVE_MINUTES),
                                   new LogMock(LogType.ACTIVE_MINUTES)]
+        super.lightly_active_minutes = [  new LogMock(LogType.LIGHTLY_ACTIVE_MINUTES),
+                                          new LogMock(LogType.LIGHTLY_ACTIVE_MINUTES),
+                                          new LogMock(LogType.LIGHTLY_ACTIVE_MINUTES)]
         super.sedentary_minutes = [  new LogMock(LogType.SEDENTARY_MINUTES),
                                      new LogMock(LogType.SEDENTARY_MINUTES),
                                      new LogMock(LogType.SEDENTARY_MINUTES)]

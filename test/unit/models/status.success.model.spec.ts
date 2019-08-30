@@ -22,5 +22,14 @@ describe('Models: StatusSuccess', () => {
                 assert.propertyVal(result.item, 'child_id', statusSuccessJSON.item.child_id)
             })
         })
+
+        context('when the StatusSuccess model is empty', () => {
+            it('should return a JSON from StatusSuccess model with undefined as the value of all attributes', () => {
+                let result = new StatusSuccess()
+                result = result.toJSON()
+                assert.propertyVal(result, 'code', undefined)
+                assert.propertyVal(result, 'item', undefined)
+            })
+        })
     })
 })

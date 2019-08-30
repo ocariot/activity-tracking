@@ -6,12 +6,12 @@ import { IJSONSerializable } from '../utils/json.serializable.interface'
  * @implements {IJSONSerializable, IJSONDeserializable<SleepPatternSummaryData>}
  */
 export class SleepPatternSummaryData implements IJSONSerializable {
-    private _count: number
-    private _duration: number // in milliseconds
+    private _count!: number
+    private _duration!: number // in milliseconds
 
     constructor(count: number, duration: number) {
-        this._count = count
-        this._duration = duration
+        this.count = count
+        this.duration = duration
     }
 
     get count(): number {
