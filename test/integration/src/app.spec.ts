@@ -12,7 +12,6 @@ describe('App', () => {
 
     // Mock objects for POST attempts
     const defaultActivity: PhysicalActivity = new PhysicalActivityMock()
-    defaultActivity.levels = []
 
     /**
      * setupErrorsHandler()
