@@ -3,7 +3,7 @@ import { SleepPatternDataSet } from '../../../src/application/domain/model/sleep
 
 describe('Models: SleepPatternDataSet', () => {
     const dataSetJSON: any = {
-        start_time: new Date().toISOString(),
+        start_time: new Date(),
         name: 'restless',
         duration: 100000
     }
@@ -12,7 +12,7 @@ describe('Models: SleepPatternDataSet', () => {
         context('when the json is correct', () => {
             it('should return an SleepPatternDataSet model', () => {
                 const result = new SleepPatternDataSet().fromJSON(dataSetJSON)
-                assert.equal(result.start_time.toISOString(), dataSetJSON.start_time)
+                assert.propertyVal(result, 'start_time', dataSetJSON.start_time)
                 assert.propertyVal(result, 'name', dataSetJSON.name)
                 assert.propertyVal(result, 'duration', dataSetJSON.duration)
             })
@@ -30,7 +30,7 @@ describe('Models: SleepPatternDataSet', () => {
         context('when the json is a string', () => {
             it('should transform the string in json and return SleepPatternDataSet model', () => {
                 const result = new SleepPatternDataSet().fromJSON(JSON.stringify(dataSetJSON))
-                assert.equal(result.start_time.toISOString(), dataSetJSON.start_time)
+                assert.deepPropertyVal(result, 'start_time', dataSetJSON.start_time)
                 assert.propertyVal(result, 'name', dataSetJSON.name)
                 assert.propertyVal(result, 'duration', dataSetJSON.duration)
             })

@@ -7,7 +7,7 @@ import { BodyFat } from '../../../src/application/domain/model/body.fat'
 describe('Models: Weight', () => {
     const weightJSON: any = {
         type: MeasurementType.WEIGHT,
-        timestamp: new Date().toISOString(),
+        timestamp: new Date(),
         value: 62,
         unit: 'kg',
         child_id: '5a62be07de34500146d9c544',
@@ -42,7 +42,7 @@ describe('Models: Weight', () => {
                 const result = new Weight().fromJSON(weightJSON)
                 assert.propertyVal(result, 'id', weightJSON.id)
                 assert.propertyVal(result, 'type', weightJSON.type)
-                assert.equal(result.timestamp!.toISOString(), weightJSON.timestamp)
+                assert.propertyVal(result, 'timestamp', weightJSON.timestamp)
                 assert.propertyVal(result, 'value', weightJSON.value)
                 assert.propertyVal(result, 'unit', weightJSON.unit)
                 assert.propertyVal(result, 'child_id', weightJSON.child_id)
@@ -68,7 +68,7 @@ describe('Models: Weight', () => {
                 const result = new Weight().fromJSON(JSON.stringify(weightJSON))
                 assert.propertyVal(result, 'id', weightJSON.id)
                 assert.propertyVal(result, 'type', weightJSON.type)
-                assert.equal(result.timestamp!.toISOString(), weightJSON.timestamp)
+                assert.deepPropertyVal(result, 'timestamp', weightJSON.timestamp)
                 assert.propertyVal(result, 'value', weightJSON.value)
                 assert.propertyVal(result, 'unit', weightJSON.unit)
                 assert.propertyVal(result, 'child_id', weightJSON.child_id)
@@ -83,7 +83,7 @@ describe('Models: Weight', () => {
                 let result = new Weight().fromJSON(weightJSON)
                 result = result.toJSON()
                 assert.propertyVal(result, 'id', weightJSON.id)
-                assert.equal(result.timestamp!.toISOString(), weightJSON.timestamp)
+                assert.propertyVal(result, 'timestamp', weightJSON.timestamp)
                 assert.propertyVal(result, 'value', weightJSON.value)
                 assert.propertyVal(result, 'unit', weightJSON.unit)
                 assert.propertyVal(result, 'child_id', weightJSON.child_id)

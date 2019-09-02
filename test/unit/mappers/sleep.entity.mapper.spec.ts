@@ -15,34 +15,16 @@ describe('Mappers: SleepEntityMapper', () => {
     // Create sleep JSON
     const sleepJSON: any = {
         id: '5a62be07de34500146d9c544',
-        start_time: new Date('2018-08-18T01:40:30Z').toISOString(),
-        end_time: new Date('2018-08-18T09:52:30Z').toISOString(),
+        start_time: new Date('2018-08-18T01:40:30Z'),
+        end_time: new Date('2018-08-18T09:52:30Z'),
         duration: 29520000,
         child_id: '5a62be07de34500146d9c544',
-        pattern: [
-            {
-                start_time: '2018-08-18T01:40:30.000Z',
-                name: 'restless',
-                duration: 60000
-            },
-            {
-                start_time: '2018-08-18T01:41:30.000Z',
-                name: 'asleep',
-                duration: 360000
-            },
-            {
-                start_time: '2018-08-18T01:47:30.000Z',
-                name: 'restless',
-                duration: 240000
-            }
-        ],
+        pattern: sleep.pattern!.data_set,
         type: SleepType.CLASSIC
     }
 
     // To test how mapper works with an object without any attributes (JSON)
-    const emptySleepJSON: any = {
-        // pattern: new SleepPattern()
-    }
+    const emptySleepJSON: any = {}
 
     describe('transform(item: any)', () => {
         context('when the parameter is of type Sleep', () => {
@@ -75,7 +57,7 @@ describe('Mappers: SleepEntityMapper', () => {
                 assert.propertyVal(result, 'duration', sleepJSON.duration)
                 assert.propertyVal(result, 'child_id', sleepJSON.child_id)
                 assert.propertyVal(result, 'type', sleepJSON.type)
-                assert.deepPropertyVal(result.pattern!.toJSON(), 'data_set', sleepJSON.pattern)
+                assert.deepPropertyVal(result.pattern, 'data_set', sleepJSON.pattern)
             })
         })
 

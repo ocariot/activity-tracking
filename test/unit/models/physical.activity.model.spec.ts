@@ -7,8 +7,8 @@ import { ActivityLevelType, PhysicalActivityLevel } from '../../../src/applicati
 describe('Models: PhysicalActivity', () => {
     const activityJSON: any = {
         id: new ObjectID(),
-        start_time: new Date().toISOString(),
-        end_time: new Date().toISOString(),
+        start_time: new Date(),
+        end_time: new Date(),
         duration: 900000,
         child_id: new ObjectID(),
         name: 'walk',

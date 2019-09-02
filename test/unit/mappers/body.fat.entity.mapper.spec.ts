@@ -18,7 +18,7 @@ describe('Mappers: BodyFatEntityMapper', () => {
     const bodyFatJSON: any = {
         id: new ObjectID(),
         type: MeasurementType.BODY_FAT,
-        timestamp: new Date().toISOString(),
+        timestamp: new Date(),
         value: Math.random() * 10 + 20, // 20-29
         unit: '%',
         child_id: '5a62be07de34500146d9c544'

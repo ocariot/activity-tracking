@@ -112,8 +112,8 @@ describe('Validators: UpdatePhysicalActivityValidator', () => {
                 // Mock through JSON
                 const activityJSON: any = {
                     id: new ObjectID(),
-                    start_time: new Date('2018-12-14T12:52:59Z').toISOString(),
-                    end_time: new Date('2018-12-14T13:12:37Z').toISOString(),
+                    start_time: new Date('2018-12-14T12:52:59Z'),
+                    end_time: new Date('2018-12-14T13:12:37Z'),
                     duration: 1178000,
                     child_id: '5a62be07de34500146d9c544',
                     name: 'walk',
@@ -156,8 +156,8 @@ describe('Validators: UpdatePhysicalActivityValidator', () => {
                 // Mock through JSON
                 const activityJSON: any = {
                     id: new ObjectID(),
-                    start_time: new Date('2018-12-14T12:52:59Z').toISOString(),
-                    end_time: new Date('2018-12-14T13:12:37Z').toISOString(),
+                    start_time: new Date('2018-12-14T12:52:59Z'),
+                    end_time: new Date('2018-12-14T13:12:37Z'),
                     duration: 1178000,
                     child_id: '5a62be07de34500146d9c544',
                     name: 'walk',

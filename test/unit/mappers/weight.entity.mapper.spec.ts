@@ -18,7 +18,7 @@ describe('Mappers: WeightEntityMapper', () => {
     const weightJSON: any = {
         id: new ObjectID(),
         type: MeasurementType.WEIGHT,
-        timestamp: new Date().toISOString(),
+        timestamp: new Date(),
         value: Math.random() * 10 + 20, // 20-29
         unit: '%',
         child_id: '5a62be07de34500146d9c544',

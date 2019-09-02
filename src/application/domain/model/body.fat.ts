@@ -30,7 +30,11 @@ export class BodyFat extends Measurement implements IJSONSerializable, IJSONDese
         }
 
         if (json.id !== undefined) super.id = json.id
-        if (json.timestamp !== undefined) this.timestamp = this.convertDatetimeString(json.timestamp)
+        if (json.timestamp !== undefined && !(json.timestamp instanceof Date)) {
+            this.timestamp = this.convertDatetimeString(json.timestamp)
+        } else {
+            this.timestamp = json.timestamp
+        }
         if (json.value !== undefined) this.value = json.value
         if (json.child_id !== undefined) this.child_id = json.child_id
 

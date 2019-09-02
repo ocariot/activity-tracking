@@ -72,7 +72,11 @@ export class Measurement extends Entity implements IJSONSerializable, IJSONDeser
         }
 
         if (json.type !== undefined) this.type = json.type
-        if (json.timestamp !== undefined) this.timestamp = this.convertDatetimeString(json.timestamp)
+        if (json.timestamp !== undefined && !(json.timestamp instanceof Date)) {
+            this.timestamp = this.convertDatetimeString(json.timestamp)
+        } else {
+            this.timestamp = json.timestamp
+        }
         if (json.value !== undefined) this.value = json.value
         if (json.unit !== undefined) this.unit = json.unit
         if (json.child_id !== undefined) this.child_id = json.child_id

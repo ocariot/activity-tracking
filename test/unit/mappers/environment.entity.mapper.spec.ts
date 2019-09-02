@@ -20,7 +20,7 @@ describe('Mappers: EnvironmentEntityMapper', () => {
         location: new Location(),
         measurements: environment.measurements,
         climatized: true,
-        timestamp: new Date().toISOString()
+        timestamp: new Date()
     }
 
     // To test how mapper works with an object without any attributes (JSON)

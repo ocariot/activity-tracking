@@ -64,8 +64,16 @@ export class Activity extends Entity implements IJSONSerializable, IJSONDeserial
         }
 
         if (json.id !== undefined) super.id = json.id
-        if (json.start_time !== undefined) this.start_time = this.convertDatetimeString(json.start_time)
-        if (json.end_time !== undefined) this.end_time = this.convertDatetimeString(json.end_time)
+        if (json.start_time !== undefined && !(json.start_time instanceof Date)) {
+            this.start_time = this.convertDatetimeString(json.start_time)
+        } else {
+            this.start_time = json.start_time
+        }
+        if (json.end_time !== undefined && !(json.end_time instanceof Date)) {
+            this.end_time = this.convertDatetimeString(json.end_time)
+        } else {
+            this.end_time = json.end_time
+        }
         if (json.duration !== undefined) this.duration = json.duration
         if (json.child_id !== undefined) this.child_id = json.child_id
 
@@ -75,8 +83,8 @@ export class Activity extends Entity implements IJSONSerializable, IJSONDeserial
     public toJSON(): any {
         return {
             id: super.id,
-            start_time: this.start_time ? this.start_time.toISOString() : this.start_time,
-            end_time: this.end_time ? this.end_time.toISOString() : this.end_time,
+            start_time: this.start_time,
+            end_time: this.end_time,
             duration: this.duration,
             child_id: this.child_id
         }

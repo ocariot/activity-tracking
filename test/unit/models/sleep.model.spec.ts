@@ -32,8 +32,8 @@ describe('Models: Sleep', () => {
 
     const sleepJSON: any = {
         id: new ObjectID(),
-        start_time: new Date().toISOString(),
-        end_time: new Date().toISOString(),
+        start_time: new Date(),
+        end_time: new Date(),
         duration: 900000,
         child_id: new ObjectID(),
         pattern: sleepPattern
@@ -63,8 +63,8 @@ describe('Models: Sleep', () => {
             it('should return an Sleep model', () => {
                 const result = new Sleep().fromJSON(sleepJSON)
                 assert.propertyVal(result, 'id', sleepJSON.id)
-                assert.equal(result.start_time!.toISOString(), sleepJSON.start_time)
-                assert.equal(result.end_time!.toISOString(), sleepJSON.end_time)
+                assert.propertyVal(result, 'start_time', sleepJSON.start_time)
+                assert.propertyVal(result, 'end_time', sleepJSON.end_time)
                 assert.propertyVal(result, 'duration', sleepJSON.duration)
                 assert.propertyVal(result, 'child_id', sleepJSON.child_id)
                 assert.deepPropertyVal(result, 'pattern', sleepJSON.pattern)
@@ -87,8 +87,8 @@ describe('Models: Sleep', () => {
             it('should transform the string in json and return Sleep model', () => {
                 const result = new Sleep().fromJSON(JSON.stringify(sleepJSON))
                 assert.propertyVal(result, 'id', sleepJSON.id.toHexString())
-                assert.equal(result.start_time!.toISOString(), sleepJSON.start_time)
-                assert.equal(result.end_time!.toISOString(), sleepJSON.end_time)
+                assert.deepPropertyVal(result, 'start_time', sleepJSON.start_time)
+                assert.deepPropertyVal(result, 'end_time', sleepJSON.end_time)
                 assert.propertyVal(result, 'duration', sleepJSON.duration)
                 assert.propertyVal(result, 'child_id', sleepJSON.child_id.toHexString())
                 assert.deepPropertyVal(result, 'pattern', sleepJSON.pattern)

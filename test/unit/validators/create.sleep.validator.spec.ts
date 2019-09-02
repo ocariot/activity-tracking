@@ -124,8 +124,8 @@ describe('Validators: CreateSleepValidator', () => {
             it('should throw a ValidationException', () => {
                 const sleepJSON: any = {
                     id: new ObjectID(),
-                    start_time: sleep.start_time!.toISOString(),
-                    end_time: sleep.end_time!.toISOString(),
+                    start_time: sleep.start_time,
+                    end_time: sleep.end_time,
                     duration: sleep.duration,
                     pattern: undefined,
                     type: '',
@@ -145,8 +145,8 @@ describe('Validators: CreateSleepValidator', () => {
             it('should throw a ValidationException', () => {
                 const sleepJSON: any = {
                     id: new ObjectID(),
-                    start_time: sleep.start_time!.toISOString(),
-                    end_time: sleep.end_time!.toISOString(),
+                    start_time: sleep.start_time,
+                    end_time: sleep.end_time,
                     duration: sleep.duration,
                     pattern: sleep.pattern,
                     type: 'classics',
@@ -264,8 +264,8 @@ describe('Validators: CreateSleepValidator', () => {
             it('should throw a ValidationException', () => {
                 const sleepJSON: any = {
                     id: new ObjectID(),
-                    start_time: sleep.start_time!.toISOString(),
-                    end_time: sleep.end_time!.toISOString(),
+                    start_time: sleep.start_time,
+                    end_time: sleep.end_time,
                     duration: sleep.duration,
                     pattern: new SleepPattern(),
                     type: SleepType.STAGES,

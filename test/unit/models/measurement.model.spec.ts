@@ -5,7 +5,7 @@ import { ValidationException } from '../../../src/application/domain/exception/v
 describe('Models: Measurement', () => {
     const measurementJSON: any = {
         type: MeasurementType.HUMIDITY,
-        timestamp: new Date().toISOString(),
+        timestamp: new Date(),
         value: 30.05,
         unit: '%',
         child_id: '5a62be07de34500146d9c544'
@@ -36,7 +36,7 @@ describe('Models: Measurement', () => {
                 const result = new Measurement().fromJSON(measurementJSON)
                 assert.propertyVal(result, 'id', measurementJSON.id)
                 assert.propertyVal(result, 'type', measurementJSON.type)
-                assert.equal(result.timestamp!.toISOString(), measurementJSON.timestamp)
+                assert.propertyVal(result, 'timestamp', measurementJSON.timestamp)
                 assert.propertyVal(result, 'value', measurementJSON.value)
                 assert.propertyVal(result, 'unit', measurementJSON.unit)
                 assert.propertyVal(result, 'child_id', measurementJSON.child_id)
@@ -60,7 +60,7 @@ describe('Models: Measurement', () => {
                 const result = new Measurement().fromJSON(JSON.stringify(measurementJSON))
                 assert.propertyVal(result, 'id', measurementJSON.id)
                 assert.propertyVal(result, 'type', measurementJSON.type)
-                assert.equal(result.timestamp!.toISOString(), measurementJSON.timestamp)
+                assert.deepPropertyVal(result, 'timestamp', measurementJSON.timestamp)
                 assert.propertyVal(result, 'value', measurementJSON.value)
                 assert.propertyVal(result, 'unit', measurementJSON.unit)
                 assert.propertyVal(result, 'child_id', measurementJSON.child_id)
@@ -75,7 +75,7 @@ describe('Models: Measurement', () => {
                 result = result.toJSON()
                 assert.propertyVal(result, 'id', measurementJSON.id)
                 assert.propertyVal(result, 'type', measurementJSON.type)
-                assert.equal(result.timestamp!.toISOString(), measurementJSON.timestamp)
+                assert.propertyVal(result, 'timestamp', measurementJSON.timestamp)
                 assert.propertyVal(result, 'value', measurementJSON.value)
                 assert.propertyVal(result, 'unit', measurementJSON.unit)
                 assert.propertyVal(result, 'child_id', measurementJSON.child_id)

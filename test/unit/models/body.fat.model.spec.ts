@@ -6,7 +6,7 @@ import { BodyFat } from '../../../src/application/domain/model/body.fat'
 describe('Models: BodyFat', () => {
     const bodyFatJSON: any = {
         type: MeasurementType.BODY_FAT,
-        timestamp: new Date().toISOString(),
+        timestamp: new Date(),
         value: 23.05,
         unit: '%',
         child_id: '5a62be07de34500146d9c544'
@@ -37,7 +37,7 @@ describe('Models: BodyFat', () => {
                 const result = new BodyFat().fromJSON(bodyFatJSON)
                 assert.propertyVal(result, 'id', bodyFatJSON.id)
                 assert.propertyVal(result, 'type', bodyFatJSON.type)
-                assert.equal(result.timestamp!.toISOString(), bodyFatJSON.timestamp)
+                assert.propertyVal(result, 'timestamp', bodyFatJSON.timestamp)
                 assert.propertyVal(result, 'value', bodyFatJSON.value)
                 assert.propertyVal(result, 'unit', bodyFatJSON.unit)
                 assert.propertyVal(result, 'child_id', bodyFatJSON.child_id)
@@ -61,7 +61,7 @@ describe('Models: BodyFat', () => {
                 const result = new BodyFat().fromJSON(JSON.stringify(bodyFatJSON))
                 assert.propertyVal(result, 'id', bodyFatJSON.id)
                 assert.propertyVal(result, 'type', bodyFatJSON.type)
-                assert.equal(result.timestamp!.toISOString(), bodyFatJSON.timestamp)
+                assert.deepPropertyVal(result, 'timestamp', bodyFatJSON.timestamp)
                 assert.propertyVal(result, 'value', bodyFatJSON.value)
                 assert.propertyVal(result, 'unit', bodyFatJSON.unit)
                 assert.propertyVal(result, 'child_id', bodyFatJSON.child_id)
@@ -75,7 +75,7 @@ describe('Models: BodyFat', () => {
                 let result = new BodyFat().fromJSON(bodyFatJSON)
                 result = result.toJSON()
                 assert.propertyVal(result, 'id', bodyFatJSON.id)
-                assert.equal(result.timestamp!.toISOString(), bodyFatJSON.timestamp)
+                assert.propertyVal(result, 'timestamp', bodyFatJSON.timestamp)
                 assert.propertyVal(result, 'value', bodyFatJSON.value)
                 assert.propertyVal(result, 'unit', bodyFatJSON.unit)
                 assert.propertyVal(result, 'child_id', bodyFatJSON.child_id)

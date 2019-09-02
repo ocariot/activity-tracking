@@ -6,8 +6,8 @@ import { ValidationException } from '../../../src/application/domain/exception/v
 describe('Models: Activity', () => {
     const activityJSON: any = {
         id: new ObjectID(),
-        start_time: new Date().toISOString(),
-        end_time: new Date().toISOString(),
+        start_time: new Date(),
+        end_time: new Date(),
         duration: 900000,
         child_id: new ObjectID()
     }
@@ -36,8 +36,8 @@ describe('Models: Activity', () => {
             it('should return an Activity model', () => {
                 const result = new Activity().fromJSON(activityJSON)
                 assert.propertyVal(result, 'id', activityJSON.id)
-                assert.deepEqual(result.start_time!.toISOString(), activityJSON.start_time)
-                assert.deepEqual(result.end_time!.toISOString(), activityJSON.end_time)
+                assert.propertyVal(result, 'start_time', activityJSON.start_time)
+                assert.propertyVal(result, 'end_time', activityJSON.end_time)
                 assert.propertyVal(result, 'duration', activityJSON.duration)
                 assert.propertyVal(result, 'child_id', activityJSON.child_id)
             })
@@ -58,8 +58,8 @@ describe('Models: Activity', () => {
             it('should transform the string in json and return Activity model', () => {
                 const result = new Activity().fromJSON(JSON.stringify(activityJSON))
                 assert.propertyVal(result, 'id', activityJSON.id.toHexString())
-                assert.deepEqual(result.start_time!.toISOString(), activityJSON.start_time)
-                assert.deepEqual(result.end_time!.toISOString(), activityJSON.end_time)
+                assert.deepPropertyVal(result, 'start_time', activityJSON.start_time)
+                assert.deepPropertyVal(result, 'end_time', activityJSON.end_time)
                 assert.propertyVal(result, 'duration', activityJSON.duration)
                 assert.propertyVal(result, 'child_id', activityJSON.child_id.toHexString())
             })
