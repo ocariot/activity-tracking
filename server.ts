@@ -9,16 +9,12 @@ import { Default } from './src/utils/default'
 import { App } from './src/app'
 import { readFileSync } from 'fs'
 
-/**
- *  Create the .env file in the root directory of your project
- *  and add your environment variables to new lines in the
- *  format NAME=VALUE. For example:
- *      DB_HOST=localhost
- *      DB_USER=root
- *      DB_PASS=mypass
- *
- *  The fastest way is to create a copy of the .env.example file.
- */
+//  Create the .env file in the root directory of your project
+//  and add your environment variables to new lines in the
+//  format NAME=VALUE. For example:
+//     DB_HOST=localhost
+//
+// The fastest way is to create a copy of the .env.example file.
 require('dotenv').config()
 
 const logger: ILogger = DIContainer.get<ILogger>(Identifier.LOGGER)
@@ -57,6 +53,7 @@ https.createServer(https_options, app)
             })
             .catch(err => {
                 logger.error(err.message)
+                process.exit()
             })
     })
 

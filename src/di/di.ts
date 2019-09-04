@@ -11,14 +11,12 @@ import { ActivityEntity } from '../infrastructure/entity/activity.entity'
 import { ActivityRepoModel } from '../infrastructure/database/schema/activity.schema'
 import { PhysicalActivityEntityMapper } from '../infrastructure/entity/mapper/physical.activity.entity.mapper'
 import { ConnectionFactoryRabbitMQ } from '../infrastructure/eventbus/rabbitmq/connection.factory.rabbitmq'
-import { ConnectionRabbitMQ } from '../infrastructure/eventbus/rabbitmq/connection.rabbitmq'
-import { EventBusRabbitMQ } from '../infrastructure/eventbus/rabbitmq/eventbus.rabbitmq'
+import { RabbitMQ } from '../infrastructure/eventbus/rabbitmq/rabbitmq'
 import { ConnectionFactoryMongoDB } from '../infrastructure/database/connection.factory.mongodb'
-import { ConnectionMongoDB } from '../infrastructure/database/connection.mongodb'
-import { IConnectionDB } from '../infrastructure/port/connection.db.interface'
-import { IConnectionEventBus } from '../infrastructure/port/connection.event.bus.interface'
+import { MongoDB } from '../infrastructure/database/mongo.db'
+import { IDatabase } from '../infrastructure/port/database.interface'
 import { IConnectionFactory } from '../infrastructure/port/connection.factory.interface'
-import { IEventBus } from '../infrastructure/port/event.bus.interface'
+import { IEventBus } from '../infrastructure/port/eventbus.interface'
 import { PhysicalActivity } from '../application/domain/model/physical.activity'
 import { BackgroundService } from '../background/background.service'
 import { App } from '../app'
@@ -42,10 +40,6 @@ import { Sleep } from '../application/domain/model/sleep'
 import { SleepEntityMapper } from '../infrastructure/entity/mapper/sleep.entity.mapper'
 import { SleepRepoModel } from '../infrastructure/database/schema/sleep.schema'
 import { IEntityMapper } from '../infrastructure/port/entity.mapper.interface'
-import { IIntegrationEventRepository } from '../application/port/integration.event.repository.interface'
-import { IntegrationEventRepository } from '../infrastructure/repository/integration.event.repository'
-import { IntegrationEventRepoModel } from '../infrastructure/database/schema/integration.event.schema'
-import { EventBusTask } from '../background/task/eventbus.task'
 import { LogRepoModel } from '../infrastructure/database/schema/log.schema'
 import { ILogRepository } from '../application/port/log.repository.interface'
 import { LogRepository } from '../infrastructure/repository/log.repository'
@@ -72,6 +66,9 @@ import { WeightService } from '../application/service/weight.service'
 import { BodyFatController } from '../ui/controller/body.fat.controller'
 import { WeightController } from '../ui/controller/weight.controller'
 import { LogController } from '../ui/controller/log.controller'
+import { SubscribeEventBusTask } from '../background/task/subscribe.event.bus.task'
+import { IBackgroundTask } from '../application/port/background.task.interface'
+import { ProviderEventBusTask } from '../background/task/provider.event.bus.task'
 
 export class IoC {
     private readonly _container: Container
@@ -140,9 +137,6 @@ export class IoC {
         this.container
             .bind<IWeightRepository>(Identifier.WEIGHT_REPOSITORY)
             .to(WeightRepository).inSingletonScope()
-        this.container
-            .bind<IIntegrationEventRepository>(Identifier.INTEGRATION_EVENT_REPOSITORY)
-            .to(IntegrationEventRepository).inSingletonScope()
 
         // Models
         this.container.bind(Identifier.ACTIVITY_REPO_MODEL).toConstantValue(ActivityRepoModel)
@@ -150,7 +144,6 @@ export class IoC {
         this.container.bind(Identifier.ENVIRONMENT_REPO_MODEL).toConstantValue(EnvironmentRepoModel)
         this.container.bind(Identifier.SLEEP_REPO_MODEL).toConstantValue(SleepRepoModel)
         this.container.bind(Identifier.MEASUREMENT_REPO_MODEL).toConstantValue(MeasurementRepoModel)
-        this.container.bind(Identifier.INTEGRATION_EVENT_REPO_MODEL).toConstantValue(IntegrationEventRepoModel)
 
         // Mappers
         this.container
@@ -177,25 +170,25 @@ export class IoC {
             .bind<IConnectionFactory>(Identifier.RABBITMQ_CONNECTION_FACTORY)
             .to(ConnectionFactoryRabbitMQ).inSingletonScope()
         this.container
-            .bind<IConnectionEventBus>(Identifier.RABBITMQ_CONNECTION)
-            .to(ConnectionRabbitMQ)
-        this.container
             .bind<IEventBus>(Identifier.RABBITMQ_EVENT_BUS)
-            .to(EventBusRabbitMQ).inSingletonScope()
+            .to(RabbitMQ).inSingletonScope()
         this.container
             .bind<IConnectionFactory>(Identifier.MONGODB_CONNECTION_FACTORY)
             .to(ConnectionFactoryMongoDB).inSingletonScope()
         this.container
-            .bind<IConnectionDB>(Identifier.MONGODB_CONNECTION)
-            .to(ConnectionMongoDB).inSingletonScope()
+            .bind<IDatabase>(Identifier.MONGODB_CONNECTION)
+            .to(MongoDB).inSingletonScope()
         this.container
             .bind(Identifier.BACKGROUND_SERVICE)
             .to(BackgroundService).inSingletonScope()
 
         // Tasks
         this.container
-            .bind(Identifier.EVENT_BUS_TASK)
-            .to(EventBusTask).inRequestScope()
+            .bind<IBackgroundTask>(Identifier.SUB_EVENT_BUS_TASK)
+            .to(SubscribeEventBusTask).inSingletonScope()
+        this.container
+            .bind<IBackgroundTask>(Identifier.PROVIDER_EVENT_BUS_TASK)
+            .to(ProviderEventBusTask).inSingletonScope()
 
         // Log
         this.container.bind<ILogger>(Identifier.LOGGER).to(CustomLogger).inSingletonScope()

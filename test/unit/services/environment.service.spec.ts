@@ -3,20 +3,18 @@ import { assert } from 'chai'
 import { EnvironmentMock } from '../../mocks/environment.mock'
 import { EnvironmentService } from '../../../src/application/service/environment.service'
 import { CustomLoggerMock } from '../../mocks/custom.logger.mock'
-import { EventBusRabbitmqMock } from '../../mocks/event.bus.rabbitmq.mock'
+import { EventBusRabbitMQMock } from '../../mocks/event.bus.rabbitmq.mock'
 import { IEnvironmentRepository } from '../../../src/application/port/environment.repository.interface'
 import { IIntegrationEventRepository } from '../../../src/application/port/integration.event.repository.interface'
-import { IConnectionEventBus } from '../../../src/infrastructure/port/connection.event.bus.interface'
 import { EnvironmentRepositoryMock } from '../../mocks/environment.repository.mock'
 import { IntegrationEventRepositoryMock } from '../../mocks/integration.event.repository.mock'
-import { ConnectionRabbitmqMock } from '../../mocks/connection.rabbitmq.mock'
 import { IConnectionFactory } from '../../../src/infrastructure/port/connection.factory.interface'
-import { ConnectionFactoryRabbitmqMock } from '../../mocks/connection.factory.rabbitmq.mock'
+import { ConnectionFactoryRabbitMQMock } from '../../mocks/connection.factory.rabbitmq.mock'
 import { IQuery } from '../../../src/application/port/query.interface'
 import { Query } from '../../../src/infrastructure/repository/query/query'
 import { Strings } from '../../../src/utils/strings'
 import { Environment } from '../../../src/application/domain/model/environment'
-import { IEventBus } from '../../../src/infrastructure/port/event.bus.interface'
+import { IEventBus } from '../../../src/infrastructure/port/eventbus.interface'
 import { ILogger } from '../../../src/utils/custom.logger'
 import { MultiStatus } from '../../../src/application/domain/model/multi.status'
 import { Measurement } from '../../../src/application/domain/model/measurement'
@@ -73,10 +71,8 @@ describe('Services: Environment', () => {
     const environmentRepo: IEnvironmentRepository = new EnvironmentRepositoryMock()
     const integrationRepo: IIntegrationEventRepository = new IntegrationEventRepositoryMock()
 
-    const connectionFactoryRabbitmq: IConnectionFactory = new ConnectionFactoryRabbitmqMock()
-    const connectionRabbitmqPub: IConnectionEventBus = new ConnectionRabbitmqMock(connectionFactoryRabbitmq)
-    const connectionRabbitmqSub: IConnectionEventBus = new ConnectionRabbitmqMock(connectionFactoryRabbitmq)
-    const eventBusRabbitmq: IEventBus = new EventBusRabbitmqMock(connectionRabbitmqPub, connectionRabbitmqSub)
+    const connectionFactoryRabbitmq: IConnectionFactory = new ConnectionFactoryRabbitMQMock()
+    const eventBusRabbitmq: IEventBus = new EventBusRabbitMQMock(connectionFactoryRabbitmq)
     const customLogger: ILogger = new CustomLoggerMock()
 
     const environmentService: EnvironmentService = new EnvironmentService(environmentRepo, integrationRepo,

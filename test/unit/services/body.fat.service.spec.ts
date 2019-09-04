@@ -1,17 +1,17 @@
 import HttpStatus from 'http-status-codes'
 import { assert } from 'chai'
 import { CustomLoggerMock } from '../../mocks/custom.logger.mock'
-import { EventBusRabbitmqMock } from '../../mocks/event.bus.rabbitmq.mock'
+import { EventBusRabbitMQMock } from '../../mocks/event.bus.rabbitmq.mock'
 import { IIntegrationEventRepository } from '../../../src/application/port/integration.event.repository.interface'
 import { IConnectionEventBus } from '../../../src/infrastructure/port/connection.event.bus.interface'
 import { IntegrationEventRepositoryMock } from '../../mocks/integration.event.repository.mock'
 import { ConnectionRabbitmqMock } from '../../mocks/connection.rabbitmq.mock'
 import { IConnectionFactory } from '../../../src/infrastructure/port/connection.factory.interface'
-import { ConnectionFactoryRabbitmqMock } from '../../mocks/connection.factory.rabbitmq.mock'
+import { ConnectionFactoryRabbitMQMock } from '../../mocks/connection.factory.rabbitmq.mock'
 import { IQuery } from '../../../src/application/port/query.interface'
 import { Query } from '../../../src/infrastructure/repository/query/query'
 import { Strings } from '../../../src/utils/strings'
-import { IEventBus } from '../../../src/infrastructure/port/event.bus.interface'
+import { IEventBus } from '../../../src/infrastructure/port/eventbus.interface'
 import { ILogger } from '../../../src/utils/custom.logger'
 import { MultiStatus } from '../../../src/application/domain/model/multi.status'
 import { BodyFat } from '../../../src/application/domain/model/body.fat'
@@ -68,10 +68,10 @@ describe('Services: BodyFatService', () => {
     const weightRepo: IWeightRepository = new WeightRepositoryMock()
     const integrationRepo: IIntegrationEventRepository = new IntegrationEventRepositoryMock()
 
-    const connectionFactoryRabbitmq: IConnectionFactory = new ConnectionFactoryRabbitmqMock()
+    const connectionFactoryRabbitmq: IConnectionFactory = new ConnectionFactoryRabbitMQMock()
     const connectionRabbitmqPub: IConnectionEventBus = new ConnectionRabbitmqMock(connectionFactoryRabbitmq)
     const connectionRabbitmqSub: IConnectionEventBus = new ConnectionRabbitmqMock(connectionFactoryRabbitmq)
-    const eventBusRabbitmq: IEventBus = new EventBusRabbitmqMock(connectionRabbitmqPub, connectionRabbitmqSub)
+    const eventBusRabbitmq: IEventBus = new EventBusRabbitMQMock(connectionRabbitmqPub, connectionRabbitmqSub)
     const customLogger: ILogger = new CustomLoggerMock()
 
     const bodyFatService: IBodyFatService = new BodyFatService(bodyFatRepo, weightRepo, integrationRepo, eventBusRabbitmq, customLogger)

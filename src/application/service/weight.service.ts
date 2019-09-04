@@ -3,12 +3,8 @@ import { inject, injectable } from 'inversify'
 import { Identifier } from '../../di/identifiers'
 import { ConflictException } from '../domain/exception/conflict.exception'
 import { IQuery } from '../port/query.interface'
-import { IEventBus } from '../../infrastructure/port/event.bus.interface'
-import { ILogger } from '../../utils/custom.logger'
 import { ObjectIdValidator } from '../domain/validator/object.id.validator'
 import { Strings } from '../../utils/strings'
-import { IIntegrationEventRepository } from '../port/integration.event.repository.interface'
-import { IntegrationEvent } from '../integration-event/event/integration.event'
 import { MultiStatus } from '../domain/model/multi.status'
 import { StatusSuccess } from '../domain/model/status.success'
 import { StatusError } from '../domain/model/status.error'
@@ -16,12 +12,12 @@ import { ValidationException } from '../domain/exception/validation.exception'
 import { IWeightService } from '../port/weight.service.interface'
 import { IWeightRepository } from '../port/weight.repository.interface'
 import { Weight } from '../domain/model/weight'
-import { WeightEvent } from '../integration-event/event/weight.event'
 import { CreateWeightValidator } from '../domain/validator/create.weight.validator'
 import { MeasurementType } from '../domain/model/measurement'
 import { BodyFat } from '../domain/model/body.fat'
 import { IBodyFatRepository } from '../port/body.fat.repository.interface'
-import { BodyFatEvent } from '../integration-event/event/body.fat.event'
+
+// TODO Refactor everything related to RabbitMQ!
 
 /**
  * Implementing Weight Service.
@@ -32,10 +28,12 @@ import { BodyFatEvent } from '../integration-event/event/body.fat.event'
 export class WeightService implements IWeightService {
 
     constructor(@inject(Identifier.WEIGHT_REPOSITORY) private readonly _weightRepository: IWeightRepository,
-                @inject(Identifier.BODY_FAT_REPOSITORY) private readonly _bodyFatRepository: IBodyFatRepository,
-                @inject(Identifier.INTEGRATION_EVENT_REPOSITORY) private readonly _integrationEventRepository: IIntegrationEventRepository,
-                @inject(Identifier.RABBITMQ_EVENT_BUS) private readonly _eventBus: IEventBus,
-                @inject(Identifier.LOGGER) private readonly _logger: ILogger) {
+                @inject(Identifier.BODY_FAT_REPOSITORY) private readonly _bodyFatRepository: IBodyFatRepository
+                // @inject(Identifier.INTEGRATION_EVENT_REPOSITORY)
+                // private readonly _integrationEventRepository: IIntegrationEventRepository,
+                // @inject(Identifier.RABBITMQ_EVENT_BUS) private readonly _eventBus: IEventBus,
+                // @inject(Identifier.LOGGER) private readonly _logger: ILogger
+    ) {
     }
 
     /**
@@ -128,13 +126,14 @@ export class WeightService implements IWeightService {
 
                     // 1.5b. If created successfully, the object is published on the message bus.
                     if (bodyFatSaved) {
-                        const event: BodyFatEvent = new BodyFatEvent('BodyFatSaveEvent', new Date(), bodyFatSaved)
-                        if (!(await this._eventBus.publish(event, 'bodyfat.save'))) {
-                            // 1.5c. Save Event for submission attempt later when there is connection to message channel.
-                            this.saveEvent(event)
-                        } else {
-                            this._logger.info(`Body Fat with ID: ${bodyFatSaved.id} published on event bus...`)
-                        }
+                        // TODO Refactor here!
+                        // const event: BodyFatEvent = new BodyFatEvent('BodyFatSaveEvent', new Date(), bodyFatSaved)
+                        // if (!(await this._eventBus.publish(event, 'bodyfat.save'))) {
+                        //     // 1.5c. Save Event for submission attempt later when there is connection to message channel.
+                        //     this.saveEvent(event)
+                        // } else {
+                        //     this._logger.info(`Body Fat with ID: ${bodyFatSaved.id} published on event bus...`)
+                        // }
                     }
                 }
             }
@@ -148,13 +147,14 @@ export class WeightService implements IWeightService {
 
             // 4. If created successfully, the object is published on the message bus.
             if (weightSaved) {
-                const event: WeightEvent = new WeightEvent('WeightSaveEvent', new Date(), weightSaved)
-                if (!(await this._eventBus.publish(event, 'weight.save'))) {
-                    // 5. Save Event for submission attempt later when there is connection to message channel.
-                    this.saveEvent(event)
-                } else {
-                    this._logger.info(`Weight with ID: ${weightSaved.id} published on event bus...`)
-                }
+                // TODO Refactor here!
+                // const event: WeightEvent = new WeightEvent('WeightSaveEvent', new Date(), weightSaved)
+                // if (!(await this._eventBus.publish(event, 'weight.save'))) {
+                //     // 5. Save Event for submission attempt later when there is connection to message channel.
+                //     this.saveEvent(event)
+                // } else {
+                //     this._logger.info(`Weight with ID: ${weightSaved.id} published on event bus...`)
+                // }
             }
             // 5. Returns the created object.
             return Promise.resolve(weightSaved)
@@ -240,13 +240,14 @@ export class WeightService implements IWeightService {
 
             // 3. If deleted successfully, the object is published on the message bus.
             if (wasDeleted) {
-                const event: WeightEvent = new WeightEvent('WeightDeleteEvent', new Date(), weightToBeDeleted)
-                if (!(await this._eventBus.publish(event, 'weight.delete'))) {
-                    // 4. Save Event for submission attempt later when there is connection to message channel.
-                    this.saveEvent(event)
-                } else {
-                    this._logger.info(`Weight with ID: ${weightToBeDeleted.id} was deleted...`)
-                }
+                // TODO Refactor here!
+                // const event: WeightEvent = new WeightEvent('WeightDeleteEvent', new Date(), weightToBeDeleted)
+                // if (!(await this._eventBus.publish(event, 'weight.delete'))) {
+                //     // 4. Save Event for submission attempt later when there is connection to message channel.
+                //     this.saveEvent(event)
+                // } else {
+                //     this._logger.info(`Weight with ID: ${weightToBeDeleted.id} was deleted...`)
+                // }
 
                 // 5a. Returns true
                 return Promise.resolve(true)
@@ -271,27 +272,28 @@ export class WeightService implements IWeightService {
         return this._weightRepository.countWeights(childId)
     }
 
-    /**
-     * Saves the event to the database.
-     * Useful when it is not possible to run the event and want to perform the
-     * operation at another time.
-     * @param event
-     */
-    private saveEvent(event: IntegrationEvent<Weight>): void {
-        const saveEvent: any = event.toJSON()
-        saveEvent.__operation = 'publish'
-        if (event.event_name === 'WeightSaveEvent') saveEvent.__routing_key = 'weight.save'
-        if (event.event_name === 'WeightDeleteEvent') saveEvent.__routing_key = 'weight.delete'
-        if (event.event_name === 'BodyFatSaveEvent') saveEvent.__routing_key = 'bodyfat.save'
-        this._integrationEventRepository
-            .create(JSON.parse(JSON.stringify(saveEvent)))
-            .then(() => {
-                this._logger.warn(`Could not publish the event named ${event.event_name}.`
-                    .concat(` The event was saved in the database for a possible recovery.`))
-            })
-            .catch(err => {
-                this._logger.error(`There was an error trying to save the name event: ${event.event_name}.`
-                    .concat(`Error: ${err.message}. Event: ${JSON.stringify(saveEvent)}`))
-            })
-    }
+    // TODO Refactor here!
+    // /**
+    //  * Saves the event to the database.
+    //  * Useful when it is not possible to run the event and want to perform the
+    //  * operation at another time.
+    //  * @param event
+    //  */
+    // private saveEvent(event: IntegrationEvent<Weight>): void {
+    //     const saveEvent: any = event.toJSON()
+    //     saveEvent.__operation = 'publish'
+    //     if (event.event_name === 'WeightSaveEvent') saveEvent.__routing_key = 'weight.save'
+    //     if (event.event_name === 'WeightDeleteEvent') saveEvent.__routing_key = 'weight.delete'
+    //     if (event.event_name === 'BodyFatSaveEvent') saveEvent.__routing_key = 'bodyfat.save'
+    //     this._integrationEventRepository
+    //         .create(JSON.parse(JSON.stringify(saveEvent)))
+    //         .then(() => {
+    //             this._logger.warn(`Could not publish the event named ${event.event_name}.`
+    //                 .concat(` The event was saved in the database for a possible recovery.`))
+    //         })
+    //         .catch(err => {
+    //             this._logger.error(`There was an error trying to save the name event: ${event.event_name}.`
+    //                 .concat(`Error: ${err.message}. Event: ${JSON.stringify(saveEvent)}`))
+    //         })
+    // }
 }

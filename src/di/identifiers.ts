@@ -30,7 +30,6 @@ export abstract class Identifier {
     public static readonly BODY_FAT_REPOSITORY: any = Symbol.for('BodyFatRepository')
     public static readonly WEIGHT_REPOSITORY: any = Symbol.for('WeightRepository')
     public static readonly ENVIRONMENT_REPOSITORY: any = Symbol.for('EnvironmentRepository')
-    public static readonly INTEGRATION_EVENT_REPOSITORY: any = Symbol.for('IntegrationEventRepository')
 
     // Models
     public static readonly ACTIVITY_REPO_MODEL: any = Symbol.for('ActivityRepoModel')
@@ -38,7 +37,6 @@ export abstract class Identifier {
     public static readonly SLEEP_REPO_MODEL: any = Symbol.for('SleepRepoModel')
     public static readonly MEASUREMENT_REPO_MODEL: any = Symbol.for('MeasurementRepoModel')
     public static readonly ENVIRONMENT_REPO_MODEL: any = Symbol.for('EnvironmentRepoModel')
-    public static readonly INTEGRATION_EVENT_REPO_MODEL: any = Symbol.for('IntegrationEventRepoModel')
 
     // Mappers
     public static readonly ACTIVITY_ENTITY_MAPPER: any = Symbol.for('PhysicalActivityEntityMapper')
@@ -49,15 +47,15 @@ export abstract class Identifier {
     public static readonly WEIGHT_ENTITY_MAPPER: any = Symbol.for('WeightEntityMapper')
 
     // Background Services
-    public static readonly RABBITMQ_EVENT_BUS: any = Symbol.for('EventBusRabbitMQ')
+    public static readonly RABBITMQ_EVENT_BUS: any = Symbol.for('RabbitMQEventBus')
     public static readonly RABBITMQ_CONNECTION_FACTORY: any = Symbol.for('ConnectionFactoryRabbitMQ')
-    public static readonly RABBITMQ_CONNECTION: any = Symbol.for('ConnectionRabbitMQ')
     public static readonly MONGODB_CONNECTION_FACTORY: any = Symbol.for('ConnectionFactoryMongoDB')
-    public static readonly MONGODB_CONNECTION: any = Symbol.for('ConnectionMongoDB')
+    public static readonly MONGODB_CONNECTION: any = Symbol.for('MongoDBConnection')
     public static readonly BACKGROUND_SERVICE: any = Symbol.for('BackgroundService')
 
     // Tasks
-    public static readonly EVENT_BUS_TASK: any = Symbol.for('EventBusTask')
+    public static readonly SUB_EVENT_BUS_TASK: any = Symbol.for('SubEventBusTask')
+    public static readonly PROVIDER_EVENT_BUS_TASK: any = Symbol.for('ProviderEventBusTask')
 
     // Log
     public static readonly LOGGER: any = Symbol.for('CustomLogger')
