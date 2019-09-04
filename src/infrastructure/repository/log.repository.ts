@@ -52,6 +52,28 @@ export class LogRepository extends BaseRepository<Log, LogEntity>
     }
 
     /**
+     * Removes all logs associated with the childId received.
+     *
+     * @param childId Child id associated with logs.
+     * @return {Promise<boolean>}
+     * @throws {ValidationException | RepositoryException}
+     */
+    public async removeAllLogsFromChild(childId: string): Promise<boolean> {
+        // Creates the query with the received parameter
+        const query: IQuery = new Query()
+        query.filters = { child_id: childId }
+
+        return new Promise<boolean>((resolve, reject) => {
+            this.logModel.deleteMany(query.filters)
+                .then(result => {
+                    if (!result) return resolve(false)
+                    return resolve(true)
+                })
+                .catch(err => reject(super.mongoDBErrorListener(err)))
+        })
+    }
+
+    /**
      * Returns the total of logs of a child in a period by resource.
      *
      * @param childId Child id associated with physical activities.

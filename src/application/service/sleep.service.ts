@@ -14,8 +14,8 @@ import { MultiStatus } from '../domain/model/multi.status'
 import { StatusSuccess } from '../domain/model/status.success'
 import { StatusError } from '../domain/model/status.error'
 import { ValidationException } from '../domain/exception/validation.exception'
-
-// TODO Refactor everything related to RabbitMQ!
+import { IEventBus } from '../../infrastructure/port/eventbus.interface'
+import { ILogger } from '../../utils/custom.logger'
 
 /**
  * Implementing sleep Service.
@@ -25,12 +25,9 @@ import { ValidationException } from '../domain/exception/validation.exception'
 @injectable()
 export class SleepService implements ISleepService {
 
-    constructor(@inject(Identifier.SLEEP_REPOSITORY) private readonly _sleepRepository: ISleepRepository
-                // @inject(Identifier.INTEGRATION_EVENT_REPOSITORY)
-                // private readonly _integrationEventRepository: IIntegrationEventRepository,
-                // @inject(Identifier.RABBITMQ_EVENT_BUS) private readonly _eventBus: IEventBus,
-                // @inject(Identifier.LOGGER) private readonly _logger: ILogger
-    ) {
+    constructor(@inject(Identifier.SLEEP_REPOSITORY) private readonly _sleepRepository: ISleepRepository,
+                @inject(Identifier.RABBITMQ_EVENT_BUS) private readonly _eventBus: IEventBus,
+                @inject(Identifier.LOGGER) private readonly _logger: ILogger) {
     }
 
     /**
@@ -45,11 +42,12 @@ export class SleepService implements ISleepService {
         try {
             // Multiple items of Sleep
             if (sleep instanceof Array) {
-                return await this.addMultipleSleep(sleep)
+                const result = await this.addMultipleSleep(sleep)
+                return Promise.resolve(result)
             }
 
             // Only one item
-            return await this.addSleep(sleep)
+            return this.addSleep(sleep)
         } catch (err) {
             return Promise.reject(err)
         }
@@ -111,21 +109,21 @@ export class SleepService implements ISleepService {
 
             // 2. Checks if sleep already exists.
             const sleepExist = await this._sleepRepository.checkExist(sleep)
-            if (sleepExist) throw new ConflictException('Sleep is already registered...')
+            if (sleepExist) throw new ConflictException(Strings.SLEEP.ALREADY_REGISTERED)
 
             // 3. Create new sleep register.
             const sleepSaved: Sleep = await this._sleepRepository.create(sleep)
 
             // 4. If created successfully, the object is published on the message bus.
-            if (sleepSaved) {
-                // TODO Refactor here!
-                // const event: SleepEvent = new SleepEvent('SleepSaveEvent', new Date(), sleepSaved)
-                // if (!(await this._eventBus.publish(event, 'sleep.save'))) {
-                //     // 5. Save Event for submission attempt later when there is connection to message channel.
-                //     this.saveEvent(event)
-                // } else {
-                //     this._logger.info(`Sleep with ID: ${sleepSaved.id} published on event bus...`)
-                // }
+            if (sleepSaved && !sleep.isFromEventBus) {
+                this._eventBus.bus
+                    .pubSaveSleep(sleepSaved)
+                    .then(() => {
+                        this._logger.info(`Sleep with ID: ${sleepSaved.id} published on event bus...`)
+                    })
+                    .catch((err) => {
+                        this._logger.error(`Error trying to publish event SaveSleep. ${err.message}`)
+                    })
             }
             // 5. Returns the created object.
             return Promise.resolve(sleepSaved)
@@ -203,24 +201,23 @@ export class SleepService implements ISleepService {
 
             // 2. Checks if sleep already exists.
             const sleepExist = await this._sleepRepository.checkExist(sleep)
-            if (sleepExist) throw new ConflictException('Sleep is already registered...')
+            if (sleepExist) throw new ConflictException(Strings.SLEEP.ALREADY_REGISTERED)
 
             // 3. Update the sleep and save it in a variable.
             const sleepUpdated: Sleep = await this._sleepRepository.updateByChild(sleep)
 
             // 4. If updated successfully, the object is published on the message bus.
-            if (sleepUpdated) {
-                // TODO Refactor here!
-                // const event: SleepEvent = new SleepEvent('SleepUpdateEvent',
-                //     new Date(), sleepUpdated)
-                // if (!(await this._eventBus.publish(event, 'sleep.update'))) {
-                //     // 5. Save Event for submission attempt later when there is connection to message channel.
-                //     this.saveEvent(event)
-                // } else {
-                //     this._logger.info(`Sleep with ID: ${sleepUpdated.id} was updated...`)
-                // }
+            if (sleepUpdated && !sleep.isFromEventBus) {
+                this._eventBus.bus
+                    .pubUpdateSleep(sleepUpdated)
+                    .then(() => {
+                        this._logger.info(`Sleep with ID: ${sleepUpdated.id} was updated...`)
+                    })
+                    .catch((err) => {
+                        this._logger.error(`Error trying to publish event UpdateSleep. ${err.message}`)
+                    })
             }
-            // 6. Returns the updated object.
+            // 5. Returns the updated object.
             return Promise.resolve(sleepUpdated)
         } catch (err) {
             return Promise.reject(err)
@@ -249,20 +246,19 @@ export class SleepService implements ISleepService {
 
             // 3. If deleted successfully, the object is published on the message bus.
             if (wasDeleted) {
-                // TODO Refactor here!
-                // const event: SleepEvent = new SleepEvent('SleepDeleteEvent', new Date(), sleepToBeDeleted)
-                // if (!(await this._eventBus.publish(event, 'sleep.delete'))) {
-                //     // 4. Save Event for submission attempt later when there is connection to message channel.
-                //     this.saveEvent(event)
-                // } else {
-                //     this._logger.info(`Sleep with ID: ${sleepToBeDeleted.id} was deleted...`)
-                // }
-
-                // 5a. Returns true
+                this._eventBus.bus
+                    .pubDeleteSleep(sleepToBeDeleted)
+                    .then(() => {
+                        this._logger.info(`Sleep with ID: ${sleepToBeDeleted.id} was deleted...`)
+                    })
+                    .catch((err) => {
+                        this._logger.error(`Error trying to publish event DeleteSleep. ${err.message}`)
+                    })
+                // 4a. Returns true
                 return Promise.resolve(true)
             }
 
-            // 5b. Returns false
+            // 4b. Returns false
             return Promise.resolve(false)
         } catch (err) {
             return Promise.reject(err)
@@ -280,29 +276,4 @@ export class SleepService implements ISleepService {
     public countSleep(childId: string): Promise<number> {
         return this._sleepRepository.countSleep(childId)
     }
-
-    // TODO Refactor here!
-    // /**
-    //  * Saves the event to the database.
-    //  * Useful when it is not possible to run the event and want to perform the
-    //  * operation at another time.
-    //  * @param event
-    //  */
-    // private saveEvent(event: IntegrationEvent<Sleep>): void {
-    //     const saveEvent: any = event.toJSON()
-    //     saveEvent.__operation = 'publish'
-    //     if (event.event_name === 'SleepSaveEvent') saveEvent.__routing_key = 'sleep.save'
-    //     if (event.event_name === 'SleepDeleteEvent') saveEvent.__routing_key = 'sleep.delete'
-    //     if (event.event_name === 'SleepUpdateEvent') saveEvent.__routing_key = 'sleep.update'
-    //     this._integrationEventRepository
-    //         .create(JSON.parse(JSON.stringify(saveEvent)))
-    //         .then(() => {
-    //             this._logger.warn(`Could not publish the event named ${event.event_name}.`
-    //                 .concat(` The event was saved in the database for a possible recovery.`))
-    //         })
-    //         .catch(err => {
-    //             this._logger.error(`There was an error trying to save the name event: ${event.event_name}.`
-    //                 .concat(`Error: ${err.message}. Event: ${JSON.stringify(saveEvent)}`))
-    //         })
-    // }
 }

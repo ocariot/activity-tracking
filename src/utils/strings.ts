@@ -18,22 +18,27 @@ export abstract class Strings {
     }
 
     public static readonly PHYSICAL_ACTIVITY: any = {
+        ALREADY_REGISTERED: 'Physical Activity is already registered!',
         PARAM_ID_NOT_VALID_FORMAT: 'Parameter {physicalactivity_id} is not in valid format!'
     }
 
     public static readonly SLEEP: any = {
+        ALREADY_REGISTERED: 'Sleep is already registered!',
         PARAM_ID_NOT_VALID_FORMAT: 'Parameter {sleep_id} is not in valid format!'
     }
 
     public static readonly BODY_FAT: any = {
+        ALREADY_REGISTERED: 'Body Fat is already registered!',
         PARAM_ID_NOT_VALID_FORMAT: 'Parameter {bodyfat_id} is not in valid format!'
     }
 
     public static readonly WEIGHT: any = {
+        ALREADY_REGISTERED: 'Weight is already registered!',
         PARAM_ID_NOT_VALID_FORMAT: 'Parameter {weight_id} is not in valid format!'
     }
 
     public static readonly ENVIRONMENT: any = {
+        ALREADY_REGISTERED: 'Environment is already registered!',
         PARAM_ID_NOT_VALID_FORMAT: 'Parameter {environment_id} is not in valid format!'
     }
 

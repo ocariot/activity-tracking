@@ -13,8 +13,8 @@ import { MultiStatus } from '../domain/model/multi.status'
 import { StatusSuccess } from '../domain/model/status.success'
 import { StatusError } from '../domain/model/status.error'
 import { ValidationException } from '../domain/exception/validation.exception'
-
-// TODO Refactor everything related to RabbitMQ!
+import { IEventBus } from '../../infrastructure/port/eventbus.interface'
+import { ILogger } from '../../utils/custom.logger'
 
 /**
  * Implementing Environment Service.
@@ -25,12 +25,9 @@ import { ValidationException } from '../domain/exception/validation.exception'
 export class EnvironmentService implements IEnvironmentService {
 
     constructor(
-        @inject(Identifier.ENVIRONMENT_REPOSITORY) private readonly _environmentRepository: IEnvironmentRepository
-        // @inject(Identifier.INTEGRATION_EVENT_REPOSITORY) private readonly _integrationEventRepository:
-        // IIntegrationEventRepository,
-        // @inject(Identifier.RABBITMQ_EVENT_BUS) private readonly _eventBus: IEventBus,
-        // @inject(Identifier.LOGGER) private readonly _logger: ILogger
-    ) {
+        @inject(Identifier.ENVIRONMENT_REPOSITORY) private readonly _environmentRepository: IEnvironmentRepository,
+        @inject(Identifier.RABBITMQ_EVENT_BUS) private readonly _eventBus: IEventBus,
+        @inject(Identifier.LOGGER) private readonly _logger: ILogger) {
     }
 
     /**
@@ -44,11 +41,12 @@ export class EnvironmentService implements IEnvironmentService {
         try {
             // Multiple items of Environment
             if (environment instanceof Array) {
-                return await this.addMultipleEnvs(environment)
+                const result = await this.addMultipleEnvs(environment)
+                return Promise.resolve(result)
             }
 
             // Only one item
-            return await this.addEnvironment(environment)
+            return this.addEnvironment(environment)
         } catch (err) {
             return Promise.reject(err)
         }
@@ -110,25 +108,24 @@ export class EnvironmentService implements IEnvironmentService {
 
             // 2. Checks if environment already exists.
             const environmentExist = await this._environmentRepository.checkExist(environment)
-            if (environmentExist) throw new ConflictException('Measurement of environment is already registered...')
+            if (environmentExist) throw new ConflictException(Strings.ENVIRONMENT.ALREADY_REGISTERED)
 
             // 3. Create new environment register.
             const environmentSaved: Environment = await this._environmentRepository.create(environment)
 
             // 4. If created successfully, the object is published on the message bus.
-            if (environmentSaved) {
-                // TODO Refactor here!
-                // const event: EnvironmentEvent = new EnvironmentEvent('EnvironmentSaveEvent',
-                //     new Date(), environmentSaved)
-                // if (!(await this._eventBus.publish(event, 'environments.save'))) {
-                //     // 5. Save Event for submission attempt later when there is connection to message channel.
-                //     this.saveEvent(event)
-                // } else {
-                //     this._logger.info(`Measurement of environment with ID: ${environmentSaved.id} published on event bus...`)
-                // }
+            if (environmentSaved && !environment.isFromEventBus) {
+                this._eventBus.bus
+                    .pubSaveEnvironment(environmentSaved)
+                    .then(() => {
+                        this._logger.info(`Measurement of environment with ID: ${environmentSaved.id} published on event bus...`)
+                    })
+                    .catch((err) => {
+                        this._logger.error(`Error trying to publish event SaveEnvironment. ${err.message}`)
+                    })
             }
 
-            // 6. Returns the created object.
+            // 5. Returns the created object.
             return Promise.resolve(environmentSaved)
         } catch (err) {
             return Promise.reject(err)
@@ -166,20 +163,18 @@ export class EnvironmentService implements IEnvironmentService {
 
             // 3. If deleted successfully, the object is published on the message bus.
             if (wasDeleted) {
-                // TODO Refactor here!
-                // const event: EnvironmentEvent = new EnvironmentEvent('EnvironmentDeleteEvent',
-                //     new Date(), environmentToBeDeleted)
-                // if (!(await this._eventBus.publish(event, 'environments.delete'))) {
-                //     // 4. Save Event for submission attempt later when there is connection to message channel.
-                //     this.saveEvent(event)
-                // } else {
-                //     this._logger.info(`Measurement of environment with ID: ${environmentToBeDeleted.id} was deleted...`)
-                // }
-                //
-                // // 5a. Returns true.
-                // return Promise.resolve(true)
+                this._eventBus.bus
+                    .pubDeleteEnvironment(environmentToBeDeleted)
+                    .then(() => {
+                        this._logger.info(`Measurement of environment with ID: ${environmentToBeDeleted.id} was deleted...`)
+                    })
+                    .catch((err) => {
+                        this._logger.error(`Error trying to publish event DeleteEnvironment. ${err.message}`)
+                    })
+                // 4a. Returns true.
+                return Promise.resolve(true)
             }
-            // 5b. Returns false.
+            // 4b. Returns false.
             return Promise.resolve(false)
         } catch (err) {
             return Promise.reject(err)
@@ -197,28 +192,4 @@ export class EnvironmentService implements IEnvironmentService {
     public count(): Promise<number> {
         return this._environmentRepository.count()
     }
-
-    // TODO Refactor here!
-    // /**
-    //  * Saves the event to the database.
-    //  * Useful when it is not possible to run the event and want to perform the
-    //  * operation at another time.
-    //  * @param event
-    //  */
-    // private saveEvent(event: IntegrationEvent<Environment>): void {
-    //     const saveEvent: any = event.toJSON()
-    //     saveEvent.__operation = 'publish'
-    //     if (event.event_name === 'EnvironmentSaveEvent') saveEvent.__routing_key = 'environments.save'
-    //     if (event.event_name === 'EnvironmentDeleteEvent') saveEvent.__routing_key = 'environments.delete'
-    //     this._integrationEventRepository
-    //         .create(JSON.parse(JSON.stringify(saveEvent)))
-    //         .then(() => {
-    //             this._logger.warn(`Could not publish the event named ${event.event_name}.`
-    //                 .concat(` The event was saved in the database for a possible recovery.`))
-    //         })
-    //         .catch(err => {
-    //             this._logger.error(`There was an error trying to save the name event: ${event.event_name}.`
-    //                 .concat(`Error: ${err.message}. Event: ${JSON.stringify(saveEvent)}`))
-    //         })
-    // }
 }

@@ -18,9 +18,11 @@ export class Environment extends Entity implements IJSONSerializable, IJSONDeser
     private _measurements?: Array<Measurement> // Associated Measurements
     private _climatized?: boolean // Boolean variable to identify if a environment is climatized.
     private _timestamp!: Date // Timestamp according to the UTC.
+    private _isFromEventBus: boolean // Boolean that defines whether the object comes from the event bus or not
 
     constructor() {
         super()
+        this._isFromEventBus = false
     }
 
     get institution_id(): string | undefined {
@@ -61,6 +63,14 @@ export class Environment extends Entity implements IJSONSerializable, IJSONDeser
 
     set timestamp(value: Date) {
         this._timestamp = value
+    }
+
+    get isFromEventBus(): boolean {
+        return this._isFromEventBus
+    }
+
+    set isFromEventBus(value: boolean) {
+        this._isFromEventBus = value
     }
 
     public convertDatetimeString(value: string): Date {

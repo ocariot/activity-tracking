@@ -7,10 +7,10 @@ import { IBodyFatRepository } from '../../port/body.fat.repository.interface'
 import { IWeightRepository } from '../../port/weight.repository.interface'
 import { DIContainer } from '../../../di/di'
 import { ValidationException } from '../../domain/exception/validation.exception'
+import { ILogRepository } from '../../port/log.repository.interface'
 
 /**
  * Handler for UserDeleteEvent operation.
- * Every operation must be within the function!
  *
  * @param event
  */
@@ -20,33 +20,65 @@ export const userDeleteEventHandler = async (event: any) => {
     const sleepRepository: ISleepRepository = DIContainer.get<ISleepRepository>(Identifier.SLEEP_REPOSITORY)
     const weightRepository: IWeightRepository = DIContainer.get<IWeightRepository>(Identifier.WEIGHT_REPOSITORY)
     const bodyFatRepository: IBodyFatRepository = DIContainer.get<IBodyFatRepository>(Identifier.BODY_FAT_REPOSITORY)
+    const logRepository: ILogRepository = DIContainer.get<ILogRepository>(Identifier.LOG_REPOSITORY)
     const logger: ILogger = DIContainer.get<ILogger>(Identifier.LOGGER)
 
     try {
         if (typeof event === 'string') event = JSON.parse(event)
         if (!event.user && !event.user.id) {
-            throw new ValidationException('Event received but could not be continued due to an error in the event format.')
+            throw new ValidationException('Event received but could not be handled due to an error in the event format.')
         }
-        const childId: string = event.user.id!
+        const childId: string = event.user.id
 
-        // Validate childId.
+        // 1. Validate childId.
         ObjectIdValidator.validate(childId)
 
-        // 1a. Try to delete all the activities associated with thi logger.errors user.
-        await activityRepository.removeAllActivitiesFromChild(childId)
+        // 2a. Try to delete all activities associated with this user.
+        activityRepository.removeAllActivitiesFromChild(childId)
+            .then(() => {
+                logger.info('All activities associated with this user have been successfully removed from the database.')
+            })
+            .catch((err) => {
+                logger.error(`Error trying to remove all activities from child. ${err.message}`)
+            })
 
-        // 1b. Try to delete all the sleep objects associated with this user.
-        await sleepRepository.removeAllSleepFromChild(childId)
+        // 2b. Try to delete all sleep objects associated with this user.
+        sleepRepository.removeAllSleepFromChild(childId)
+            .then(() => {
+                logger.info('All sleep objects associated with this user have been successfully removed from the database.')
+            })
+            .catch((err) => {
+                logger.error(`Error trying to remove all sleep objects from child. ${err.message}`)
+            })
 
-        // 1c. Try to delete all the bodyfat objects associated with this user.
-        await bodyFatRepository.removeAllBodyFatFromChild(childId)
+        // 2c. Try to delete all bodyfat objects associated with this user.
+        bodyFatRepository.removeAllBodyFatFromChild(childId)
+            .then(() => {
+                logger.info('All body fat objects associated with this user have been successfully removed from the database.')
+            })
+            .catch((err) => {
+                logger.error(`Error trying to remove all body fats from child. ${err.message}`)
+            })
 
-        // 1d. Try to delete all the weight objects associated with this user.
-        await weightRepository.removeAllWeightFromChild(childId)
+        // 2d. Try to delete all weight objects associated with this user.
+        weightRepository.removeAllWeightFromChild(childId)
+            .then(() => {
+                logger.info('All weight objects associated with this user have been successfully removed from the database.')
+            })
+            .catch((err) => {
+                logger.error(`Error trying to remove all weights from child. ${err.message}`)
+            })
 
-        // TODO Remove logs must be implemented!!!
+        // 2e. Try to delete all logs associated with this user.
+        logRepository.removeAllLogsFromChild(childId)
+            .then(() => {
+                logger.info('All logs associated with this user have been successfully removed from the database.')
+            })
+            .catch((err) => {
+                logger.error(`Error trying to remove all logs from child. ${err.message}`)
+            })
 
-        // 2. If got here, it's because the action was successful.
+        // 3. If got here, it's because the action was successful.
         logger.info(`Action for event ${event.event_name} successfully held!`)
     } catch (err) {
         logger.warn(`An error occurred while attempting `

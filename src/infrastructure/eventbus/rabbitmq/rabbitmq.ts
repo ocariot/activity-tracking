@@ -2,7 +2,7 @@ import { inject, injectable } from 'inversify'
 import { IEventBus } from '../../port/eventbus.interface'
 import { Identifier } from '../../../di/identifiers'
 import { IConnectionFactory, IEventBusOptions } from '../../port/connection.factory.interface'
-import { IOcariotRabbitMQClient } from '@ocariot/rabbitmq-client-node/lib'
+import { IOcariotRabbitMQClient } from '@ocariot/rabbitmq-client-node'
 
 @injectable()
 export class RabbitMQ implements IEventBus {

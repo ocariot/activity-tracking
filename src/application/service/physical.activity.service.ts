@@ -41,7 +41,6 @@ export class PhysicalActivityService implements IPhysicalActivityService {
         try {
             // Multiple items of PhysicalActivity
             if (activity instanceof Array) {
-                // TODO Attention! eh para retornar uma Promise, antes estava retornando-a resolvida. Revisar outros services!!!
                 const result = await this.addMultipleActivities(activity)
                 return Promise.resolve(result)
             }
@@ -109,13 +108,13 @@ export class PhysicalActivityService implements IPhysicalActivityService {
 
             // 2. Checks if physical activity already exists.
             const activityExist = await this._activityRepository.checkExist(activity)
-            if (activityExist) throw new ConflictException('Physical Activity is already registered...')
+            if (activityExist) throw new ConflictException(Strings.PHYSICAL_ACTIVITY.ALREADY_REGISTERED)
 
             // 3. Create new physical activity register.
             const activitySaved: PhysicalActivity = await this._activityRepository.create(activity)
 
             // 4. If created successfully, the object is published on the message bus.
-            if (activitySaved) {
+            if (activitySaved && !activity.isFromEventBus) {
                 this._eventBus.bus
                     .pubSavePhysicalActivity(activitySaved)
                     .then(() => {
@@ -201,13 +200,13 @@ export class PhysicalActivityService implements IPhysicalActivityService {
 
             // 2. Checks if physical activity already exists.
             const activityExist = await this._activityRepository.checkExist(activity)
-            if (activityExist) throw new ConflictException('Physical Activity is already registered...')
+            if (activityExist) throw new ConflictException(Strings.PHYSICAL_ACTIVITY.ALREADY_REGISTERED)
 
             // 3. Update the activity and save it in a variable.
             const activityUpdated: PhysicalActivity = await this._activityRepository.updateByChild(activity)
 
             // 4. If updated successfully, the object is published on the message bus.
-            if (activityUpdated) {
+            if (activityUpdated && !activity.isFromEventBus) {
                 this._eventBus.bus
                     .pubUpdatePhysicalActivity(activityUpdated)
                     .then(() => {

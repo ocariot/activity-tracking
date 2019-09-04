@@ -21,6 +21,15 @@ export interface ILogRepository extends IRepository<Log> {
     selectByChild(childId: string, logType: string, dateLog: string): Promise<Log>
 
     /**
+     * Removes all logs associated with the childId received.
+     *
+     * @param childId Child id associated with logs.
+     * @return {Promise<boolean>}
+     * @throws {ValidationException | RepositoryException}
+     */
+    removeAllLogsFromChild(childId: string): Promise<boolean>
+
+    /**
      * Returns the total of logs of a child in a period by resource.
      *
      * @param childId Child id associated with logs.

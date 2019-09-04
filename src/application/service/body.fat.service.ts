@@ -16,8 +16,6 @@ import { CreateBodyFatValidator } from '../domain/validator/create.body.fat.vali
 import { MeasurementType } from '../domain/model/measurement'
 import { IWeightRepository } from '../port/weight.repository.interface'
 
-// TODO Refactor everything related to RabbitMQ!
-
 /**
  * Implementing BodyFat Service.
  *
@@ -28,10 +26,6 @@ export class BodyFatService implements IBodyFatService {
 
     constructor(@inject(Identifier.BODY_FAT_REPOSITORY) private readonly _bodyFatRepository: IBodyFatRepository,
                 @inject(Identifier.WEIGHT_REPOSITORY) private readonly _weightRepository: IWeightRepository
-                // @inject(Identifier.INTEGRATION_EVENT_REPOSITORY) private readonly _integrationEventRepository:
-                // IIntegrationEventRepository,
-                // @inject(Identifier.RABBITMQ_EVENT_BUS) private readonly _eventBus: IEventBus,
-                // @inject(Identifier.LOGGER) private readonly _logger: ILogger
     ) {
     }
 
@@ -47,11 +41,12 @@ export class BodyFatService implements IBodyFatService {
         try {
             // Multiple items of BodyFat
             if (bodyFat instanceof Array) {
-                return await this.addMultipleFat(bodyFat)
+                const result = await this.addMultipleFat(bodyFat)
+                return Promise.resolve(result)
             }
 
             // Only one item
-            return await this.addFat(bodyFat)
+            return this.addFat(bodyFat)
         } catch (err) {
             return Promise.reject(err)
         }
@@ -113,23 +108,12 @@ export class BodyFatService implements IBodyFatService {
 
             // 2. Checks if BodyFat already exists.
             const bodyFatExist = await this._bodyFatRepository.checkExist(bodyFat)
-            if (bodyFatExist) throw new ConflictException('BodyFat is already registered...')
+            if (bodyFatExist) throw new ConflictException(Strings.BODY_FAT.ALREADY_REGISTERED)
 
             // 3. Create new BodyFat register.
             const bodyFatSaved: BodyFat = await this._bodyFatRepository.create(bodyFat)
 
-            // 4. If created successfully, the object is published on the message bus.
-            // TODO Refactor here!
-            // if (bodyFatSaved) {
-            //     const event: BodyFatEvent = new BodyFatEvent('BodyFatSaveEvent', new Date(), bodyFatSaved)
-            //     if (!(await this._eventBus.publish(event, 'bodyfat.save'))) {
-            //         // 5. Save Event for submission attempt later when there is connection to message channel.
-            //         this.saveEvent(event)
-            //     } else {
-            //         this._logger.info(`Body Fat with ID: ${bodyFatSaved.id} published on event bus...`)
-            //     }
-            // }
-            // 5. Returns the created object.
+            // 4. Returns the created object.
             return Promise.resolve(bodyFatSaved)
         } catch (err) {
             return Promise.reject(err)
@@ -214,21 +198,12 @@ export class BodyFatService implements IBodyFatService {
             const wasDeleted: boolean = await this._bodyFatRepository.removeByChild(bodyFatId, childId, MeasurementType.BODY_FAT)
 
             // 3. If deleted successfully, the object is published on the message bus.
-            // TODO Refactor here!
             if (wasDeleted) {
-                //     const event: BodyFatEvent = new BodyFatEvent('BodyFatDeleteEvent', new Date(), bodyFatToBeDeleted)
-                //     if (!(await this._eventBus.publish(event, 'bodyfat.delete'))) {
-                //         // 4. Save Event for submission attempt later when there is connection to message channel.
-                //         this.saveEvent(event)
-                //     } else {
-                //         this._logger.info(`Body Fat with ID: ${bodyFatToBeDeleted.id} was deleted...`)
-                //     }
-                //
-                //     // 5a. Returns true
-                //     return Promise.resolve(true)
+                // 4a. Returns true
+                return Promise.resolve(true)
             }
 
-            // 5b. Returns false
+            // 4b. Returns false
             return Promise.resolve(false)
         } catch (err) {
             return Promise.reject(err)
@@ -246,28 +221,4 @@ export class BodyFatService implements IBodyFatService {
     public countBodyFats(childId: string): Promise<number> {
         return this._bodyFatRepository.countBodyFats(childId)
     }
-
-    // TODO Refactor here!
-    // /**
-    //  * Saves the event to the database.
-    //  * Useful when it is not possible to run the event and want to perform the
-    //  * operation at another time.
-    //  * @param event
-    //  */
-    // private saveEvent(event: IntegrationEvent<BodyFat>): void {
-    //     const saveEvent: any = event.toJSON()
-    //     saveEvent.__operation = 'publish'
-    //     if (event.event_name === 'BodyFatSaveEvent') saveEvent.__routing_key = 'bodyfat.save'
-    //     if (event.event_name === 'BodyFatDeleteEvent') saveEvent.__routing_key = 'bodyfat.delete'
-    //     this._integrationEventRepository
-    //         .create(JSON.parse(JSON.stringify(saveEvent)))
-    //         .then(() => {
-    //             this._logger.warn(`Could not publish the event named ${event.event_name}.`
-    //                 .concat(` The event was saved in the database for a possible recovery.`))
-    //         })
-    //         .catch(err => {
-    //             this._logger.error(`There was an error trying to save the name event: ${event.event_name}.`
-    //                 .concat(`Error: ${err.message}. Event: ${JSON.stringify(saveEvent)}`))
-    //         })
-    // }
 }

@@ -3,7 +3,6 @@ import { Log, LogType } from '../../src/application/domain/model/log'
 import { LogMock } from './log.mock'
 
 export class LogRepositoryMock implements ILogRepository {
-
     public count(query: any): Promise<number> {
         return Promise.resolve(1)
     }
@@ -52,5 +51,9 @@ export class LogRepositoryMock implements ILogRepository {
 
     public selectByChild(child_id: string, type: string, date: string): Promise<Log> {
         return Promise.resolve(new LogMock())
+    }
+
+    public removeAllLogsFromChild(childId: string): Promise<boolean> {
+        return Promise.resolve(true)
     }
 }

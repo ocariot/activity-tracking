@@ -12,10 +12,12 @@ import { BodyFat } from './body.fat'
  */
 export class Weight extends Measurement implements IJSONSerializable, IJSONDeserializable<Weight> {
     private _body_fat?: BodyFat // Object of body_fat measurement associated with the weight measurement.
+    private _isFromEventBus: boolean // Boolean that defines whether the object comes from the event bus or not
 
     constructor() {
         super()
         this.type = MeasurementType.WEIGHT
+        this._isFromEventBus = false
     }
 
     get body_fat(): BodyFat | undefined {
@@ -24,6 +26,14 @@ export class Weight extends Measurement implements IJSONSerializable, IJSONDeser
 
     set body_fat(value: BodyFat | undefined) {
         this._body_fat = value
+    }
+
+    get isFromEventBus(): boolean {
+        return this._isFromEventBus
+    }
+
+    set isFromEventBus(value: boolean) {
+        this._isFromEventBus = value
     }
 
     public fromJSON(json: any): Weight {
