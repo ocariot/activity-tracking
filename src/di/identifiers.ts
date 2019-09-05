@@ -47,7 +47,7 @@ export abstract class Identifier {
     public static readonly WEIGHT_ENTITY_MAPPER: any = Symbol.for('WeightEntityMapper')
 
     // Background Services
-    public static readonly RABBITMQ_EVENT_BUS: any = Symbol.for('RabbitMQEventBus')
+    public static readonly RABBITMQ_EVENT_BUS: any = Symbol.for('RabbitMQ')
     public static readonly RABBITMQ_CONNECTION_FACTORY: any = Symbol.for('ConnectionFactoryRabbitMQ')
     public static readonly MONGODB_CONNECTION_FACTORY: any = Symbol.for('ConnectionFactoryMongoDB')
     public static readonly MONGODB_CONNECTION: any = Symbol.for('MongoDBConnection')

@@ -103,7 +103,7 @@ describe('Routes: children.logs', () => {
                     .post(`/v1/children/${defaultActivity.child_id}/logs/${LogType.STEPS}`)
                     .send(body)
                     .set('Content-Type', 'application/json')
-                    .expect(201)
+                    .expect(207)
                     .then(res => {
                         for (let i = 0; i < res.body.success.length; i++) {
                             expect(res.body.success[i].code).to.eql(HttpStatus.CREATED)
@@ -132,7 +132,7 @@ describe('Routes: children.logs', () => {
                     .post(`/v1/children/${defaultActivity.child_id}/logs/${LogType.STEPS}`)
                     .send(body)
                     .set('Content-Type', 'application/json')
-                    .expect(201)
+                    .expect(207)
                     .then(res => {
                         for (let i = 0; i < res.body.success.length; i++) {
                             expect(res.body.success[i].code).to.eql(HttpStatus.CREATED)
@@ -166,7 +166,7 @@ describe('Routes: children.logs', () => {
                     .post(`/v1/children/${defaultActivity.child_id}/logs/${LogType.STEPS}`)
                     .send(body)
                     .set('Content-Type', 'application/json')
-                    .expect(201)
+                    .expect(207)
                     .then(res => {
                         for (let i = 0; i < res.body.success.length; i++) {
                             expect(res.body.success[i].code).to.eql(HttpStatus.CREATED)
@@ -199,7 +199,7 @@ describe('Routes: children.logs', () => {
                     .post(`/v1/children/${defaultActivity.child_id}/logs/${LogType.STEPS}`)
                     .send(body)
                     .set('Content-Type', 'application/json')
-                    .expect(201)
+                    .expect(207)
                     .then(res => {
                         for (let i = 0; i < res.body.success.length; i++) {
                             expect(res.body.success[i].code).to.eql(HttpStatus.CREATED)
@@ -229,7 +229,7 @@ describe('Routes: children.logs', () => {
                         .post(`/v1/children/${defaultActivity.child_id}/logs/${LogType.STEPS}`)
                         .send(body)
                         .set('Content-Type', 'application/json')
-                        .expect(201)
+                        .expect(207)
                         .then(res => {
                             for (let i = 0; i < res.body.success.length; i++) {
                                 expect(res.body.success[i].code).to.eql(HttpStatus.CREATED)
@@ -273,7 +273,7 @@ describe('Routes: children.logs', () => {
                         .post(`/v1/children/123/logs/${LogType.STEPS}`)
                         .send(body)
                         .set('Content-Type', 'application/json')
-                        .expect(201)
+                        .expect(207)
                         .then(res => {
                             expect(res.body.success.length).to.eql(0)
                             for (let i = 0; i < res.body.error.length; i++) {
@@ -305,7 +305,7 @@ describe('Routes: children.logs', () => {
                         .post(`/v1/children/${defaultActivity.child_id}/logs/step`)
                         .send(body)
                         .set('Content-Type', 'application/json')
-                        .expect(201)
+                        .expect(207)
                         .then(res => {
                             expect(res.body.success.length).to.eql(0)
                             for (let i = 0; i < res.body.error.length; i++) {
@@ -343,7 +343,7 @@ describe('Routes: children.logs', () => {
                         .post(`/v1/children/${defaultActivity.child_id}/logs/${LogType.CALORIES}`)
                         .send(body)
                         .set('Content-Type', 'application/json')
-                        .expect(201)
+                        .expect(207)
                         .then(res => {
                             for (let i = 0; i < res.body.success.length; i++) {
                                 expect(res.body.success[i].code).to.eql(HttpStatus.CREATED)

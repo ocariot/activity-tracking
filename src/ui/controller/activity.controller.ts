@@ -50,7 +50,7 @@ export class ActivityController {
                 })
 
                 const resultMultiStatus: MultiStatus<PhysicalActivity> = await this._activityService.add(activitiesArr)
-                return res.status(HttpStatus.CREATED).send(resultMultiStatus)
+                return res.status(HttpStatus.MULTI_STATUS).send(resultMultiStatus)
             }
 
             // Only one item

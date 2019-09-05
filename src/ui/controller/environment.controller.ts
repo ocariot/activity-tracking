@@ -47,7 +47,7 @@ export class EnvironmentController {
                 })
 
                 const resultMultiStatus: MultiStatus<Environment> = await this._environmentService.add(environmentsArr)
-                return res.status(HttpStatus.CREATED).send(resultMultiStatus)
+                return res.status(HttpStatus.MULTI_STATUS).send(resultMultiStatus)
             }
 
             // Only one item

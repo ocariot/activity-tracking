@@ -51,7 +51,7 @@ export class WeightController {
                 })
 
                 const resultMultiStatus: MultiStatus<Weight> = await this._weightService.add(weightArr)
-                return res.status(HttpStatus.CREATED).send(resultMultiStatus)
+                return res.status(HttpStatus.MULTI_STATUS).send(resultMultiStatus)
             }
 
             // Only one item

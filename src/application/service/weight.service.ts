@@ -120,10 +120,12 @@ export class WeightService implements IWeightService {
             if (weight.body_fat) {
                 const bodyFat: BodyFat = await this._bodyFatRepository.selectByChild(weight.body_fat.timestamp!,
                     weight.body_fat.child_id!, weight.body_fat.type!)
-                bodyFat.value = weight.body_fat.value
-                await this._bodyFatRepository.update(bodyFat)
+                if (bodyFat) {
+                    bodyFat.value = weight.body_fat.value
+                    await this._bodyFatRepository.update(bodyFat)
 
-                if (bodyFat) weight.body_fat = bodyFat
+                    weight.body_fat = bodyFat
+                }
                 else {
                     bodyFatSaved = await this._bodyFatRepository.create(weight.body_fat)
                     weight.body_fat = bodyFatSaved

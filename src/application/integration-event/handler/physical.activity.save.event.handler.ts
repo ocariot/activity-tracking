@@ -20,7 +20,7 @@ export const physicalActivitySaveEventHandler = async (event: any) => {
             throw new ValidationException('Event received but could not be handled due to an error in the event format.')
         }
         if (event.physicalactivity instanceof Array) {
-            // 1. Convert json physical activity array to object.
+            // 1. Convert physical activity array json to object.
             const activitiesArr: Array<PhysicalActivity> = event.physicalactivity.map(item => {
                 const activityItem: PhysicalActivity = new PhysicalActivity().fromJSON(item)
                 activityItem.isFromEventBus = true
@@ -38,7 +38,7 @@ export const physicalActivitySaveEventHandler = async (event: any) => {
                 })
         }
         else {
-            // 1. Convert json physical activity to object.
+            // 1. Convert physical activity json to object.
             const activity: PhysicalActivity = new PhysicalActivity().fromJSON(event.physicalactivity)
             activity.isFromEventBus = true
 

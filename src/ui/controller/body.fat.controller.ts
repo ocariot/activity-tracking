@@ -50,7 +50,7 @@ export class BodyFatController {
                 })
 
                 const resultMultiStatus: MultiStatus<BodyFat> = await this._bodyFatService.add(bodyFatArr)
-                return res.status(HttpStatus.CREATED).send(resultMultiStatus)
+                return res.status(HttpStatus.MULTI_STATUS).send(resultMultiStatus)
             }
 
             // Only one item

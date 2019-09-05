@@ -66,7 +66,7 @@ describe('Routes: children.weights', () => {
                     timestamp: defaultWeight.timestamp,
                     value: defaultWeight.value,
                     unit: defaultWeight.unit,
-                    body_fat: defaultWeight.body_fat!.value
+                    body_fat: defaultWeight.value
                 }
 
                 return request
@@ -81,7 +81,7 @@ describe('Routes: children.weights', () => {
                         expect(res.body.value).to.eql(defaultWeight.value)
                         expect(res.body.unit).to.eql(defaultWeight.unit)
                         expect(res.body.child_id).to.eql(defaultWeight.child_id)
-                        expect(res.body.body_fat).to.eql(defaultWeight.body_fat!.value)
+                        expect(res.body.body_fat).to.eql(defaultWeight.value)
                     })
             })
         })
@@ -135,7 +135,7 @@ describe('Routes: children.weights', () => {
                     .expect(409)
                     .then(err => {
                         expect(err.body.code).to.eql(409)
-                        expect(err.body.message).to.eql('Weight is already registered...')
+                        expect(err.body.message).to.eql(Strings.WEIGHT.ALREADY_REGISTERED)
                     })
             })
         })
@@ -210,7 +210,7 @@ describe('Routes: children.weights', () => {
                     .post(`/v1/children/${defaultWeight.child_id}/weights`)
                     .send(body)
                     .set('Content-Type', 'application/json')
-                    .expect(201)
+                    .expect(207)
                     .then(res => {
                         for (let i = 0; i < res.body.success.length; i++) {
                             expect(res.body.success[i].code).to.eql(HttpStatus.CREATED)
@@ -245,11 +245,11 @@ describe('Routes: children.weights', () => {
                     .post(`/v1/children/${defaultWeight.child_id}/weights`)
                     .send(body)
                     .set('Content-Type', 'application/json')
-                    .expect(201)
+                    .expect(207)
                     .then(res => {
                         for (let i = 0; i < res.body.error.length; i++) {
                             expect(res.body.error[i].code).to.eql(HttpStatus.CONFLICT)
-                            expect(res.body.error[i].message).to.eql('Weight is already registered...')
+                            expect(res.body.error[i].message).to.eql(Strings.WEIGHT.ALREADY_REGISTERED)
                             expect(res.body.error[i].item.timestamp).to.eql(correctWeightArr[i].timestamp!.toISOString())
                             expect(res.body.error[i].item.value).to.eql(correctWeightArr[i].value)
                             expect(res.body.error[i].item.unit).to.eql(correctWeightArr[i].unit)
@@ -289,7 +289,7 @@ describe('Routes: children.weights', () => {
                     .post(`/v1/children/${defaultWeight.child_id}/weights`)
                     .send(body)
                     .set('Content-Type', 'application/json')
-                    .expect(201)
+                    .expect(207)
                     .then(res => {
                         // Success item
                         expect(res.body.success[0].code).to.eql(HttpStatus.CREATED)

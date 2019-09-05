@@ -50,7 +50,7 @@ export class SleepController {
                 })
 
                 const resultMultiStatus: MultiStatus<Sleep> = await this._sleepService.add(sleepArr)
-                return res.status(HttpStatus.CREATED).send(resultMultiStatus)
+                return res.status(HttpStatus.MULTI_STATUS).send(resultMultiStatus)
             }
 
             // Only one item

@@ -1,11 +1,7 @@
 import HttpStatus from 'http-status-codes'
 import { assert } from 'chai'
 import { CustomLoggerMock } from '../../mocks/custom.logger.mock'
-import { EventBusRabbitMQMock } from '../../mocks/event.bus.rabbitmq.mock'
-import { IIntegrationEventRepository } from '../../../src/application/port/integration.event.repository.interface'
-import { IConnectionEventBus } from '../../../src/infrastructure/port/connection.event.bus.interface'
-import { IntegrationEventRepositoryMock } from '../../mocks/integration.event.repository.mock'
-import { ConnectionRabbitmqMock } from '../../mocks/connection.rabbitmq.mock'
+import { RabbitMQMock } from '../../mocks/rabbitmq.mock'
 import { IConnectionFactory } from '../../../src/infrastructure/port/connection.factory.interface'
 import { ConnectionFactoryRabbitMQMock } from '../../mocks/connection.factory.rabbitmq.mock'
 import { IQuery } from '../../../src/application/port/query.interface'
@@ -23,6 +19,7 @@ import { IEventBus } from '../../../src/infrastructure/port/eventbus.interface'
 import { ILogger } from '../../../src/utils/custom.logger'
 import { MultiStatus } from '../../../src/application/domain/model/multi.status'
 import { ObjectID } from 'bson'
+import { Default } from '../../../src/utils/default'
 
 describe('Services: SleepService', () => {
     const sleep: Sleep = new SleepMock()
@@ -142,20 +139,16 @@ describe('Services: SleepService', () => {
     incorrectSleepArr.push(incorrectSleep13)
 
     const sleepRepo: ISleepRepository = new SleepRepositoryMock()
-    const integrationRepo: IIntegrationEventRepository = new IntegrationEventRepositoryMock()
 
     const connectionFactoryRabbitmq: IConnectionFactory = new ConnectionFactoryRabbitMQMock()
-    const connectionRabbitmqPub: IConnectionEventBus = new ConnectionRabbitmqMock(connectionFactoryRabbitmq)
-    const connectionRabbitmqSub: IConnectionEventBus = new ConnectionRabbitmqMock(connectionFactoryRabbitmq)
-    const eventBusRabbitmq: IEventBus = new EventBusRabbitMQMock(connectionRabbitmqPub, connectionRabbitmqSub)
+    const rabbitmq: IEventBus = new RabbitMQMock(connectionFactoryRabbitmq)
     const customLogger: ILogger = new CustomLoggerMock()
 
-    const sleepService: ISleepService = new SleepService(sleepRepo, integrationRepo, eventBusRabbitmq, customLogger)
+    const sleepService: ISleepService = new SleepService(sleepRepo, rabbitmq, customLogger)
 
     before(async () => {
         try {
-            await connectionRabbitmqPub.tryConnect(0, 500)
-            await connectionRabbitmqSub.tryConnect(0, 500)
+            await rabbitmq.initialize(process.env.RABBITMQ_URI || Default.RABBITMQ_URI, { sslOptions: { ca: [] } })
         } catch (err) {
             throw new Error('Failure on SleepService unit test: ' + err.message)
         }
@@ -165,47 +158,8 @@ describe('Services: SleepService', () => {
      * Method: add(sleep: Sleep | Array<Sleep>) with Sleep argument)
      */
     describe('add(sleep: Sleep | Array<Sleep>) with Sleep argument)', () => {
-        context('when the Sleep is correct, it still does not exist in the repository and there is a connection ' +
-            'to the RabbitMQ', () => {
+        context('when the Sleep is correct and it still does not exist in the repository', () => {
             it('should return the Sleep that was added', () => {
-                return sleepService.add(sleep)
-                    .then((result: Sleep | Array<Sleep>) => {
-                        result = result as Sleep
-                        assert.propertyVal(result, 'id', sleep.id)
-                        assert.propertyVal(result, 'start_time', sleep.start_time)
-                        assert.propertyVal(result, 'end_time', sleep.end_time)
-                        assert.propertyVal(result, 'duration', sleep.duration)
-                        assert.propertyVal(result, 'child_id', sleep.child_id)
-                        assert.propertyVal(result, 'pattern', sleep.pattern)
-                        assert.propertyVal(result, 'type', sleep.type)
-                    })
-            })
-        })
-
-        context('when the Sleep is correct and it still does not exist in the repository but there is no connection ' +
-            'to the RabbitMQ', () => {
-            it('should return the Sleep that was saved', () => {
-                connectionRabbitmqPub.isConnected = false
-
-                return sleepService.add(sleep)
-                    .then((result: Sleep | Array<Sleep>) => {
-                        result = result as Sleep
-                        assert.propertyVal(result, 'id', sleep.id)
-                        assert.propertyVal(result, 'start_time', sleep.start_time)
-                        assert.propertyVal(result, 'end_time', sleep.end_time)
-                        assert.propertyVal(result, 'duration', sleep.duration)
-                        assert.propertyVal(result, 'child_id', sleep.child_id)
-                        assert.propertyVal(result, 'pattern', sleep.pattern)
-                        assert.propertyVal(result, 'type', sleep.type)
-                    })
-            })
-        })
-
-        context('when the Sleep is correct and it still does not exist in the repository, there is no connection ' +
-            'to the RabbitMQ but the event could not be saved', () => {
-            it('should return the Sleep because the current implementation does not throw an exception, it just prints a log', () => {
-                sleep.id = '507f1f77bcf86cd799439012'           // Make mock throw an error in IntegrationEventRepository
-
                 return sleepService.add(sleep)
                     .then((result: Sleep | Array<Sleep>) => {
                         result = result as Sleep
@@ -222,7 +176,6 @@ describe('Services: SleepService', () => {
 
         context('when the Sleep is correct but is not successfully created in the database', () => {
             it('should return undefined', () => {
-                connectionRabbitmqPub.isConnected = true
                 sleep.id = '507f1f77bcf86cd799439013'           // Make return undefined in create method
 
                 return sleepService.add(sleep)
@@ -238,7 +191,7 @@ describe('Services: SleepService', () => {
 
                 return sleepService.add(sleep)
                     .catch(error => {
-                        assert.propertyVal(error, 'message', 'Sleep is already registered...')
+                        assert.propertyVal(error, 'message', Strings.SLEEP.ALREADY_REGISTERED)
                     })
             })
         })
@@ -476,64 +429,9 @@ describe('Services: SleepService', () => {
      * Method "add(sleep: Sleep | Array<Sleep>)" with Array<Sleep> argument
      */
     describe('add(sleep: Sleep | Array<Sleep>) with Array<Sleep> argument', () => {
-        context('when all the sleep objects of the array are correct, they still do not exist in the repository and there is ' +
-            'a connection to the RabbitMQ', () => {
+        context('when all the sleep objects of the array are correct and they still do not exist in the repository', () => {
             it('should create each Sleep and return a response of type MultiStatus<Sleep> with the description ' +
                 'of success in sending each one of them', () => {
-                return sleepService.add(correctSleepArr)
-                    .then((result: Sleep | MultiStatus<Sleep>) => {
-                        result = result as MultiStatus<Sleep>
-
-                        for (let i = 0; i < result.success.length; i++) {
-                            assert.propertyVal(result.success[i], 'code', HttpStatus.CREATED)
-                            assert.propertyVal(result.success[i].item, 'id', correctSleepArr[i].id)
-                            assert.propertyVal(result.success[i].item, 'start_time', correctSleepArr[i].start_time)
-                            assert.propertyVal(result.success[i].item, 'end_time', correctSleepArr[i].end_time)
-                            assert.propertyVal(result.success[i].item, 'duration', correctSleepArr[i].duration)
-                            assert.propertyVal(result.success[i].item, 'child_id', correctSleepArr[i].child_id)
-                            assert.propertyVal(result.success[i].item, 'pattern', correctSleepArr[i].pattern)
-                            assert.propertyVal(result.success[i].item, 'type', correctSleepArr[i].type)
-                        }
-
-                        assert.isEmpty(result.error)
-                    })
-            })
-        })
-
-        context('when all the sleep objects of the array are correct, they still do not exist in the repository but there is no ' +
-            'a connection to the RabbitMQ', () => {
-            it('should save each Sleep for submission attempt later to the bus and return a response of type ' +
-                'MultiStatus<Sleep> with the description of success in each one of them', () => {
-                connectionRabbitmqPub.isConnected = false
-
-                return sleepService.add(correctSleepArr)
-                    .then((result: Sleep | MultiStatus<Sleep>) => {
-                        result = result as MultiStatus<Sleep>
-
-                        for (let i = 0; i < result.success.length; i++) {
-                            assert.propertyVal(result.success[i], 'code', HttpStatus.CREATED)
-                            assert.propertyVal(result.success[i].item, 'id', correctSleepArr[i].id)
-                            assert.propertyVal(result.success[i].item, 'start_time', correctSleepArr[i].start_time)
-                            assert.propertyVal(result.success[i].item, 'end_time', correctSleepArr[i].end_time)
-                            assert.propertyVal(result.success[i].item, 'duration', correctSleepArr[i].duration)
-                            assert.propertyVal(result.success[i].item, 'child_id', correctSleepArr[i].child_id)
-                            assert.propertyVal(result.success[i].item, 'pattern', correctSleepArr[i].pattern)
-                            assert.propertyVal(result.success[i].item, 'type', correctSleepArr[i].type)
-                        }
-
-                        assert.isEmpty(result.error)
-                    })
-            })
-        })
-
-        context('when all the sleep objects of the array are correct, they still do not exist in the repository, there is no ' +
-            'a connection to the RabbitMQ but the events could not be saved', () => {
-            it('should return a response of type MultiStatus<Sleep> with the description of success in each one of them ' +
-                'because the current implementation does not throw an exception, it just prints a log', () => {
-                correctSleepArr.forEach(elem => {
-                    elem.id = '507f1f77bcf86cd799439012'            // Make mock throw an error in IntegrationEventRepository
-                })
-
                 return sleepService.add(correctSleepArr)
                     .then((result: Sleep | MultiStatus<Sleep>) => {
                         result = result as MultiStatus<Sleep>
@@ -557,8 +455,6 @@ describe('Services: SleepService', () => {
         context('when all the sleep objects of the array are correct but already exists in the repository', () => {
             it('should return a response of type MultiStatus<Sleep> with the description of conflict in each one of ' +
                 'them', () => {
-                connectionRabbitmqPub.isConnected = true
-
                 correctSleepArr.forEach(elem => {
                     elem.id = '507f1f77bcf86cd799439011'
                 })
@@ -569,7 +465,7 @@ describe('Services: SleepService', () => {
 
                         for (let i = 0; i < result.error.length; i++) {
                             assert.propertyVal(result.error[i], 'code', HttpStatus.CONFLICT)
-                            assert.propertyVal(result.error[i], 'message', 'Sleep is already registered...')
+                            assert.propertyVal(result.error[i], 'message', Strings.SLEEP.ALREADY_REGISTERED)
                             assert.propertyVal(result.error[i].item, 'id', correctSleepArr[i].id)
                             assert.propertyVal(result.error[i].item, 'start_time', correctSleepArr[i].start_time)
                             assert.propertyVal(result.error[i].item, 'end_time', correctSleepArr[i].end_time)
@@ -584,7 +480,7 @@ describe('Services: SleepService', () => {
             })
         })
 
-        context('when there are correct and incorrect sleep objects in the array and there is a connection to the RabbitMQ', () => {
+        context('when there are correct and incorrect sleep objects in the array', () => {
             it('should create each correct Sleep and return a response of type MultiStatus<Sleep> with the description of success ' +
                 'and error in each one of them', () => {
                 return sleepService.add(mixedSleepArr)
@@ -826,7 +722,7 @@ describe('Services: SleepService', () => {
 
                 return sleepService.updateByChild(otherSleep)
                     .catch(err => {
-                        assert.propertyVal(err, 'message', 'Sleep is already registered...')
+                        assert.propertyVal(err, 'message', Strings.SLEEP.ALREADY_REGISTERED)
                     })
             })
         })
@@ -843,27 +739,8 @@ describe('Services: SleepService', () => {
             })
         })
 
-        context('when sleep exists in the database but there is no connection to the RabbitMQ', () => {
-            it('should return the Sleep that was updated and save the event that will report the update', () => {
-                connectionRabbitmqPub.isConnected = false
-                otherSleep.id = '507f1f77bcf86cd799439012'            // Make mock return a sleep
-
-                return sleepService.updateByChild(otherSleep)
-                    .then(result => {
-                        assert.propertyVal(result, 'id', otherSleep.id)
-                        assert.propertyVal(result, 'start_time', otherSleep.start_time)
-                        assert.propertyVal(result, 'end_time', otherSleep.end_time)
-                        assert.propertyVal(result, 'duration', otherSleep.duration)
-                        assert.propertyVal(result, 'child_id', otherSleep.child_id)
-                        assert.propertyVal(result, 'pattern', otherSleep.pattern)
-                        assert.propertyVal(result, 'type', otherSleep.type)
-                    })
-            })
-        })
-
         context('when the sleep is incorrect (id is invalid)', () => {
             it('should throw a ValidationException', () => {
-                connectionRabbitmqPub.isConnected = true
                 incorrectSleep.id = '5a62be07de34500146d9c5442'           // Make sleep id invalid
 
                 return sleepService.updateByChild(incorrectSleep)
@@ -1056,22 +933,8 @@ describe('Services: SleepService', () => {
             })
         })
 
-        context('when there is sleep with the received parameters but there is no connection to the RabbitMQ', () => {
-            it('should return true and save the event that will report the removal of the resource', () => {
-                connectionRabbitmqPub.isConnected = false
-                sleep.id = '507f1f77bcf86cd799439011'            // Make mock return true
-                sleep.child_id = '5a62be07de34500146d9c544'     // Make child_id valid again
-
-                return sleepService.removeByChild(sleep.id!, sleep.child_id)
-                    .then(result => {
-                        assert.equal(result, true)
-                    })
-            })
-        })
-
         context('when the sleep is incorrect (child_id is invalid)', () => {
             it('should throw a ValidationException', () => {
-                connectionRabbitmqPub.isConnected = true
                 incorrectSleep.child_id = '5a62be07de34500146d9c5442'     // Make child_id invalid
 
                 return sleepService.removeByChild(incorrectSleep.id!, incorrectSleep.child_id)

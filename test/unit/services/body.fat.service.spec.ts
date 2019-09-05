@@ -1,18 +1,8 @@
 import HttpStatus from 'http-status-codes'
 import { assert } from 'chai'
-import { CustomLoggerMock } from '../../mocks/custom.logger.mock'
-import { EventBusRabbitMQMock } from '../../mocks/event.bus.rabbitmq.mock'
-import { IIntegrationEventRepository } from '../../../src/application/port/integration.event.repository.interface'
-import { IConnectionEventBus } from '../../../src/infrastructure/port/connection.event.bus.interface'
-import { IntegrationEventRepositoryMock } from '../../mocks/integration.event.repository.mock'
-import { ConnectionRabbitmqMock } from '../../mocks/connection.rabbitmq.mock'
-import { IConnectionFactory } from '../../../src/infrastructure/port/connection.factory.interface'
-import { ConnectionFactoryRabbitMQMock } from '../../mocks/connection.factory.rabbitmq.mock'
 import { IQuery } from '../../../src/application/port/query.interface'
 import { Query } from '../../../src/infrastructure/repository/query/query'
 import { Strings } from '../../../src/utils/strings'
-import { IEventBus } from '../../../src/infrastructure/port/eventbus.interface'
-import { ILogger } from '../../../src/utils/custom.logger'
 import { MultiStatus } from '../../../src/application/domain/model/multi.status'
 import { BodyFat } from '../../../src/application/domain/model/body.fat'
 import { BodyFatMock } from '../../mocks/body.fat.mock'
@@ -66,68 +56,15 @@ describe('Services: BodyFatService', () => {
 
     const bodyFatRepo: IBodyFatRepository = new BodyFatRepositoryMock()
     const weightRepo: IWeightRepository = new WeightRepositoryMock()
-    const integrationRepo: IIntegrationEventRepository = new IntegrationEventRepositoryMock()
 
-    const connectionFactoryRabbitmq: IConnectionFactory = new ConnectionFactoryRabbitMQMock()
-    const connectionRabbitmqPub: IConnectionEventBus = new ConnectionRabbitmqMock(connectionFactoryRabbitmq)
-    const connectionRabbitmqSub: IConnectionEventBus = new ConnectionRabbitmqMock(connectionFactoryRabbitmq)
-    const eventBusRabbitmq: IEventBus = new EventBusRabbitMQMock(connectionRabbitmqPub, connectionRabbitmqSub)
-    const customLogger: ILogger = new CustomLoggerMock()
-
-    const bodyFatService: IBodyFatService = new BodyFatService(bodyFatRepo, weightRepo, integrationRepo, eventBusRabbitmq, customLogger)
-
-    before(async () => {
-        try {
-            await connectionRabbitmqPub.tryConnect(0, 500)
-            await connectionRabbitmqSub.tryConnect(0, 500)
-        } catch (err) {
-            throw new Error('Failure on BodyFatService unit test: ' + err.message)
-        }
-    })
+    const bodyFatService: IBodyFatService = new BodyFatService(bodyFatRepo, weightRepo)
 
     /**
      * Method: add(bodyFat: BodyFat | Array<BodyFat>) with BodyFat argument)
      */
     describe('add(bodyFat: BodyFat | Array<BodyFat>) with BodyFat argument)', () => {
-        context('when the BodyFat is correct, it still does not exist in the repository and there is a connection ' +
-            'to the RabbitMQ', () => {
+        context('when the BodyFat is correct, it still does not exist in the repository', () => {
             it('should return the BodyFat that was added', () => {
-                return bodyFatService.add(bodyFat)
-                    .then((result: BodyFat | Array<BodyFat>) => {
-                        result = result as BodyFat
-                        assert.propertyVal(result, 'id', bodyFat.id)
-                        assert.propertyVal(result, 'type', bodyFat.type)
-                        assert.propertyVal(result, 'timestamp', bodyFat.timestamp)
-                        assert.propertyVal(result, 'value', bodyFat.value)
-                        assert.propertyVal(result, 'unit', bodyFat.unit)
-                        assert.propertyVal(result, 'child_id', bodyFat.child_id)
-                    })
-            })
-        })
-
-        context('when the BodyFat is correct and it still does not exist in the repository but there is no connection ' +
-            'to the RabbitMQ', () => {
-            it('should return the BodyFat that was saved', () => {
-                connectionRabbitmqPub.isConnected = false
-
-                return bodyFatService.add(bodyFat)
-                    .then((result: BodyFat | Array<BodyFat>) => {
-                        result = result as BodyFat
-                        assert.propertyVal(result, 'id', bodyFat.id)
-                        assert.propertyVal(result, 'type', bodyFat.type)
-                        assert.propertyVal(result, 'timestamp', bodyFat.timestamp)
-                        assert.propertyVal(result, 'value', bodyFat.value)
-                        assert.propertyVal(result, 'unit', bodyFat.unit)
-                        assert.propertyVal(result, 'child_id', bodyFat.child_id)
-                    })
-            })
-        })
-
-        context('when the BodyFat is correct and it still does not exist in the repository, there is no connection ' +
-            'to the RabbitMQ but the event could not be saved', () => {
-            it('should return the BodyFat because the current implementation does not throw an exception, it just prints a log', () => {
-                bodyFat.id = '507f1f77bcf86cd799439012'           // Make mock throw an error in IntegrationEventRepository
-
                 return bodyFatService.add(bodyFat)
                     .then((result: BodyFat | Array<BodyFat>) => {
                         result = result as BodyFat
@@ -143,7 +80,6 @@ describe('Services: BodyFatService', () => {
 
         context('when the BodyFat is correct but is not successfully created in the database', () => {
             it('should return undefined', () => {
-                connectionRabbitmqPub.isConnected = true
                 bodyFat.id = '507f1f77bcf86cd799439013'             // Make return undefined in create method
 
                 return bodyFatService.add(bodyFat)
@@ -159,7 +95,7 @@ describe('Services: BodyFatService', () => {
 
                 return bodyFatService.add(bodyFat)
                     .catch(error => {
-                        assert.propertyVal(error, 'message', 'BodyFat is already registered...')
+                        assert.propertyVal(error, 'message', Strings.BODY_FAT.ALREADY_REGISTERED)
                     })
             })
         })
@@ -212,62 +148,9 @@ describe('Services: BodyFatService', () => {
      * Method "add(bodyFat: BodyFat | Array<BodyFat>)" with Array<BodyFat> argument
      */
     describe('add(bodyFat: BodyFat | Array<BodyFat>) with Array<BodyFat> argument', () => {
-        context('when all the BodyFat objects of the array are correct, they still do not exist in the repository and there is ' +
-            'a connection to the RabbitMQ', () => {
+        context('when all the BodyFat objects of the array are correct, they still do not exist in the repository', () => {
             it('should create each BodyFat and return a response of type MultiStatus<BodyFat> with the description ' +
                 'of success in sending each one of them', () => {
-                return bodyFatService.add(correctBodyFatArr)
-                    .then((result: BodyFat | MultiStatus<BodyFat>) => {
-                        result = result as MultiStatus<BodyFat>
-
-                        for (let i = 0; i < result.success.length; i++) {
-                            assert.propertyVal(result.success[i], 'code', HttpStatus.CREATED)
-                            assert.propertyVal(result.success[i].item, 'id', correctBodyFatArr[i].id)
-                            assert.propertyVal(result.success[i].item, 'type', correctBodyFatArr[i].type)
-                            assert.propertyVal(result.success[i].item, 'timestamp', correctBodyFatArr[i].timestamp)
-                            assert.propertyVal(result.success[i].item, 'value', correctBodyFatArr[i].value)
-                            assert.propertyVal(result.success[i].item, 'unit', correctBodyFatArr[i].unit)
-                            assert.propertyVal(result.success[i].item, 'child_id', correctBodyFatArr[i].child_id)
-                        }
-
-                        assert.isEmpty(result.error)
-                    })
-            })
-        })
-
-        context('when all the BodyFat objects of the array are correct, they still do not exist in the repository but there is no ' +
-            'a connection to the RabbitMQ', () => {
-            it('should save each BodyFat for submission attempt later to the bus and return a response of type ' +
-                'MultiStatus<BodyFat> with the description of success in each one of them', () => {
-                connectionRabbitmqPub.isConnected = false
-
-                return bodyFatService.add(correctBodyFatArr)
-                    .then((result: BodyFat | MultiStatus<BodyFat>) => {
-                        result = result as MultiStatus<BodyFat>
-
-                        for (let i = 0; i < result.success.length; i++) {
-                            assert.propertyVal(result.success[i], 'code', HttpStatus.CREATED)
-                            assert.propertyVal(result.success[i].item, 'id', correctBodyFatArr[i].id)
-                            assert.propertyVal(result.success[i].item, 'type', correctBodyFatArr[i].type)
-                            assert.propertyVal(result.success[i].item, 'timestamp', correctBodyFatArr[i].timestamp)
-                            assert.propertyVal(result.success[i].item, 'value', correctBodyFatArr[i].value)
-                            assert.propertyVal(result.success[i].item, 'unit', correctBodyFatArr[i].unit)
-                            assert.propertyVal(result.success[i].item, 'child_id', correctBodyFatArr[i].child_id)
-                        }
-
-                        assert.isEmpty(result.error)
-                    })
-            })
-        })
-
-        context('when all the BodyFat objects of the array are correct, they still do not exist in the repository, there is no ' +
-            'a connection to the RabbitMQ but the events could not be saved', () => {
-            it('should return a response of type MultiStatus<BodyFat> with the description of success in each one of them ' +
-                'because the current implementation does not throw an exception, it just prints a log', () => {
-                correctBodyFatArr.forEach(elem => {
-                    elem.id = '507f1f77bcf86cd799439012'            // Make mock throw an error in IntegrationEventRepository
-                })
-
                 return bodyFatService.add(correctBodyFatArr)
                     .then((result: BodyFat | MultiStatus<BodyFat>) => {
                         result = result as MultiStatus<BodyFat>
@@ -290,8 +173,6 @@ describe('Services: BodyFatService', () => {
         context('when all the BodyFat objects of the array are correct but already exists in the repository', () => {
             it('should return a response of type MultiStatus<BodyFat> with the description of conflict in each one of ' +
                 'them', () => {
-                connectionRabbitmqPub.isConnected = true
-
                 correctBodyFatArr.forEach(elem => {
                     elem.id = '507f1f77bcf86cd799439011'
                 })
@@ -302,7 +183,7 @@ describe('Services: BodyFatService', () => {
 
                         for (let i = 0; i < result.error.length; i++) {
                             assert.propertyVal(result.error[i], 'code', HttpStatus.CONFLICT)
-                            assert.propertyVal(result.error[i], 'message', 'BodyFat is already registered...')
+                            assert.propertyVal(result.error[i], 'message', Strings.BODY_FAT.ALREADY_REGISTERED)
                             assert.propertyVal(result.error[i].item, 'id', correctBodyFatArr[i].id)
                             assert.propertyVal(result.error[i].item, 'type', correctBodyFatArr[i].type)
                             assert.propertyVal(result.error[i].item, 'timestamp', correctBodyFatArr[i].timestamp)
@@ -316,7 +197,7 @@ describe('Services: BodyFatService', () => {
             })
         })
 
-        context('when there are correct and incorrect BodyFat objects in the array and there is a connection to the RabbitMQ', () => {
+        context('when there are correct and incorrect BodyFat objects in the array', () => {
             it('should create each correct BodyFat and return a response of type MultiStatus<BodyFat> with the description of success ' +
                 'and error in each one of them', () => {
                 return bodyFatService.add(mixedBodyFatArr)
@@ -536,22 +417,8 @@ describe('Services: BodyFatService', () => {
             })
         })
 
-        context('when there is BodyFat with the received parameters but there is no connection to the RabbitMQ', () => {
-            it('should return true and save the event that will report the removal of the resource', () => {
-                connectionRabbitmqPub.isConnected = false
-                bodyFat.id = '507f1f77bcf86cd799439011'            // Make mock return true
-                bodyFat.child_id = '5a62be07de34500146d9c544'     // Make child_id valid again
-
-                return bodyFatService.removeByChild(bodyFat.id!, bodyFat.child_id)
-                    .then(result => {
-                        assert.equal(result, true)
-                    })
-            })
-        })
-
         context('when the BodyFat is incorrect (child_id is invalid)', () => {
             it('should throw a ValidationException', () => {
-                connectionRabbitmqPub.isConnected = true
                 incorrectBodyFat.child_id = '5a62be07de34500146d9c5442'     // Make child_id invalid
 
                 return bodyFatService.removeByChild(incorrectBodyFat.id!, incorrectBodyFat.child_id)

@@ -126,7 +126,7 @@ describe('Routes: environments', () => {
                     .expect(409)
                     .then(err => {
                         expect(err.body.code).to.eql(409)
-                        expect(err.body.message).to.eql('Measurement of environment is already registered...')
+                        expect(err.body.message).to.eql(Strings.ENVIRONMENT.ALREADY_REGISTERED)
                     })
             })
         })
@@ -278,7 +278,7 @@ describe('Routes: environments', () => {
                     .post('/v1/environments')
                     .send(body)
                     .set('Content-Type', 'application/json')
-                    .expect(201)
+                    .expect(207)
                     .then(res => {
                         for (let i = 0; i < res.body.success.length; i++) {
                             expect(res.body.success[i].code).to.eql(HttpStatus.CREATED)
@@ -325,11 +325,11 @@ describe('Routes: environments', () => {
                     .post('/v1/environments')
                     .send(body)
                     .set('Content-Type', 'application/json')
-                    .expect(201)
+                    .expect(207)
                     .then(res => {
                         for (let i = 0; i < res.body.error.length; i++) {
                             expect(res.body.error[i].code).to.eql(HttpStatus.CONFLICT)
-                            expect(res.body.error[i].message).to.eql('Measurement of environment is already registered...')
+                            expect(res.body.error[i].message).to.eql(Strings.ENVIRONMENT.ALREADY_REGISTERED)
                             expect(res.body.error[i].item.id).to.eql(correctEnvironmentsArr[i].id)
                             expect(res.body.error[i].item.institution_id).to.eql(correctEnvironmentsArr[i].institution_id)
                             expect(res.body.error[i].item.location).to.eql(correctEnvironmentsArr[i].location!.toJSON())
@@ -381,7 +381,7 @@ describe('Routes: environments', () => {
                     .post('/v1/environments')
                     .send(body)
                     .set('Content-Type', 'application/json')
-                    .expect(201)
+                    .expect(207)
                     .then(res => {
                         // Success item
                         expect(res.body.success[0].code).to.eql(HttpStatus.CREATED)
@@ -439,7 +439,7 @@ describe('Routes: environments', () => {
                     .post('/v1/environments')
                     .send(body)
                     .set('Content-Type', 'application/json')
-                    .expect(201)
+                    .expect(207)
                     .then(res => {
                         expect(res.body.error[0].message)
                             .to.eql('Required fields were not provided...')

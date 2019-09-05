@@ -19,7 +19,7 @@ export const physicalActivityUpdateEventHandler = async (event: any) => {
         if (!event.physicalactivity) {
             throw new ValidationException('Event received but could not be handled due to an error in the event format.')
         }
-        // 1. Convert json physical activity to object.
+        // 1. Convert physical activity json to object.
         const activity: PhysicalActivity = new PhysicalActivity().fromJSON(event.physicalactivity)
         activity.isFromEventBus = true
 

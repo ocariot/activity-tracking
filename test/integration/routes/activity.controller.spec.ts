@@ -221,7 +221,7 @@ describe('Routes: children.physicalactivities', () => {
                     .expect(409)
                     .then(err => {
                         expect(err.body.code).to.eql(409)
-                        expect(err.body.message).to.eql('Physical Activity is already registered...')
+                        expect(err.body.message).to.eql(Strings.PHYSICAL_ACTIVITY.ALREADY_REGISTERED)
                     })
             })
         })
@@ -700,7 +700,7 @@ describe('Routes: children.physicalactivities', () => {
                     .post(`/v1/children/${defaultActivity.child_id}/physicalactivities`)
                     .send(body)
                     .set('Content-Type', 'application/json')
-                    .expect(201)
+                    .expect(207)
                     .then(res => {
                         for (let i = 0; i < res.body.success.length; i++) {
                             expect(res.body.success[i].code).to.eql(HttpStatus.CREATED)
@@ -750,11 +750,11 @@ describe('Routes: children.physicalactivities', () => {
                     .post(`/v1/children/${defaultActivity.child_id}/physicalactivities`)
                     .send(body)
                     .set('Content-Type', 'application/json')
-                    .expect(201)
+                    .expect(207)
                     .then(res => {
                         for (let i = 0; i < res.body.error.length; i++) {
                             expect(res.body.error[i].code).to.eql(HttpStatus.CONFLICT)
-                            expect(res.body.error[i].message).to.eql('Physical Activity is already registered...')
+                            expect(res.body.error[i].message).to.eql(Strings.PHYSICAL_ACTIVITY.ALREADY_REGISTERED)
                             expect(res.body.error[i].item.name).to.eql(correctActivitiesArr[i].name)
                             expect(res.body.error[i].item.start_time).to.eql(correctActivitiesArr[i].start_time!.toISOString())
                             expect(res.body.error[i].item.end_time).to.eql(correctActivitiesArr[i].end_time!.toISOString())
@@ -809,7 +809,7 @@ describe('Routes: children.physicalactivities', () => {
                     .post(`/v1/children/${defaultActivity.child_id}/physicalactivities`)
                     .send(body)
                     .set('Content-Type', 'application/json')
-                    .expect(201)
+                    .expect(207)
                     .then(res => {
                         // Success item
                         expect(res.body.success[0].code).to.eql(HttpStatus.CREATED)
@@ -870,7 +870,7 @@ describe('Routes: children.physicalactivities', () => {
                     .post(`/v1/children/${defaultActivity.child_id}/physicalactivities`)
                     .send(body)
                     .set('Content-Type', 'application/json')
-                    .expect(201)
+                    .expect(207)
                     .then(res => {
                         expect(res.body.error[0].message).to.eql('Required fields were not provided...')
                         expect(res.body.error[0].description).to.eql('Activity validation failed: ' +
@@ -1671,7 +1671,7 @@ describe('Routes: children.physicalactivities', () => {
                     .expect(409)
                     .then(err => {
                         expect(err.body.code).to.eql(409)
-                        expect(err.body.message).to.eql('Physical Activity is already registered...')
+                        expect(err.body.message).to.eql(Strings.PHYSICAL_ACTIVITY.ALREADY_REGISTERED)
                     })
             })
         })
@@ -2435,7 +2435,7 @@ async function createActivity(item): Promise<any> {
 
 async function createActivityToBeUpdated(defaultActivity: PhysicalActivity): Promise<any> {
     // physical activity to be updated
-    const result =  createActivity({
+    const result = createActivity({
         name: defaultActivity.name,
         start_time: defaultActivity.start_time,
         end_time: defaultActivity.end_time,

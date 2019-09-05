@@ -98,7 +98,7 @@ describe('Routes: children.bodyfats', () => {
                     .expect(409)
                     .then(err => {
                         expect(err.body.code).to.eql(409)
-                        expect(err.body.message).to.eql('BodyFat is already registered...')
+                        expect(err.body.message).to.eql(Strings.BODY_FAT.ALREADY_REGISTERED)
                     })
             })
         })
@@ -171,7 +171,7 @@ describe('Routes: children.bodyfats', () => {
                     .post(`/v1/children/${defaultBodyFat.child_id}/bodyfats`)
                     .send(body)
                     .set('Content-Type', 'application/json')
-                    .expect(201)
+                    .expect(207)
                     .then(res => {
                         for (let i = 0; i < res.body.success.length; i++) {
                             expect(res.body.success[i].code).to.eql(HttpStatus.CREATED)
@@ -204,11 +204,11 @@ describe('Routes: children.bodyfats', () => {
                     .post(`/v1/children/${defaultBodyFat.child_id}/bodyfats`)
                     .send(body)
                     .set('Content-Type', 'application/json')
-                    .expect(201)
+                    .expect(207)
                     .then(res => {
                         for (let i = 0; i < res.body.error.length; i++) {
                             expect(res.body.error[i].code).to.eql(HttpStatus.CONFLICT)
-                            expect(res.body.error[i].message).to.eql('BodyFat is already registered...')
+                            expect(res.body.error[i].message).to.eql(Strings.BODY_FAT.ALREADY_REGISTERED)
                             expect(res.body.error[i].item.timestamp).to.eql(correctBodyFatArr[i].timestamp!.toISOString())
                             expect(res.body.error[i].item.value).to.eql(correctBodyFatArr[i].value)
                             expect(res.body.error[i].item.unit).to.eql(correctBodyFatArr[i].unit)
@@ -246,7 +246,7 @@ describe('Routes: children.bodyfats', () => {
                     .post(`/v1/children/${defaultBodyFat.child_id}/bodyfats`)
                     .send(body)
                     .set('Content-Type', 'application/json')
-                    .expect(201)
+                    .expect(207)
                     .then(res => {
                         // Success item
                         expect(res.body.success[0].code).to.eql(HttpStatus.CREATED)

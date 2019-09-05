@@ -1,7 +1,7 @@
 import { IEventBus } from '../../src/infrastructure/port/eventbus.interface'
 import { IConnectionFactory, IEventBusOptions } from '../../src/infrastructure/port/connection.factory.interface'
 
-export class EventBusRabbitMQMock implements IEventBus {
+export class RabbitMQMock implements IEventBus {
     public bus: any
 
     constructor(private readonly connectionFactory: IConnectionFactory) {

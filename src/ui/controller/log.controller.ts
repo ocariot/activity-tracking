@@ -53,7 +53,7 @@ export class LogController {
             }
 
             const result: MultiStatus<Log> = await this._logService.addLogs(activityLogs)
-            return res.status(HttpStatus.CREATED).send(result)
+            return res.status(HttpStatus.MULTI_STATUS).send(result)
         } catch (err) {
             const handlerError = ApiExceptionManager.build(err)
             return res.status(handlerError.code)

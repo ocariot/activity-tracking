@@ -1,9 +1,9 @@
-import { DIContainer } from '../../src/di/di'
-import { Identifier } from '../../src/di/identifiers'
-import { App } from '../../src/app'
+import { DIContainer } from '../../../src/di/di'
+import { Identifier } from '../../../src/di/identifiers'
+import { App } from '../../../src/app'
 import { expect } from 'chai'
-import { PhysicalActivity } from '../../src/application/domain/model/physical.activity'
-import { PhysicalActivityMock } from '../mocks/physical.activity.mock'
+import { PhysicalActivity } from '../../../src/application/domain/model/physical.activity'
+import { PhysicalActivityMock } from '../../mocks/physical.activity.mock'
 
 const app: App = DIContainer.get(Identifier.APP)
 const request = require('supertest')(app.getExpress())

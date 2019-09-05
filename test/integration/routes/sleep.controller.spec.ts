@@ -198,7 +198,7 @@ describe('Routes: children.sleep', () => {
                     .expect(409)
                     .then(err => {
                         expect(err.body.code).to.eql(409)
-                        expect(err.body.message).to.eql('Sleep is already registered...')
+                        expect(err.body.message).to.eql(Strings.SLEEP.ALREADY_REGISTERED)
                     })
             })
         })
@@ -547,7 +547,7 @@ describe('Routes: children.sleep', () => {
                     .post(`/v1/children/${defaultSleep.child_id}/sleep`)
                     .send(body)
                     .set('Content-Type', 'application/json')
-                    .expect(201)
+                    .expect(207)
                     .then(res => {
                         for (let i = 0; i < res.body.success.length; i++) {
                             expect(res.body.success[i].code).to.eql(HttpStatus.CREATED)
@@ -590,11 +590,11 @@ describe('Routes: children.sleep', () => {
                     .post(`/v1/children/${defaultSleep.child_id}/sleep`)
                     .send(body)
                     .set('Content-Type', 'application/json')
-                    .expect(201)
+                    .expect(207)
                     .then(res => {
                         for (let i = 0; i < res.body.error.length; i++) {
                             expect(res.body.error[i].code).to.eql(HttpStatus.CONFLICT)
-                            expect(res.body.error[i].message).to.eql('Sleep is already registered...')
+                            expect(res.body.error[i].message).to.eql(Strings.SLEEP.ALREADY_REGISTERED)
                             expect(res.body.error[i].item.start_time).to.eql(correctSleepArr[i].start_time!.toISOString())
                             expect(res.body.error[i].item.end_time).to.eql(correctSleepArr[i].end_time!.toISOString())
                             expect(res.body.error[i].item.duration).to.eql(correctSleepArr[i].duration)
@@ -642,7 +642,7 @@ describe('Routes: children.sleep', () => {
                     .post(`/v1/children/${defaultSleep.child_id}/sleep`)
                     .send(body)
                     .set('Content-Type', 'application/json')
-                    .expect(201)
+                    .expect(207)
                     .then(res => {
                         // Success item
                         expect(res.body.success[0].code).to.eql(HttpStatus.CREATED)
@@ -696,7 +696,7 @@ describe('Routes: children.sleep', () => {
                     .post(`/v1/children/${defaultSleep.child_id}/sleep`)
                     .send(body)
                     .set('Content-Type', 'application/json')
-                    .expect(201)
+                    .expect(207)
                     .then(res => {
                         expect(res.body.error[0].message).to.eql('Required fields were not provided...')
                         expect(res.body.error[0].description).to.eql('Activity validation failed: start_time, end_time, ' +
@@ -1384,7 +1384,7 @@ describe('Routes: children.sleep', () => {
                     .expect(409)
                     .then(err => {
                         expect(err.body.code).to.eql(409)
-                        expect(err.body.message).to.eql('Sleep is already registered...')
+                        expect(err.body.message).to.eql(Strings.SLEEP.ALREADY_REGISTERED)
                     })
             })
         })

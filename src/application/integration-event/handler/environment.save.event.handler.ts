@@ -20,7 +20,7 @@ export const environmentSaveEventHandler = async (event: any) => {
             throw new ValidationException('Event received but could not be handled due to an error in the event format.')
         }
         if (event.environment instanceof Array) {
-            // 1. Convert json environment array to object.
+            // 1. Convert environment array json to objects.
             const environmentsArr: Array<Environment> = event.environment.map(item => {
                 const environmentItem: Environment = new Environment().fromJSON(item)
                 environmentItem.isFromEventBus = true
@@ -38,7 +38,7 @@ export const environmentSaveEventHandler = async (event: any) => {
                 })
         }
         else {
-            // 1. Convert json environment to object.
+            // 1. Convert environment json to object.
             const environment: Environment = new Environment().fromJSON(event.environment)
             environment.isFromEventBus = true
 
