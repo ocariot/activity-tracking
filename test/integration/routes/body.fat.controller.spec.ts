@@ -2,7 +2,6 @@ import HttpStatus from 'http-status-codes'
 import { DIContainer } from '../../../src/di/di'
 import { Identifier } from '../../../src/di/identifiers'
 import { App } from '../../../src/app'
-import { BackgroundService } from '../../../src/background/background.service'
 import { expect } from 'chai'
 import { ObjectID } from 'bson'
 import { BodyFat } from '../../../src/application/domain/model/body.fat'
@@ -10,8 +9,10 @@ import { BodyFatMock } from '../../mocks/body.fat.mock'
 import { BodyFatEntityMapper } from '../../../src/infrastructure/entity/mapper/body.fat.entity.mapper'
 import { MeasurementRepoModel } from '../../../src/infrastructure/database/schema/measurement.schema'
 import { Strings } from '../../../src/utils/strings'
+import { IDatabase } from '../../../src/infrastructure/port/database.interface'
+import { Default } from '../../../src/utils/default'
 
-const backgroundServices: BackgroundService = DIContainer.get(Identifier.BACKGROUND_SERVICE)
+const dbConnection: IDatabase = DIContainer.get(Identifier.MONGODB_CONNECTION)
 const app: App = DIContainer.get(Identifier.APP)
 const request = require('supertest')(app.getExpress())
 
@@ -41,7 +42,7 @@ describe('Routes: children.bodyfats', () => {
     before(async () => {
         try {
             deleteAllBodyFat()
-            await backgroundServices.startServices()
+            await dbConnection.connect(process.env.MONGODB_URI_TEST || Default.MONGODB_URI_TEST)
         } catch (err) {
             throw new Error('Failure on children.bodyfats routes test: ' + err.message)
         }
@@ -51,6 +52,7 @@ describe('Routes: children.bodyfats', () => {
     after(async () => {
         try {
             deleteAllBodyFat()
+            await dbConnection.dispose()
         } catch (err) {
             throw new Error('Failure on children.bodyfats routes test: ' + err.message)
         }

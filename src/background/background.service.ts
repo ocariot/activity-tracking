@@ -35,7 +35,7 @@ export class BackgroundService {
             await this._eventBus.initialize(rabbitUri, rabbitOptions)
             this._eventBus.bus.logger('warn')
 
-            // Provide all resources
+            // Subscribe all resources
             this._subscribeTask.run()
 
             // All resource provider

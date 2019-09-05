@@ -2,7 +2,6 @@ import HttpStatus from 'http-status-codes'
 import { DIContainer } from '../../../src/di/di'
 import { Identifier } from '../../../src/di/identifiers'
 import { App } from '../../../src/app'
-import { BackgroundService } from '../../../src/background/background.service'
 import { EnvironmentMock } from '../../mocks/environment.mock'
 import { Environment } from '../../../src/application/domain/model/environment'
 import { Location } from '../../../src/application/domain/model/location'
@@ -11,8 +10,12 @@ import { EnvironmentRepoModel } from '../../../src/infrastructure/database/schem
 import { Strings } from '../../../src/utils/strings'
 import { EnvironmentEntityMapper } from '../../../src/infrastructure/entity/mapper/environment.entity.mapper'
 import { Measurement, MeasurementType } from '../../../src/application/domain/model/measurement'
+import { IDatabase } from '../../../src/infrastructure/port/database.interface'
+import { IEventBus } from '../../../src/infrastructure/port/eventbus.interface'
+import { Default } from '../../../src/utils/default'
 
-const backgroundServices: BackgroundService = DIContainer.get(Identifier.BACKGROUND_SERVICE)
+const dbConnection: IDatabase = DIContainer.get(Identifier.MONGODB_CONNECTION)
+const rabbitmq: IEventBus = DIContainer.get(Identifier.RABBITMQ_EVENT_BUS)
 const app: App = DIContainer.get(Identifier.APP)
 const request = require('supertest')(app.getExpress())
 
@@ -62,9 +65,20 @@ describe('Routes: environments', () => {
     // Start services
     before(async () => {
         try {
-            await backgroundServices.startServices()
+            await dbConnection.connect(process.env.MONGODB_URI_TEST || Default.MONGODB_URI_TEST)
+            await rabbitmq.initialize(process.env.RABBITMQ_URI || Default.RABBITMQ_URI, { sslOptions: { ca: [] } })
         } catch (err) {
             throw new Error('Failure on environments routes test: ' + err.message)
+        }
+    })
+    // Delete all environments from the database
+    after(async () => {
+        try {
+            deleteAllEnvironments()
+            await dbConnection.dispose()
+            await rabbitmq.dispose()
+        } catch (err) {
+            throw new Error('Failure on children.logs routes test: ' + err.message)
         }
     })
     /**

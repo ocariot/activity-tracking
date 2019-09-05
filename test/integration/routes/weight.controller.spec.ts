@@ -2,7 +2,6 @@ import HttpStatus from 'http-status-codes'
 import { DIContainer } from '../../../src/di/di'
 import { Identifier } from '../../../src/di/identifiers'
 import { App } from '../../../src/app'
-import { BackgroundService } from '../../../src/background/background.service'
 import { expect } from 'chai'
 import { ObjectID } from 'bson'
 import { MeasurementRepoModel } from '../../../src/infrastructure/database/schema/measurement.schema'
@@ -11,8 +10,12 @@ import { Weight } from '../../../src/application/domain/model/weight'
 import { WeightMock } from '../../mocks/weight.mock'
 import { WeightEntityMapper } from '../../../src/infrastructure/entity/mapper/weight.entity.mapper'
 import { BodyFatEntityMapper } from '../../../src/infrastructure/entity/mapper/body.fat.entity.mapper'
+import { IDatabase } from '../../../src/infrastructure/port/database.interface'
+import { IEventBus } from '../../../src/infrastructure/port/eventbus.interface'
+import { Default } from '../../../src/utils/default'
 
-const backgroundServices: BackgroundService = DIContainer.get(Identifier.BACKGROUND_SERVICE)
+const dbConnection: IDatabase = DIContainer.get(Identifier.MONGODB_CONNECTION)
+const rabbitmq: IEventBus = DIContainer.get(Identifier.RABBITMQ_EVENT_BUS)
 const app: App = DIContainer.get(Identifier.APP)
 const request = require('supertest')(app.getExpress())
 
@@ -42,7 +45,8 @@ describe('Routes: children.weights', () => {
     before(async () => {
         try {
             deleteAllWeight()
-            await backgroundServices.startServices()
+            await dbConnection.connect(process.env.MONGODB_URI_TEST || Default.MONGODB_URI_TEST)
+            await rabbitmq.initialize(process.env.RABBITMQ_URI || Default.RABBITMQ_URI, { sslOptions: { ca: [] } })
         } catch (err) {
             throw new Error('Failure on children.weights routes test: ' + err.message)
         }
@@ -52,6 +56,8 @@ describe('Routes: children.weights', () => {
     after(async () => {
         try {
             deleteAllWeight()
+            await dbConnection.dispose()
+            await rabbitmq.dispose()
         } catch (err) {
             throw new Error('Failure on children.weights routes test: ' + err.message)
         }

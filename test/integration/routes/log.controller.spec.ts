@@ -4,14 +4,15 @@ import HttpStatus from 'http-status-codes'
 import { LogMock } from '../../mocks/log.mock'
 import { Strings } from '../../../src/utils/strings'
 import { LogRepoModel } from '../../../src/infrastructure/database/schema/log.schema'
-import { BackgroundService } from '../../../src/background/background.service'
 import { DIContainer } from '../../../src/di/di'
 import { Identifier } from '../../../src/di/identifiers'
 import { App } from '../../../src/app'
 import { PhysicalActivity } from '../../../src/application/domain/model/physical.activity'
 import { PhysicalActivityMock } from '../../mocks/physical.activity.mock'
+import { IDatabase } from '../../../src/infrastructure/port/database.interface'
+import { Default } from '../../../src/utils/default'
 
-const backgroundServices: BackgroundService = DIContainer.get(Identifier.BACKGROUND_SERVICE)
+const dbConnection: IDatabase = DIContainer.get(Identifier.MONGODB_CONNECTION)
 const app: App = DIContainer.get(Identifier.APP)
 const request = require('supertest')(app.getExpress())
 
@@ -60,7 +61,7 @@ describe('Routes: children.logs', () => {
     before(async () => {
         try {
             deleteAllLogs()
-            await backgroundServices.startServices()
+            await dbConnection.connect(process.env.MONGODB_URI_TEST || Default.MONGODB_URI_TEST)
         } catch (err) {
             throw new Error('Failure on children.logs routes test: ' + err.message)
         }
@@ -70,6 +71,7 @@ describe('Routes: children.logs', () => {
     after(async () => {
         try {
             deleteAllLogs()
+            await dbConnection.dispose()
         } catch (err) {
             throw new Error('Failure on children.logs routes test: ' + err.message)
         }
