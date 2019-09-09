@@ -5,6 +5,7 @@ import { IBackgroundTask } from '../application/port/background.task.interface'
 import { Default } from '../utils/default'
 import fs from 'fs'
 import { IEventBus } from '../infrastructure/port/eventbus.interface'
+import { ILogger } from '../utils/custom.logger'
 
 @injectable()
 export class BackgroundService {
@@ -13,7 +14,8 @@ export class BackgroundService {
         @inject(Identifier.MONGODB_CONNECTION) private readonly _mongodb: IDatabase,
         @inject(Identifier.RABBITMQ_EVENT_BUS) private readonly _eventBus: IEventBus,
         @inject(Identifier.SUB_EVENT_BUS_TASK) private readonly _subscribeTask: IBackgroundTask,
-        @inject(Identifier.PROVIDER_EVENT_BUS_TASK) private readonly _providerTask: IBackgroundTask
+        @inject(Identifier.PROVIDER_EVENT_BUS_TASK) private readonly _providerTask: IBackgroundTask,
+        @inject(Identifier.LOGGER) private readonly _logger: ILogger
     ) {
     }
 
@@ -33,7 +35,7 @@ export class BackgroundService {
                 rabbitOptions.sslOptions.ca = [fs.readFileSync(process.env.RABBIMQ_CA_PATH || Default.RABBIMQ_CA_PATH)]
             }
             await this._eventBus.initialize(rabbitUri, rabbitOptions)
-            this._eventBus.bus.logger('warn')
+            this.initializeBusEvents()
 
             // Subscribe all resources
             this._subscribeTask.run()
@@ -52,6 +54,32 @@ export class BackgroundService {
         } catch (err) {
             return Promise.reject(new Error(`Error stopping MongoDB! ${err.message}`))
         }
+    }
+
+    private initializeBusEvents(): void {
+        this._eventBus.bus.on('sub_trying_connection', () => {
+            this._logger.warn('Trying to reestablish Subscribe connection...')
+        })
+
+        this._eventBus.bus.on('sub_reconnected', () => {
+            this._logger.warn('Subscribe connection successfully reconnected!')
+        })
+
+        this._eventBus.bus.on('pub_trying_connection', () => {
+            this._logger.warn('Trying to reestablish Publish connection...')
+        })
+
+        this._eventBus.bus.on('pub_reconnected', () => {
+            this._logger.warn('Publish connection successfully reconnected!')
+        })
+
+        this._eventBus.bus.on('rpc_server_trying_connection', () => {
+            this._logger.warn('Trying to reestablish Provider (RPC Server) connection...')
+        })
+
+        this._eventBus.bus.on('rpc_server_reconnected', () => {
+            this._logger.warn('Provider (RPC Server) connection successfully reconnected!')
+        })
     }
 
     /**
