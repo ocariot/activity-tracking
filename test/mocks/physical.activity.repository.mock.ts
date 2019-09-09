@@ -13,7 +13,13 @@ export class PhysicalActivityRepositoryMock implements IPhysicalActivityReposito
         return Promise.resolve(1)
     }
 
+    public countActivities(childId: string): Promise<number> {
+        return Promise.resolve(1)
+    }
+
     public create(item: PhysicalActivity): Promise<PhysicalActivity> {
+        if (item.id === '507f1f77bcf86cd799439013')
+            return Promise.resolve(undefined!)
         return Promise.resolve(item)
     }
 
@@ -52,7 +58,7 @@ export class PhysicalActivityRepositoryMock implements IPhysicalActivityReposito
     }
 
     public updateByChild(activity: PhysicalActivity): Promise<PhysicalActivity> {
-        if (activity.id === '507f1f77bcf86cd799439011')
+        if (activity.id === '507f1f77bcf86cd799439012')
             return Promise.resolve(activity)
         return Promise.resolve(undefined!)
     }

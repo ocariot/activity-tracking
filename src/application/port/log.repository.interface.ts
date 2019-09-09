@@ -1,5 +1,5 @@
 import { IRepository } from './repository.interface'
-import { Log, LogType } from '../domain/model/log'
+import { Log } from '../domain/model/log'
 
 /**
  * Interface of the log repository
@@ -18,5 +18,26 @@ export interface ILogRepository extends IRepository<Log> {
      * @return {Promise<Log>}
      * @throws {ValidationException | RepositoryException}
      */
-    findOneByChild(childId: string, logType: LogType, dateLog: string): Promise<Log>
+    selectByChild(childId: string, logType: string, dateLog: string): Promise<Log>
+
+    /**
+     * Removes all logs associated with the childId received.
+     *
+     * @param childId Child id associated with logs.
+     * @return {Promise<boolean>}
+     * @throws {ValidationException | RepositoryException}
+     */
+    removeAllLogsFromChild(childId: string): Promise<boolean>
+
+    /**
+     * Returns the total of logs of a child in a period by resource.
+     *
+     * @param childId Child id associated with logs.
+     * @param desiredResource Desired resource.
+     * @param dateStart Range start date.
+     * @param dateEnd Range end date.
+     * @return {Promise<number>}
+     * @throws {RepositoryException}
+     */
+    countLogsByResource(childId: string, desiredResource: string, dateStart: string, dateEnd: string): Promise<number>
 }

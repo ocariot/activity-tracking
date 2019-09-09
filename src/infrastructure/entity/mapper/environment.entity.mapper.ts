@@ -2,8 +2,8 @@ import { injectable } from 'inversify'
 import { Environment } from '../../../application/domain/model/environment'
 import { EnvironmentEntity } from '../environment.entity'
 import { Location } from '../../../application/domain/model/location'
-import { Measurement } from '../../../application/domain/model/measurement'
 import { IEntityMapper } from '../../port/entity.mapper.interface'
+import { Measurement } from '../../../application/domain/model/measurement'
 
 @injectable()
 export class EnvironmentEntityMapper implements IEntityMapper<Environment, EnvironmentEntity> {
@@ -34,17 +34,6 @@ export class EnvironmentEntityMapper implements IEntityMapper<Environment, Envir
         }
 
         return result
-    }
-
-    /**
-     * Convert {EnvironmentEntity} for {Environment}.
-     *
-     * @see Each attribute must be mapped only if it contains an assigned value,
-     * because at some point the attribute accessed may not exist.
-     * @param item
-     */
-    public modelEntityToModel(item: EnvironmentEntity): Environment {
-        throw Error('Not implemented!')
     }
 
     /**

@@ -3,6 +3,7 @@ import { PhysicalActivity } from '../../../application/domain/model/physical.act
 import { PhysicalActivityLevel } from '../../../application/domain/model/physical.activity.level'
 import { PhysicalActivityEntity } from '../physical.activity.entity'
 import { IEntityMapper } from '../../port/entity.mapper.interface'
+import { PhysicalActivityHeartRate } from '../../../application/domain/model/physical.activity.heart.rate'
 
 @injectable()
 export class PhysicalActivityEntityMapper implements IEntityMapper<PhysicalActivity, PhysicalActivityEntity> {
@@ -34,19 +35,9 @@ export class PhysicalActivityEntityMapper implements IEntityMapper<PhysicalActiv
         if (item.levels !== undefined && item.levels.length > 0) {
             result.levels = item.levels.map((elem: PhysicalActivityLevel) => elem.toJSON())
         } else result.levels = []
+        if (item.heart_rate !== undefined) result.heart_rate = item.heart_rate.toJSON()
 
         return result
-    }
-
-    /**
-     * Convert {PhysicalActivityEntity} for {PhysicalActivity}.
-     *
-     * @see Each attribute must be mapped only if it contains an assigned value,
-     * because at some point the attribute accessed may not exist.
-     * @param item
-     */
-    public modelEntityToModel(item: PhysicalActivityEntity): PhysicalActivity {
-        throw Error('Not implemented!')
     }
 
     /**
@@ -70,6 +61,10 @@ export class PhysicalActivityEntityMapper implements IEntityMapper<PhysicalActiv
         if (json.child_id !== undefined) result.child_id = json.child_id
         if (json.levels !== undefined && json.levels.length > 0) {
             result.levels = json.levels.map(elem => new PhysicalActivityLevel().fromJSON(elem))
+        }
+        if (json.heart_rate !== undefined && json.heart_rate.fat_burn_zone !== undefined
+            && json.heart_rate.fat_burn_zone.min !== undefined) {
+                result.heart_rate = new PhysicalActivityHeartRate().fromJSON(json.heart_rate)
         }
 
         return result

@@ -1,11 +1,16 @@
 import { injectable } from 'inversify'
-import { Sleep } from '../../../application/domain/model/sleep'
+import { Sleep, SleepType } from '../../../application/domain/model/sleep'
 import { SleepEntity } from '../sleep.entity'
-import { SleepPatternType, SleepPattern } from '../../../application/domain/model/sleep.pattern'
-import { SleepPatternDataSet } from '../../../application/domain/model/sleep.pattern.data.set'
-import { SleepPatternSummary } from '../../../application/domain/model/sleep.pattern.summary'
+import { SleepPattern } from '../../../application/domain/model/sleep.pattern'
+import {
+    PhasesPatternType,
+    SleepPatternDataSet,
+    StagesPatternType
+} from '../../../application/domain/model/sleep.pattern.data.set'
+import { SleepPatternPhasesSummary } from '../../../application/domain/model/sleep.pattern.phases.summary'
 import { SleepPatternSummaryData } from '../../../application/domain/model/sleep.pattern.summary.data'
 import { IEntityMapper } from '../../port/entity.mapper.interface'
+import { SleepPatternStagesSummary } from '../../../application/domain/model/sleep.pattern.stages.summary'
 
 @injectable()
 export class SleepEntityMapper implements IEntityMapper<Sleep, SleepEntity> {
@@ -38,19 +43,9 @@ export class SleepEntityMapper implements IEntityMapper<Sleep, SleepEntity> {
         if (item.pattern) {
             result.pattern = item.pattern.data_set.map((elem: SleepPatternDataSet) => elem.toJSON())
         }
+        if (item.type) result.type = item.type
 
         return result
-    }
-
-    /**
-     * Convert {SleepEntity} for {Sleep}.
-     *
-     * @see Each attribute must be mapped only if it contains an assigned value,
-     * because at some point the attribute accessed may not exist.
-     * @param item
-     */
-    public modelEntityToModel(item: SleepEntity): Sleep {
-        throw Error('Not Implemented!')
     }
 
     /**
@@ -69,32 +64,54 @@ export class SleepEntityMapper implements IEntityMapper<Sleep, SleepEntity> {
         if (json.end_time !== undefined) result.end_time = json.end_time
         if (json.duration !== undefined) result.duration = json.duration
         if (json.child_id !== undefined) result.child_id = json.child_id
-        if (json.pattern !== undefined) result.pattern = this.deserializeSleepPattern(json.pattern)
+        if (json.pattern !== undefined) result.pattern = this.deserializeSleepPattern(json.pattern, json.type)
+        if (json.type !== undefined) result.type = json.type
 
         return result
     }
 
-    private deserializeSleepPattern(pattern: any): SleepPattern {
+    private deserializeSleepPattern(pattern: any, sleepType: string): SleepPattern {
         const sleepPattern: SleepPattern = new SleepPattern()
-        if (!pattern) return sleepPattern
 
         const sleepPatternDataSet: Array<SleepPatternDataSet> = pattern.map(elem => new SleepPatternDataSet().fromJSON(elem))
-        const summary: SleepPatternSummary = new SleepPatternSummary()
+        if (sleepType === SleepType.CLASSIC) {
+            const summary: SleepPatternPhasesSummary = new SleepPatternPhasesSummary()
 
-        const countAsleep = this.countOfPattern(SleepPatternType.ASLEEP, pattern)
-        const countAwake = this.countOfPattern(SleepPatternType.AWAKE, pattern)
-        const countRestless = this.countOfPattern(SleepPatternType.RESTLESS, pattern)
-        const durationAsleep = this.countDurationOfPattern(SleepPatternType.ASLEEP, pattern)
-        const durationAwake = this.countDurationOfPattern(SleepPatternType.AWAKE, pattern)
-        const durationRestless = this.countDurationOfPattern(SleepPatternType.RESTLESS, pattern)
+            const countAsleep = this.countOfPattern(PhasesPatternType.ASLEEP, pattern)
+            const countAwake = this.countOfPattern(PhasesPatternType.AWAKE, pattern)
+            const countRestless = this.countOfPattern(PhasesPatternType.RESTLESS, pattern)
+            const durationAsleep = this.countDurationOfPattern(PhasesPatternType.ASLEEP, pattern)
+            const durationAwake = this.countDurationOfPattern(PhasesPatternType.AWAKE, pattern)
+            const durationRestless = this.countDurationOfPattern(PhasesPatternType.RESTLESS, pattern)
 
-        summary.asleep = new SleepPatternSummaryData(countAsleep, durationAsleep)
-        summary.awake = new SleepPatternSummaryData(countAwake, durationAwake)
-        summary.restless = new SleepPatternSummaryData(countRestless, durationRestless)
+            summary.asleep = new SleepPatternSummaryData(countAsleep, durationAsleep)
+            summary.awake = new SleepPatternSummaryData(countAwake, durationAwake)
+            summary.restless = new SleepPatternSummaryData(countRestless, durationRestless)
 
-        sleepPattern.data_set = sleepPatternDataSet
-        sleepPattern.summary = summary
-        return sleepPattern
+            sleepPattern.data_set = sleepPatternDataSet
+            sleepPattern.summary = summary
+            return sleepPattern
+        } else {
+            const summary: SleepPatternStagesSummary = new SleepPatternStagesSummary()
+
+            const countDeep = this.countOfPattern(StagesPatternType.DEEP, pattern)
+            const countLight = this.countOfPattern(StagesPatternType.LIGHT, pattern)
+            const countRem = this.countOfPattern(StagesPatternType.REM, pattern)
+            const countAwake = this.countOfPattern(StagesPatternType.AWAKE, pattern)
+            const durationDeep = this.countDurationOfPattern(StagesPatternType.DEEP, pattern)
+            const durationLight = this.countDurationOfPattern(StagesPatternType.LIGHT, pattern)
+            const durationRem = this.countDurationOfPattern(StagesPatternType.REM, pattern)
+            const durationAwake = this.countDurationOfPattern(StagesPatternType.AWAKE, pattern)
+
+            summary.deep = new SleepPatternSummaryData(countDeep, durationDeep)
+            summary.light = new SleepPatternSummaryData(countLight, durationLight)
+            summary.rem = new SleepPatternSummaryData(countRem, durationRem)
+            summary.awake = new SleepPatternSummaryData(countAwake, durationAwake)
+
+            sleepPattern.data_set = sleepPatternDataSet
+            sleepPattern.summary = summary
+            return sleepPattern
+        }
     }
 
     /**
@@ -111,8 +128,7 @@ export class SleepEntityMapper implements IEntityMapper<Sleep, SleepEntity> {
     }
 
     /**
-     * Sum the sleep pattern durations that are in milliseconds
-     * and are converted into minutes.
+     * Sum the sleep pattern durations that are in milliseconds.
      *
      * @param pattern
      * @param dataSet
@@ -121,6 +137,6 @@ export class SleepEntityMapper implements IEntityMapper<Sleep, SleepEntity> {
         return dataSet.reduce((prev, item) => {
             if (item.name.toLowerCase() === pattern && item.duration) return prev + item.duration
             return prev
-        }, 0) / 60000
+        }, 0)
     }
 }

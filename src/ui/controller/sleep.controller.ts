@@ -17,7 +17,7 @@ import { MultiStatus } from '../../application/domain/model/multi.status'
  * @remarks To define paths, we use library inversify-express-utils.
  * @see {@link https://github.com/inversify/inversify-express-utils} for further information.
  */
-@controller('/users/children')
+@controller('/v1/children')
 export class SleepController {
 
     /**
@@ -30,26 +30,6 @@ export class SleepController {
         @inject(Identifier.SLEEP_SERVICE) private readonly _sleepService: ISleepService,
         @inject(Identifier.LOGGER) readonly _logger: ILogger
     ) {
-    }
-
-    /**
-     * Retrieve sleep list of all children.
-     * For the query strings, the query-strings-parser middleware was used.
-     * @see {@link https://www.npmjs.com/package/query-strings-parser} for further information.
-     *
-     * @param {Request} req
-     * @param {Response} res
-     */
-    @httpGet('/sleep')
-    public async getAllSleep(@request() req: Request, @response() res: Response): Promise<Response> {
-        try {
-            const result = await this._sleepService.getAll(new Query().fromJSON(req.query))
-            return res.status(HttpStatus.OK).send(result)
-        } catch (err) {
-            const handlerError = ApiExceptionManager.build(err)
-            return res.status(handlerError.code)
-                .send(handlerError.toJson())
-        }
     }
 
     /**
@@ -70,7 +50,7 @@ export class SleepController {
                 })
 
                 const resultMultiStatus: MultiStatus<Sleep> = await this._sleepService.add(sleepArr)
-                return res.status(HttpStatus.CREATED).send(resultMultiStatus)
+                return res.status(HttpStatus.MULTI_STATUS).send(resultMultiStatus)
             }
 
             // Only one item
@@ -99,6 +79,8 @@ export class SleepController {
         try {
             const result = await this._sleepService
                 .getAllByChild(req.params.child_id, new Query().fromJSON(req.query))
+            const count: number = await this._sleepService.countSleep(req.params.child_id)
+            res.setHeader('X-Total-Count', count)
             return res.status(HttpStatus.OK).send(result)
         } catch (err) {
             const handlerError = ApiExceptionManager.build(err)

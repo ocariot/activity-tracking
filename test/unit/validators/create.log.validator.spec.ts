@@ -5,7 +5,7 @@ import { Strings } from '../../../src/utils/strings'
 
 const log: Log = new Log('2019-03-11', 1000, LogType.STEPS, '5a62be07de34500146d9c544')
 
-describe('Validators: CreateLog', () => {
+describe('Validators: CreateLogValidator', () => {
     describe('validate(activityLog: Log)', () => {
         context('when the log has all the required parameters, and that they have valid values', () => {
             it('should return undefined representing the success of the validation', () => {
@@ -21,7 +21,7 @@ describe('Validators: CreateLog', () => {
                     CreateLogValidator.validate(log)
                 } catch (err) {
                     assert.equal(err.message, 'Required fields were not provided...')
-                    assert.equal(err.description, 'Physical Activity log validation failed: type is required!')
+                    assert.equal(err.description, 'Child log validation failed: type is required!')
                 }
             })
         })
@@ -35,7 +35,8 @@ describe('Validators: CreateLog', () => {
                     CreateLogValidator.validate(log)
                 } catch (err) {
                     assert.equal(err.message, 'Required fields were not provided...')
-                    assert.equal(err.description, 'Physical Activity log validation failed: type, date, value, child_id is required!')
+                    assert.equal(err.description,
+                        'Child log validation failed: type, date, value, child_id is required!')
                 }
             })
         })
@@ -57,8 +58,31 @@ describe('Validators: CreateLog', () => {
                     CreateLogValidator.validate(logTest)
                 } catch (err) {
                     assert.equal(err.message, 'The name of type provided "step" is not supported...')
-                    assert.equal(err.description, 'The names of the allowed types are: steps, calories, ' +
-                        'active_minutes.')
+                    assert.equal(err.description,
+                        'The names of the allowed types are: ' +
+                        'steps, calories, active_minutes, lightly_active_minutes, sedentary_minutes.')
+                }
+            })
+        })
+
+        context('When the log has a invalid value (the value received is not a number)', () => {
+            it('should throw a ValidationException', () => {
+                // Mock through JSON
+                const logJSON: any = {
+                    date: '2019-03-11',
+                    value: 'wrong_value',
+                    type: LogType.STEPS,
+                    child_id: '5a62be07de34500146d9c544',
+                }
+
+                let logTest: Log = new Log()
+                logTest = logTest.fromJSON(logJSON)
+
+                try {
+                    CreateLogValidator.validate(logTest)
+                } catch (err) {
+                    assert.equal(err.message, 'Value field is invalid...')
+                    assert.equal(err.description, 'Child log validation failed: The value received is not a number')
                 }
             })
         })
@@ -95,7 +119,8 @@ describe('Validators: CreateLog', () => {
                     CreateLogValidator.validate(log)
                 } catch (err) {
                     assert.equal(err.message, 'Value field is invalid...')
-                    assert.equal(err.description, 'Physical Activity log validation failed: The value provided has a negative value!')
+                    assert.equal(err.description,
+                        'Child log validation failed: The value provided has a negative value!')
                 }
                 log.value = 1000
             })

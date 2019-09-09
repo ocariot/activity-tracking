@@ -10,49 +10,25 @@ describe('Models: StatusSuccess', () => {
         item: new Log('20199-03-11', 1000, LogType.STEPS, new ObjectID().toHexString())
     }
 
-    describe('fromJSON(json: any)', () => {
-        context('when the json is correct', () => {
-            it('should return an StatusSuccess model', () => {
-                const result = new StatusSuccess().fromJSON(statusSuccessJSON)
-                assert.typeOf(result.code, 'string')
-                assert.propertyVal(result, 'code', statusSuccessJSON.code)
-                assert.propertyVal(result.item, 'date', statusSuccessJSON.item.date)
-                assert.propertyVal(result.item, 'value', statusSuccessJSON.item.value)
-                assert.propertyVal(result.item, 'type', statusSuccessJSON.item.type)
-                assert.propertyVal(result.item, 'child_id', statusSuccessJSON.item.child_id)
-            })
-        })
-
-        context('when the json is undefined', () => {
-            it('should return an StatusSuccess model with all attributes with undefined value', () => {
-                const result = new StatusSuccess().fromJSON(undefined)
-                assert.isUndefined(result.code)
-                assert.isUndefined(result.item)
-            })
-        })
-
-        context('when the json is a string', () => {
-            it('should transform the string in json and return StatusSuccess model', () => {
-                const result = new StatusSuccess().fromJSON(JSON.stringify(statusSuccessJSON))
-                assert.typeOf(result.code, 'string')
-                assert.propertyVal(result, 'code', statusSuccessJSON.code)
-                assert.propertyVal(result.item, 'date', statusSuccessJSON.item.date)
-                assert.propertyVal(result.item, 'value', statusSuccessJSON.item.value)
-            })
-        })
-    })
-
     describe('toJSON()', () => {
         context('when the StatusSuccess model is correct', () => {
             it('should return a JSON from StatusSuccess model', () => {
-                let result = new StatusSuccess().fromJSON(statusSuccessJSON)
+                let result = new StatusSuccess(statusSuccessJSON.code, statusSuccessJSON.item)
                 result = result.toJSON()
-                assert.typeOf(result.code, 'string')
                 assert.propertyVal(result, 'code', statusSuccessJSON.code)
                 assert.propertyVal(result.item, 'date', statusSuccessJSON.item.date)
                 assert.propertyVal(result.item, 'value', statusSuccessJSON.item.value)
                 assert.propertyVal(result.item, 'type', statusSuccessJSON.item.type)
                 assert.propertyVal(result.item, 'child_id', statusSuccessJSON.item.child_id)
+            })
+        })
+
+        context('when the StatusSuccess model is empty', () => {
+            it('should return a JSON from StatusSuccess model with undefined as the value of all attributes', () => {
+                let result = new StatusSuccess()
+                result = result.toJSON()
+                assert.propertyVal(result, 'code', undefined)
+                assert.propertyVal(result, 'item', undefined)
             })
         })
     })

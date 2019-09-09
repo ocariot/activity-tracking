@@ -66,12 +66,16 @@ export class EnvironmentRepository extends BaseRepository<Environment, Environme
         query.filters = { institution_id: institutionID }
 
         return new Promise<boolean>((resolve, reject) => {
-            this.Model.deleteMany(query.filters)
+            this.environmentModel.deleteMany(query.filters)
                 .then(result => {
                     if (!result) return resolve(false)
                     return resolve(true)
                 })
-                .catch(err => reject(this.mongoDBErrorListener(err)))
+                .catch(err => reject(super.mongoDBErrorListener(err)))
         })
+    }
+
+    public count(): Promise<number> {
+        return super.count(new Query())
     }
 }

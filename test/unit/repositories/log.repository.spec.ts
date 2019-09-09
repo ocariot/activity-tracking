@@ -4,17 +4,18 @@ import { EntityMapperMock } from '../../mocks/entity.mapper.mock'
 import { CustomLoggerMock } from '../../mocks/custom.logger.mock'
 import { Log } from '../../../src/application/domain/model/log'
 import { LogMock } from '../../mocks/log.mock'
-import { ActivityLogRepoModel } from '../../../src/infrastructure/database/schema/activity.log.schema'
+import { LogRepoModel } from '../../../src/infrastructure/database/schema/log.schema'
 import { ILogRepository } from '../../../src/application/port/log.repository.interface'
 import { LogRepository } from '../../../src/infrastructure/repository/log.repository'
+import { ObjectID } from 'bson'
 
 require('sinon-mongoose')
 
-describe('Repositories: Log', () => {
+describe('Repositories: LogRepository', () => {
     const defaultLog: Log = new LogMock()
 
-    const modelFake: any = ActivityLogRepoModel
-    const repo: ILogRepository = new LogRepository(modelFake, new EntityMapperMock(), new CustomLoggerMock())
+    const modelFake: any = LogRepoModel
+    const logRepo: ILogRepository = new LogRepository(modelFake, new EntityMapperMock(), new CustomLoggerMock())
 
     const queryMock: any = {
         toJSON: () => {
@@ -33,7 +34,7 @@ describe('Repositories: Log', () => {
         sinon.restore()
     })
 
-    describe('findOneByChild(childId: string, logType: LogType, dateLog: string)', () => {
+    describe('selectByChild(childId: string, logType: string, dateLog: string)', () => {
         context('when the log is found', () => {
             it('should return the log found', () => {
                 sinon
@@ -43,7 +44,7 @@ describe('Repositories: Log', () => {
                     .chain('exec')
                     .resolves(defaultLog)
 
-                return repo.findOneByChild(defaultLog.child_id, defaultLog.type, defaultLog.date)
+                return logRepo.selectByChild(defaultLog.child_id, defaultLog.type, defaultLog.date)
                     .then(result => {
                         assert.propertyVal(result, 'id', defaultLog.id)
                         assert.propertyVal(result, 'date', defaultLog.date)
@@ -65,17 +66,15 @@ describe('Repositories: Log', () => {
                     .chain('exec')
                     .resolves(undefined)
 
-                return repo.findOneByChild(defaultLog.child_id, defaultLog.type, defaultLog.date)
+                return logRepo.selectByChild(defaultLog.child_id, defaultLog.type, defaultLog.date)
                     .then(result => {
                         assert.equal(result, undefined)
                     })
             })
         })
 
-        context('when the child id of the log is invalid', () => {
+        context('when a database error occurs', () => {
             it('should throw a RepositoryException', () => {
-                defaultLog.child_id = '5a62be07de34500146d9c5442'
-
                 sinon
                     .mock(modelFake)
                     .expects('findOne')
@@ -84,29 +83,124 @@ describe('Repositories: Log', () => {
                     .rejects({ message: 'An internal error has occurred in the database!',
                                description: 'Please try again later...' })
 
-                return repo.findOneByChild(defaultLog.child_id, defaultLog.type, defaultLog.date)
+                return logRepo.selectByChild(defaultLog.child_id, defaultLog.type, defaultLog.date)
                     .catch((err: any) => {
                         assert.propertyVal(err, 'message', 'An internal error has occurred in the database!')
                         assert.propertyVal(err, 'description', 'Please try again later...')
                     })
             })
         })
+    })
 
-        context('when the log date is invalid', () => {
-            it('should throw a RepositoryException', () => {
-                defaultLog.child_id = '5a62be07de34500146d9c544'        // Make child_id valid again
-                defaultLog.date = '20199-04-15'
+    describe('removeAllLogsFromChild(childId: string)', () => {
+        context('when there is at least one log associated with that childID and the delete operation is ' +
+            'done successfully', () => {
+            it('should return true for confirm delete', () => {
+                sinon
+                    .mock(modelFake)
+                    .expects('deleteMany')
+                    .withArgs({ child_id: defaultLog.child_id })
+                    .resolves(true)
+
+                return logRepo.removeAllLogsFromChild(defaultLog.child_id)
+                    .then((result: boolean) => {
+                        assert.isTrue(result)
+                    })
+            })
+        })
+
+        context('when there is no logs associated with that childId', () => {
+            it('should return false', () => {
+                const randomChildId: any = new ObjectID()
 
                 sinon
                     .mock(modelFake)
-                    .expects('findOne')
-                    .withArgs(queryMock.toJSON().filters)
+                    .expects('deleteMany')
+                    .withArgs({ child_id: randomChildId })
+                    .resolves(false)
+
+                return logRepo.removeAllLogsFromChild(randomChildId)
+                    .then((result: boolean) => {
+                        assert.isFalse(result)
+                    })
+            })
+        })
+
+        context('when a database error occurs', () => {
+            it('should throw a RepositoryException', () => {
+                sinon
+                    .mock(modelFake)
+                    .expects('deleteMany')
+                    .withArgs({ child_id: defaultLog.child_id })
+                    .rejects({ message: 'An internal error has occurred in the database!',
+                               description: 'Please try again later...' })
+
+                return logRepo.removeAllLogsFromChild(defaultLog.child_id)
+                    .catch (err => {
+                        assert.propertyVal(err, 'message', 'An internal error has occurred in the database!')
+                        assert.propertyVal(err, 'description', 'Please try again later...')
+                    })
+            })
+        })
+    })
+
+    describe('countLogsByResource(childId: string, desiredResource: string, dateStart: string, dateEnd: string)', () => {
+        context('when there is at least one body fat associated with the child received', () => {
+            it('should return how many body fats are associated with such child in the database', () => {
+                sinon
+                    .mock(modelFake)
+                    .expects('countDocuments')
+                    .withArgs({ child_id: defaultLog.child_id, type: defaultLog.type,
+                        $and: [
+                            { date: { $lte: defaultLog.date.concat('T00:00:00') } },
+                            { date: { $gte: defaultLog.date.concat('T00:00:00') } }
+                        ] })
+                    .chain('exec')
+                    .resolves(2)
+
+                return logRepo.countLogsByResource(defaultLog.child_id, defaultLog.type, defaultLog.date, defaultLog.date)
+                    .then((countBodyFats: number) => {
+                        assert.equal(countBodyFats, 2)
+                    })
+            })
+        })
+
+        context('when there are no body fats associated with the child received', () => {
+            it('should return 0', () => {
+                sinon
+                    .mock(modelFake)
+                    .expects('countDocuments')
+                    .withArgs({ child_id: defaultLog.child_id, type: defaultLog.type,
+                        $and: [
+                            { date: { $lte: defaultLog.date.concat('T00:00:00') } },
+                            { date: { $gte: defaultLog.date.concat('T00:00:00') } }
+                        ] })
+                    .chain('exec')
+                    .resolves(0)
+
+                return logRepo.countLogsByResource(defaultLog.child_id, defaultLog.type, defaultLog.date, defaultLog.date)
+                    .then((countBodyFats: number) => {
+                        assert.equal(countBodyFats, 0)
+                    })
+            })
+        })
+
+        context('when a database error occurs', () => {
+            it('should throw a RepositoryException', () => {
+                sinon
+                    .mock(modelFake)
+                    .expects('countDocuments')
+                    .withArgs({ child_id: defaultLog.child_id, type: defaultLog.type,
+                        $and: [
+                            { date: { $lte: defaultLog.date.concat('T00:00:00') } },
+                            { date: { $gte: defaultLog.date.concat('T00:00:00') } }
+                        ] })
                     .chain('exec')
                     .rejects({ message: 'An internal error has occurred in the database!',
                                description: 'Please try again later...' })
 
-                return repo.findOneByChild(defaultLog.child_id, defaultLog.type, defaultLog.date)
-                    .catch((err: any) => {
+                return logRepo.countLogsByResource(defaultLog.child_id, defaultLog.type, defaultLog.date, defaultLog.date)
+                    .catch (err => {
                         assert.propertyVal(err, 'message', 'An internal error has occurred in the database!')
                         assert.propertyVal(err, 'description', 'Please try again later...')
                     })

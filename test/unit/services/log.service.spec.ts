@@ -1,20 +1,14 @@
 import HttpStatus from 'http-status-codes'
-import sinon from 'sinon'
 import { assert } from 'chai'
 import { LogMock } from '../../mocks/log.mock'
 import { Log, LogType } from '../../../src/application/domain/model/log'
-import { ActivityLogRepoModel } from '../../../src/infrastructure/database/schema/activity.log.schema'
 import { ILogRepository } from '../../../src/application/port/log.repository.interface'
 import { LogRepositoryMock } from '../../mocks/log.repository.mock'
 import { ILogService } from '../../../src/application/port/log.service.interface'
 import { LogService } from '../../../src/application/service/log.service'
-import { MultiStatusMock } from '../../mocks/multi.status.mock'
-import { MultiStatus } from '../../../src/application/domain/model/multi.status'
 import { IQuery } from '../../../src/application/port/query.interface'
 import { Query } from '../../../src/infrastructure/repository/query/query'
 import { Strings } from '../../../src/utils/strings'
-
-require('sinon-mongoose')
 
 describe('Services: Log', () => {
     // Mock correct logs array
@@ -52,35 +46,16 @@ describe('Services: Log', () => {
     incorrectLogsArr.push(incorrectLog)
     incorrectLogsArr.push(otherIncorrectLog)
 
-    /**
-     * Mock MultiStatus responses
-     */
-    const multiStatusCorrect: MultiStatus<Log> = new MultiStatusMock<Log>(correctLogsArr) // MultiStatus totally correct
-    const multiStatusMixed: MultiStatus<Log> = new MultiStatusMock<Log>(mixedLogsArr) // Mixed MultiStatus
-    const multiStatusIncorrect: MultiStatus<Log> = new MultiStatusMock<Log>(incorrectLogsArr) // Mixed MultiStatus
-
-    const modelFake = ActivityLogRepoModel
     const logRepo: ILogRepository = new LogRepositoryMock()
 
     const logService: ILogService = new LogService(logRepo)
 
-    afterEach(() => {
-        sinon.restore()
-    })
-
     /**
-     * Method: addLogs(activityLogs: Array<Log>)
+     * Method: addLogs(logs: Array<Log>)
      */
-    describe('addLogs(activityLogs: Array<Log>)', () => {
+    describe('addLogs(logs: Array<Log>)', () => {
         context('when all the logs in the array are correct and it still does not exist in the repository', () => {
             it('should return a response of type MultiStatus<Log> with the description of success in sending each log',  () => {
-                sinon
-                    .mock(modelFake)
-                    .expects('create')
-                    .withArgs(correctLogsArr)
-                    .chain('exec')
-                    .resolves(multiStatusCorrect)
-
                 return  logService.addLogs(correctLogsArr)
                     .then(result => {
                         for (let i = 0; i < result.success.length; i++) {
@@ -102,12 +77,6 @@ describe('Services: Log', () => {
                 correctLogsArr.forEach(elem => {
                     elem.date = '2018-03-10'
                 })
-                sinon
-                    .mock(modelFake)
-                    .expects('create')
-                    .withArgs(correctLogsArr)
-                    .chain('exec')
-                    .resolves(multiStatusCorrect)
 
                 return  logService.addLogs(correctLogsArr)
                     .then(result => {
@@ -128,12 +97,6 @@ describe('Services: Log', () => {
             it('should update the value of the existing items already in the repository, create the new ones, and return a ' +
                 'response of type MultiStatus<Log> with the description of success in sending each log',  () => {
                 correctLogsArr.push(new LogMock(LogType.STEPS))
-                sinon
-                    .mock(modelFake)
-                    .expects('create')
-                    .withArgs(correctLogsArr)
-                    .chain('exec')
-                    .resolves(multiStatusCorrect)
 
                 return  logService.addLogs(correctLogsArr)
                     .then(result => {
@@ -153,20 +116,18 @@ describe('Services: Log', () => {
         context('when all the logs in the array are incorrect', () => {
             it('should return a response of type MultiStatus<Log> with the description of error in sending each log',  () => {
                 correctLogsArr.push(new LogMock(LogType.STEPS))
-                sinon
-                    .mock(modelFake)
-                    .expects('create')
-                    .withArgs(incorrectLogsArr)
-                    .chain('exec')
-                    .resolves(multiStatusIncorrect)
 
                 return  logService.addLogs(incorrectLogsArr)
                     .then(result => {
-                        assert.propertyVal(result.error[0], 'message', 'Date parameter: 20199-03-08, is not in valid ISO 8601 format.')
-                        assert.propertyVal(result.error[0], 'description', 'Date must be in the format: yyyy-MM-dd')
-                        assert.propertyVal(result.error[1], 'message', 'The name of type provided "step" is not supported...')
-                        assert.propertyVal(result.error[1], 'description', 'The names of the allowed types are: steps, calories, ' +
-                            'active_minutes.')
+                        assert.propertyVal(result.error[0], 'message',
+                            'Date parameter: 20199-03-08, is not in valid ISO 8601 format.')
+                        assert.propertyVal(result.error[0], 'description',
+                            'Date must be in the format: yyyy-MM-dd')
+                        assert.propertyVal(result.error[1], 'message',
+                            'The name of type provided "step" is not supported...')
+                        assert.propertyVal(result.error[1], 'description',
+                            'The names of the allowed types are: ' +
+                            'steps, calories, active_minutes, lightly_active_minutes, sedentary_minutes.')
 
                         for (let i = 0; i < result.error.length; i++) {
                             assert.propertyVal(result.error[i], 'code', HttpStatus.BAD_REQUEST)
@@ -185,13 +146,6 @@ describe('Services: Log', () => {
         context('when some of the logs in the array are incorrect (date and type are invalid)', () => {
             it('should perform the operations of creating and updating normally for the correct logs and returning a response ' +
                 'of type MultiStatus<Log> with the description of success and error cases of each log',  () => {
-                sinon
-                    .mock(modelFake)
-                    .expects('create')
-                    .withArgs(mixedLogsArr)
-                    .chain('exec')
-                    .resolves(multiStatusMixed)
-
                 return  logService.addLogs(mixedLogsArr)
                     .then(result => {
                         for (let i = 0; i < result.success.length; i++) {
@@ -203,11 +157,15 @@ describe('Services: Log', () => {
                             assert.propertyVal(result.success[i].item, 'child_id', mixedLogsArr[i].child_id)
                         }
 
-                        assert.propertyVal(result.error[0], 'message', 'Date parameter: 20199-03-08, is not in valid ISO 8601 format.')
-                        assert.propertyVal(result.error[0], 'description', 'Date must be in the format: yyyy-MM-dd')
-                        assert.propertyVal(result.error[1], 'message', 'The name of type provided "step" is not supported...')
-                        assert.propertyVal(result.error[1], 'description', 'The names of the allowed types are: steps, calories, ' +
-                            'active_minutes.')
+                        assert.propertyVal(result.error[0], 'message',
+                            'Date parameter: 20199-03-08, is not in valid ISO 8601 format.')
+                        assert.propertyVal(result.error[0], 'description',
+                            'Date must be in the format: yyyy-MM-dd')
+                        assert.propertyVal(result.error[1], 'message',
+                            'The name of type provided "step" is not supported...')
+                        assert.propertyVal(result.error[1], 'description',
+                            'The names of the allowed types are: ' +
+                            'steps, calories, active_minutes, lightly_active_minutes, sedentary_minutes.')
 
                         for (let i = 0; i < result.error.length; i++) {
                             assert.propertyVal(result.error[i], 'code', HttpStatus.BAD_REQUEST)
@@ -226,12 +184,6 @@ describe('Services: Log', () => {
                 'of type MultiStatus<Log> with the description of success and error cases of each log',  () => {
                 incorrectLog.date = '2019-03-10'
                 incorrectLog.value = -((Math.floor(Math.random() * 10 + 1)) * 100)
-                sinon
-                    .mock(modelFake)
-                    .expects('create')
-                    .withArgs(mixedLogsArr)
-                    .chain('exec')
-                    .resolves(multiStatusMixed)
 
                 return  logService.addLogs(mixedLogsArr)
                     .then(result => {
@@ -244,12 +196,15 @@ describe('Services: Log', () => {
                             assert.propertyVal(result.success[i].item, 'child_id', mixedLogsArr[i].child_id)
                         }
 
-                        assert.propertyVal(result.error[0], 'message', 'Value field is invalid...')
-                        assert.propertyVal(result.error[0], 'description', 'Physical Activity log validation failed: The value ' +
-                            'provided has a negative value!')
-                        assert.propertyVal(result.error[1], 'message', 'The name of type provided "step" is not supported...')
-                        assert.propertyVal(result.error[1], 'description', 'The names of the allowed types are: steps, calories, ' +
-                            'active_minutes.')
+                        assert.propertyVal(result.error[0], 'message',
+                            'Value field is invalid...')
+                        assert.propertyVal(result.error[0], 'description',
+                            'Child log validation failed: The value provided has a negative value!')
+                        assert.propertyVal(result.error[1], 'message',
+                            'The name of type provided "step" is not supported...')
+                        assert.propertyVal(result.error[1], 'description',
+                            'The names of the allowed types are: ' +
+                            'steps, calories, active_minutes, lightly_active_minutes, sedentary_minutes.')
 
                         for (let i = 0; i < result.error.length; i++) {
                             assert.propertyVal(result.error[i], 'code', HttpStatus.BAD_REQUEST)
@@ -268,12 +223,6 @@ describe('Services: Log', () => {
                 'of type MultiStatus<Log> with the description of success and error cases of each log',  () => {
                 incorrectLog.value = ((Math.floor(Math.random() * 10 + 1)) * 100)
                 incorrectLog.child_id = '507f1f77bcf86cd7994390112'
-                sinon
-                    .mock(modelFake)
-                    .expects('create')
-                    .withArgs(mixedLogsArr)
-                    .chain('exec')
-                    .resolves(multiStatusMixed)
 
                 return  logService.addLogs(mixedLogsArr)
                     .then(result => {
@@ -287,10 +236,13 @@ describe('Services: Log', () => {
                         }
 
                         assert.propertyVal(result.error[0], 'message', Strings.CHILD.PARAM_ID_NOT_VALID_FORMAT)
-                        assert.propertyVal(result.error[0], 'description', Strings.ERROR_MESSAGE.UUID_NOT_VALID_FORMAT_DESC)
-                        assert.propertyVal(result.error[1], 'message', 'The name of type provided "step" is not supported...')
-                        assert.propertyVal(result.error[1], 'description', 'The names of the allowed types are: steps, calories, ' +
-                            'active_minutes.')
+                        assert.propertyVal(result.error[0], 'description',
+                            Strings.ERROR_MESSAGE.UUID_NOT_VALID_FORMAT_DESC)
+                        assert.propertyVal(result.error[1], 'message',
+                            'The name of type provided "step" is not supported...')
+                        assert.propertyVal(result.error[1], 'description',
+                            'The names of the allowed types are: ' +
+                            'steps, calories, active_minutes, lightly_active_minutes, sedentary_minutes.')
 
                         for (let i = 0; i < result.error.length; i++) {
                             assert.propertyVal(result.error[i], 'code', HttpStatus.BAD_REQUEST)
@@ -311,12 +263,6 @@ describe('Services: Log', () => {
                 incorrectLog.value = undefined!
                 incorrectLog.type = undefined!
                 incorrectLog.child_id = ''
-                sinon
-                    .mock(modelFake)
-                    .expects('create')
-                    .withArgs(mixedLogsArr)
-                    .chain('exec')
-                    .resolves(multiStatusMixed)
 
                 return  logService.addLogs(mixedLogsArr)
                     .then(result => {
@@ -329,12 +275,15 @@ describe('Services: Log', () => {
                             assert.propertyVal(result.success[i].item, 'child_id', mixedLogsArr[i].child_id)
                         }
 
-                        assert.propertyVal(result.error[0], 'message', 'Required fields were not provided...')
-                        assert.propertyVal(result.error[0], 'description', 'Physical Activity log validation failed: type, ' +
-                            'date, value, child_id is required!')
-                        assert.propertyVal(result.error[1], 'message', 'The name of type provided "step" is not supported...')
-                        assert.propertyVal(result.error[1], 'description', 'The names of the allowed types are: steps, calories, ' +
-                            'active_minutes.')
+                        assert.propertyVal(result.error[0], 'message',
+                            'Required fields were not provided...')
+                        assert.propertyVal(result.error[0], 'description',
+                            'Child log validation failed: type, date, value, child_id is required!')
+                        assert.propertyVal(result.error[1], 'message',
+                            'The name of type provided "step" is not supported...')
+                        assert.propertyVal(result.error[1], 'description',
+                            'The names of the allowed types are: ' +
+                            'steps, calories, active_minutes, lightly_active_minutes, sedentary_minutes.')
 
                         for (let i = 0; i < result.error.length; i++) {
                             assert.propertyVal(result.error[i], 'code', HttpStatus.BAD_REQUEST)
@@ -353,53 +302,36 @@ describe('Services: Log', () => {
      * Method: getByChildAndDate(childId: string, dateStart: Date, dateEnd: Date, query: IQuery)
      */
     describe('getByChildAndDate(childId: string, dateStart: Date, dateEnd: Date, query: IQuery)', () => {
+
+        const query: IQuery = new Query()
+        query.filters = {
+            child_id: correctLogsArr[0].child_id,
+            $and: [
+                { date: { $lte: correctLogsArr[0].date.toString().concat('T00:00:00') } },
+                { date: { $gte: correctLogsArr[1].date.toString().concat('T00:00:00') } }
+            ]
+        }
+
         context('when the parameters are correct and there are corresponding logs with the query', () => {
-            it('should return a PhysicalActivityLog with steps and/or calories logs',  () => {
-                const query: IQuery = new Query()
-                query.filters = {
-                    child_id: correctLogsArr[0].child_id,
-                    $and: [
-                        { date: { $lte: correctLogsArr[0].date.toString().concat('T00:00:00') } },
-                        { date: { $gte: correctLogsArr[1].date.toString().concat('T00:00:00') } }
-                    ]
-                }
+            it('should return a ChildLog with steps and/or calories logs',  () => {
 
-                sinon
-                    .mock(modelFake)
-                    .expects('find')
-                    .withArgs(query)
-                    .chain('exec')
-                    .resolves(correctLogsArr)
-
-                return  logService.getByChildAndDate(correctLogsArr[0].child_id, correctLogsArr[0].date,
+                return logService.getByChildAndDate(correctLogsArr[0].child_id, correctLogsArr[0].date,
                     correctLogsArr[1].date, query)
                     .then(result => {
                         assert.property(result, 'steps')
                         assert.property(result, 'calories')
+                        assert.property(result, 'active_minutes')
+                        assert.property(result, 'lightly_active_minutes')
+                        assert.property(result, 'sedentary_minutes')
                     })
             })
         })
 
         context('when the parameters are correct but there are no corresponding logs with the query', () => {
-            it('should return an empty PhysicalActivityLog',  () => {
+            it('should return an empty ChildLog',  () => {
                 correctLogsArr[0].child_id = '507f1f77bcf86cd799439011'
-                const query: IQuery = new Query()
-                query.filters = {
-                    child_id: correctLogsArr[0].child_id,
-                    $and: [
-                        { date: { $lte: correctLogsArr[0].date.toString().concat('T00:00:00') } },
-                        { date: { $gte: correctLogsArr[1].date.toString().concat('T00:00:00') } }
-                    ]
-                }
 
-                sinon
-                    .mock(modelFake)
-                    .expects('find')
-                    .withArgs(query)
-                    .chain('exec')
-                    .resolves(correctLogsArr)
-
-                return  logService.getByChildAndDate(correctLogsArr[0].child_id, correctLogsArr[0].date,
+                return logService.getByChildAndDate(correctLogsArr[0].child_id, correctLogsArr[0].date,
                     correctLogsArr[1].date, query)
                     .then(result => {
                         assert.isEmpty(result.steps)
@@ -411,30 +343,13 @@ describe('Services: Log', () => {
         context('when the parameters are incorrect (child_id is invalid)', () => {
             it('should throw a ValidationException', async () => {
                 correctLogsArr[0].child_id = '507f1f77bcf86cd7994390112'
-                const query: IQuery = new Query()
-                query.filters = {
-                    child_id: correctLogsArr[0].child_id,
-                    $and: [
-                        { date: { $lte: correctLogsArr[0].date.toString().concat('T00:00:00') } },
-                        { date: { $gte: correctLogsArr[1].date.toString().concat('T00:00:00') } }
-                    ]
-                }
 
-                sinon
-                    .mock(modelFake)
-                    .expects('find')
-                    .withArgs(query)
-                    .chain('exec')
-                    .rejects({ message: Strings.CHILD.PARAM_ID_NOT_VALID_FORMAT,
-                               description: Strings.ERROR_MESSAGE.UUID_NOT_VALID_FORMAT_DESC })
-
-                try {
-                    return await logService.getByChildAndDate(correctLogsArr[0].child_id, correctLogsArr[0].date,
+                return logService.getByChildAndDate(correctLogsArr[0].child_id, correctLogsArr[0].date,
                         correctLogsArr[1].date, query)
-                } catch (err) {
-                    assert.propertyVal(err, 'message', Strings.CHILD.PARAM_ID_NOT_VALID_FORMAT)
-                    assert.propertyVal(err, 'description', Strings.ERROR_MESSAGE.UUID_NOT_VALID_FORMAT_DESC)
-                }
+                    .catch (err => {
+                        assert.propertyVal(err, 'message', Strings.CHILD.PARAM_ID_NOT_VALID_FORMAT)
+                        assert.propertyVal(err, 'description', Strings.ERROR_MESSAGE.UUID_NOT_VALID_FORMAT_DESC)
+                    })
             })
         })
 
@@ -442,22 +357,6 @@ describe('Services: Log', () => {
             it('should throw a ValidationException', async () => {
                 correctLogsArr[0].child_id = '507f1f77bcf86cd799439011'
                 correctLogsArr[0].date = '20199-03-18'
-                const query: IQuery = new Query()
-                query.filters = {
-                    child_id: correctLogsArr[0].child_id,
-                    $and: [
-                        { date: { $lte: correctLogsArr[0].date.toString().concat('T00:00:00') } },
-                        { date: { $gte: correctLogsArr[1].date.toString().concat('T00:00:00') } }
-                    ]
-                }
-
-                sinon
-                    .mock(modelFake)
-                    .expects('find')
-                    .withArgs(query)
-                    .chain('exec')
-                    .rejects({ message: 'Date parameter: 20199-03-18, is not in valid ISO 8601 format.',
-                               description: 'Date must be in the format: yyyy-MM-dd' })
 
                 try {
                     return await logService.getByChildAndDate(correctLogsArr[0].child_id, correctLogsArr[0].date,
@@ -474,22 +373,6 @@ describe('Services: Log', () => {
                 correctLogsArr[0].child_id = '507f1f77bcf86cd799439011'
                 correctLogsArr[0].date = '2019-03-18'
                 correctLogsArr[1].date = '20199-03-18'
-                const query: IQuery = new Query()
-                query.filters = {
-                    child_id: correctLogsArr[0].child_id,
-                    $and: [
-                        { date: { $lte: correctLogsArr[0].date.toString().concat('T00:00:00') } },
-                        { date: { $gte: correctLogsArr[1].date.toString().concat('T00:00:00') } }
-                    ]
-                }
-
-                sinon
-                    .mock(modelFake)
-                    .expects('find')
-                    .withArgs(query)
-                    .chain('exec')
-                    .rejects({ message: 'Date parameter: 20199-03-18, is not in valid ISO 8601 format.',
-                               description: 'Date must be in the format: yyyy-MM-dd' })
 
                 try {
                     return await logService.getByChildAndDate(correctLogsArr[0].child_id, correctLogsArr[0].date,
@@ -500,6 +383,20 @@ describe('Services: Log', () => {
                 }
             })
         })
+
+        context('when the parameters are invalid (date range is invalid)', () => {
+            it('should throw a ValidationException', async () => {
+
+                try {
+                    return await logService.getByChildAndDate(correctLogsArr[0].child_id, '2018-03-18',
+                        '2019-03-27', query)
+                } catch (err) {
+                    assert.propertyVal(err, 'message', 'Date range is invalid...')
+                    assert.propertyVal(err, 'description', 'Log dates range validation failed: ' +
+                        'The period between the received dates is longer than one year')
+                }
+            })
+        })
     })
 
     /**
@@ -507,26 +404,21 @@ describe('Services: Log', () => {
      */
     describe('getByChildResourceAndDate(childId: string, desiredResource: LogType, dateStart: string, dateEnd: string, ' +
         'query: IQuery)', () => {
+
+        const query: IQuery = new Query()
+        query.filters = {
+            child_id: correctLogsArr[0].child_id,
+            type: correctLogsArr[0].type,
+            $and: [
+                { date: { $lte: correctLogsArr[0].date.toString().concat('T00:00:00') } },
+                { date: { $gte: correctLogsArr[1].date.toString().concat('T00:00:00') } }
+            ]
+        }
+
         context('when the parameters are correct and there are corresponding logs with the query', () => {
             it('should return the logs array', () => {
                 correctLogsArr[0].child_id = '507f1f77bcf86cd799439012'
-                correctLogsArr[1] = new LogMock()
-                const query: IQuery = new Query()
-                query.filters = {
-                    child_id: correctLogsArr[0].child_id,
-                    type: correctLogsArr[0].type,
-                    $and: [
-                        { date: { $lte: correctLogsArr[0].date.toString().concat('T00:00:00') } },
-                        { date: { $gte: correctLogsArr[1].date.toString().concat('T00:00:00') } }
-                    ]
-                }
-
-                sinon
-                    .mock(modelFake)
-                    .expects('find')
-                    .withArgs(query)
-                    .chain('exec')
-                    .resolves(correctLogsArr)
+                correctLogsArr[1].date = '2019-03-20'
 
                 return logService.getByChildResourceAndDate(correctLogsArr[0].child_id, correctLogsArr[0].type,
                     correctLogsArr[0].date, correctLogsArr[1].date, query)
@@ -540,21 +432,6 @@ describe('Services: Log', () => {
         context('when the parameters are correct but there are no corresponding logs with the query', () => {
             it('should return an empty log array', () => {
                 correctLogsArr[0].child_id = '507f1f77bcf86cd799439011'
-                const query: IQuery = new Query()
-                query.filters = {
-                    child_id: correctLogsArr[0].child_id,
-                    $and: [
-                        { date: { $lte: correctLogsArr[0].date.toString().concat('T00:00:00') } },
-                        { date: { $gte: correctLogsArr[1].date.toString().concat('T00:00:00') } }
-                    ]
-                }
-
-                sinon
-                    .mock(modelFake)
-                    .expects('find')
-                    .withArgs(query)
-                    .chain('exec')
-                    .resolves(correctLogsArr)
 
                 return logService.getByChildResourceAndDate(correctLogsArr[0].child_id, correctLogsArr[0].type,
                     correctLogsArr[0].date, correctLogsArr[1].date, query)
@@ -568,22 +445,6 @@ describe('Services: Log', () => {
         context('when the parameters are incorrect (child_id is invalid)', () => {
             it('should throw a ValidationException', () => {
                 correctLogsArr[0].child_id = '507f1f77bcf86cd7994390112'
-                const query: IQuery = new Query()
-                query.filters = {
-                    child_id: correctLogsArr[0].child_id,
-                    $and: [
-                        { date: { $lte: correctLogsArr[0].date.toString().concat('T00:00:00') } },
-                        { date: { $gte: correctLogsArr[1].date.toString().concat('T00:00:00') } }
-                    ]
-                }
-
-                sinon
-                    .mock(modelFake)
-                    .expects('find')
-                    .withArgs(query)
-                    .chain('exec')
-                    .rejects({ message: Strings.CHILD.PARAM_ID_NOT_VALID_FORMAT,
-                               description: Strings.ERROR_MESSAGE.UUID_NOT_VALID_FORMAT_DESC })
 
                 try {
                     return logService.getByChildResourceAndDate(correctLogsArr[0].child_id, correctLogsArr[0].type,
@@ -598,30 +459,16 @@ describe('Services: Log', () => {
         context('when the parameters are incorrect (type is invalid)', () => {
             it('should throw a ValidationException', () => {
                 correctLogsArr[0].child_id = '507f1f77bcf86cd799439011'
-                const query: IQuery = new Query()
-                query.filters = {
-                    child_id: correctLogsArr[0].child_id,
-                    $and: [
-                        { date: { $lte: correctLogsArr[0].date.toString().concat('T00:00:00') } },
-                        { date: { $gte: correctLogsArr[1].date.toString().concat('T00:00:00') } }
-                    ]
-                }
-
-                sinon
-                    .mock(modelFake)
-                    .expects('find')
-                    .withArgs(query)
-                    .chain('exec')
-                    .rejects({ message: 'The name of type provided "step" is not supported...',
-                               description: 'The names of the allowed types are: steps, calories.' })
 
                 try {
                     return logService.getByChildResourceAndDate(correctLogsArr[0].child_id, otherIncorrectLog.type,
                         correctLogsArr[0].date, correctLogsArr[1].date, query)
                 } catch (err) {
-                    assert.propertyVal(err, 'message', 'The name of type provided "step" is not supported...')
-                    assert.propertyVal(err, 'description', 'The names of the allowed types are: steps, calories, ' +
-                        'active_minutes.')
+                    assert.propertyVal(err, 'message',
+                        'The name of type provided "step" is not supported...')
+                    assert.propertyVal(err, 'description',
+                        'The names of the allowed types are: ' +
+                        'steps, calories, active_minutes, lightly_active_minutes, sedentary_minutes.')
                 }
             })
         })
@@ -629,22 +476,6 @@ describe('Services: Log', () => {
         context('when the parameters are incorrect (dateStart is invalid)', () => {
             it('should throw a ValidationException', () => {
                 correctLogsArr[0].date = '20199-03-18'
-                const query: IQuery = new Query()
-                query.filters = {
-                    child_id: correctLogsArr[0].child_id,
-                    $and: [
-                        { date: { $lte: correctLogsArr[0].date.toString().concat('T00:00:00') } },
-                        { date: { $gte: correctLogsArr[1].date.toString().concat('T00:00:00') } }
-                    ]
-                }
-
-                sinon
-                    .mock(modelFake)
-                    .expects('find')
-                    .withArgs(query)
-                    .chain('exec')
-                    .rejects({ message: 'Date parameter: 20199-03-18, is not in valid ISO 8601 format.',
-                               description: 'Date must be in the format: yyyy-MM-dd' })
 
                 try {
                     return logService.getByChildResourceAndDate(correctLogsArr[0].child_id, correctLogsArr[0].type,
@@ -660,22 +491,6 @@ describe('Services: Log', () => {
             it('should throw a ValidationException', () => {
                 correctLogsArr[0].date = '2019-03-18'
                 correctLogsArr[1].date = '20199-03-18'
-                const query: IQuery = new Query()
-                query.filters = {
-                    child_id: correctLogsArr[0].child_id,
-                    $and: [
-                        { date: { $lte: correctLogsArr[0].date.toString().concat('T00:00:00') } },
-                        { date: { $gte: correctLogsArr[1].date.toString().concat('T00:00:00') } }
-                    ]
-                }
-
-                sinon
-                    .mock(modelFake)
-                    .expects('find')
-                    .withArgs(query)
-                    .chain('exec')
-                    .rejects({ message: 'Date parameter: 20199-03-18, is not in valid ISO 8601 format.',
-                               description: 'Date must be in the format: yyyy-MM-dd' })
 
                 try {
                     return logService.getByChildResourceAndDate(correctLogsArr[0].child_id, correctLogsArr[0].type,
@@ -684,6 +499,32 @@ describe('Services: Log', () => {
                     assert.propertyVal(err, 'message', 'Date parameter: 20199-03-18, is not in valid ISO 8601 format.')
                     assert.propertyVal(err, 'description', 'Date must be in the format: yyyy-MM-dd')
                 }
+            })
+        })
+
+        context('when the parameters are invalid (date range is invalid)', () => {
+            it('should throw a ValidationException', () => {
+
+                try {
+                    return logService.getByChildResourceAndDate(correctLogsArr[0].child_id, correctLogsArr[0].type,
+                        '2018-03-18', '2019-03-27', query)
+                } catch (err) {
+                    assert.propertyVal(err, 'message', 'Date range is invalid...')
+                    assert.propertyVal(err, 'description', 'Log dates range validation failed: ' +
+                        'The period between the received dates is longer than one year')
+                }
+            })
+        })
+    })
+
+    describe('countLogsByResource(childId: string, desiredResource: string, dateStart: string, dateEnd: string)', () => {
+        context('when there is at least one log of the received type associated with the received child', () => {
+            it('should return how many logs of the received type are associated with such child in the database', () => {
+                return logService.countLogsByResource(correctLogsArr[0].child_id, correctLogsArr[0].type,
+                    correctLogsArr[0].date, correctLogsArr[1].date)
+                    .then(res => {
+                        assert.equal(res, 1)
+                    })
             })
         })
     })

@@ -10,11 +10,11 @@ import { ObjectID } from 'bson'
 
 require('sinon-mongoose')
 
-describe('Repositories: Environment', () => {
+describe('Repositories: EnvironmentRepository', () => {
     const defaultEnvironment: EnvironmentMock = new EnvironmentMock()
 
     const modelFake: any = EnvironmentRepoModel
-    const repo: IEnvironmentRepository = new EnvironmentRepository(modelFake, new EntityMapperMock(), new CustomLoggerMock())
+    const environmentRepo: IEnvironmentRepository = new EnvironmentRepository(modelFake, new EntityMapperMock(), new CustomLoggerMock())
 
     const queryMock: any = {
         toJSON: () => {
@@ -45,7 +45,7 @@ describe('Repositories: Environment', () => {
                     .chain('exec')
                     .resolves(true)
 
-                return repo.checkExist(defaultEnvironment)
+                return environmentRepo.checkExist(defaultEnvironment)
                     .then(result => {
                         assert.isTrue(result)
                     })
@@ -61,7 +61,7 @@ describe('Repositories: Environment', () => {
                     .chain('exec')
                     .resolves(false)
 
-                return repo.checkExist(defaultEnvironment)
+                return environmentRepo.checkExist(defaultEnvironment)
                     .then(result => {
                         assert.isFalse(result)
                     })
@@ -81,7 +81,7 @@ describe('Repositories: Environment', () => {
                                description: 'Please try again later...' })
 
                 try {
-                    await repo.checkExist(defaultEnvironment)
+                    await environmentRepo.checkExist(defaultEnvironment)
                 } catch (err) {
                     assert.propertyVal(err, 'message', 'An internal error has occurred in the database!')
                     assert.propertyVal(err, 'description', 'Please try again later...')
@@ -100,7 +100,7 @@ describe('Repositories: Environment', () => {
                     .withArgs({ institution_id: defaultEnvironment.institution_id })
                     .resolves(true)
 
-                return repo.removeAllEnvironmentsFromInstitution(defaultEnvironment.institution_id!)
+                return environmentRepo.removeAllEnvironmentsFromInstitution(defaultEnvironment.institution_id!)
                     .then((result: boolean) => {
                         assert.isTrue(result)
                     })
@@ -117,17 +117,15 @@ describe('Repositories: Environment', () => {
                     .withArgs({ institution_id: randomInstitutionId })
                     .resolves(false)
 
-                return repo.removeAllEnvironmentsFromInstitution(randomInstitutionId)
+                return environmentRepo.removeAllEnvironmentsFromInstitution(randomInstitutionId)
                     .then((result: boolean) => {
                         assert.isFalse(result)
                     })
             })
         })
 
-        context('when the institution_id parameter is invalid', () => {
+        context('when a database error occurs', () => {
             it('should throw a RepositoryException', () => {
-                defaultEnvironment.institution_id = '1a2b3c'
-
                 sinon
                     .mock(modelFake)
                     .expects('deleteMany')
@@ -135,7 +133,59 @@ describe('Repositories: Environment', () => {
                     .rejects({ message: 'An internal error has occurred in the database!',
                                description: 'Please try again later...' })
 
-                return repo.removeAllEnvironmentsFromInstitution(defaultEnvironment.institution_id)
+                return environmentRepo.removeAllEnvironmentsFromInstitution(defaultEnvironment.institution_id!)
+                    .catch (err => {
+                        assert.propertyVal(err, 'message', 'An internal error has occurred in the database!')
+                        assert.propertyVal(err, 'description', 'Please try again later...')
+                    })
+            })
+        })
+    })
+
+    describe('count()', () => {
+        context('when there is at least one environment in the database', () => {
+            it('should return how many environments there are in the database', () => {
+                sinon
+                    .mock(modelFake)
+                    .expects('countDocuments')
+                    .withArgs()
+                    .chain('exec')
+                    .resolves(2)
+
+                return environmentRepo.count()
+                    .then((countEnvironments: number) => {
+                        assert.equal(countEnvironments, 2)
+                    })
+            })
+        })
+
+        context('when there no are environments in database', () => {
+            it('should return 0', () => {
+                sinon
+                    .mock(modelFake)
+                    .expects('countDocuments')
+                    .withArgs()
+                    .chain('exec')
+                    .resolves(0)
+
+                return environmentRepo.count()
+                    .then((countEnvironments: number) => {
+                        assert.equal(countEnvironments, 0)
+                    })
+            })
+        })
+
+        context('when a database error occurs', () => {
+            it('should throw a RepositoryException', () => {
+                sinon
+                    .mock(modelFake)
+                    .expects('countDocuments')
+                    .withArgs()
+                    .chain('exec')
+                    .rejects({ message: 'An internal error has occurred in the database!',
+                               description: 'Please try again later...' })
+
+                return environmentRepo.count()
                     .catch (err => {
                         assert.propertyVal(err, 'message', 'An internal error has occurred in the database!')
                         assert.propertyVal(err, 'description', 'Please try again later...')

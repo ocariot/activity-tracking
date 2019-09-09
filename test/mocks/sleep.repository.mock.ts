@@ -13,7 +13,13 @@ export class SleepRepositoryMock implements ISleepRepository {
         return Promise.resolve(1)
     }
 
+    public countSleep(childId: string): Promise<number> {
+        return Promise.resolve(1)
+    }
+
     public create(item: Sleep): Promise<Sleep> {
+        if (item.id === '507f1f77bcf86cd799439013')
+            return Promise.resolve(undefined!)
         return Promise.resolve(item)
     }
 
@@ -52,7 +58,7 @@ export class SleepRepositoryMock implements ISleepRepository {
     }
 
     public updateByChild(sleep: Sleep): Promise<Sleep> {
-        if (sleep.id === '507f1f77bcf86cd799439011')
+        if (sleep.id === '507f1f77bcf86cd799439012')
             return Promise.resolve(sleep)
         return Promise.resolve(undefined!)
     }

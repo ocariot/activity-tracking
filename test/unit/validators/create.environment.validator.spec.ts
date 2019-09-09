@@ -12,8 +12,9 @@ const location_aux: Location = environment.location!
 const measurements_aux: Array<Measurement> = environment.measurements!
 const timestamp_aux: Date = environment.timestamp
 const local_aux: string = environment.location!.local
+const room_aux: string = environment.location!.room
 
-describe('Validators: CreateEnvironment', () => {
+describe('Validators: CreateEnvironmentValidator', () => {
     describe('validate(environment: Environment)', () => {
         context('when the environment has all the required parameters, and that they have valid values', () => {
             it('should return undefined representing the success of the validation', () => {
@@ -29,7 +30,7 @@ describe('Validators: CreateEnvironment', () => {
                     CreateEnvironmentValidator.validate(environment)
                 } catch (err) {
                     assert.equal(err.message, 'Required fields were not provided...')
-                    assert.equal(err.description, 'Validation of environment measurements failed: institution_id required!')
+                    assert.equal(err.description, 'Validation of environment failed: institution_id required!')
                 }
             })
         })
@@ -43,7 +44,7 @@ describe('Validators: CreateEnvironment', () => {
                     CreateEnvironmentValidator.validate(environment)
                 } catch (err) {
                     assert.equal(err.message, 'Required fields were not provided...')
-                    assert.equal(err.description, 'Validation of environment measurements failed: timestamp, ' +
+                    assert.equal(err.description, 'Validation of environment failed: timestamp, ' +
                         'institution_id, location, measurements required!')
                 }
             })
@@ -55,7 +56,7 @@ describe('Validators: CreateEnvironment', () => {
                 try {
                     CreateEnvironmentValidator.validate(environment)
                 } catch (err) {
-                    assert.equal(err.message, 'Some ID provided, does not have a valid format!')
+                    assert.equal(err.message, Strings.ERROR_MESSAGE.UUID_NOT_VALID_FORMAT)
                     assert.equal(err.description, Strings.ERROR_MESSAGE.UUID_NOT_VALID_FORMAT_DESC)
                 }
             })
@@ -67,14 +68,18 @@ describe('Validators: CreateEnvironment', () => {
                 environment.location = location_aux
                 environment.measurements = measurements_aux
                 environment.timestamp = timestamp_aux
-                if (environment.location) environment.location.local = ''
+                if (environment.location) {
+                    environment.location.local = ''
+                    environment.location.room = ''
+                }
                 try {
                     CreateEnvironmentValidator.validate(environment)
                 } catch (err) {
                     assert.equal(err.message, 'Location are not in a format that is supported...')
-                    assert.equal(err.description, 'Validation of location failed: location local is required!')
+                    assert.equal(err.description, 'Validation of location failed: location local, location room is required!')
                 }
                 environment.location.local = local_aux
+                environment.location.room = room_aux
             })
         })
 
@@ -93,13 +98,13 @@ describe('Validators: CreateEnvironment', () => {
 
         context('when the environment has an invalid measurement (invalid type)', () => {
             it('should throw a ValidationException', () => {
-                environment.measurements = [new Measurement(MeasurementType.HUMIDITY, 34, '%'),
-                    new Measurement('Temperatures', 40, '°C')]
+                environment.measurements![1].type = 'Temperatures'
                 try {
                     CreateEnvironmentValidator.validate(environment)
                 } catch (err) {
                     assert.equal(err.message, 'The type of measurement provided "temperatures" is not supported...')
-                    assert.equal(err.description, 'The types allowed are: temperature, humidity.')
+                    assert.equal(err.description,
+                        'The types allowed are: temperature, humidity, pm1, pm2.5, pm10, body_fat, weight.')
                 }
                 environment.measurements = measurements_aux
             })
@@ -110,13 +115,12 @@ describe('Validators: CreateEnvironment', () => {
                 const measurement: Measurement = new Measurement()
                 measurement.type = MeasurementType.TEMPERATURE
                 measurement.value = 40
-                environment.measurements = [new Measurement(MeasurementType.HUMIDITY, 34, '%'),
-                    measurement]
+                environment.measurements![1] = measurement
                 try {
                     CreateEnvironmentValidator.validate(environment)
                 } catch (err) {
-                    assert.equal(err.message, 'Measurement are not in a format that is supported!')
-                    assert.equal(err.description, 'Validation of measurements failed: measurement unit is required!')
+                    assert.equal(err.message, 'Required fields were not provided...')
+                    assert.equal(err.description, 'Validation of environment failed: measurement unit required!')
                 }
                 environment.measurements = measurements_aux
             })
@@ -124,15 +128,13 @@ describe('Validators: CreateEnvironment', () => {
 
         context('when the environment has an invalid measurement (missing all fields)', () => {
             it('should throw a ValidationException', () => {
-                const measurement: Measurement = new Measurement()
-                environment.measurements = [new Measurement(MeasurementType.HUMIDITY, 34, '%'),
-                    measurement]
+                environment.measurements![1] = new Measurement()
                 try {
                     CreateEnvironmentValidator.validate(environment)
                 } catch (err) {
-                    assert.equal(err.message, 'Measurement are not in a format that is supported!')
-                    assert.equal(err.description, 'Validation of measurements failed: measurement type,' +
-                        ' measurement value, measurement unit is required!')
+                    assert.equal(err.message, 'Required fields were not provided...')
+                    assert.equal(err.description, 'Validation of environment failed: measurement type,' +
+                        ' measurement value, measurement unit required!')
                 }
                 environment.measurements = measurements_aux
             })

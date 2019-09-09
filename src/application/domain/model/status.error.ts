@@ -1,6 +1,4 @@
 import { IJSONSerializable } from '../utils/json.serializable.interface'
-import { IJSONDeserializable } from '../utils/json.deserializable.interface'
-import { JsonUtils } from '../utils/json.utils'
 
 /**
  * Implementation of a class to represent the 'error' item of a MultiStatus
@@ -8,7 +6,7 @@ import { JsonUtils } from '../utils/json.utils'
  * @implements {IJSONSerializable, IJSONDeserializable}
  * @template T
  */
-export class StatusError<T> implements IJSONSerializable, IJSONDeserializable<StatusError<T>> {
+export class StatusError<T> implements IJSONSerializable {
     private _code!: number
     private _message!: string
     private _description!: string
@@ -51,20 +49,6 @@ export class StatusError<T> implements IJSONSerializable, IJSONDeserializable<St
 
     set item(value: T) {
         this._item = value
-    }
-
-    public fromJSON(json: any): StatusError<T> {
-        if (!json) return this
-        if (typeof json === 'string' && JsonUtils.isJsonString(json)) {
-            json = JSON.parse(json)
-        }
-
-        if (json.code !== undefined) this.code = json.code
-        if (json.message !== undefined) this.message = json.message
-        if (json.description !== undefined) this.description = json.description
-        if (json.item !== undefined) this.item = json.item
-
-        return this
     }
 
     public toJSON(): any {

@@ -7,11 +7,20 @@ describe('Models: Institution', () => {
         id: new ObjectID()
     }
 
+    const emptyInstitutionJSON: any = {}
+
     describe('fromJSON(json: any)', () => {
         context('when the json is correct', () => {
             it('should return an Institution model', () => {
                 const result = new Institution().fromJSON(institutionJSON)
                 assert.propertyVal(result, 'id', institutionJSON.id)
+            })
+        })
+
+        context('when the json is empty', () => {
+            it('should return an empty Institution model', () => {
+                const result = new Institution().fromJSON(emptyInstitutionJSON)
+                assert.propertyVal(result, 'id', emptyInstitutionJSON.id)
             })
         })
 

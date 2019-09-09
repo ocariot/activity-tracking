@@ -1,44 +1,36 @@
-import { inject } from 'inversify'
+import { DIContainer } from '../../../di/di'
 import { Identifier } from '../../../di/identifiers'
-import { IIntegrationEventHandler } from './integration.event.handler.interface'
 import { ILogger } from '../../../utils/custom.logger'
-import { ISleepRepository } from '../../port/sleep.repository.interface'
 import { Sleep } from '../../domain/model/sleep'
-import { SleepEvent } from '../event/sleep.event'
-import { UpdateSleepValidator } from '../../domain/validator/update.sleep.validator'
+import { ValidationException } from '../../domain/exception/validation.exception'
+import { ISleepService } from '../../port/sleep.service.interface'
 
-export class SleepUpdateEventHandler implements IIntegrationEventHandler<SleepEvent> {
-    private count: number = 0
+/**
+ * Handler for SleepUpdateEvent operation.
+ *
+ * @param event
+ */
+export const sleepUpdateEventHandler = async (event: any) => {
+    const sleepService: ISleepService = DIContainer.get<ISleepService>(Identifier.SLEEP_SERVICE)
+    const logger: ILogger = DIContainer.get<ILogger>(Identifier.LOGGER)
 
-    /**
-     * Creates an instance of SleepUpdateEventHandler.
-     *
-     * @param _sleepRepository
-     * @param _logger
-     */
-    constructor(
-        @inject(Identifier.SLEEP_REPOSITORY) private readonly _sleepRepository: ISleepRepository,
-        @inject(Identifier.LOGGER) private readonly _logger: ILogger
-    ) {
-    }
-
-    public async handle(event: SleepEvent): Promise<void> {
-        try {
-            // 1. Convert json sleep to object.
-            const sleep: Sleep = new Sleep().fromJSON(event.sleep)
-
-            // 2. Validate the object.
-            UpdateSleepValidator.validate(sleep)
-
-            // 3. Try to update the sleep.
-            await this._sleepRepository.updateByChild(sleep)
-
-            // 4. If got here, it's because the action was successful.
-            this._logger.info(`Action for event ${event.event_name} successfully held! TOTAL: ${++this.count}`)
-        } catch (err) {
-            this._logger.warn(`An error occurred while attempting `
-                .concat(`perform the operation with the ${event.event_name} name event. ${err.message}`)
-                .concat(err.description ? ' ' + err.description : ''))
+    try {
+        if (typeof event === 'string') event = JSON.parse(event)
+        if (!event.sleep) {
+            throw new ValidationException('Event received but could not be handled due to an error in the event format.')
         }
+        // 1. Convert sleep json to object.
+        const sleep: Sleep = new Sleep().fromJSON(event.sleep)
+        sleep.isFromEventBus = true
+
+        // 2. Try to update the sleep.
+        await sleepService.updateByChild(sleep)
+
+        // 3. If got here, it's because the action was successful.
+        logger.info(`Action for event ${event.event_name} successfully held!`)
+    } catch (err) {
+        logger.warn(`An error occurred while attempting `
+            .concat(`perform the operation with the ${event.event_name} name event. ${err.message}`)
+            .concat(err.description ? ' ' + err.description : ''))
     }
 }

@@ -1,13 +1,14 @@
 import { ValidationException } from '../exception/validation.exception'
-import { SleepPatternDataSet } from '../model/sleep.pattern.data.set'
-import { SleepPatternType } from '../model/sleep.pattern'
+import { PhasesPatternType, SleepPatternDataSet, StagesPatternType } from '../model/sleep.pattern.data.set'
 import { Strings } from '../../../utils/strings'
+import { SleepType } from '../model/sleep'
 
 export class SleepPatternDataSetValidator {
-    public static validate(dataset: Array<SleepPatternDataSet>): void | ValidationException {
+    public static validate(dataset: Array<SleepPatternDataSet>, sleepType: SleepType): void | ValidationException {
         const fields: Array<string> = []
         const message: string = 'Dataset are not in a format that is supported!'
-        const sleepPatternTypes = Object.values(SleepPatternType)
+        const phasesPatternTypes: Array<string> = Object.values(PhasesPatternType)
+        const stagesPatternTypes: Array<string> = Object.values(StagesPatternType)
 
         if (!dataset.length) {
             throw new ValidationException(message, 'The data_set collection must not be empty!')
@@ -17,9 +18,13 @@ export class SleepPatternDataSetValidator {
             // validate null
             if (!data.start_time) fields.push('data_set start_time')
             if (!data.name) fields.push('data_set name')
-            else if (!sleepPatternTypes.includes(data.name)) {
-                throw new ValidationException(`The sleep pattern name provided "${data.name}" is not supported...`,
-                    'The names of the allowed patterns are: '.concat(sleepPatternTypes.join(', '), '.'))
+            else if (sleepType === SleepType.CLASSIC && !phasesPatternTypes.includes(data.name)) {
+                    throw new ValidationException(`The sleep pattern name provided "${data.name}" is not supported...`,
+                        'The names of the allowed patterns are: '.concat(phasesPatternTypes.join(', ').concat('.')))
+            }
+            else if (sleepType === SleepType.STAGES && !stagesPatternTypes.includes(data.name)) {
+                    throw new ValidationException(`The sleep pattern name provided "${data.name}" is not supported...`,
+                        'The names of the allowed patterns are: '.concat(stagesPatternTypes.join(', ').concat('.')))
             }
             if (data.duration === undefined) fields.push('data_set duration')
             else if (data.duration < 0) {

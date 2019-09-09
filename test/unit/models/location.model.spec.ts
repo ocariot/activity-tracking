@@ -13,13 +13,9 @@ describe('Models: Location', () => {
         context('when the json is correct', () => {
             it('should return an Location model', () => {
                 const result = new Location().fromJSON(locationJSON)
-                assert.typeOf(result.local, 'string')
                 assert.propertyVal(result, 'local', locationJSON.local)
-                assert.typeOf(result.room, 'string')
                 assert.propertyVal(result, 'room', locationJSON.room)
-                assert.typeOf(result.latitude, 'string')
                 assert.propertyVal(result, 'latitude', locationJSON.latitude)
-                assert.typeOf(result.longitude, 'string')
                 assert.propertyVal(result, 'longitude', locationJSON.longitude)
             })
         })
@@ -37,13 +33,9 @@ describe('Models: Location', () => {
         context('when the json is a string', () => {
             it('should transform the string in json and return Location model', () => {
                 const result = new Location().fromJSON(JSON.stringify(locationJSON))
-                assert.typeOf(result.local, 'string')
                 assert.propertyVal(result, 'local', locationJSON.local)
-                assert.typeOf(result.room, 'string')
                 assert.propertyVal(result, 'room', locationJSON.room)
-                assert.typeOf(result.latitude, 'string')
                 assert.propertyVal(result, 'latitude', locationJSON.latitude)
-                assert.typeOf(result.longitude, 'string')
                 assert.propertyVal(result, 'longitude', locationJSON.longitude)
             })
         })
@@ -52,15 +44,11 @@ describe('Models: Location', () => {
     describe('toJSON()', () => {
         context('when the Location model is correct', () => {
             it('should return a JSON from Location model', () => {
-                let result = new Location().fromJSON(locationJSON)
+                let result = new Location(locationJSON.local, locationJSON.room, locationJSON.latitude, locationJSON.longitude)
                 result = result.toJSON()
-                assert.typeOf(result.local, 'string')
                 assert.propertyVal(result, 'local', locationJSON.local)
-                assert.typeOf(result.room, 'string')
                 assert.propertyVal(result, 'room', locationJSON.room)
-                assert.typeOf(result.latitude, 'string')
                 assert.propertyVal(result, 'latitude', locationJSON.latitude)
-                assert.typeOf(result.longitude, 'string')
                 assert.propertyVal(result, 'longitude', locationJSON.longitude)
             })
         })

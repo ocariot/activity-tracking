@@ -1,45 +1,36 @@
-import { inject } from 'inversify'
+import { DIContainer } from '../../../di/di'
 import { Identifier } from '../../../di/identifiers'
-import { IIntegrationEventHandler } from './integration.event.handler.interface'
-import { PhysicalActivityEvent } from '../event/physical.activity.event'
-import { PhysicalActivity } from '../../domain/model/physical.activity'
 import { ILogger } from '../../../utils/custom.logger'
-import { IPhysicalActivityRepository } from '../../port/physical.activity.repository.interface'
-import { UpdatePhysicalActivityValidator } from '../../domain/validator/update.physical.activity.validator'
+import { PhysicalActivity } from '../../domain/model/physical.activity'
+import { ValidationException } from '../../domain/exception/validation.exception'
+import { IPhysicalActivityService } from '../../port/physical.activity.service.interface'
 
-export class PhysicalActivityUpdateEventHandler implements IIntegrationEventHandler<PhysicalActivityEvent> {
-    private count: number = 0
+/**
+ * Handler for PhysicalActivityUpdateEvent operation.
+ *
+ * @param event
+ */
+export const physicalActivityUpdateEventHandler = async (event: any) => {
+    const activityService: IPhysicalActivityService = DIContainer.get<IPhysicalActivityService>(Identifier.ACTIVITY_SERVICE)
+    const logger: ILogger = DIContainer.get<ILogger>(Identifier.LOGGER)
 
-    /**
-     * Creates an instance of PhysicalActivityUpdateEventHandler.
-     *
-     * @param _activityRepository
-     * @param _logger
-     */
-    constructor(
-        @inject(Identifier.ACTIVITY_REPOSITORY) private readonly _activityRepository: IPhysicalActivityRepository,
-        @inject(Identifier.LOGGER) private readonly _logger: ILogger
-    ) {
-    }
-
-    public async handle(event: PhysicalActivityEvent): Promise<void> {
-        try {
-            // 1. Convert json physical activity to object.
-            const activity: PhysicalActivity = new PhysicalActivity().fromJSON(event.physicalactivity)
-
-            // 2. Validate object.
-            UpdatePhysicalActivityValidator.validate(activity)
-
-            // 3. Try to update the physical activity.
-            // Exceptions of type RepositoryException and ValidationException can be triggered.
-            await this._activityRepository.updateByChild(activity)
-
-            // 4. If got here, it's because the action was successful.
-            this._logger.info(`Action for event ${event.event_name} successfully held! TOTAL: ${++this.count}`)
-        } catch (err) {
-            this._logger.warn(`An error occurred while attempting `
-                .concat(`perform the operation with the ${event.event_name} name event. ${err.message}`)
-                .concat(err.description ? ' ' + err.description : ''))
+    try {
+        if (typeof event === 'string') event = JSON.parse(event)
+        if (!event.physicalactivity) {
+            throw new ValidationException('Event received but could not be handled due to an error in the event format.')
         }
+        // 1. Convert physical activity json to object.
+        const activity: PhysicalActivity = new PhysicalActivity().fromJSON(event.physicalactivity)
+        activity.isFromEventBus = true
+
+        // 2. Try to update activity.
+        await activityService.updateByChild(activity)
+
+        // 3. If got here, it's because the action was successful.
+        logger.info(`Action for event ${event.event_name} successfully held!`)
+    } catch (err) {
+        logger.warn(`An error occurred while attempting `
+            .concat(`perform the operation with the ${event.event_name} name event. ${err.message}`)
+            .concat(err.description ? ' ' + err.description : ''))
     }
 }

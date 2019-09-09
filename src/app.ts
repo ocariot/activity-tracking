@@ -1,18 +1,17 @@
 import 'reflect-metadata'
 import morgan from 'morgan'
-import accessControl from 'express-ip-access-control'
 import helmet from 'helmet'
-import dns from 'dns'
 import bodyParser from 'body-parser'
 import HttpStatus from 'http-status-codes'
 import swaggerUi from 'swagger-ui-express'
+import whitelist from 'ip-allowed'
 import qs from 'query-strings-parser'
-import express, { Application, Request, Response } from 'express'
-import { Container, inject, injectable } from 'inversify'
+import express, { Application, NextFunction, Request, Response } from 'express'
+import { inject, injectable } from 'inversify'
 import { InversifyExpressServer } from 'inversify-express-utils'
 import { ApiException } from './ui/exception/api.exception'
 import { Default } from './utils/default'
-import { DI } from './di/di'
+import { DIContainer } from './di/di'
 import { Identifier } from './di/identifiers'
 import { ILogger } from './utils/custom.logger'
 import { Strings } from './utils/strings'
@@ -24,7 +23,6 @@ import { Strings } from './utils/strings'
  */
 @injectable()
 export class App {
-    private readonly container: Container
     private readonly express: Application
 
     /**
@@ -32,7 +30,6 @@ export class App {
      */
     constructor(@inject(Identifier.LOGGER) private readonly _logger: ILogger) {
         this.express = express()
-        this.container = DI.getInstance().getContainer()
         this.bootstrap()
     }
 
@@ -80,32 +77,13 @@ export class App {
      * @return Promise<void>
      */
     private async setupHostWhitelist(): Promise<void> {
-        let whitelist = Default.IP_WHITELIST
-
-        if (process.env.HOST_WHITELIST) {
-            whitelist = process.env.HOST_WHITELIST
-                .replace(/[\[\]]/g, '')
-                .split(',')
-                .map(item => item.trim())
-        }
-
-        // Accept requests from any origin.
-        if (whitelist.includes('*') ||
-            whitelist.includes('')) return Promise.resolve()
-
-        const promises = whitelist.map(this.getIPFromHost)
-        whitelist = await Promise.all(promises)
-
-        this.express.use(accessControl({
-            mode: 'allow',
-            allows: whitelist,
-            log: (clientIp, access) => {
-                if (!access) this._logger.warn(`Access denied for IP ${clientIp}`)
-            },
-            statusCode: 401,
-            message: new ApiException(401, 'UNAUTHORIZED',
-                'Client is not allowed to access the service...').toJson()
-        }))
+        this.express.use(whitelist(process.env.HOST_WHITELIST || Default.IP_WHITELIST,
+            {
+                log: (clientIp, accessDenied) => {
+                    if (accessDenied) this._logger.warn(`Access denied for IP ${clientIp}`)
+                }
+            })
+        )
     }
 
     /**
@@ -118,7 +96,7 @@ export class App {
      */
     private async setupInversifyExpress(): Promise<void> {
         const inversifyExpress: InversifyExpressServer = new InversifyExpressServer(
-            this.container, null, { rootPath: '/' })
+            DIContainer, null, { rootPath: '/' })
 
         inversifyExpress.setConfig((app: Application) => {
             // for handling query strings
@@ -151,22 +129,6 @@ export class App {
     }
 
     /**
-     *  Get DNS from a host name.
-     *
-     * @private
-     * @param host
-     * @return Promise<void>
-     */
-    private async getIPFromHost(host: string): Promise<any> {
-        return new Promise((resolve, reject) => {
-            dns.lookup(host, async (err, ip) => {
-                if (err) return reject(err)
-                return resolve(ip)
-            })
-        })
-    }
-
-    /**
      * Setup swagger ui.
      *
      * @private
@@ -181,7 +143,7 @@ export class App {
                 customfavIcon: Default.LOGO_URI,
                 customSiteTitle: `API Reference | ${Strings.APP.TITLE}`
             }
-            this.express.use('/reference', swaggerUi.serve, swaggerUi.setup(null, options))
+            this.express.use('/v1/reference', swaggerUi.serve, swaggerUi.setup(null, options))
         }
     }
 
@@ -199,11 +161,18 @@ export class App {
             res.status(HttpStatus.NOT_FOUND).send(errorMessage.toJson())
         })
 
-        // Handle 500
-        this.express.use((err: any, req: Request, res: Response) => {
-            res.locals
-            const errorMessage: ApiException = new ApiException(err.code, err.message, err.description)
-            res.status(HttpStatus.INTERNAL_SERVER_ERROR).send(errorMessage.toJson())
+        // Handle 400, 500
+        this.express.use((err: any, req: Request, res: Response, next: NextFunction) => {
+            let statusCode = HttpStatus.INTERNAL_SERVER_ERROR
+            const errorMessage: ApiException = new ApiException(statusCode, err.message)
+            if (err && err.statusCode === HttpStatus.BAD_REQUEST) {
+                statusCode = HttpStatus.BAD_REQUEST
+                errorMessage.code = statusCode
+                errorMessage.message = 'Unable to process request body.'
+                errorMessage.description = 'Please verify that the JSON provided in'
+                    .concat(' the request body has a valid format and try again.')
+            }
+            res.status(statusCode).send(errorMessage.toJson())
         })
     }
 }

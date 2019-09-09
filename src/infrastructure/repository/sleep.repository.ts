@@ -57,7 +57,7 @@ export class SleepRepository extends BaseRepository<Sleep, SleepEntity> implemen
     public updateByChild(sleep: Sleep): Promise<Sleep> {
         const itemUp: SleepEntity = this.sleepMapper.transform(sleep)
         return new Promise<Sleep>((resolve, reject) => {
-            this.Model.findOneAndUpdate({ child_id: sleep.child_id, _id: itemUp.id }, itemUp, { new: true })
+            this.sleepModel.findOneAndUpdate({ child_id: sleep.child_id, _id: itemUp.id }, itemUp, { new: true })
                 .exec()
                 .then(result => {
                     if (!result) return resolve(undefined)
@@ -77,7 +77,7 @@ export class SleepRepository extends BaseRepository<Sleep, SleepEntity> implemen
      */
     public removeByChild(sleepId: string, childId: string): Promise<boolean> {
         return new Promise<boolean>((resolve, reject) => {
-            this.Model.findOneAndDelete({ child_id: childId, _id: sleepId })
+            this.sleepModel.findOneAndDelete({ child_id: childId, _id: sleepId })
                 .exec()
                 .then(result => {
                     if (!result) return resolve(false)
@@ -100,12 +100,16 @@ export class SleepRepository extends BaseRepository<Sleep, SleepEntity> implemen
         query.filters = { child_id: childId }
 
         return new Promise<boolean>((resolve, reject) => {
-            this.Model.deleteMany(query.filters)
+            this.sleepModel.deleteMany(query.filters)
                 .then(result => {
                     if (!result) return resolve(false)
                     return resolve(true)
                 })
-                .catch(err => reject(this.mongoDBErrorListener(err)))
+                .catch(err => reject(super.mongoDBErrorListener(err)))
         })
+    }
+
+    public countSleep(childId: string): Promise<number> {
+        return super.count(new Query().fromJSON({ filters: { child_id: childId } }))
     }
 }

@@ -1,51 +1,54 @@
-import { inject } from 'inversify'
+import { DIContainer } from '../../../di/di'
 import { Identifier } from '../../../di/identifiers'
-import { IIntegrationEventHandler } from './integration.event.handler.interface'
 import { ILogger } from '../../../utils/custom.logger'
-import { ConflictException } from '../../domain/exception/conflict.exception'
-import { EnvironmentEvent } from '../event/environment.event'
-import { IEnvironmentRepository } from '../../port/environment.repository.interface'
-import { CreateEnvironmentValidator } from '../../domain/validator/create.environment.validator'
+import { ValidationException } from '../../domain/exception/validation.exception'
 import { Environment } from '../../domain/model/environment'
+import { IEnvironmentService } from '../../port/environment.service.interface'
 
-export class EnvironmentSaveEventHandler implements IIntegrationEventHandler<EnvironmentEvent> {
-    private count: number = 0
+/**
+ * Handler for EnvironmentSaveEvent operation.
+ *
+ * @param event
+ */
+export const environmentSaveEventHandler = async (event: any) => {
+    const environmentService: IEnvironmentService = DIContainer.get<IEnvironmentService>(Identifier.ENVIRONMENT_SERVICE)
+    const logger: ILogger = DIContainer.get<ILogger>(Identifier.LOGGER)
 
-    /**
-     * Creates an instance of EnvironmentSaveEventHandler.
-     *
-     * @param _environmentRepository
-     * @param _logger
-     */
-    constructor(
-        @inject(Identifier.ENVIRONMENT_REPOSITORY) private readonly _environmentRepository: IEnvironmentRepository,
-        @inject(Identifier.LOGGER) private readonly _logger: ILogger
-    ) {
-    }
-
-    public async handle(event: EnvironmentEvent): Promise<void> {
-        try {
-            // 1. Convert json environment to object.
-            const environment: Environment = await new Environment().fromJSON(event.environment)
-
-            // 2. Validate object based on create action.
-            CreateEnvironmentValidator.validate(environment)
-
-            // 3. Checks whether the object already has a record.
-            // If it exists, an exception of type ConflictException is thrown.
-            const environmentExist = await this._environmentRepository.checkExist(environment)
-            if (environmentExist) throw new ConflictException('Environment is already registered...')
-
-            // 4. Try to save the environment.
-            // Exceptions of type RepositoryException and ValidationException can be triggered.
-            await this._environmentRepository.create(environment)
-
-            // 5. If got here, it's because the action was successful.
-            this._logger.info(`Action for event ${event.event_name} successfully held! TOTAL: ${++this.count}`)
-        } catch (err) {
-            this._logger.warn(`An error occurred while attempting `
-                .concat(`perform the operation with the ${event.event_name} name event. ${err.message}`)
-                .concat(err.description ? ' ' + err.description : ''))
+    try {
+        if (typeof event === 'string') event = JSON.parse(event)
+        if (!event.environment) {
+            throw new ValidationException('Event received but could not be handled due to an error in the event format.')
         }
+        if (event.environment instanceof Array) {
+            // 1. Convert environment array json to objects.
+            const environmentsArr: Array<Environment> = event.environment.map(item => {
+                const environmentItem: Environment = new Environment().fromJSON(item)
+                environmentItem.isFromEventBus = true
+                return environmentItem
+            })
+
+            // 2. Try to add environments
+            environmentService.add(environmentsArr)
+                .then(result => {
+                    logger.info(`Action for event ${event.event_name} successfully held! Total successful items: `
+                        .concat(`${result.success.length} / Total items with error: ${result.error.length}`))
+                })
+                .catch((err) => {
+                    throw err
+                })
+        }
+        else {
+            // 1. Convert environment json to object.
+            const environment: Environment = new Environment().fromJSON(event.environment)
+            environment.isFromEventBus = true
+
+            // 2. Try to add the environment
+            await environmentService.add(environment)
+            logger.info(`Action for event ${event.event_name} successfully held!`)
+        }
+    } catch (err) {
+        logger.warn(`An error occurred while attempting `
+            .concat(`perform the operation with the ${event.event_name} name event. ${err.message}`)
+            .concat(err.description ? ' ' + err.description : ''))
     }
 }

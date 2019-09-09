@@ -53,7 +53,7 @@ export class PhysicalActivityLevel implements IJSONSerializable, IJSONDeserializ
 }
 
 /**
- * Name of traceable physicalactivity levels.
+ * Names of traceable physicalactivity levels.
  */
 export enum ActivityLevelType {
     SEDENTARY = 'sedentary',

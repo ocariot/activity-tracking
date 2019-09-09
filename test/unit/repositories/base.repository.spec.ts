@@ -23,7 +23,7 @@ class TestRepository<T extends Entity, TModel> extends BaseRepository<any, any> 
     }
 }
 
-describe('Repositories: Base', () => {
+describe('Repositories: BaseRepository', () => {
 
     const defaultSleep: Sleep = new SleepMock()
 
@@ -63,6 +63,7 @@ describe('Repositories: Base', () => {
                         assert.propertyVal(sleep, 'end_time', sleep.end_time)
                         assert.propertyVal(sleep, 'duration', sleep.duration)
                         assert.propertyVal(sleep, 'pattern', sleep.pattern)
+                        assert.propertyVal(sleep, 'type', sleep.type)
                         assert.propertyVal(sleep, 'child_id', sleep.child_id)
                     })
             })
@@ -95,8 +96,6 @@ describe('Repositories: Base', () => {
             sinon
                 .mock(modelFake)
                 .expects('find')
-                .chain('select')
-                .withArgs(queryMock.toJSON().fields)
                 .chain('sort')
                 .withArgs(queryMock.toJSON().ordination)
                 .chain('skip')
@@ -111,10 +110,11 @@ describe('Repositories: Base', () => {
                     assert.isNotEmpty(sleepArr)
                     sleepArr[0] = sleepArr[0].toJSON()
                     assert.propertyVal(sleepArr[0], 'id', defaultSleep.id)
-                    assert.propertyVal(sleepArr[0], 'start_time', (defaultSleep.start_time)!.toISOString())
-                    assert.propertyVal(sleepArr[0], 'end_time', (defaultSleep.end_time)!.toISOString())
+                    assert.propertyVal(sleepArr[0], 'start_time', defaultSleep.start_time)
+                    assert.propertyVal(sleepArr[0], 'end_time', defaultSleep.end_time)
                     assert.propertyVal(sleepArr[0], 'duration', defaultSleep.duration)
-                    assert.property(sleepArr[0], 'pattern')
+                    assert.deepPropertyVal(sleepArr[0], 'pattern', defaultSleep.pattern!.toJSON())
+                    assert.propertyVal(sleepArr[0], 'type', defaultSleep.type)
                     assert.propertyVal(sleepArr[0], 'child_id', defaultSleep.child_id)
                 })
         })
@@ -124,8 +124,6 @@ describe('Repositories: Base', () => {
                 sinon
                     .mock(modelFake)
                     .expects('find')
-                    .chain('select')
-                    .withArgs(queryMock.toJSON().fields)
                     .chain('sort')
                     .withArgs(queryMock.toJSON().ordination)
                     .chain('skip')
@@ -147,8 +145,6 @@ describe('Repositories: Base', () => {
                 sinon
                     .mock(modelFake)
                     .expects('find')
-                    .chain('select')
-                    .withArgs(queryMock.toJSON().fields)
                     .chain('sort')
                     .withArgs(queryMock.toJSON().ordination)
                     .chain('skip')
@@ -176,8 +172,6 @@ describe('Repositories: Base', () => {
                 .mock(modelFake)
                 .expects('findOne')
                 .withArgs(queryMock.toJSON().filters)
-                .chain('select')
-                .withArgs(queryMock.toJSON().fields)
                 .chain('exec')
                 .resolves(defaultSleep)
 
@@ -189,6 +183,7 @@ describe('Repositories: Base', () => {
                     assert.propertyVal(sleep, 'end_time', sleep.end_time)
                     assert.propertyVal(sleep, 'duration', sleep.duration)
                     assert.propertyVal(sleep, 'pattern', sleep.pattern)
+                    assert.propertyVal(sleep, 'type', sleep.type)
                     assert.propertyVal(sleep, 'child_id', sleep.child_id)
                 })
         })
@@ -199,8 +194,6 @@ describe('Repositories: Base', () => {
                     .mock(modelFake)
                     .expects('findOne')
                     .withArgs(queryMock.toJSON().filters)
-                    .chain('select')
-                    .withArgs(queryMock.toJSON().fields)
                     .chain('exec')
                     .resolves(undefined)
 
@@ -217,8 +210,6 @@ describe('Repositories: Base', () => {
                     .mock(modelFake)
                     .expects('findOne')
                     .withArgs(queryMock.toJSON().filters)
-                    .chain('select')
-                    .withArgs(queryMock.toJSON().fields)
                     .chain('exec')
                     .rejects({ message: 'An internal error has occurred in the database!',
                                description: 'Please try again later...' })
@@ -249,6 +240,7 @@ describe('Repositories: Base', () => {
                     assert.propertyVal(sleep, 'end_time', sleep.end_time)
                     assert.propertyVal(sleep, 'duration', sleep.duration)
                     assert.propertyVal(sleep, 'pattern', sleep.pattern)
+                    assert.propertyVal(sleep, 'type', sleep.type)
                     assert.propertyVal(sleep, 'child_id', sleep.child_id)
                 })
         })

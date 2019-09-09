@@ -46,4 +46,13 @@ export interface ISleepRepository extends IRepository<Sleep> {
      * @throws {ValidationException | RepositoryException}
      */
     removeAllSleepFromChild(childId: string): Promise<boolean>
+
+    /**
+     * Returns the total of sleep objects of a child.
+     *
+     * @param childId Child id associated with Sleep objects.
+     * @return {Promise<number>}
+     * @throws {RepositoryException}
+     */
+    countSleep(childId: string): Promise<number>
 }

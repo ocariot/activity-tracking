@@ -2,12 +2,12 @@ import { Log, LogType } from '../../src/application/domain/model/log'
 
 export class LogMock extends Log {
 
-    constructor(type?: LogType) {
+    constructor(type?: string) {
         super()
         this.generateLog(type)
     }
 
-    private generateLog(type?: LogType): void {
+    private generateLog(type?: string): void {
         if (!type) type = this.generateType()
 
         super.id = this.generateObjectId()
@@ -48,17 +48,23 @@ export class LogMock extends Log {
         return `${date.getFullYear()}-${monthString}-${dayString}`
     }
 
-    private generateType(): LogType {
-        let logType
-        switch (Math.floor((Math.random() * 2 + 1))) { // 1 or 2
+    private generateType(): string {
+        let logType: string
+        switch (Math.floor((Math.random() * 5 + 1))) { // 1, 2, 3, 4 or 5
             case 1:
                 logType = LogType.STEPS
                 return logType
             case 2:
                 logType = LogType.CALORIES
                 return logType
+            case 3:
+                logType = LogType.ACTIVE_MINUTES
+                return logType
+            case 4:
+                logType = LogType.LIGHTLY_ACTIVE_MINUTES
+                return logType
             default:
-                return LogType.STEPS
+                return LogType.SEDENTARY_MINUTES
         }
     }
 }

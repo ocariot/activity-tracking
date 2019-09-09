@@ -16,7 +16,7 @@ import { MultiStatus } from '../../application/domain/model/multi.status'
  * @remarks To define paths, we use library inversify-express-utils.
  * @see {@link https://github.com/inversify/inversify-express-utils} for further information.
  */
-@controller('/environments')
+@controller('/v1/environments')
 export class EnvironmentController {
 
     /**
@@ -47,7 +47,7 @@ export class EnvironmentController {
                 })
 
                 const resultMultiStatus: MultiStatus<Environment> = await this._environmentService.add(environmentsArr)
-                return res.status(HttpStatus.CREATED).send(resultMultiStatus)
+                return res.status(HttpStatus.MULTI_STATUS).send(resultMultiStatus)
             }
 
             // Only one item
@@ -74,6 +74,8 @@ export class EnvironmentController {
     public async getAllEnvironments(@request() req: Request, @response() res: Response): Promise<Response> {
         try {
             const result = await this._environmentService.getAll(new Query().fromJSON(req.query))
+            const count: number = await this._environmentService.count()
+            res.setHeader('X-Total-Count', count)
             return res.status(HttpStatus.OK).send(result)
         } catch (err) {
             const handlerError = ApiExceptionManager.build(err)

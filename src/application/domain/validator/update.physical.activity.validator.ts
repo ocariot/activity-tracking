@@ -3,6 +3,7 @@ import { PhysicalActivity } from '../model/physical.activity'
 import { PhysicalActivityLevelsValidator } from './physical.activity.levels.validator'
 import { ObjectIdValidator } from './object.id.validator'
 import { Strings } from '../../../utils/strings'
+import { PhysicalActivityHeartRateValidator } from './physical.activity.heart.rate.validator'
 
 export class UpdatePhysicalActivityValidator {
     public static validate(physicalActivity: PhysicalActivity): void | ValidationException {
@@ -31,6 +32,10 @@ export class UpdatePhysicalActivityValidator {
 
         if (physicalActivity.levels && physicalActivity.levels.length) {
             PhysicalActivityLevelsValidator.validate(physicalActivity.levels)
+        }
+
+        if (physicalActivity.heart_rate) {
+            PhysicalActivityHeartRateValidator.validate(physicalActivity.heart_rate)
         }
     }
 }

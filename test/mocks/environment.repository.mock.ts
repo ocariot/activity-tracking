@@ -9,11 +9,13 @@ export class EnvironmentRepositoryMock implements IEnvironmentRepository {
         return Promise.resolve(false)
     }
 
-    public count(query: any): Promise<number> {
+    public count(): Promise<number> {
         return Promise.resolve(1)
     }
 
     public create(item: Environment): Promise<Environment> {
+        if (item.id === '507f1f77bcf86cd799439013')
+            return Promise.resolve(undefined!)
         return Promise.resolve(item)
     }
 

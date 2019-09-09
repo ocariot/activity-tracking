@@ -7,11 +7,20 @@ describe('Models: User', () => {
         id: new ObjectID()
     }
 
+    const emptyUserJSON: any = {}
+
     describe('fromJSON(json: any)', () => {
         context('when the json is correct', () => {
             it('should return an User model', () => {
                 const result = new User().fromJSON(userJSON)
                 assert.propertyVal(result, 'id', userJSON.id)
+            })
+        })
+
+        context('when the json is empty', () => {
+            it('should return an empty User model', () => {
+                const result = new User().fromJSON(emptyUserJSON)
+                assert.propertyVal(result, 'id', emptyUserJSON.id)
             })
         })
 

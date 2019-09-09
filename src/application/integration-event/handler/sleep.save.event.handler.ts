@@ -1,51 +1,54 @@
-import { inject } from 'inversify'
+import { DIContainer } from '../../../di/di'
 import { Identifier } from '../../../di/identifiers'
-import { IIntegrationEventHandler } from './integration.event.handler.interface'
 import { ILogger } from '../../../utils/custom.logger'
-import { ConflictException } from '../../domain/exception/conflict.exception'
-import { ISleepRepository } from '../../port/sleep.repository.interface'
 import { Sleep } from '../../domain/model/sleep'
-import { CreateSleepValidator } from '../../domain/validator/create.sleep.validator'
-import { SleepEvent } from '../event/sleep.event'
+import { ValidationException } from '../../domain/exception/validation.exception'
+import { ISleepService } from '../../port/sleep.service.interface'
 
-export class SleepSaveEventHandler implements IIntegrationEventHandler<SleepEvent> {
-    private count: number = 0
+/**
+ * Handler for SleepSaveEvent operation.
+ *
+ * @param event
+ */
+export const sleepSaveEventHandler = async (event: any) => {
+    const sleepService: ISleepService = DIContainer.get<ISleepService>(Identifier.SLEEP_SERVICE)
+    const logger: ILogger = DIContainer.get<ILogger>(Identifier.LOGGER)
 
-    /**
-     * Creates an instance of SleepSaveEventHandler.
-     *
-     * @param _sleepRepository
-     * @param _logger
-     */
-    constructor(
-        @inject(Identifier.SLEEP_REPOSITORY) private readonly _sleepRepository: ISleepRepository,
-        @inject(Identifier.LOGGER) private readonly _logger: ILogger
-    ) {
-    }
-
-    public async handle(event: SleepEvent): Promise<void> {
-        try {
-            // 1. Convert json sleep to object.
-            const sleep: Sleep = new Sleep().fromJSON(event.sleep)
-
-            // 2. Validate object based on create action.
-            CreateSleepValidator.validate(sleep)
-
-            // 3. Checks whether the object already has a record.
-            // If it exists, an exception of type ConflictException is thrown.
-            const sleepExist = await this._sleepRepository.checkExist(sleep)
-            if (sleepExist) throw new ConflictException('Sleep is already registered...')
-
-            // 4. Try to save the sleep.
-            // Exceptions of type RepositoryException and ValidationException can be triggered.
-            await this._sleepRepository.create(sleep)
-
-            // 5. If got here, it's because the action was successful.
-            this._logger.info(`Action for event ${event.event_name} successfully held! TOTAL: ${++this.count}`)
-        } catch (err) {
-            this._logger.warn(`An error occurred while attempting `
-                .concat(`perform the operation with the ${event.event_name} name event. ${err.message}`)
-                .concat(err.description ? ' ' + err.description : ''))
+    try {
+        if (typeof event === 'string') event = JSON.parse(event)
+        if (!event.sleep) {
+            throw new ValidationException('Event received but could not be handled due to an error in the event format.')
         }
+        if (event.sleep instanceof Array) {
+            // 1. Convert sleep array json to object.
+            const sleepArr: Array<Sleep> = event.sleep.map(item => {
+                const sleepItem: Sleep = new Sleep().fromJSON(item)
+                sleepItem.isFromEventBus = true
+                return sleepItem
+            })
+
+            // 2. Try to add sleep objects
+            sleepService.add(sleepArr)
+                .then(result => {
+                    logger.info(`Action for event ${event.event_name} successfully held! Total successful items: `
+                        .concat(`${result.success.length} / Total items with error: ${result.error.length}`))
+                })
+                .catch((err) => {
+                    throw err
+                })
+        }
+        else {
+            // 1. Convert sleep json to object.
+            const sleep: Sleep = new Sleep().fromJSON(event.sleep)
+            sleep.isFromEventBus = true
+
+            // 2. Try to add the sleep
+            await sleepService.add(sleep)
+            logger.info(`Action for event ${event.event_name} successfully held!`)
+        }
+    } catch (err) {
+        logger.warn(`An error occurred while attempting `
+            .concat(`perform the operation with the ${event.event_name} name event. ${err.message}`)
+            .concat(err.description ? ' ' + err.description : ''))
     }
 }
