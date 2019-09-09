@@ -75,6 +75,7 @@ export class WeightRepository extends BaseRepository<Weight, WeightEntity> imple
      * @throws {ValidationException | RepositoryException}
      */
     public find(query: IQuery): Promise<Array<Weight>> {
+        query.addFilter({ type: MeasurementType.WEIGHT })
         const q: any = query.toJSON()
         return new Promise<Array<Weight>>((resolve, reject) => {
             this.measurementModel.find(q.filters)

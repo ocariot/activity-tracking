@@ -8,6 +8,7 @@ import { ObjectID } from 'bson'
 import { Sleep, SleepType } from '../../../src/application/domain/model/sleep'
 
 const sleep: SleepMock = new SleepMock()
+const duration_aux = sleep.duration
 const phase_name_aux = sleep.pattern!.data_set[0].name
 
 const incompleteSleep: SleepMock = new SleepMock()
@@ -69,7 +70,7 @@ describe('Validators: UpdateSleepValidator', () => {
                     assert.equal(err.message, 'Duration field is invalid...')
                     assert.equal(err.description, 'Sleep validation failed: '.concat(Strings.ERROR_MESSAGE.NEGATIVE_PARAMETER))
                 }
-                sleep.duration = 29520000
+                sleep.duration = duration_aux
             })
         })
 

@@ -1334,7 +1334,7 @@ describe('Routes: children.sleep', () => {
                 const body = {
                     start_time: otherSleep.start_time,
                     end_time: otherSleep.end_time,
-                    duration: defaultSleep.duration,
+                    duration: otherSleep.duration,
                     pattern: defaultSleep.pattern,
                     type: defaultSleep.type
                 }
@@ -1349,7 +1349,7 @@ describe('Routes: children.sleep', () => {
                         expect(res.body.id).to.eql(defaultSleep.id)
                         expect(res.body.start_time).to.eql(otherSleep.start_time!.toISOString())
                         expect(res.body.end_time).to.eql(otherSleep.end_time!.toISOString())
-                        expect(res.body.duration).to.eql(defaultSleep.duration)
+                        expect(res.body.duration).to.eql(otherSleep.duration)
                         let index = 0
                         for (const elem of defaultSleep.pattern!.data_set) {
                             expect(res.body.pattern.data_set[index].start_time).to.eql(elem.start_time.toISOString())
@@ -1364,7 +1364,7 @@ describe('Routes: children.sleep', () => {
         })
 
         context('when this sleep already exists in the database', () => {
-            it('should return status status code 404 and an info message about the conflict', async () => {
+            it('should return status status code 409 and an info message about the conflict', async () => {
                 let result
 
                 try {
@@ -1378,7 +1378,7 @@ describe('Routes: children.sleep', () => {
                 const body = {
                     start_time: otherSleep.start_time,
                     end_time: otherSleep.end_time,
-                    duration: defaultSleep.duration,
+                    duration: otherSleep.duration,
                     pattern: defaultSleep.pattern,
                     type: defaultSleep.type
                 }

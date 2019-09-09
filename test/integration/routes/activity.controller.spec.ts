@@ -1611,7 +1611,7 @@ describe('Routes: children.physicalactivities', () => {
                     name: defaultActivity.name,
                     start_time: otherActivity.start_time,
                     end_time: otherActivity.end_time,
-                    duration: defaultActivity.duration,
+                    duration: otherActivity.duration,
                     calories: defaultActivity.calories,
                     steps: defaultActivity.steps ? defaultActivity.steps : undefined,
                     levels: defaultActivity.levels ? defaultActivity.levels : undefined,
@@ -1629,7 +1629,7 @@ describe('Routes: children.physicalactivities', () => {
                         expect(res.body.id).to.eql(defaultActivity.id)
                         expect(res.body.start_time).to.eql(otherActivity.start_time!.toISOString())
                         expect(res.body.end_time).to.eql(otherActivity.end_time!.toISOString())
-                        expect(res.body.duration).to.eql(defaultActivity.duration)
+                        expect(res.body.duration).to.eql(otherActivity.duration)
                         expect(res.body.calories).to.eql(defaultActivity.calories)
                         if (defaultActivity.steps) {
                             expect(res.body.steps).to.eql(defaultActivity.steps)
@@ -1647,7 +1647,7 @@ describe('Routes: children.physicalactivities', () => {
         })
 
         context('when physical activity already exists in the database', () => {
-            it('should return status status code 404 and an info message about the conflict', async () => {
+            it('should return status status code 409 and an info message about the conflict', async () => {
                 let result
 
                 try {
@@ -1662,7 +1662,7 @@ describe('Routes: children.physicalactivities', () => {
                     name: defaultActivity.name,
                     start_time: otherActivity.start_time,
                     end_time: otherActivity.end_time,
-                    duration: defaultActivity.duration,
+                    duration: otherActivity.duration,
                     calories: defaultActivity.calories,
                     steps: defaultActivity.steps ? defaultActivity.steps : undefined,
                     levels: defaultActivity.levels ? defaultActivity.levels : undefined,

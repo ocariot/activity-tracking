@@ -47,7 +47,6 @@ export class LogController {
                     const log: Log = new Log().fromJSON(item)
                     log.type = req.params.resource
                     log.child_id = req.params.child_id
-                    activityLogs.push(log)
                     return log
                 })
             }

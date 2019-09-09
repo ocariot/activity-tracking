@@ -9,6 +9,7 @@ import { WeightMock } from '../../mocks/weight.mock'
 import { IWeightRepository } from '../../../src/application/port/weight.repository.interface'
 import { WeightRepository } from '../../../src/infrastructure/repository/weight.repository'
 import { MeasurementType } from '../../../src/application/domain/model/measurement'
+import { Query } from '../../../src/infrastructure/repository/query/query'
 
 require('sinon-mongoose')
 
@@ -163,6 +164,9 @@ describe('Repositories: WeightRepository', () => {
     })
 
     describe('find(query: IQuery)', () => {
+        const query: Query = new Query()
+        query.ordination = new Map()
+        query.filters = { child_id: defaultWeight.child_id }
         context('when there are Weight objects associated with the query parameters', () => {
             it('should return a list of Weight objects', () => {
                 const resultExpected = new Array<Weight>(defaultWeight)
@@ -171,17 +175,17 @@ describe('Repositories: WeightRepository', () => {
                     .mock(modelFake)
                     .expects('find')
                     .chain('sort')
-                    .withArgs(queryMock.toJSON().ordination)
+                    .withArgs({})
                     .chain('skip')
-                    .withArgs(queryMock.toJSON().pagination.skip)
+                    .withArgs(0)
                     .chain('limit')
-                    .withArgs(queryMock.toJSON().pagination.limit)
+                    .withArgs(100)
                     .chain('populate')
                     .withArgs('body_fat')
                     .chain('exec')
                     .resolves(resultExpected)
 
-                return weightRepo.find(queryMock)
+                return weightRepo.find(query)
                     .then((weightArr: Array<Weight>) => {
                         assert.isNotEmpty(weightArr)
                         assert.propertyVal(weightArr[0], 'id', defaultWeight.id)
@@ -201,17 +205,17 @@ describe('Repositories: WeightRepository', () => {
                     .mock(modelFake)
                     .expects('find')
                     .chain('sort')
-                    .withArgs(queryMock.toJSON().ordination)
+                    .withArgs({})
                     .chain('skip')
-                    .withArgs(queryMock.toJSON().pagination.skip)
+                    .withArgs(0)
                     .chain('limit')
-                    .withArgs(queryMock.toJSON().pagination.limit)
+                    .withArgs(100)
                     .chain('populate')
                     .withArgs('body_fat')
                     .chain('exec')
                     .resolves([])
 
-                return weightRepo.find(queryMock)
+                return weightRepo.find(query)
                     .then(weightArr => {
                         assert.equal(weightArr.length, 0)
                     })
@@ -224,18 +228,18 @@ describe('Repositories: WeightRepository', () => {
                     .mock(modelFake)
                     .expects('find')
                     .chain('sort')
-                    .withArgs(queryMock.toJSON().ordination)
+                    .withArgs({})
                     .chain('skip')
-                    .withArgs(queryMock.toJSON().pagination.skip)
+                    .withArgs(0)
                     .chain('limit')
-                    .withArgs(queryMock.toJSON().pagination.limit)
+                    .withArgs(100)
                     .chain('populate')
                     .withArgs('body_fat')
                     .chain('exec')
                     .rejects({ message: 'An internal error has occurred in the database!',
                                description: 'Please try again later...' })
 
-                return weightRepo.find(queryMock)
+                return weightRepo.find(query)
                     .catch (err => {
                         assert.propertyVal(err, 'message', 'An internal error has occurred in the database!')
                         assert.propertyVal(err, 'description', 'Please try again later...')

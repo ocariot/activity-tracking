@@ -10,6 +10,7 @@ import { PhysicalActivityHeartRateMock } from '../../mocks/physical.activity.hea
 import { HeartRateZone } from '../../../src/application/domain/model/heart.rate.zone'
 
 const activity: PhysicalActivityMock = new PhysicalActivityMock()
+const duration_aux = activity.duration
 const out_of_range_zone_aux = activity.heart_rate!.out_of_range_zone
 const fat_burn_zone_aux = activity.heart_rate!.fat_burn_zone
 const cardio_zone_aux = activity.heart_rate!.cardio_zone
@@ -75,7 +76,7 @@ describe('Validators: UpdatePhysicalActivityValidator', () => {
                     assert.equal(err.message, 'Duration field is invalid...')
                     assert.equal(err.description, 'Physical Activity validation failed: '.concat(Strings.ERROR_MESSAGE.NEGATIVE_PARAMETER))
                 }
-                activity.duration = 1178000
+                activity.duration = duration_aux
             })
         })
         /**
