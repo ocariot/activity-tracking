@@ -131,9 +131,9 @@ describe('Routes: children.sleep', () => {
     // Start services
     before(async () => {
         try {
-            deleteAllSleep()
             await dbConnection.connect(process.env.MONGODB_URI_TEST || Default.MONGODB_URI_TEST)
             await rabbitmq.initialize(process.env.RABBITMQ_URI || Default.RABBITMQ_URI, { sslOptions: { ca: [] } })
+            await deleteAllSleep()
         } catch (err) {
             throw new Error('Failure on children.sleep routes test: ' + err.message)
         }
@@ -142,7 +142,7 @@ describe('Routes: children.sleep', () => {
     // Delete all database sleep objects
     after(async () => {
         try {
-            deleteAllSleep()
+            await deleteAllSleep()
             await dbConnection.dispose()
             await rabbitmq.dispose()
         } catch (err) {
@@ -526,9 +526,9 @@ describe('Routes: children.sleep', () => {
      */
     describe('POST /v1/children/:child_id/sleep with a Sleep array in the body', () => {
         context('when all the sleep objects are correct and still do not exist in the repository', () => {
-            before(() => {
+            before(async () => {
                 try {
-                    deleteAllSleep()
+                    await deleteAllSleep()
                 } catch (err) {
                     throw new Error('Failure on children.sleep routes test: ' + err.message)
                 }
@@ -621,9 +621,9 @@ describe('Routes: children.sleep', () => {
         })
 
         context('when there are correct and incorrect sleep objects in the body', () => {
-            before(() => {
+            before(async () => {
                 try {
-                    deleteAllSleep()
+                    await deleteAllSleep()
                 } catch (err) {
                     throw new Error('Failure on children.sleep routes test: ' + err.message)
                 }
@@ -675,9 +675,9 @@ describe('Routes: children.sleep', () => {
         })
 
         context('when all the sleep objects are incorrect', () => {
-            before(() => {
+            before(async () => {
                 try {
-                    deleteAllSleep()
+                    await deleteAllSleep()
                 } catch (err) {
                     throw new Error('Failure on children.sleep routes test: ' + err.message)
                 }
@@ -769,9 +769,9 @@ describe('Routes: children.sleep', () => {
      */
     describe('GET /v1/children/:child_id/sleep', () => {
         context('when get all sleep of a specific child of the database successfully', () => {
-            before(() => {
+            before(async () => {
                 try {
-                    deleteAllSleep()
+                    await deleteAllSleep()
                 } catch (err) {
                     throw new Error('Failure on children.sleep routes test: ' + err.message)
                 }
@@ -820,9 +820,9 @@ describe('Routes: children.sleep', () => {
         })
 
         context('when there are no sleep associated with that specific child in the database', () => {
-            before(() => {
+            before(async () => {
                 try {
-                    deleteAllSleep()
+                    await deleteAllSleep()
                 } catch (err) {
                     throw new Error('Failure on children.sleep routes test: ' + err.message)
                 }
@@ -841,9 +841,9 @@ describe('Routes: children.sleep', () => {
         })
 
         context('when the child_id is invalid', () => {
-            before(() => {
+            before(async () => {
                 try {
-                    deleteAllSleep()
+                    await deleteAllSleep()
                 } catch (err) {
                     throw new Error('Failure on children.sleep routes test: ' + err.message)
                 }
@@ -878,9 +878,9 @@ describe('Routes: children.sleep', () => {
          * query-strings-parser library test
          */
         context('when get sleep using the "query-strings-parser" library', () => {
-            before(() => {
+            before(async () => {
                 try {
-                    deleteAllSleep()
+                    await deleteAllSleep()
                 } catch (err) {
                     throw new Error('Failure on children.sleep routes test: ' + err.message)
                 }
@@ -933,9 +933,9 @@ describe('Routes: children.sleep', () => {
 
         context('when there is an attempt to get sleep of a specific child using the "query-strings-parser" library but ' +
             'this sleep does not exist', () => {
-            before(() => {
+            before(async () => {
                 try {
-                    deleteAllSleep()
+                    await deleteAllSleep()
                 } catch (err) {
                     throw new Error('Failure on children.sleep routes test: ' + err.message)
                 }
@@ -958,9 +958,9 @@ describe('Routes: children.sleep', () => {
 
         context('when there is an attempt to get sleep of a specific child using the "query-strings-parser" library ' +
             'but the child_id is invalid', () => {
-            before(() => {
+            before(async () => {
                 try {
-                    deleteAllSleep()
+                    await deleteAllSleep()
                 } catch (err) {
                     throw new Error('Failure on children.sleep routes test: ' + err.message)
                 }
@@ -1000,9 +1000,9 @@ describe('Routes: children.sleep', () => {
      */
     describe('GET /v1/children/:child_id/sleep/:sleep_id', () => {
         context('when get a specific sleep of a child of the database successfully', () => {
-            before(() => {
+            before(async () => {
                 try {
-                    deleteAllSleep()
+                    await deleteAllSleep()
                 } catch (err) {
                     throw new Error('Failure on children.sleep routes test: ' + err.message)
                 }
@@ -1050,9 +1050,9 @@ describe('Routes: children.sleep', () => {
         })
 
         context('when there is no that specific sleep associated with that child in the database', () => {
-            before(() => {
+            before(async () => {
                 try {
-                    deleteAllSleep()
+                    await deleteAllSleep()
                 } catch (err) {
                     throw new Error('Failure on children.sleep routes test: ' + err.message)
                 }
@@ -1073,9 +1073,9 @@ describe('Routes: children.sleep', () => {
         })
 
         context('when the child_id is invalid', () => {
-            before(() => {
+            before(async () => {
                 try {
-                    deleteAllSleep()
+                    await deleteAllSleep()
                 } catch (err) {
                     throw new Error('Failure on children.sleep routes test: ' + err.message)
                 }
@@ -1110,9 +1110,9 @@ describe('Routes: children.sleep', () => {
         })
 
         context('when the sleep id is invalid', () => {
-            before(() => {
+            before(async () => {
                 try {
-                    deleteAllSleep()
+                    await deleteAllSleep()
                 } catch (err) {
                     throw new Error('Failure on children.sleep routes test: ' + err.message)
                 }
@@ -1149,9 +1149,9 @@ describe('Routes: children.sleep', () => {
          * query-strings-parser library test
          */
         context('when get a specific sleep of a child using the "query-strings-parser" library', () => {
-            before(() => {
+            before(async () => {
                 try {
-                    deleteAllSleep()
+                    await deleteAllSleep()
                 } catch (err) {
                     throw new Error('Failure on children.sleep routes test: ' + err.message)
                 }
@@ -1200,9 +1200,9 @@ describe('Routes: children.sleep', () => {
 
         context('when there is an attempt to get a specific sleep using the "query-strings-parser" library but this sleep ' +
             'does not exist', () => {
-            before(() => {
+            before(async () => {
                 try {
-                    deleteAllSleep()
+                    await deleteAllSleep()
                 } catch (err) {
                     throw new Error('Failure on children.sleep routes test: ' + err.message)
                 }
@@ -1227,9 +1227,9 @@ describe('Routes: children.sleep', () => {
 
         context('when there is an attempt to get a specific sleep using the "query-strings-parser" library but the ' +
             'child_id is invalid', () => {
-            before(() => {
+            before(async () => {
                 try {
-                    deleteAllSleep()
+                    await deleteAllSleep()
                 } catch (err) {
                     throw new Error('Failure on children.sleep routes test: ' + err.message)
                 }
@@ -1268,9 +1268,9 @@ describe('Routes: children.sleep', () => {
 
         context('when there is an attempt to get a specific sleep using the "query-strings-parser" library but the ' +
             'sleep id is invalid', () => {
-            before(() => {
+            before(async () => {
                 try {
-                    deleteAllSleep()
+                    await deleteAllSleep()
                 } catch (err) {
                     throw new Error('Failure on children.sleep routes test: ' + err.message)
                 }
@@ -1312,9 +1312,9 @@ describe('Routes: children.sleep', () => {
      */
     describe('PATCH /v1/children/:child_id/sleep/:sleep_id', () => {
         context('when this sleep exists in the database and is updated successfully', () => {
-            before(() => {
+            before(async () => {
                 try {
-                    deleteAllSleep()
+                    await deleteAllSleep()
                 } catch (err) {
                     throw new Error('Failure on children.sleep routes test: ' + err.message)
                 }
@@ -1396,9 +1396,9 @@ describe('Routes: children.sleep', () => {
         })
 
         context('when sleep does not exist in the database', () => {
-            before(() => {
+            before(async () => {
                 try {
-                    deleteAllSleep()
+                    await deleteAllSleep()
                 } catch (err) {
                     throw new Error('Failure on children.sleep routes test: ' + err.message)
                 }
@@ -1429,9 +1429,9 @@ describe('Routes: children.sleep', () => {
         })
 
         context('when the child_id is invalid', () => {
-            before(() => {
+            before(async () => {
                 try {
-                    deleteAllSleep()
+                    await deleteAllSleep()
                 } catch (err) {
                     throw new Error('Failure on children.sleep routes test: ' + err.message)
                 }
@@ -1470,9 +1470,9 @@ describe('Routes: children.sleep', () => {
         })
 
         context('when the sleep id is invalid', () => {
-            before(() => {
+            before(async () => {
                 try {
-                    deleteAllSleep()
+                    await deleteAllSleep()
                 } catch (err) {
                     throw new Error('Failure on children.sleep routes test: ' + err.message)
                 }
@@ -1511,9 +1511,9 @@ describe('Routes: children.sleep', () => {
         })
 
         context('when a validation error occurs (the duration is negative)', () => {
-            before(() => {
+            before(async () => {
                 try {
-                    deleteAllSleep()
+                    await deleteAllSleep()
                 } catch (err) {
                     throw new Error('Failure on children.sleep routes test: ' + err.message)
                 }
@@ -1552,9 +1552,9 @@ describe('Routes: children.sleep', () => {
         })
 
         context('when a validation error occurs (the sleep type is invalid)', () => {
-            before(() => {
+            before(async () => {
                 try {
-                    deleteAllSleep()
+                    await deleteAllSleep()
                 } catch (err) {
                     throw new Error('Failure on children.sleep routes test: ' + err.message)
                 }
@@ -1593,9 +1593,9 @@ describe('Routes: children.sleep', () => {
         })
 
         context('when a validation error occurs (missing data_set of pattern)', () => {
-            before(() => {
+            before(async () => {
                 try {
-                    deleteAllSleep()
+                    await deleteAllSleep()
                 } catch (err) {
                     throw new Error('Failure on children.sleep routes test: ' + err.message)
                 }
@@ -1634,9 +1634,9 @@ describe('Routes: children.sleep', () => {
         })
 
         context('when a validation error occurs (the pattern has an empty data_set array)', () => {
-            before(() => {
+            before(async () => {
                 try {
-                    deleteAllSleep()
+                    await deleteAllSleep()
                 } catch (err) {
                     throw new Error('Failure on children.sleep routes test: ' + err.message)
                 }
@@ -1677,9 +1677,9 @@ describe('Routes: children.sleep', () => {
         })
 
         context('when a validation error occurs (missing fields of some item from the data_set array of pattern)', () => {
-            before(() => {
+            before(async () => {
                 try {
-                    deleteAllSleep()
+                    await deleteAllSleep()
                 } catch (err) {
                     throw new Error('Failure on children.sleep routes test: ' + err.message)
                 }
@@ -1723,9 +1723,9 @@ describe('Routes: children.sleep', () => {
         })
 
         context('when a validation error occurs (there is a negative duration on some item from the data_set array of pattern)', () => {
-            before(() => {
+            before(async () => {
                 try {
-                    deleteAllSleep()
+                    await deleteAllSleep()
                 } catch (err) {
                     throw new Error('Failure on children.sleep routes test: ' + err.message)
                 }
@@ -1773,9 +1773,9 @@ describe('Routes: children.sleep', () => {
         })
 
         context('when a validation error occurs (the sleep pattern data set array has an invalid item with an invalid name)', () => {
-            before(() => {
+            before(async () => {
                 try {
-                    deleteAllSleep()
+                    await deleteAllSleep()
                 } catch (err) {
                     throw new Error('Failure on children.sleep routes test: ' + err.message)
                 }
@@ -1823,9 +1823,9 @@ describe('Routes: children.sleep', () => {
 
         context('when a validation error occurs (the sleep pattern data set array has an invalid item with an invalid name' +
             ' and the sleep type is "stages")', () => {
-            before(() => {
+            before(async () => {
                 try {
-                    deleteAllSleep()
+                    await deleteAllSleep()
                 } catch (err) {
                     throw new Error('Failure on children.sleep routes test: ' + err.message)
                 }
@@ -1876,9 +1876,9 @@ describe('Routes: children.sleep', () => {
      */
     describe('DELETE /v1/children/:child_id/sleep/:sleep_id', () => {
         context('when the sleep was deleted successfully', () => {
-            before(() => {
+            before(async () => {
                 try {
-                    deleteAllSleep()
+                    await deleteAllSleep()
                 } catch (err) {
                     throw new Error('Failure on children.sleep routes test: ' + err.message)
                 }
@@ -1911,9 +1911,9 @@ describe('Routes: children.sleep', () => {
         })
 
         context('when the sleep is not found', () => {
-            before(() => {
+            before(async () => {
                 try {
-                    deleteAllSleep()
+                    await deleteAllSleep()
                 } catch (err) {
                     throw new Error('Failure on children.sleep routes test: ' + err.message)
                 }
@@ -1931,9 +1931,9 @@ describe('Routes: children.sleep', () => {
         })
 
         context('when the child_id is invalid', () => {
-            before(() => {
+            before(async () => {
                 try {
-                    deleteAllSleep()
+                    await deleteAllSleep()
                 } catch (err) {
                     throw new Error('Failure on children.sleep routes test: ' + err.message)
                 }
@@ -1968,9 +1968,9 @@ describe('Routes: children.sleep', () => {
         })
 
         context('when the sleep id is invalid', () => {
-            before(() => {
+            before(async () => {
                 try {
-                    deleteAllSleep()
+                    await deleteAllSleep()
                 } catch (err) {
                     throw new Error('Failure on children.sleep routes test: ' + err.message)
                 }
@@ -2026,8 +2026,6 @@ async function createSleepToBeUpdated(defaultSleep: Sleep): Promise<any> {
     return await Promise.resolve(result)
 }
 
-function deleteAllSleep(): void {
-    SleepRepoModel.deleteMany({}, err => {
-        if (err) console.log('err: ' + err)
-    })
+async function deleteAllSleep() {
+    return SleepRepoModel.deleteMany({})
 }

@@ -67,6 +67,7 @@ describe('Routes: environments', () => {
         try {
             await dbConnection.connect(process.env.MONGODB_URI_TEST || Default.MONGODB_URI_TEST)
             await rabbitmq.initialize(process.env.RABBITMQ_URI || Default.RABBITMQ_URI, { sslOptions: { ca: [] } })
+            await deleteAllEnvironments()
         } catch (err) {
             throw new Error('Failure on environments routes test: ' + err.message)
         }
@@ -74,7 +75,7 @@ describe('Routes: environments', () => {
     // Delete all environments from the database
     after(async () => {
         try {
-            deleteAllEnvironments()
+            await deleteAllEnvironments()
             await dbConnection.dispose()
             await rabbitmq.dispose()
         } catch (err) {
@@ -264,9 +265,9 @@ describe('Routes: environments', () => {
      */
     describe('POST /v1/environments with an environment array in the body', () => {
         context('when all the environments are correct and still do not exist in the repository', () => {
-            before(() => {
+            before(async () => {
                 try {
-                    deleteAllEnvironments()
+                    await deleteAllEnvironments()
                 } catch (err) {
                     throw new Error('Failure on environments routes test: ' + err.message)
                 }
@@ -367,9 +368,9 @@ describe('Routes: environments', () => {
         })
 
         context('when there is correct and incorrect environments in the body', () => {
-            before(() => {
+            before(async () => {
                 try {
-                    deleteAllEnvironments()
+                    await deleteAllEnvironments()
                 } catch (err) {
                     throw new Error('Failure on environments routes test: ' + err.message)
                 }
@@ -425,9 +426,9 @@ describe('Routes: environments', () => {
         })
 
         context('when all the environments of the body are incorrect', () => {
-            before(() => {
+            before(async () => {
                 try {
-                    deleteAllEnvironments()
+                    await deleteAllEnvironments()
                 } catch (err) {
                     throw new Error('Failure on environments routes test: ' + err.message)
                 }
@@ -578,9 +579,9 @@ describe('Routes: environments', () => {
         })
 
         context('when there are no environment in the database', () => {
-            before(() => {
+            before(async () => {
                 try {
-                    deleteAllEnvironments()
+                    await deleteAllEnvironments()
                 } catch (err) {
                     throw new Error('Failure on environments routes test: ' + err.message)
                 }
@@ -688,9 +689,9 @@ describe('Routes: environments', () => {
 
         context('when there is an attempt to get environment using the "query-strings-parser" library but there is no ' +
             'environment in the database', () => {
-            before(() => {
+            before(async () => {
                 try {
-                    deleteAllEnvironments()
+                    await deleteAllEnvironments()
                 } catch (err) {
                     throw new Error('Failure on environments routes test: ' + err.message)
                 }
@@ -757,9 +758,9 @@ describe('Routes: environments', () => {
         })
 
         context('when the environment is not found', () => {
-            before(() => {
+            before(async () => {
                 try {
-                    deleteAllEnvironments()
+                    await deleteAllEnvironments()
                 } catch (err) {
                     throw new Error('Failure on environments routes test: ' + err.message)
                 }
@@ -777,9 +778,9 @@ describe('Routes: environments', () => {
         })
 
         context('when the environment id is invalid', () => {
-            before(() => {
+            before(async () => {
                 try {
-                    deleteAllEnvironments()
+                    await deleteAllEnvironments()
                 } catch (err) {
                     throw new Error('Failure on environments routes test: ' + err.message)
                 }
@@ -807,8 +808,6 @@ async function createEnvironment(item): Promise<any> {
     return await Promise.resolve(EnvironmentRepoModel.create(resultModelEntity))
 }
 
-function deleteAllEnvironments(): void {
-    EnvironmentRepoModel.deleteMany({}, err => {
-        if (err) console.log('err: ' + err)
-    })
+async function deleteAllEnvironments() {
+    return EnvironmentRepoModel.deleteMany({})
 }

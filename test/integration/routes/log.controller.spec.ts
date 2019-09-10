@@ -60,8 +60,8 @@ describe('Routes: children.logs', () => {
     // Start services
     before(async () => {
         try {
-            deleteAllLogs()
             await dbConnection.connect(process.env.MONGODB_URI_TEST || Default.MONGODB_URI_TEST)
+            await deleteAllLogs()
         } catch (err) {
             throw new Error('Failure on children.logs routes test: ' + err.message)
         }
@@ -70,7 +70,7 @@ describe('Routes: children.logs', () => {
     // Delete all log objects from the database
     after(async () => {
         try {
-            deleteAllLogs()
+            await deleteAllLogs()
             await dbConnection.dispose()
         } catch (err) {
             throw new Error('Failure on children.logs routes test: ' + err.message)
@@ -81,9 +81,9 @@ describe('Routes: children.logs', () => {
      */
     describe('POST /v1/children/:child_id/logs/:resource', () => {
         context('when all the logs in the body are correct and it still does not exist in the repository', () => {
-            before(() => {
+            before(async () => {
                 try {
-                    deleteAllLogs()
+                    await deleteAllLogs()
                 } catch (err) {
                     throw new Error('Failure on children.logs routes test: ' + err.message)
                 }
@@ -742,9 +742,9 @@ describe('Routes: children.logs', () => {
 
         context('when there is an attempt to get all logs in a time interval using the "query-strings-parser" library but there ' +
             'is no corresponding logs with the query in the database', () => {
-            before(() => {
+            before(async () => {
                 try {
-                    deleteAllLogs()
+                    await deleteAllLogs()
                 } catch (err) {
                     throw new Error('Failure on children.logs routes test: ' + err.message)
                 }
@@ -768,9 +768,9 @@ describe('Routes: children.logs', () => {
 
         context('when there is an attempt to get all logs in a time interval using the "query-strings-parser" library ' +
             'but the parameters are incorrect (child_id is invalid)', () => {
-            before(() => {
+            before(async () => {
                 try {
-                    deleteAllLogs()
+                    await deleteAllLogs()
                 } catch (err) {
                     throw new Error('Failure on children.logs routes test: ' + err.message)
                 }
@@ -796,9 +796,9 @@ describe('Routes: children.logs', () => {
 
         context('when there is an attempt to get all logs in a time interval using the "query-strings-parser" library ' +
             'but the parameters are incorrect (resource is invalid)', () => {
-            before(() => {
+            before(async () => {
                 try {
-                    deleteAllLogs()
+                    await deleteAllLogs()
                 } catch (err) {
                     throw new Error('Failure on children.logs routes test: ' + err.message)
                 }
@@ -826,9 +826,9 @@ describe('Routes: children.logs', () => {
 
         context('when there is an attempt to get all logs in a time interval using the "query-strings-parser" library ' +
             'but the parameters are incorrect (date_start is invalid)', () => {
-            before(() => {
+            before(async () => {
                 try {
-                    deleteAllLogs()
+                    await deleteAllLogs()
                 } catch (err) {
                     throw new Error('Failure on children.logs routes test: ' + err.message)
                 }
@@ -854,9 +854,9 @@ describe('Routes: children.logs', () => {
 
         context('when there is an attempt to get all logs in a time interval using the "query-strings-parser" library ' +
             'but the parameters are incorrect (date_end is invalid)', () => {
-            before(() => {
+            before(async () => {
                 try {
-                    deleteAllLogs()
+                    await deleteAllLogs()
                 } catch (err) {
                     throw new Error('Failure on children.logs routes test: ' + err.message)
                 }
@@ -882,9 +882,9 @@ describe('Routes: children.logs', () => {
 
         context('when there is an attempt to get all logs in a time interval using the "query-strings-parser" library ' +
             'but the parameters are invalid (date range is invalid)', () => {
-            before(() => {
+            before(async () => {
                 try {
-                    deleteAllLogs()
+                    await deleteAllLogs()
                 } catch (err) {
                     throw new Error('Failure on children.logs routes test: ' + err.message)
                 }
@@ -911,8 +911,6 @@ describe('Routes: children.logs', () => {
     })
 })
 
-function deleteAllLogs(): void {
-    LogRepoModel.deleteMany({}, err => {
-        if (err) console.log(err)
-    })
+async function deleteAllLogs() {
+    return LogRepoModel.deleteMany({})
 }
