@@ -1390,7 +1390,7 @@ describe('Routes: children.sleep', () => {
                     .expect(409)
                     .then(err => {
                         expect(err.body.code).to.eql(409)
-                        expect(err.body.message).to.eql(Strings.SLEEP.ALREADY_REGISTERED)
+                        expect(err.body.message).to.eql('A registration with the same unique data already exists!')
                     })
             })
         })

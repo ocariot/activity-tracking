@@ -199,10 +199,6 @@ export class SleepService implements ISleepService {
             // 1. Validate the object.
             UpdateSleepValidator.validate(sleep)
 
-            // 2. Checks if sleep already exists.
-            const sleepExist = await this._sleepRepository.checkExist(sleep)
-            if (sleepExist) throw new ConflictException(Strings.SLEEP.ALREADY_REGISTERED)
-
             // 3. Update the sleep and save it in a variable.
             const sleepUpdated: Sleep = await this._sleepRepository.updateByChild(sleep)
 

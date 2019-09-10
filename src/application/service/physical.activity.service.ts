@@ -198,10 +198,6 @@ export class PhysicalActivityService implements IPhysicalActivityService {
             // 1. Validate the object.
             UpdatePhysicalActivityValidator.validate(activity)
 
-            // 2. Checks if physical activity already exists.
-            const activityExist = await this._activityRepository.checkExist(activity)
-            if (activityExist) throw new ConflictException(Strings.PHYSICAL_ACTIVITY.ALREADY_REGISTERED)
-
             // 3. Update the activity and save it in a variable.
             const activityUpdated: PhysicalActivity = await this._activityRepository.updateByChild(activity)
 
