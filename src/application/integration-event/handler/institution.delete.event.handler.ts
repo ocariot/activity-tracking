@@ -27,7 +27,8 @@ export const institutionDeleteEventHandler = async (event: any) => {
         // 2. Try to delete all the environments associated with this institution.
         environmentRepository.removeAllEnvironmentsFromInstitution(institutionId)
             .then(() => {
-                logger.info('All environments associated with this institution have been successfully removed from the database.')
+                logger.info(`All environments associated with the institution with ID: ${institutionId} have been`
+                    .concat(` successfully removed from the database.`))
                 // 3. If got here, it's because the action was successful.
                 logger.info(`Action for event ${event.event_name} successfully held!`)})
             .catch((err) => {

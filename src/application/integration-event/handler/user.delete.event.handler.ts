@@ -36,7 +36,8 @@ export const userDeleteEventHandler = async (event: any) => {
         // 2a. Try to delete all activities associated with this user.
         activityRepository.removeAllActivitiesFromChild(childId)
             .then(() => {
-                logger.info('All activities associated with this user have been successfully removed from the database.')
+                logger.info(`All activities associated with the user with ID: ${childId} have been successfully`
+                    .concat(` removed from the database.`))
             })
             .catch((err) => {
                 logger.error(`Error trying to remove all activities from child. ${err.message}`)
@@ -45,7 +46,8 @@ export const userDeleteEventHandler = async (event: any) => {
         // 2b. Try to delete all sleep objects associated with this user.
         sleepRepository.removeAllSleepFromChild(childId)
             .then(() => {
-                logger.info('All sleep objects associated with this user have been successfully removed from the database.')
+                logger.info(`All sleep objects associated with the user with ID: ${childId} have been successfully`
+                    .concat(` removed from the database.`))
             })
             .catch((err) => {
                 logger.error(`Error trying to remove all sleep objects from child. ${err.message}`)
@@ -54,7 +56,8 @@ export const userDeleteEventHandler = async (event: any) => {
         // 2c. Try to delete all bodyfat objects associated with this user.
         bodyFatRepository.removeAllBodyFatFromChild(childId)
             .then(() => {
-                logger.info('All body fat objects associated with this user have been successfully removed from the database.')
+                logger.info(`All body fat objects associated with the user with ID: ${childId} have been successfully`
+                    .concat(` removed from the database.`))
             })
             .catch((err) => {
                 logger.error(`Error trying to remove all body fats from child. ${err.message}`)
@@ -63,7 +66,8 @@ export const userDeleteEventHandler = async (event: any) => {
         // 2d. Try to delete all weight objects associated with this user.
         weightRepository.removeAllWeightFromChild(childId)
             .then(() => {
-                logger.info('All weight objects associated with this user have been successfully removed from the database.')
+                logger.info(`All weight objects associated with the user with ID: ${childId} have been successfully`
+                    .concat(` removed from the database.`))
             })
             .catch((err) => {
                 logger.error(`Error trying to remove all weights from child. ${err.message}`)
@@ -72,7 +76,8 @@ export const userDeleteEventHandler = async (event: any) => {
         // 2e. Try to delete all logs associated with this user.
         logRepository.removeAllLogsFromChild(childId)
             .then(() => {
-                logger.info('All logs associated with this user have been successfully removed from the database.')
+                logger.info(`All logs associated with the user with ID: ${childId} have been successfully`
+                    .concat(` removed from the database.`))
             })
             .catch((err) => {
                 logger.error(`Error trying to remove all logs from child. ${err.message}`)
