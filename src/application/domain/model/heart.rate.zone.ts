@@ -1,6 +1,13 @@
 import { JsonUtils } from '../utils/json.utils'
+import { IJSONSerializable } from '../utils/json.serializable.interface'
+import { IJSONDeserializable } from '../utils/json.deserializable.interface'
 
-export class HeartRateZone {
+/**
+ * Implementation of Heart Rate zones model.
+ *
+ * @implements {IJSONSerializable, IJSONDeserializable<HeartRateZone>}
+ */
+export class HeartRateZone implements IJSONSerializable, IJSONDeserializable<HeartRateZone> {
     private _min?: number // Minimum value of the heart rate zone.
     private _max?: number // Maximum value of the heart rate zone.
     private _duration?: number  // Duration in the heart rate zone (given in milliseconds).

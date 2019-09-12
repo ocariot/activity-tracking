@@ -7,7 +7,7 @@ import { DatetimeValidator } from '../validator/datetime.validator'
 /**
  * Implementation of the measurement entity.
  *
- * @implements { IJSONSerializable, IJSONDeserializable<Measurement>
+ * @implements {IJSONSerializable, IJSONDeserializable<Measurement>}
  */
 export class Measurement extends Entity implements IJSONSerializable, IJSONDeserializable<Measurement> {
     private _type?: string // Type of measurement.

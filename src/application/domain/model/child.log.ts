@@ -4,7 +4,7 @@ import { Log } from './log'
 /**
  * Entity implementation of the child logs.
  *
- * @implements {IJSONSerializable, IJSONDeserializable<Log>}
+ * @implements {IJSONSerializable}
  */
 export class ChildLog implements IJSONSerializable {
     private _steps!: Array<Log> // Logs of steps of a child

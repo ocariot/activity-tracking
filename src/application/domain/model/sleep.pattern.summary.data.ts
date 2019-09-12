@@ -3,7 +3,7 @@ import { IJSONSerializable } from '../utils/json.serializable.interface'
 /**
  * The implementation of the entity summary data of sleep pattern.
  *
- * @implements {IJSONSerializable, IJSONDeserializable<SleepPatternSummaryData>}
+ * @implements {IJSONSerializable}
  */
 export class SleepPatternSummaryData implements IJSONSerializable {
     private _count!: number

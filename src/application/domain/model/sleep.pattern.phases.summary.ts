@@ -2,9 +2,9 @@ import { SleepPatternSummaryData } from './sleep.pattern.summary.data'
 import { IJSONSerializable } from '../utils/json.serializable.interface'
 
 /**
- * The implementation of the summary entity of sleep pattern.
+ * The implementation of the summary entity of sleep pattern from 'classic' type.
  *
- * @implements {IJSONSerializable, IJSONDeserializable<SleepPatternPhasesSummary>}
+ * @implements {IJSONSerializable}
  */
 export class SleepPatternPhasesSummary implements IJSONSerializable {
     private _awake!: SleepPatternSummaryData
