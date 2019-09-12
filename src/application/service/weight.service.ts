@@ -204,7 +204,7 @@ export class WeightService implements IWeightService {
     public getAllByChild(childId: string, query: IQuery): Promise<Array<Weight>> {
         ObjectIdValidator.validate(childId, Strings.CHILD.PARAM_ID_NOT_VALID_FORMAT)
 
-        query.addFilter({ child_id: childId, type: MeasurementType.WEIGHT })
+        query.addFilter({ child_id: childId })
         return this._weightRepository.find(query)
     }
 

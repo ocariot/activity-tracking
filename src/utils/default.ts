@@ -20,7 +20,7 @@ export abstract class Default {
     public static readonly MONGODB_URI_TEST: string = 'mongodb://127.0.0.1:27017/ocariot-activity-tracking-test'
 
     // RabbitMQ
-    public static readonly RABBITMQ_URI: string = 'amqp://guest:guest@127.0.0.1:5672/ocariot'
+    public static readonly RABBITMQ_URI: string = 'amqp://guest:guest@127.0.0.1:5672'
 
     // Log
     public static readonly LOG_DIR: string = 'logs'

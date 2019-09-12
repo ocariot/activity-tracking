@@ -3,7 +3,7 @@ import { IJSONSerializable } from '../utils/json.serializable.interface'
 /**
  * Implementation of a class to represent the 'error' item of a MultiStatus
  *
- * @implements {IJSONSerializable, IJSONDeserializable}
+ * @implements {IJSONSerializable}
  * @template T
  */
 export class StatusError<T> implements IJSONSerializable {

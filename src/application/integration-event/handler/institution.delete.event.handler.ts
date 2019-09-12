@@ -25,10 +25,15 @@ export const institutionDeleteEventHandler = async (event: any) => {
         ObjectIdValidator.validate(institutionId)
 
         // 2. Try to delete all the environments associated with this institution.
-        await environmentRepository.removeAllEnvironmentsFromInstitution(institutionId)
-
-        // 3. If got here, it's because the action was successful.
-        logger.info(`Action for event ${event.event_name} successfully held!`)
+        environmentRepository.removeAllEnvironmentsFromInstitution(institutionId)
+            .then(() => {
+                logger.info(`All environments associated with the institution with ID: ${institutionId} have been`
+                    .concat(` successfully removed from the database.`))
+                // 3. If got here, it's because the action was successful.
+                logger.info(`Action for event ${event.event_name} successfully held!`)})
+            .catch((err) => {
+                logger.error(`Error trying to remove all environments from institution. ${err.message}`)
+            })
     } catch (err) {
         logger.warn(`An error occurred while attempting `
             .concat(`perform the operation with the ${event.event_name} name event. ${err.message}`)

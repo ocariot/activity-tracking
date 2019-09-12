@@ -3,7 +3,7 @@ import { IJSONSerializable } from '../utils/json.serializable.interface'
 /**
  * Implementation of a class to represent the 'success' item of a MultiStatus
  *
- * @implements {IJSONSerializable, IJSONDeserializable}
+ * @implements {IJSONSerializable}
  * @template T
  */
 export class StatusSuccess<T> implements IJSONSerializable {

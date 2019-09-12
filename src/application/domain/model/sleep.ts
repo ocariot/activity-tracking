@@ -8,7 +8,7 @@ import { SleepPattern } from './sleep.pattern'
  * Implementation of the sleep entity.
  *
  * @extends {Activity}
- * @implements { IJSONSerializable, IJSONDeserializable<Sleep>
+ * @implements {IJSONSerializable, IJSONDeserializable<Sleep>}
  */
 export class Sleep extends Activity implements IJSONSerializable, IJSONDeserializable<Sleep> {
     private _pattern?: SleepPattern // Sleep Pattern tracking.

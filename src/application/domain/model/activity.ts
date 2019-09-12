@@ -76,12 +76,12 @@ export class Activity extends Entity implements IJSONSerializable, IJSONDeserial
         if (json.id !== undefined) super.id = json.id
         if (json.start_time !== undefined && !(json.start_time instanceof Date)) {
             this.start_time = this.convertDatetimeString(json.start_time)
-        } else {
+        } else if (json.start_time !== undefined && json.start_time instanceof Date) {
             this.start_time = json.start_time
         }
         if (json.end_time !== undefined && !(json.end_time instanceof Date)) {
             this.end_time = this.convertDatetimeString(json.end_time)
-        } else {
+        } else if (json.end_time !== undefined && json.end_time instanceof Date) {
             this.end_time = json.end_time
         }
         if (json.duration !== undefined) this.duration = json.duration
