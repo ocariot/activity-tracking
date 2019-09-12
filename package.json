@@ -24,6 +24,8 @@
     "tracking",
     "activity",
     "sleep",
+    "weight",
+    "body-fat",
     "environment"
   ],
   "author": "NUTES/UEPB",
@@ -61,17 +63,17 @@
     "inversify": "^5.0.1",
     "inversify-express-utils": "^6.3.2",
     "ip-allowed": "^1.1.1",
-    "mongoose": "^5.6.13",
+    "mongoose": "^5.7.0",
     "morgan": "^1.9.1",
     "query-strings-parser": "^2.1.2",
     "reflect-metadata": "^0.1.13",
     "swagger-ui-express": "^4.0.7",
     "winston": "^3.2.1",
-    "winston-daily-rotate-file": "^4.0.0"
+    "winston-daily-rotate-file": "^4.1.0"
   },
   "devDependencies": {
     "@types/body-parser": "^1.17.1",
-    "@types/chai": "^4.2.1",
+    "@types/chai": "^4.2.2",
     "@types/express": "^4.17.1",
     "@types/helmet": "^0.0.44",
     "@types/mocha": "^5.2.7",
@@ -89,8 +91,8 @@
     "sinon-mongoose": "^2.3.0",
     "supertest": "^4.0.2",
     "ts-node": "^8.3.0",
-    "tslint": "^5.19.0",
+    "tslint": "^5.20.0",
     "typedoc": "^0.15.0",
-    "typescript": "^3.6.2"
+    "typescript": "^3.6.3"
   }
 }
