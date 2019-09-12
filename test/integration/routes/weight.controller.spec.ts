@@ -65,8 +65,55 @@ describe('Routes: children.weights', () => {
     /**
      * POST route with only one Weight in the body
      */
+    describe('NO CONNECTION TO RABBITMQ -> POST /v1/children/:child_id/weights with only one Weight in the body', () => {
+        context('when posting a new Weight with success', () => {
+            before(async () => {
+                try {
+                    await rabbitmq.dispose()
+
+                    await rabbitmq.initialize('amqp://invalidUser:guest@localhost', { retries: 1, interval: 100 })
+                } catch (err) {
+                    throw new Error('Failure on children.weights routes test: ' + err.message)
+                }
+            })
+            it('should return status code 201 and the saved Weight (and show an error log about unable to send ' +
+                'SaveWeight event)', () => {
+                const body = {
+                    timestamp: defaultWeight.timestamp,
+                    value: defaultWeight.value,
+                    unit: defaultWeight.unit,
+                    body_fat: defaultWeight.value
+                }
+
+                return request
+                    .post(`/v1/children/${defaultWeight.child_id}/weights`)
+                    .send(body)
+                    .set('Content-Type', 'application/json')
+                    .expect(201)
+                    .then(res => {
+                        defaultWeight.id = res.body.id
+                        expect(res.body.id).to.eql(defaultWeight.id)
+                        expect(res.body.timestamp).to.eql(defaultWeight.timestamp!.toISOString())
+                        expect(res.body.value).to.eql(defaultWeight.value)
+                        expect(res.body.unit).to.eql(defaultWeight.unit)
+                        expect(res.body.child_id).to.eql(defaultWeight.child_id)
+                        expect(res.body.body_fat).to.eql(defaultWeight.value)
+                    })
+            })
+        })
+    })
+
     describe('POST /v1/children/:child_id/weights with only one Weight in the body', () => {
         context('when posting a new Weight with success', () => {
+            before(async () => {
+                try {
+                    await deleteAllWeight()
+
+                    await rabbitmq.initialize(process.env.RABBITMQ_URI || Default.RABBITMQ_URI, { sslOptions: { ca: [] } })
+                } catch (err) {
+                    throw new Error('Failure on children.weights routes test: ' + err.message)
+                }
+            })
             it('should return status code 201 and the saved Weight', () => {
                 const body = {
                     timestamp: defaultWeight.timestamp,
@@ -894,20 +941,14 @@ describe('Routes: children.weights', () => {
     /**
      * DELETE route
      */
-    describe('DELETE /v1/children/:child_id/weights/:weight_id', () => {
+    describe('NO CONNECTION TO RABBITMQ -> DELETE /v1/children/:child_id/weights/:weight_id', () => {
         context('when the Weight was deleted successfully', () => {
+            let result
+
             before(async () => {
                 try {
                     await deleteAllWeight()
-                } catch (err) {
-                    throw new Error('Failure on children.weights routes test: ' + err.message)
-                }
-            })
 
-            it('should return status code 204 and no content for Weight', async () => {
-                let result
-
-                try {
                     const bodyFat = await createBodyFat({
                         timestamp: defaultWeight.timestamp,
                         value: defaultWeight.value,
@@ -922,10 +963,57 @@ describe('Routes: children.weights', () => {
                         child_id: defaultWeight.child_id,
                         body_fat: bodyFat
                     })
+
+                    await rabbitmq.dispose()
+
+                    await rabbitmq.initialize('amqp://invalidUser:guest@localhost', { retries: 1, interval: 100 })
                 } catch (err) {
                     throw new Error('Failure on children.weights routes test: ' + err.message)
                 }
+            })
+            it('should return status code 204 and no content for Weight (and show an error log about unable to send ' +
+                'DeleteWeight event)', () => {
+                return request
+                    .delete(`/v1/children/${result.child_id}/weights/${result.id}`)
+                    .set('Content-Type', 'application/json')
+                    .expect(204)
+                    .then(res => {
+                        expect(res.body).to.eql({})
+                    })
+            })
+        })
+    })
 
+    describe('DELETE /v1/children/:child_id/weights/:weight_id', () => {
+        context('when the Weight was deleted successfully', () => {
+            let result
+
+            before(async () => {
+                try {
+                    await deleteAllWeight()
+
+                    const bodyFat = await createBodyFat({
+                        timestamp: defaultWeight.timestamp,
+                        value: defaultWeight.value,
+                        unit: defaultWeight.unit,
+                        child_id: defaultWeight.child_id
+                    })
+
+                    result = await createWeight({
+                        timestamp: defaultWeight.timestamp,
+                        value: defaultWeight.value,
+                        unit: defaultWeight.unit,
+                        child_id: defaultWeight.child_id,
+                        body_fat: bodyFat
+                    })
+
+                    await rabbitmq.initialize(process.env.RABBITMQ_URI || Default.RABBITMQ_URI, { sslOptions: { ca: [] } })
+                } catch (err) {
+                    throw new Error('Failure on children.weights routes test: ' + err.message)
+                }
+            })
+
+            it('should return status code 204 and no content for Weight', async () => {
                 return request
                     .delete(`/v1/children/${result.child_id}/weights/${result.id}`)
                     .set('Content-Type', 'application/json')

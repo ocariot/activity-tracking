@@ -85,8 +85,67 @@ describe('Routes: environments', () => {
     /**
      * POST route with only one Environment in the body
      */
+    describe('NO CONNECTION TO RABBITMQ -> POST /v1/environments with only one Environment in the body', () => {
+        context('when posting a new Environment with success', () => {
+            before(async () => {
+                try {
+                    await rabbitmq.dispose()
+
+                    await rabbitmq.initialize('amqp://invalidUser:guest@localhost', { retries: 1, interval: 100 })
+                } catch (err) {
+                    throw new Error('Failure on environments routes test: ' + err.message)
+                }
+            })
+            it('should return status code 201 and the saved Environment (and show an error log about unable to send ' +
+                'SaveEnvironment event)', () => {
+                const body = {
+                    institution_id: defaultEnvironment.institution_id,
+                    location: defaultEnvironment.location,
+                    measurements: defaultEnvironment.measurements,
+                    climatized: defaultEnvironment.climatized,
+                    timestamp: defaultEnvironment.timestamp
+                }
+
+                return request
+                    .post('/v1/environments')
+                    .send(body)
+                    .set('Content-Type', 'application/json')
+                    .expect(201)
+                    .then(res => {
+                        defaultEnvironment.id = res.body.id
+                        expect(res.body.id).to.eql(defaultEnvironment.id)
+                        expect(res.body.institution_id).to.eql(defaultEnvironment.institution_id)
+                        expect(res.body.location.local).to.eql(defaultEnvironment.location!.local)
+                        expect(res.body.location.room).to.eql(defaultEnvironment.location!.room)
+                        expect(res.body.location.latitude).to.eql(defaultEnvironment.location!.latitude)
+                        expect(res.body.location.longitude).to.eql(defaultEnvironment.location!.longitude)
+                        expect(res.body.measurements[0].type).to.eql(defaultEnvironment.measurements![0].type)
+                        expect(res.body.measurements[0].value).to.eql(defaultEnvironment.measurements![0].value)
+                        expect(res.body.measurements[0].unit).to.eql(defaultEnvironment.measurements![0].unit)
+                        expect(res.body.measurements[1].type).to.eql(defaultEnvironment.measurements![1].type)
+                        expect(res.body.measurements[1].value).to.eql(defaultEnvironment.measurements![1].value)
+                        expect(res.body.measurements[1].unit).to.eql(defaultEnvironment.measurements![1].unit)
+                        expect(res.body.measurements[2].type).to.eql(defaultEnvironment.measurements![2].type)
+                        expect(res.body.measurements[2].value).to.eql(defaultEnvironment.measurements![2].value)
+                        expect(res.body.measurements[2].unit).to.eql(defaultEnvironment.measurements![2].unit)
+                        expect(res.body.climatized).to.eql(defaultEnvironment.climatized)
+                        expect(res.body.timestamp).to.eql(defaultEnvironment.timestamp.toISOString())
+                    })
+            })
+        })
+    })
+
     describe('POST /v1/environments with only one Environment in the body', () => {
         context('when posting a new Environment with success', () => {
+            before(async () => {
+                try {
+                    await deleteAllEnvironments()
+
+                    await rabbitmq.initialize(process.env.RABBITMQ_URI || Default.RABBITMQ_URI, { sslOptions: { ca: [] } })
+                } catch (err) {
+                    throw new Error('Failure on children.weights routes test: ' + err.message)
+                }
+            })
             it('should return status code 201 and the saved Environment', () => {
                 const body = {
                     institution_id: defaultEnvironment.institution_id,
@@ -714,12 +773,64 @@ describe('Routes: environments', () => {
     /**
      * DELETE route
      */
+    describe('NO CONNECTION TO RABBITMQ -> DELETE /v1/environments/:environment_id', () => {
+        context('when the environment was deleted successfully', () => {
+            let result
+
+            before(async () => {
+                try {
+                    result = await createEnvironment({
+                        institution_id: defaultEnvironment.institution_id,
+                        location: {
+                            local: (defaultEnvironment.location) ? defaultEnvironment.location.local : '',
+                            room: (defaultEnvironment.location) ? defaultEnvironment.location.room : '',
+                            latitude: (defaultEnvironment.location) ? defaultEnvironment.location.latitude : '',
+                            longitude: (defaultEnvironment.location) ? defaultEnvironment.location.longitude : ''
+                        },
+                        measurements: [
+                            {
+                                type: MeasurementType.HUMIDITY,
+                                value: 34,
+                                unit: '%'
+                            },
+                            {
+                                type: MeasurementType.TEMPERATURE,
+                                value: 40,
+                                unit: '°C'
+                            }
+                        ],
+                        climatized: true,
+                        timestamp: defaultEnvironment.timestamp
+                    })
+
+                    await rabbitmq.dispose()
+
+                    await rabbitmq.initialize('amqp://invalidUser:guest@localhost', { retries: 1, interval: 100 })
+                } catch (err) {
+                    throw new Error('Failure on environments routes test: ' + err.message)
+                }
+            })
+            it('should return status code 204 and no content for environment (and show an error log about unable to send ' +
+                'DeleteEnvironment event)', () => {
+                return request
+                    .delete(`/v1/environments/${result.id}`)
+                    .set('Content-Type', 'application/json')
+                    .expect(204)
+                    .then(res => {
+                        expect(res.body).to.eql({})
+                    })
+            })
+        })
+    })
+
     describe('DELETE /v1/environments/:environment_id', () => {
         context('when the environment was deleted successfully', () => {
             it('should return status code 204 and no content for environment', async () => {
                 let result
 
                 try {
+                    await deleteAllEnvironments()
+
                     result = await createEnvironment({
                         institution_id: defaultEnvironment.institution_id,
                         location: {

@@ -167,8 +167,69 @@ describe('Routes: children.physicalactivities', () => {
     /**
      * POST route to PhysicalActivity with only one item of this type in the body
      */
+    describe('NO CONNECTION TO RABBITMQ -> POST /v1/children/:child_id/physicalactivities with only one PhysicalActivity ' +
+        'in the body', () => {
+        context('when posting a new PhysicalActivity with success', () => {
+            before(async () => {
+                try {
+                    await rabbitmq.dispose()
+
+                    await rabbitmq.initialize('amqp://invalidUser:guest@localhost', { retries: 1, interval: 100 })
+                } catch (err) {
+                    throw new Error('Failure on children.physicalactivities routes test: ' + err.message)
+                }
+            })
+            it('should return status code 201 and the saved PhysicalActivity (and show an error log about unable to send ' +
+                'SavePhysicalActivity event)', () => {
+                const body = {
+                    name: defaultActivity.name,
+                    start_time: defaultActivity.start_time,
+                    end_time: defaultActivity.end_time,
+                    duration: defaultActivity.duration,
+                    calories: defaultActivity.calories,
+                    steps: defaultActivity.steps ? defaultActivity.steps : undefined,
+                    levels: defaultActivity.levels ? defaultActivity.levels : undefined,
+                    heart_rate: defaultActivity.heart_rate ? defaultActivity.heart_rate : undefined
+                }
+
+                return request
+                    .post(`/v1/children/${defaultActivity.child_id}/physicalactivities`)
+                    .send(body)
+                    .set('Content-Type', 'application/json')
+                    .expect(201)
+                    .then(res => {
+                        defaultActivity.id = res.body.id
+                        expect(res.body.id).to.eql(defaultActivity.id)
+                        expect(res.body.name).to.eql(defaultActivity.name)
+                        expect(res.body.start_time).to.eql(defaultActivity.start_time!.toISOString())
+                        expect(res.body.end_time).to.eql(defaultActivity.end_time!.toISOString())
+                        expect(res.body.duration).to.eql(defaultActivity.duration)
+                        expect(res.body.calories).to.eql(defaultActivity.calories)
+                        if (res.body.steps) {
+                            expect(res.body.steps).to.eql(defaultActivity.steps)
+                        }
+                        if (defaultActivity.levels) {
+                            expect(res.body.levels)
+                                .to.eql(defaultActivity.levels.map((elem: PhysicalActivityLevel) => elem.toJSON()))
+                        }
+                        expect(res.body.heart_rate).to.eql(defaultActivity.heart_rate!.toJSON())
+                        expect(res.body.child_id).to.eql(defaultActivity.child_id)
+                    })
+            })
+        })
+    })
+
     describe('POST /v1/children/:child_id/physicalactivities with only one PhysicalActivity in the body', () => {
         context('when posting a new PhysicalActivity with success', () => {
+            before(async () => {
+                try {
+                    await deleteAllActivity()
+
+                    await rabbitmq.initialize(process.env.RABBITMQ_URI || Default.RABBITMQ_URI, { sslOptions: { ca: [] } })
+                } catch (err) {
+                    throw new Error('Failure on children.physicalactivities routes test: ' + err.message)
+                }
+            })
             it('should return status code 201 and the saved PhysicalActivity', () => {
                 const body = {
                     name: defaultActivity.name,
@@ -1586,26 +1647,85 @@ describe('Routes: children.physicalactivities', () => {
     /**
      * PATCH route for PhysicalActivity
      */
-    describe('PATCH /v1/children/:child_id/physicalactivities/:physicalactivity_id', () => {
+    describe('NO CONNECTION TO RABBITMQ -> PATCH /v1/children/:child_id/physicalactivities/:physicalactivity_id', () => {
         context('when this physical activity is updated successfully', () => {
+            let result
+
             before(async () => {
                 try {
                     await deleteAllActivity()
+
+                    // physical activity to be updated
+                    result = await createActivityToBeUpdated(defaultActivity)
+
+                    await rabbitmq.dispose()
+
+                    await rabbitmq.initialize('amqp://invalidUser:guest@localhost', { retries: 1, interval: 100 })
+                } catch (err) {
+                    throw new Error('Failure on children.physicalactivities routes test: ' + err.message)
+                }
+            })
+            it('should return status code 200 and the updated physical activity (and show an error log about unable to send ' +
+                'UpdatePhysicalActivity event)', () => {
+                // physical activity to update
+                const body = {
+                    name: defaultActivity.name,
+                    start_time: defaultActivity.start_time,
+                    end_time: defaultActivity.end_time,
+                    duration: defaultActivity.duration,
+                    calories: defaultActivity.calories,
+                    steps: defaultActivity.steps ? defaultActivity.steps : undefined,
+                    levels: defaultActivity.levels ? defaultActivity.levels : undefined,
+                    heart_rate: defaultActivity.heart_rate ? defaultActivity.heart_rate : undefined,
+                    child_id: defaultActivity.child_id
+                }
+
+                return request
+                    .patch(`/v1/children/${result.child_id}/physicalactivities/${result.id}`)
+                    .send(body)
+                    .set('Content-Type', 'application/json')
+                    .expect(200)
+                    .then(res => {
+                        defaultActivity.id = res.body.id
+                        expect(res.body.id).to.eql(defaultActivity.id)
+                        expect(res.body.start_time).to.eql(defaultActivity.start_time!.toISOString())
+                        expect(res.body.end_time).to.eql(defaultActivity.end_time!.toISOString())
+                        expect(res.body.duration).to.eql(defaultActivity.duration)
+                        expect(res.body.calories).to.eql(defaultActivity.calories)
+                        if (defaultActivity.steps) {
+                            expect(res.body.steps).to.eql(defaultActivity.steps)
+                        }
+                        if (defaultActivity.levels) {
+                            expect(res.body.levels)
+                                .to.eql(defaultActivity.levels.map((elem: PhysicalActivityLevel) => elem.toJSON()))
+                        }
+                        if (defaultActivity.heart_rate) {
+                            expect(res.body.heart_rate).to.eql(defaultActivity.heart_rate.toJSON())
+                        }
+                        expect(res.body.child_id).to.eql(defaultActivity.child_id)
+                    })
+            })
+        })
+    })
+
+    describe('PATCH /v1/children/:child_id/physicalactivities/:physicalactivity_id', () => {
+        context('when this physical activity is updated successfully', () => {
+            let result
+
+            before(async () => {
+                try {
+                    await deleteAllActivity()
+
+                    // physical activity to be updated
+                    result = await createActivityToBeUpdated(defaultActivity)
+
+                    await rabbitmq.initialize(process.env.RABBITMQ_URI || Default.RABBITMQ_URI, { sslOptions: { ca: [] } })
                 } catch (err) {
                     throw new Error('Failure on children.physicalactivities routes test: ' + err.message)
                 }
             })
 
             it('should return status code 200 and the updated physical activity', async () => {
-                let result
-
-                try {
-                    // physical activity to be updated
-                    result = await createActivityToBeUpdated(defaultActivity)
-                } catch (err) {
-                    throw new Error('Failure on children.physicalactivities routes test: ' + err.message)
-                }
-
                 // physical activity to update
                 const body = {
                     name: defaultActivity.name,
@@ -2291,20 +2411,14 @@ describe('Routes: children.physicalactivities', () => {
     /**
      * DELETE route for PhysicalActivity
      */
-    describe('DELETE /v1/children/:child_id/physicalactivities/:physicalactivity_id', () => {
+    describe('NO CONNECTION TO RABBITMQ -> DELETE /v1/children/:child_id/physicalactivities/:physicalactivity_id', () => {
         context('when the physical activity was deleted successfully', () => {
+            let result
+
             before(async () => {
                 try {
                     await deleteAllActivity()
-                } catch (err) {
-                    throw new Error('Failure on children.physicalactivities routes test: ' + err.message)
-                }
-            })
 
-            it('should return status code 204 and no content for physical activity', async () => {
-                let result
-
-                try {
                     result = await createActivity({
                         name: defaultActivity.name,
                         start_time: defaultActivity.start_time,
@@ -2316,10 +2430,54 @@ describe('Routes: children.physicalactivities', () => {
                         heart_rate: defaultActivity.heart_rate ? defaultActivity.heart_rate : undefined,
                         child_id: defaultActivity.child_id
                     })
+
+                    await rabbitmq.dispose()
+
+                    await rabbitmq.initialize('amqp://invalidUser:guest@localhost', { retries: 1, interval: 100 })
                 } catch (err) {
                     throw new Error('Failure on children.physicalactivities routes test: ' + err.message)
                 }
+            })
+            it('should return status code 204 and no content for physical activity (and show an error log about unable to send ' +
+                'DeletePhysicalActivity event)', () => {
+                return request
+                    .delete(`/v1/children/${result.child_id}/physicalactivities/${result.id}`)
+                    .set('Content-Type', 'application/json')
+                    .expect(204)
+                    .then(res => {
+                        expect(res.body).to.eql({})
+                    })
+            })
+        })
+    })
 
+    describe('DELETE /v1/children/:child_id/physicalactivities/:physicalactivity_id', () => {
+        context('when the physical activity was deleted successfully', () => {
+            let result
+
+            before(async () => {
+                try {
+                    await deleteAllActivity()
+
+                    result = await createActivity({
+                        name: defaultActivity.name,
+                        start_time: defaultActivity.start_time,
+                        end_time: defaultActivity.end_time,
+                        duration: defaultActivity.duration,
+                        calories: defaultActivity.calories,
+                        steps: defaultActivity.steps ? defaultActivity.steps : undefined,
+                        levels: defaultActivity.levels ? defaultActivity.levels : undefined,
+                        heart_rate: defaultActivity.heart_rate ? defaultActivity.heart_rate : undefined,
+                        child_id: defaultActivity.child_id
+                    })
+
+                    await rabbitmq.initialize(process.env.RABBITMQ_URI || Default.RABBITMQ_URI, { sslOptions: { ca: [] } })
+                } catch (err) {
+                    throw new Error('Failure on children.physicalactivities routes test: ' + err.message)
+                }
+            })
+
+            it('should return status code 204 and no content for physical activity', async () => {
                 return request
                     .delete(`/v1/children/${result.child_id}/physicalactivities/${result.id}`)
                     .set('Content-Type', 'application/json')
