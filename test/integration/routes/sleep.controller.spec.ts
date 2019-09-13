@@ -198,11 +198,72 @@ describe('Routes: children.sleep', () => {
         })
     })
 
+    describe('RABBITMQ PUBLISHER -> POST /v1/children/:child_id/sleep with only one Sleep in the body', () => {
+        context('when posting a new Sleep with success and publishing it to the bus', () => {
+            const body = {
+                start_time: defaultSleep.start_time,
+                end_time: defaultSleep.end_time,
+                duration: defaultSleep.duration,
+                pattern: defaultSleep.pattern,
+                type: defaultSleep.type
+            }
+
+            before(async () => {
+                try {
+                    await deleteAllSleep()
+
+                    await rabbitmq.initialize(process.env.RABBITMQ_URI || Default.RABBITMQ_URI,
+                        { receiveFromYourself: true, sslOptions: { ca: [] } })
+                } catch (err) {
+                    throw new Error('Failure on children.sleep routes test: ' + err.message)
+                }
+            })
+
+            it('The subscriber should receive a message in the correct format and with the same values as the sleep ' +
+                'published on the bus', (done) => {
+                rabbitmq.bus
+                    .subSaveSleep(message => {
+                        expect(message.event_name).to.eql('SleepSaveEvent')
+                        expect(message).to.have.property('timestamp')
+                        expect(message).to.have.property('sleep')
+                        defaultSleep.id = message.sleep.id
+                        expect(message.sleep.id).to.eql(defaultSleep.id)
+                        expect(message.sleep.start_time).to.eql(defaultSleep.start_time!.toISOString())
+                        expect(message.sleep.end_time).to.eql(defaultSleep.end_time!.toISOString())
+                        expect(message.sleep.duration).to.eql(defaultSleep.duration)
+                        let index = 0
+                        for (const elem of defaultSleep.pattern!.data_set) {
+                            expect(message.sleep.pattern.data_set[index].start_time).to.eql(elem.start_time.toISOString())
+                            expect(message.sleep.pattern.data_set[index].name).to.eql(elem.name)
+                            expect(message.sleep.pattern.data_set[index].duration).to.eql(elem.duration)
+                            index++
+                        }
+                        expect(message.sleep.type).to.eql(defaultSleep.type)
+                        expect(message.sleep.child_id).to.eql(defaultSleep.child_id)
+                        done()
+                    })
+                    .then(() => {
+                        request
+                            .post(`/v1/children/${defaultSleep.child_id}/sleep`)
+                            .send(body)
+                            .set('Content-Type', 'application/json')
+                            .expect(201)
+                            .then()
+                    })
+                    .catch((err) => {
+                        done(err)
+                    })
+            })
+        })
+    })
+
     describe('POST /v1/children/:child_id/sleep with only one Sleep in the body', () => {
         context('when posting a new Sleep with success', () => {
             before(async () => {
                 try {
                     await deleteAllSleep()
+
+                    await rabbitmq.dispose()
 
                     await rabbitmq.initialize(process.env.RABBITMQ_URI || Default.RABBITMQ_URI, { sslOptions: { ca: [] } })
                 } catch (err) {
@@ -1419,6 +1480,71 @@ describe('Routes: children.sleep', () => {
         })
     })
 
+    describe('RABBITMQ PUBLISHER -> PATCH /v1/children/:child_id/sleep/:sleep_id', () => {
+        context('when this sleep exists in the database, is updated successfully and published to the bus', () => {
+            // Sleep to update
+            const body = {
+                start_time: otherSleep.start_time,
+                end_time: otherSleep.end_time,
+                duration: otherSleep.duration,
+                pattern: defaultSleep.pattern,
+                type: defaultSleep.type
+            }
+
+            let result
+
+            before(async () => {
+                try {
+                    await deleteAllSleep()
+
+                    // Sleep to be updated
+                    result = await createSleepToBeUpdated(defaultSleep)
+
+                    await rabbitmq.initialize(process.env.RABBITMQ_URI || Default.RABBITMQ_URI,
+                        { receiveFromYourself: true, sslOptions: { ca: [] } })
+                } catch (err) {
+                    throw new Error('Failure on children.sleep routes test: ' + err.message)
+                }
+            })
+
+            it('The subscriber should receive a message in the correct format and with the same values as the sleep ' +
+                'published on the bus', (done) => {
+                rabbitmq.bus
+                    .subUpdateSleep(message => {
+                        expect(message.event_name).to.eql('SleepUpdateEvent')
+                        expect(message).to.have.property('timestamp')
+                        expect(message).to.have.property('sleep')
+                        defaultSleep.id = message.sleep.id
+                        expect(message.sleep.id).to.eql(defaultSleep.id)
+                        expect(message.sleep.start_time).to.eql(otherSleep.start_time!.toISOString())
+                        expect(message.sleep.end_time).to.eql(otherSleep.end_time!.toISOString())
+                        expect(message.sleep.duration).to.eql(otherSleep.duration)
+                        let index = 0
+                        for (const elem of defaultSleep.pattern!.data_set) {
+                            expect(message.sleep.pattern.data_set[index].start_time).to.eql(elem.start_time.toISOString())
+                            expect(message.sleep.pattern.data_set[index].name).to.eql(elem.name)
+                            expect(message.sleep.pattern.data_set[index].duration).to.eql(elem.duration)
+                            index++
+                        }
+                        expect(message.sleep.type).to.eql(defaultSleep.type)
+                        expect(message.sleep.child_id).to.eql(defaultSleep.child_id)
+                        done()
+                    })
+                    .then(() => {
+                        request
+                            .patch(`/v1/children/${result.child_id}/sleep/${result.id}`)
+                            .send(body)
+                            .set('Content-Type', 'application/json')
+                            .expect(200)
+                            .then()
+                    })
+                    .catch((err) => {
+                        done(err)
+                    })
+            })
+        })
+    })
+
     describe('PATCH /v1/children/:child_id/sleep/:sleep_id', () => {
         context('when this sleep exists in the database and is updated successfully', () => {
             let result
@@ -1429,6 +1555,8 @@ describe('Routes: children.sleep', () => {
 
                     // Sleep to be updated
                     result = await createSleepToBeUpdated(defaultSleep)
+
+                    await rabbitmq.dispose()
 
                     await rabbitmq.initialize(process.env.RABBITMQ_URI || Default.RABBITMQ_URI, { sslOptions: { ca: [] } })
                 } catch (err) {
@@ -2019,6 +2147,55 @@ describe('Routes: children.sleep', () => {
         })
     })
 
+    describe('RABBITMQ PUBLISHER -> DELETE /v1/children/:child_id/sleep/:sleep_id', () => {
+        context('when the sleep was deleted successfully and your ID is published on the bus', () => {
+            let result
+
+            before(async () => {
+                try {
+                    await deleteAllSleep()
+
+                    result = await createSleep({
+                        start_time: defaultSleep.start_time,
+                        end_time: defaultSleep.end_time,
+                        duration: defaultSleep.duration,
+                        pattern: defaultSleep.pattern!.data_set,
+                        type: defaultSleep.type,
+                        child_id: defaultSleep.child_id
+                    })
+
+                    await rabbitmq.initialize(process.env.RABBITMQ_URI || Default.RABBITMQ_URI,
+                        { receiveFromYourself: true, sslOptions: { ca: [] } })
+                } catch (err) {
+                    throw new Error('Failure on children.sleep routes test: ' + err.message)
+                }
+            })
+
+            it('The subscriber should receive a message in the correct format and that has the same ID ' +
+                'published on the bus', (done) => {
+                rabbitmq.bus
+                    .subDeleteSleep(message => {
+                        expect(message.event_name).to.eql('SleepDeleteEvent')
+                        expect(message).to.have.property('timestamp')
+                        expect(message).to.have.property('sleep')
+                        defaultSleep.id = message.sleep.id
+                        expect(message.sleep.id).to.eql(defaultSleep.id)
+                        done()
+                    })
+                    .then(() => {
+                        request
+                            .delete(`/v1/children/${result.child_id}/sleep/${result.id}`)
+                            .set('Content-Type', 'application/json')
+                            .expect(204)
+                            .then()
+                    })
+                    .catch((err) => {
+                        done(err)
+                    })
+            })
+        })
+    })
+
     describe('DELETE /v1/children/:child_id/sleep/:sleep_id', () => {
         context('when the sleep was deleted successfully', () => {
             let result
@@ -2035,6 +2212,8 @@ describe('Routes: children.sleep', () => {
                         type: defaultSleep.type,
                         child_id: defaultSleep.child_id
                     })
+
+                    await rabbitmq.dispose()
 
                     await rabbitmq.initialize(process.env.RABBITMQ_URI || Default.RABBITMQ_URI, { sslOptions: { ca: [] } })
                 } catch (err) {

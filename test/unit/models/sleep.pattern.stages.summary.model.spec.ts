@@ -1,20 +1,35 @@
 import { assert } from 'chai'
-import { SleepPatternSummaryData } from '../../../src/application/domain/model/sleep.pattern.summary.data'
 import { SleepPatternStagesSummary } from '../../../src/application/domain/model/sleep.pattern.stages.summary'
+import { SleepPatternSummaryData } from '../../../src/application/domain/model/sleep.pattern.summary.data'
 
 describe('Models: SleepPatternStagesSummary', () => {
     const summaryDataJSON: any = {
-        deep: new SleepPatternSummaryData(1, 1000),
-        light: new SleepPatternSummaryData(2, 10000),
-        rem: new SleepPatternSummaryData(3, 20000),
-        awake: new SleepPatternSummaryData(4, 30000)
+        deep: {
+            count: 1,
+            duration: 1000
+        },
+        light: {
+            count: 2,
+            duration: 10000
+        },
+        rem: {
+            count: 3,
+            duration: 20000
+        },
+        awake: {
+            count: 4,
+            duration: 30000
+        }
     }
 
     describe('toJSON()', () => {
         context('when the SleepPatternStagesSummary model is correct', () => {
             it('should return a JSON from SleepPatternStagesSummary model', () => {
-                let result =
-                    new SleepPatternStagesSummary(summaryDataJSON.deep, summaryDataJSON.light, summaryDataJSON.rem, summaryDataJSON.awake)
+                let result: SleepPatternStagesSummary = new SleepPatternStagesSummary()
+                result.deep = new SleepPatternSummaryData(summaryDataJSON.deep.count, summaryDataJSON.deep.duration)
+                result.light = new SleepPatternSummaryData(summaryDataJSON.light.count, summaryDataJSON.light.duration)
+                result.rem = new SleepPatternSummaryData(summaryDataJSON.rem.count, summaryDataJSON.rem.duration)
+                result.awake = new SleepPatternSummaryData(summaryDataJSON.awake.count, summaryDataJSON.awake.duration)
                 result = result.toJSON()
                 assert.deepPropertyVal(result, 'deep', summaryDataJSON.deep)
                 assert.deepPropertyVal(result, 'light', summaryDataJSON.light)

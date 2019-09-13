@@ -219,11 +219,77 @@ describe('Routes: children.physicalactivities', () => {
         })
     })
 
+    describe('RABBITMQ PUBLISHER -> POST /v1/children/:child_id/physicalactivities with only one PhysicalActivity in the body', () => {
+        context('when posting a new PhysicalActivity with success and publishing it to the bus', () => {
+            const body = {
+                name: defaultActivity.name,
+                start_time: defaultActivity.start_time,
+                end_time: defaultActivity.end_time,
+                duration: defaultActivity.duration,
+                calories: defaultActivity.calories,
+                steps: defaultActivity.steps ? defaultActivity.steps : undefined,
+                levels: defaultActivity.levels ? defaultActivity.levels : undefined,
+                heart_rate: defaultActivity.heart_rate ? defaultActivity.heart_rate : undefined
+            }
+
+            before(async () => {
+                try {
+                    await deleteAllActivity()
+
+                    await rabbitmq.initialize(process.env.RABBITMQ_URI || Default.RABBITMQ_URI,
+                        { receiveFromYourself: true, sslOptions: { ca: [] } })
+                } catch (err) {
+                    throw new Error('Failure on children.physicalactivities routes test: ' + err.message)
+                }
+            })
+
+            it('The subscriber should receive a message in the correct format and with the same values as the activity ' +
+                'published on the bus', (done) => {
+                rabbitmq.bus
+                    .subSavePhysicalActivity(message => {
+                        expect(message.event_name).to.eql('PhysicalActivitySaveEvent')
+                        expect(message).to.have.property('timestamp')
+                        expect(message).to.have.property('physicalactivity')
+                        defaultActivity.id = message.physicalactivity.id
+                        expect(message.physicalactivity.id).to.eql(defaultActivity.id)
+                        expect(message.physicalactivity.name).to.eql(defaultActivity.name)
+                        expect(message.physicalactivity.start_time).to.eql(defaultActivity.start_time!.toISOString())
+                        expect(message.physicalactivity.end_time).to.eql(defaultActivity.end_time!.toISOString())
+                        expect(message.physicalactivity.duration).to.eql(defaultActivity.duration)
+                        expect(message.physicalactivity.calories).to.eql(defaultActivity.calories)
+                        if (message.physicalactivity.steps) {
+                            expect(message.physicalactivity.steps).to.eql(defaultActivity.steps)
+                        }
+                        if (defaultActivity.levels) {
+                            expect(message.physicalactivity.levels)
+                                .to.eql(defaultActivity.levels.map((elem: PhysicalActivityLevel) => elem.toJSON()))
+                        }
+                        expect(message.physicalactivity.heart_rate).to.eql(defaultActivity.heart_rate!.toJSON())
+                        expect(message.physicalactivity.child_id).to.eql(defaultActivity.child_id)
+                        done()
+                    })
+                    .then(() => {
+                        request
+                            .post(`/v1/children/${defaultActivity.child_id}/physicalactivities`)
+                            .send(body)
+                            .set('Content-Type', 'application/json')
+                            .expect(201)
+                            .then()
+                    })
+                    .catch((err) => {
+                        done(err)
+                    })
+            })
+        })
+    })
+
     describe('POST /v1/children/:child_id/physicalactivities with only one PhysicalActivity in the body', () => {
         context('when posting a new PhysicalActivity with success', () => {
             before(async () => {
                 try {
                     await deleteAllActivity()
+
+                    await rabbitmq.dispose()
 
                     await rabbitmq.initialize(process.env.RABBITMQ_URI || Default.RABBITMQ_URI, { sslOptions: { ca: [] } })
                 } catch (err) {
@@ -1708,6 +1774,77 @@ describe('Routes: children.physicalactivities', () => {
         })
     })
 
+    describe('RABBITMQ PUBLISHER -> PATCH /v1/children/:child_id/physicalactivities/:physicalactivity_id', () => {
+        context('when this physical activity is updated successfully and published to the bus', () => {
+            // physical activity to update
+            const body = {
+                name: defaultActivity.name,
+                start_time: otherActivity.start_time,
+                end_time: otherActivity.end_time,
+                duration: otherActivity.duration,
+                calories: defaultActivity.calories,
+                steps: defaultActivity.steps ? defaultActivity.steps : undefined,
+                levels: defaultActivity.levels ? defaultActivity.levels : undefined,
+                heart_rate: defaultActivity.heart_rate ? defaultActivity.heart_rate : undefined,
+                child_id: defaultActivity.child_id
+            }
+
+            let result
+
+            before(async () => {
+                try {
+                    await deleteAllActivity()
+
+                    // physical activity to be updated
+                    result = await createActivityToBeUpdated(defaultActivity)
+
+                    await rabbitmq.initialize(process.env.RABBITMQ_URI || Default.RABBITMQ_URI,
+                        { receiveFromYourself: true, sslOptions: { ca: [] } })
+                } catch (err) {
+                    throw new Error('Failure on children.physicalactivities routes test: ' + err.message)
+                }
+            })
+
+            it('The subscriber should receive a message in the correct format and with the same values as the activity ' +
+                'published on the bus', (done) => {
+                rabbitmq.bus
+                    .subUpdatePhysicalActivity(message => {
+                        expect(message.event_name).to.eql('PhysicalActivityUpdateEvent')
+                        expect(message).to.have.property('timestamp')
+                        expect(message).to.have.property('physicalactivity')
+                        defaultActivity.id = message.physicalactivity.id
+                        expect(message.physicalactivity.id).to.eql(defaultActivity.id)
+                        expect(message.physicalactivity.name).to.eql(defaultActivity.name)
+                        expect(message.physicalactivity.start_time).to.eql(otherActivity.start_time!.toISOString())
+                        expect(message.physicalactivity.end_time).to.eql(otherActivity.end_time!.toISOString())
+                        expect(message.physicalactivity.duration).to.eql(otherActivity.duration)
+                        expect(message.physicalactivity.calories).to.eql(defaultActivity.calories)
+                        if (message.physicalactivity.steps) {
+                            expect(message.physicalactivity.steps).to.eql(defaultActivity.steps)
+                        }
+                        if (defaultActivity.levels) {
+                            expect(message.physicalactivity.levels)
+                                .to.eql(defaultActivity.levels.map((elem: PhysicalActivityLevel) => elem.toJSON()))
+                        }
+                        expect(message.physicalactivity.heart_rate).to.eql(defaultActivity.heart_rate!.toJSON())
+                        expect(message.physicalactivity.child_id).to.eql(defaultActivity.child_id)
+                        done()
+                    })
+                    .then(() => {
+                        request
+                            .patch(`/v1/children/${result.child_id}/physicalactivities/${result.id}`)
+                            .send(body)
+                            .set('Content-Type', 'application/json')
+                            .expect(200)
+                            .then()
+                    })
+                    .catch((err) => {
+                        done(err)
+                    })
+            })
+        })
+    })
+
     describe('PATCH /v1/children/:child_id/physicalactivities/:physicalactivity_id', () => {
         context('when this physical activity is updated successfully', () => {
             let result
@@ -1715,6 +1852,8 @@ describe('Routes: children.physicalactivities', () => {
             before(async () => {
                 try {
                     await deleteAllActivity()
+
+                    await rabbitmq.dispose()
 
                     // physical activity to be updated
                     result = await createActivityToBeUpdated(defaultActivity)
@@ -2451,6 +2590,58 @@ describe('Routes: children.physicalactivities', () => {
         })
     })
 
+    describe('RABBITMQ PUBLISHER -> DELETE /v1/children/:child_id/physicalactivities/:physicalactivity_id', () => {
+        context('when the physical activity was deleted successfully and your ID is published on the bus', () => {
+            let result
+
+            before(async () => {
+                try {
+                    await deleteAllActivity()
+
+                    result = await createActivity({
+                        name: defaultActivity.name,
+                        start_time: defaultActivity.start_time,
+                        end_time: defaultActivity.end_time,
+                        duration: defaultActivity.duration,
+                        calories: defaultActivity.calories,
+                        steps: defaultActivity.steps ? defaultActivity.steps : undefined,
+                        levels: defaultActivity.levels ? defaultActivity.levels : undefined,
+                        heart_rate: defaultActivity.heart_rate ? defaultActivity.heart_rate : undefined,
+                        child_id: defaultActivity.child_id
+                    })
+
+                    await rabbitmq.initialize(process.env.RABBITMQ_URI || Default.RABBITMQ_URI,
+                        { receiveFromYourself: true, sslOptions: { ca: [] } })
+                } catch (err) {
+                    throw new Error('Failure on children.physicalactivities routes test: ' + err.message)
+                }
+            })
+
+            it('The subscriber should receive a message in the correct format and that has the same ID ' +
+                'published on the bus', (done) => {
+                rabbitmq.bus
+                    .subDeletePhysicalActivity(message => {
+                        expect(message.event_name).to.eql('PhysicalActivityDeleteEvent')
+                        expect(message).to.have.property('timestamp')
+                        expect(message).to.have.property('physicalactivity')
+                        defaultActivity.id = message.physicalactivity.id
+                        expect(message.physicalactivity.id).to.eql(defaultActivity.id)
+                        done()
+                    })
+                    .then(() => {
+                        request
+                            .delete(`/v1/children/${result.child_id}/physicalactivities/${result.id}`)
+                            .set('Content-Type', 'application/json')
+                            .expect(204)
+                            .then()
+                    })
+                    .catch((err) => {
+                        done(err)
+                    })
+            })
+        })
+    })
+
     describe('DELETE /v1/children/:child_id/physicalactivities/:physicalactivity_id', () => {
         context('when the physical activity was deleted successfully', () => {
             let result
@@ -2470,6 +2661,8 @@ describe('Routes: children.physicalactivities', () => {
                         heart_rate: defaultActivity.heart_rate ? defaultActivity.heart_rate : undefined,
                         child_id: defaultActivity.child_id
                     })
+
+                    await rabbitmq.dispose()
 
                     await rabbitmq.initialize(process.env.RABBITMQ_URI || Default.RABBITMQ_URI, { sslOptions: { ca: [] } })
                 } catch (err) {
