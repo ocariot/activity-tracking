@@ -26,7 +26,8 @@ export const logSaveEventHandler = async (event: any) => {
             // 2. Try to add activities
             logService.addLogs(logsArr)
                 .then(result => {
-                    logger.info(`Action for event ${event.event_name} successfully held! Total successful items: `
+                    logger.info(`Action for event ${event.event_name} associated with child with ID: `
+                        .concat(`${logsArr[0].child_id} successfully held! Total successful items: `)
                         .concat(`${result.success.length} / Total items with error: ${result.error.length}`))
                 })
                 .catch((err) => {
