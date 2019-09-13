@@ -103,11 +103,64 @@ describe('Routes: children.weights', () => {
         })
     })
 
+    describe('RABBITMQ PUBLISHER -> POST /v1/children/:child_id/weights with only one Weight in the body', () => {
+        context('when posting a new Weight with success and publishing it to the bus', () => {
+            const body = {
+                timestamp: defaultWeight.timestamp,
+                value: defaultWeight.value,
+                unit: defaultWeight.unit,
+                body_fat: defaultWeight.value
+            }
+
+            before(async () => {
+                try {
+                    await deleteAllWeight()
+
+                    await rabbitmq.initialize(process.env.RABBITMQ_URI || Default.RABBITMQ_URI,
+                        { receiveFromYourself: true, sslOptions: { ca: [] } })
+                } catch (err) {
+                    throw new Error('Failure on children.weights routes test: ' + err.message)
+                }
+            })
+
+            it('The subscriber should receive a message in the correct format and with the same values as the weight ' +
+                'published on the bus', (done) => {
+                rabbitmq.bus
+                    .subSaveWeight(message => {
+                        expect(message.event_name).to.eql('WeightSaveEvent')
+                        expect(message).to.have.property('timestamp')
+                        expect(message).to.have.property('weight')
+                        defaultWeight.id = message.weight.id
+                        expect(message.weight.id).to.eql(defaultWeight.id)
+                        expect(message.weight.timestamp).to.eql(defaultWeight.timestamp!.toISOString())
+                        expect(message.weight.value).to.eql(defaultWeight.value)
+                        expect(message.weight.unit).to.eql(defaultWeight.unit)
+                        expect(message.weight.child_id).to.eql(defaultWeight.child_id)
+                        expect(message.weight.body_fat).to.eql(defaultWeight.value)
+                        done()
+                    })
+                    .then(() => {
+                        request
+                            .post(`/v1/children/${defaultWeight.child_id}/weights`)
+                            .send(body)
+                            .set('Content-Type', 'application/json')
+                            .expect(201)
+                            .then()
+                    })
+                    .catch((err) => {
+                        done(err)
+                    })
+            })
+        })
+    })
+
     describe('POST /v1/children/:child_id/weights with only one Weight in the body', () => {
         context('when posting a new Weight with success', () => {
             before(async () => {
                 try {
                     await deleteAllWeight()
+
+                    await rabbitmq.dispose()
 
                     await rabbitmq.initialize(process.env.RABBITMQ_URI || Default.RABBITMQ_URI, { sslOptions: { ca: [] } })
                 } catch (err) {
@@ -984,6 +1037,61 @@ describe('Routes: children.weights', () => {
         })
     })
 
+    describe('RABBITMQ PUBLISHER -> DELETE /v1/children/:child_id/weights/:weight_id', () => {
+        context('when the Weight was deleted successfully and your ID is published on the bus', () => {
+            let result
+
+            before(async () => {
+                try {
+                    await deleteAllWeight()
+
+                    const bodyFat = await createBodyFat({
+                        timestamp: defaultWeight.timestamp,
+                        value: defaultWeight.value,
+                        unit: defaultWeight.unit,
+                        child_id: defaultWeight.child_id
+                    })
+
+                    result = await createWeight({
+                        timestamp: defaultWeight.timestamp,
+                        value: defaultWeight.value,
+                        unit: defaultWeight.unit,
+                        child_id: defaultWeight.child_id,
+                        body_fat: bodyFat
+                    })
+
+                    await rabbitmq.initialize(process.env.RABBITMQ_URI || Default.RABBITMQ_URI,
+                        { receiveFromYourself: true, sslOptions: { ca: [] } })
+                } catch (err) {
+                    throw new Error('Failure on children.weights routes test: ' + err.message)
+                }
+            })
+
+            it('The subscriber should receive a message in the correct format and that has the same ID ' +
+                'published on the bus', (done) => {
+                rabbitmq.bus
+                    .subDeleteWeight(message => {
+                        expect(message.event_name).to.eql('WeightDeleteEvent')
+                        expect(message).to.have.property('timestamp')
+                        expect(message).to.have.property('weight')
+                        defaultWeight.id = message.weight.id
+                        expect(message.weight.id).to.eql(defaultWeight.id)
+                        done()
+                    })
+                    .then(() => {
+                        request
+                            .delete(`/v1/children/${result.child_id}/weights/${result.id}`)
+                            .set('Content-Type', 'application/json')
+                            .expect(204)
+                            .then()
+                    })
+                    .catch((err) => {
+                        done(err)
+                    })
+            })
+        })
+    })
+
     describe('DELETE /v1/children/:child_id/weights/:weight_id', () => {
         context('when the Weight was deleted successfully', () => {
             let result
@@ -1006,6 +1114,8 @@ describe('Routes: children.weights', () => {
                         child_id: defaultWeight.child_id,
                         body_fat: bodyFat
                     })
+
+                    await rabbitmq.dispose()
 
                     await rabbitmq.initialize(process.env.RABBITMQ_URI || Default.RABBITMQ_URI, { sslOptions: { ca: [] } })
                 } catch (err) {

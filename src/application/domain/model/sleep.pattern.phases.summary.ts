@@ -43,9 +43,9 @@ export class SleepPatternPhasesSummary implements IJSONSerializable {
 
     public toJSON(): any {
         return {
-            awake: this.awake,
-            asleep: this.asleep,
-            restless: this.restless,
+            awake: this.awake ? this.awake.toJSON() : this.awake,
+            asleep: this.asleep ? this.asleep.toJSON() : this.asleep,
+            restless: this.restless ? this.restless.toJSON() : this.restless
         }
     }
 }

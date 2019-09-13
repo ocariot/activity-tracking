@@ -30,7 +30,8 @@ export const physicalActivitySaveEventHandler = async (event: any) => {
             // 2. Try to add activities
             activityService.add(activitiesArr)
                 .then(result => {
-                    logger.info(`Action for event ${event.event_name} successfully held! Total successful items: `
+                    logger.info(`Action for event ${event.event_name} associated with child with ID: `
+                        .concat(`${activitiesArr[0].child_id} successfully held! Total successful items: `)
                         .concat(`${result.success.length} / Total items with error: ${result.error.length}`))
                 })
                 .catch((err) => {
@@ -44,7 +45,7 @@ export const physicalActivitySaveEventHandler = async (event: any) => {
 
             // 2. Try to add the activity
             await activityService.add(activity)
-            logger.info(`Action for event ${event.event_name} successfully held!`)
+            logger.info(`Action for event ${event.event_name} associated with child with ID: ${activity.child_id} successfully held!`)
         }
     } catch (err) {
         logger.warn(`An error occurred while attempting `
