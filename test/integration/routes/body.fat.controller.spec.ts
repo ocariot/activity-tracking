@@ -42,7 +42,7 @@ describe('Routes: children.bodyfats', () => {
     before(async () => {
         try {
             await dbConnection.connect(process.env.MONGODB_URI_TEST || Default.MONGODB_URI_TEST)
-            await deleteAllBodyFat()
+            await deleteAllBodyFats()
         } catch (err) {
             throw new Error('Failure on children.bodyfats routes test: ' + err.message)
         }
@@ -51,7 +51,7 @@ describe('Routes: children.bodyfats', () => {
     // Delete all database BodyFat objects
     after(async () => {
         try {
-            await deleteAllBodyFat()
+            await deleteAllBodyFats()
             await dbConnection.dispose()
         } catch (err) {
             throw new Error('Failure on children.bodyfats routes test: ' + err.message)
@@ -150,7 +150,7 @@ describe('Routes: children.bodyfats', () => {
         context('when all the BodyFat objects are correct and still do not exist in the repository', () => {
             before(async () => {
                 try {
-                    await deleteAllBodyFat()
+                    await deleteAllBodyFats()
                 } catch (err) {
                     throw new Error('Failure on children.bodyfats routes test: ' + err.message)
                 }
@@ -225,7 +225,7 @@ describe('Routes: children.bodyfats', () => {
         context('when there are correct and incorrect BodyFat objects in the body', () => {
             before(async () => {
                 try {
-                    await deleteAllBodyFat()
+                    await deleteAllBodyFats()
                 } catch (err) {
                     throw new Error('Failure on children.bodyfats routes test: ' + err.message)
                 }
@@ -305,7 +305,7 @@ describe('Routes: children.bodyfats', () => {
         context('when there are no BodyFat associated with the child in the database', () => {
             before(async () => {
                 try {
-                    await deleteAllBodyFat()
+                    await deleteAllBodyFats()
                 } catch (err) {
                     throw new Error('Failure on children.bodyfats routes test: ' + err.message)
                 }
@@ -326,7 +326,7 @@ describe('Routes: children.bodyfats', () => {
         context('when the child_id is invalid', () => {
             before(async () => {
                 try {
-                    await deleteAllBodyFat()
+                    await deleteAllBodyFats()
                 } catch (err) {
                     throw new Error('Failure on children.bodyfats routes test: ' + err.message)
                 }
@@ -361,7 +361,7 @@ describe('Routes: children.bodyfats', () => {
         context('when get BodyFat of a child using the "query-strings-parser" library', () => {
             before(async () => {
                 try {
-                    await deleteAllBodyFat()
+                    await deleteAllBodyFats()
                 } catch (err) {
                     throw new Error('Failure on children.bodyfats routes test: ' + err.message)
                 }
@@ -413,7 +413,7 @@ describe('Routes: children.bodyfats', () => {
             'associated with the child in the database', () => {
             before(async () => {
                 try {
-                    await deleteAllBodyFat()
+                    await deleteAllBodyFats()
                 } catch (err) {
                     throw new Error('Failure on children.bodyfats routes test: ' + err.message)
                 }
@@ -438,7 +438,7 @@ describe('Routes: children.bodyfats', () => {
             'but the child_id is invalid', () => {
             before(async () => {
                 try {
-                    await deleteAllBodyFat()
+                    await deleteAllBodyFats()
                 } catch (err) {
                     throw new Error('Failure on children.bodyfats routes test: ' + err.message)
                 }
@@ -477,7 +477,7 @@ describe('Routes: children.bodyfats', () => {
         context('when get a specific BodyFat of a child of the database successfully', () => {
             before(async () => {
                 try {
-                    await deleteAllBodyFat()
+                    await deleteAllBodyFats()
                 } catch (err) {
                     throw new Error('Failure on children.bodyfats routes test: ' + err.message)
                 }
@@ -517,7 +517,7 @@ describe('Routes: children.bodyfats', () => {
         context('when there is no that specific BodyFat associated with that child in the database', () => {
             before(async () => {
                 try {
-                    await deleteAllBodyFat()
+                    await deleteAllBodyFats()
                 } catch (err) {
                     throw new Error('Failure on children.bodyfats routes test: ' + err.message)
                 }
@@ -540,7 +540,7 @@ describe('Routes: children.bodyfats', () => {
         context('when the child_id is invalid', () => {
             before(async () => {
                 try {
-                    await deleteAllBodyFat()
+                    await deleteAllBodyFats()
                 } catch (err) {
                     throw new Error('Failure on children.bodyfats routes test: ' + err.message)
                 }
@@ -575,7 +575,7 @@ describe('Routes: children.bodyfats', () => {
         context('when the BodyFat id is invalid', () => {
             before(async () => {
                 try {
-                    await deleteAllBodyFat()
+                    await deleteAllBodyFats()
                 } catch (err) {
                     throw new Error('Failure on children.bodyfats routes test: ' + err.message)
                 }
@@ -612,7 +612,7 @@ describe('Routes: children.bodyfats', () => {
         context('when get a specific BodyFat of a child using the "query-strings-parser" library', () => {
             before(async () => {
                 try {
-                    await deleteAllBodyFat()
+                    await deleteAllBodyFats()
                 } catch (err) {
                     throw new Error('Failure on children.bodyfats routes test: ' + err.message)
                 }
@@ -653,7 +653,7 @@ describe('Routes: children.bodyfats', () => {
             'does not exist', () => {
             before(async () => {
                 try {
-                    await deleteAllBodyFat()
+                    await deleteAllBodyFats()
                 } catch (err) {
                     throw new Error('Failure on children.bodyfats routes test: ' + err.message)
                 }
@@ -680,7 +680,7 @@ describe('Routes: children.bodyfats', () => {
             'child_id is invalid', () => {
             before(async () => {
                 try {
-                    await deleteAllBodyFat()
+                    await deleteAllBodyFats()
                 } catch (err) {
                     throw new Error('Failure on children.bodyfats routes test: ' + err.message)
                 }
@@ -719,7 +719,7 @@ describe('Routes: children.bodyfats', () => {
             'BodyFat id is invalid', () => {
             before(async () => {
                 try {
-                    await deleteAllBodyFat()
+                    await deleteAllBodyFats()
                 } catch (err) {
                     throw new Error('Failure on children.bodyfats routes test: ' + err.message)
                 }
@@ -761,7 +761,7 @@ describe('Routes: children.bodyfats', () => {
         context('when the BodyFat was deleted successfully', () => {
             before(async () => {
                 try {
-                    await deleteAllBodyFat()
+                    await deleteAllBodyFats()
                 } catch (err) {
                     throw new Error('Failure on children.bodyfats routes test: ' + err.message)
                 }
@@ -794,7 +794,7 @@ describe('Routes: children.bodyfats', () => {
         context('when the BodyFat is not found', () => {
             before(async () => {
                 try {
-                    await deleteAllBodyFat()
+                    await deleteAllBodyFats()
                 } catch (err) {
                     throw new Error('Failure on children.bodyfats routes test: ' + err.message)
                 }
@@ -814,7 +814,7 @@ describe('Routes: children.bodyfats', () => {
         context('when the child_id is invalid', () => {
             before(async () => {
                 try {
-                    await deleteAllBodyFat()
+                    await deleteAllBodyFats()
                 } catch (err) {
                     throw new Error('Failure on children.bodyfats routes test: ' + err.message)
                 }
@@ -849,7 +849,7 @@ describe('Routes: children.bodyfats', () => {
         context('when the BodyFat id is invalid', () => {
             before(async () => {
                 try {
-                    await deleteAllBodyFat()
+                    await deleteAllBodyFats()
                 } catch (err) {
                     throw new Error('Failure on children.bodyfats routes test: ' + err.message)
                 }
@@ -890,6 +890,6 @@ async function createBodyFat(item): Promise<any> {
     return await Promise.resolve(MeasurementRepoModel.create(resultModelEntity))
 }
 
-async function deleteAllBodyFat() {
+async function deleteAllBodyFats() {
     return MeasurementRepoModel.deleteMany({})
 }

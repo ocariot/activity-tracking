@@ -46,7 +46,7 @@ describe('Routes: children.weights', () => {
         try {
             await dbConnection.connect(process.env.MONGODB_URI_TEST || Default.MONGODB_URI_TEST)
             await rabbitmq.initialize(process.env.RABBITMQ_URI || Default.RABBITMQ_URI, { sslOptions: { ca: [] } })
-            await deleteAllWeight()
+            await deleteAllWeights()
         } catch (err) {
             throw new Error('Failure on children.weights routes test: ' + err.message)
         }
@@ -55,7 +55,7 @@ describe('Routes: children.weights', () => {
     // Delete all database Weight objects
     after(async () => {
         try {
-            await deleteAllWeight()
+            await deleteAllWeights()
             await dbConnection.dispose()
             await rabbitmq.dispose()
         } catch (err) {
@@ -114,7 +114,7 @@ describe('Routes: children.weights', () => {
 
             before(async () => {
                 try {
-                    await deleteAllWeight()
+                    await deleteAllWeights()
 
                     await rabbitmq.initialize(process.env.RABBITMQ_URI || Default.RABBITMQ_URI,
                         { receiveFromYourself: true, sslOptions: { ca: [] } })
@@ -158,7 +158,7 @@ describe('Routes: children.weights', () => {
         context('when posting a new Weight with success', () => {
             before(async () => {
                 try {
-                    await deleteAllWeight()
+                    await deleteAllWeights()
 
                     await rabbitmq.dispose()
 
@@ -195,7 +195,7 @@ describe('Routes: children.weights', () => {
         context('when posting a new Weight (without body_fat) with success', () => {
             before(async () => {
                 try {
-                    await deleteAllWeight()
+                    await deleteAllWeights()
                 } catch (err) {
                     throw new Error('Failure on children.weights routes test: ' + err.message)
                 }
@@ -292,7 +292,7 @@ describe('Routes: children.weights', () => {
         context('when all the Weight objects are correct and still do not exist in the repository', () => {
             before(async () => {
                 try {
-                    await deleteAllWeight()
+                    await deleteAllWeights()
                 } catch (err) {
                     throw new Error('Failure on children.weights routes test: ' + err.message)
                 }
@@ -371,7 +371,7 @@ describe('Routes: children.weights', () => {
         context('when there are correct and incorrect Weight objects in the body', () => {
             before(async () => {
                 try {
-                    await deleteAllWeight()
+                    await deleteAllWeights()
                 } catch (err) {
                     throw new Error('Failure on children.weights routes test: ' + err.message)
                 }
@@ -463,7 +463,7 @@ describe('Routes: children.weights', () => {
         context('when there are no Weight associated with the child in the database', () => {
             before(async () => {
                 try {
-                    await deleteAllWeight()
+                    await deleteAllWeights()
                 } catch (err) {
                     throw new Error('Failure on children.weights routes test: ' + err.message)
                 }
@@ -484,7 +484,7 @@ describe('Routes: children.weights', () => {
         context('when the child_id is invalid', () => {
             before(async () => {
                 try {
-                    await deleteAllWeight()
+                    await deleteAllWeights()
                 } catch (err) {
                     throw new Error('Failure on children.weights routes test: ' + err.message)
                 }
@@ -528,7 +528,7 @@ describe('Routes: children.weights', () => {
         context('when get Weight of a child using the "query-strings-parser" library', () => {
             before(async () => {
                 try {
-                    await deleteAllWeight()
+                    await deleteAllWeights()
                 } catch (err) {
                     throw new Error('Failure on children.weights routes test: ' + err.message)
                 }
@@ -590,7 +590,7 @@ describe('Routes: children.weights', () => {
             'in the database', () => {
             before(async () => {
                 try {
-                    await deleteAllWeight()
+                    await deleteAllWeights()
                 } catch (err) {
                     throw new Error('Failure on children.weights routes test: ' + err.message)
                 }
@@ -615,7 +615,7 @@ describe('Routes: children.weights', () => {
             'but the child_id is invalid', () => {
             before(async () => {
                 try {
-                    await deleteAllWeight()
+                    await deleteAllWeights()
                 } catch (err) {
                     throw new Error('Failure on children.weights routes test: ' + err.message)
                 }
@@ -662,7 +662,7 @@ describe('Routes: children.weights', () => {
         context('when get a specific Weight of a child of the database successfully', () => {
             before(async () => {
                 try {
-                    await deleteAllWeight()
+                    await deleteAllWeights()
                 } catch (err) {
                     throw new Error('Failure on children.weights routes test: ' + err.message)
                 }
@@ -712,7 +712,7 @@ describe('Routes: children.weights', () => {
         context('when there is no that specific Weight associated with that child in the database', () => {
             before(async () => {
                 try {
-                    await deleteAllWeight()
+                    await deleteAllWeights()
                 } catch (err) {
                     throw new Error('Failure on children.weights routes test: ' + err.message)
                 }
@@ -735,7 +735,7 @@ describe('Routes: children.weights', () => {
         context('when the child_id is invalid', () => {
             before(async () => {
                 try {
-                    await deleteAllWeight()
+                    await deleteAllWeights()
                 } catch (err) {
                     throw new Error('Failure on children.weights routes test: ' + err.message)
                 }
@@ -778,7 +778,7 @@ describe('Routes: children.weights', () => {
         context('when the Weight id is invalid', () => {
             before(async () => {
                 try {
-                    await deleteAllWeight()
+                    await deleteAllWeights()
                 } catch (err) {
                     throw new Error('Failure on children.weights routes test: ' + err.message)
                 }
@@ -823,7 +823,7 @@ describe('Routes: children.weights', () => {
         context('when get a specific Weight of a child using the "query-strings-parser" library', () => {
             before(async () => {
                 try {
-                    await deleteAllWeight()
+                    await deleteAllWeights()
                 } catch (err) {
                     throw new Error('Failure on children.weights routes test: ' + err.message)
                 }
@@ -874,7 +874,7 @@ describe('Routes: children.weights', () => {
             'does not exist', () => {
             before(async () => {
                 try {
-                    await deleteAllWeight()
+                    await deleteAllWeights()
                 } catch (err) {
                     throw new Error('Failure on children.weights routes test: ' + err.message)
                 }
@@ -901,7 +901,7 @@ describe('Routes: children.weights', () => {
             'child_id is invalid', () => {
             before(async () => {
                 try {
-                    await deleteAllWeight()
+                    await deleteAllWeights()
                 } catch (err) {
                     throw new Error('Failure on children.weights routes test: ' + err.message)
                 }
@@ -948,7 +948,7 @@ describe('Routes: children.weights', () => {
             'Weight id is invalid', () => {
             before(async () => {
                 try {
-                    await deleteAllWeight()
+                    await deleteAllWeights()
                 } catch (err) {
                     throw new Error('Failure on children.weights routes test: ' + err.message)
                 }
@@ -1000,7 +1000,7 @@ describe('Routes: children.weights', () => {
 
             before(async () => {
                 try {
-                    await deleteAllWeight()
+                    await deleteAllWeights()
 
                     const bodyFat = await createBodyFat({
                         timestamp: defaultWeight.timestamp,
@@ -1043,7 +1043,7 @@ describe('Routes: children.weights', () => {
 
             before(async () => {
                 try {
-                    await deleteAllWeight()
+                    await deleteAllWeights()
 
                     const bodyFat = await createBodyFat({
                         timestamp: defaultWeight.timestamp,
@@ -1098,7 +1098,7 @@ describe('Routes: children.weights', () => {
 
             before(async () => {
                 try {
-                    await deleteAllWeight()
+                    await deleteAllWeights()
 
                     const bodyFat = await createBodyFat({
                         timestamp: defaultWeight.timestamp,
@@ -1137,7 +1137,7 @@ describe('Routes: children.weights', () => {
         context('when the Weight is not found', () => {
             before(async () => {
                 try {
-                    await deleteAllWeight()
+                    await deleteAllWeights()
                 } catch (err) {
                     throw new Error('Failure on children.weights routes test: ' + err.message)
                 }
@@ -1157,7 +1157,7 @@ describe('Routes: children.weights', () => {
         context('when the child_id is invalid', () => {
             before(async () => {
                 try {
-                    await deleteAllWeight()
+                    await deleteAllWeights()
                 } catch (err) {
                     throw new Error('Failure on children.weights routes test: ' + err.message)
                 }
@@ -1200,7 +1200,7 @@ describe('Routes: children.weights', () => {
         context('when the Weight id is invalid', () => {
             before(async () => {
                 try {
-                    await deleteAllWeight()
+                    await deleteAllWeights()
                 } catch (err) {
                     throw new Error('Failure on children.weights routes test: ' + err.message)
                 }
@@ -1256,6 +1256,6 @@ async function createWeight(item): Promise<any> {
     return await Promise.resolve(MeasurementRepoModel.create(resultModelEntity))
 }
 
-async function deleteAllWeight() {
+async function deleteAllWeights() {
     return MeasurementRepoModel.deleteMany({})
 }
