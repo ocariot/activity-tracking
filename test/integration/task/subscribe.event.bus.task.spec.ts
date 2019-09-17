@@ -30,14 +30,14 @@ import { MeasurementType } from '../../../src/application/domain/model/measureme
 import { IQuery } from '../../../src/application/port/query.interface'
 
 const dbConnection: IDatabase = DIContainer.get(Identifier.MONGODB_CONNECTION)
+const rabbitmq: IEventBus = DIContainer.get(Identifier.RABBITMQ_EVENT_BUS)
+const subscribeEventBusTask: IBackgroundTask = DIContainer.get(Identifier.SUB_EVENT_BUS_TASK)
 const activityRepository: IPhysicalActivityRepository = DIContainer.get(Identifier.ACTIVITY_REPOSITORY)
 const sleepRepository: ISleepRepository = DIContainer.get(Identifier.SLEEP_REPOSITORY)
 const bodyFatRepository: IBodyFatRepository = DIContainer.get(Identifier.BODY_FAT_REPOSITORY)
 const weightRepository: IWeightRepository = DIContainer.get(Identifier.WEIGHT_REPOSITORY)
 const logRepository: ILogRepository = DIContainer.get(Identifier.LOG_REPOSITORY)
 const environmentRepository: IEnvironmentRepository = DIContainer.get(Identifier.ENVIRONMENT_REPOSITORY)
-const rabbitmq: IEventBus = DIContainer.get(Identifier.RABBITMQ_EVENT_BUS)
-const subscribeEventBusTask: IBackgroundTask = DIContainer.get(Identifier.SUB_EVENT_BUS_TASK)
 
 describe('SUBSCRIBE EVENT BUS TASK', () => {
     // Timeout function for control of execution
@@ -687,7 +687,7 @@ describe('SUBSCRIBE EVENT BUS TASK', () => {
         })
 
         context('when posting a InstitutionDeleteEvent with an invalid institution (invalid id)', () => {
-            const institution: any = { id: '5d7fb75ae48591c21a793f701',      // Invalid log
+            const institution: any = { id: '5d7fb75ae48591c21a793f701',      // Invalid institution
                 type: 'Institute of Scientific Research',
                 name: 'NUTES/UEPB',
                 address: 'Av. Juvêncio Arruda, S/N - Universitário, Campina Grande - PB, 58429-600',
@@ -900,7 +900,7 @@ describe('SUBSCRIBE EVENT BUS TASK', () => {
         })
 
         context('when posting a UserDeleteEvent with an invalid user (invalid id)', () => {
-            const user: any = { id: '5d7fb75ae48591c21a793f701',
+            const user: any = { id: '5d7fb75ae48591c21a793f701',        // Invalid user
                 type: 'child',
                 username: 'BR9999',
                 gender: 'male',

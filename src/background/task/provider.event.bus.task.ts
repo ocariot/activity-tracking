@@ -46,7 +46,8 @@ export class ProviderEventBusTask implements IBackgroundTask {
         // Providing physical activity resource.
         this._eventBus.bus
             .providePhysicalActivities(async (query) => {
-                const _query: IQuery = new Query().fromJSON({ ...qs.parser(query) })
+                const _query: IQuery = new Query().fromJSON({ ...qs.parser(query, {},
+                                            { date_fields: { start_at: 'start_time', end_at: 'start_time'}}) })
                 const result: Array<PhysicalActivity> = await this._activityRepository.find(_query)
                 return result.map(item => item.toJSON())
             })
@@ -56,7 +57,8 @@ export class ProviderEventBusTask implements IBackgroundTask {
         // Providing sleep resource.
         this._eventBus.bus
             .provideSleep(async (query) => {
-                const _query: IQuery = new Query().fromJSON({ ...qs.parser(query) })
+                const _query: IQuery = new Query().fromJSON({ ...qs.parser(query, {},
+                        { date_fields: { start_at: 'start_time', end_at: 'start_time'}}) })
                 const result: Array<Sleep> = await this._sleepRepository.find(_query)
                 return result.map(item => item.toJSON())
             })
