@@ -17,6 +17,7 @@ export class WeightMock extends Weight {
         super.unit = 'kg'
         super.child_id = '5a62be07de34500146d9c544'
         super.body_fat = new BodyFatMock()
+        super.body_fat.timestamp = super.timestamp
     }
 
     private generateObjectId(): string {

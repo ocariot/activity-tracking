@@ -88,6 +88,13 @@ describe('SUBSCRIBE EVENT BUS TASK', () => {
      * SUBSCRIBERS
      */
     describe('SUBSCRIBE PhysicalActivitySaveEvent', () => {
+        before(async () => {
+            try {
+                await deleteAllActivities()
+            } catch (err) {
+                throw new Error('Failure on Subscribe PhysicalActivitySaveEvent test: ' + err.message)
+            }
+        })
         // Delete all activities from database after each test case
         afterEach(async () => {
             try {
@@ -109,8 +116,8 @@ describe('SUBSCRIBE EVENT BUS TASK', () => {
                             // As a new resource saved in the database always has a new id,
                             // this is necessary before comparing the saved resource in the
                             // database with the one sent to the bus.
-                            result[0].child_id = result[0].child_id.toString()
                             activity.id = result[0].id
+                            result[0].child_id = result[0].child_id.toString()
                             // Comparing the resources
                             expect(result[0]).to.eql(activity)
                             done()
@@ -159,8 +166,8 @@ describe('SUBSCRIBE EVENT BUS TASK', () => {
                         activityRepository.find(new Query()).then(result => {
                             expect(result.length).to.eql(1)
 
-                            result[0].child_id = result[0].child_id.toString()
                             activity.id = result[0].id
+                            result[0].child_id = result[0].child_id.toString()
 
                             expect(result[0]).to.eql(activity)
                             done()
@@ -204,6 +211,13 @@ describe('SUBSCRIBE EVENT BUS TASK', () => {
     })
 
     describe('SUBSCRIBE SleepSaveEvent', () => {
+        before(async () => {
+            try {
+                await deleteAllSleep()
+            } catch (err) {
+                throw new Error('Failure on Subscribe SleepSaveEvent test: ' + err.message)
+            }
+        })
         // Delete all sleep objects from database after each test case
         afterEach(async () => {
             try {
@@ -225,8 +239,8 @@ describe('SUBSCRIBE EVENT BUS TASK', () => {
                             // As a new resource saved in the database always has a new id,
                             // this is necessary before comparing the saved resource in the
                             // database with the one sent to the bus.
-                            result[0].child_id = result[0].child_id.toString()
                             sleep.id = result[0].id
+                            result[0].child_id = result[0].child_id.toString()
                             // Comparing the resources
                             expect(result[0].id).to.eql(sleep.id)
                             expect(result[0].start_time).to.eql(sleep.start_time)
@@ -282,8 +296,8 @@ describe('SUBSCRIBE EVENT BUS TASK', () => {
                         sleepRepository.find(new Query()).then(result => {
                             expect(result.length).to.eql(1)
 
-                            result[0].child_id = result[0].child_id.toString()
                             sleep.id = result[0].id
+                            result[0].child_id = result[0].child_id.toString()
 
                             expect(result[0].id).to.eql(sleep.id)
                             expect(result[0].start_time).to.eql(sleep.start_time)
@@ -334,15 +348,23 @@ describe('SUBSCRIBE EVENT BUS TASK', () => {
     })
 
     describe('SUBSCRIBE WeightSaveEvent', () => {
-        // Delete all weight objects from database after each test case
-        afterEach(async () => {
+        before(async () => {
             try {
+                await deleteAllBodyFats()
                 await deleteAllWeights()
             } catch (err) {
                 throw new Error('Failure on Subscribe WeightSaveEvent test: ' + err.message)
             }
         })
-
+        // Delete all weight objects from database after each test case
+        afterEach(async () => {
+            try {
+                await deleteAllBodyFats()
+                await deleteAllWeights()
+            } catch (err) {
+                throw new Error('Failure on Subscribe WeightSaveEvent test: ' + err.message)
+            }
+        })
         context('when posting a WeightSaveEvent with one weight object successfully', () => {
             const weight: Weight = new WeightMock()
             it('should return an array with one weight object', (done) => {
@@ -355,8 +377,8 @@ describe('SUBSCRIBE EVENT BUS TASK', () => {
                             // As a new resource saved in the database always has a new id,
                             // this is necessary before comparing the saved resource in the
                             // database with the one sent to the bus.
-                            result[0].child_id = result[0].child_id!.toString()
                             weight.id = result[0].id
+                            result[0].child_id = result[0].child_id!.toString()
                             // Comparing the resources
                             expect(result[0].id).to.eql(weight.id)
                             expect(result[0].type).to.eql(weight.type)
@@ -411,8 +433,8 @@ describe('SUBSCRIBE EVENT BUS TASK', () => {
                         weightRepository.find(new Query()).then(result => {
                             expect(result.length).to.eql(1)
 
-                            result[0].child_id = result[0].child_id!.toString()
                             weight.id = result[0].id
+                            result[0].child_id = result[0].child_id!.toString()
 
                             expect(result[0].id).to.eql(weight.id)
                             expect(result[0].type).to.eql(weight.type)
@@ -462,6 +484,13 @@ describe('SUBSCRIBE EVENT BUS TASK', () => {
     })
 
     describe('SUBSCRIBE LogSaveEvent', () => {
+        before(async () => {
+            try {
+                await deleteAllLogs()
+            } catch (err) {
+                throw new Error('Failure on Subscribe LogSaveEvent test: ' + err.message)
+            }
+        })
         // Delete all logs from database after each test case
         afterEach(async () => {
             try {
@@ -470,7 +499,6 @@ describe('SUBSCRIBE EVENT BUS TASK', () => {
                 throw new Error('Failure on Subscribe LogSaveEvent test: ' + err.message)
             }
         })
-
         context('when posting a LogSaveEvent with one log successfully', () => {
             const log: any = {  type: 'steps',
                                 value: 20,
@@ -486,8 +514,8 @@ describe('SUBSCRIBE EVENT BUS TASK', () => {
                             // As a new resource saved in the database always has a new id,
                             // this is necessary before comparing the saved resource in the
                             // database with the one sent to the bus.
-                            result[0].child_id = result[0].child_id.toString()
                             log.id = result[0].id
+                            result[0].child_id = result[0].child_id.toString()
                             // Comparing the resources
                             expect(result[0].id).to.eql(log.id)
                             expect(result[0].date).to.eql(log.date)
@@ -543,8 +571,8 @@ describe('SUBSCRIBE EVENT BUS TASK', () => {
                         logRepository.find(new Query()).then(result => {
                             expect(result.length).to.eql(1)
 
-                            result[0].child_id = result[0].child_id.toString()
                             log.id = result[0].id
+                            result[0].child_id = result[0].child_id.toString()
 
                             expect(result[0].id).to.eql(log.id)
                             expect(result[0].date).to.eql(log.date)
@@ -607,6 +635,13 @@ describe('SUBSCRIBE EVENT BUS TASK', () => {
     })
 
     describe('SUBSCRIBE InstitutionDeleteEvent', () => {
+        before(async () => {
+            try {
+                await deleteAllEnvironments()
+            } catch (err) {
+                throw new Error('Failure on Subscribe InstitutionDeleteEvent test: ' + err.message)
+            }
+        })
         // Delete all environments from database after each test case
         afterEach(async () => {
             try {
@@ -615,7 +650,6 @@ describe('SUBSCRIBE EVENT BUS TASK', () => {
                 throw new Error('Failure on Subscribe InstitutionDeleteEvent test: ' + err.message)
             }
         })
-
         context('when posting a InstitutionDeleteEvent with an institution that is associated with two previously ' +
             'saved environments', () => {
             before(async () => {
@@ -753,6 +787,17 @@ describe('SUBSCRIBE EVENT BUS TASK', () => {
     })
 
     describe('SUBSCRIBE UserDeleteEvent', () => {
+        before(async () => {
+            try {
+                await deleteAllActivities()
+                await deleteAllSleep()
+                await deleteAllBodyFats()
+                await deleteAllWeights()
+                await deleteAllLogs()
+            } catch (err) {
+                throw new Error('Failure on Subscribe UserDeleteEvent test: ' + err.message)
+            }
+        })
         // Delete all objects associated with the user from database after each test case
         afterEach(async () => {
             try {
@@ -765,7 +810,6 @@ describe('SUBSCRIBE EVENT BUS TASK', () => {
                 throw new Error('Failure on Subscribe UserDeleteEvent test: ' + err.message)
             }
         })
-
         context('when posting a UserDeleteEvent with an user that is associated with two activities, ' +
             'one sleep object, one bodyfat, one weight and one log', () => {
             before(async () => {

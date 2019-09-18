@@ -68,7 +68,8 @@ export class ProviderEventBusTask implements IBackgroundTask {
         // Providing weight resource.
         this._eventBus.bus
             .provideWeights(async (query) => {
-                const _query: IQuery = new Query().fromJSON({ ...qs.parser(query) })
+                const _query: IQuery = new Query().fromJSON({ ...qs.parser(query, {},
+                        { date_fields: { start_at: 'timestamp', end_at: 'timestamp'}}) })
                 const result: Array<Weight> = await this._weightRepository.find(_query)
                 return result.map(item => item.toJSON())
             })
@@ -78,7 +79,8 @@ export class ProviderEventBusTask implements IBackgroundTask {
         // Providing environment resource.
         this._eventBus.bus
             .provideEnvironments(async (query) => {
-                const _query: IQuery = new Query().fromJSON({ ...qs.parser(query) })
+                const _query: IQuery = new Query().fromJSON({ ...qs.parser(query, {},
+                        { date_fields: { start_at: 'timestamp', end_at: 'timestamp'}}) })
                 const result: Array<Environment> = await this._environmentRepository.find(_query)
                 return result.map(item => item.toJSON())
             })
@@ -88,7 +90,8 @@ export class ProviderEventBusTask implements IBackgroundTask {
         // Providing logs resource.
         this._eventBus.bus
             .provideLogs(async (query) => {
-                const _query: IQuery = new Query().fromJSON({ ...qs.parser(query) })
+                const _query: IQuery = new Query().fromJSON({ ...qs.parser(query, {},
+                        { date_fields: { start_at: 'date', end_at: 'date'}}) })
                 const result: Array<Log> = await this._logRepository.find(_query)
                 return result.map(item => item.toJSON())
             })

@@ -70,8 +70,6 @@ describe('Repositories: EnvironmentRepository', () => {
 
         context('when a database error occurs', () => {
             it('should throw a RepositoryException', async () => {
-                defaultEnvironment.timestamp = undefined!
-
                 sinon
                     .mock(modelFake)
                     .expects('findOne')

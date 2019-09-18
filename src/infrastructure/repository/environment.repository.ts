@@ -49,7 +49,7 @@ export class EnvironmentRepository extends BaseRepository<Environment, Environme
                     if (result) return resolve(true)
                     return resolve(false)
                 })
-                .catch(err => reject(super.mongoDBErrorListener(err)))
+                .catch(err => reject(err))
         })
     }
 

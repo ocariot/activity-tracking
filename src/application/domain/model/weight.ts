@@ -45,7 +45,7 @@ export class Weight extends Measurement implements IJSONSerializable, IJSONDeser
         if (json.id !== undefined) super.id = json.id
         if (json.timestamp !== undefined && !(json.timestamp instanceof Date)) {
             this.timestamp = this.convertDatetimeString(json.timestamp)
-        } else {
+        } else if (json.timestamp !== undefined && json.timestamp instanceof Date){
             this.timestamp = json.timestamp
         }
         if (json.value !== undefined) this.value = json.value

@@ -60,7 +60,6 @@ export class LogService implements ILogService {
                 } else {
                     // 3b. Creates new child log.
                     await this._logRepository.create(elem)
-
                     // 4b. Creates a StatusSuccess object for the construction of the MultiStatus response.
                     const statusSuccess: StatusSuccess<Log> = new StatusSuccess<Log>(HttpStatus.CREATED, elem)
                     statusSuccessArr.push(statusSuccess)
@@ -124,6 +123,7 @@ export class LogService implements ILogService {
             DateValidator.validate(dateEnd)
             LogDateRangeValidator.validate(dateStart, dateEnd)
 
+            query.ordination = new Map<string, string>().set('date', 'desc')
             query.addFilter({
                 child_id: childId,
                 $and: [
@@ -182,6 +182,7 @@ export class LogService implements ILogService {
         DateValidator.validate(dateEnd)
         LogDateRangeValidator.validate(dateStart, dateEnd)
 
+        query.ordination = new Map<string, string>().set('date', 'desc')
         query.addFilter({
             child_id: childId,
             type: desiredResource,

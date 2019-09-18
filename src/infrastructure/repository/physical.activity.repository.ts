@@ -44,7 +44,7 @@ export class PhysicalActivityRepository extends BaseRepository<PhysicalActivity,
                     if (result) return resolve(true)
                     return resolve(false)
                 })
-                .catch(err => reject(super.mongoDBErrorListener(err)))
+                .catch(err => reject(err))
         })
     }
 

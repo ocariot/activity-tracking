@@ -93,7 +93,7 @@ export class Environment extends Entity implements IJSONSerializable, IJSONDeser
         this.climatized = json.climatized
         if (json.timestamp !== undefined && !(json.timestamp instanceof Date)) {
             this.timestamp = this.convertDatetimeString(json.timestamp)
-        } else {
+        } else if (json.timestamp !== undefined && json.timestamp instanceof Date){
             this.timestamp = json.timestamp
         }
 

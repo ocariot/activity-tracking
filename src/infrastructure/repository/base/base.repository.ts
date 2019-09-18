@@ -102,6 +102,9 @@ export abstract class BaseRepository<T extends Entity, TModel> implements IRepos
             if (err.name === 'ValidationError') {
                 return new ValidationException('Required fields were not provided!', err.message)
             } else if (err.name === 'CastError' || new RegExp(/(invalid format)/i).test(err)) {
+                if (err.message && err.message.indexOf('Invalid Date')) {
+                    return new ValidationException(`The ${err.path} is not in valid ISO 8601 format.`)
+                }
                 return new ValidationException('Some ID provided, does not have a valid format.',
                     'A 24-byte hex ID similar to this: 507f191e810c19729de860ea, is expected.')
             } else if (err.name === 'MongoError' && err.code === 11000) {
