@@ -25,6 +25,7 @@ import { LogMock } from '../../mocks/log.mock'
 import { Environment } from '../../../src/application/domain/model/environment'
 import { EnvironmentMock } from '../../mocks/environment.mock'
 import { IEnvironmentRepository } from '../../../src/application/port/environment.repository.interface'
+import { Location } from '../../../src/application/domain/model/location'
 
 const dbConnection: IDatabase = DIContainer.get(Identifier.MONGODB_CONNECTION)
 const rabbitmq: IEventBus = DIContainer.get(Identifier.RABBITMQ_EVENT_BUS)
@@ -118,10 +119,9 @@ describe('PROVIDER EVENT BUS TASK', () => {
                         expect(result[0].steps).to.eql(activity.steps)
                         expect(result[0].levels).to.eql(activity.levels!.map(item => item.toJSON()))
                         expect(result[0].heart_rate).to.eql(activity.heart_rate!.toJSON())
+                        done()
                     })
                 })
-
-                done()
             })
         })
 
@@ -217,21 +217,21 @@ describe('PROVIDER EVENT BUS TASK', () => {
                 })
             })
 
-            it('should return an array with three physical activities (query activities by child_id)', (done) => {
+            it('should return an array with three physical activities (query all activities by child_id)', (done) => {
                 rabbitmq.bus.getPhysicalActivities('?child_id=5a62be07de34500146d9c544').then(result => {
                     expect(result.length).to.eql(3)
                     done()
                 })
             })
 
-            it('should return an array with three physical activities (query activities by name)', (done) => {
+            it('should return an array with three physical activities (query all activities by name)', (done) => {
                 rabbitmq.bus.getPhysicalActivities('?name=walk').then(result => {
                     expect(result.length).to.eql(3)
                     done()
                 })
             })
 
-            it('should return an array with two physical activities (query activities by name and child_id)', (done) => {
+            it('should return an array with two physical activities (query all activities by name and child_id)', (done) => {
                 rabbitmq.bus.getPhysicalActivities('?name=walk&child_id=5a62be07d6f33400146c9b61').then(result => {
                     expect(result.length).to.eql(2)
                     done()
@@ -718,7 +718,7 @@ describe('PROVIDER EVENT BUS TASK', () => {
                 })
             })
 
-            it('should return an array with three weight objects (query weight registers by child_id)', (done) => {
+            it('should return an array with three weight objects (query all weight registers by child_id)', (done) => {
                 rabbitmq.bus.getWeights('?child_id=5a62be07de34500146d9c544').then(result => {
                     expect(result.length).to.eql(3)
                     done()
@@ -862,21 +862,33 @@ describe('PROVIDER EVENT BUS TASK', () => {
                 try {
                     const environment1: Environment = new EnvironmentMock()
                     environment1.institution_id = '5a62be07d6f33400146c9b61'
+                    environment1.location = new Location('Indoor', 'Room 40')
+                    environment1.climatized = true
+                    environment1.timestamp = new Date(1547953200000 + Math.floor((Math.random() * 1000)))
 
                     const environment2: Environment = new EnvironmentMock()
                     environment2.institution_id = '5a62be07d6f33400146c9b61'
+                    environment2.location = new Location('Indoor', 'Room 40')
+                    environment2.climatized = true
+                    environment2.timestamp = new Date(1547953200000 + Math.floor((Math.random() * 1000)))
 
                     const environment3: Environment = new EnvironmentMock()
                     environment3.institution_id = '5a62be07de34500146d9c544'
+                    environment3.climatized = true
 
                     const environment4: Environment = new EnvironmentMock()
                     environment4.institution_id = '5a62be07de34500146d9c544'
+                    environment4.climatized = false
 
                     const environment5: Environment = new EnvironmentMock()
                     environment5.institution_id = '5a62be07d6f33400146c9b61'
+                    environment5.location = new Location('Indoor', 'Room 35')
+                    environment5.climatized = true
+                    environment5.timestamp = new Date(1547953200000 + Math.floor((Math.random() * 1000)))
 
                     const environment6: Environment = new EnvironmentMock()
                     environment6.institution_id = '5a62be07de34500146d9c544'
+                    environment6.climatized = false
 
                     await environmentRepository.create(environment1)
                     await environmentRepository.create(environment2)
@@ -909,11 +921,66 @@ describe('PROVIDER EVENT BUS TASK', () => {
                 })
             })
 
-            it('should return an array with three environments (query environments by institution_id)', (done) => {
+            it('should return an array with three environments (query all environments by institution_id)', (done) => {
                 rabbitmq.bus.getEnvironments('?institution_id=5a62be07de34500146d9c544').then(result => {
                     expect(result.length).to.eql(3)
                     done()
                 })
+            })
+
+            it('should return an array with four environments (query all environments that are climatized)', (done) => {
+                rabbitmq.bus.getEnvironments('?climatized=true').then(result => {
+                    expect(result.length).to.eql(4)
+                    done()
+                })
+            })
+
+            it('should return an array with one environment (query all environments that are climatized in an institution)',
+                (done) => {
+                rabbitmq.bus.getEnvironments('?climatized=true&institution_id=5a62be07de34500146d9c544').then(result => {
+                    expect(result.length).to.eql(1)
+                    done()
+                })
+            })
+
+            it('should return an array with three environments (query all the environment records of an institution in one day)',
+                (done) => {
+                    rabbitmq.bus.getEnvironments('?timestamp=gte:2019-01-20T00:00:00.000Z' +
+                        '&timestamp=lt:2019-01-20T23:59:59.999Z' +
+                        '&institution_id=5a62be07d6f33400146c9b61&climatized=true').then(result => {
+                        expect(result.length).to.eql(3)
+                        done()
+                    })
+            })
+
+            it('should return an array with three environments (query all the environment records of an institution in one month)',
+                (done) => {
+                    rabbitmq.bus.getEnvironments('?start_at=2019-01-20T00:00:00.000Z&period=1m' +
+                        '&institution_id=5a62be07d6f33400146c9b61&climatized=true').then(result => {
+                        expect(result.length).to.eql(3)
+                        done()
+                    })
+            })
+
+            it('should return an array with two environments (query all the environment records of a room in one day)',
+                (done) => {
+                    rabbitmq.bus.getEnvironments('?location.local=Indoor&location.room=Room 40' +
+                        '&timestamp=gte:2019-01-20T00:00:00.000Z' +
+                        '&timestamp=lt:2019-01-20T23:59:59.999Z' +
+                        '&institution_id=5a62be07d6f33400146c9b61&climatized=true').then(result => {
+                        expect(result.length).to.eql(2)
+                        done()
+                    })
+            })
+
+            it('should return an array with two environments (query all the environment records of a room in one month)',
+                (done) => {
+                    rabbitmq.bus.getEnvironments('?location.local=Indoor&location.room=Room 40' +
+                        '&start_at=2019-01-20T00:00:00.000Z&period=1m' +
+                        '&institution_id=5a62be07d6f33400146c9b61&climatized=true').then(result => {
+                        expect(result.length).to.eql(2)
+                        done()
+                    })
             })
         })
 
@@ -1096,14 +1163,14 @@ describe('PROVIDER EVENT BUS TASK', () => {
                 })
             })
 
-            it('should return an array with eight logs (query logs by child_id)', (done) => {
+            it('should return an array with eight logs (query all logs by child_id)', (done) => {
                 rabbitmq.bus.getLogs('?child_id=5a62be07de34500146d9c544').then(result => {
                     expect(result.length).to.eql(8)
                     done()
                 })
             })
 
-            it('should return an array with three logs (query logs by type)', (done) => {
+            it('should return an array with three logs (query all logs by type)', (done) => {
                 rabbitmq.bus.getLogs('?type=sedentary_minutes').then(result => {
                     expect(result.length).to.eql(3)
                     done()
