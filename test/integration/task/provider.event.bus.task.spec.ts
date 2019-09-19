@@ -37,10 +37,16 @@ const environmentRepository: IEnvironmentRepository = DIContainer.get(Identifier
 const logRepository: ILogRepository = DIContainer.get(Identifier.LOG_REPOSITORY)
 
 describe('PROVIDER EVENT BUS TASK', () => {
+    // Timeout function for control of execution
+    const timeout = (milliseconds) => {
+        return new Promise(resolve => setTimeout(resolve, milliseconds))
+    }
+
     // Start DB connection, RabbitMQ connection and ProviderEventBusTask
     before(async () => {
         try {
-            await dbConnection.connect(process.env.MONGODB_URI_TEST || Default.MONGODB_URI_TEST)
+            await dbConnection.connect(process.env.MONGODB_URI_TEST || Default.MONGODB_URI_TEST,
+                { interval: 100 })
 
             await deleteAllActivities()
             await deleteAllSleep()
@@ -50,9 +56,11 @@ describe('PROVIDER EVENT BUS TASK', () => {
             await deleteAllEnvironments()
 
             await rabbitmq.initialize(process.env.RABBITMQ_URI || Default.RABBITMQ_URI,
-                { receiveFromYourself: true, sslOptions: { ca: [] }, rpcTimeout: 500 })
+                { interval: 100, receiveFromYourself: true, sslOptions: { ca: [] }, rpcTimeout: 5000 })
 
-            await providerEventBusTask.run()
+            providerEventBusTask.run()
+
+            await timeout(2000)
         } catch (err) {
             throw new Error('Failure on ProviderEventBusTask test: ' + err.message)
         }
@@ -101,8 +109,9 @@ describe('PROVIDER EVENT BUS TASK', () => {
                 const activity: PhysicalActivity = new PhysicalActivityMock()
                 activity.child_id = '5a62be07d6f33400146c9b61'
 
-                activityRepository.create(activity).then(() => {
-                    rabbitmq.bus.getPhysicalActivities('?child_id=5a62be07d6f33400146c9b61').then(result => {
+                activityRepository.create(activity)
+                    .then(async () => {
+                        const result = await rabbitmq.bus.getPhysicalActivities('?child_id=5a62be07d6f33400146c9b61')
                         expect(result.length).to.eql(1)
                         // As a new resource saved in the database always has a new id,
                         // this is necessary before comparing the saved resource in the
@@ -121,7 +130,7 @@ describe('PROVIDER EVENT BUS TASK', () => {
                         expect(result[0].heart_rate).to.eql(activity.heart_rate!.toJSON())
                         done()
                     })
-                })
+                    .catch(done)
             })
         })
 
@@ -204,86 +213,101 @@ describe('PROVIDER EVENT BUS TASK', () => {
                 }
             })
             it('should return an array with six physical activities (regardless of association with a child)', (done) => {
-                rabbitmq.bus.getPhysicalActivities('').then(result => {
-                    expect(result.length).to.eql(6)
-                    done()
-                })
+                rabbitmq.bus.getPhysicalActivities('')
+                    .then(result => {
+                        expect(result.length).to.eql(6)
+                        done()
+                    })
+                    .catch(done)
             })
 
             it('should return an empty array (no activity matches query)', (done) => {
-                rabbitmq.bus.getPhysicalActivities('?child_id=5a62be07d6f33400146c9b64').then(result => {
-                    expect(result.length).to.eql(0)
-                    done()
-                })
+                rabbitmq.bus.getPhysicalActivities('?child_id=5a62be07d6f33400146c9b64')
+                    .then(result => {
+                        expect(result.length).to.eql(0)
+                        done()
+                    })
+                    .catch(done)
             })
 
             it('should return an array with three physical activities (query all activities by child_id)', (done) => {
-                rabbitmq.bus.getPhysicalActivities('?child_id=5a62be07de34500146d9c544').then(result => {
-                    expect(result.length).to.eql(3)
-                    done()
-                })
+                rabbitmq.bus.getPhysicalActivities('?child_id=5a62be07de34500146d9c544')
+                    .then(result => {
+                        expect(result.length).to.eql(3)
+                        done()
+                    })
+                    .catch(done)
             })
 
             it('should return an array with three physical activities (query all activities by name)', (done) => {
-                rabbitmq.bus.getPhysicalActivities('?name=walk').then(result => {
-                    expect(result.length).to.eql(3)
-                    done()
-                })
+                rabbitmq.bus.getPhysicalActivities('?name=walk')
+                    .then(result => {
+                        expect(result.length).to.eql(3)
+                        done()
+                    })
+                    .catch(done)
             })
 
             it('should return an array with two physical activities (query all activities by name and child_id)', (done) => {
-                rabbitmq.bus.getPhysicalActivities('?name=walk&child_id=5a62be07d6f33400146c9b61').then(result => {
-                    expect(result.length).to.eql(2)
-                    done()
-                })
+                rabbitmq.bus.getPhysicalActivities('?name=walk&child_id=5a62be07d6f33400146c9b61')
+                    .then(result => {
+                        expect(result.length).to.eql(2)
+                        done()
+                    })
+                    .catch(done)
             })
 
             it('should return an array with three physical activities (query all activities performed in one day)',
                 (done) => {
-                rabbitmq.bus.getPhysicalActivities('?start_time=gte:2019-01-20T00:00:00.000Z&start_time=lt:2019-01-20T23:59:59.999Z')
-                    .then(result => {
-                        expect(result.length).to.eql(3)
-                        done()
-                    })
-            })
+                    rabbitmq.bus.getPhysicalActivities('?start_time=gte:2019-01-20T00:00:00.000Z&start_time=lt:2019-01-20T23:59:59.999Z')
+                        .then(result => {
+                            expect(result.length).to.eql(3)
+                            done()
+                        })
+                        .catch(done)
+                })
 
             it('should return an array with two physical activities (query the activities of a child performed in one day)',
                 (done) => {
-                rabbitmq.bus.getPhysicalActivities('?start_time=gte:2019-01-20T00:00:00.000Z' +
-                                                          '&start_time=lt:2019-01-20T23:59:59.999Z' +
-                                                          '&child_id=5a62be07de34500146d9c544')
-                    .then(result => {
-                        expect(result.length).to.eql(2)
-                        done()
-                    })
-            })
+                    rabbitmq.bus.getPhysicalActivities('?start_time=gte:2019-01-20T00:00:00.000Z' +
+                        '&start_time=lt:2019-01-20T23:59:59.999Z' +
+                        '&child_id=5a62be07de34500146d9c544')
+                        .then(result => {
+                            expect(result.length).to.eql(2)
+                            done()
+                        })
+                        .catch(done)
+                })
 
             it('should return an array with three physical activities (query all activities performed in one week)',
                 (done) => {
-                rabbitmq.bus.getPhysicalActivities('?start_at=2019-01-20T00:00:00.000Z&period=1w')
-                    .then(result => {
-                        expect(result.length).to.eql(3)
-                        done()
-                    })
-            })
+                    rabbitmq.bus.getPhysicalActivities('?start_at=2019-01-20T00:00:00.000Z&period=1w')
+                        .then(result => {
+                            expect(result.length).to.eql(3)
+                            done()
+                        })
+                        .catch(done)
+                })
 
             it('should return an array with two physical activities (query the activities of a child performed in one week)',
                 (done) => {
-                rabbitmq.bus.getPhysicalActivities('?start_at=2019-01-20T00:00:00.000Z&period=1w&child_id=5a62be07de34500146d9c544')
-                    .then(result => {
-                        expect(result.length).to.eql(2)
-                        done()
-                    })
-            })
+                    rabbitmq.bus.getPhysicalActivities('?start_at=2019-01-20T00:00:00.000Z&period=1w&child_id=5a62be07de34500146d9c544')
+                        .then(result => {
+                            expect(result.length).to.eql(2)
+                            done()
+                        })
+                        .catch(done)
+                })
 
             it('should return an array with five physical activities (query all activities that burned 100 calories or more)',
                 (done) => {
-                rabbitmq.bus.getPhysicalActivities('?calories=gte:100')
-                    .then(result => {
-                        expect(result.length).to.eql(5)
-                        done()
-                    })
-            })
+                    rabbitmq.bus.getPhysicalActivities('?calories=gte:100')
+                        .then(result => {
+                            expect(result.length).to.eql(5)
+                            done()
+                        })
+                        .catch(done)
+                })
 
             it('should return an array with three physical activities ' +
                 '(query all activities of a child that burned 100 calories or more)', (done) => {
@@ -292,16 +316,18 @@ describe('PROVIDER EVENT BUS TASK', () => {
                         expect(result.length).to.eql(3)
                         done()
                     })
+                    .catch(done)
             })
 
             it('should return an array with four physical activities (query all activities that had 700 steps or more)',
                 (done) => {
-                rabbitmq.bus.getPhysicalActivities('?steps=gte:700')
-                    .then(result => {
-                        expect(result.length).to.eql(4)
-                        done()
-                    })
-            })
+                    rabbitmq.bus.getPhysicalActivities('?steps=gte:700')
+                        .then(result => {
+                            expect(result.length).to.eql(4)
+                            done()
+                        })
+                        .catch(done)
+                })
 
             it('should return an array with three physical activities ' +
                 '(query all activities of a child that had 700 steps or more)', (done) => {
@@ -310,6 +336,7 @@ describe('PROVIDER EVENT BUS TASK', () => {
                         expect(result.length).to.eql(3)
                         done()
                     })
+                    .catch(done)
             })
 
             it('should return an array with three physical activities ' +
@@ -319,6 +346,7 @@ describe('PROVIDER EVENT BUS TASK', () => {
                         expect(result.length).to.eql(3)
                         done()
                     })
+                    .catch(done)
             })
 
             it('should return an array with two physical activities ' +
@@ -328,64 +356,70 @@ describe('PROVIDER EVENT BUS TASK', () => {
                         expect(result.length).to.eql(2)
                         done()
                     })
+                    .catch(done)
             })
 
             it('should return an array with three physical activities (query all activities lasting 15 minutes or more)',
                 (done) => {
-                rabbitmq.bus.getPhysicalActivities('?duration=gte:900000')
-                    .then(result => {
-                        expect(result.length).to.eql(3)
-                        done()
-                    })
-            })
+                    rabbitmq.bus.getPhysicalActivities('?duration=gte:900000')
+                        .then(result => {
+                            expect(result.length).to.eql(3)
+                            done()
+                        })
+                        .catch(done)
+                })
 
             it('should return an array with one physical activity (query all activities of a child lasting 15 minutes or more)',
                 (done) => {
-                rabbitmq.bus.getPhysicalActivities('?duration=gte:900000&child_id=5a62be07de34500146d9c544')
-                    .then(result => {
-                        expect(result.length).to.eql(1)
-                        done()
-                    })
-            })
+                    rabbitmq.bus.getPhysicalActivities('?duration=gte:900000&child_id=5a62be07de34500146d9c544')
+                        .then(result => {
+                            expect(result.length).to.eql(1)
+                            done()
+                        })
+                        .catch(done)
+                })
         })
 
         context('when trying to recover physical activities through a query unsuccessful (without MongoDB connection)',
             () => {
-            before(async () => {
-                try {
-                    const activity1: PhysicalActivity = new PhysicalActivityMock()
-                    activity1.child_id = '5a62be07d6f33400146c9b61'
-                    const activity2: PhysicalActivity = new PhysicalActivityMock()
-                    activity2.child_id = '5a62be07d6f33400146c9b61'
+                before(async () => {
+                    try {
+                        const activity1: PhysicalActivity = new PhysicalActivityMock()
+                        activity1.child_id = '5a62be07d6f33400146c9b61'
+                        const activity2: PhysicalActivity = new PhysicalActivityMock()
+                        activity2.child_id = '5a62be07d6f33400146c9b61'
 
-                    await activityRepository.create(activity1)
-                    await activityRepository.create(activity2)
-                } catch (err) {
-                    throw new Error('Failure on Provider PhysicalActivity test: ' + err.message)
-                }
-            })
-            after(async () => {
-                try {
-                    await deleteAllActivities()
-                } catch (err) {
-                    throw new Error('Failure on Provider PhysicalActivity test: ' + err.message)
-                }
-            })
-            it('should return a rpc timeout error', (done) => {
-                dbConnection.dispose().then(() => {
-                    rabbitmq.bus.getPhysicalActivities('?child_id=5a62be07d6f33400146c9b61')
-                        .then(result => {
-                            expect(result.length).to.eql(2)
-                        })
-                        .catch(err => {
-                            expect(err.message).to.eql('rpc timed out')
-                            dbConnection.connect(process.env.MONGODB_URI_TEST || Default.MONGODB_URI_TEST).then(() => {
+                        await activityRepository.create(activity1)
+                        await activityRepository.create(activity2)
+                    } catch (err) {
+                        throw new Error('Failure on Provider PhysicalActivity test: ' + err.message)
+                    }
+                })
+                after(async () => {
+                    try {
+                        await dbConnection.connect(process.env.MONGODB_URI_TEST || Default.MONGODB_URI_TEST,
+                            { interval: 100 })
+                        await deleteAllActivities()
+                    } catch (err) {
+                        throw new Error('Failure on Provider PhysicalActivity test: ' + err.message)
+                    }
+                })
+                it('should return a rpc timeout error', (done) => {
+                    dbConnection.dispose().then(async () => {
+                        try {
+                            await rabbitmq.bus.getPhysicalActivities('?child_id=5a62be07d6f33400146c9b61')
+                            done(new Error('RPC should not function normally'))
+                        } catch (err) {
+                            try {
+                                expect(err.message).to.eql('rpc timed out')
                                 done()
-                            })
-                        })
+                            } catch (err) {
+                                done(err)
+                            }
+                        }
+                    })
                 })
             })
-        })
     })
 
     describe('Provider Sleep', () => {
@@ -410,8 +444,9 @@ describe('PROVIDER EVENT BUS TASK', () => {
                 const sleep: Sleep = new SleepMock()
                 sleep.child_id = '5a62be07d6f33400146c9b61'
 
-                sleepRepository.create(sleep).then(() => {
-                    rabbitmq.bus.getSleep('?child_id=5a62be07d6f33400146c9b61').then(result => {
+                sleepRepository.create(sleep)
+                    .then(async () => {
+                        const result = await rabbitmq.bus.getSleep('?child_id=5a62be07d6f33400146c9b61')
                         expect(result.length).to.eql(1)
                         // As a new resource saved in the database always has a new id,
                         // this is necessary before comparing the saved resource in the
@@ -434,7 +469,7 @@ describe('PROVIDER EVENT BUS TASK', () => {
                         expect(result[0].type).to.eql(sleep.type)
                         done()
                     })
-                })
+                    .catch(done)
             })
         })
 
@@ -493,24 +528,30 @@ describe('PROVIDER EVENT BUS TASK', () => {
                 }
             })
             it('should return an array with six sleep objects (regardless of association with a child)', (done) => {
-                rabbitmq.bus.getSleep('').then(result => {
-                    expect(result.length).to.eql(6)
-                    done()
-                })
+                rabbitmq.bus.getSleep('')
+                    .then(result => {
+                        expect(result.length).to.eql(6)
+                        done()
+                    })
+                    .catch(done)
             })
 
             it('should return an empty array (no sleep matches query)', (done) => {
-                rabbitmq.bus.getSleep('?child_id=5a62be07d6f33400146c9b64').then(result => {
-                    expect(result.length).to.eql(0)
-                    done()
-                })
+                rabbitmq.bus.getSleep('?child_id=5a62be07d6f33400146c9b64')
+                    .then(result => {
+                        expect(result.length).to.eql(0)
+                        done()
+                    })
+                    .catch(done)
             })
 
             it('should return an array with three sleep objects (query sleep records by child_id)', (done) => {
-                rabbitmq.bus.getSleep('?child_id=5a62be07d6f33400146c9b61').then(result => {
-                    expect(result.length).to.eql(3)
-                    done()
-                })
+                rabbitmq.bus.getSleep('?child_id=5a62be07d6f33400146c9b61')
+                    .then(result => {
+                        expect(result.length).to.eql(3)
+                        done()
+                    })
+                    .catch(done)
             })
 
             it('should return an array with three sleep objects (query all sleep records in one day)', (done) => {
@@ -519,6 +560,7 @@ describe('PROVIDER EVENT BUS TASK', () => {
                         expect(result.length).to.eql(3)
                         done()
                     })
+                    .catch(done)
             })
 
             it('should return an array with two sleep objects (query all sleep records of a child in one day)', (done) => {
@@ -529,6 +571,7 @@ describe('PROVIDER EVENT BUS TASK', () => {
                         expect(result.length).to.eql(2)
                         done()
                     })
+                    .catch(done)
             })
 
             it('should return an array with three sleep objects (query all sleep records in one week)', (done) => {
@@ -537,6 +580,7 @@ describe('PROVIDER EVENT BUS TASK', () => {
                         expect(result.length).to.eql(3)
                         done()
                     })
+                    .catch(done)
             })
 
             it('should return an array with two sleep objects (query all sleep records of a child in one week)', (done) => {
@@ -545,25 +589,28 @@ describe('PROVIDER EVENT BUS TASK', () => {
                         expect(result.length).to.eql(2)
                         done()
                     })
+                    .catch(done)
             })
 
             it('should return an array with three sleep objects (query all sleep records that lasted 8 hours or more)',
                 (done) => {
-                rabbitmq.bus.getSleep('?duration=gte:28800000')
-                    .then(result => {
-                        expect(result.length).to.eql(3)
-                        done()
-                    })
-            })
+                    rabbitmq.bus.getSleep('?duration=gte:28800000')
+                        .then(result => {
+                            expect(result.length).to.eql(3)
+                            done()
+                        })
+                        .catch(done)
+                })
 
             it('should return an array with three sleep objects (query all sleep records that lasted less than 8 hours)',
                 (done) => {
-                rabbitmq.bus.getSleep('?duration=lt:28800000')
-                    .then(result => {
-                        expect(result.length).to.eql(3)
-                        done()
-                    })
-            })
+                    rabbitmq.bus.getSleep('?duration=lt:28800000')
+                        .then(result => {
+                            expect(result.length).to.eql(3)
+                            done()
+                        })
+                        .catch(done)
+                })
 
             it('should return an array with two sleep objects ' +
                 '(query all sleep records of a child that lasted 8 hours or more)', (done) => {
@@ -572,6 +619,7 @@ describe('PROVIDER EVENT BUS TASK', () => {
                         expect(result.length).to.eql(2)
                         done()
                     })
+                    .catch(done)
             })
         })
 
@@ -592,24 +640,29 @@ describe('PROVIDER EVENT BUS TASK', () => {
                 })
                 after(async () => {
                     try {
+                        await dbConnection.connect(process.env.MONGODB_URI_TEST || Default.MONGODB_URI_TEST,
+                            { interval: 100 })
                         await deleteAllSleep()
                     } catch (err) {
                         throw new Error('Failure on Provider Sleep test: ' + err.message)
                     }
                 })
                 it('should return a rpc timeout error', (done) => {
-                    dbConnection.dispose().then(() => {
-                        rabbitmq.bus.getSleep('?child_id=5a62be07d6f33400146c9b61')
-                            .then(result => {
-                                expect(result.length).to.eql(2)
-                            })
-                            .catch(err => {
-                                expect(err.message).to.eql('rpc timed out')
-                                dbConnection.connect(process.env.MONGODB_URI_TEST || Default.MONGODB_URI_TEST).then(() => {
+                    dbConnection.dispose()
+                        .then(async () => {
+                            try {
+                                await rabbitmq.bus.getSleep('?child_id=5a62be07d6f33400146c9b61')
+                                done(new Error('RPC should not function normally'))
+                            } catch (err) {
+                                try {
+                                    expect(err.message).to.eql('rpc timed out')
                                     done()
-                                })
-                            })
-                    })
+                                } catch (err) {
+                                    done(err)
+                                }
+                            }
+                        })
+                        .catch(done)
                 })
             })
     })
@@ -636,8 +689,9 @@ describe('PROVIDER EVENT BUS TASK', () => {
                 const weight: Weight = new WeightMock()
                 weight.child_id = '5a62be07d6f33400146c9b61'
 
-                weightService.add(weight).then(() => {
-                    rabbitmq.bus.getWeights('?child_id=5a62be07d6f33400146c9b61').then(result => {
+                weightService.add(weight)
+                    .then(async () => {
+                        const result = await rabbitmq.bus.getWeights('?child_id=5a62be07d6f33400146c9b61')
                         expect(result.length).to.eql(1)
                         // As a new resource saved in the database always has a new id,
                         // this is necessary before comparing the saved resource in the
@@ -652,7 +706,7 @@ describe('PROVIDER EVENT BUS TASK', () => {
                         expect(result[0].body_fat).to.eql(weight.body_fat!.value)
                         done()
                     })
-                })
+                    .catch(done)
             })
         })
 
@@ -705,24 +759,30 @@ describe('PROVIDER EVENT BUS TASK', () => {
                 }
             })
             it('should return an array with six weight objects (regardless of association with a child)', (done) => {
-                rabbitmq.bus.getWeights('').then(result => {
-                    expect(result.length).to.eql(6)
-                    done()
-                })
+                rabbitmq.bus.getWeights('')
+                    .then(result => {
+                        expect(result.length).to.eql(6)
+                        done()
+                    })
+                    .catch(done)
             })
 
             it('should return an empty array (no weight matches query)', (done) => {
-                rabbitmq.bus.getWeights('?child_id=5a62be07d6f33400146c9b64').then(result => {
-                    expect(result.length).to.eql(0)
-                    done()
-                })
+                rabbitmq.bus.getWeights('?child_id=5a62be07d6f33400146c9b64')
+                    .then(result => {
+                        expect(result.length).to.eql(0)
+                        done()
+                    })
+                    .catch(done)
             })
 
             it('should return an array with three weight objects (query all weight registers by child_id)', (done) => {
-                rabbitmq.bus.getWeights('?child_id=5a62be07de34500146d9c544').then(result => {
-                    expect(result.length).to.eql(3)
-                    done()
-                })
+                rabbitmq.bus.getWeights('?child_id=5a62be07de34500146d9c544')
+                    .then(result => {
+                        expect(result.length).to.eql(3)
+                        done()
+                    })
+                    .catch(done)
             })
 
             it('should return an array with three weight objects (query all weight registers in one month)', (done) => {
@@ -731,6 +791,7 @@ describe('PROVIDER EVENT BUS TASK', () => {
                         expect(result.length).to.eql(3)
                         done()
                     })
+                    .catch(done)
             })
 
             it('should return an array with two weight objects (query all weight registers of a child in one month)', (done) => {
@@ -739,6 +800,7 @@ describe('PROVIDER EVENT BUS TASK', () => {
                         expect(result.length).to.eql(2)
                         done()
                     })
+                    .catch(done)
             })
 
             it('should return an array with two weight objects (query all weight registers over 60 kilos)',
@@ -748,7 +810,8 @@ describe('PROVIDER EVENT BUS TASK', () => {
                             expect(result.length).to.eql(2)
                             done()
                         })
-            })
+                        .catch(done)
+                })
 
             it('should return an array with four weight objects (query all weight registers below or equal to 60 kilos)',
                 (done) => {
@@ -757,7 +820,8 @@ describe('PROVIDER EVENT BUS TASK', () => {
                             expect(result.length).to.eql(4)
                             done()
                         })
-            })
+                        .catch(done)
+                })
 
             it('should return an array with two weight objects (query all weight registers of a child below or equal to 60 kilos)',
                 (done) => {
@@ -766,7 +830,8 @@ describe('PROVIDER EVENT BUS TASK', () => {
                             expect(result.length).to.eql(2)
                             done()
                         })
-            })
+                        .catch(done)
+                })
         })
 
         context('when trying to recover weight objects through a query unsuccessful (without MongoDB connection)',
@@ -786,26 +851,31 @@ describe('PROVIDER EVENT BUS TASK', () => {
                 })
                 after(async () => {
                     try {
+                        await dbConnection.connect(process.env.MONGODB_URI_TEST || Default.MONGODB_URI_TEST,
+                            { interval: 100 })
                         await deleteAllWeights()
                     } catch (err) {
                         throw new Error('Failure on Provider Weight test: ' + err.message)
                     }
                 })
                 it('should return a rpc timeout error', (done) => {
-                    dbConnection.dispose().then(() => {
-                        rabbitmq.bus.getWeights('?child_id=5a62be07d6f33400146c9b61')
-                            .then(result => {
-                                expect(result.length).to.eql(2)
-                            })
-                            .catch(err => {
-                                expect(err.message).to.eql('rpc timed out')
-                                dbConnection.connect(process.env.MONGODB_URI_TEST || Default.MONGODB_URI_TEST).then(() => {
+                    dbConnection.dispose()
+                        .then(async () => {
+                            try {
+                                await rabbitmq.bus.getWeights('?child_id=5a62be07d6f33400146c9b61')
+                                done(new Error('RPC should not function normally'))
+                            } catch (err) {
+                                try {
+                                    expect(err.message).to.eql('rpc timed out')
                                     done()
-                                })
-                            })
-                    })
+                                } catch (err) {
+                                    done(err)
+                                }
+                            }
+                        })
+                        .catch(done)
                 })
-        })
+            })
     })
 
     describe('Provider Environment', () => {
@@ -830,8 +900,9 @@ describe('PROVIDER EVENT BUS TASK', () => {
                 const environment: Environment = new EnvironmentMock()
                 environment.institution_id = '5a62be07d6f33400146c9b61'
 
-                environmentRepository.create(environment).then(() => {
-                    rabbitmq.bus.getEnvironments('?institution_id=5a62be07d6f33400146c9b61').then(result => {
+                environmentRepository.create(environment)
+                    .then(async () => {
+                        const result = await rabbitmq.bus.getEnvironments('?institution_id=5a62be07d6f33400146c9b61')
                         expect(result.length).to.eql(1)
                         // As a new resource saved in the database always has a new id,
                         // this is necessary before comparing the saved resource in the
@@ -852,7 +923,7 @@ describe('PROVIDER EVENT BUS TASK', () => {
                         expect(result[0].timestamp).to.eql(environment.timestamp.toISOString())
                         done()
                     })
-                })
+                    .catch(done)
             })
         })
 
@@ -908,80 +979,98 @@ describe('PROVIDER EVENT BUS TASK', () => {
                 }
             })
             it('should return an array with six environments (regardless of association with an institution)', (done) => {
-                rabbitmq.bus.getEnvironments('').then(result => {
-                    expect(result.length).to.eql(6)
-                    done()
-                })
+                rabbitmq.bus.getEnvironments('')
+                    .then(result => {
+                        expect(result.length).to.eql(6)
+                        done()
+                    })
+                    .catch(done)
             })
 
             it('should return an empty array (no environment matches query)', (done) => {
-                rabbitmq.bus.getEnvironments('?institution_id=5a62be07d6f33400146c9b64').then(result => {
-                    expect(result.length).to.eql(0)
-                    done()
-                })
+                rabbitmq.bus.getEnvironments('?institution_id=5a62be07d6f33400146c9b64')
+                    .then(result => {
+                        expect(result.length).to.eql(0)
+                        done()
+                    })
+                    .catch(done)
             })
 
             it('should return an array with three environments (query all environments by institution_id)', (done) => {
-                rabbitmq.bus.getEnvironments('?institution_id=5a62be07de34500146d9c544').then(result => {
-                    expect(result.length).to.eql(3)
-                    done()
-                })
+                rabbitmq.bus.getEnvironments('?institution_id=5a62be07de34500146d9c544')
+                    .then(result => {
+                        expect(result.length).to.eql(3)
+                        done()
+                    })
+                    .catch(done)
             })
 
             it('should return an array with four environments (query all environments that are climatized)', (done) => {
-                rabbitmq.bus.getEnvironments('?climatized=true').then(result => {
-                    expect(result.length).to.eql(4)
-                    done()
-                })
+                rabbitmq.bus.getEnvironments('?climatized=true')
+                    .then(result => {
+                        expect(result.length).to.eql(4)
+                        done()
+                    })
+                    .catch(done)
             })
 
             it('should return an array with one environment (query all environments that are climatized in an institution)',
                 (done) => {
-                rabbitmq.bus.getEnvironments('?climatized=true&institution_id=5a62be07de34500146d9c544').then(result => {
-                    expect(result.length).to.eql(1)
-                    done()
+                    rabbitmq.bus.getEnvironments('?climatized=true&institution_id=5a62be07de34500146d9c544')
+                        .then(result => {
+                            expect(result.length).to.eql(1)
+                            done()
+                        })
+                        .catch(done)
                 })
-            })
 
             it('should return an array with three environments (query all the environment records of an institution in one day)',
                 (done) => {
                     rabbitmq.bus.getEnvironments('?timestamp=gte:2019-01-20T00:00:00.000Z' +
                         '&timestamp=lt:2019-01-20T23:59:59.999Z' +
-                        '&institution_id=5a62be07d6f33400146c9b61&climatized=true').then(result => {
-                        expect(result.length).to.eql(3)
-                        done()
-                    })
-            })
+                        '&institution_id=5a62be07d6f33400146c9b61&climatized=true')
+                        .then(result => {
+                            expect(result.length).to.eql(3)
+                            done()
+                        })
+                        .catch(done)
+                })
 
             it('should return an array with three environments (query all the environment records of an institution in one month)',
                 (done) => {
                     rabbitmq.bus.getEnvironments('?start_at=2019-01-20T00:00:00.000Z&period=1m' +
-                        '&institution_id=5a62be07d6f33400146c9b61&climatized=true').then(result => {
-                        expect(result.length).to.eql(3)
-                        done()
-                    })
-            })
+                        '&institution_id=5a62be07d6f33400146c9b61&climatized=true')
+                        .then(result => {
+                            expect(result.length).to.eql(3)
+                            done()
+                        })
+                        .catch(done)
+                })
 
             it('should return an array with two environments (query all the environment records of a room in one day)',
                 (done) => {
                     rabbitmq.bus.getEnvironments('?location.local=Indoor&location.room=Room 40' +
                         '&timestamp=gte:2019-01-20T00:00:00.000Z' +
                         '&timestamp=lt:2019-01-20T23:59:59.999Z' +
-                        '&institution_id=5a62be07d6f33400146c9b61&climatized=true').then(result => {
-                        expect(result.length).to.eql(2)
-                        done()
-                    })
-            })
+                        '&institution_id=5a62be07d6f33400146c9b61&climatized=true')
+                        .then(result => {
+                            expect(result.length).to.eql(2)
+                            done()
+                        })
+                        .catch(done)
+                })
 
             it('should return an array with two environments (query all the environment records of a room in one month)',
                 (done) => {
                     rabbitmq.bus.getEnvironments('?location.local=Indoor&location.room=Room 40' +
                         '&start_at=2019-01-20T00:00:00.000Z&period=1m' +
-                        '&institution_id=5a62be07d6f33400146c9b61&climatized=true').then(result => {
-                        expect(result.length).to.eql(2)
-                        done()
-                    })
-            })
+                        '&institution_id=5a62be07d6f33400146c9b61&climatized=true')
+                        .then(result => {
+                            expect(result.length).to.eql(2)
+                            done()
+                        })
+                        .catch(done)
+                })
         })
 
         context('when trying to recover environments through a query unsuccessful (without MongoDB connection)',
@@ -1001,25 +1090,29 @@ describe('PROVIDER EVENT BUS TASK', () => {
                 })
                 after(async () => {
                     try {
+                        await dbConnection.connect(process.env.MONGODB_URI_TEST || Default.MONGODB_URI_TEST,
+                            { interval: 100 })
                         await deleteAllEnvironments()
                     } catch (err) {
                         throw new Error('Failure on Provider Environment test: ' + err.message)
                     }
                 })
                 it('should return a rpc timeout error', (done) => {
-                    dbConnection.dispose().then(() => {
-                        rabbitmq.bus.getEnvironments('?institution_id=5a62be07d6f33400146c9b61')
-                            .then(result => {
-                                expect(result.length).to.eql(2)
-                                done()
-                            })
-                            .catch(err => {
-                                expect(err.message).to.eql('rpc timed out')
-                                dbConnection.connect(process.env.MONGODB_URI_TEST || Default.MONGODB_URI_TEST).then(() => {
+                    dbConnection.dispose()
+                        .then(async () => {
+                            try {
+                                await rabbitmq.bus.getEnvironments('?institution_id=5a62be07d6f33400146c9b61')
+                                done(new Error('RPC should not function normally'))
+                            } catch (err) {
+                                try {
+                                    expect(err.message).to.eql('rpc timed out')
                                     done()
-                                })
-                            })
-                    })
+                                } catch (err) {
+                                    done(err)
+                                }
+                            }
+                        })
+                        .catch(done)
                 })
             })
     })
@@ -1046,8 +1139,9 @@ describe('PROVIDER EVENT BUS TASK', () => {
                 const log: Log = new LogMock()
                 log.child_id = '5a62be07d6f33400146c9b61'
 
-                logRepository.create(log).then(() => {
-                    rabbitmq.bus.getLogs('?child_id=5a62be07d6f33400146c9b61').then(result => {
+                logRepository.create(log)
+                    .then(async () => {
+                        const result = await rabbitmq.bus.getLogs('?child_id=5a62be07d6f33400146c9b61')
                         expect(result.length).to.eql(1)
                         // As a new resource saved in the database always has a new id,
                         // this is necessary before comparing the saved resource in the
@@ -1059,7 +1153,7 @@ describe('PROVIDER EVENT BUS TASK', () => {
                         expect(result[0].value).to.eql(log.value)
                         done()
                     })
-                })
+                    .catch(done)
             })
         })
 
@@ -1150,38 +1244,48 @@ describe('PROVIDER EVENT BUS TASK', () => {
                 }
             })
             it('should return an array with thirteen logs (regardless of association with a child)', (done) => {
-                rabbitmq.bus.getLogs('').then(result => {
-                    expect(result.length).to.eql(13)
-                    done()
-                })
+                rabbitmq.bus.getLogs('')
+                    .then(result => {
+                        expect(result.length).to.eql(13)
+                        done()
+                    })
+                    .catch(done)
             })
 
             it('should return an empty array (no log matches query)', (done) => {
-                rabbitmq.bus.getLogs('?child_id=5a62be07d6f33400146c9b64').then(result => {
-                    expect(result.length).to.eql(0)
-                    done()
-                })
+                rabbitmq.bus.getLogs('?child_id=5a62be07d6f33400146c9b64')
+                    .then(result => {
+                        expect(result.length).to.eql(0)
+                        done()
+                    })
+                    .catch(done)
             })
 
             it('should return an array with eight logs (query all logs by child_id)', (done) => {
-                rabbitmq.bus.getLogs('?child_id=5a62be07de34500146d9c544').then(result => {
-                    expect(result.length).to.eql(8)
-                    done()
-                })
+                rabbitmq.bus.getLogs('?child_id=5a62be07de34500146d9c544')
+                    .then(result => {
+                        expect(result.length).to.eql(8)
+                        done()
+                    })
+                    .catch(done)
             })
 
             it('should return an array with three logs (query all logs by type)', (done) => {
-                rabbitmq.bus.getLogs('?type=sedentary_minutes').then(result => {
-                    expect(result.length).to.eql(3)
-                    done()
-                })
+                rabbitmq.bus.getLogs('?type=sedentary_minutes')
+                    .then(result => {
+                        expect(result.length).to.eql(3)
+                        done()
+                    })
+                    .catch(done)
             })
 
             it('should return an array with two logs (query logs of a child by type)', (done) => {
-                rabbitmq.bus.getLogs('?type=sedentary_minutes&child_id=5a62be07de34500146d9c544').then(result => {
-                    expect(result.length).to.eql(2)
-                    done()
-                })
+                rabbitmq.bus.getLogs('?type=sedentary_minutes&child_id=5a62be07de34500146d9c544')
+                    .then(result => {
+                        expect(result.length).to.eql(2)
+                        done()
+                    })
+                    .catch(done)
             })
 
             it('should return an array with seven logs (query all logs in one month)', (done) => {
@@ -1190,6 +1294,7 @@ describe('PROVIDER EVENT BUS TASK', () => {
                         expect(result.length).to.eql(7)
                         done()
                     })
+                    .catch(done)
             })
 
             it('should return an array with five log (query all logs of a child in one month)', (done) => {
@@ -1198,6 +1303,7 @@ describe('PROVIDER EVENT BUS TASK', () => {
                         expect(result.length).to.eql(5)
                         done()
                     })
+                    .catch(done)
             })
 
             it('should return an array with two log (query all logs of a child by type in one month)', (done) => {
@@ -1207,6 +1313,7 @@ describe('PROVIDER EVENT BUS TASK', () => {
                         expect(result.length).to.eql(2)
                         done()
                     })
+                    .catch(done)
             })
 
             it('should return an array with two log (query all calories logs over 100)',
@@ -1216,7 +1323,8 @@ describe('PROVIDER EVENT BUS TASK', () => {
                             expect(result.length).to.eql(2)
                             done()
                         })
-            })
+                        .catch(done)
+                })
 
             it('should return an array with two log (query all calories logs of a child over 100)',
                 (done) => {
@@ -1225,6 +1333,7 @@ describe('PROVIDER EVENT BUS TASK', () => {
                             expect(result.length).to.eql(2)
                             done()
                         })
+                        .catch(done)
                 })
         })
 
@@ -1245,24 +1354,29 @@ describe('PROVIDER EVENT BUS TASK', () => {
                 })
                 after(async () => {
                     try {
+                        await dbConnection.connect(process.env.MONGODB_URI_TEST || Default.MONGODB_URI_TEST,
+                            { interval: 100 })
                         await deleteAllLogs()
                     } catch (err) {
                         throw new Error('Failure on Provider Log test: ' + err.message)
                     }
                 })
                 it('should return a rpc timeout error', (done) => {
-                    dbConnection.dispose().then(() => {
-                        rabbitmq.bus.getLogs('?child_id=5a62be07d6f33400146c9b61')
-                            .then(result => {
-                                expect(result.length).to.eql(2)
-                            })
-                            .catch(err => {
-                                expect(err.message).to.eql('rpc timed out')
-                                dbConnection.connect(process.env.MONGODB_URI_TEST || Default.MONGODB_URI_TEST).then(() => {
+                    dbConnection.dispose()
+                        .then(async () => {
+                            try {
+                                await rabbitmq.bus.getLogs('?child_id=5a62be07d6f33400146c9b61')
+                                done(new Error('RPC should not function normally'))
+                            } catch (err) {
+                                try {
+                                    expect(err.message).to.eql('rpc timed out')
                                     done()
-                                })
-                            })
-                    })
+                                } catch (err) {
+                                    done(err)
+                                }
+                            }
+                        })
+                        .catch(done)
                 })
             })
     })

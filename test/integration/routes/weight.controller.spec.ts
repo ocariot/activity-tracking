@@ -44,8 +44,10 @@ describe('Routes: children.weights', () => {
     // Start services
     before(async () => {
         try {
-            await dbConnection.connect(process.env.MONGODB_URI_TEST || Default.MONGODB_URI_TEST)
-            await rabbitmq.initialize(process.env.RABBITMQ_URI || Default.RABBITMQ_URI, { sslOptions: { ca: [] } })
+            await dbConnection.connect(process.env.MONGODB_URI_TEST || Default.MONGODB_URI_TEST,
+                { interval: 100 })
+            await rabbitmq.initialize(process.env.RABBITMQ_URI || Default.RABBITMQ_URI,
+                { interval: 100, sslOptions: { ca: [] } })
             await deleteAllWeights()
         } catch (err) {
             throw new Error('Failure on children.weights routes test: ' + err.message)
@@ -117,7 +119,7 @@ describe('Routes: children.weights', () => {
                     await deleteAllWeights()
 
                     await rabbitmq.initialize(process.env.RABBITMQ_URI || Default.RABBITMQ_URI,
-                        { receiveFromYourself: true, sslOptions: { ca: [] } })
+                        { interval: 100, receiveFromYourself: true, sslOptions: { ca: [] } })
                 } catch (err) {
                     throw new Error('Failure on children.weights routes test: ' + err.message)
                 }
@@ -127,17 +129,21 @@ describe('Routes: children.weights', () => {
                 'published on the bus', (done) => {
                 rabbitmq.bus
                     .subSaveWeight(message => {
-                        expect(message.event_name).to.eql('WeightSaveEvent')
-                        expect(message).to.have.property('timestamp')
-                        expect(message).to.have.property('weight')
-                        defaultWeight.id = message.weight.id
-                        expect(message.weight.id).to.eql(defaultWeight.id)
-                        expect(message.weight.timestamp).to.eql(defaultWeight.timestamp!.toISOString())
-                        expect(message.weight.value).to.eql(defaultWeight.value)
-                        expect(message.weight.unit).to.eql(defaultWeight.unit)
-                        expect(message.weight.child_id).to.eql(defaultWeight.child_id)
-                        expect(message.weight.body_fat).to.eql(defaultWeight.value)
-                        done()
+                        try {
+                            expect(message.event_name).to.eql('WeightSaveEvent')
+                            expect(message).to.have.property('timestamp')
+                            expect(message).to.have.property('weight')
+                            defaultWeight.id = message.weight.id
+                            expect(message.weight.id).to.eql(defaultWeight.id)
+                            expect(message.weight.timestamp).to.eql(defaultWeight.timestamp!.toISOString())
+                            expect(message.weight.value).to.eql(defaultWeight.value)
+                            expect(message.weight.unit).to.eql(defaultWeight.unit)
+                            expect(message.weight.child_id).to.eql(defaultWeight.child_id)
+                            expect(message.weight.body_fat).to.eql(defaultWeight.value)
+                            done()
+                        } catch (err) {
+                            done(err)
+                        }
                     })
                     .then(() => {
                         request
@@ -147,9 +153,7 @@ describe('Routes: children.weights', () => {
                             .expect(201)
                             .then()
                     })
-                    .catch((err) => {
-                        done(err)
-                    })
+                    .catch(done)
             })
         })
     })
@@ -162,7 +166,8 @@ describe('Routes: children.weights', () => {
 
                     await rabbitmq.dispose()
 
-                    await rabbitmq.initialize(process.env.RABBITMQ_URI || Default.RABBITMQ_URI, { sslOptions: { ca: [] } })
+                    await rabbitmq.initialize(process.env.RABBITMQ_URI || Default.RABBITMQ_URI,
+                        { interval: 100, sslOptions: { ca: [] } })
                 } catch (err) {
                     throw new Error('Failure on children.weights routes test: ' + err.message)
                 }
@@ -1061,7 +1066,7 @@ describe('Routes: children.weights', () => {
                     })
 
                     await rabbitmq.initialize(process.env.RABBITMQ_URI || Default.RABBITMQ_URI,
-                        { receiveFromYourself: true, sslOptions: { ca: [] } })
+                        { interval: 100, receiveFromYourself: true, sslOptions: { ca: [] } })
                 } catch (err) {
                     throw new Error('Failure on children.weights routes test: ' + err.message)
                 }
@@ -1071,12 +1076,16 @@ describe('Routes: children.weights', () => {
                 'published on the bus', (done) => {
                 rabbitmq.bus
                     .subDeleteWeight(message => {
-                        expect(message.event_name).to.eql('WeightDeleteEvent')
-                        expect(message).to.have.property('timestamp')
-                        expect(message).to.have.property('weight')
-                        defaultWeight.id = message.weight.id
-                        expect(message.weight.id).to.eql(defaultWeight.id)
-                        done()
+                        try {
+                            expect(message.event_name).to.eql('WeightDeleteEvent')
+                            expect(message).to.have.property('timestamp')
+                            expect(message).to.have.property('weight')
+                            defaultWeight.id = message.weight.id
+                            expect(message.weight.id).to.eql(defaultWeight.id)
+                            done()
+                        } catch (err) {
+                            done(err)
+                        }
                     })
                     .then(() => {
                         request
@@ -1085,9 +1094,7 @@ describe('Routes: children.weights', () => {
                             .expect(204)
                             .then()
                     })
-                    .catch((err) => {
-                        done(err)
-                    })
+                    .catch(done)
             })
         })
     })
@@ -1117,7 +1124,8 @@ describe('Routes: children.weights', () => {
 
                     await rabbitmq.dispose()
 
-                    await rabbitmq.initialize(process.env.RABBITMQ_URI || Default.RABBITMQ_URI, { sslOptions: { ca: [] } })
+                    await rabbitmq.initialize(process.env.RABBITMQ_URI || Default.RABBITMQ_URI,
+                        { interval: 100, sslOptions: { ca: [] } })
                 } catch (err) {
                     throw new Error('Failure on children.weights routes test: ' + err.message)
                 }

@@ -48,7 +48,8 @@ describe('SUBSCRIBE EVENT BUS TASK', () => {
     // Start DB connection, RabbitMQ connection and SubscribeEventBusTask
     before(async () => {
         try {
-            await dbConnection.connect(process.env.MONGODB_URI_TEST || Default.MONGODB_URI_TEST)
+            await dbConnection.connect(process.env.MONGODB_URI_TEST || Default.MONGODB_URI_TEST,
+                { interval: 100 })
 
             await deleteAllActivities()
             await deleteAllSleep()
@@ -58,9 +59,11 @@ describe('SUBSCRIBE EVENT BUS TASK', () => {
             await deleteAllEnvironments()
 
             await rabbitmq.initialize(process.env.RABBITMQ_URI || Default.RABBITMQ_URI,
-                { receiveFromYourself: true, sslOptions: { ca: [] } })
+                { interval: 100, receiveFromYourself: true, sslOptions: { ca: [] } })
 
-            await subscribeEventBusTask.run()
+            subscribeEventBusTask.run()
+
+            await timeout(2000)
         } catch (err) {
             throw new Error('Failure on SubscribeEventBusTask test: ' + err.message)
         }
@@ -107,38 +110,37 @@ describe('SUBSCRIBE EVENT BUS TASK', () => {
         context('when posting a PhysicalActivitySaveEvent with one physical activity successfully', () => {
             const activity: PhysicalActivity = new PhysicalActivityMock()
             it('should return an array with one physical activity', (done) => {
-                rabbitmq.bus.pubSavePhysicalActivity(activity).then(() => {
-                    // Wait for 1000 milliseconds for the task to be executed
-                    timeout(1000).then(() => {
+                rabbitmq.bus.pubSavePhysicalActivity(activity)
+                    .then(async () => {
+                        // Wait for 2000 milliseconds for the task to be executed
+                        await timeout(2000)
 
-                        activityRepository.find(new Query()).then(result => {
-                            expect(result.length).to.eql(1)
-                            // As a new resource saved in the database always has a new id,
-                            // this is necessary before comparing the saved resource in the
-                            // database with the one sent to the bus.
-                            activity.id = result[0].id
-                            result[0].child_id = result[0].child_id.toString()
-                            // Comparing the resources
-                            expect(result[0]).to.eql(activity)
-                            done()
-                        })
+                        const result = await activityRepository.find(new Query())
+                        expect(result.length).to.eql(1)
+                        // As a new resource saved in the database always has a new id,
+                        // this is necessary before comparing the saved resource in the
+                        // database with the one sent to the bus.
+                        activity.id = result[0].id
+                        result[0].child_id = result[0].child_id.toString()
+                        // Comparing the resources
+                        expect(result[0]).to.eql(activity)
+                        done()
                     })
-                })
+                    .catch(done)
             })
         })
 
         context('when posting a PhysicalActivitySaveEvent with one invalid physical activity', () => {
             const activity: PhysicalActivity = new PhysicalActivity()       // Invalid activity
             it('should return an empty array', (done) => {
-                rabbitmq.bus.pubSavePhysicalActivity(activity).then(() => {
-                    // Wait for 1000 milliseconds for the task to be executed
-                    timeout(1000).then(() => {
-                        activityRepository.find(new Query()).then(result => {
-                            expect(result.length).to.eql(0)
-                            done()
-                        })
+                rabbitmq.bus.pubSavePhysicalActivity(activity)
+                    .then(async () => {
+                        await timeout(2000)
+                        const result = await activityRepository.find(new Query())
+                        expect(result.length).to.eql(0)
+                        done()
                     })
-                })
+                    .catch(done)
             })
         })
 
@@ -153,27 +155,23 @@ describe('SUBSCRIBE EVENT BUS TASK', () => {
             })
             const activity: PhysicalActivity = new PhysicalActivityMock()
             it('should return an array with one physical activity', (done) => {
-                rabbitmq.bus.pubSavePhysicalActivity(activity).then(() => {
-                    setTimeout(async () => {
-                        try {
-                            await dbConnection.connect(process.env.MONGODB_URI_TEST || Default.MONGODB_URI_TEST)
-                        } catch (err) {
-                            console.log(err)
-                        }
-                    }, 1000)
+                rabbitmq.bus.pubSavePhysicalActivity(activity)
+                    .then(async () => {
+                        await timeout(1000)
+                        await dbConnection.connect(process.env.MONGODB_URI_TEST || Default.MONGODB_URI_TEST,
+                            { interval: 100 })
 
-                    setTimeout(() => {
-                        activityRepository.find(new Query()).then(result => {
-                            expect(result.length).to.eql(1)
+                        await timeout(2000)
+                        const result = await activityRepository.find(new Query())
+                        expect(result.length).to.eql(1)
 
-                            activity.id = result[0].id
-                            result[0].child_id = result[0].child_id.toString()
+                        activity.id = result[0].id
+                        result[0].child_id = result[0].child_id.toString()
 
-                            expect(result[0]).to.eql(activity)
-                            done()
-                        })
-                    }, 2000)
-                })
+                        expect(result[0]).to.eql(activity)
+                        done()
+                    })
+                    .catch(done)
             })
         })
 
@@ -182,14 +180,14 @@ describe('SUBSCRIBE EVENT BUS TASK', () => {
             const activity2: PhysicalActivity = new PhysicalActivityMock()
             const activity3: PhysicalActivity = new PhysicalActivityMock()
             it('should return an array with three physical activities', (done) => {
-                rabbitmq.bus.pubSavePhysicalActivity([activity1, activity2, activity3]).then(() => {
-                    timeout(1000).then(() => {
-                        activityRepository.find(new Query()).then(result => {
-                            expect(result.length).to.eql(3)
-                            done()
-                        })
+                rabbitmq.bus.pubSavePhysicalActivity([activity1, activity2, activity3])
+                    .then(async () => {
+                        await timeout(2000)
+                        const result = await activityRepository.find(new Query())
+                        expect(result.length).to.eql(3)
+                        done()
                     })
-                })
+                    .catch(done)
             })
         })
 
@@ -198,14 +196,14 @@ describe('SUBSCRIBE EVENT BUS TASK', () => {
             const activity2: PhysicalActivity = new PhysicalActivity()
             const activity3: PhysicalActivity = new PhysicalActivityMock()
             it('should return an array with two physical activities', (done) => {
-                rabbitmq.bus.pubSavePhysicalActivity([activity1, activity2, activity3]).then(() => {
-                    timeout(1000).then(() => {
-                        activityRepository.find(new Query()).then(result => {
-                            expect(result.length).to.eql(2)
-                            done()
-                        })
+                rabbitmq.bus.pubSavePhysicalActivity([activity1, activity2, activity3])
+                    .then(async () => {
+                        await timeout(2000)
+                        const result = await activityRepository.find(new Query())
+                        expect(result.length).to.eql(2)
+                        done()
                     })
-                })
+                    .catch(done)
             })
         })
     })
@@ -230,45 +228,44 @@ describe('SUBSCRIBE EVENT BUS TASK', () => {
         context('when posting a SleepSaveEvent with one sleep object successfully', () => {
             const sleep: Sleep = new SleepMock()
             it('should return an array with one sleep object', (done) => {
-                rabbitmq.bus.pubSaveSleep(sleep).then(() => {
-                    // Wait for 1000 milliseconds for the task to be executed
-                    timeout(1000).then(() => {
+                rabbitmq.bus.pubSaveSleep(sleep)
+                    .then(async () => {
+                        // Wait for 2000 milliseconds for the task to be executed
+                        await timeout(2000)
 
-                        sleepRepository.find(new Query()).then(result => {
-                            expect(result.length).to.eql(1)
-                            // As a new resource saved in the database always has a new id,
-                            // this is necessary before comparing the saved resource in the
-                            // database with the one sent to the bus.
-                            sleep.id = result[0].id
-                            result[0].child_id = result[0].child_id.toString()
-                            // Comparing the resources
-                            expect(result[0].id).to.eql(sleep.id)
-                            expect(result[0].start_time).to.eql(sleep.start_time)
-                            expect(result[0].end_time).to.eql(sleep.end_time)
-                            expect(result[0].duration).to.eql(sleep.duration)
-                            expect(result[0].child_id).to.eql(sleep.child_id)
-                            expect(result[0].pattern!.data_set).to.eql(sleep.pattern!.data_set)
-                            expect(result[0].pattern).to.have.property('summary')
-                            expect(result[0].type).to.eql(sleep.type)
-                            done()
-                        })
+                        const result = await sleepRepository.find(new Query())
+                        expect(result.length).to.eql(1)
+                        // As a new resource saved in the database always has a new id,
+                        // this is necessary before comparing the saved resource in the
+                        // database with the one sent to the bus.
+                        sleep.id = result[0].id
+                        result[0].child_id = result[0].child_id.toString()
+                        // Comparing the resources
+                        expect(result[0].id).to.eql(sleep.id)
+                        expect(result[0].start_time).to.eql(sleep.start_time)
+                        expect(result[0].end_time).to.eql(sleep.end_time)
+                        expect(result[0].duration).to.eql(sleep.duration)
+                        expect(result[0].child_id).to.eql(sleep.child_id)
+                        expect(result[0].pattern!.data_set).to.eql(sleep.pattern!.data_set)
+                        expect(result[0].pattern).to.have.property('summary')
+                        expect(result[0].type).to.eql(sleep.type)
+                        done()
                     })
-                })
+                    .catch(done)
             })
         })
 
         context('when posting a SleepSaveEvent with one invalid sleep object', () => {
             const sleep: Sleep = new Sleep()       // Invalid sleep object
             it('should return an empty array', (done) => {
-                rabbitmq.bus.pubSaveSleep(sleep).then(() => {
-                    // Wait for 1000 milliseconds for the task to be executed
-                    timeout(1000).then(() => {
-                        sleepRepository.find(new Query()).then(result => {
-                            expect(result.length).to.eql(0)
-                            done()
-                        })
+                rabbitmq.bus.pubSaveSleep(sleep)
+                    .then(async () => {
+                        await timeout(2000)
+                        const result = await sleepRepository.find(new Query())
+                        expect(result.length).to.eql(0)
+                        done()
                     })
-                })
+                    .catch(done)
             })
         })
 
@@ -283,34 +280,30 @@ describe('SUBSCRIBE EVENT BUS TASK', () => {
             })
             const sleep: Sleep = new SleepMock()
             it('should return an array with one sleep object', (done) => {
-                rabbitmq.bus.pubSaveSleep(sleep).then(() => {
-                    setTimeout(async () => {
-                        try {
-                            await dbConnection.connect(process.env.MONGODB_URI_TEST || Default.MONGODB_URI_TEST)
-                        } catch (err) {
-                            console.log(err)
-                        }
-                    }, 1000)
+                rabbitmq.bus.pubSaveSleep(sleep)
+                    .then(async () => {
+                        await timeout(1000)
+                        await dbConnection.connect(process.env.MONGODB_URI_TEST || Default.MONGODB_URI_TEST,
+                            { interval: 100 })
 
-                    setTimeout(() => {
-                        sleepRepository.find(new Query()).then(result => {
-                            expect(result.length).to.eql(1)
+                        await timeout(2000)
+                        const result = await sleepRepository.find(new Query())
+                        expect(result.length).to.eql(1)
 
-                            sleep.id = result[0].id
-                            result[0].child_id = result[0].child_id.toString()
+                        sleep.id = result[0].id
+                        result[0].child_id = result[0].child_id.toString()
 
-                            expect(result[0].id).to.eql(sleep.id)
-                            expect(result[0].start_time).to.eql(sleep.start_time)
-                            expect(result[0].end_time).to.eql(sleep.end_time)
-                            expect(result[0].duration).to.eql(sleep.duration)
-                            expect(result[0].child_id).to.eql(sleep.child_id)
-                            expect(result[0].pattern!.data_set).to.eql(sleep.pattern!.data_set)
-                            expect(result[0].pattern).to.have.property('summary')
-                            expect(result[0].type).to.eql(sleep.type)
-                            done()
-                        })
-                    }, 2000)
-                })
+                        expect(result[0].id).to.eql(sleep.id)
+                        expect(result[0].start_time).to.eql(sleep.start_time)
+                        expect(result[0].end_time).to.eql(sleep.end_time)
+                        expect(result[0].duration).to.eql(sleep.duration)
+                        expect(result[0].child_id).to.eql(sleep.child_id)
+                        expect(result[0].pattern!.data_set).to.eql(sleep.pattern!.data_set)
+                        expect(result[0].pattern).to.have.property('summary')
+                        expect(result[0].type).to.eql(sleep.type)
+                        done()
+                    })
+                    .catch(done)
             })
         })
 
@@ -319,14 +312,14 @@ describe('SUBSCRIBE EVENT BUS TASK', () => {
             const sleep2: Sleep = new SleepMock()
             const sleep3: Sleep = new SleepMock()
             it('should return an array with three sleep objects', (done) => {
-                rabbitmq.bus.pubSaveSleep([sleep1, sleep2, sleep3]).then(() => {
-                    timeout(1000).then(() => {
-                        sleepRepository.find(new Query()).then(result => {
-                            expect(result.length).to.eql(3)
-                            done()
-                        })
+                rabbitmq.bus.pubSaveSleep([sleep1, sleep2, sleep3])
+                    .then(async () => {
+                        await timeout(2000)
+                        const result = await sleepRepository.find(new Query())
+                        expect(result.length).to.eql(3)
+                        done()
                     })
-                })
+                    .catch(done)
             })
         })
 
@@ -335,14 +328,14 @@ describe('SUBSCRIBE EVENT BUS TASK', () => {
             const sleep2: Sleep = new Sleep()
             const sleep3: Sleep = new SleepMock()
             it('should return an array with two sleep objects', (done) => {
-                rabbitmq.bus.pubSaveSleep([sleep1, sleep2, sleep3]).then(() => {
-                    timeout(1000).then(() => {
-                        sleepRepository.find(new Query()).then(result => {
-                            expect(result.length).to.eql(2)
-                            done()
-                        })
+                rabbitmq.bus.pubSaveSleep([sleep1, sleep2, sleep3])
+                    .then(async () => {
+                        await timeout(2000)
+                        const result = await sleepRepository.find(new Query())
+                        expect(result.length).to.eql(2)
+                        done()
                     })
-                })
+                    .catch(done)
             })
         })
     })
@@ -368,44 +361,43 @@ describe('SUBSCRIBE EVENT BUS TASK', () => {
         context('when posting a WeightSaveEvent with one weight object successfully', () => {
             const weight: Weight = new WeightMock()
             it('should return an array with one weight object', (done) => {
-                rabbitmq.bus.pubSaveWeight(weight).then(() => {
-                    // Wait for 1000 milliseconds for the task to be executed
-                    timeout(1000).then(() => {
+                rabbitmq.bus.pubSaveWeight(weight)
+                    .then(async () => {
+                        // Wait for 2000 milliseconds for the task to be executed
+                        await timeout(2000)
 
-                        weightRepository.find(new Query()).then(result => {
-                            expect(result.length).to.eql(1)
-                            // As a new resource saved in the database always has a new id,
-                            // this is necessary before comparing the saved resource in the
-                            // database with the one sent to the bus.
-                            weight.id = result[0].id
-                            result[0].child_id = result[0].child_id!.toString()
-                            // Comparing the resources
-                            expect(result[0].id).to.eql(weight.id)
-                            expect(result[0].type).to.eql(weight.type)
-                            expect(result[0].timestamp).to.eql(weight.timestamp)
-                            expect(result[0].value).to.eql(weight.value)
-                            expect(result[0].unit).to.eql(weight.unit)
-                            expect(result[0].child_id).to.eql(weight.child_id)
-                            expect(result[0].body_fat!.value).to.eql(weight.body_fat!.value)
-                            done()
-                        })
+                        const result = await weightRepository.find(new Query())
+                        expect(result.length).to.eql(1)
+                        // As a new resource saved in the database always has a new id,
+                        // this is necessary before comparing the saved resource in the
+                        // database with the one sent to the bus.
+                        weight.id = result[0].id
+                        result[0].child_id = result[0].child_id!.toString()
+                        // Comparing the resources
+                        expect(result[0].id).to.eql(weight.id)
+                        expect(result[0].type).to.eql(weight.type)
+                        expect(result[0].timestamp).to.eql(weight.timestamp)
+                        expect(result[0].value).to.eql(weight.value)
+                        expect(result[0].unit).to.eql(weight.unit)
+                        expect(result[0].child_id).to.eql(weight.child_id)
+                        expect(result[0].body_fat!.value).to.eql(weight.body_fat!.value)
+                        done()
                     })
-                })
+                    .catch(done)
             })
         })
 
         context('when posting a WeightSaveEvent with one invalid weight object', () => {
             const weight: Weight = new Weight()       // Invalid weight object
             it('should return an empty array', (done) => {
-                rabbitmq.bus.pubSaveWeight(weight).then(() => {
-                    // Wait for 1000 milliseconds for the task to be executed
-                    timeout(1000).then(() => {
-                        weightRepository.find(new Query()).then(result => {
-                            expect(result.length).to.eql(0)
-                            done()
-                        })
+                rabbitmq.bus.pubSaveWeight(weight)
+                    .then(async () => {
+                        await timeout(2000)
+                        const result = await weightRepository.find(new Query())
+                        expect(result.length).to.eql(0)
+                        done()
                     })
-                })
+                    .catch(done)
             })
         })
 
@@ -420,33 +412,29 @@ describe('SUBSCRIBE EVENT BUS TASK', () => {
             })
             const weight: Weight = new WeightMock()
             it('should return an array with one weight object', (done) => {
-                rabbitmq.bus.pubSaveWeight(weight).then(() => {
-                    setTimeout(async () => {
-                        try {
-                            await dbConnection.connect(process.env.MONGODB_URI_TEST || Default.MONGODB_URI_TEST)
-                        } catch (err) {
-                            console.log(err)
-                        }
-                    }, 1000)
+                rabbitmq.bus.pubSaveWeight(weight)
+                    .then(async () => {
+                        await timeout(1000)
+                        await dbConnection.connect(process.env.MONGODB_URI_TEST || Default.MONGODB_URI_TEST,
+                            { interval: 100 })
 
-                    setTimeout(() => {
-                        weightRepository.find(new Query()).then(result => {
-                            expect(result.length).to.eql(1)
+                        await timeout(2000)
+                        const result = await weightRepository.find(new Query())
+                        expect(result.length).to.eql(1)
 
-                            weight.id = result[0].id
-                            result[0].child_id = result[0].child_id!.toString()
+                        weight.id = result[0].id
+                        result[0].child_id = result[0].child_id!.toString()
 
-                            expect(result[0].id).to.eql(weight.id)
-                            expect(result[0].type).to.eql(weight.type)
-                            expect(result[0].timestamp).to.eql(weight.timestamp)
-                            expect(result[0].value).to.eql(weight.value)
-                            expect(result[0].unit).to.eql(weight.unit)
-                            expect(result[0].child_id).to.eql(weight.child_id)
-                            expect(result[0].body_fat!.value).to.eql(weight.body_fat!.value)
-                            done()
-                        })
-                    }, 2000)
-                })
+                        expect(result[0].id).to.eql(weight.id)
+                        expect(result[0].type).to.eql(weight.type)
+                        expect(result[0].timestamp).to.eql(weight.timestamp)
+                        expect(result[0].value).to.eql(weight.value)
+                        expect(result[0].unit).to.eql(weight.unit)
+                        expect(result[0].child_id).to.eql(weight.child_id)
+                        expect(result[0].body_fat!.value).to.eql(weight.body_fat!.value)
+                        done()
+                    })
+                    .catch(done)
             })
         })
 
@@ -455,14 +443,14 @@ describe('SUBSCRIBE EVENT BUS TASK', () => {
             const weight2: Weight = new WeightMock()
             const weight3: Weight = new WeightMock()
             it('should return an array with three weight objects', (done) => {
-                rabbitmq.bus.pubSaveWeight([weight1, weight2, weight3]).then(() => {
-                    timeout(1000).then(() => {
-                        weightRepository.find(new Query()).then(result => {
-                            expect(result.length).to.eql(3)
-                            done()
-                        })
+                rabbitmq.bus.pubSaveWeight([weight1, weight2, weight3])
+                    .then(async () => {
+                        await timeout(2000)
+                        const result = await weightRepository.find(new Query())
+                        expect(result.length).to.eql(3)
+                        done()
                     })
-                })
+                    .catch(done)
             })
         })
 
@@ -471,14 +459,14 @@ describe('SUBSCRIBE EVENT BUS TASK', () => {
             const weight2: Weight = new Weight()
             const weight3: Weight = new WeightMock()
             it('should return an array with two weight objects', (done) => {
-                rabbitmq.bus.pubSaveWeight([weight1, weight2, weight3]).then(() => {
-                    timeout(1000).then(() => {
-                        weightRepository.find(new Query()).then(result => {
-                            expect(result.length).to.eql(2)
-                            done()
-                        })
+                rabbitmq.bus.pubSaveWeight([weight1, weight2, weight3])
+                    .then(async () => {
+                        await timeout(2000)
+                        const result = await weightRepository.find(new Query())
+                        expect(result.length).to.eql(2)
+                        done()
                     })
-                })
+                    .catch(done)
             })
         })
     })
@@ -505,42 +493,41 @@ describe('SUBSCRIBE EVENT BUS TASK', () => {
                                 date: '2019-09-16',
                                 child_id: '5d7fb75ae48591c21a793f70' }
             it('should return an array with one log', (done) => {
-                rabbitmq.bus.pubSaveLog([ log ]).then(() => {
-                    // Wait for 1000 milliseconds for the task to be executed
-                    timeout(1000).then(() => {
+                rabbitmq.bus.pubSaveLog([ log ])
+                    .then(async () => {
+                        // Wait for 2000 milliseconds for the task to be executed
+                        await timeout(2000)
 
-                        logRepository.find(new Query()).then(result => {
-                            expect(result.length).to.eql(1)
-                            // As a new resource saved in the database always has a new id,
-                            // this is necessary before comparing the saved resource in the
-                            // database with the one sent to the bus.
-                            log.id = result[0].id
-                            result[0].child_id = result[0].child_id.toString()
-                            // Comparing the resources
-                            expect(result[0].id).to.eql(log.id)
-                            expect(result[0].date).to.eql(log.date)
-                            expect(result[0].value).to.eql(log.value)
-                            expect(result[0].type).to.eql(log.type)
-                            expect(result[0].child_id).to.eql(log.child_id)
-                            done()
-                        })
+                        const result = await logRepository.find(new Query())
+                        expect(result.length).to.eql(1)
+                        // As a new resource saved in the database always has a new id,
+                        // this is necessary before comparing the saved resource in the
+                        // database with the one sent to the bus.
+                        log.id = result[0].id
+                        result[0].child_id = result[0].child_id.toString()
+                        // Comparing the resources
+                        expect(result[0].id).to.eql(log.id)
+                        expect(result[0].date).to.eql(log.date)
+                        expect(result[0].value).to.eql(log.value)
+                        expect(result[0].type).to.eql(log.type)
+                        expect(result[0].child_id).to.eql(log.child_id)
+                        done()
                     })
-                })
+                    .catch(done)
             })
         })
 
         context('when posting a LogSaveEvent with one invalid log', () => {
             const log: Log = new Log()       // Invalid log
             it('should return an empty array', (done) => {
-                rabbitmq.bus.pubSaveLog([ log ]).then(() => {
-                    // Wait for 1000 milliseconds for the task to be executed
-                    timeout(1000).then(() => {
-                        logRepository.find(new Query()).then(result => {
-                            expect(result.length).to.eql(0)
-                            done()
-                        })
+                rabbitmq.bus.pubSaveLog([ log ])
+                    .then(async () => {
+                        await timeout(2000)
+                        const result = await logRepository.find(new Query())
+                        expect(result.length).to.eql(0)
+                        done()
                     })
-                })
+                    .catch(done)
             })
         })
 
@@ -558,31 +545,27 @@ describe('SUBSCRIBE EVENT BUS TASK', () => {
                                 date: '2019-09-16',
                                 child_id: '5d7fb75ae48591c21a793f70' }
             it('should return an array with one log', (done) => {
-                rabbitmq.bus.pubSaveLog([ log ]).then(() => {
-                    setTimeout(async () => {
-                        try {
-                            await dbConnection.connect(process.env.MONGODB_URI_TEST || Default.MONGODB_URI_TEST)
-                        } catch (err) {
-                            console.log(err)
-                        }
-                    }, 1000)
+                rabbitmq.bus.pubSaveLog([ log ])
+                    .then(async () => {
+                        await timeout(1000)
+                        await dbConnection.connect(process.env.MONGODB_URI_TEST || Default.MONGODB_URI_TEST,
+                            { interval: 100 })
 
-                    setTimeout(() => {
-                        logRepository.find(new Query()).then(result => {
-                            expect(result.length).to.eql(1)
+                        await timeout(2000)
+                        const result = await logRepository.find(new Query())
+                        expect(result.length).to.eql(1)
 
-                            log.id = result[0].id
-                            result[0].child_id = result[0].child_id.toString()
+                        log.id = result[0].id
+                        result[0].child_id = result[0].child_id.toString()
 
-                            expect(result[0].id).to.eql(log.id)
-                            expect(result[0].date).to.eql(log.date)
-                            expect(result[0].value).to.eql(log.value)
-                            expect(result[0].type).to.eql(log.type)
-                            expect(result[0].child_id).to.eql(log.child_id)
-                            done()
-                        })
-                    }, 2000)
-                })
+                        expect(result[0].id).to.eql(log.id)
+                        expect(result[0].date).to.eql(log.date)
+                        expect(result[0].value).to.eql(log.value)
+                        expect(result[0].type).to.eql(log.type)
+                        expect(result[0].child_id).to.eql(log.child_id)
+                        done()
+                    })
+                    .catch(done)
             })
         })
 
@@ -600,14 +583,14 @@ describe('SUBSCRIBE EVENT BUS TASK', () => {
                                  date: '2019-09-16',
                                  child_id: '5d7fb75ae48591c21a793f70' }
             it('should return an array with three logs', (done) => {
-                rabbitmq.bus.pubSaveLog([log1, log2, log3]).then(() => {
-                    timeout(1000).then(() => {
-                        logRepository.find(new Query()).then(result => {
-                            expect(result.length).to.eql(3)
-                            done()
-                        })
+                rabbitmq.bus.pubSaveLog([log1, log2, log3])
+                    .then(async () => {
+                        await timeout(2000)
+                        const result = await logRepository.find(new Query())
+                        expect(result.length).to.eql(3)
+                        done()
                     })
-                })
+                    .catch(done)
             })
         })
 
@@ -622,14 +605,14 @@ describe('SUBSCRIBE EVENT BUS TASK', () => {
                                  date: '2019-09-16',
                                  child_id: '5d7fb75ae48591c21a793f70' }
             it('should return an array with two logs', (done) => {
-                rabbitmq.bus.pubSaveLog([log1, log2, log3]).then(() => {
-                    timeout(1000).then(() => {
-                        logRepository.find(new Query()).then(result => {
-                            expect(result.length).to.eql(2)
-                            done()
-                        })
+                rabbitmq.bus.pubSaveLog([log1, log2, log3])
+                    .then(async () => {
+                        await timeout(2000)
+                        const result = await logRepository.find(new Query())
+                        expect(result.length).to.eql(2)
+                        done()
                     })
-                })
+                    .catch(done)
             })
         })
     })
@@ -650,7 +633,7 @@ describe('SUBSCRIBE EVENT BUS TASK', () => {
                 throw new Error('Failure on Subscribe InstitutionDeleteEvent test: ' + err.message)
             }
         })
-        context('when posting a InstitutionDeleteEvent with an institution that is associated with two previously ' +
+        context('when posting an InstitutionDeleteEvent with an institution that is associated with two previously ' +
             'saved environments', () => {
             before(async () => {
                 try {
@@ -672,20 +655,20 @@ describe('SUBSCRIBE EVENT BUS TASK', () => {
                                        latitude: -7.2100766,
                                        longitude: -35.9175756 }
             it('should return an empty array', (done) => {
-                rabbitmq.bus.pubDeleteInstitution(institution).then(() => {
-                    // Wait for 1000 milliseconds for the task to be executed
-                    timeout(1000).then(() => {
+                rabbitmq.bus.pubDeleteInstitution(institution)
+                    .then(async () => {
+                        // Wait for 2000 milliseconds for the task to be executed
+                        await timeout(2000)
 
-                        environmentRepository.find(new Query()).then(result => {
-                            expect(result.length).to.eql(0)
-                            done()
-                        })
+                        const result = await environmentRepository.find(new Query())
+                        expect(result.length).to.eql(0)
+                        done()
                     })
-                })
+                    .catch(done)
             })
         })
 
-        context('when posting a InstitutionDeleteEvent with an institution that is associated with one of two previously ' +
+        context('when posting an InstitutionDeleteEvent with an institution that is associated with one of two previously ' +
             'saved environments', () => {
             before(async () => {
                 try {
@@ -707,20 +690,19 @@ describe('SUBSCRIBE EVENT BUS TASK', () => {
                 latitude: -7.2100766,
                 longitude: -35.9175756 }
             it('should return an array with one environment (which was not associated with the deleted institution)', (done) => {
-                rabbitmq.bus.pubDeleteInstitution(institution).then(() => {
-                    // Wait for 1000 milliseconds for the task to be executed
-                    timeout(1000).then(() => {
+                rabbitmq.bus.pubDeleteInstitution(institution)
+                    .then(async () => {
+                        await timeout(2000)
 
-                        environmentRepository.find(new Query()).then(result => {
-                            expect(result.length).to.eql(1)
-                            done()
-                        })
+                        const result = await environmentRepository.find(new Query())
+                        expect(result.length).to.eql(1)
+                        done()
                     })
-                })
+                    .catch(done)
             })
         })
 
-        context('when posting a InstitutionDeleteEvent with an invalid institution (invalid id)', () => {
+        context('when posting an InstitutionDeleteEvent with an invalid institution (invalid id)', () => {
             const institution: any = { id: '5d7fb75ae48591c21a793f701',      // Invalid institution
                 type: 'Institute of Scientific Research',
                 name: 'NUTES/UEPB',
@@ -729,20 +711,20 @@ describe('SUBSCRIBE EVENT BUS TASK', () => {
                 longitude: -35.9175756 }
             it('should return an empty array and print a log referring to the wrong institution format, ' +
                 'in this case the id that is not in the correct format', (done) => {
-                rabbitmq.bus.pubDeleteInstitution(institution).then(() => {
-                    // Wait for 1000 milliseconds for the task to be executed
-                    timeout(1000).then(() => {
+                rabbitmq.bus.pubDeleteInstitution(institution)
+                    .then(async () => {
+                        // Wait for 2000 milliseconds for the task to be executed
+                        await timeout(2000)
 
-                        environmentRepository.find(new Query()).then(result => {
-                            expect(result.length).to.eql(0)
-                            done()
-                        })
+                        const result = await environmentRepository.find(new Query())
+                        expect(result.length).to.eql(0)
+                        done()
                     })
-                })
+                    .catch(done)
             })
         })
 
-        context('when posting a InstitutionDeleteEvent with an institution that is associated with two previously ' +
+        context('when posting an InstitutionDeleteEvent with an institution that is associated with two previously ' +
             'saved environments (without MongoDB connection, at first)', () => {
             before(async () => {
                 try {
@@ -766,22 +748,18 @@ describe('SUBSCRIBE EVENT BUS TASK', () => {
                 latitude: -7.2100766,
                 longitude: -35.9175756 }
             it('should return an empty array', (done) => {
-                rabbitmq.bus.pubDeleteInstitution(institution).then(() => {
-                    setTimeout(async () => {
-                        try {
-                            await dbConnection.connect(process.env.MONGODB_URI_TEST || Default.MONGODB_URI_TEST)
-                        } catch (err) {
-                            console.log(err)
-                        }
-                    }, 1000)
+                rabbitmq.bus.pubDeleteInstitution(institution)
+                    .then(async () => {
+                        await timeout(1000)
+                        await dbConnection.connect(process.env.MONGODB_URI_TEST || Default.MONGODB_URI_TEST,
+                            { interval: 100 })
 
-                    setTimeout(() => {
-                        environmentRepository.find(new Query()).then(result => {
-                            expect(result.length).to.eql(0)
-                            done()
-                        })
-                    }, 2000)
-                })
+                        await timeout(2000)
+                        const result = await environmentRepository.find(new Query())
+                        expect(result.length).to.eql(0)
+                        done()
+                    })
+                    .catch(done)
             })
         })
     })
@@ -810,7 +788,7 @@ describe('SUBSCRIBE EVENT BUS TASK', () => {
                 throw new Error('Failure on Subscribe UserDeleteEvent test: ' + err.message)
             }
         })
-        context('when posting a UserDeleteEvent with an user that is associated with two activities, ' +
+        context('when posting an UserDeleteEvent with an user that is associated with two activities, ' +
             'one sleep object, one bodyfat, one weight and one log', () => {
             before(async () => {
                 try {
@@ -845,39 +823,35 @@ describe('SUBSCRIBE EVENT BUS TASK', () => {
                                 last_login: '2018-11-19T14:40:00',
                                 last_sync: '2018-11-19T14:40:00' }
             it('should return an empty array for each repository queried', (done) => {
-                rabbitmq.bus.pubDeleteUser(user).then(() => {
-                    // Wait for 1000 milliseconds for the task to be executed
-                    timeout(1000).then(() => {
+                rabbitmq.bus.pubDeleteUser(user)
+                    .then(async () => {
+                        // Wait for 2000 milliseconds for the task to be executed
+                        await timeout(2000)
                         const query: IQuery = new Query()
-                        activityRepository.find(query).then(result => {
-                            expect(result.length).to.eql(0)
-                        })
+                        const activityResult = await activityRepository.find(query)
+                        expect(activityResult.length).to.eql(0)
 
-                        sleepRepository.find(query).then(result => {
-                            expect(result.length).to.eql(0)
-                        })
+                        const sleepResult = await sleepRepository.find(query)
+                        expect(sleepResult.length).to.eql(0)
 
                         query.addFilter({ type: MeasurementType.BODY_FAT })
-                        bodyFatRepository.find(query).then(result => {
-                            expect(result.length).to.eql(0)
-                        })
+                        const bodyFatResult = await bodyFatRepository.find(query)
+                        expect(bodyFatResult.length).to.eql(0)
 
                         query.filters = { type: MeasurementType.WEIGHT }
-                        weightRepository.find(new Query()).then(result => {
-                            expect(result.length).to.eql(0)
-                        })
+                        const weightResult = await weightRepository.find(query)
+                        expect(weightResult.length).to.eql(0)
 
-                        logRepository.find(new Query()).then(result => {
-                            expect(result.length).to.eql(0)
-                        })
+                        const logResult = await logRepository.find(new Query())
+                        expect(logResult.length).to.eql(0)
 
                         done()
                     })
-                })
+                    .catch(done)
             })
         })
 
-        context('when posting a UserDeleteEvent with an user who is not associated with all objects created below', () => {
+        context('when posting an UserDeleteEvent with an user who is not associated with all objects created below', () => {
             before(async () => {
                 try {
                     const user_id: string = '5d7fb75ae48591c21a793f70'
@@ -911,39 +885,34 @@ describe('SUBSCRIBE EVENT BUS TASK', () => {
                 last_login: '2018-11-19T14:40:00',
                 last_sync: '2018-11-19T14:40:00' }
             it('should return an empty array for the BodyFat, Weight and Log repositories', (done) => {
-                rabbitmq.bus.pubDeleteUser(user).then(() => {
-                    // Wait for 1000 milliseconds for the task to be executed
-                    timeout(1000).then(() => {
+                rabbitmq.bus.pubDeleteUser(user)
+                    .then(async () => {
+                        await timeout(2000)
                         const query: IQuery = new Query()
-                        activityRepository.find(query).then(result => {
-                            expect(result.length).to.eql(1)
-                        })
+                        const activityResult = await activityRepository.find(query)
+                        expect(activityResult.length).to.eql(1)
 
-                        sleepRepository.find(query).then(result => {
-                            expect(result.length).to.eql(1)
-                        })
+                        const sleepResult = await sleepRepository.find(query)
+                        expect(sleepResult.length).to.eql(1)
 
                         query.addFilter({ type: MeasurementType.BODY_FAT })
-                        bodyFatRepository.find(query).then(result => {
-                            expect(result.length).to.eql(0)
-                        })
+                        const bodyFatResult = await bodyFatRepository.find(query)
+                        expect(bodyFatResult.length).to.eql(0)
 
                         query.filters = { type: MeasurementType.WEIGHT }
-                        weightRepository.find(new Query()).then(result => {
-                            expect(result.length).to.eql(0)
-                        })
+                        const weightResult = await weightRepository.find(query)
+                        expect(weightResult.length).to.eql(0)
 
-                        logRepository.find(new Query()).then(result => {
-                            expect(result.length).to.eql(0)
-                        })
+                        const logResult = await logRepository.find(new Query())
+                        expect(logResult.length).to.eql(0)
 
                         done()
                     })
-                })
+                    .catch(done)
             })
         })
 
-        context('when posting a UserDeleteEvent with an invalid user (invalid id)', () => {
+        context('when posting an UserDeleteEvent with an invalid user (invalid id)', () => {
             const user: any = { id: '5d7fb75ae48591c21a793f701',        // Invalid user
                 type: 'child',
                 username: 'BR9999',
@@ -954,16 +923,16 @@ describe('SUBSCRIBE EVENT BUS TASK', () => {
                 last_sync: '2018-11-19T14:40:00' }
             it('should print a log referring to the wrong user format, in this case the id that is not in the ' +
                 'correct format', (done) => {
-                rabbitmq.bus.pubDeleteUser(user).then(() => {
-                    // Wait for 1000 milliseconds for the task to be executed
-                    timeout(1000).then(() => {
+                rabbitmq.bus.pubDeleteUser(user)
+                    .then(async () => {
+                        await timeout(2000)
                         done()
                     })
-                })
+                    .catch(done)
             })
         })
 
-        context('when posting a UserDeleteEvent with an user that is associated with two activities, ' +
+        context('when posting an UserDeleteEvent with an user that is associated with two activities, ' +
             'one sleep object, one bodyfat, one weight and one log (without MongoDB connection, at first)', () => {
             before(async () => {
                 try {
@@ -1000,42 +969,34 @@ describe('SUBSCRIBE EVENT BUS TASK', () => {
                 last_login: '2018-11-19T14:40:00',
                 last_sync: '2018-11-19T14:40:00' }
             it('should return an empty array for each repository queried', (done) => {
-                rabbitmq.bus.pubDeleteUser(user).then(() => {
-                    setTimeout(async () => {
-                        try {
-                            await dbConnection.connect(process.env.MONGODB_URI_TEST || Default.MONGODB_URI_TEST)
-                        } catch (err) {
-                            console.log(err)
-                        }
-                    }, 1000)
+                rabbitmq.bus.pubDeleteUser(user)
+                    .then(async () => {
+                        await timeout(1000)
+                        await dbConnection.connect(process.env.MONGODB_URI_TEST || Default.MONGODB_URI_TEST,
+                            { interval: 100 })
 
-                    setTimeout(() => {
+                        await timeout(2000)
                         const query: IQuery = new Query()
-                        activityRepository.find(query).then(result => {
-                            expect(result.length).to.eql(0)
-                        })
+                        const activityResult = await activityRepository.find(query)
+                        expect(activityResult.length).to.eql(0)
 
-                        sleepRepository.find(query).then(result => {
-                            expect(result.length).to.eql(0)
-                        })
+                        const sleepResult = await sleepRepository.find(query)
+                        expect(sleepResult.length).to.eql(0)
 
                         query.addFilter({ type: MeasurementType.BODY_FAT })
-                        bodyFatRepository.find(query).then(result => {
-                            expect(result.length).to.eql(0)
-                        })
+                        const bodyFatResult = await bodyFatRepository.find(query)
+                        expect(bodyFatResult.length).to.eql(0)
 
                         query.filters = { type: MeasurementType.WEIGHT }
-                        weightRepository.find(new Query()).then(result => {
-                            expect(result.length).to.eql(0)
-                        })
+                        const weightResult = await weightRepository.find(query)
+                        expect(weightResult.length).to.eql(0)
 
-                        logRepository.find(new Query()).then(result => {
-                            expect(result.length).to.eql(0)
-                        })
+                        const logResult = await logRepository.find(new Query())
+                        expect(logResult.length).to.eql(0)
 
                         done()
-                    }, 2000)
-                })
+                    })
+                    .catch(done)
             })
         })
     })

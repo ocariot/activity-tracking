@@ -65,8 +65,10 @@ describe('Routes: environments', () => {
     // Start services
     before(async () => {
         try {
-            await dbConnection.connect(process.env.MONGODB_URI_TEST || Default.MONGODB_URI_TEST)
-            await rabbitmq.initialize(process.env.RABBITMQ_URI || Default.RABBITMQ_URI, { sslOptions: { ca: [] } })
+            await dbConnection.connect(process.env.MONGODB_URI_TEST || Default.MONGODB_URI_TEST,
+                { interval: 100 })
+            await rabbitmq.initialize(process.env.RABBITMQ_URI || Default.RABBITMQ_URI,
+                { interval: 100, sslOptions: { ca: [] } })
             await deleteAllEnvironments()
         } catch (err) {
             throw new Error('Failure on environments routes test: ' + err.message)
@@ -150,7 +152,7 @@ describe('Routes: environments', () => {
                     await deleteAllEnvironments()
 
                     await rabbitmq.initialize(process.env.RABBITMQ_URI || Default.RABBITMQ_URI,
-                        { receiveFromYourself: true, sslOptions: { ca: [] } })
+                        { interval: 100, receiveFromYourself: true, sslOptions: { ca: [] } })
                 } catch (err) {
                     throw new Error('Failure on environments routes test: ' + err.message)
                 }
@@ -160,28 +162,32 @@ describe('Routes: environments', () => {
                 'published on the bus', (done) => {
                 rabbitmq.bus
                     .subSaveEnvironment(message => {
-                        expect(message.event_name).to.eql('EnvironmentSaveEvent')
-                        expect(message).to.have.property('timestamp')
-                        expect(message).to.have.property('environment')
-                        defaultEnvironment.id = message.environment.id
-                        expect(message.environment.id).to.eql(defaultEnvironment.id)
-                        expect(message.environment.institution_id).to.eql(defaultEnvironment.institution_id)
-                        expect(message.environment.location.local).to.eql(defaultEnvironment.location!.local)
-                        expect(message.environment.location.room).to.eql(defaultEnvironment.location!.room)
-                        expect(message.environment.location.latitude).to.eql(defaultEnvironment.location!.latitude)
-                        expect(message.environment.location.longitude).to.eql(defaultEnvironment.location!.longitude)
-                        expect(message.environment.measurements[0].type).to.eql(defaultEnvironment.measurements![0].type)
-                        expect(message.environment.measurements[0].value).to.eql(defaultEnvironment.measurements![0].value)
-                        expect(message.environment.measurements[0].unit).to.eql(defaultEnvironment.measurements![0].unit)
-                        expect(message.environment.measurements[1].type).to.eql(defaultEnvironment.measurements![1].type)
-                        expect(message.environment.measurements[1].value).to.eql(defaultEnvironment.measurements![1].value)
-                        expect(message.environment.measurements[1].unit).to.eql(defaultEnvironment.measurements![1].unit)
-                        expect(message.environment.measurements[2].type).to.eql(defaultEnvironment.measurements![2].type)
-                        expect(message.environment.measurements[2].value).to.eql(defaultEnvironment.measurements![2].value)
-                        expect(message.environment.measurements[2].unit).to.eql(defaultEnvironment.measurements![2].unit)
-                        expect(message.environment.climatized).to.eql(defaultEnvironment.climatized)
-                        expect(message.environment.timestamp).to.eql(defaultEnvironment.timestamp.toISOString())
-                        done()
+                        try {
+                            expect(message.event_name).to.eql('EnvironmentSaveEvent')
+                            expect(message).to.have.property('timestamp')
+                            expect(message).to.have.property('environment')
+                            defaultEnvironment.id = message.environment.id
+                            expect(message.environment.id).to.eql(defaultEnvironment.id)
+                            expect(message.environment.institution_id).to.eql(defaultEnvironment.institution_id)
+                            expect(message.environment.location.local).to.eql(defaultEnvironment.location!.local)
+                            expect(message.environment.location.room).to.eql(defaultEnvironment.location!.room)
+                            expect(message.environment.location.latitude).to.eql(defaultEnvironment.location!.latitude)
+                            expect(message.environment.location.longitude).to.eql(defaultEnvironment.location!.longitude)
+                            expect(message.environment.measurements[0].type).to.eql(defaultEnvironment.measurements![0].type)
+                            expect(message.environment.measurements[0].value).to.eql(defaultEnvironment.measurements![0].value)
+                            expect(message.environment.measurements[0].unit).to.eql(defaultEnvironment.measurements![0].unit)
+                            expect(message.environment.measurements[1].type).to.eql(defaultEnvironment.measurements![1].type)
+                            expect(message.environment.measurements[1].value).to.eql(defaultEnvironment.measurements![1].value)
+                            expect(message.environment.measurements[1].unit).to.eql(defaultEnvironment.measurements![1].unit)
+                            expect(message.environment.measurements[2].type).to.eql(defaultEnvironment.measurements![2].type)
+                            expect(message.environment.measurements[2].value).to.eql(defaultEnvironment.measurements![2].value)
+                            expect(message.environment.measurements[2].unit).to.eql(defaultEnvironment.measurements![2].unit)
+                            expect(message.environment.climatized).to.eql(defaultEnvironment.climatized)
+                            expect(message.environment.timestamp).to.eql(defaultEnvironment.timestamp.toISOString())
+                            done()
+                        } catch (err) {
+                            done(err)
+                        }
                     })
                     .then(() => {
                         request
@@ -191,9 +197,7 @@ describe('Routes: environments', () => {
                             .expect(201)
                             .then()
                     })
-                    .catch((err) => {
-                        done(err)
-                    })
+                    .catch(done)
             })
         })
     })
@@ -206,7 +210,8 @@ describe('Routes: environments', () => {
 
                     await rabbitmq.dispose()
 
-                    await rabbitmq.initialize(process.env.RABBITMQ_URI || Default.RABBITMQ_URI, { sslOptions: { ca: [] } })
+                    await rabbitmq.initialize(process.env.RABBITMQ_URI || Default.RABBITMQ_URI,
+                        { interval: 100, sslOptions: { ca: [] } })
                 } catch (err) {
                     throw new Error('Failure on children.weights routes test: ' + err.message)
                 }
@@ -921,7 +926,7 @@ describe('Routes: environments', () => {
                     })
 
                     await rabbitmq.initialize(process.env.RABBITMQ_URI || Default.RABBITMQ_URI,
-                        { receiveFromYourself: true, sslOptions: { ca: [] } })
+                        { interval: 100, receiveFromYourself: true, sslOptions: { ca: [] } })
                 } catch (err) {
                     throw new Error('Failure on children.weights routes test: ' + err.message)
                 }
@@ -931,12 +936,16 @@ describe('Routes: environments', () => {
                 'published on the bus', (done) => {
                 rabbitmq.bus
                     .subDeleteEnvironment(message => {
-                        expect(message.event_name).to.eql('EnvironmentDeleteEvent')
-                        expect(message).to.have.property('timestamp')
-                        expect(message).to.have.property('environment')
-                        defaultEnvironment.id = message.environment.id
-                        expect(message.environment.id).to.eql(defaultEnvironment.id)
-                        done()
+                        try {
+                            expect(message.event_name).to.eql('EnvironmentDeleteEvent')
+                            expect(message).to.have.property('timestamp')
+                            expect(message).to.have.property('environment')
+                            defaultEnvironment.id = message.environment.id
+                            expect(message.environment.id).to.eql(defaultEnvironment.id)
+                            done()
+                        } catch (err) {
+                            done(err)
+                        }
                     })
                     .then(() => {
                         request
@@ -945,9 +954,7 @@ describe('Routes: environments', () => {
                             .expect(204)
                             .then()
                     })
-                    .catch((err) => {
-                        done(err)
-                    })
+                    .catch(done)
             })
         })
     })
@@ -986,7 +993,8 @@ describe('Routes: environments', () => {
 
                     await rabbitmq.dispose()
 
-                    await rabbitmq.initialize(process.env.RABBITMQ_URI || Default.RABBITMQ_URI, { sslOptions: { ca: [] } })
+                    await rabbitmq.initialize(process.env.RABBITMQ_URI || Default.RABBITMQ_URI,
+                        { interval: 100, sslOptions: { ca: [] } })
                 } catch (err) {
                     throw new Error('Failure on environments routes test: ' + err.message)
                 }

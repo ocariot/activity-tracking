@@ -131,8 +131,10 @@ describe('Routes: children.sleep', () => {
     // Start services
     before(async () => {
         try {
-            await dbConnection.connect(process.env.MONGODB_URI_TEST || Default.MONGODB_URI_TEST)
-            await rabbitmq.initialize(process.env.RABBITMQ_URI || Default.RABBITMQ_URI, { sslOptions: { ca: [] } })
+            await dbConnection.connect(process.env.MONGODB_URI_TEST || Default.MONGODB_URI_TEST,
+                { interval: 100 })
+            await rabbitmq.initialize(process.env.RABBITMQ_URI || Default.RABBITMQ_URI,
+                { interval: 100, sslOptions: { ca: [] } })
             await deleteAllSleep()
         } catch (err) {
             throw new Error('Failure on children.sleep routes test: ' + err.message)
@@ -213,7 +215,7 @@ describe('Routes: children.sleep', () => {
                     await deleteAllSleep()
 
                     await rabbitmq.initialize(process.env.RABBITMQ_URI || Default.RABBITMQ_URI,
-                        { receiveFromYourself: true, sslOptions: { ca: [] } })
+                        { interval: 100, receiveFromYourself: true, sslOptions: { ca: [] } })
                 } catch (err) {
                     throw new Error('Failure on children.sleep routes test: ' + err.message)
                 }
@@ -223,24 +225,28 @@ describe('Routes: children.sleep', () => {
                 'published on the bus', (done) => {
                 rabbitmq.bus
                     .subSaveSleep(message => {
-                        expect(message.event_name).to.eql('SleepSaveEvent')
-                        expect(message).to.have.property('timestamp')
-                        expect(message).to.have.property('sleep')
-                        defaultSleep.id = message.sleep.id
-                        expect(message.sleep.id).to.eql(defaultSleep.id)
-                        expect(message.sleep.start_time).to.eql(defaultSleep.start_time!.toISOString())
-                        expect(message.sleep.end_time).to.eql(defaultSleep.end_time!.toISOString())
-                        expect(message.sleep.duration).to.eql(defaultSleep.duration)
-                        let index = 0
-                        for (const elem of defaultSleep.pattern!.data_set) {
-                            expect(message.sleep.pattern.data_set[index].start_time).to.eql(elem.start_time.toISOString())
-                            expect(message.sleep.pattern.data_set[index].name).to.eql(elem.name)
-                            expect(message.sleep.pattern.data_set[index].duration).to.eql(elem.duration)
-                            index++
+                        try {
+                            expect(message.event_name).to.eql('SleepSaveEvent')
+                            expect(message).to.have.property('timestamp')
+                            expect(message).to.have.property('sleep')
+                            defaultSleep.id = message.sleep.id
+                            expect(message.sleep.id).to.eql(defaultSleep.id)
+                            expect(message.sleep.start_time).to.eql(defaultSleep.start_time!.toISOString())
+                            expect(message.sleep.end_time).to.eql(defaultSleep.end_time!.toISOString())
+                            expect(message.sleep.duration).to.eql(defaultSleep.duration)
+                            let index = 0
+                            for (const elem of defaultSleep.pattern!.data_set) {
+                                expect(message.sleep.pattern.data_set[index].start_time).to.eql(elem.start_time.toISOString())
+                                expect(message.sleep.pattern.data_set[index].name).to.eql(elem.name)
+                                expect(message.sleep.pattern.data_set[index].duration).to.eql(elem.duration)
+                                index++
+                            }
+                            expect(message.sleep.type).to.eql(defaultSleep.type)
+                            expect(message.sleep.child_id).to.eql(defaultSleep.child_id)
+                            done()
+                        } catch (err) {
+                            done(err)
                         }
-                        expect(message.sleep.type).to.eql(defaultSleep.type)
-                        expect(message.sleep.child_id).to.eql(defaultSleep.child_id)
-                        done()
                     })
                     .then(() => {
                         request
@@ -250,9 +256,7 @@ describe('Routes: children.sleep', () => {
                             .expect(201)
                             .then()
                     })
-                    .catch((err) => {
-                        done(err)
-                    })
+                    .catch(done)
             })
         })
     })
@@ -265,7 +269,8 @@ describe('Routes: children.sleep', () => {
 
                     await rabbitmq.dispose()
 
-                    await rabbitmq.initialize(process.env.RABBITMQ_URI || Default.RABBITMQ_URI, { sslOptions: { ca: [] } })
+                    await rabbitmq.initialize(process.env.RABBITMQ_URI || Default.RABBITMQ_URI,
+                        { interval: 100, sslOptions: { ca: [] } })
                 } catch (err) {
                     throw new Error('Failure on children.sleep routes test: ' + err.message)
                 }
@@ -1501,7 +1506,7 @@ describe('Routes: children.sleep', () => {
                     result = await createSleepToBeUpdated(defaultSleep)
 
                     await rabbitmq.initialize(process.env.RABBITMQ_URI || Default.RABBITMQ_URI,
-                        { receiveFromYourself: true, sslOptions: { ca: [] } })
+                        { interval: 100, receiveFromYourself: true, sslOptions: { ca: [] } })
                 } catch (err) {
                     throw new Error('Failure on children.sleep routes test: ' + err.message)
                 }
@@ -1511,24 +1516,28 @@ describe('Routes: children.sleep', () => {
                 'published on the bus', (done) => {
                 rabbitmq.bus
                     .subUpdateSleep(message => {
-                        expect(message.event_name).to.eql('SleepUpdateEvent')
-                        expect(message).to.have.property('timestamp')
-                        expect(message).to.have.property('sleep')
-                        defaultSleep.id = message.sleep.id
-                        expect(message.sleep.id).to.eql(defaultSleep.id)
-                        expect(message.sleep.start_time).to.eql(otherSleep.start_time!.toISOString())
-                        expect(message.sleep.end_time).to.eql(otherSleep.end_time!.toISOString())
-                        expect(message.sleep.duration).to.eql(otherSleep.duration)
-                        let index = 0
-                        for (const elem of defaultSleep.pattern!.data_set) {
-                            expect(message.sleep.pattern.data_set[index].start_time).to.eql(elem.start_time.toISOString())
-                            expect(message.sleep.pattern.data_set[index].name).to.eql(elem.name)
-                            expect(message.sleep.pattern.data_set[index].duration).to.eql(elem.duration)
-                            index++
+                        try {
+                            expect(message.event_name).to.eql('SleepUpdateEvent')
+                            expect(message).to.have.property('timestamp')
+                            expect(message).to.have.property('sleep')
+                            defaultSleep.id = message.sleep.id
+                            expect(message.sleep.id).to.eql(defaultSleep.id)
+                            expect(message.sleep.start_time).to.eql(otherSleep.start_time!.toISOString())
+                            expect(message.sleep.end_time).to.eql(otherSleep.end_time!.toISOString())
+                            expect(message.sleep.duration).to.eql(otherSleep.duration)
+                            let index = 0
+                            for (const elem of defaultSleep.pattern!.data_set) {
+                                expect(message.sleep.pattern.data_set[index].start_time).to.eql(elem.start_time.toISOString())
+                                expect(message.sleep.pattern.data_set[index].name).to.eql(elem.name)
+                                expect(message.sleep.pattern.data_set[index].duration).to.eql(elem.duration)
+                                index++
+                            }
+                            expect(message.sleep.type).to.eql(defaultSleep.type)
+                            expect(message.sleep.child_id).to.eql(defaultSleep.child_id)
+                            done()
+                        } catch (err) {
+                            done(err)
                         }
-                        expect(message.sleep.type).to.eql(defaultSleep.type)
-                        expect(message.sleep.child_id).to.eql(defaultSleep.child_id)
-                        done()
                     })
                     .then(() => {
                         request
@@ -1538,9 +1547,7 @@ describe('Routes: children.sleep', () => {
                             .expect(200)
                             .then()
                     })
-                    .catch((err) => {
-                        done(err)
-                    })
+                    .catch(done)
             })
         })
     })
@@ -1558,7 +1565,8 @@ describe('Routes: children.sleep', () => {
 
                     await rabbitmq.dispose()
 
-                    await rabbitmq.initialize(process.env.RABBITMQ_URI || Default.RABBITMQ_URI, { sslOptions: { ca: [] } })
+                    await rabbitmq.initialize(process.env.RABBITMQ_URI || Default.RABBITMQ_URI,
+                        { interval: 100, sslOptions: { ca: [] } })
                 } catch (err) {
                     throw new Error('Failure on children.sleep routes test: ' + err.message)
                 }
@@ -2165,7 +2173,7 @@ describe('Routes: children.sleep', () => {
                     })
 
                     await rabbitmq.initialize(process.env.RABBITMQ_URI || Default.RABBITMQ_URI,
-                        { receiveFromYourself: true, sslOptions: { ca: [] } })
+                        { interval: 100, receiveFromYourself: true, sslOptions: { ca: [] } })
                 } catch (err) {
                     throw new Error('Failure on children.sleep routes test: ' + err.message)
                 }
@@ -2175,12 +2183,16 @@ describe('Routes: children.sleep', () => {
                 'published on the bus', (done) => {
                 rabbitmq.bus
                     .subDeleteSleep(message => {
-                        expect(message.event_name).to.eql('SleepDeleteEvent')
-                        expect(message).to.have.property('timestamp')
-                        expect(message).to.have.property('sleep')
-                        defaultSleep.id = message.sleep.id
-                        expect(message.sleep.id).to.eql(defaultSleep.id)
-                        done()
+                        try {
+                            expect(message.event_name).to.eql('SleepDeleteEvent')
+                            expect(message).to.have.property('timestamp')
+                            expect(message).to.have.property('sleep')
+                            defaultSleep.id = message.sleep.id
+                            expect(message.sleep.id).to.eql(defaultSleep.id)
+                            done()
+                        } catch (err) {
+                            done(err)
+                        }
                     })
                     .then(() => {
                         request
@@ -2215,7 +2227,8 @@ describe('Routes: children.sleep', () => {
 
                     await rabbitmq.dispose()
 
-                    await rabbitmq.initialize(process.env.RABBITMQ_URI || Default.RABBITMQ_URI, { sslOptions: { ca: [] } })
+                    await rabbitmq.initialize(process.env.RABBITMQ_URI || Default.RABBITMQ_URI,
+                        { interval: 100, sslOptions: { ca: [] } })
                 } catch (err) {
                     throw new Error('Failure on children.sleep routes test: ' + err.message)
                 }

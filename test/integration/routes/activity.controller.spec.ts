@@ -146,8 +146,10 @@ describe('Routes: children.physicalactivities', () => {
     // Start services
     before(async () => {
         try {
-            await dbConnection.connect(process.env.MONGODB_URI_TEST || Default.MONGODB_URI_TEST)
-            await rabbitmq.initialize(process.env.RABBITMQ_URI || Default.RABBITMQ_URI, { sslOptions: { ca: [] } })
+            await dbConnection.connect(process.env.MONGODB_URI_TEST || Default.MONGODB_URI_TEST,
+                { interval: 100 })
+            await rabbitmq.initialize(process.env.RABBITMQ_URI || Default.RABBITMQ_URI,
+                { interval: 100, sslOptions: { ca: [] } })
             await deleteAllActivities()
         } catch (err) {
             throw new Error('Failure on children.physicalactivities routes test: ' + err.message)
@@ -237,7 +239,7 @@ describe('Routes: children.physicalactivities', () => {
                     await deleteAllActivities()
 
                     await rabbitmq.initialize(process.env.RABBITMQ_URI || Default.RABBITMQ_URI,
-                        { receiveFromYourself: true, sslOptions: { ca: [] } })
+                        { interval: 100, receiveFromYourself: true, sslOptions: { ca: [] } })
                 } catch (err) {
                     throw new Error('Failure on children.physicalactivities routes test: ' + err.message)
                 }
@@ -247,26 +249,30 @@ describe('Routes: children.physicalactivities', () => {
                 'published on the bus', (done) => {
                 rabbitmq.bus
                     .subSavePhysicalActivity(message => {
-                        expect(message.event_name).to.eql('PhysicalActivitySaveEvent')
-                        expect(message).to.have.property('timestamp')
-                        expect(message).to.have.property('physicalactivity')
-                        defaultActivity.id = message.physicalactivity.id
-                        expect(message.physicalactivity.id).to.eql(defaultActivity.id)
-                        expect(message.physicalactivity.name).to.eql(defaultActivity.name)
-                        expect(message.physicalactivity.start_time).to.eql(defaultActivity.start_time!.toISOString())
-                        expect(message.physicalactivity.end_time).to.eql(defaultActivity.end_time!.toISOString())
-                        expect(message.physicalactivity.duration).to.eql(defaultActivity.duration)
-                        expect(message.physicalactivity.calories).to.eql(defaultActivity.calories)
-                        if (message.physicalactivity.steps) {
-                            expect(message.physicalactivity.steps).to.eql(defaultActivity.steps)
+                        try {
+                            expect(message.event_name).to.eql('PhysicalActivitySaveEvent')
+                            expect(message).to.have.property('timestamp')
+                            expect(message).to.have.property('physicalactivity')
+                            defaultActivity.id = message.physicalactivity.id
+                            expect(message.physicalactivity.id).to.eql(defaultActivity.id)
+                            expect(message.physicalactivity.name).to.eql(defaultActivity.name)
+                            expect(message.physicalactivity.start_time).to.eql(defaultActivity.start_time!.toISOString())
+                            expect(message.physicalactivity.end_time).to.eql(defaultActivity.end_time!.toISOString())
+                            expect(message.physicalactivity.duration).to.eql(defaultActivity.duration)
+                            expect(message.physicalactivity.calories).to.eql(defaultActivity.calories)
+                            if (message.physicalactivity.steps) {
+                                expect(message.physicalactivity.steps).to.eql(defaultActivity.steps)
+                            }
+                            if (defaultActivity.levels) {
+                                expect(message.physicalactivity.levels)
+                                    .to.eql(defaultActivity.levels.map((elem: PhysicalActivityLevel) => elem.toJSON()))
+                            }
+                            expect(message.physicalactivity.heart_rate).to.eql(defaultActivity.heart_rate!.toJSON())
+                            expect(message.physicalactivity.child_id).to.eql(defaultActivity.child_id)
+                            done()
+                        } catch (err) {
+                            done(err)
                         }
-                        if (defaultActivity.levels) {
-                            expect(message.physicalactivity.levels)
-                                .to.eql(defaultActivity.levels.map((elem: PhysicalActivityLevel) => elem.toJSON()))
-                        }
-                        expect(message.physicalactivity.heart_rate).to.eql(defaultActivity.heart_rate!.toJSON())
-                        expect(message.physicalactivity.child_id).to.eql(defaultActivity.child_id)
-                        done()
                     })
                     .then(() => {
                         request
@@ -276,9 +282,7 @@ describe('Routes: children.physicalactivities', () => {
                             .expect(201)
                             .then()
                     })
-                    .catch((err) => {
-                        done(err)
-                    })
+                    .catch(done)
             })
         })
     })
@@ -291,7 +295,8 @@ describe('Routes: children.physicalactivities', () => {
 
                     await rabbitmq.dispose()
 
-                    await rabbitmq.initialize(process.env.RABBITMQ_URI || Default.RABBITMQ_URI, { sslOptions: { ca: [] } })
+                    await rabbitmq.initialize(process.env.RABBITMQ_URI || Default.RABBITMQ_URI,
+                        { interval: 100, sslOptions: { ca: [] } })
                 } catch (err) {
                     throw new Error('Failure on children.physicalactivities routes test: ' + err.message)
                 }
@@ -1799,7 +1804,7 @@ describe('Routes: children.physicalactivities', () => {
                     result = await createActivityToBeUpdated(defaultActivity)
 
                     await rabbitmq.initialize(process.env.RABBITMQ_URI || Default.RABBITMQ_URI,
-                        { receiveFromYourself: true, sslOptions: { ca: [] } })
+                        { interval: 100, receiveFromYourself: true, sslOptions: { ca: [] } })
                 } catch (err) {
                     throw new Error('Failure on children.physicalactivities routes test: ' + err.message)
                 }
@@ -1809,26 +1814,30 @@ describe('Routes: children.physicalactivities', () => {
                 'published on the bus', (done) => {
                 rabbitmq.bus
                     .subUpdatePhysicalActivity(message => {
-                        expect(message.event_name).to.eql('PhysicalActivityUpdateEvent')
-                        expect(message).to.have.property('timestamp')
-                        expect(message).to.have.property('physicalactivity')
-                        defaultActivity.id = message.physicalactivity.id
-                        expect(message.physicalactivity.id).to.eql(defaultActivity.id)
-                        expect(message.physicalactivity.name).to.eql(defaultActivity.name)
-                        expect(message.physicalactivity.start_time).to.eql(otherActivity.start_time!.toISOString())
-                        expect(message.physicalactivity.end_time).to.eql(otherActivity.end_time!.toISOString())
-                        expect(message.physicalactivity.duration).to.eql(otherActivity.duration)
-                        expect(message.physicalactivity.calories).to.eql(defaultActivity.calories)
-                        if (message.physicalactivity.steps) {
-                            expect(message.physicalactivity.steps).to.eql(defaultActivity.steps)
+                        try {
+                            expect(message.event_name).to.eql('PhysicalActivityUpdateEvent')
+                            expect(message).to.have.property('timestamp')
+                            expect(message).to.have.property('physicalactivity')
+                            defaultActivity.id = message.physicalactivity.id
+                            expect(message.physicalactivity.id).to.eql(defaultActivity.id)
+                            expect(message.physicalactivity.name).to.eql(defaultActivity.name)
+                            expect(message.physicalactivity.start_time).to.eql(otherActivity.start_time!.toISOString())
+                            expect(message.physicalactivity.end_time).to.eql(otherActivity.end_time!.toISOString())
+                            expect(message.physicalactivity.duration).to.eql(otherActivity.duration)
+                            expect(message.physicalactivity.calories).to.eql(defaultActivity.calories)
+                            if (message.physicalactivity.steps) {
+                                expect(message.physicalactivity.steps).to.eql(defaultActivity.steps)
+                            }
+                            if (defaultActivity.levels) {
+                                expect(message.physicalactivity.levels)
+                                    .to.eql(defaultActivity.levels.map((elem: PhysicalActivityLevel) => elem.toJSON()))
+                            }
+                            expect(message.physicalactivity.heart_rate).to.eql(defaultActivity.heart_rate!.toJSON())
+                            expect(message.physicalactivity.child_id).to.eql(defaultActivity.child_id)
+                            done()
+                        } catch (err) {
+                            done(err)
                         }
-                        if (defaultActivity.levels) {
-                            expect(message.physicalactivity.levels)
-                                .to.eql(defaultActivity.levels.map((elem: PhysicalActivityLevel) => elem.toJSON()))
-                        }
-                        expect(message.physicalactivity.heart_rate).to.eql(defaultActivity.heart_rate!.toJSON())
-                        expect(message.physicalactivity.child_id).to.eql(defaultActivity.child_id)
-                        done()
                     })
                     .then(() => {
                         request
@@ -1838,9 +1847,7 @@ describe('Routes: children.physicalactivities', () => {
                             .expect(200)
                             .then()
                     })
-                    .catch((err) => {
-                        done(err)
-                    })
+                    .catch(done)
             })
         })
     })
@@ -1858,7 +1865,8 @@ describe('Routes: children.physicalactivities', () => {
                     // physical activity to be updated
                     result = await createActivityToBeUpdated(defaultActivity)
 
-                    await rabbitmq.initialize(process.env.RABBITMQ_URI || Default.RABBITMQ_URI, { sslOptions: { ca: [] } })
+                    await rabbitmq.initialize(process.env.RABBITMQ_URI || Default.RABBITMQ_URI,
+                        { interval: 100, sslOptions: { ca: [] } })
                 } catch (err) {
                     throw new Error('Failure on children.physicalactivities routes test: ' + err.message)
                 }
@@ -2611,7 +2619,7 @@ describe('Routes: children.physicalactivities', () => {
                     })
 
                     await rabbitmq.initialize(process.env.RABBITMQ_URI || Default.RABBITMQ_URI,
-                        { receiveFromYourself: true, sslOptions: { ca: [] } })
+                        { interval: 100, receiveFromYourself: true, sslOptions: { ca: [] } })
                 } catch (err) {
                     throw new Error('Failure on children.physicalactivities routes test: ' + err.message)
                 }
@@ -2621,12 +2629,16 @@ describe('Routes: children.physicalactivities', () => {
                 'published on the bus', (done) => {
                 rabbitmq.bus
                     .subDeletePhysicalActivity(message => {
-                        expect(message.event_name).to.eql('PhysicalActivityDeleteEvent')
-                        expect(message).to.have.property('timestamp')
-                        expect(message).to.have.property('physicalactivity')
-                        defaultActivity.id = message.physicalactivity.id
-                        expect(message.physicalactivity.id).to.eql(defaultActivity.id)
-                        done()
+                        try {
+                            expect(message.event_name).to.eql('PhysicalActivityDeleteEvent')
+                            expect(message).to.have.property('timestamp')
+                            expect(message).to.have.property('physicalactivity')
+                            defaultActivity.id = message.physicalactivity.id
+                            expect(message.physicalactivity.id).to.eql(defaultActivity.id)
+                            done()
+                        } catch (err) {
+                            done(err)
+                        }
                     })
                     .then(() => {
                         request
@@ -2635,9 +2647,7 @@ describe('Routes: children.physicalactivities', () => {
                             .expect(204)
                             .then()
                     })
-                    .catch((err) => {
-                        done(err)
-                    })
+                    .catch(done)
             })
         })
     })
@@ -2664,7 +2674,8 @@ describe('Routes: children.physicalactivities', () => {
 
                     await rabbitmq.dispose()
 
-                    await rabbitmq.initialize(process.env.RABBITMQ_URI || Default.RABBITMQ_URI, { sslOptions: { ca: [] } })
+                    await rabbitmq.initialize(process.env.RABBITMQ_URI || Default.RABBITMQ_URI,
+                        { interval: 100, sslOptions: { ca: [] } })
                 } catch (err) {
                     throw new Error('Failure on children.physicalactivities routes test: ' + err.message)
                 }
