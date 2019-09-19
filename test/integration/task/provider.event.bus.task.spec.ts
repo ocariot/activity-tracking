@@ -107,7 +107,6 @@ describe('PROVIDER EVENT BUS TASK', () => {
                         // this is necessary before comparing the saved resource in the
                         // database with the one sent to the bus.
                         activity.id = result[0].id
-                        result[0].child_id = result[0].child_id.toString()
                         // Comparing the resources
                         expect(result[0].id).to.eql(activity.id)
                         expect(result[0].start_time).to.eql(activity.start_time!.toISOString())
@@ -119,9 +118,10 @@ describe('PROVIDER EVENT BUS TASK', () => {
                         expect(result[0].steps).to.eql(activity.steps)
                         expect(result[0].levels).to.eql(activity.levels!.map(item => item.toJSON()))
                         expect(result[0].heart_rate).to.eql(activity.heart_rate!.toJSON())
-                        done()
                     })
                 })
+
+                done()
             })
         })
 
@@ -417,7 +417,6 @@ describe('PROVIDER EVENT BUS TASK', () => {
                         // this is necessary before comparing the saved resource in the
                         // database with the one sent to the bus.
                         sleep.id = result[0].id
-                        result[0].child_id = result[0].child_id.toString()
                         // Comparing the resources
                         expect(result[0].id).to.eql(sleep.id)
                         expect(result[0].start_time).to.eql(sleep.start_time!.toISOString())
@@ -644,7 +643,6 @@ describe('PROVIDER EVENT BUS TASK', () => {
                         // this is necessary before comparing the saved resource in the
                         // database with the one sent to the bus.
                         weight.id = result[0].id
-                        result[0].child_id = result[0].child_id.toString()
                         // Comparing the resources
                         expect(result[0].id).to.eql(weight.id)
                         expect(result[0].timestamp).to.eql(weight.timestamp!.toISOString())
@@ -839,7 +837,6 @@ describe('PROVIDER EVENT BUS TASK', () => {
                         // this is necessary before comparing the saved resource in the
                         // database with the one sent to the bus.
                         environment.id = result[0].id
-                        result[0].institution_id = result[0].institution_id.toString()
                         // Comparing the resources
                         expect(result[0].id).to.eql(environment.id)
                         expect(result[0].institution_id).to.eql(environment.institution_id)
@@ -906,7 +903,7 @@ describe('PROVIDER EVENT BUS TASK', () => {
             })
 
             it('should return an empty array (no environment matches query)', (done) => {
-                rabbitmq.bus.getEnvironments('?institution=5a62be07d6f33400146c9b64').then(result => {
+                rabbitmq.bus.getEnvironments('?institution_id=5a62be07d6f33400146c9b64').then(result => {
                     expect(result.length).to.eql(0)
                     done()
                 })
@@ -947,6 +944,7 @@ describe('PROVIDER EVENT BUS TASK', () => {
                         rabbitmq.bus.getEnvironments('?institution_id=5a62be07d6f33400146c9b61')
                             .then(result => {
                                 expect(result.length).to.eql(2)
+                                done()
                             })
                             .catch(err => {
                                 expect(err.message).to.eql('rpc timed out')
