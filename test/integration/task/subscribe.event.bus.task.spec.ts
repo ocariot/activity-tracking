@@ -107,7 +107,7 @@ describe('SUBSCRIBE EVENT BUS TASK', () => {
             }
         })
 
-        context('when posting a PhysicalActivitySaveEvent with one physical activity successfully', () => {
+        context('when receiving a PhysicalActivitySaveEvent with one physical activity successfully', () => {
             const activity: PhysicalActivity = new PhysicalActivityMock()
             it('should return an array with one physical activity', (done) => {
                 rabbitmq.bus.pubSavePhysicalActivity(activity)
@@ -130,7 +130,7 @@ describe('SUBSCRIBE EVENT BUS TASK', () => {
             })
         })
 
-        context('when posting a PhysicalActivitySaveEvent with one invalid physical activity', () => {
+        context('when receiving a PhysicalActivitySaveEvent with one invalid physical activity', () => {
             const activity: PhysicalActivity = new PhysicalActivity()       // Invalid activity
             it('should return an empty array', (done) => {
                 rabbitmq.bus.pubSavePhysicalActivity(activity)
@@ -144,7 +144,7 @@ describe('SUBSCRIBE EVENT BUS TASK', () => {
             })
         })
 
-        context('when posting a PhysicalActivitySaveEvent with one physical activity successfully ' +
+        context('when receiving a PhysicalActivitySaveEvent with one physical activity successfully ' +
             '(without MongoDB connection, at first)', () => {
             before(async () => {
                 try {
@@ -175,7 +175,7 @@ describe('SUBSCRIBE EVENT BUS TASK', () => {
             })
         })
 
-        context('when posting a PhysicalActivitySaveEvent with some correct physical activities successfully', () => {
+        context('when receiving a PhysicalActivitySaveEvent with some correct physical activities successfully', () => {
             const activity1: PhysicalActivity = new PhysicalActivityMock()
             const activity2: PhysicalActivity = new PhysicalActivityMock()
             const activity3: PhysicalActivity = new PhysicalActivityMock()
@@ -191,7 +191,7 @@ describe('SUBSCRIBE EVENT BUS TASK', () => {
             })
         })
 
-        context('when posting a PhysicalActivitySaveEvent with some incorrect physical activities successfully', () => {
+        context('when receiving a PhysicalActivitySaveEvent with some incorrect physical activities successfully', () => {
             const activity1: PhysicalActivity = new PhysicalActivityMock()
             const activity2: PhysicalActivity = new PhysicalActivity()
             const activity3: PhysicalActivity = new PhysicalActivityMock()
@@ -225,7 +225,7 @@ describe('SUBSCRIBE EVENT BUS TASK', () => {
             }
         })
 
-        context('when posting a SleepSaveEvent with one sleep object successfully', () => {
+        context('when receiving a SleepSaveEvent with one sleep object successfully', () => {
             const sleep: Sleep = new SleepMock()
             it('should return an array with one sleep object', (done) => {
                 rabbitmq.bus.pubSaveSleep(sleep)
@@ -255,7 +255,7 @@ describe('SUBSCRIBE EVENT BUS TASK', () => {
             })
         })
 
-        context('when posting a SleepSaveEvent with one invalid sleep object', () => {
+        context('when receiving a SleepSaveEvent with one invalid sleep object', () => {
             const sleep: Sleep = new Sleep()       // Invalid sleep object
             it('should return an empty array', (done) => {
                 rabbitmq.bus.pubSaveSleep(sleep)
@@ -269,7 +269,7 @@ describe('SUBSCRIBE EVENT BUS TASK', () => {
             })
         })
 
-        context('when posting a SleepSaveEvent with one sleep object successfully ' +
+        context('when receiving a SleepSaveEvent with one sleep object successfully ' +
             '(without MongoDB connection, at first)', () => {
             before(async () => {
                 try {
@@ -307,7 +307,7 @@ describe('SUBSCRIBE EVENT BUS TASK', () => {
             })
         })
 
-        context('when posting a SleepSaveEvent with some correct sleep objects successfully', () => {
+        context('when receiving a SleepSaveEvent with some correct sleep objects successfully', () => {
             const sleep1: Sleep = new SleepMock()
             const sleep2: Sleep = new SleepMock()
             const sleep3: Sleep = new SleepMock()
@@ -323,7 +323,7 @@ describe('SUBSCRIBE EVENT BUS TASK', () => {
             })
         })
 
-        context('when posting a SleepSaveEvent with some incorrect sleep objects successfully', () => {
+        context('when receiving a SleepSaveEvent with some incorrect sleep objects successfully', () => {
             const sleep1: Sleep = new SleepMock()
             const sleep2: Sleep = new Sleep()
             const sleep3: Sleep = new SleepMock()
@@ -358,7 +358,7 @@ describe('SUBSCRIBE EVENT BUS TASK', () => {
                 throw new Error('Failure on Subscribe WeightSaveEvent test: ' + err.message)
             }
         })
-        context('when posting a WeightSaveEvent with one weight object successfully', () => {
+        context('when receiving a WeightSaveEvent with one weight object successfully', () => {
             const weight: Weight = new WeightMock()
             it('should return an array with one weight object', (done) => {
                 rabbitmq.bus.pubSaveWeight(weight)
@@ -387,7 +387,7 @@ describe('SUBSCRIBE EVENT BUS TASK', () => {
             })
         })
 
-        context('when posting a WeightSaveEvent with one invalid weight object', () => {
+        context('when receiving a WeightSaveEvent with one invalid weight object', () => {
             const weight: Weight = new Weight()       // Invalid weight object
             it('should return an empty array', (done) => {
                 rabbitmq.bus.pubSaveWeight(weight)
@@ -401,7 +401,7 @@ describe('SUBSCRIBE EVENT BUS TASK', () => {
             })
         })
 
-        context('when posting a WeightSaveEvent with one weight object successfully ' +
+        context('when receiving a WeightSaveEvent with one weight object successfully ' +
             '(without MongoDB connection, at first)', () => {
             before(async () => {
                 try {
@@ -438,7 +438,7 @@ describe('SUBSCRIBE EVENT BUS TASK', () => {
             })
         })
 
-        context('when posting a WeightSaveEvent with some correct weight objects successfully', () => {
+        context('when receiving a WeightSaveEvent with some correct weight objects successfully', () => {
             const weight1: Weight = new WeightMock()
             const weight2: Weight = new WeightMock()
             const weight3: Weight = new WeightMock()
@@ -454,7 +454,7 @@ describe('SUBSCRIBE EVENT BUS TASK', () => {
             })
         })
 
-        context('when posting a WeightSaveEvent with some incorrect weight objects successfully', () => {
+        context('when receiving a WeightSaveEvent with some incorrect weight objects successfully', () => {
             const weight1: Weight = new WeightMock()
             const weight2: Weight = new Weight()
             const weight3: Weight = new WeightMock()
@@ -487,7 +487,7 @@ describe('SUBSCRIBE EVENT BUS TASK', () => {
                 throw new Error('Failure on Subscribe LogSaveEvent test: ' + err.message)
             }
         })
-        context('when posting a LogSaveEvent with one log successfully', () => {
+        context('when receiving a LogSaveEvent with one log successfully', () => {
             const log: any = {  type: 'steps',
                                 value: 20,
                                 date: '2019-09-16',
@@ -517,7 +517,7 @@ describe('SUBSCRIBE EVENT BUS TASK', () => {
             })
         })
 
-        context('when posting a LogSaveEvent with one invalid log', () => {
+        context('when receiving a LogSaveEvent with one invalid log', () => {
             const log: Log = new Log()       // Invalid log
             it('should return an empty array', (done) => {
                 rabbitmq.bus.pubSaveLog([ log ])
@@ -531,7 +531,7 @@ describe('SUBSCRIBE EVENT BUS TASK', () => {
             })
         })
 
-        context('when posting a LogSaveEvent with one log successfully ' +
+        context('when receiving a LogSaveEvent with one log successfully ' +
             '(without MongoDB connection, at first)', () => {
             before(async () => {
                 try {
@@ -569,7 +569,7 @@ describe('SUBSCRIBE EVENT BUS TASK', () => {
             })
         })
 
-        context('when posting a LogSaveEvent with some correct logs successfully', () => {
+        context('when receiving a LogSaveEvent with some correct logs successfully', () => {
             const log1: any = {  type: 'active_minutes',
                                  value: 4,
                                  date: '2019-09-16',
@@ -594,7 +594,7 @@ describe('SUBSCRIBE EVENT BUS TASK', () => {
             })
         })
 
-        context('when posting a LogSaveEvent with some incorrect logs successfully', () => {
+        context('when receiving a LogSaveEvent with some incorrect logs successfully', () => {
             const log1: any = {  type: 'active_minutes',
                                  value: 4,
                                  date: '2019-09-16',
@@ -633,7 +633,7 @@ describe('SUBSCRIBE EVENT BUS TASK', () => {
                 throw new Error('Failure on Subscribe InstitutionDeleteEvent test: ' + err.message)
             }
         })
-        context('when posting an InstitutionDeleteEvent with an institution that is associated with two previously ' +
+        context('when receiving an InstitutionDeleteEvent with an institution that is associated with two previously ' +
             'saved environments', () => {
             before(async () => {
                 try {
@@ -668,7 +668,7 @@ describe('SUBSCRIBE EVENT BUS TASK', () => {
             })
         })
 
-        context('when posting an InstitutionDeleteEvent with an institution that is associated with one of two previously ' +
+        context('when receiving an InstitutionDeleteEvent with an institution that is associated with one of two previously ' +
             'saved environments', () => {
             before(async () => {
                 try {
@@ -702,7 +702,7 @@ describe('SUBSCRIBE EVENT BUS TASK', () => {
             })
         })
 
-        context('when posting an InstitutionDeleteEvent with an invalid institution (invalid id)', () => {
+        context('when receiving an InstitutionDeleteEvent with an invalid institution (invalid id)', () => {
             const institution: any = { id: '5d7fb75ae48591c21a793f701',      // Invalid institution
                 type: 'Institute of Scientific Research',
                 name: 'NUTES/UEPB',
@@ -724,7 +724,7 @@ describe('SUBSCRIBE EVENT BUS TASK', () => {
             })
         })
 
-        context('when posting an InstitutionDeleteEvent with an institution that is associated with two previously ' +
+        context('when receiving an InstitutionDeleteEvent with an institution that is associated with two previously ' +
             'saved environments (without MongoDB connection, at first)', () => {
             before(async () => {
                 try {
@@ -788,7 +788,7 @@ describe('SUBSCRIBE EVENT BUS TASK', () => {
                 throw new Error('Failure on Subscribe UserDeleteEvent test: ' + err.message)
             }
         })
-        context('when posting an UserDeleteEvent with an user that is associated with two activities, ' +
+        context('when receiving an UserDeleteEvent with an user that is associated with two activities, ' +
             'one sleep object, one bodyfat, one weight and one log', () => {
             before(async () => {
                 try {
@@ -851,7 +851,7 @@ describe('SUBSCRIBE EVENT BUS TASK', () => {
             })
         })
 
-        context('when posting an UserDeleteEvent with an user who is not associated with all objects created below', () => {
+        context('when receiving an UserDeleteEvent with an user who is not associated with all objects created below', () => {
             before(async () => {
                 try {
                     const user_id: string = '5d7fb75ae48591c21a793f70'
@@ -912,7 +912,7 @@ describe('SUBSCRIBE EVENT BUS TASK', () => {
             })
         })
 
-        context('when posting an UserDeleteEvent with an invalid user (invalid id)', () => {
+        context('when receiving an UserDeleteEvent with an invalid user (invalid id)', () => {
             const user: any = { id: '5d7fb75ae48591c21a793f701',        // Invalid user
                 type: 'child',
                 username: 'BR9999',
@@ -932,7 +932,7 @@ describe('SUBSCRIBE EVENT BUS TASK', () => {
             })
         })
 
-        context('when posting an UserDeleteEvent with an user that is associated with two activities, ' +
+        context('when receiving an UserDeleteEvent with an user that is associated with two activities, ' +
             'one sleep object, one bodyfat, one weight and one log (without MongoDB connection, at first)', () => {
             before(async () => {
                 try {

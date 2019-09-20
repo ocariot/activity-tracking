@@ -259,7 +259,7 @@ describe('PROVIDER EVENT BUS TASK', () => {
 
             it('should return an array with three physical activities (query all activities performed in one day)',
                 (done) => {
-                    rabbitmq.bus.getPhysicalActivities('?start_time=gte:2019-01-20T00:00:00.000Z&start_time=lt:2019-01-20T23:59:59.999Z')
+                    rabbitmq.bus.getPhysicalActivities('?start_time=gte:2019-01-20T00:00:00.000Z&end_time=lt:2019-01-20T23:59:59.999Z')
                         .then(result => {
                             expect(result.length).to.eql(3)
                             done()
@@ -270,7 +270,7 @@ describe('PROVIDER EVENT BUS TASK', () => {
             it('should return an array with two physical activities (query the activities of a child performed in one day)',
                 (done) => {
                     rabbitmq.bus.getPhysicalActivities('?start_time=gte:2019-01-20T00:00:00.000Z' +
-                        '&start_time=lt:2019-01-20T23:59:59.999Z' +
+                        '&end_time=lt:2019-01-20T23:59:59.999Z' +
                         '&child_id=5a62be07de34500146d9c544')
                         .then(result => {
                             expect(result.length).to.eql(2)
@@ -555,7 +555,7 @@ describe('PROVIDER EVENT BUS TASK', () => {
             })
 
             it('should return an array with three sleep objects (query all sleep records in one day)', (done) => {
-                rabbitmq.bus.getSleep('?start_time=gte:2019-01-20T00:00:00.000Z&start_time=lt:2019-01-20T23:59:59.999Z')
+                rabbitmq.bus.getSleep('?start_time=gte:2019-01-20T00:00:00.000Z&end_time=lt:2019-01-20T23:59:59.999Z')
                     .then(result => {
                         expect(result.length).to.eql(3)
                         done()
@@ -565,7 +565,7 @@ describe('PROVIDER EVENT BUS TASK', () => {
 
             it('should return an array with two sleep objects (query all sleep records of a child in one day)', (done) => {
                 rabbitmq.bus.getSleep('?start_time=gte:2019-01-20T00:00:00.000Z' +
-                    '&start_time=lt:2019-01-20T23:59:59.999Z' +
+                    '&end_time=lt:2019-01-20T23:59:59.999Z' +
                     '&child_id=5a62be07de34500146d9c544')
                     .then(result => {
                         expect(result.length).to.eql(2)
