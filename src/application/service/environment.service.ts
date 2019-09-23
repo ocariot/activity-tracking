@@ -68,10 +68,10 @@ export class EnvironmentService implements IEnvironmentService {
         for (const elem of environment) {
             try {
                 // Add each environment from the array
-                await this.addEnvironment(elem)
+                const environmentResult = await this.addEnvironment(elem)
 
                 // Create a StatusSuccess object for the construction of the MultiStatus response.
-                const statusSuccess: StatusSuccess<Environment> = new StatusSuccess<Environment>(HttpStatus.CREATED, elem)
+                const statusSuccess: StatusSuccess<Environment> = new StatusSuccess<Environment>(HttpStatus.CREATED, environmentResult)
                 statusSuccessArr.push(statusSuccess)
             } catch (err) {
                 let statusCode: number = HttpStatus.INTERNAL_SERVER_ERROR

@@ -10,6 +10,7 @@ import { Entity } from '../../../src/application/domain/model/entity'
 import { Sleep } from '../../../src/application/domain/model/sleep'
 import { SleepMock } from '../../mocks/sleep.mock'
 import { SleepRepoModel } from '../../../src/infrastructure/database/schema/sleep.schema'
+import { Strings } from '../../../src/utils/strings'
 
 require('sinon-mongoose')
 
@@ -276,7 +277,8 @@ describe('Repositories: BaseRepository', () => {
 
                 return repo.update(defaultSleep)
                     .catch((err: any) => {
-                        assert.equal(err.message, 'Some ID provided, does not have a valid format.')
+                        assert.equal(err.message, Strings.ERROR_MESSAGE.UUID_NOT_VALID_FORMAT)
+                        assert.equal(err.description, Strings.ERROR_MESSAGE.UUID_NOT_VALID_FORMAT_DESC)
                     })
             })
         })
@@ -354,7 +356,8 @@ describe('Repositories: BaseRepository', () => {
 
                 return repo.delete(invalidId)
                     .catch((err: any) => {
-                        assert.equal(err.message, 'Some ID provided, does not have a valid format.')
+                        assert.equal(err.message, Strings.ERROR_MESSAGE.UUID_NOT_VALID_FORMAT)
+                        assert.equal(err.description, Strings.ERROR_MESSAGE.UUID_NOT_VALID_FORMAT_DESC)
                     })
             })
         })

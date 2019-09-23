@@ -59,6 +59,7 @@ describe('Services: Log', () => {
                 return  logService.addLogs(correctLogsArr)
                     .then(result => {
                         for (let i = 0; i < result.success.length; i++) {
+                            correctLogsArr[i].id = result.success[i].item.id
                             assert.propertyVal(result.success[i], 'code', HttpStatus.CREATED)
                             assert.propertyVal(result.success[i].item, 'id', correctLogsArr[i].id)
                             assert.propertyVal(result.success[i].item, 'date', correctLogsArr[i].date)

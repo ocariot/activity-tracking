@@ -302,6 +302,16 @@ describe('Routes: children.sleep', () => {
                             expect(res.body.pattern.data_set[index].duration).to.eql(elem.duration)
                             index++
                         }
+                        if (defaultSleep.type === SleepType.CLASSIC) {
+                            expect(res.body.pattern.summary).to.have.property('awake')
+                            expect(res.body.pattern.summary).to.have.property('asleep')
+                            expect(res.body.pattern.summary).to.have.property('restless')
+                        } else {
+                            expect(res.body.pattern.summary).to.have.property('deep')
+                            expect(res.body.pattern.summary).to.have.property('light')
+                            expect(res.body.pattern.summary).to.have.property('rem')
+                            expect(res.body.pattern.summary).to.have.property('awake')
+                        }
                         expect(res.body.type).to.eql(defaultSleep.type)
                         expect(res.body.child_id).to.eql(defaultSleep.child_id)
                     })
@@ -688,6 +698,16 @@ describe('Routes: children.sleep', () => {
                                 expect(res.body.success[i].item.pattern.data_set[index].duration).to.eql(elem.duration)
                                 index++
                             }
+                            if (correctSleepArr[i].type === SleepType.CLASSIC) {
+                                expect(res.body.success[i].item.pattern.summary).to.have.property('awake')
+                                expect(res.body.success[i].item.pattern.summary).to.have.property('asleep')
+                                expect(res.body.success[i].item.pattern.summary).to.have.property('restless')
+                            } else {
+                                expect(res.body.success[i].item.pattern.summary).to.have.property('deep')
+                                expect(res.body.success[i].item.pattern.summary).to.have.property('light')
+                                expect(res.body.success[i].item.pattern.summary).to.have.property('rem')
+                                expect(res.body.success[i].item.pattern.summary).to.have.property('awake')
+                            }
                             expect(res.body.success[i].item.type).to.eql(correctSleepArr[i].type)
                             expect(res.body.success[i].item.child_id).to.eql(correctSleepArr[i].child_id)
                         }
@@ -782,6 +802,16 @@ describe('Routes: children.sleep', () => {
                             expect(res.body.success[0].item.pattern.data_set[index].name).to.eql(elem.name)
                             expect(res.body.success[0].item.pattern.data_set[index].duration).to.eql(elem.duration)
                             index++
+                        }
+                        if (correctSleepArr[0].type === SleepType.CLASSIC) {
+                            expect(res.body.success[0].item.pattern.summary).to.have.property('awake')
+                            expect(res.body.success[0].item.pattern.summary).to.have.property('asleep')
+                            expect(res.body.success[0].item.pattern.summary).to.have.property('restless')
+                        } else {
+                            expect(res.body.success[0].item.pattern.summary).to.have.property('deep')
+                            expect(res.body.success[0].item.pattern.summary).to.have.property('light')
+                            expect(res.body.success[0].item.pattern.summary).to.have.property('rem')
+                            expect(res.body.success[0].item.pattern.summary).to.have.property('awake')
                         }
                         expect(res.body.success[0].item.type).to.eql(mixedSleepArr[0].type)
                         expect(res.body.success[0].item.child_id).to.eql(mixedSleepArr[0].child_id)

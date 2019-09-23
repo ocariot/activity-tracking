@@ -425,6 +425,7 @@ describe('Routes: environments', () => {
                     .expect(207)
                     .then(res => {
                         for (let i = 0; i < res.body.success.length; i++) {
+                            correctEnvironmentsArr[i].id = res.body.success[i].item.id
                             expect(res.body.success[i].code).to.eql(HttpStatus.CREATED)
                             expect(res.body.success[i].item.id).to.eql(correctEnvironmentsArr[i].id)
                             expect(res.body.success[i].item.institution_id).to.eql(correctEnvironmentsArr[i].institution_id)
@@ -528,6 +529,7 @@ describe('Routes: environments', () => {
                     .expect(207)
                     .then(res => {
                         // Success item
+                        mixedEnvironmentsArr[0].id = res.body.success[0].item.id
                         expect(res.body.success[0].code).to.eql(HttpStatus.CREATED)
                         expect(res.body.success[0].item.id).to.eql(mixedEnvironmentsArr[0].id)
                         expect(res.body.success[0].item.institution_id).to.eql(mixedEnvironmentsArr[0].institution_id)

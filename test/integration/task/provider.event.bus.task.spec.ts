@@ -26,6 +26,7 @@ import { Environment } from '../../../src/application/domain/model/environment'
 import { EnvironmentMock } from '../../mocks/environment.mock'
 import { IEnvironmentRepository } from '../../../src/application/port/environment.repository.interface'
 import { Location } from '../../../src/application/domain/model/location'
+import { Strings } from '../../../src/utils/strings'
 
 const dbConnection: IDatabase = DIContainer.get(Identifier.MONGODB_CONNECTION)
 const rabbitmq: IEventBus = DIContainer.get(Identifier.RABBITMQ_EVENT_BUS)
@@ -380,6 +381,126 @@ describe('PROVIDER EVENT BUS TASK', () => {
                 })
         })
 
+        context('when trying to retrieve physical activities through invalid query', () => {
+            before(async () => {
+                try {
+                    const activity: PhysicalActivity = new PhysicalActivityMock()
+
+                    await activityRepository.create(activity)
+                } catch (err) {
+                    throw new Error('Failure on Provider PhysicalActivity test: ' + err.message)
+                }
+            })
+            // Delete all physical activities from database after each test case
+            after(async () => {
+                try {
+                    await deleteAllActivities()
+                } catch (err) {
+                    throw new Error('Failure on Provider PhysicalActivity test: ' + err.message)
+                }
+            })
+            it('should return a ValidationException (query with an invalid date (start_time))', (done) => {
+                rabbitmq.bus.getPhysicalActivities('?start_time=invalidStartTime')
+                    .then(result => {
+                        expect(result.length).to.eql(0)
+                        done(new Error('The find method of the repository should not function normally'))
+                    })
+                    .catch((err) => {
+                        try {
+                            expect(err.message).to.eql('Error: '
+                                .concat('Datetime: invalidStartTime is not in valid ISO 8601 format.'))
+                            done()
+                        } catch (err) {
+                            done(err)
+                        }
+                    })
+            })
+
+            it('should return a ValidationException (query with an invalid date (end_time))', (done) => {
+                rabbitmq.bus.getPhysicalActivities('?end_time=invalidEndTime')
+                    .then(result => {
+                        expect(result.length).to.eql(0)
+                        done(new Error('The find method of the repository should not function normally'))
+                    })
+                    .catch((err) => {
+                        try {
+                            expect(err.message).to.eql('Error: '
+                                .concat('Datetime: invalidEndTime is not in valid ISO 8601 format.'))
+                            done()
+                        } catch (err) {
+                            done(err)
+                        }
+                    })
+            })
+
+            it('should return a ValidationException (query with an invalid number (duration))', (done) => {
+                rabbitmq.bus.getPhysicalActivities('?duration=invalidDuration')
+                    .then(result => {
+                        expect(result.length).to.eql(0)
+                        done(new Error('The find method of the repository should not function normally'))
+                    })
+                    .catch((err) => {
+                        try {
+                            expect(err.message).to.eql('Error: '
+                                .concat('The value \'invalidDuration\' of duration field is not a number.'))
+                            done()
+                        } catch (err) {
+                            done(err)
+                        }
+                    })
+            })
+
+            it('should return a ValidationException (query with an invalid number (calories))', (done) => {
+                rabbitmq.bus.getPhysicalActivities('?calories=invalidCalories')
+                    .then(result => {
+                        expect(result.length).to.eql(0)
+                        done(new Error('The find method of the repository should not function normally'))
+                    })
+                    .catch((err) => {
+                        try {
+                            expect(err.message).to.eql('Error: '
+                                .concat('The value \'invalidCalories\' of calories field is not a number.'))
+                            done()
+                        } catch (err) {
+                            done(err)
+                        }
+                    })
+            })
+
+            it('should return a ValidationException (query with an invalid number (steps))', (done) => {
+                rabbitmq.bus.getPhysicalActivities('?steps=invalidSteps')
+                    .then(result => {
+                        expect(result.length).to.eql(0)
+                        done(new Error('The find method of the repository should not function normally'))
+                    })
+                    .catch((err) => {
+                        try {
+                            expect(err.message).to.eql('Error: '
+                                .concat('The value \'invalidSteps\' of steps field is not a number.'))
+                            done()
+                        } catch (err) {
+                            done(err)
+                        }
+                    })
+            })
+
+            it('should return a ValidationException (query with an invalid child id)', (done) => {
+                rabbitmq.bus.getPhysicalActivities('?child_id=invalidChildId')
+                    .then(result => {
+                        expect(result.length).to.eql(0)
+                        done(new Error('The find method of the repository should not function normally'))
+                    })
+                    .catch((err) => {
+                        try {
+                            expect(err.message).to.eql('Error: '.concat(Strings.ERROR_MESSAGE.UUID_NOT_VALID_FORMAT))
+                            done()
+                        } catch (err) {
+                            done(err)
+                        }
+                    })
+            })
+        })
+
         context('when trying to recover physical activities through a query unsuccessful (without MongoDB connection)',
             () => {
                 before(async () => {
@@ -623,6 +744,92 @@ describe('PROVIDER EVENT BUS TASK', () => {
             })
         })
 
+        context('when trying to retrieve sleep objects through invalid query', () => {
+            before(async () => {
+                try {
+                    const sleep: Sleep = new SleepMock()
+
+                    await sleepRepository.create(sleep)
+                } catch (err) {
+                    throw new Error('Failure on Provider Sleep test: ' + err.message)
+                }
+            })
+            // Delete all sleep objects from database after each test case
+            after(async () => {
+                try {
+                    await deleteAllSleep()
+                } catch (err) {
+                    throw new Error('Failure on Provider Sleep test: ' + err.message)
+                }
+            })
+            it('should return a ValidationException (query with an invalid date (start_time))', (done) => {
+                rabbitmq.bus.getSleep('?start_time=invalidStartTime')
+                    .then(result => {
+                        expect(result.length).to.eql(0)
+                        done(new Error('The find method of the repository should not function normally'))
+                    })
+                    .catch((err) => {
+                        try {
+                            expect(err.message).to.eql('Error: '
+                                .concat('Datetime: invalidStartTime is not in valid ISO 8601 format.'))
+                            done()
+                        } catch (err) {
+                            done(err)
+                        }
+                    })
+            })
+
+            it('should return a ValidationException (query with an invalid date (end_time))', (done) => {
+                rabbitmq.bus.getSleep('?end_time=invalidEndTime')
+                    .then(result => {
+                        expect(result.length).to.eql(0)
+                        done(new Error('The find method of the repository should not function normally'))
+                    })
+                    .catch((err) => {
+                        try {
+                            expect(err.message).to.eql('Error: '
+                                .concat('Datetime: invalidEndTime is not in valid ISO 8601 format.'))
+                            done()
+                        } catch (err) {
+                            done(err)
+                        }
+                    })
+            })
+
+            it('should return a ValidationException (query with an invalid number (duration))', (done) => {
+                rabbitmq.bus.getSleep('?duration=invalidDuration')
+                    .then(result => {
+                        expect(result.length).to.eql(0)
+                        done(new Error('The find method of the repository should not function normally'))
+                    })
+                    .catch((err) => {
+                        try {
+                            expect(err.message).to.eql('Error: '
+                                .concat('The value \'invalidDuration\' of duration field is not a number.'))
+                            done()
+                        } catch (err) {
+                            done(err)
+                        }
+                    })
+            })
+
+            it('should return a ValidationException (query with an invalid child id)', (done) => {
+                rabbitmq.bus.getSleep('?child_id=invalidChildId')
+                    .then(result => {
+                        expect(result.length).to.eql(0)
+                        done(new Error('The find method of the repository should not function normally'))
+                    })
+                    .catch((err) => {
+                        try {
+                            expect(err.message).to.eql('Error: '.concat(Strings.ERROR_MESSAGE.UUID_NOT_VALID_FORMAT))
+                            done()
+                        } catch (err) {
+                            done(err)
+                        }
+                    })
+            })
+        })
+
         context('when trying to recover sleep objects through a query unsuccessful (without MongoDB connection)',
             () => {
                 before(async () => {
@@ -834,6 +1041,75 @@ describe('PROVIDER EVENT BUS TASK', () => {
                 })
         })
 
+        context('when trying to retrieve weight objects through invalid query', () => {
+            before(async () => {
+                try {
+                    const weight: Weight = new WeightMock()
+
+                    await weightService.add(weight)
+                } catch (err) {
+                    throw new Error('Failure on Provider Weight test: ' + err.message)
+                }
+            })
+            // Delete all weight objects from database after each test case
+            after(async () => {
+                try {
+                    await deleteAllWeights()
+                } catch (err) {
+                    throw new Error('Failure on Provider Weight test: ' + err.message)
+                }
+            })
+            it('should return a ValidationException (query with an invalid date (timestamp))', (done) => {
+                rabbitmq.bus.getWeights('?timestamp=invalidTimestamp')
+                    .then(result => {
+                        expect(result.length).to.eql(0)
+                        done(new Error('The find method of the repository should not function normally'))
+                    })
+                    .catch((err) => {
+                        try {
+                            expect(err.message).to.eql('Error: '
+                                .concat('Datetime: invalidTimestamp is not in valid ISO 8601 format.'))
+                            done()
+                        } catch (err) {
+                            done(err)
+                        }
+                    })
+            })
+
+            it('should return a ValidationException (query with an invalid number (value))', (done) => {
+                rabbitmq.bus.getWeights('?value=invalidValue')
+                    .then(result => {
+                        expect(result.length).to.eql(0)
+                        done(new Error('The find method of the repository should not function normally'))
+                    })
+                    .catch((err) => {
+                        try {
+                            expect(err.message).to.eql('Error: '
+                                .concat('The value \'invalidValue\' of value field is not a number.'))
+                            done()
+                        } catch (err) {
+                            done(err)
+                        }
+                    })
+            })
+
+            it('should return a ValidationException (query with an invalid child id)', (done) => {
+                rabbitmq.bus.getWeights('?child_id=invalidChildId')
+                    .then(result => {
+                        expect(result.length).to.eql(0)
+                        done(new Error('The find method of the repository should not function normally'))
+                    })
+                    .catch((err) => {
+                        try {
+                            expect(err.message).to.eql('Error: '.concat(Strings.ERROR_MESSAGE.UUID_NOT_VALID_FORMAT))
+                            done()
+                        } catch (err) {
+                            done(err)
+                        }
+                    })
+            })
+        })
+
         context('when trying to recover weight objects through a query unsuccessful (without MongoDB connection)',
             () => {
                 before(async () => {
@@ -888,7 +1164,7 @@ describe('PROVIDER EVENT BUS TASK', () => {
         })
         context('when retrieving environments through a query successfully when there is at least ' +
             'one matching environment associated with the institution_id passed in the query', () => {
-            // Delete all activities from database after each test case
+            // Delete all environments from database after each test case
             after(async () => {
                 try {
                     await deleteAllEnvironments()
@@ -1071,6 +1347,109 @@ describe('PROVIDER EVENT BUS TASK', () => {
                         })
                         .catch(done)
                 })
+        })
+
+        context('when trying to retrieve environments through invalid query', () => {
+            before(async () => {
+                try {
+                    const environment: Environment = new EnvironmentMock()
+
+                    await environmentRepository.create(environment)
+                } catch (err) {
+                    throw new Error('Failure on Provider Environment test: ' + err.message)
+                }
+            })
+            // Delete all environments from database after each test case
+            after(async () => {
+                try {
+                    await deleteAllEnvironments()
+                } catch (err) {
+                    throw new Error('Failure on Provider Environment test: ' + err.message)
+                }
+            })
+            it('should return a ValidationException (query with an invalid institution id)', (done) => {
+                rabbitmq.bus.getEnvironments('?institution_id=invalidInstitutionId')
+                    .then(result => {
+                        expect(result.length).to.eql(0)
+                        done(new Error('The find method of the repository should not function normally'))
+                    })
+                    .catch((err) => {
+                        try {
+                            expect(err.message).to.eql('Error: '.concat(Strings.ERROR_MESSAGE.UUID_NOT_VALID_FORMAT))
+                            done()
+                        } catch (err) {
+                            done(err)
+                        }
+                    })
+            })
+
+            it('should return a ValidationException (query with an invalid number (location latitude)', (done) => {
+                rabbitmq.bus.getEnvironments('?location.latitude=invalidLatitude')
+                    .then(result => {
+                        expect(result.length).to.eql(0)
+                        done(new Error('The find method of the repository should not function normally'))
+                    })
+                    .catch((err) => {
+                        try {
+                            expect(err.message).to.eql('Error: '
+                                .concat('The value \'invalidLatitude\' of location.latitude field is not a number.'))
+                            done()
+                        } catch (err) {
+                            done(err)
+                        }
+                    })
+            })
+
+            it('should return a ValidationException (query with an invalid number (location longitude)', (done) => {
+                rabbitmq.bus.getEnvironments('?location.longitude=invalidLongitude')
+                    .then(result => {
+                        expect(result.length).to.eql(0)
+                        done(new Error('The find method of the repository should not function normally'))
+                    })
+                    .catch((err) => {
+                        try {
+                            expect(err.message).to.eql('Error: '
+                                .concat('The value \'invalidLongitude\' of location.longitude field is not a number.'))
+                            done()
+                        } catch (err) {
+                            done(err)
+                        }
+                    })
+            })
+
+            it('should return a ValidationException (query with an invalid climatized parameter)', (done) => {
+                rabbitmq.bus.getEnvironments('?climatized=invalidClimatized')
+                    .then(result => {
+                        expect(result.length).to.eql(0)
+                        done(new Error('The find method of the repository should not function normally'))
+                    })
+                    .catch((err) => {
+                        try {
+                            expect(err.message).to.eql('Error: '
+                                .concat('The value \'invalidClimatized\' of climatized field is not a boolean.'))
+                            done()
+                        } catch (err) {
+                            done(err)
+                        }
+                    })
+            })
+
+            it('should return a ValidationException (query with an invalid date (timestamp))', (done) => {
+                rabbitmq.bus.getEnvironments('?timestamp=invalidTimestamp')
+                    .then(result => {
+                        expect(result.length).to.eql(0)
+                        done(new Error('The find method of the repository should not function normally'))
+                    })
+                    .catch((err) => {
+                        try {
+                            expect(err.message).to.eql('Error: '
+                                .concat('Datetime: invalidTimestamp is not in valid ISO 8601 format.'))
+                            done()
+                        } catch (err) {
+                            done(err)
+                        }
+                    })
+            })
         })
 
         context('when trying to recover environments through a query unsuccessful (without MongoDB connection)',
@@ -1335,6 +1714,75 @@ describe('PROVIDER EVENT BUS TASK', () => {
                         })
                         .catch(done)
                 })
+        })
+
+        context('when trying to retrieve logs through invalid query', () => {
+            before(async () => {
+                try {
+                    const log: Log = new LogMock(LogType.STEPS)
+
+                    await logRepository.create(log)
+                } catch (err) {
+                    throw new Error('Failure on Provider Log test: ' + err.message)
+                }
+            })
+            // Delete all logs from database after each test case
+            after(async () => {
+                try {
+                    await deleteAllLogs()
+                } catch (err) {
+                    throw new Error('Failure on Provider Log test: ' + err.message)
+                }
+            })
+            it('should return a ValidationException (query with an invalid date (date))', (done) => {
+                rabbitmq.bus.getLogs('?date=invalidDate')
+                    .then(result => {
+                        expect(result.length).to.eql(0)
+                        done(new Error('The find method of the repository should not function normally'))
+                    })
+                    .catch((err) => {
+                        try {
+                            expect(err.message).to.eql('Error: '
+                                .concat('Datetime: invalidDate is not in valid ISO 8601 format.'))
+                            done()
+                        } catch (err) {
+                            done(err)
+                        }
+                    })
+            })
+
+            it('should return a ValidationException (query with an invalid number (value))', (done) => {
+                rabbitmq.bus.getLogs('?value=invalidValue')
+                    .then(result => {
+                        expect(result.length).to.eql(0)
+                        done(new Error('The find method of the repository should not function normally'))
+                    })
+                    .catch((err) => {
+                        try {
+                            expect(err.message).to.eql('Error: '
+                                .concat('The value \'invalidValue\' of value field is not a number.'))
+                            done()
+                        } catch (err) {
+                            done(err)
+                        }
+                    })
+            })
+
+            it('should return a ValidationException (query with an invalid child id)', (done) => {
+                rabbitmq.bus.getLogs('?child_id=invalidChildId')
+                    .then(result => {
+                        expect(result.length).to.eql(0)
+                        done(new Error('The find method of the repository should not function normally'))
+                    })
+                    .catch((err) => {
+                        try {
+                            expect(err.message).to.eql('Error: '.concat(Strings.ERROR_MESSAGE.UUID_NOT_VALID_FORMAT))
+                            done()
+                        } catch (err) {
+                            done(err)
+                        }
+                    })
+            })
         })
 
         context('when trying to recover logs through a query unsuccessful (without MongoDB connection)',

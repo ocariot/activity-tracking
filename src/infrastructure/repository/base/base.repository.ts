@@ -7,6 +7,7 @@ import { ConflictException } from '../../../application/domain/exception/conflic
 import { IEntityMapper } from '../../port/entity.mapper.interface'
 import { IQuery } from '../../../application/port/query.interface'
 import { ILogger } from '../../../utils/custom.logger'
+import { Strings } from '../../../utils/strings'
 
 /**
  * Base implementation of the repository.
@@ -102,11 +103,21 @@ export abstract class BaseRepository<T extends Entity, TModel> implements IRepos
             if (err.name === 'ValidationError') {
                 return new ValidationException('Required fields were not provided!', err.message)
             } else if (err.name === 'CastError' || new RegExp(/(invalid format)/i).test(err)) {
-                if (err.message && err.message.indexOf('Invalid Date')) {
-                    return new ValidationException(`The ${err.path} is not in valid ISO 8601 format.`)
+                if (err.name === 'CastError' && err.kind) {
+                    if (err.kind === 'date') {
+                        return new ValidationException(`Datetime: ${err.value} is not in valid ISO 8601 format.`)
+                    } else if (err.kind === 'ObjectId') {
+                        return new ValidationException(Strings.ERROR_MESSAGE.UUID_NOT_VALID_FORMAT,
+                            Strings.ERROR_MESSAGE.UUID_NOT_VALID_FORMAT_DESC)
+                    } else if (err.kind === 'number') {
+                        return new ValidationException(`The value \'${err.value}\' of ${err.path} field is not a number.`)
+                    } else if (err.kind === 'Boolean') {
+                        return new ValidationException(`The value \'${err.value}\' of ${err.path} field is not a boolean.`)
+                    }
+                    return new ValidationException(`The value \'${err.value}\' of ${err.path} field is invalid.`)
                 }
-                return new ValidationException('Some ID provided, does not have a valid format.',
-                    'A 24-byte hex ID similar to this: 507f191e810c19729de860ea, is expected.')
+                return new ValidationException(Strings.ERROR_MESSAGE.UUID_NOT_VALID_FORMAT,
+                    Strings.ERROR_MESSAGE.UUID_NOT_VALID_FORMAT_DESC)
             } else if (err.name === 'MongoError' && err.code === 11000) {
                 return new ConflictException('A registration with the same unique data already exists!')
             } else if (err.name === 'ObjectParameterError') {

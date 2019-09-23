@@ -68,10 +68,10 @@ export class BodyFatService implements IBodyFatService {
         for (const elem of bodyFat) {
             try {
                 // Add each body fat from the array
-                await this.addFat(elem)
+                const bodyFatResult = await this.addFat(elem)
 
                 // Create a StatusSuccess object for the construction of the MultiStatus response.
-                const statusSuccess: StatusSuccess<BodyFat> = new StatusSuccess<BodyFat>(HttpStatus.CREATED, elem)
+                const statusSuccess: StatusSuccess<BodyFat> = new StatusSuccess<BodyFat>(HttpStatus.CREATED, bodyFatResult)
                 statusSuccessArr.push(statusSuccess)
             } catch (err) {
                 let statusCode: number = HttpStatus.INTERNAL_SERVER_ERROR
