@@ -107,7 +107,7 @@ describe('Services: WeightService', () => {
                 return weightService.add(weight)
                     .then((result: Weight | Array<Weight>) => {
                         result = result as Weight
-                        assert.property(result, 'id')
+                        assert.propertyVal(result, 'id', weight.id)
                         assert.propertyVal(result, 'type', weight.type)
                         assert.propertyVal(result, 'timestamp', weight.timestamp)
                         assert.propertyVal(result, 'value', weight.value)
@@ -125,7 +125,7 @@ describe('Services: WeightService', () => {
                 return weightService.add(weight)
                     .then((result: Weight | Array<Weight>) => {
                         result = result as Weight
-                        assert.property(result, 'id')
+                        assert.propertyVal(result, 'id', weight.id)
                         assert.propertyVal(result, 'type', weight.type)
                         assert.propertyVal(result, 'timestamp', weight.timestamp)
                         assert.propertyVal(result, 'value', weight.value)
@@ -143,7 +143,7 @@ describe('Services: WeightService', () => {
                 return weightService.add(weight)
                     .then((result: Weight | Array<Weight>) => {
                         result = result as Weight
-                        assert.property(result, 'id')
+                        assert.propertyVal(result, 'id', weight.id)
                         assert.propertyVal(result, 'type', weight.type)
                         assert.propertyVal(result, 'timestamp', weight.timestamp)
                         assert.propertyVal(result, 'value', weight.value)
@@ -161,7 +161,7 @@ describe('Services: WeightService', () => {
                 return weightService.add(weight)
                     .then((result: Weight | Array<Weight>) => {
                         result = result as Weight
-                        assert.property(result, 'id')
+                        assert.propertyVal(result, 'id', weight.id)
                         assert.propertyVal(result, 'type', weight.type)
                         assert.propertyVal(result, 'timestamp', weight.timestamp)
                         assert.propertyVal(result, 'value', weight.value)
@@ -179,7 +179,7 @@ describe('Services: WeightService', () => {
                 return weightService.add(weight)
                     .then((result: Weight | Array<Weight>) => {
                         result = result as Weight
-                        assert.property(result, 'id')
+                        assert.propertyVal(result, 'id', weight.id)
                         assert.propertyVal(result, 'type', weight.type)
                         assert.propertyVal(result, 'timestamp', weight.timestamp)
                         assert.propertyVal(result, 'value', weight.value)

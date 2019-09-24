@@ -56,16 +56,16 @@ describe('Services: Log', () => {
     describe('addLogs(logs: Array<Log>)', () => {
         context('when all the logs in the array are correct and it still does not exist in the repository', () => {
             it('should return a response of type MultiStatus<Log> with the description of success in sending each log',  () => {
-                return  logService.addLogs(correctLogsArr)
+                return logService.addLogs(correctLogsArr)
                     .then(result => {
                         for (let i = 0; i < result.success.length; i++) {
                             correctLogsArr[i].id = result.success[i].item.id
                             assert.propertyVal(result.success[i], 'code', HttpStatus.CREATED)
-                            assert.propertyVal(result.success[i].item, 'id', correctLogsArr[i].id)
-                            assert.propertyVal(result.success[i].item, 'date', correctLogsArr[i].date)
-                            assert.propertyVal(result.success[i].item, 'value', correctLogsArr[i].value)
-                            assert.propertyVal(result.success[i].item, 'type', correctLogsArr[i].type)
-                            assert.propertyVal(result.success[i].item, 'child_id', correctLogsArr[i].child_id)
+                            assert.property(result.success[i].item, 'id')
+                            assert.property(result.success[i].item, 'date')
+                            assert.property(result.success[i].item, 'value')
+                            assert.property(result.success[i].item, 'type')
+                            assert.property(result.success[i].item, 'child_id')
                         }
                         assert.isEmpty(result.error)
                     })
@@ -79,15 +79,15 @@ describe('Services: Log', () => {
                     elem.date = '2018-03-10'
                 })
 
-                return  logService.addLogs(correctLogsArr)
+                return logService.addLogs(correctLogsArr)
                     .then(result => {
                         for (let i = 0; i < result.success.length; i++) {
                             assert.propertyVal(result.success[i], 'code', HttpStatus.CREATED)
-                            assert.propertyVal(result.success[i].item, 'id', correctLogsArr[i].id)
-                            assert.propertyVal(result.success[i].item, 'date', correctLogsArr[i].date)
-                            assert.propertyVal(result.success[i].item, 'value', correctLogsArr[i].value)
-                            assert.propertyVal(result.success[i].item, 'type', correctLogsArr[i].type)
-                            assert.propertyVal(result.success[i].item, 'child_id', correctLogsArr[i].child_id)
+                            assert.property(result.success[i].item, 'id')
+                            assert.property(result.success[i].item, 'date')
+                            assert.property(result.success[i].item, 'value')
+                            assert.property(result.success[i].item, 'type')
+                            assert.property(result.success[i].item, 'child_id')
                         }
                         assert.isEmpty(result.error)
                     })
@@ -99,15 +99,15 @@ describe('Services: Log', () => {
                 'response of type MultiStatus<Log> with the description of success in sending each log',  () => {
                 correctLogsArr.push(new LogMock(LogType.STEPS))
 
-                return  logService.addLogs(correctLogsArr)
+                return logService.addLogs(correctLogsArr)
                     .then(result => {
                         for (let i = 0; i < result.success.length; i++) {
                             assert.propertyVal(result.success[i], 'code', HttpStatus.CREATED)
-                            assert.propertyVal(result.success[i].item, 'id', correctLogsArr[i].id)
-                            assert.propertyVal(result.success[i].item, 'date', correctLogsArr[i].date)
-                            assert.propertyVal(result.success[i].item, 'value', correctLogsArr[i].value)
-                            assert.propertyVal(result.success[i].item, 'type', correctLogsArr[i].type)
-                            assert.propertyVal(result.success[i].item, 'child_id', correctLogsArr[i].child_id)
+                            assert.property(result.success[i].item, 'id')
+                            assert.property(result.success[i].item, 'date')
+                            assert.property(result.success[i].item, 'value')
+                            assert.property(result.success[i].item, 'type')
+                            assert.property(result.success[i].item, 'child_id')
                         }
                         assert.isEmpty(result.error)
                     })
@@ -118,7 +118,7 @@ describe('Services: Log', () => {
             it('should return a response of type MultiStatus<Log> with the description of error in sending each log',  () => {
                 correctLogsArr.push(new LogMock(LogType.STEPS))
 
-                return  logService.addLogs(incorrectLogsArr)
+                return logService.addLogs(incorrectLogsArr)
                     .then(result => {
                         assert.propertyVal(result.error[0], 'message',
                             'Date parameter: 20199-03-08, is not in valid ISO 8601 format.')
@@ -147,15 +147,15 @@ describe('Services: Log', () => {
         context('when some of the logs in the array are incorrect (date and type are invalid)', () => {
             it('should perform the operations of creating and updating normally for the correct logs and returning a response ' +
                 'of type MultiStatus<Log> with the description of success and error cases of each log',  () => {
-                return  logService.addLogs(mixedLogsArr)
+                return logService.addLogs(mixedLogsArr)
                     .then(result => {
                         for (let i = 0; i < result.success.length; i++) {
                             assert.propertyVal(result.success[i], 'code', HttpStatus.CREATED)
-                            assert.propertyVal(result.success[i].item, 'id', mixedLogsArr[i].id)
-                            assert.propertyVal(result.success[i].item, 'date', mixedLogsArr[i].date)
-                            assert.propertyVal(result.success[i].item, 'value', mixedLogsArr[i].value)
-                            assert.propertyVal(result.success[i].item, 'type', mixedLogsArr[i].type)
-                            assert.propertyVal(result.success[i].item, 'child_id', mixedLogsArr[i].child_id)
+                            assert.property(result.success[i].item, 'id')
+                            assert.property(result.success[i].item, 'date')
+                            assert.property(result.success[i].item, 'value')
+                            assert.property(result.success[i].item, 'type')
+                            assert.property(result.success[i].item, 'child_id')
                         }
 
                         assert.propertyVal(result.error[0], 'message',
@@ -186,15 +186,15 @@ describe('Services: Log', () => {
                 incorrectLog.date = '2019-03-10'
                 incorrectLog.value = -((Math.floor(Math.random() * 10 + 1)) * 100)
 
-                return  logService.addLogs(mixedLogsArr)
+                return logService.addLogs(mixedLogsArr)
                     .then(result => {
                         for (let i = 0; i < result.success.length; i++) {
                             assert.propertyVal(result.success[i], 'code', HttpStatus.CREATED)
-                            assert.propertyVal(result.success[i].item, 'id', mixedLogsArr[i].id)
-                            assert.propertyVal(result.success[i].item, 'date', mixedLogsArr[i].date)
-                            assert.propertyVal(result.success[i].item, 'value', mixedLogsArr[i].value)
-                            assert.propertyVal(result.success[i].item, 'type', mixedLogsArr[i].type)
-                            assert.propertyVal(result.success[i].item, 'child_id', mixedLogsArr[i].child_id)
+                            assert.property(result.success[i].item, 'id')
+                            assert.property(result.success[i].item, 'date')
+                            assert.property(result.success[i].item, 'value')
+                            assert.property(result.success[i].item, 'type')
+                            assert.property(result.success[i].item, 'child_id')
                         }
 
                         assert.propertyVal(result.error[0], 'message',
@@ -225,15 +225,15 @@ describe('Services: Log', () => {
                 incorrectLog.value = ((Math.floor(Math.random() * 10 + 1)) * 100)
                 incorrectLog.child_id = '507f1f77bcf86cd7994390112'
 
-                return  logService.addLogs(mixedLogsArr)
+                return logService.addLogs(mixedLogsArr)
                     .then(result => {
                         for (let i = 0; i < result.success.length; i++) {
                             assert.propertyVal(result.success[i], 'code', HttpStatus.CREATED)
-                            assert.propertyVal(result.success[i].item, 'id', mixedLogsArr[i].id)
-                            assert.propertyVal(result.success[i].item, 'date', mixedLogsArr[i].date)
-                            assert.propertyVal(result.success[i].item, 'value', mixedLogsArr[i].value)
-                            assert.propertyVal(result.success[i].item, 'type', mixedLogsArr[i].type)
-                            assert.propertyVal(result.success[i].item, 'child_id', mixedLogsArr[i].child_id)
+                            assert.property(result.success[i].item, 'id')
+                            assert.property(result.success[i].item, 'date')
+                            assert.property(result.success[i].item, 'value')
+                            assert.property(result.success[i].item, 'type')
+                            assert.property(result.success[i].item, 'child_id')
                         }
 
                         assert.propertyVal(result.error[0], 'message', Strings.CHILD.PARAM_ID_NOT_VALID_FORMAT)
@@ -265,15 +265,15 @@ describe('Services: Log', () => {
                 incorrectLog.type = undefined!
                 incorrectLog.child_id = ''
 
-                return  logService.addLogs(mixedLogsArr)
+                return logService.addLogs(mixedLogsArr)
                     .then(result => {
                         for (let i = 0; i < result.success.length; i++) {
                             assert.propertyVal(result.success[i], 'code', HttpStatus.CREATED)
-                            assert.propertyVal(result.success[i].item, 'id', mixedLogsArr[i].id)
-                            assert.propertyVal(result.success[i].item, 'date', mixedLogsArr[i].date)
-                            assert.propertyVal(result.success[i].item, 'value', mixedLogsArr[i].value)
-                            assert.propertyVal(result.success[i].item, 'type', mixedLogsArr[i].type)
-                            assert.propertyVal(result.success[i].item, 'child_id', mixedLogsArr[i].child_id)
+                            assert.property(result.success[i].item, 'id')
+                            assert.property(result.success[i].item, 'date')
+                            assert.property(result.success[i].item, 'value')
+                            assert.property(result.success[i].item, 'type')
+                            assert.property(result.success[i].item, 'child_id')
                         }
 
                         assert.propertyVal(result.error[0], 'message',
