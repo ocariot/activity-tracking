@@ -522,6 +522,9 @@ describe('PROVIDER EVENT BUS TASK', () => {
                     try {
                         await dbConnection.connect(process.env.MONGODB_URI_TEST || Default.MONGODB_URI_TEST,
                             { interval: 100 })
+
+                        await timeout(500)
+
                         await deleteAllActivities()
                     } catch (err) {
                         throw new Error('Failure on Provider PhysicalActivity test: ' + err.message)
@@ -853,6 +856,9 @@ describe('PROVIDER EVENT BUS TASK', () => {
                     try {
                         await dbConnection.connect(process.env.MONGODB_URI_TEST || Default.MONGODB_URI_TEST,
                             { interval: 100 })
+
+                        await timeout(500)
+
                         await deleteAllSleep()
                     } catch (err) {
                         throw new Error('Failure on Provider Sleep test: ' + err.message)
@@ -1135,6 +1141,9 @@ describe('PROVIDER EVENT BUS TASK', () => {
                     try {
                         await dbConnection.connect(process.env.MONGODB_URI_TEST || Default.MONGODB_URI_TEST,
                             { interval: 100 })
+
+                        await timeout(500)
+
                         await deleteAllWeights()
                     } catch (err) {
                         throw new Error('Failure on Provider Weight test: ' + err.message)
@@ -1479,6 +1488,9 @@ describe('PROVIDER EVENT BUS TASK', () => {
                     try {
                         await dbConnection.connect(process.env.MONGODB_URI_TEST || Default.MONGODB_URI_TEST,
                             { interval: 100 })
+
+                        await timeout(500)
+
                         await deleteAllEnvironments()
                     } catch (err) {
                         throw new Error('Failure on Provider Environment test: ' + err.message)
@@ -1813,6 +1825,9 @@ describe('PROVIDER EVENT BUS TASK', () => {
                     try {
                         await dbConnection.connect(process.env.MONGODB_URI_TEST || Default.MONGODB_URI_TEST,
                             { interval: 100 })
+
+                        await timeout(500)
+
                         await deleteAllLogs()
                     } catch (err) {
                         throw new Error('Failure on Provider Log test: ' + err.message)
