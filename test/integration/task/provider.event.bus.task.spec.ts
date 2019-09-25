@@ -89,15 +89,15 @@ describe('PROVIDER EVENT BUS TASK', () => {
      * PROVIDERS
      */
     describe('Provider PhysicalActivity', () => {
-        before(async () => {
-            try {
-                await deleteAllActivities()
-            } catch (err) {
-                throw new Error('Failure on Provider PhysicalActivity test: ' + err.message)
-            }
-        })
         context('when retrieving physical activities through a query successfully when there is at least ' +
             'one matching activity associated with the child_id passed in the query', () => {
+            before(async () => {
+                try {
+                    await deleteAllActivities()
+                } catch (err) {
+                    throw new Error('Failure on Provider PhysicalActivity test: ' + err.message)
+                }
+            })
             // Delete all activities from database after each test case
             after(async () => {
                 try {
@@ -135,6 +135,8 @@ describe('PROVIDER EVENT BUS TASK', () => {
             'one matching activity', () => {
             before(async () => {
                 try {
+                    await deleteAllActivities()
+
                     const activity1: PhysicalActivity = new PhysicalActivityMock()
                     activity1.duration = 900000
                     activity1.child_id = '5a62be07d6f33400146c9b61'
@@ -380,6 +382,8 @@ describe('PROVIDER EVENT BUS TASK', () => {
         context('when trying to retrieve physical activities through invalid query', () => {
             before(async () => {
                 try {
+                    await deleteAllActivities()
+
                     const activity: PhysicalActivity = new PhysicalActivityMock()
 
                     await activityRepository.create(activity)
@@ -501,6 +505,8 @@ describe('PROVIDER EVENT BUS TASK', () => {
             () => {
                 before(async () => {
                     try {
+                        await deleteAllActivities()
+
                         const activity1: PhysicalActivity = new PhysicalActivityMock()
                         activity1.child_id = '5a62be07d6f33400146c9b61'
                         const activity2: PhysicalActivity = new PhysicalActivityMock()
@@ -540,15 +546,15 @@ describe('PROVIDER EVENT BUS TASK', () => {
     })
 
     describe('Provider Sleep', () => {
-        before(async () => {
-            try {
-                await deleteAllSleep()
-            } catch (err) {
-                throw new Error('Failure on Provider Sleep test: ' + err.message)
-            }
-        })
         context('when retrieving sleep objects through a query successfully when there is at least ' +
             'one matching sleep associated with the child_id passed in the query', () => {
+            before(async () => {
+                try {
+                    await deleteAllSleep()
+                } catch (err) {
+                    throw new Error('Failure on Provider Sleep test: ' + err.message)
+                }
+            })
             // Delete all sleep objects from database after each test case
             after(async () => {
                 try {
@@ -590,6 +596,8 @@ describe('PROVIDER EVENT BUS TASK', () => {
             'one matching sleep', () => {
             before(async () => {
                 try {
+                    await deleteAllSleep()
+
                     const sleep1: Sleep = new SleepMock()
                     sleep1.duration = 28800000
                     sleep1.child_id = '5a62be07d6f33400146c9b61'
@@ -739,6 +747,8 @@ describe('PROVIDER EVENT BUS TASK', () => {
         context('when trying to retrieve sleep objects through invalid query', () => {
             before(async () => {
                 try {
+                    await deleteAllSleep()
+
                     const sleep: Sleep = new SleepMock()
 
                     await sleepRepository.create(sleep)
@@ -826,6 +836,8 @@ describe('PROVIDER EVENT BUS TASK', () => {
             () => {
                 before(async () => {
                     try {
+                        await deleteAllSleep()
+
                         const sleep1: Sleep = new SleepMock()
                         sleep1.child_id = '5a62be07d6f33400146c9b61'
                         const sleep2: Sleep = new SleepMock()
@@ -867,15 +879,15 @@ describe('PROVIDER EVENT BUS TASK', () => {
     })
 
     describe('Provider Weight', () => {
-        before(async () => {
-            try {
-                await deleteAllWeights()
-            } catch (err) {
-                throw new Error('Failure on Provider Weight test: ' + err.message)
-            }
-        })
         context('when retrieving weight objects through a query successfully when there is at least ' +
             'one matching weight associated with the child_id passed in the query', () => {
+            before(async () => {
+                try {
+                    await deleteAllWeights()
+                } catch (err) {
+                    throw new Error('Failure on Provider Weight test: ' + err.message)
+                }
+            })
             // Delete all weight objects from database after each test case
             after(async () => {
                 try {
@@ -909,6 +921,8 @@ describe('PROVIDER EVENT BUS TASK', () => {
             'one matching weight', () => {
             before(async () => {
                 try {
+                    await deleteAllWeights()
+
                     const weight1: Weight = new WeightMock()
                     weight1.value = 60
                     weight1.child_id = '5a62be07d6f33400146c9b61'
@@ -1032,6 +1046,8 @@ describe('PROVIDER EVENT BUS TASK', () => {
         context('when trying to retrieve weight objects through invalid query', () => {
             before(async () => {
                 try {
+                    await deleteAllWeights()
+
                     const weight: Weight = new WeightMock()
 
                     await weightService.add(weight)
@@ -1102,6 +1118,8 @@ describe('PROVIDER EVENT BUS TASK', () => {
             () => {
                 before(async () => {
                     try {
+                        await deleteAllWeights()
+
                         const weight1: Weight = new WeightMock()
                         weight1.child_id = '5a62be07d6f33400146c9b61'
                         const weight2: Weight = new WeightMock()
@@ -1143,15 +1161,15 @@ describe('PROVIDER EVENT BUS TASK', () => {
     })
 
     describe('Provider Environment', () => {
-        before(async () => {
-            try {
-                await deleteAllEnvironments()
-            } catch (err) {
-                throw new Error('Failure on Provider Environment test: ' + err.message)
-            }
-        })
         context('when retrieving environments through a query successfully when there is at least ' +
             'one matching environment associated with the institution_id passed in the query', () => {
+            before(async () => {
+                try {
+                    await deleteAllEnvironments()
+                } catch (err) {
+                    throw new Error('Failure on Provider Environment test: ' + err.message)
+                }
+            })
             // Delete all environments from database after each test case
             after(async () => {
                 try {
@@ -1191,6 +1209,8 @@ describe('PROVIDER EVENT BUS TASK', () => {
             'one matching environment', () => {
             before(async () => {
                 try {
+                    await deleteAllEnvironments()
+
                     const environment1: Environment = new EnvironmentMock()
                     environment1.institution_id = '5a62be07d6f33400146c9b61'
                     environment1.location = new Location('Indoor', 'Room 40')
@@ -1336,6 +1356,8 @@ describe('PROVIDER EVENT BUS TASK', () => {
         context('when trying to retrieve environments through invalid query', () => {
             before(async () => {
                 try {
+                    await deleteAllEnvironments()
+
                     const environment: Environment = new EnvironmentMock()
 
                     await environmentRepository.create(environment)
@@ -1440,6 +1462,8 @@ describe('PROVIDER EVENT BUS TASK', () => {
             () => {
                 before(async () => {
                     try {
+                        await deleteAllEnvironments()
+
                         const environment1: Environment = new EnvironmentMock()
                         environment1.institution_id = '5a62be07d6f33400146c9b61'
                         const environment2: Environment = new EnvironmentMock()
@@ -1481,15 +1505,15 @@ describe('PROVIDER EVENT BUS TASK', () => {
     })
 
     describe('Provider Log', () => {
-        before(async () => {
-            try {
-                await deleteAllLogs()
-            } catch (err) {
-                throw new Error('Failure on Provider Log test: ' + err.message)
-            }
-        })
         context('when retrieving logs through a query successfully when there is at least one matching log ' +
             'associated with the child_id passed in the query', () => {
+            before(async () => {
+                try {
+                    await deleteAllLogs()
+                } catch (err) {
+                    throw new Error('Failure on Provider Log test: ' + err.message)
+                }
+            })
             // Delete all logs from database after each test case
             after(async () => {
                 try {
@@ -1518,6 +1542,8 @@ describe('PROVIDER EVENT BUS TASK', () => {
         context('when retrieving logs through a query successfully when there is at least one matching log', () => {
             before(async () => {
                 try {
+                    await deleteAllLogs()
+
                     const log1: Log = new LogMock(LogType.STEPS)
                     log1.value = 60
                     log1.child_id = '5a62be07d6f33400146c9b61'
@@ -1698,6 +1724,8 @@ describe('PROVIDER EVENT BUS TASK', () => {
         context('when trying to retrieve logs through invalid query', () => {
             before(async () => {
                 try {
+                    await deleteAllLogs()
+
                     const log: Log = new LogMock(LogType.STEPS)
 
                     await logRepository.create(log)
@@ -1768,6 +1796,8 @@ describe('PROVIDER EVENT BUS TASK', () => {
             () => {
                 before(async () => {
                     try {
+                        await deleteAllLogs()
+
                         const log1: Log = new LogMock()
                         log1.child_id = '5a62be07d6f33400146c9b61'
                         const log2: Log = new LogMock()
