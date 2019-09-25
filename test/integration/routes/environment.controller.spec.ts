@@ -114,7 +114,6 @@ describe('Routes: environments', () => {
                     .set('Content-Type', 'application/json')
                     .expect(201)
                     .then(res => {
-                        defaultEnvironment.id = res.body.id
                         expect(res.body).to.have.property('id')
                         expect(res.body.institution_id).to.eql(defaultEnvironment.institution_id)
                         expect(res.body.location.local).to.eql(defaultEnvironment.location!.local)
@@ -226,7 +225,6 @@ describe('Routes: environments', () => {
                     .set('Content-Type', 'application/json')
                     .expect(201)
                     .then(res => {
-                        defaultEnvironment.id = res.body.id
                         expect(res.body).to.have.property('id')
                         expect(res.body.institution_id).to.eql(defaultEnvironment.institution_id)
                         expect(res.body.location.local).to.eql(defaultEnvironment.location!.local)
@@ -545,7 +543,6 @@ describe('Routes: environments', () => {
                     .expect(207)
                     .then(res => {
                         // Success item
-                        mixedEnvironmentsArr[0].id = res.body.success[0].item.id
                         expect(res.body.success[0].code).to.eql(HttpStatus.CREATED)
                         expect(res.body.success[0].item).to.have.property('id')
                         expect(res.body.success[0].item.institution_id).to.eql(mixedEnvironmentsArr[0].institution_id)

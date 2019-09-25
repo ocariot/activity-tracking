@@ -114,12 +114,8 @@ describe('PROVIDER EVENT BUS TASK', () => {
                     .then(async () => {
                         const result = await rabbitmq.bus.getPhysicalActivities('?child_id=5a62be07d6f33400146c9b61')
                         expect(result.length).to.eql(1)
-                        // As a new resource saved in the database always has a new id,
-                        // this is necessary before comparing the saved resource in the
-                        // database with the one sent to the bus.
-                        activity.id = result[0].id
                         // Comparing the resources
-                        expect(result[0].id).to.eql(activity.id)
+                        expect(result[0]).to.have.property('id')
                         expect(result[0].start_time).to.eql(activity.start_time!.toISOString())
                         expect(result[0].end_time).to.eql(activity.end_time!.toISOString())
                         expect(result[0].duration).to.eql(activity.duration)
@@ -569,12 +565,8 @@ describe('PROVIDER EVENT BUS TASK', () => {
                     .then(async () => {
                         const result = await rabbitmq.bus.getSleep('?child_id=5a62be07d6f33400146c9b61')
                         expect(result.length).to.eql(1)
-                        // As a new resource saved in the database always has a new id,
-                        // this is necessary before comparing the saved resource in the
-                        // database with the one sent to the bus.
-                        sleep.id = result[0].id
                         // Comparing the resources
-                        expect(result[0].id).to.eql(sleep.id)
+                        expect(result[0]).to.have.property('id')
                         expect(result[0].start_time).to.eql(sleep.start_time!.toISOString())
                         expect(result[0].end_time).to.eql(sleep.end_time!.toISOString())
                         expect(result[0].duration).to.eql(sleep.duration)
@@ -900,12 +892,8 @@ describe('PROVIDER EVENT BUS TASK', () => {
                     .then(async () => {
                         const result = await rabbitmq.bus.getWeights('?child_id=5a62be07d6f33400146c9b61')
                         expect(result.length).to.eql(1)
-                        // As a new resource saved in the database always has a new id,
-                        // this is necessary before comparing the saved resource in the
-                        // database with the one sent to the bus.
-                        weight.id = result[0].id
                         // Comparing the resources
-                        expect(result[0].id).to.eql(weight.id)
+                        expect(result[0]).to.have.property('id')
                         expect(result[0].timestamp).to.eql(weight.timestamp!.toISOString())
                         expect(result[0].value).to.eql(weight.value)
                         expect(result[0].unit).to.eql(weight.unit)
@@ -1180,12 +1168,8 @@ describe('PROVIDER EVENT BUS TASK', () => {
                     .then(async () => {
                         const result = await rabbitmq.bus.getEnvironments('?institution_id=5a62be07d6f33400146c9b61')
                         expect(result.length).to.eql(1)
-                        // As a new resource saved in the database always has a new id,
-                        // this is necessary before comparing the saved resource in the
-                        // database with the one sent to the bus.
-                        environment.id = result[0].id
                         // Comparing the resources
-                        expect(result[0].id).to.eql(environment.id)
+                        expect(result[0]).to.have.property('id')
                         expect(result[0].institution_id).to.eql(environment.institution_id)
                         expect(result[0].location).to.eql(environment.location!.toJSON())
                         let index = 0
@@ -1522,12 +1506,7 @@ describe('PROVIDER EVENT BUS TASK', () => {
                     .then(async () => {
                         const result = await rabbitmq.bus.getLogs('?child_id=5a62be07d6f33400146c9b61')
                         expect(result.length).to.eql(1)
-                        // As a new resource saved in the database always has a new id,
-                        // this is necessary before comparing the saved resource in the
-                        // database with the one sent to the bus.
-                        log.id = result[0].id
                         // Comparing the resources
-                        expect(result[0].id).to.eql(log.id)
                         expect(result[0].date).to.eql(log.date)
                         expect(result[0].value).to.eql(log.value)
                         done()

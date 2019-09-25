@@ -181,7 +181,6 @@ describe('Routes: children.sleep', () => {
                     .set('Content-Type', 'application/json')
                     .expect(201)
                     .then(res => {
-                        defaultSleep.id = res.body.id
                         expect(res.body).to.have.property('id')
                         expect(res.body.start_time).to.eql(defaultSleep.start_time!.toISOString())
                         expect(res.body.end_time).to.eql(defaultSleep.end_time!.toISOString())

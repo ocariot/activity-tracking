@@ -117,13 +117,18 @@ describe('SUBSCRIBE EVENT BUS TASK', () => {
 
                         const result = await activityRepository.find(new Query())
                         expect(result.length).to.eql(1)
-                        // As a new resource saved in the database always has a new id,
-                        // this is necessary before comparing the saved resource in the
-                        // database with the one sent to the bus.
-                        activity.id = result[0].id
-                        result[0].child_id = result[0].child_id.toString()
+
                         // Comparing the resources
-                        expect(result[0]).to.eql(activity)
+                        expect(result[0]).to.have.property('id')
+                        expect(result[0].start_time).to.eql(activity.start_time)
+                        expect(result[0].end_time).to.eql(activity.end_time)
+                        expect(result[0].duration).to.eql(activity.duration)
+                        expect(result[0].child_id.toString()).to.eql(activity.child_id)
+                        expect(result[0].name).to.eql(activity.name)
+                        expect(result[0].calories).to.eql(activity.calories)
+                        expect(result[0].steps).to.eql(activity.steps)
+                        expect(result[0].levels).to.eql(activity.levels)
+                        expect(result[0].heart_rate).to.eql(activity.heart_rate)
                         done()
                     })
                     .catch(done)
@@ -165,10 +170,16 @@ describe('SUBSCRIBE EVENT BUS TASK', () => {
                         const result = await activityRepository.find(new Query())
                         expect(result.length).to.eql(1)
 
-                        activity.id = result[0].id
-                        result[0].child_id = result[0].child_id.toString()
-
-                        expect(result[0]).to.eql(activity)
+                        expect(result[0]).to.have.property('id')
+                        expect(result[0].start_time).to.eql(activity.start_time)
+                        expect(result[0].end_time).to.eql(activity.end_time)
+                        expect(result[0].duration).to.eql(activity.duration)
+                        expect(result[0].child_id.toString()).to.eql(activity.child_id)
+                        expect(result[0].name).to.eql(activity.name)
+                        expect(result[0].calories).to.eql(activity.calories)
+                        expect(result[0].steps).to.eql(activity.steps)
+                        expect(result[0].levels).to.eql(activity.levels)
+                        expect(result[0].heart_rate).to.eql(activity.heart_rate)
                         done()
                     })
                     .catch(done)
@@ -235,17 +246,13 @@ describe('SUBSCRIBE EVENT BUS TASK', () => {
 
                         const result = await sleepRepository.find(new Query())
                         expect(result.length).to.eql(1)
-                        // As a new resource saved in the database always has a new id,
-                        // this is necessary before comparing the saved resource in the
-                        // database with the one sent to the bus.
-                        sleep.id = result[0].id
-                        result[0].child_id = result[0].child_id.toString()
+
                         // Comparing the resources
-                        expect(result[0].id).to.eql(sleep.id)
+                        expect(result[0]).to.have.property('id')
                         expect(result[0].start_time).to.eql(sleep.start_time)
                         expect(result[0].end_time).to.eql(sleep.end_time)
                         expect(result[0].duration).to.eql(sleep.duration)
-                        expect(result[0].child_id).to.eql(sleep.child_id)
+                        expect(result[0].child_id.toString()).to.eql(sleep.child_id)
                         expect(result[0].pattern!.data_set).to.eql(sleep.pattern!.data_set)
                         expect(result[0].pattern).to.have.property('summary')
                         expect(result[0].type).to.eql(sleep.type)
@@ -290,14 +297,11 @@ describe('SUBSCRIBE EVENT BUS TASK', () => {
                         const result = await sleepRepository.find(new Query())
                         expect(result.length).to.eql(1)
 
-                        sleep.id = result[0].id
-                        result[0].child_id = result[0].child_id.toString()
-
-                        expect(result[0].id).to.eql(sleep.id)
+                        expect(result[0]).to.have.property('id')
                         expect(result[0].start_time).to.eql(sleep.start_time)
                         expect(result[0].end_time).to.eql(sleep.end_time)
                         expect(result[0].duration).to.eql(sleep.duration)
-                        expect(result[0].child_id).to.eql(sleep.child_id)
+                        expect(result[0].child_id.toString()).to.eql(sleep.child_id)
                         expect(result[0].pattern!.data_set).to.eql(sleep.pattern!.data_set)
                         expect(result[0].pattern).to.have.property('summary')
                         expect(result[0].type).to.eql(sleep.type)
@@ -368,18 +372,14 @@ describe('SUBSCRIBE EVENT BUS TASK', () => {
 
                         const result = await weightRepository.find(new Query())
                         expect(result.length).to.eql(1)
-                        // As a new resource saved in the database always has a new id,
-                        // this is necessary before comparing the saved resource in the
-                        // database with the one sent to the bus.
-                        weight.id = result[0].id
-                        result[0].child_id = result[0].child_id!.toString()
+
                         // Comparing the resources
-                        expect(result[0].id).to.eql(weight.id)
+                        expect(result[0]).to.have.property('id')
                         expect(result[0].type).to.eql(weight.type)
                         expect(result[0].timestamp).to.eql(weight.timestamp)
                         expect(result[0].value).to.eql(weight.value)
                         expect(result[0].unit).to.eql(weight.unit)
-                        expect(result[0].child_id).to.eql(weight.child_id)
+                        expect(result[0].child_id!.toString()).to.eql(weight.child_id)
                         expect(result[0].body_fat!.value).to.eql(weight.body_fat!.value)
                         done()
                     })
@@ -422,15 +422,12 @@ describe('SUBSCRIBE EVENT BUS TASK', () => {
                         const result = await weightRepository.find(new Query())
                         expect(result.length).to.eql(1)
 
-                        weight.id = result[0].id
-                        result[0].child_id = result[0].child_id!.toString()
-
-                        expect(result[0].id).to.eql(weight.id)
+                        expect(result[0]).to.have.property('id')
                         expect(result[0].type).to.eql(weight.type)
                         expect(result[0].timestamp).to.eql(weight.timestamp)
                         expect(result[0].value).to.eql(weight.value)
                         expect(result[0].unit).to.eql(weight.unit)
-                        expect(result[0].child_id).to.eql(weight.child_id)
+                        expect(result[0].child_id!.toString()).to.eql(weight.child_id)
                         expect(result[0].body_fat!.value).to.eql(weight.body_fat!.value)
                         done()
                     })
@@ -500,17 +497,12 @@ describe('SUBSCRIBE EVENT BUS TASK', () => {
 
                         const result = await logRepository.find(new Query())
                         expect(result.length).to.eql(1)
-                        // As a new resource saved in the database always has a new id,
-                        // this is necessary before comparing the saved resource in the
-                        // database with the one sent to the bus.
-                        log.id = result[0].id
-                        result[0].child_id = result[0].child_id.toString()
+
                         // Comparing the resources
-                        expect(result[0].id).to.eql(log.id)
                         expect(result[0].date).to.eql(log.date)
                         expect(result[0].value).to.eql(log.value)
                         expect(result[0].type).to.eql(log.type)
-                        expect(result[0].child_id).to.eql(log.child_id)
+                        expect(result[0].child_id.toString()).to.eql(log.child_id)
                         done()
                     })
                     .catch(done)
@@ -555,14 +547,10 @@ describe('SUBSCRIBE EVENT BUS TASK', () => {
                         const result = await logRepository.find(new Query())
                         expect(result.length).to.eql(1)
 
-                        log.id = result[0].id
-                        result[0].child_id = result[0].child_id.toString()
-
-                        expect(result[0].id).to.eql(log.id)
                         expect(result[0].date).to.eql(log.date)
                         expect(result[0].value).to.eql(log.value)
                         expect(result[0].type).to.eql(log.type)
-                        expect(result[0].child_id).to.eql(log.child_id)
+                        expect(result[0].child_id.toString()).to.eql(log.child_id)
                         done()
                     })
                     .catch(done)
