@@ -93,6 +93,9 @@ describe('PROVIDER EVENT BUS TASK', () => {
             'one matching activity associated with the child_id passed in the query', () => {
             before(async () => {
                 try {
+                    await dbConnection.connect(process.env.MONGODB_URI_TEST || Default.MONGODB_URI_TEST,
+                        { interval: 100 })
+
                     await deleteAllActivities()
                 } catch (err) {
                     throw new Error('Failure on Provider PhysicalActivity test: ' + err.message)
@@ -505,15 +508,7 @@ describe('PROVIDER EVENT BUS TASK', () => {
             () => {
                 before(async () => {
                     try {
-                        await deleteAllActivities()
-
-                        const activity1: PhysicalActivity = new PhysicalActivityMock()
-                        activity1.child_id = '5a62be07d6f33400146c9b61'
-                        const activity2: PhysicalActivity = new PhysicalActivityMock()
-                        activity2.child_id = '5a62be07d6f33400146c9b61'
-
-                        await activityRepository.create(activity1)
-                        await activityRepository.create(activity2)
+                        await dbConnection.dispose()
                     } catch (err) {
                         throw new Error('Failure on Provider PhysicalActivity test: ' + err.message)
                     }
@@ -522,28 +517,23 @@ describe('PROVIDER EVENT BUS TASK', () => {
                     try {
                         await dbConnection.connect(process.env.MONGODB_URI_TEST || Default.MONGODB_URI_TEST,
                             { interval: 100 })
-
-                        await timeout(500)
-
-                        await deleteAllActivities()
                     } catch (err) {
                         throw new Error('Failure on Provider PhysicalActivity test: ' + err.message)
                     }
                 })
                 it('should return a rpc timeout error', (done) => {
-                    dbConnection.dispose().then(async () => {
-                        try {
-                            await rabbitmq.bus.getPhysicalActivities('?child_id=5a62be07d6f33400146c9b61')
+                    rabbitmq.bus.getPhysicalActivities('?child_id=5a62be07d6f33400146c9b61')
+                        .then(() => {
                             done(new Error('RPC should not function normally'))
-                        } catch (err) {
+                        })
+                        .catch((err) => {
                             try {
                                 expect(err.message).to.eql('rpc timed out')
                                 done()
                             } catch (err) {
                                 done(err)
                             }
-                        }
-                    })
+                        })
                 })
             })
     })
@@ -839,15 +829,7 @@ describe('PROVIDER EVENT BUS TASK', () => {
             () => {
                 before(async () => {
                     try {
-                        await deleteAllSleep()
-
-                        const sleep1: Sleep = new SleepMock()
-                        sleep1.child_id = '5a62be07d6f33400146c9b61'
-                        const sleep2: Sleep = new SleepMock()
-                        sleep2.child_id = '5a62be07d6f33400146c9b61'
-
-                        await sleepRepository.create(sleep1)
-                        await sleepRepository.create(sleep2)
+                        await dbConnection.dispose()
                     } catch (err) {
                         throw new Error('Failure on Provider Sleep test: ' + err.message)
                     }
@@ -856,30 +838,23 @@ describe('PROVIDER EVENT BUS TASK', () => {
                     try {
                         await dbConnection.connect(process.env.MONGODB_URI_TEST || Default.MONGODB_URI_TEST,
                             { interval: 100 })
-
-                        await timeout(500)
-
-                        await deleteAllSleep()
                     } catch (err) {
                         throw new Error('Failure on Provider Sleep test: ' + err.message)
                     }
                 })
                 it('should return a rpc timeout error', (done) => {
-                    dbConnection.dispose()
-                        .then(async () => {
+                    rabbitmq.bus.getSleep('?child_id=5a62be07d6f33400146c9b61')
+                        .then(() => {
+                            done(new Error('RPC should not function normally'))
+                        })
+                        .catch((err) => {
                             try {
-                                await rabbitmq.bus.getSleep('?child_id=5a62be07d6f33400146c9b61')
-                                done(new Error('RPC should not function normally'))
+                                expect(err.message).to.eql('rpc timed out')
+                                done()
                             } catch (err) {
-                                try {
-                                    expect(err.message).to.eql('rpc timed out')
-                                    done()
-                                } catch (err) {
-                                    done(err)
-                                }
+                                done(err)
                             }
                         })
-                        .catch(done)
                 })
             })
     })
@@ -1124,15 +1099,7 @@ describe('PROVIDER EVENT BUS TASK', () => {
             () => {
                 before(async () => {
                     try {
-                        await deleteAllWeights()
-
-                        const weight1: Weight = new WeightMock()
-                        weight1.child_id = '5a62be07d6f33400146c9b61'
-                        const weight2: Weight = new WeightMock()
-                        weight2.child_id = '5a62be07d6f33400146c9b61'
-
-                        await weightService.add(weight1)
-                        await weightService.add(weight2)
+                        await dbConnection.dispose()
                     } catch (err) {
                         throw new Error('Failure on Provider Weight test: ' + err.message)
                     }
@@ -1141,30 +1108,23 @@ describe('PROVIDER EVENT BUS TASK', () => {
                     try {
                         await dbConnection.connect(process.env.MONGODB_URI_TEST || Default.MONGODB_URI_TEST,
                             { interval: 100 })
-
-                        await timeout(500)
-
-                        await deleteAllWeights()
                     } catch (err) {
                         throw new Error('Failure on Provider Weight test: ' + err.message)
                     }
                 })
                 it('should return a rpc timeout error', (done) => {
-                    dbConnection.dispose()
-                        .then(async () => {
+                    rabbitmq.bus.getWeights('?child_id=5a62be07d6f33400146c9b61')
+                        .then(() => {
+                            done(new Error('RPC should not function normally'))
+                        })
+                        .catch((err) => {
                             try {
-                                await rabbitmq.bus.getWeights('?child_id=5a62be07d6f33400146c9b61')
-                                done(new Error('RPC should not function normally'))
+                                expect(err.message).to.eql('rpc timed out')
+                                done()
                             } catch (err) {
-                                try {
-                                    expect(err.message).to.eql('rpc timed out')
-                                    done()
-                                } catch (err) {
-                                    done(err)
-                                }
+                                done(err)
                             }
                         })
-                        .catch(done)
                 })
             })
     })
@@ -1471,15 +1431,7 @@ describe('PROVIDER EVENT BUS TASK', () => {
             () => {
                 before(async () => {
                     try {
-                        await deleteAllEnvironments()
-
-                        const environment1: Environment = new EnvironmentMock()
-                        environment1.institution_id = '5a62be07d6f33400146c9b61'
-                        const environment2: Environment = new EnvironmentMock()
-                        environment2.institution_id = '5a62be07d6f33400146c9b61'
-
-                        await environmentRepository.create(environment1)
-                        await environmentRepository.create(environment2)
+                        await dbConnection.dispose()
                     } catch (err) {
                         throw new Error('Failure on Provider Environment test: ' + err.message)
                     }
@@ -1488,30 +1440,23 @@ describe('PROVIDER EVENT BUS TASK', () => {
                     try {
                         await dbConnection.connect(process.env.MONGODB_URI_TEST || Default.MONGODB_URI_TEST,
                             { interval: 100 })
-
-                        await timeout(500)
-
-                        await deleteAllEnvironments()
                     } catch (err) {
                         throw new Error('Failure on Provider Environment test: ' + err.message)
                     }
                 })
                 it('should return a rpc timeout error', (done) => {
-                    dbConnection.dispose()
-                        .then(async () => {
+                    rabbitmq.bus.getEnvironments('?child_id=5a62be07d6f33400146c9b61')
+                        .then(() => {
+                            done(new Error('RPC should not function normally'))
+                        })
+                        .catch((err) => {
                             try {
-                                await rabbitmq.bus.getEnvironments('?institution_id=5a62be07d6f33400146c9b61')
-                                done(new Error('RPC should not function normally'))
+                                expect(err.message).to.eql('rpc timed out')
+                                done()
                             } catch (err) {
-                                try {
-                                    expect(err.message).to.eql('rpc timed out')
-                                    done()
-                                } catch (err) {
-                                    done(err)
-                                }
+                                done(err)
                             }
                         })
-                        .catch(done)
                 })
             })
     })
@@ -1808,17 +1753,7 @@ describe('PROVIDER EVENT BUS TASK', () => {
             () => {
                 before(async () => {
                     try {
-                        await deleteAllLogs()
-
-                        await timeout(1000)
-
-                        const log1: Log = new LogMock()
-                        log1.child_id = '5a62be07d6f33400146c9b61'
-                        const log2: Log = new LogMock()
-                        log2.child_id = '5a62be07d6f33400146c9b61'
-
-                        await logRepository.create(log1)
-                        await logRepository.create(log2)
+                        await dbConnection.dispose()
                     } catch (err) {
                         throw new Error('Failure on Provider Log test: ' + err.message)
                     }
@@ -1827,30 +1762,23 @@ describe('PROVIDER EVENT BUS TASK', () => {
                     try {
                         await dbConnection.connect(process.env.MONGODB_URI_TEST || Default.MONGODB_URI_TEST,
                             { interval: 100 })
-
-                        await timeout(500)
-
-                        await deleteAllLogs()
                     } catch (err) {
                         throw new Error('Failure on Provider Log test: ' + err.message)
                     }
                 })
                 it('should return a rpc timeout error', (done) => {
-                    dbConnection.dispose()
-                        .then(async () => {
+                    rabbitmq.bus.getLogs('?child_id=5a62be07d6f33400146c9b61')
+                        .then(() => {
+                            done(new Error('RPC should not function normally'))
+                        })
+                        .catch((err) => {
                             try {
-                                await rabbitmq.bus.getLogs('?child_id=5a62be07d6f33400146c9b61')
-                                done(new Error('RPC should not function normally'))
+                                expect(err.message).to.eql('rpc timed out')
+                                done()
                             } catch (err) {
-                                try {
-                                    expect(err.message).to.eql('rpc timed out')
-                                    done()
-                                } catch (err) {
-                                    done(err)
-                                }
+                                done(err)
                             }
                         })
-                        .catch(done)
                 })
             })
     })
