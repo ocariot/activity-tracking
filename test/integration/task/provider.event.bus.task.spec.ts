@@ -141,6 +141,7 @@ describe('PROVIDER EVENT BUS TASK', () => {
                     await deleteAllActivities()
 
                     const activity1: PhysicalActivity = new PhysicalActivityMock()
+                    activity1.start_time = new Date(1516417200000  + Math.floor((Math.random() * 1000)))
                     activity1.duration = 900000
                     activity1.child_id = '5a62be07d6f33400146c9b61'
                     activity1.name = ActivityTypeMock.WALK
@@ -149,6 +150,7 @@ describe('PROVIDER EVENT BUS TASK', () => {
                     activity1.heart_rate!.average = 80
 
                     const activity2: PhysicalActivity = new PhysicalActivityMock()
+                    activity2.start_time = new Date(1516417200000  + Math.floor((Math.random() * 1000)))
                     activity2.duration = 899999
                     activity2.child_id = '5a62be07d6f33400146c9b61'
                     activity2.name = ActivityTypeMock.RUN
@@ -157,6 +159,7 @@ describe('PROVIDER EVENT BUS TASK', () => {
                     activity2.heart_rate!.average = 90
 
                     const activity3: PhysicalActivity = new PhysicalActivityMock()
+                    activity3.start_time = new Date(1516417200000  + Math.floor((Math.random() * 1000)))
                     activity3.duration = 899999
                     activity3.child_id = '5a62be07de34500146d9c544'
                     activity3.name = ActivityTypeMock.WALK
@@ -592,14 +595,17 @@ describe('PROVIDER EVENT BUS TASK', () => {
                     await deleteAllSleep()
 
                     const sleep1: Sleep = new SleepMock()
+                    sleep1.start_time = new Date(1516417200000  + Math.floor((Math.random() * 1000)))
                     sleep1.duration = 28800000
                     sleep1.child_id = '5a62be07d6f33400146c9b61'
 
                     const sleep2: Sleep = new SleepMock()
+                    sleep2.start_time = new Date(1516417200000  + Math.floor((Math.random() * 1000)))
                     sleep2.duration = 27800000
                     sleep2.child_id = '5a62be07d6f33400146c9b61'
 
                     const sleep3: Sleep = new SleepMock()
+                    sleep3.start_time = new Date(1516417200000  + Math.floor((Math.random() * 1000)))
                     sleep3.duration = 28810000
                     sleep3.child_id = '5a62be07de34500146d9c544'
 
@@ -905,14 +911,17 @@ describe('PROVIDER EVENT BUS TASK', () => {
                     await deleteAllWeights()
 
                     const weight1: Weight = new WeightMock()
+                    weight1.timestamp = new Date(1516417200000  + Math.floor((Math.random() * 1000)))
                     weight1.value = 60
                     weight1.child_id = '5a62be07d6f33400146c9b61'
 
                     const weight2: Weight = new WeightMock()
+                    weight2.timestamp = new Date(1516417200000  + Math.floor((Math.random() * 1000)))
                     weight2.value = 59
                     weight2.child_id = '5a62be07d6f33400146c9b61'
 
                     const weight3: Weight = new WeightMock()
+                    weight3.timestamp = new Date(1516417200000  + Math.floor((Math.random() * 1000)))
                     weight3.value = 61
                     weight3.child_id = '5a62be07de34500146d9c544'
 
@@ -1195,10 +1204,12 @@ describe('PROVIDER EVENT BUS TASK', () => {
                     const environment3: Environment = new EnvironmentMock()
                     environment3.institution_id = '5a62be07de34500146d9c544'
                     environment3.climatized = true
+                    environment3.timestamp = new Date(1516417200000  + Math.floor((Math.random() * 1000)))
 
                     const environment4: Environment = new EnvironmentMock()
                     environment4.institution_id = '5a62be07de34500146d9c544'
                     environment4.climatized = false
+                    environment4.timestamp = new Date(1516417200000  + Math.floor((Math.random() * 1000)))
 
                     const environment5: Environment = new EnvironmentMock()
                     environment5.institution_id = '5a62be07d6f33400146c9b61'
@@ -1209,6 +1220,7 @@ describe('PROVIDER EVENT BUS TASK', () => {
                     const environment6: Environment = new EnvironmentMock()
                     environment6.institution_id = '5a62be07de34500146d9c544'
                     environment6.climatized = false
+                    environment6.timestamp = new Date(1516417200000  + Math.floor((Math.random() * 1000)))
 
                     await environmentRepository.create(environment1)
                     await environmentRepository.create(environment2)
