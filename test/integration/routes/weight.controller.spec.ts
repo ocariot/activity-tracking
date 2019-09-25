@@ -71,6 +71,8 @@ describe('Routes: children.weights', () => {
         context('when posting a new Weight with success', () => {
             before(async () => {
                 try {
+                    await deleteAllWeights()
+
                     await rabbitmq.dispose()
 
                     await rabbitmq.initialize('amqp://invalidUser:guest@localhost', { retries: 1, interval: 100 })

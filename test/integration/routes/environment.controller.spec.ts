@@ -91,6 +91,8 @@ describe('Routes: environments', () => {
         context('when posting a new Environment with success', () => {
             before(async () => {
                 try {
+                    await deleteAllEnvironments()
+
                     await rabbitmq.dispose()
 
                     await rabbitmq.initialize('amqp://invalidUser:guest@localhost', { retries: 1, interval: 100 })

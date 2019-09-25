@@ -1810,6 +1810,8 @@ describe('PROVIDER EVENT BUS TASK', () => {
                     try {
                         await deleteAllLogs()
 
+                        await timeout(1000)
+
                         const log1: Log = new LogMock()
                         log1.child_id = '5a62be07d6f33400146c9b61'
                         const log2: Log = new LogMock()

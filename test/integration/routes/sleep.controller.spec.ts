@@ -158,6 +158,8 @@ describe('Routes: children.sleep', () => {
         context('when posting a new Sleep with success', () => {
             before(async () => {
                 try {
+                    await deleteAllSleep()
+
                     await rabbitmq.dispose()
 
                     await rabbitmq.initialize('amqp://invalidUser:guest@localhost', { retries: 1, interval: 100 })

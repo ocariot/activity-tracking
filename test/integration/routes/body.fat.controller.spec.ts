@@ -62,6 +62,13 @@ describe('Routes: children.bodyfats', () => {
      */
     describe('POST /v1/children/:child_id/bodyfats with only one BodyFat in the body', () => {
         context('when posting a new BodyFat with success', () => {
+            before(async () => {
+                try {
+                    await deleteAllBodyFats()
+                } catch (err) {
+                    throw new Error('Failure on children.bodyfats routes test: ' + err.message)
+                }
+            })
             it('should return status code 201 and the saved BodyFat', () => {
                 const body = {
                     timestamp: defaultBodyFat.timestamp,

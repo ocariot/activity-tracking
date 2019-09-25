@@ -174,6 +174,8 @@ describe('Routes: children.physicalactivities', () => {
         context('when posting a new PhysicalActivity with success', () => {
             before(async () => {
                 try {
+                    await deleteAllActivities()
+
                     await rabbitmq.dispose()
 
                     await rabbitmq.initialize('amqp://invalidUser:guest@localhost', { retries: 1, interval: 100 })
