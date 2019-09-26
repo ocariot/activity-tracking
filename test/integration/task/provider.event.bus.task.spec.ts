@@ -93,9 +93,6 @@ describe('PROVIDER EVENT BUS TASK', () => {
             'one matching activity associated with the child_id passed in the query', () => {
             before(async () => {
                 try {
-                    await dbConnection.connect(process.env.MONGODB_URI_TEST || Default.MONGODB_URI_TEST,
-                        { interval: 100 })
-
                     await deleteAllActivities()
                 } catch (err) {
                     throw new Error('Failure on Provider PhysicalActivity test: ' + err.message)
@@ -142,6 +139,8 @@ describe('PROVIDER EVENT BUS TASK', () => {
 
                     const activity1: PhysicalActivity = new PhysicalActivityMock()
                     activity1.start_time = new Date(1516417200000  + Math.floor((Math.random() * 1000)))
+                    activity1.end_time = new Date(new Date(activity1.start_time)
+                        .setMilliseconds(Math.floor(Math.random() * 35 + 10) * 60000)) // 10-45min in milliseconds
                     activity1.duration = 900000
                     activity1.child_id = '5a62be07d6f33400146c9b61'
                     activity1.name = ActivityTypeMock.WALK
@@ -151,6 +150,8 @@ describe('PROVIDER EVENT BUS TASK', () => {
 
                     const activity2: PhysicalActivity = new PhysicalActivityMock()
                     activity2.start_time = new Date(1516417200000  + Math.floor((Math.random() * 1000)))
+                    activity2.end_time = new Date(new Date(activity2.start_time)
+                        .setMilliseconds(Math.floor(Math.random() * 35 + 10) * 60000))
                     activity2.duration = 899999
                     activity2.child_id = '5a62be07d6f33400146c9b61'
                     activity2.name = ActivityTypeMock.RUN
@@ -160,6 +161,8 @@ describe('PROVIDER EVENT BUS TASK', () => {
 
                     const activity3: PhysicalActivity = new PhysicalActivityMock()
                     activity3.start_time = new Date(1516417200000  + Math.floor((Math.random() * 1000)))
+                    activity3.end_time = new Date(new Date(activity3.start_time)
+                        .setMilliseconds(Math.floor(Math.random() * 35 + 10) * 60000))
                     activity3.duration = 899999
                     activity3.child_id = '5a62be07de34500146d9c544'
                     activity3.name = ActivityTypeMock.WALK
@@ -170,7 +173,7 @@ describe('PROVIDER EVENT BUS TASK', () => {
                     const activity4: PhysicalActivity = new PhysicalActivityMock()
                     activity4.start_time = new Date(1547953200000 + Math.floor((Math.random() * 1000)))
                     activity4.end_time = new Date(new Date(activity4.start_time)
-                        .setMilliseconds(Math.floor(Math.random() * 35 + 10) * 60000)) // 10-45min in milliseconds
+                        .setMilliseconds(Math.floor(Math.random() * 35 + 10) * 60000))
                     activity4.duration = 920000
                     activity4.child_id = '5a62be07de34500146d9c544'
                     activity4.name = ActivityTypeMock.RUN
@@ -181,7 +184,7 @@ describe('PROVIDER EVENT BUS TASK', () => {
                     const activity5: PhysicalActivity = new PhysicalActivityMock()
                     activity5.start_time = new Date(1547953200000 + Math.floor((Math.random() * 1000)))
                     activity5.end_time = new Date(new Date(activity5.start_time)
-                        .setMilliseconds(Math.floor(Math.random() * 35 + 10) * 60000)) // 10-45min in milliseconds
+                        .setMilliseconds(Math.floor(Math.random() * 35 + 10) * 60000))
                     activity5.duration = 930000
                     activity5.child_id = '5a62be07d6f33400146c9b61'
                     activity5.name = ActivityTypeMock.WALK
@@ -192,7 +195,7 @@ describe('PROVIDER EVENT BUS TASK', () => {
                     const activity6: PhysicalActivity = new PhysicalActivityMock()
                     activity6.start_time = new Date(1547953200000 + Math.floor((Math.random() * 1000)))
                     activity6.end_time = new Date(new Date(activity6.start_time)
-                        .setMilliseconds(Math.floor(Math.random() * 35 + 10) * 60000)) // 10-45min in milliseconds
+                        .setMilliseconds(Math.floor(Math.random() * 35 + 10) * 60000))
                     activity6.duration = 820000
                     activity6.child_id = '5a62be07de34500146d9c544'
                     activity6.name = ActivityTypeMock.RUN
@@ -596,37 +599,43 @@ describe('PROVIDER EVENT BUS TASK', () => {
 
                     const sleep1: Sleep = new SleepMock()
                     sleep1.start_time = new Date(1516417200000  + Math.floor((Math.random() * 1000)))
+                    sleep1.end_time = new Date(new Date(sleep1.start_time)
+                        .setMilliseconds(Math.floor(Math.random() * 35 + 10) * 60000)) // 10-45min in milliseconds
                     sleep1.duration = 28800000
                     sleep1.child_id = '5a62be07d6f33400146c9b61'
 
                     const sleep2: Sleep = new SleepMock()
                     sleep2.start_time = new Date(1516417200000  + Math.floor((Math.random() * 1000)))
+                    sleep2.end_time = new Date(new Date(sleep2.start_time)
+                        .setMilliseconds(Math.floor(Math.random() * 35 + 10) * 60000))
                     sleep2.duration = 27800000
                     sleep2.child_id = '5a62be07d6f33400146c9b61'
 
                     const sleep3: Sleep = new SleepMock()
                     sleep3.start_time = new Date(1516417200000  + Math.floor((Math.random() * 1000)))
+                    sleep3.end_time = new Date(new Date(sleep3.start_time)
+                        .setMilliseconds(Math.floor(Math.random() * 35 + 10) * 60000))
                     sleep3.duration = 28810000
                     sleep3.child_id = '5a62be07de34500146d9c544'
 
                     const sleep4: Sleep = new SleepMock()
                     sleep4.start_time = new Date(1547953200000 + Math.floor((Math.random() * 1000)))
                     sleep4.end_time = new Date(new Date(sleep4.start_time)
-                        .setMilliseconds(Math.floor(Math.random() * 35 + 10) * 60000)) // 10-45min in milliseconds
+                        .setMilliseconds(Math.floor(Math.random() * 35 + 10) * 60000))
                     sleep4.duration = 27900000
                     sleep4.child_id = '5a62be07de34500146d9c544'
 
                     const sleep5: Sleep = new SleepMock()
                     sleep5.start_time = new Date(1547953200000 + Math.floor((Math.random() * 1000)))
                     sleep5.end_time = new Date(new Date(sleep5.start_time)
-                        .setMilliseconds(Math.floor(Math.random() * 35 + 10) * 60000)) // 10-45min in milliseconds
+                        .setMilliseconds(Math.floor(Math.random() * 35 + 10) * 60000))
                     sleep5.duration = 27895000
                     sleep5.child_id = '5a62be07d6f33400146c9b61'
 
                     const sleep6: Sleep = new SleepMock()
                     sleep6.start_time = new Date(1547953200000 + Math.floor((Math.random() * 1000)))
                     sleep6.end_time = new Date(new Date(sleep6.start_time)
-                        .setMilliseconds(Math.floor(Math.random() * 35 + 10) * 60000)) // 10-45min in milliseconds
+                        .setMilliseconds(Math.floor(Math.random() * 35 + 10) * 60000))
                     sleep6.duration = 28820000
                     sleep6.child_id = '5a62be07de34500146d9c544'
 
