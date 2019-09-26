@@ -67,8 +67,9 @@ describe('Routes: environments', () => {
         try {
             await dbConnection.connect(process.env.MONGODB_URI_TEST || Default.MONGODB_URI_TEST,
                 { interval: 100 })
-            await rabbitmq.initialize(process.env.RABBITMQ_URI || Default.RABBITMQ_URI,
-                { interval: 100, sslOptions: { ca: [] } })
+
+            await rabbitmq.initialize('amqp://invalidUser:guest@localhost', { retries: 1, interval: 100 })
+
             await deleteAllEnvironments()
         } catch (err) {
             throw new Error('Failure on environments routes test: ' + err.message)
@@ -81,7 +82,7 @@ describe('Routes: environments', () => {
             await dbConnection.dispose()
             await rabbitmq.dispose()
         } catch (err) {
-            throw new Error('Failure on children.logs routes test: ' + err.message)
+            throw new Error('Failure on environments routes test: ' + err.message)
         }
     })
     /**
@@ -92,10 +93,6 @@ describe('Routes: environments', () => {
             before(async () => {
                 try {
                     await deleteAllEnvironments()
-
-                    await rabbitmq.dispose()
-
-                    await rabbitmq.initialize('amqp://invalidUser:guest@localhost', { retries: 1, interval: 100 })
                 } catch (err) {
                     throw new Error('Failure on environments routes test: ' + err.message)
                 }
@@ -157,6 +154,15 @@ describe('Routes: environments', () => {
                 }
             })
 
+            after(async () => {
+                try {
+                    await rabbitmq.dispose()
+                    await rabbitmq.initialize('amqp://invalidUser:guest@localhost', { retries: 1, interval: 100 })
+                } catch (err) {
+                    throw new Error('Failure on environments test: ' + err.message)
+                }
+            })
+
             it('The subscriber should receive a message in the correct format and with the same values as the environment ' +
                 'published on the bus', (done) => {
                 rabbitmq.bus
@@ -204,13 +210,8 @@ describe('Routes: environments', () => {
             before(async () => {
                 try {
                     await deleteAllEnvironments()
-
-                    await rabbitmq.dispose()
-
-                    await rabbitmq.initialize(process.env.RABBITMQ_URI || Default.RABBITMQ_URI,
-                        { interval: 100, sslOptions: { ca: [] } })
                 } catch (err) {
-                    throw new Error('Failure on children.weights routes test: ' + err.message)
+                    throw new Error('Failure on environments routes test: ' + err.message)
                 }
             })
             it('should return status code 201 and the saved Environment', () => {
@@ -260,7 +261,7 @@ describe('Routes: environments', () => {
                         timestamp: defaultEnvironment.timestamp
                     })
                 } catch (err) {
-                    throw new Error('Failure on children.weights routes test: ' + err.message)
+                    throw new Error('Failure on environments routes test: ' + err.message)
                 }
             })
             it('should return status code 409 and an info message about duplicate items', () => {
@@ -864,10 +865,6 @@ describe('Routes: environments', () => {
                         climatized: defaultEnvironment.climatized,
                         timestamp: defaultEnvironment.timestamp
                     })
-
-                    await rabbitmq.dispose()
-
-                    await rabbitmq.initialize('amqp://invalidUser:guest@localhost', { retries: 1, interval: 100 })
                 } catch (err) {
                     throw new Error('Failure on environments routes test: ' + err.message)
                 }
@@ -915,7 +912,16 @@ describe('Routes: environments', () => {
                     await rabbitmq.initialize(process.env.RABBITMQ_URI || Default.RABBITMQ_URI,
                         { interval: 100, receiveFromYourself: true, sslOptions: { ca: [] } })
                 } catch (err) {
-                    throw new Error('Failure on children.weights routes test: ' + err.message)
+                    throw new Error('Failure on environments routes test: ' + err.message)
+                }
+            })
+
+            after(async () => {
+                try {
+                    await rabbitmq.dispose()
+                    await rabbitmq.initialize('amqp://invalidUser:guest@localhost', { retries: 1, interval: 100 })
+                } catch (err) {
+                    throw new Error('Failure on environments test: ' + err.message)
                 }
             })
 
@@ -972,11 +978,6 @@ describe('Routes: environments', () => {
                         climatized: defaultEnvironment.climatized,
                         timestamp: defaultEnvironment.timestamp
                     })
-
-                    await rabbitmq.dispose()
-
-                    await rabbitmq.initialize(process.env.RABBITMQ_URI || Default.RABBITMQ_URI,
-                        { interval: 100, sslOptions: { ca: [] } })
                 } catch (err) {
                     throw new Error('Failure on environments routes test: ' + err.message)
                 }

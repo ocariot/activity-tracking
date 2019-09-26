@@ -46,8 +46,9 @@ describe('Routes: children.weights', () => {
         try {
             await dbConnection.connect(process.env.MONGODB_URI_TEST || Default.MONGODB_URI_TEST,
                 { interval: 100 })
-            await rabbitmq.initialize(process.env.RABBITMQ_URI || Default.RABBITMQ_URI,
-                { interval: 100, sslOptions: { ca: [] } })
+
+            await rabbitmq.initialize('amqp://invalidUser:guest@localhost', { retries: 1, interval: 100 })
+
             await deleteAllWeights()
         } catch (err) {
             throw new Error('Failure on children.weights routes test: ' + err.message)
@@ -72,10 +73,6 @@ describe('Routes: children.weights', () => {
             before(async () => {
                 try {
                     await deleteAllWeights()
-
-                    await rabbitmq.dispose()
-
-                    await rabbitmq.initialize('amqp://invalidUser:guest@localhost', { retries: 1, interval: 100 })
                 } catch (err) {
                     throw new Error('Failure on children.weights routes test: ' + err.message)
                 }
@@ -126,6 +123,15 @@ describe('Routes: children.weights', () => {
                 }
             })
 
+            after(async () => {
+                try {
+                    await rabbitmq.dispose()
+                    await rabbitmq.initialize('amqp://invalidUser:guest@localhost', { retries: 1, interval: 100 })
+                } catch (err) {
+                    throw new Error('Failure on children.weights test: ' + err.message)
+                }
+            })
+
             it('The subscriber should receive a message in the correct format and with the same values as the weight ' +
                 'published on the bus', (done) => {
                 rabbitmq.bus
@@ -164,11 +170,6 @@ describe('Routes: children.weights', () => {
             before(async () => {
                 try {
                     await deleteAllWeights()
-
-                    await rabbitmq.dispose()
-
-                    await rabbitmq.initialize(process.env.RABBITMQ_URI || Default.RABBITMQ_URI,
-                        { interval: 100, sslOptions: { ca: [] } })
                 } catch (err) {
                     throw new Error('Failure on children.weights routes test: ' + err.message)
                 }
@@ -928,10 +929,6 @@ describe('Routes: children.weights', () => {
                         child_id: defaultWeight.child_id,
                         body_fat: bodyFat
                     })
-
-                    await rabbitmq.dispose()
-
-                    await rabbitmq.initialize('amqp://invalidUser:guest@localhost', { retries: 1, interval: 100 })
                 } catch (err) {
                     throw new Error('Failure on children.weights routes test: ' + err.message)
                 }
@@ -976,6 +973,15 @@ describe('Routes: children.weights', () => {
                         { interval: 100, receiveFromYourself: true, sslOptions: { ca: [] } })
                 } catch (err) {
                     throw new Error('Failure on children.weights routes test: ' + err.message)
+                }
+            })
+
+            after(async () => {
+                try {
+                    await rabbitmq.dispose()
+                    await rabbitmq.initialize('amqp://invalidUser:guest@localhost', { retries: 1, interval: 100 })
+                } catch (err) {
+                    throw new Error('Failure on children.weights test: ' + err.message)
                 }
             })
 
@@ -1028,11 +1034,6 @@ describe('Routes: children.weights', () => {
                         child_id: defaultWeight.child_id,
                         body_fat: bodyFat
                     })
-
-                    await rabbitmq.dispose()
-
-                    await rabbitmq.initialize(process.env.RABBITMQ_URI || Default.RABBITMQ_URI,
-                        { interval: 100, sslOptions: { ca: [] } })
                 } catch (err) {
                     throw new Error('Failure on children.weights routes test: ' + err.message)
                 }

@@ -148,8 +148,9 @@ describe('Routes: children.physicalactivities', () => {
         try {
             await dbConnection.connect(process.env.MONGODB_URI_TEST || Default.MONGODB_URI_TEST,
                 { interval: 100 })
-            await rabbitmq.initialize(process.env.RABBITMQ_URI || Default.RABBITMQ_URI,
-                { interval: 100, sslOptions: { ca: [] } })
+
+            await rabbitmq.initialize('amqp://invalidUser:guest@localhost', { retries: 1, interval: 100 })
+
             await deleteAllActivities()
         } catch (err) {
             throw new Error('Failure on children.physicalactivities routes test: ' + err.message)
@@ -175,10 +176,6 @@ describe('Routes: children.physicalactivities', () => {
             before(async () => {
                 try {
                     await deleteAllActivities()
-
-                    await rabbitmq.dispose()
-
-                    await rabbitmq.initialize('amqp://invalidUser:guest@localhost', { retries: 1, interval: 100 })
                 } catch (err) {
                     throw new Error('Failure on children.physicalactivities routes test: ' + err.message)
                 }
@@ -246,6 +243,15 @@ describe('Routes: children.physicalactivities', () => {
                 }
             })
 
+            after(async () => {
+                try {
+                    await rabbitmq.dispose()
+                    await rabbitmq.initialize('amqp://invalidUser:guest@localhost', { retries: 1, interval: 100 })
+                } catch (err) {
+                    throw new Error('Failure on children.physicalactivities test: ' + err.message)
+                }
+            })
+
             it('The subscriber should receive a message in the correct format and with the same values as the activity ' +
                 'published on the bus', (done) => {
                 rabbitmq.bus
@@ -293,11 +299,6 @@ describe('Routes: children.physicalactivities', () => {
             before(async () => {
                 try {
                     await deleteAllActivities()
-
-                    await rabbitmq.dispose()
-
-                    await rabbitmq.initialize(process.env.RABBITMQ_URI || Default.RABBITMQ_URI,
-                        { interval: 100, sslOptions: { ca: [] } })
                 } catch (err) {
                     throw new Error('Failure on children.physicalactivities routes test: ' + err.message)
                 }
@@ -1625,10 +1626,6 @@ describe('Routes: children.physicalactivities', () => {
 
                     // physical activity to be updated
                     result = await createActivityToBeUpdated(defaultActivity)
-
-                    await rabbitmq.dispose()
-
-                    await rabbitmq.initialize('amqp://invalidUser:guest@localhost', { retries: 1, interval: 100 })
                 } catch (err) {
                     throw new Error('Failure on children.physicalactivities routes test: ' + err.message)
                 }
@@ -1706,6 +1703,15 @@ describe('Routes: children.physicalactivities', () => {
                 }
             })
 
+            after(async () => {
+                try {
+                    await rabbitmq.dispose()
+                    await rabbitmq.initialize('amqp://invalidUser:guest@localhost', { retries: 1, interval: 100 })
+                } catch (err) {
+                    throw new Error('Failure on children.physicalactivities test: ' + err.message)
+                }
+            })
+
             it('The subscriber should receive a message in the correct format and with the same values as the activity ' +
                 'published on the bus', (done) => {
                 rabbitmq.bus
@@ -1756,13 +1762,8 @@ describe('Routes: children.physicalactivities', () => {
                 try {
                     await deleteAllActivities()
 
-                    await rabbitmq.dispose()
-
                     // physical activity to be updated
                     result = await createActivityToBeUpdated(defaultActivity)
-
-                    await rabbitmq.initialize(process.env.RABBITMQ_URI || Default.RABBITMQ_URI,
-                        { interval: 100, sslOptions: { ca: [] } })
                 } catch (err) {
                     throw new Error('Failure on children.physicalactivities routes test: ' + err.message)
                 }
@@ -2259,10 +2260,6 @@ describe('Routes: children.physicalactivities', () => {
                         heart_rate: defaultActivity.heart_rate ? defaultActivity.heart_rate : undefined,
                         child_id: defaultActivity.child_id
                     })
-
-                    await rabbitmq.dispose()
-
-                    await rabbitmq.initialize('amqp://invalidUser:guest@localhost', { retries: 1, interval: 100 })
                 } catch (err) {
                     throw new Error('Failure on children.physicalactivities routes test: ' + err.message)
                 }
@@ -2304,6 +2301,15 @@ describe('Routes: children.physicalactivities', () => {
                         { interval: 100, receiveFromYourself: true, sslOptions: { ca: [] } })
                 } catch (err) {
                     throw new Error('Failure on children.physicalactivities routes test: ' + err.message)
+                }
+            })
+
+            after(async () => {
+                try {
+                    await rabbitmq.dispose()
+                    await rabbitmq.initialize('amqp://invalidUser:guest@localhost', { retries: 1, interval: 100 })
+                } catch (err) {
+                    throw new Error('Failure on children.physicalactivities test: ' + err.message)
                 }
             })
 
@@ -2353,11 +2359,6 @@ describe('Routes: children.physicalactivities', () => {
                         heart_rate: defaultActivity.heart_rate ? defaultActivity.heart_rate : undefined,
                         child_id: defaultActivity.child_id
                     })
-
-                    await rabbitmq.dispose()
-
-                    await rabbitmq.initialize(process.env.RABBITMQ_URI || Default.RABBITMQ_URI,
-                        { interval: 100, sslOptions: { ca: [] } })
                 } catch (err) {
                     throw new Error('Failure on children.physicalactivities routes test: ' + err.message)
                 }
