@@ -111,14 +111,14 @@ describe('Validators: PhysicalActivityLevelsValidator', () => {
 
         context('when the physical activity levels array has an invalid level (the duration is negative)', () => {
             it('should throw a ValidationException', () => {
-                levels[1].duration = -(Math.floor((Math.random() * 10) * 60000))
+                levels[1].duration = -(Math.floor((Math.random() * 10 + 1) * 60000))
                 try {
                     PhysicalActivityLevelsValidator.validate(levels)
                 } catch (err) {
                     assert.equal(err.message, 'Some (or several) duration field of levels array is invalid...')
                     assert.equal(err.description, 'Physical Activity Level validation failed: The value provided has a negative value!')
                 }
-                levels[1].duration = Math.floor((Math.random() * 10) * 60000)
+                levels[1].duration = Math.floor((Math.random() * 10 + 1) * 60000)
             })
         })
     })

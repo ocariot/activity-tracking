@@ -111,7 +111,7 @@ describe('Services: PhysicalActivityService', () => {
     // The levels array has an item that contains negative duration
     let incorrectActivity11: PhysicalActivity = new PhysicalActivityMock()
     incorrectActivityJSON.levels[0].name = ActivityLevelType.SEDENTARY
-    incorrectActivityJSON.levels[0].duration = -(Math.floor((Math.random() * 10) * 60000))
+    incorrectActivityJSON.levels[0].duration = -(Math.floor((Math.random() * 10 + 1) * 60000))
     incorrectActivity11 = incorrectActivity11.fromJSON(incorrectActivityJSON)
 
     // The PhysicalActivityHeartRate is empty
@@ -377,7 +377,7 @@ describe('Services: PhysicalActivityService', () => {
         context('when the physical activity is incorrect (the levels array has an item that contains negative duration)', () => {
             it('should throw a ValidationException', async () => {
                 incorrectActivityJSON.levels[0].name = ActivityLevelType.SEDENTARY
-                incorrectActivityJSON.levels[0].duration = -(Math.floor((Math.random() * 10) * 60000))
+                incorrectActivityJSON.levels[0].duration = -(Math.floor((Math.random() * 10 + 1) * 60000))
                 incorrectActivity = incorrectActivity.fromJSON(incorrectActivityJSON)
 
                 try {
@@ -878,7 +878,7 @@ describe('Services: PhysicalActivityService', () => {
         context('when the physical activity is incorrect (the levels array has an item that contains negative duration)', () => {
             it('should throw a ValidationException', () => {
                 incorrectActivityJSON.levels[0].name = ActivityLevelType.SEDENTARY
-                incorrectActivityJSON.levels[0].duration = -(Math.floor((Math.random() * 10) * 60000))
+                incorrectActivityJSON.levels[0].duration = -(Math.floor((Math.random() * 10 + 1) * 60000))
                 incorrectActivity = incorrectActivity.fromJSON(incorrectActivityJSON)
 
                 return activityService.updateByChild(incorrectActivity)

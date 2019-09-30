@@ -103,7 +103,7 @@ describe('Routes: children.physicalactivities', () => {
     // The levels array has an item that contains negative duration
     let incorrectActivity10: PhysicalActivity = new PhysicalActivityMock()
     incorrectActivityJSON.levels[0].name = ActivityLevelType.SEDENTARY
-    incorrectActivityJSON.levels[0].duration = -(Math.floor((Math.random() * 10) * 60000))
+    incorrectActivityJSON.levels[0].duration = -(Math.floor((Math.random() * 10 + 1) * 60000))
     incorrectActivity10 = incorrectActivity10.fromJSON(incorrectActivityJSON)
 
     // The PhysicalActivityHeartRate is empty
@@ -729,7 +729,7 @@ describe('Routes: children.physicalactivities', () => {
                     levels: [
                         {
                             name: ActivityLevelType.SEDENTARY,
-                            duration: -(Math.floor((Math.random() * 10) * 60000))
+                            duration: -(Math.floor((Math.random() * 10 + 1) * 60000))
                         },
                         {
                             name: ActivityLevelType.LIGHTLY,

@@ -65,7 +65,7 @@
     "ip-allowed": "^1.1.1",
     "mongoose": "^5.7.0",
     "morgan": "^1.9.1",
-    "query-strings-parser": "^2.1.2",
+    "query-strings-parser": "^2.1.3",
     "reflect-metadata": "^0.1.13",
     "swagger-ui-express": "^4.0.7",
     "winston": "^3.2.1",

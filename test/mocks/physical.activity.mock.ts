@@ -20,13 +20,10 @@ export class PhysicalActivityMock extends PhysicalActivity {
         super.child_id = '5a62be07de34500146d9c544'
         super.name = type
         super.calories = Math.floor((Math.random() * 20000 + 500)) // 500-20100
-
         if (type === ActivityTypeMock.WALK || type === ActivityTypeMock.RUN) {
             super.steps = Math.floor((Math.random() * 20000 + 100)) // 100-20100
         }
-
         super.distance = Math.floor((Math.random() * 1000 + 100)) // 100-1100
-
         super.levels = this.generatePhysicalActivityLevels()
         super.heart_rate = this.generateHeartRate()
     }
