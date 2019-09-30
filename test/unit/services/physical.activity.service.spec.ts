@@ -37,6 +37,7 @@ describe('Services: PhysicalActivityService', () => {
         name: 'walk',
         calories: 200,
         steps: 1000,
+        distance: 1000,
         levels: [
             {
                 name: 'sedentaries',
@@ -185,6 +186,7 @@ describe('Services: PhysicalActivityService', () => {
                         assert.propertyVal(result, 'name', activity.name)
                         assert.propertyVal(result, 'calories', activity.calories)
                         assert.propertyVal(result, 'steps', activity.steps)
+                        assert.propertyVal(result, 'distance', activity.distance)
                         assert.propertyVal(result, 'levels', activity.levels)
                         assert.propertyVal(result, 'heart_rate', activity.heart_rate)
                     })
@@ -328,6 +330,20 @@ describe('Services: PhysicalActivityService', () => {
             })
         })
 
+        context('when the physical activity is incorrect (the steps parameter is negative)', () => {
+            it('should throw a ValidationException', async () => {
+                incorrectActivity.steps = 1000
+                incorrectActivity.distance = -1000
+
+                try {
+                    return await activityService.add(incorrectActivity)
+                } catch (err) {
+                    assert.propertyVal(err, 'message', 'Distance field is invalid...')
+                    assert.propertyVal(err, 'description', 'Physical Activity validation failed: The value provided has a negative value!')
+                }
+            })
+        })
+
         context('when the physical activity is incorrect (the levels array has an item with an invalid type)', () => {
             it('should throw a ValidationException', async () => {
                 // Mock through JSON
@@ -443,6 +459,7 @@ describe('Services: PhysicalActivityService', () => {
                             assert.propertyVal(result.success[i].item, 'name', correctActivitiesArr[i].name)
                             assert.propertyVal(result.success[i].item, 'calories', correctActivitiesArr[i].calories)
                             assert.propertyVal(result.success[i].item, 'steps', correctActivitiesArr[i].steps)
+                            assert.propertyVal(result.success[i].item, 'distance', correctActivitiesArr[i].distance)
                             assert.propertyVal(result.success[i].item, 'levels', correctActivitiesArr[i].levels)
                             assert.propertyVal(result.success[i].item, 'heart_rate', correctActivitiesArr[i].heart_rate)
                         }
@@ -474,6 +491,7 @@ describe('Services: PhysicalActivityService', () => {
                             assert.propertyVal(result.error[i].item, 'name', correctActivitiesArr[i].name)
                             assert.propertyVal(result.error[i].item, 'calories', correctActivitiesArr[i].calories)
                             assert.propertyVal(result.error[i].item, 'steps', correctActivitiesArr[i].steps)
+                            assert.propertyVal(result.error[i].item, 'distance', correctActivitiesArr[i].distance)
                             assert.propertyVal(result.error[i].item, 'levels', correctActivitiesArr[i].levels)
                             assert.propertyVal(result.error[i].item, 'heart_rate', correctActivitiesArr[i].heart_rate)
                         }
@@ -499,6 +517,7 @@ describe('Services: PhysicalActivityService', () => {
                         assert.propertyVal(result.success[0].item, 'name', mixedActivitiesArr[0].name)
                         assert.propertyVal(result.success[0].item, 'calories', mixedActivitiesArr[0].calories)
                         assert.propertyVal(result.success[0].item, 'steps', mixedActivitiesArr[0].steps)
+                        assert.propertyVal(result.success[0].item, 'distance', mixedActivitiesArr[0].distance)
                         assert.propertyVal(result.success[0].item, 'levels', mixedActivitiesArr[0].levels)
                         assert.propertyVal(result.success[0].item, 'heart_rate', mixedActivitiesArr[0].heart_rate)
 
@@ -572,6 +591,7 @@ describe('Services: PhysicalActivityService', () => {
                             if (i !== 0) assert.propertyVal(result.error[i].item, 'name', incorrectActivitiesArr[i].name)
                             if (i !== 0) assert.propertyVal(result.error[i].item, 'calories', incorrectActivitiesArr[i].calories)
                             if (i !== 0) assert.propertyVal(result.error[i].item, 'steps', incorrectActivitiesArr[i].steps)
+                            if (i !== 0) assert.propertyVal(result.error[i].item, 'distance', incorrectActivitiesArr[i].distance)
                             if (i !== 0) assert.propertyVal(result.error[i].item, 'levels', incorrectActivitiesArr[i].levels)
                             if (i !== 0) assert.propertyVal(result.error[i].item, 'heart_rate', incorrectActivitiesArr[i].heart_rate)
                         }
@@ -728,6 +748,7 @@ describe('Services: PhysicalActivityService', () => {
                         assert.propertyVal(result, 'name', otherActivity.name)
                         assert.propertyVal(result, 'calories', otherActivity.calories)
                         assert.propertyVal(result, 'steps', otherActivity.steps)
+                        assert.propertyVal(result, 'distance', otherActivity.distance)
                         assert.propertyVal(result, 'levels', otherActivity.levels)
                         assert.propertyVal(result, 'heart_rate', otherActivity.heart_rate)
                     })

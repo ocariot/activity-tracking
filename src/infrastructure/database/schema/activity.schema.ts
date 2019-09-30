@@ -27,6 +27,9 @@ const physicalActivitySchema = new Mongoose.Schema({
         steps: {
             type: Number
         },
+        distance: {
+            type: Number
+        },
         levels: [
             {
                 name: {

@@ -20,6 +20,10 @@ export class CreatePhysicalActivityValidator {
             throw new ValidationException('Steps field is invalid...',
                 'Physical Activity validation failed: '.concat(Strings.ERROR_MESSAGE.NEGATIVE_PARAMETER))
         }
+        if (activity.distance !== undefined && activity.distance < 0) {
+            throw new ValidationException('Distance field is invalid...',
+                'Physical Activity validation failed: '.concat(Strings.ERROR_MESSAGE.NEGATIVE_PARAMETER))
+        }
         if (activity.levels && activity.levels.length > 0) PhysicalActivityLevelsValidator.validate(activity.levels)
         if (activity.heart_rate) PhysicalActivityHeartRateValidator.validate(activity.heart_rate)
 

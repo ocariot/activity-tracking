@@ -43,6 +43,11 @@ export class UpdatePhysicalActivityValidator {
                     'Physical Activity validation failed: '.concat(Strings.ERROR_MESSAGE.NEGATIVE_PARAMETER))
         }
 
+        if (physicalActivity.distance && physicalActivity.distance < 0) {
+            throw new ValidationException('Distance field is invalid...',
+                'Physical Activity validation failed: '.concat(Strings.ERROR_MESSAGE.NEGATIVE_PARAMETER))
+        }
+
         if (physicalActivity.levels && physicalActivity.levels.length) {
             PhysicalActivityLevelsValidator.validate(physicalActivity.levels)
         }

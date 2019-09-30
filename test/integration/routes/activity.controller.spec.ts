@@ -41,6 +41,7 @@ describe('Routes: children.physicalactivities', () => {
             name: 'walk',
             calories: 200,
             steps: 1000,
+            distance: 1000,
             levels: [
                 {
                     name: 'sedentaries',
@@ -189,6 +190,7 @@ describe('Routes: children.physicalactivities', () => {
                     duration: defaultActivity.duration,
                     calories: defaultActivity.calories,
                     steps: defaultActivity.steps ? defaultActivity.steps : undefined,
+                    distance: defaultActivity.distance ? defaultActivity.distance : undefined,
                     levels: defaultActivity.levels ? defaultActivity.levels : undefined,
                     heart_rate: defaultActivity.heart_rate ? defaultActivity.heart_rate : undefined
                 }
@@ -208,6 +210,7 @@ describe('Routes: children.physicalactivities', () => {
                         if (res.body.steps) {
                             expect(res.body.steps).to.eql(defaultActivity.steps)
                         }
+                        expect(res.body.distance).to.eql(defaultActivity.distance)
                         if (defaultActivity.levels) {
                             expect(res.body.levels)
                                 .to.eql(defaultActivity.levels.map((elem: PhysicalActivityLevel) => elem.toJSON()))
@@ -228,6 +231,7 @@ describe('Routes: children.physicalactivities', () => {
                 duration: defaultActivity.duration,
                 calories: defaultActivity.calories,
                 steps: defaultActivity.steps ? defaultActivity.steps : undefined,
+                distance: defaultActivity.distance ? defaultActivity.distance : undefined,
                 levels: defaultActivity.levels ? defaultActivity.levels : undefined,
                 heart_rate: defaultActivity.heart_rate ? defaultActivity.heart_rate : undefined
             }
@@ -269,6 +273,7 @@ describe('Routes: children.physicalactivities', () => {
                             if (message.physicalactivity.steps) {
                                 expect(message.physicalactivity.steps).to.eql(defaultActivity.steps)
                             }
+                            expect(message.physicalactivity.distance).to.eql(defaultActivity.distance)
                             if (defaultActivity.levels) {
                                 expect(message.physicalactivity.levels)
                                     .to.eql(defaultActivity.levels.map((elem: PhysicalActivityLevel) => elem.toJSON()))
@@ -311,6 +316,7 @@ describe('Routes: children.physicalactivities', () => {
                     duration: defaultActivity.duration,
                     calories: defaultActivity.calories,
                     steps: defaultActivity.steps ? defaultActivity.steps : undefined,
+                    distance: defaultActivity.distance ? defaultActivity.distance : undefined,
                     levels: defaultActivity.levels ? defaultActivity.levels : undefined,
                     heart_rate: defaultActivity.heart_rate ? defaultActivity.heart_rate : undefined
                 }
@@ -330,6 +336,7 @@ describe('Routes: children.physicalactivities', () => {
                         if (res.body.steps) {
                             expect(res.body.steps).to.eql(defaultActivity.steps)
                         }
+                        expect(res.body.distance).to.eql(defaultActivity.distance)
                         if (defaultActivity.levels) {
                             expect(res.body.levels)
                                 .to.eql(defaultActivity.levels.map((elem: PhysicalActivityLevel) => elem.toJSON()))
@@ -352,6 +359,7 @@ describe('Routes: children.physicalactivities', () => {
                         duration: defaultActivity.duration,
                         calories: defaultActivity.calories,
                         steps: defaultActivity.steps ? defaultActivity.steps : undefined,
+                        distance: defaultActivity.distance ? defaultActivity.distance : undefined,
                         levels: defaultActivity.levels ? defaultActivity.levels : undefined,
                         heart_rate: defaultActivity.heart_rate ? defaultActivity.heart_rate : undefined,
                         child_id: defaultActivity.child_id
@@ -368,6 +376,7 @@ describe('Routes: children.physicalactivities', () => {
                     duration: defaultActivity.duration,
                     calories: defaultActivity.calories,
                     steps: defaultActivity.steps ? defaultActivity.steps : undefined,
+                    distance: defaultActivity.distance ? defaultActivity.distance : undefined,
                     levels: defaultActivity.levels ? defaultActivity.levels : undefined,
                     heart_rate: defaultActivity.heart_rate ? defaultActivity.heart_rate : undefined
                 }
@@ -408,6 +417,7 @@ describe('Routes: children.physicalactivities', () => {
                     end_time: defaultActivity.end_time,
                     duration: defaultActivity.duration,
                     steps: defaultActivity.steps ? defaultActivity.steps : undefined,
+                    distance: defaultActivity.distance ? defaultActivity.distance : undefined,
                     levels: defaultActivity.levels ? defaultActivity.levels : undefined,
                     heart_rate: defaultActivity.heart_rate ? defaultActivity.heart_rate : undefined
                 }
@@ -434,6 +444,7 @@ describe('Routes: children.physicalactivities', () => {
                     duration: defaultActivity.duration,
                     calories: defaultActivity.calories,
                     steps: defaultActivity.steps ? defaultActivity.steps : undefined,
+                    distance: defaultActivity.distance ? defaultActivity.distance : undefined,
                     levels: defaultActivity.levels ? defaultActivity.levels : undefined,
                     heart_rate: defaultActivity.heart_rate ? defaultActivity.heart_rate : undefined
                 }
@@ -461,6 +472,7 @@ describe('Routes: children.physicalactivities', () => {
                     duration: Math.floor(Math.random() * 180 + 1) * 60000,
                     calories: defaultActivity.calories,
                     steps: defaultActivity.steps ? defaultActivity.steps : undefined,
+                    distance: defaultActivity.distance ? defaultActivity.distance : undefined,
                     levels: defaultActivity.levels ? defaultActivity.levels : undefined,
                     heart_rate: defaultActivity.heart_rate ? defaultActivity.heart_rate : undefined
                 }
@@ -488,6 +500,7 @@ describe('Routes: children.physicalactivities', () => {
                     duration: -(defaultActivity.duration!),
                     calories: defaultActivity.calories,
                     steps: defaultActivity.steps ? defaultActivity.steps : undefined,
+                    distance: defaultActivity.distance ? defaultActivity.distance : undefined,
                     levels: defaultActivity.levels ? defaultActivity.levels : undefined,
                     heart_rate: defaultActivity.heart_rate ? defaultActivity.heart_rate : undefined
                 }
@@ -513,6 +526,7 @@ describe('Routes: children.physicalactivities', () => {
                     duration: defaultActivity.duration,
                     calories: -(defaultActivity.calories!),
                     steps: defaultActivity.steps ? defaultActivity.steps : undefined,
+                    distance: defaultActivity.distance ? defaultActivity.distance : undefined,
                     levels: defaultActivity.levels ? defaultActivity.levels : undefined,
                     heart_rate: defaultActivity.heart_rate ? defaultActivity.heart_rate : undefined
                 }
@@ -539,6 +553,7 @@ describe('Routes: children.physicalactivities', () => {
                     duration: defaultActivity.duration,
                     calories: -(defaultActivity.calories!),
                     steps: defaultActivity.steps ? defaultActivity.steps : undefined,
+                    distance: defaultActivity.distance ? defaultActivity.distance : undefined,
                     levels: defaultActivity.levels ? defaultActivity.levels : undefined,
                     heart_rate: defaultActivity.heart_rate ? defaultActivity.heart_rate : undefined
                 }
@@ -565,6 +580,7 @@ describe('Routes: children.physicalactivities', () => {
                     duration: defaultActivity.duration,
                     calories: defaultActivity.calories,
                     steps: -200,
+                    distance: defaultActivity.distance ? defaultActivity.distance : undefined,
                     levels: defaultActivity.levels ? defaultActivity.levels : undefined,
                     heart_rate: defaultActivity.heart_rate ? defaultActivity.heart_rate : undefined
                 }
@@ -583,6 +599,34 @@ describe('Routes: children.physicalactivities', () => {
             })
         })
 
+        context('when a validation error occurs (the distance parameter is negative)', () => {
+            it('should return status code 400 and info message about the invalid parameter of distance', () => {
+                const body = {
+                    name: defaultActivity.name,
+                    start_time: defaultActivity.start_time,
+                    end_time: defaultActivity.end_time,
+                    duration: defaultActivity.duration,
+                    calories: defaultActivity.calories,
+                    steps: defaultActivity.steps ? defaultActivity.steps : undefined,
+                    distance: -1000,
+                    levels: defaultActivity.levels ? defaultActivity.levels : undefined,
+                    heart_rate: defaultActivity.heart_rate ? defaultActivity.heart_rate : undefined
+                }
+
+                return request
+                    .post(`/v1/children/${defaultActivity.child_id}/physicalactivities`)
+                    .send(body)
+                    .set('Content-Type', 'application/json')
+                    .expect(400)
+                    .then(err => {
+                        expect(err.body.code).to.eql(400)
+                        expect(err.body.message).to.eql('Distance field is invalid...')
+                        expect(err.body.description).to.eql('Physical Activity validation failed: The value provided ' +
+                            'has a negative value!')
+                    })
+            })
+        })
+
         context('when a validation error occurs (the levels array has an item with an invalid type)', () => {
             it('should return status code 400 and info message about the invalid levels array', () => {
                 const body = {
@@ -592,6 +636,7 @@ describe('Routes: children.physicalactivities', () => {
                     duration: defaultActivity.duration,
                     calories: defaultActivity.calories,
                     steps: defaultActivity.steps ? defaultActivity.steps : undefined,
+                    distance: defaultActivity.distance ? defaultActivity.distance : undefined,
                     levels: [
                         {
                             name: 'sedentaries',
@@ -635,6 +680,7 @@ describe('Routes: children.physicalactivities', () => {
                     duration: defaultActivity.duration,
                     calories: defaultActivity.calories,
                     steps: defaultActivity.steps ? defaultActivity.steps : undefined,
+                    distance: defaultActivity.distance ? defaultActivity.distance : undefined,
                     levels: [
                         {
                             name: undefined,
@@ -679,6 +725,7 @@ describe('Routes: children.physicalactivities', () => {
                     duration: defaultActivity.duration,
                     calories: defaultActivity.calories,
                     steps: defaultActivity.steps ? defaultActivity.steps : undefined,
+                    distance: defaultActivity.distance ? defaultActivity.distance : undefined,
                     levels: [
                         {
                             name: ActivityLevelType.SEDENTARY,
@@ -723,6 +770,7 @@ describe('Routes: children.physicalactivities', () => {
                     duration: incorrectActivity11.duration,
                     calories: incorrectActivity11.calories,
                     steps: incorrectActivity11.steps ? incorrectActivity11.steps : undefined,
+                    distance: defaultActivity.distance ? defaultActivity.distance : undefined,
                     levels: incorrectActivity11.levels ? incorrectActivity11.levels : undefined,
                     heart_rate: incorrectActivity11.heart_rate ? incorrectActivity11.heart_rate : undefined
                 }
@@ -750,6 +798,7 @@ describe('Routes: children.physicalactivities', () => {
                     duration: incorrectActivity12.duration,
                     calories: incorrectActivity12.calories,
                     steps: incorrectActivity12.steps ? incorrectActivity12.steps : undefined,
+                    distance: defaultActivity.distance ? defaultActivity.distance : undefined,
                     levels: incorrectActivity12.levels ? incorrectActivity12.levels : undefined,
                     heart_rate: incorrectActivity12.heart_rate ? incorrectActivity12.heart_rate : undefined
                 }
@@ -777,6 +826,7 @@ describe('Routes: children.physicalactivities', () => {
                     duration: incorrectActivity13.duration,
                     calories: incorrectActivity13.calories,
                     steps: incorrectActivity13.steps ? incorrectActivity13.steps : undefined,
+                    distance: defaultActivity.distance ? defaultActivity.distance : undefined,
                     levels: incorrectActivity13.levels ? incorrectActivity13.levels : undefined,
                     heart_rate: incorrectActivity13.heart_rate ? incorrectActivity13.heart_rate : undefined
                 }
@@ -805,6 +855,7 @@ describe('Routes: children.physicalactivities', () => {
                     duration: incorrectActivity14.duration,
                     calories: incorrectActivity14.calories,
                     steps: incorrectActivity14.steps ? incorrectActivity14.steps : undefined,
+                    distance: defaultActivity.distance ? defaultActivity.distance : undefined,
                     levels: incorrectActivity14.levels ? incorrectActivity14.levels : undefined,
                     heart_rate: incorrectActivity14.heart_rate ? incorrectActivity14.heart_rate : undefined
                 }
@@ -848,6 +899,7 @@ describe('Routes: children.physicalactivities', () => {
                         duration: activity.duration,
                         calories: activity.calories,
                         steps: activity.steps ? activity.steps : undefined,
+                        distance: activity.distance ? activity.distance : undefined,
                         levels: activity.levels ? activity.levels : undefined,
                         heart_rate: activity.heart_rate ? activity.heart_rate : undefined
                     }
@@ -871,6 +923,7 @@ describe('Routes: children.physicalactivities', () => {
                             if (correctActivitiesArr[i].steps) {
                                 expect(res.body.success[i].item.steps).to.eql(correctActivitiesArr[i].steps)
                             }
+                            expect(res.body.success[i].item.distance).to.eql(correctActivitiesArr[i].distance)
                             if (correctActivitiesArr[i].levels) {
                                 expect(res.body.success[i].item.levels)
                                     .to.eql(correctActivitiesArr[i].levels!.map((elem: PhysicalActivityLevel) => elem.toJSON()))
@@ -899,6 +952,7 @@ describe('Routes: children.physicalactivities', () => {
                             duration: activity.duration,
                             calories: activity.calories,
                             steps: activity.steps ? activity.steps : undefined,
+                            distance: activity.distance ? activity.distance : undefined,
                             levels: activity.levels ? activity.levels : undefined,
                             heart_rate: activity.heart_rate ? activity.heart_rate : undefined,
                             child_id: activity.child_id
@@ -920,6 +974,7 @@ describe('Routes: children.physicalactivities', () => {
                         duration: activity.duration,
                         calories: activity.calories,
                         steps: activity.steps ? activity.steps : undefined,
+                        distance: activity.distance ? activity.distance : undefined,
                         levels: activity.levels ? activity.levels : undefined,
                         heart_rate: activity.heart_rate ? activity.heart_rate : undefined
                     }
@@ -943,6 +998,7 @@ describe('Routes: children.physicalactivities', () => {
                             if (correctActivitiesArr[i].steps) {
                                 expect(res.body.error[i].item.steps).to.eql(correctActivitiesArr[i].steps)
                             }
+                            expect(res.body.error[i].item.distance).to.eql(correctActivitiesArr[i].distance)
                             if (correctActivitiesArr[i].levels) {
                                 expect(res.body.error[i].item.levels)
                                     .to.eql(correctActivitiesArr[i].levels!.map((elem: PhysicalActivityLevel) => elem.toJSON()))
@@ -979,6 +1035,7 @@ describe('Routes: children.physicalactivities', () => {
                         duration: activity.duration,
                         calories: activity.calories,
                         steps: activity.steps ? activity.steps : undefined,
+                        distance: activity.distance ? activity.distance : undefined,
                         levels: activity.levels ? activity.levels : undefined,
                         heart_rate: activity.heart_rate ? activity.heart_rate : undefined
                     }
@@ -1002,6 +1059,7 @@ describe('Routes: children.physicalactivities', () => {
                         if (mixedActivitiesArr[0].steps) {
                             expect(res.body.success[0].item.steps).to.eql(mixedActivitiesArr[0].steps)
                         }
+                        expect(res.body.success[0].item.distance).to.eql(mixedActivitiesArr[0].distance)
                         if (mixedActivitiesArr[0].levels) {
                             expect(res.body.success[0].item.levels)
                                 .to.eql(mixedActivitiesArr[0].levels.map((elem: PhysicalActivityLevel) => elem.toJSON()))
@@ -1041,6 +1099,7 @@ describe('Routes: children.physicalactivities', () => {
                         duration: activity.duration,
                         calories: activity.calories,
                         steps: activity.steps ? activity.steps : undefined,
+                        distance: activity.distance ? activity.distance : undefined,
                         levels: activity.levels ? activity.levels : undefined,
                         heart_rate: activity.heart_rate ? activity.heart_rate : undefined
                     }
@@ -1107,6 +1166,7 @@ describe('Routes: children.physicalactivities', () => {
                             if (incorrectActivitiesArr[i].steps) {
                                 expect(res.body.error[i].item.steps).to.eql(incorrectActivitiesArr[i].steps)
                             }
+                            expect(res.body.error[i].item.distance).to.eql(incorrectActivitiesArr[i].distance)
                             if (i !== 8 && incorrectActivitiesArr[i].levels) {
                                 expect(res.body.error[i].item.levels)
                                     .to.eql(incorrectActivitiesArr[i].levels!.map((elem: PhysicalActivityLevel) => elem.toJSON()))
@@ -1153,6 +1213,7 @@ describe('Routes: children.physicalactivities', () => {
                         duration: defaultActivity.duration,
                         calories: defaultActivity.calories,
                         steps: defaultActivity.steps ? defaultActivity.steps : undefined,
+                        distance: defaultActivity.distance ? defaultActivity.distance : undefined,
                         levels: defaultActivity.levels ? defaultActivity.levels : undefined,
                         heart_rate: defaultActivity.heart_rate ? defaultActivity.heart_rate : undefined,
                         child_id: defaultActivity.child_id
@@ -1182,6 +1243,7 @@ describe('Routes: children.physicalactivities', () => {
                         if (defaultActivity.steps) {
                             expect(res.body[0].steps).to.eql(defaultActivity.steps)
                         }
+                        expect(res.body[0].distance).to.eql(defaultActivity.distance)
                         if (defaultActivity.levels) {
                             expect(res.body[0].levels)
                                 .to.eql(defaultActivity.levels.map((elem: PhysicalActivityLevel) => elem.toJSON()))
@@ -1250,6 +1312,7 @@ describe('Routes: children.physicalactivities', () => {
                         duration: defaultActivity.duration,
                         calories: defaultActivity.calories,
                         steps: defaultActivity.steps ? defaultActivity.steps : undefined,
+                        distance: defaultActivity.distance ? defaultActivity.distance : undefined,
                         levels: defaultActivity.levels ? defaultActivity.levels : undefined,
                         heart_rate: defaultActivity.heart_rate ? defaultActivity.heart_rate : undefined,
                         child_id: defaultActivity.child_id
@@ -1262,6 +1325,7 @@ describe('Routes: children.physicalactivities', () => {
                         duration: defaultActivity.duration,
                         calories: defaultActivity.calories,
                         steps: defaultActivity.steps ? defaultActivity.steps : undefined,
+                        distance: defaultActivity.distance ? defaultActivity.distance : undefined,
                         levels: defaultActivity.levels ? defaultActivity.levels : undefined,
                         heart_rate: defaultActivity.heart_rate ? defaultActivity.heart_rate : undefined,
                         child_id: new ObjectID()
@@ -1293,6 +1357,7 @@ describe('Routes: children.physicalactivities', () => {
                         if (defaultActivity.steps) {
                             expect(res.body[0].steps).to.eql(defaultActivity.steps)
                         }
+                        expect(res.body[0].distance).to.eql(defaultActivity.distance)
                         if (defaultActivity.levels) {
                             expect(res.body[0].levels)
                                 .to.eql(defaultActivity.levels.map((elem: PhysicalActivityLevel) => elem.toJSON()))
@@ -1341,8 +1406,7 @@ describe('Routes: children.physicalactivities', () => {
             })
 
             it('should return status code 400 and an info message about the invalid child_id', async () => {
-                const url = `/v1/children/123/physicalactivities?child_id=${defaultActivity.child_id}&fields=start_time,end_time,`
-                    .concat(`&sort=child_id&page=1&limit=3`)
+                const url = `/v1/children/123/physicalactivities?child_id=${defaultActivity.child_id}&sort=child_id&page=1&limit=3`
 
                 return request
                     .get(url)
@@ -1374,6 +1438,7 @@ describe('Routes: children.physicalactivities', () => {
                         duration: defaultActivity.duration,
                         calories: defaultActivity.calories,
                         steps: defaultActivity.steps ? defaultActivity.steps : undefined,
+                        distance: defaultActivity.distance ? defaultActivity.distance : undefined,
                         levels: defaultActivity.levels ? defaultActivity.levels : undefined,
                         heart_rate: defaultActivity.heart_rate ? defaultActivity.heart_rate : undefined,
                         child_id: defaultActivity.child_id
@@ -1400,6 +1465,7 @@ describe('Routes: children.physicalactivities', () => {
                         if (defaultActivity.steps) {
                             expect(res.body.steps).to.eql(defaultActivity.steps)
                         }
+                        expect(res.body.distance).to.eql(defaultActivity.distance)
                         if (defaultActivity.levels) {
                             expect(res.body.levels)
                                 .to.eql(defaultActivity.levels.map((elem: PhysicalActivityLevel) => elem.toJSON()))
@@ -1495,6 +1561,7 @@ describe('Routes: children.physicalactivities', () => {
                         duration: defaultActivity.duration,
                         calories: defaultActivity.calories,
                         steps: defaultActivity.steps ? defaultActivity.steps : undefined,
+                        distance: defaultActivity.distance ? defaultActivity.distance : undefined,
                         levels: defaultActivity.levels ? defaultActivity.levels : undefined,
                         heart_rate: defaultActivity.heart_rate ? defaultActivity.heart_rate : undefined,
                         child_id: defaultActivity.child_id
@@ -1522,6 +1589,7 @@ describe('Routes: children.physicalactivities', () => {
                         if (defaultActivity.steps) {
                             expect(res.body.steps).to.eql(defaultActivity.steps)
                         }
+                        expect(res.body.distance).to.eql(defaultActivity.distance)
                         if (defaultActivity.levels) {
                             expect(res.body.levels)
                                 .to.eql(defaultActivity.levels.map((elem: PhysicalActivityLevel) => elem.toJSON()))
@@ -1640,9 +1708,9 @@ describe('Routes: children.physicalactivities', () => {
                     duration: defaultActivity.duration,
                     calories: defaultActivity.calories,
                     steps: defaultActivity.steps ? defaultActivity.steps : undefined,
+                    distance: defaultActivity.distance ? defaultActivity.distance : undefined,
                     levels: defaultActivity.levels ? defaultActivity.levels : undefined,
-                    heart_rate: defaultActivity.heart_rate ? defaultActivity.heart_rate : undefined,
-                    child_id: defaultActivity.child_id
+                    heart_rate: defaultActivity.heart_rate ? defaultActivity.heart_rate : undefined
                 }
 
                 return request
@@ -1659,6 +1727,7 @@ describe('Routes: children.physicalactivities', () => {
                         if (defaultActivity.steps) {
                             expect(res.body.steps).to.eql(defaultActivity.steps)
                         }
+                        expect(res.body.distance).to.eql(defaultActivity.distance)
                         if (defaultActivity.levels) {
                             expect(res.body.levels)
                                 .to.eql(defaultActivity.levels.map((elem: PhysicalActivityLevel) => elem.toJSON()))
@@ -1682,9 +1751,9 @@ describe('Routes: children.physicalactivities', () => {
                 duration: otherActivity.duration,
                 calories: defaultActivity.calories,
                 steps: defaultActivity.steps ? defaultActivity.steps : undefined,
+                distance: defaultActivity.distance ? defaultActivity.distance : undefined,
                 levels: defaultActivity.levels ? defaultActivity.levels : undefined,
-                heart_rate: defaultActivity.heart_rate ? defaultActivity.heart_rate : undefined,
-                child_id: defaultActivity.child_id
+                heart_rate: defaultActivity.heart_rate ? defaultActivity.heart_rate : undefined
             }
 
             let result
@@ -1729,6 +1798,7 @@ describe('Routes: children.physicalactivities', () => {
                             if (message.physicalactivity.steps) {
                                 expect(message.physicalactivity.steps).to.eql(defaultActivity.steps)
                             }
+                            expect(message.physicalactivity.distance).to.eql(defaultActivity.distance)
                             if (defaultActivity.levels) {
                                 expect(message.physicalactivity.levels)
                                     .to.eql(defaultActivity.levels.map((elem: PhysicalActivityLevel) => elem.toJSON()))
@@ -1778,9 +1848,9 @@ describe('Routes: children.physicalactivities', () => {
                     duration: otherActivity.duration,
                     calories: defaultActivity.calories,
                     steps: defaultActivity.steps ? defaultActivity.steps : undefined,
+                    distance: defaultActivity.distance ? defaultActivity.distance : undefined,
                     levels: defaultActivity.levels ? defaultActivity.levels : undefined,
-                    heart_rate: defaultActivity.heart_rate ? defaultActivity.heart_rate : undefined,
-                    child_id: defaultActivity.child_id
+                    heart_rate: defaultActivity.heart_rate ? defaultActivity.heart_rate : undefined
                 }
 
                 return request
@@ -1797,6 +1867,7 @@ describe('Routes: children.physicalactivities', () => {
                         if (defaultActivity.steps) {
                             expect(res.body.steps).to.eql(defaultActivity.steps)
                         }
+                        expect(res.body.distance).to.eql(defaultActivity.distance)
                         if (defaultActivity.levels) {
                             expect(res.body.levels)
                                 .to.eql(defaultActivity.levels.map((elem: PhysicalActivityLevel) => elem.toJSON()))
@@ -1823,6 +1894,7 @@ describe('Routes: children.physicalactivities', () => {
                         duration: otherActivity.duration,
                         calories: defaultActivity.calories,
                         steps: defaultActivity.steps ? defaultActivity.steps : undefined,
+                        distance: defaultActivity.distance ? defaultActivity.distance : undefined,
                         levels: defaultActivity.levels ? defaultActivity.levels : undefined,
                         heart_rate: defaultActivity.heart_rate ? defaultActivity.heart_rate : undefined,
                         child_id: defaultActivity.child_id
@@ -1871,9 +1943,9 @@ describe('Routes: children.physicalactivities', () => {
                     duration: defaultActivity.duration,
                     calories: defaultActivity.calories,
                     steps: defaultActivity.steps ? defaultActivity.steps : undefined,
+                    distance: defaultActivity.distance ? defaultActivity.distance : undefined,
                     levels: defaultActivity.levels ? defaultActivity.levels : undefined,
-                    heart_rate: defaultActivity.heart_rate ? defaultActivity.heart_rate : undefined,
-                    child_id: defaultActivity.child_id
+                    heart_rate: defaultActivity.heart_rate ? defaultActivity.heart_rate : undefined
                 }
 
                 return request
@@ -1907,9 +1979,9 @@ describe('Routes: children.physicalactivities', () => {
                     duration: defaultActivity.duration,
                     calories: defaultActivity.calories,
                     steps: defaultActivity.steps ? defaultActivity.steps : undefined,
+                    distance: defaultActivity.distance ? defaultActivity.distance : undefined,
                     levels: defaultActivity.levels ? defaultActivity.levels : undefined,
-                    heart_rate: defaultActivity.heart_rate ? defaultActivity.heart_rate : undefined,
-                    child_id: defaultActivity.child_id
+                    heart_rate: defaultActivity.heart_rate ? defaultActivity.heart_rate : undefined
                 }
 
                 return request
@@ -1942,9 +2014,9 @@ describe('Routes: children.physicalactivities', () => {
                     duration: defaultActivity.duration,
                     calories: defaultActivity.calories,
                     steps: defaultActivity.steps ? defaultActivity.steps : undefined,
+                    distance: defaultActivity.distance ? defaultActivity.distance : undefined,
                     levels: defaultActivity.levels ? defaultActivity.levels : undefined,
-                    heart_rate: defaultActivity.heart_rate ? defaultActivity.heart_rate : undefined,
-                    child_id: defaultActivity.child_id
+                    heart_rate: defaultActivity.heart_rate ? defaultActivity.heart_rate : undefined
                 }
 
                 return request
@@ -2256,6 +2328,7 @@ describe('Routes: children.physicalactivities', () => {
                         duration: defaultActivity.duration,
                         calories: defaultActivity.calories,
                         steps: defaultActivity.steps ? defaultActivity.steps : undefined,
+                        distance: defaultActivity.distance ? defaultActivity.distance : undefined,
                         levels: defaultActivity.levels ? defaultActivity.levels : undefined,
                         heart_rate: defaultActivity.heart_rate ? defaultActivity.heart_rate : undefined,
                         child_id: defaultActivity.child_id
@@ -2292,6 +2365,7 @@ describe('Routes: children.physicalactivities', () => {
                         duration: defaultActivity.duration,
                         calories: defaultActivity.calories,
                         steps: defaultActivity.steps ? defaultActivity.steps : undefined,
+                        distance: defaultActivity.distance ? defaultActivity.distance : undefined,
                         levels: defaultActivity.levels ? defaultActivity.levels : undefined,
                         heart_rate: defaultActivity.heart_rate ? defaultActivity.heart_rate : undefined,
                         child_id: defaultActivity.child_id
@@ -2355,6 +2429,7 @@ describe('Routes: children.physicalactivities', () => {
                         duration: defaultActivity.duration,
                         calories: defaultActivity.calories,
                         steps: defaultActivity.steps ? defaultActivity.steps : undefined,
+                        distance: defaultActivity.distance ? defaultActivity.distance : undefined,
                         levels: defaultActivity.levels ? defaultActivity.levels : undefined,
                         heart_rate: defaultActivity.heart_rate ? defaultActivity.heart_rate : undefined,
                         child_id: defaultActivity.child_id

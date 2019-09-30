@@ -14,10 +14,11 @@ describe('Models: PhysicalActivity', () => {
         name: 'walk',
         calories: 250,
         steps: 1000,
+        distance: 1000,
         levels: [new PhysicalActivityLevel(ActivityLevelType.SEDENTARY, Math.floor((Math.random() * 10) * 60000)),
-                 new PhysicalActivityLevel(ActivityLevelType.LIGHTLY, Math.floor((Math.random() * 10) * 60000)),
-                 new PhysicalActivityLevel(ActivityLevelType.FAIRLY, Math.floor((Math.random() * 10) * 60000)),
-                 new PhysicalActivityLevel(ActivityLevelType.VERY, Math.floor((Math.random() * 10) * 60000))]
+            new PhysicalActivityLevel(ActivityLevelType.LIGHTLY, Math.floor((Math.random() * 10) * 60000)),
+            new PhysicalActivityLevel(ActivityLevelType.FAIRLY, Math.floor((Math.random() * 10) * 60000)),
+            new PhysicalActivityLevel(ActivityLevelType.VERY, Math.floor((Math.random() * 10) * 60000))]
     }
 
     describe('convertDatetimeString(value: string)', () => {
@@ -49,6 +50,7 @@ describe('Models: PhysicalActivity', () => {
                 assert.propertyVal(result, 'name', activityJSON.name)
                 assert.propertyVal(result, 'calories', activityJSON.calories)
                 assert.propertyVal(result, 'steps', activityJSON.steps)
+                assert.propertyVal(result, 'distance', activityJSON.distance)
                 // PhysicalActivity levels
                 assert.deepPropertyVal(result, 'levels', activityJSON.levels)
                 assert.deepPropertyVal(result, 'heart_rate', activityJSON.heart_rate)
@@ -66,6 +68,7 @@ describe('Models: PhysicalActivity', () => {
                 assert.isUndefined(result.name)
                 assert.isUndefined(result.calories)
                 assert.isUndefined(result.steps)
+                assert.isUndefined(result.distance)
                 assert.isUndefined(result.levels)
                 assert.isUndefined(result.heart_rate)
             })
@@ -80,6 +83,7 @@ describe('Models: PhysicalActivity', () => {
                 assert.propertyVal(result, 'name', activityJSON.name)
                 assert.propertyVal(result, 'calories', activityJSON.calories)
                 assert.propertyVal(result, 'steps', activityJSON.steps)
+                assert.propertyVal(result, 'distance', activityJSON.distance)
                 // PhysicalActivity levels
                 assert.deepPropertyVal(result, 'levels', activityJSON.levels)
                 assert.deepPropertyVal(result, 'heart_rate', activityJSON.heart_rate)
@@ -98,6 +102,7 @@ describe('Models: PhysicalActivity', () => {
                 assert.propertyVal(result, 'name', activityJSON.name)
                 assert.propertyVal(result, 'calories', activityJSON.calories)
                 assert.propertyVal(result, 'steps', activityJSON.steps)
+                assert.propertyVal(result, 'distance', activityJSON.distance)
                 // PhysicalActivity levels
                 // Level 1
                 assert.propertyVal(result.levels![0], 'name', activityJSON.levels[0].name)
