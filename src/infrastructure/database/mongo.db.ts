@@ -96,7 +96,10 @@ export class MongoDB implements IDatabase {
      * @return {Promise<void>}
      */
     public async dispose(): Promise<void> {
-        if (this._connection) await this._connection.close()
+        if (this._connection) {
+            this._connection.removeAllListeners()
+            await this._connection.close()
+        }
         this._connection = undefined
     }
 }
