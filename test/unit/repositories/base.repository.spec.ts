@@ -47,7 +47,7 @@ describe('Repositories: BaseRepository', () => {
     })
 
     describe('create(item: T)', () => {
-        context('when create a item with success', () => {
+        context('when create an item with success', () => {
             it('should return a sleep object.', () => {
 
                 sinon
@@ -121,7 +121,7 @@ describe('Repositories: BaseRepository', () => {
         })
 
         context('when there are no sleep activities in database', () => {
-            it('should return a empty list', () => {
+            it('should return an empty list', () => {
                 sinon
                     .mock(modelFake)
                     .expects('find')
@@ -168,7 +168,7 @@ describe('Repositories: BaseRepository', () => {
     describe('findOne(query: IQuery)', () => {
         queryMock.filters = { id: defaultSleep.id }
 
-        it('should return a unique sleep', () => {
+        it('should return an unique sleep', () => {
             sinon
                 .mock(modelFake)
                 .expects('findOne')

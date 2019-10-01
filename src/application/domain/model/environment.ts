@@ -13,12 +13,12 @@ import { Measurement } from './measurement'
  * @implements {IJSONSerializable, IJSONDeserializable<Environment>}
  */
 export class Environment extends Entity implements IJSONSerializable, IJSONDeserializable<Environment> {
-    private _institution_id?: string // Id of institution associated with a environment.
-    private _location?: Location // Sensor Location
-    private _measurements?: Array<Measurement> // Associated Measurements
-    private _climatized?: boolean // Boolean variable to identify if a environment is climatized.
+    private _institution_id?: string // Id of institution associated with an environment.
+    private _location?: Location // Sensor Location.
+    private _measurements?: Array<Measurement> // Associated Measurements.
+    private _climatized?: boolean // Boolean variable to identify if an environment is climatized.
     private _timestamp!: Date // Timestamp according to the UTC.
-    private _isFromEventBus: boolean // Boolean that defines whether the object comes from the event bus or not
+    private _isFromEventBus: boolean // Boolean that defines whether the object comes from the event bus or not.
 
     constructor() {
         super()

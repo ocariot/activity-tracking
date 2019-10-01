@@ -73,7 +73,7 @@ describe('Validators: CreatePhysicalActivityValidator', () => {
                     CreatePhysicalActivityValidator.validate(activity)
                 } catch (err) {
                     assert.equal(err.message, 'Date field is invalid...')
-                    assert.equal(err.description, 'Date validation failed: The end_time parameter can not contain a older date ' +
+                    assert.equal(err.description, 'Date validation failed: The end_time parameter can not contain an older date ' +
                         'than that the start_time parameter!')
                 }
             })

@@ -132,7 +132,7 @@ describe('Mappers: PhysicalActivityEntityMapper', () => {
             })
         })
 
-        context('when the parameter is a undefined', () => {
+        context('when the parameter is an undefined', () => {
             it('should normally execute the method, returning an empty PhysicalActivity as a result of the transformation', () => {
                 const result: PhysicalActivity = new PhysicalActivityEntityMapper().transform(undefined)
 

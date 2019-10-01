@@ -88,51 +88,6 @@ describe('Routes: environments', () => {
     /**
      * POST route with only one Environment in the body
      */
-    describe('NO CONNECTION TO RABBITMQ -> POST /v1/environments with only one Environment in the body', () => {
-        context('when posting a new Environment with success', () => {
-            before(async () => {
-                try {
-                    await deleteAllEnvironments()
-                } catch (err) {
-                    throw new Error('Failure on environments routes test: ' + err.message)
-                }
-            })
-            it('should return status code 201 and the saved Environment (and show an error log about unable to send ' +
-                'SaveEnvironment event)', () => {
-                const body = {
-                    institution_id: defaultEnvironment.institution_id,
-                    location: defaultEnvironment.location,
-                    measurements: defaultEnvironment.measurements,
-                    climatized: defaultEnvironment.climatized,
-                    timestamp: defaultEnvironment.timestamp
-                }
-
-                return request
-                    .post('/v1/environments')
-                    .send(body)
-                    .set('Content-Type', 'application/json')
-                    .expect(201)
-                    .then(res => {
-                        expect(res.body).to.have.property('id')
-                        expect(res.body.institution_id).to.eql(defaultEnvironment.institution_id)
-                        expect(res.body.location.local).to.eql(defaultEnvironment.location!.local)
-                        expect(res.body.location.room).to.eql(defaultEnvironment.location!.room)
-                        expect(res.body.location.latitude).to.eql(defaultEnvironment.location!.latitude)
-                        expect(res.body.location.longitude).to.eql(defaultEnvironment.location!.longitude)
-                        let index = 0
-                        for (const measurement of res.body.measurements) {
-                            expect(measurement.type).to.eql(defaultEnvironment.measurements![index].type)
-                            expect(measurement.value).to.eql(defaultEnvironment.measurements![index].value)
-                            expect(measurement.unit).to.eql(defaultEnvironment.measurements![index].unit)
-                            index++
-                        }
-                        expect(res.body.climatized).to.eql(defaultEnvironment.climatized)
-                        expect(res.body.timestamp).to.eql(defaultEnvironment.timestamp.toISOString())
-                    })
-            })
-        })
-    })
-
     describe('RABBITMQ PUBLISHER -> POST /v1/environments with only one Environment in the body', () => {
         context('when posting a new Environment with success and publishing it to the bus', () => {
             const body = {
@@ -206,7 +161,7 @@ describe('Routes: environments', () => {
     })
 
     describe('POST /v1/environments with only one Environment in the body', () => {
-        context('when posting a new Environment with success', () => {
+        context('when posting a new Environment with success (there is no connection to RabbitMQ)', () => {
             before(async () => {
                 try {
                     await deleteAllEnvironments()
@@ -214,7 +169,8 @@ describe('Routes: environments', () => {
                     throw new Error('Failure on environments routes test: ' + err.message)
                 }
             })
-            it('should return status code 201 and the saved Environment', () => {
+            it('should return status code 201 and the saved Environment (and show an error log about unable to send ' +
+                'SaveEnvironment event)', () => {
                 const body = {
                     institution_id: defaultEnvironment.institution_id,
                     location: defaultEnvironment.location,
@@ -839,49 +795,6 @@ describe('Routes: environments', () => {
     /**
      * DELETE route
      */
-    describe('NO CONNECTION TO RABBITMQ -> DELETE /v1/environments/:environment_id', () => {
-        context('when the environment was deleted successfully', () => {
-            let result
-
-            before(async () => {
-                try {
-                    await deleteAllEnvironments()
-
-                    result = await createEnvironment({
-                        institution_id: defaultEnvironment.institution_id,
-                        location: defaultEnvironment.location,
-                        measurements: [
-                            {
-                                type: MeasurementType.HUMIDITY,
-                                value: 34,
-                                unit: '%'
-                            },
-                            {
-                                type: MeasurementType.TEMPERATURE,
-                                value: 40,
-                                unit: '°C'
-                            }
-                        ],
-                        climatized: defaultEnvironment.climatized,
-                        timestamp: defaultEnvironment.timestamp
-                    })
-                } catch (err) {
-                    throw new Error('Failure on environments routes test: ' + err.message)
-                }
-            })
-            it('should return status code 204 and no content for environment (and show an error log about unable to send ' +
-                'DeleteEnvironment event)', () => {
-                return request
-                    .delete(`/v1/environments/${result.id}`)
-                    .set('Content-Type', 'application/json')
-                    .expect(204)
-                    .then(res => {
-                        expect(res.body).to.eql({})
-                    })
-            })
-        })
-    })
-
     describe('RABBITMQ PUBLISHER -> DELETE /v1/environments/:environment_id', () => {
         context('when the environment was deleted successfully and your ID is published on the bus', () => {
             let result
@@ -953,10 +866,10 @@ describe('Routes: environments', () => {
     })
 
     describe('DELETE /v1/environments/:environment_id', () => {
-        context('when the environment was deleted successfully', () => {
-            it('should return status code 204 and no content for environment', async () => {
-                let result
+        context('when the environment was deleted successfully (there is no connection to RabbitMQ)', () => {
+            let result
 
+            before(async () => {
                 try {
                     await deleteAllEnvironments()
 
@@ -981,7 +894,9 @@ describe('Routes: environments', () => {
                 } catch (err) {
                     throw new Error('Failure on environments routes test: ' + err.message)
                 }
-
+            })
+            it('should return status code 204 and no content for environment (and show an error log about unable to send ' +
+                'DeleteEnvironment event)', async () => {
                 return request
                     .delete(`/v1/environments/${result.id}`)
                     .set('Content-Type', 'application/json')

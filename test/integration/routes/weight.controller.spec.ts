@@ -68,41 +68,6 @@ describe('Routes: children.weights', () => {
     /**
      * POST route with only one Weight in the body
      */
-    describe('NO CONNECTION TO RABBITMQ -> POST /v1/children/:child_id/weights with only one Weight in the body', () => {
-        context('when posting a new Weight with success', () => {
-            before(async () => {
-                try {
-                    await deleteAllWeights()
-                } catch (err) {
-                    throw new Error('Failure on children.weights routes test: ' + err.message)
-                }
-            })
-            it('should return status code 201 and the saved Weight (and show an error log about unable to send ' +
-                'SaveWeight event)', () => {
-                const body = {
-                    timestamp: defaultWeight.timestamp,
-                    value: defaultWeight.value,
-                    unit: defaultWeight.unit,
-                    body_fat: defaultWeight.value
-                }
-
-                return request
-                    .post(`/v1/children/${defaultWeight.child_id}/weights`)
-                    .send(body)
-                    .set('Content-Type', 'application/json')
-                    .expect(201)
-                    .then(res => {
-                        expect(res.body).to.have.property('id')
-                        expect(res.body.timestamp).to.eql(defaultWeight.timestamp!.toISOString())
-                        expect(res.body.value).to.eql(defaultWeight.value)
-                        expect(res.body.unit).to.eql(defaultWeight.unit)
-                        expect(res.body.child_id).to.eql(defaultWeight.child_id)
-                        expect(res.body.body_fat).to.eql(defaultWeight.value)
-                    })
-            })
-        })
-    })
-
     describe('RABBITMQ PUBLISHER -> POST /v1/children/:child_id/weights with only one Weight in the body', () => {
         context('when posting a new Weight with success and publishing it to the bus', () => {
             const body = {
@@ -166,7 +131,7 @@ describe('Routes: children.weights', () => {
     })
 
     describe('POST /v1/children/:child_id/weights with only one Weight in the body', () => {
-        context('when posting a new Weight with success', () => {
+        context('when posting a new Weight with success (there is no connection to RabbitMQ)', () => {
             before(async () => {
                 try {
                     await deleteAllWeights()
@@ -174,7 +139,8 @@ describe('Routes: children.weights', () => {
                     throw new Error('Failure on children.weights routes test: ' + err.message)
                 }
             })
-            it('should return status code 201 and the saved Weight', () => {
+            it('should return status code 201 and the saved Weight (and show an error log about unable to send ' +
+                'SaveWeight event)', () => {
                 const body = {
                     timestamp: defaultWeight.timestamp,
                     value: defaultWeight.value,
@@ -907,45 +873,6 @@ describe('Routes: children.weights', () => {
     /**
      * DELETE route
      */
-    describe('NO CONNECTION TO RABBITMQ -> DELETE /v1/children/:child_id/weights/:weight_id', () => {
-        context('when the Weight was deleted successfully', () => {
-            let result
-
-            before(async () => {
-                try {
-                    await deleteAllWeights()
-
-                    const bodyFat = await createBodyFat({
-                        timestamp: defaultWeight.timestamp,
-                        value: defaultWeight.body_fat!.value,
-                        unit: defaultWeight.body_fat!.unit,
-                        child_id: defaultWeight.child_id
-                    })
-
-                    result = await createWeight({
-                        timestamp: defaultWeight.timestamp,
-                        value: defaultWeight.value,
-                        unit: defaultWeight.unit,
-                        child_id: defaultWeight.child_id,
-                        body_fat: bodyFat
-                    })
-                } catch (err) {
-                    throw new Error('Failure on children.weights routes test: ' + err.message)
-                }
-            })
-            it('should return status code 204 and no content for Weight (and show an error log about unable to send ' +
-                'DeleteWeight event)', () => {
-                return request
-                    .delete(`/v1/children/${result.child_id}/weights/${result.id}`)
-                    .set('Content-Type', 'application/json')
-                    .expect(204)
-                    .then(res => {
-                        expect(res.body).to.eql({})
-                    })
-            })
-        })
-    })
-
     describe('RABBITMQ PUBLISHER -> DELETE /v1/children/:child_id/weights/:weight_id', () => {
         context('when the Weight was deleted successfully and your ID is published on the bus', () => {
             let result
@@ -1013,7 +940,7 @@ describe('Routes: children.weights', () => {
     })
 
     describe('DELETE /v1/children/:child_id/weights/:weight_id', () => {
-        context('when the Weight was deleted successfully', () => {
+        context('when the Weight was deleted successfully (there is no connection to RabbitMQ)', () => {
             let result
 
             before(async () => {
@@ -1039,7 +966,8 @@ describe('Routes: children.weights', () => {
                 }
             })
 
-            it('should return status code 204 and no content for Weight', async () => {
+            it('should return status code 204 and no content for Weight (and show an error log about unable to send ' +
+                'DeleteWeight event)', async () => {
                 return request
                     .delete(`/v1/children/${result.child_id}/weights/${result.id}`)
                     .set('Content-Type', 'application/json')

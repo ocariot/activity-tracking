@@ -63,7 +63,7 @@ describe('Mappers: LogEntityMapper', () => {
             })
         })
 
-        context('when the parameter is a undefined', () => {
+        context('when the parameter is an undefined', () => {
             it('should normally execute the method, returning an empty Log as a result of the transformation', () => {
                 const result: Log = new LogEntityMapper().transform(undefined)
 

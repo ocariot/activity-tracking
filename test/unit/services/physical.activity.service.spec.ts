@@ -253,7 +253,7 @@ describe('Services: PhysicalActivityService', () => {
                 } catch (err) {
                     assert.propertyVal(err, 'message', 'Date field is invalid...')
                     assert.propertyVal(err, 'description', 'Date validation failed: The end_time parameter can not contain ' +
-                        'a older date than that the start_time parameter!')
+                        'an older date than that the start_time parameter!')
                 }
             })
         })
@@ -544,7 +544,7 @@ describe('Services: PhysicalActivityService', () => {
                             'name, calories is required!')
                         assert.propertyVal(result.error[2], 'message', 'Date field is invalid...')
                         assert.propertyVal(result.error[2], 'description', 'Date validation failed: ' +
-                            'The end_time parameter can not contain a older date than that the start_time parameter!')
+                            'The end_time parameter can not contain an older date than that the start_time parameter!')
                         assert.propertyVal(result.error[3], 'message', 'Duration field is invalid...')
                         assert.propertyVal(result.error[3], 'description', 'Duration validation failed: ' +
                             'Activity duration value does not match values passed in start_time and end_time parameters!')

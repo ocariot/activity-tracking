@@ -155,49 +155,6 @@ describe('Routes: children.sleep', () => {
     /**
      * POST route with only one Sleep in the body
      */
-    describe('NO CONNECTION TO RABBITMQ -> POST /v1/children/:child_id/sleep with only one Sleep in the body', () => {
-        context('when posting a new Sleep with success', () => {
-            before(async () => {
-                try {
-                    await deleteAllSleep()
-                } catch (err) {
-                    throw new Error('Failure on children.sleep routes test: ' + err.message)
-                }
-            })
-            it('should return status code 201 and the saved Sleep (and show an error log about unable to send ' +
-                'SaveSleep event)', () => {
-                const body = {
-                    start_time: defaultSleep.start_time,
-                    end_time: defaultSleep.end_time,
-                    duration: defaultSleep.duration,
-                    pattern: defaultSleep.pattern,
-                    type: defaultSleep.type
-                }
-
-                return request
-                    .post(`/v1/children/${defaultSleep.child_id}/sleep`)
-                    .send(body)
-                    .set('Content-Type', 'application/json')
-                    .expect(201)
-                    .then(res => {
-                        expect(res.body).to.have.property('id')
-                        expect(res.body.start_time).to.eql(defaultSleep.start_time!.toISOString())
-                        expect(res.body.end_time).to.eql(defaultSleep.end_time!.toISOString())
-                        expect(res.body.duration).to.eql(defaultSleep.duration)
-                        let index = 0
-                        for (const elem of defaultSleep.pattern!.data_set) {
-                            expect(res.body.pattern.data_set[index].start_time).to.eql(elem.start_time.toISOString())
-                            expect(res.body.pattern.data_set[index].name).to.eql(elem.name)
-                            expect(res.body.pattern.data_set[index].duration).to.eql(elem.duration)
-                            index++
-                        }
-                        expect(res.body.type).to.eql(defaultSleep.type)
-                        expect(res.body.child_id).to.eql(defaultSleep.child_id)
-                    })
-            })
-        })
-    })
-
     describe('RABBITMQ PUBLISHER -> POST /v1/children/:child_id/sleep with only one Sleep in the body', () => {
         context('when posting a new Sleep with success and publishing it to the bus', () => {
             const body = {
@@ -269,7 +226,7 @@ describe('Routes: children.sleep', () => {
     })
 
     describe('POST /v1/children/:child_id/sleep with only one Sleep in the body', () => {
-        context('when posting a new Sleep with success', () => {
+        context('when posting a new Sleep with success (there is no connection to RabbitMQ)', () => {
             before(async () => {
                 try {
                     await deleteAllSleep()
@@ -277,7 +234,8 @@ describe('Routes: children.sleep', () => {
                     throw new Error('Failure on children.sleep routes test: ' + err.message)
                 }
             })
-            it('should return status code 201 and the saved Sleep', () => {
+            it('should return status code 201 and the saved Sleep (and show an error log about unable to send ' +
+                'SaveSleep event)', () => {
                 const body = {
                     start_time: defaultSleep.start_time,
                     end_time: defaultSleep.end_time,
@@ -414,7 +372,7 @@ describe('Routes: children.sleep', () => {
                         expect(err.body.code).to.eql(400)
                         expect(err.body.message).to.eql('Date field is invalid...')
                         expect(err.body.description).to.eql('Date validation failed: The end_time parameter can not ' +
-                            'contain a older date than that the start_time parameter!')
+                            'contain an older date than that the start_time parameter!')
                     })
             })
         })
@@ -899,7 +857,7 @@ describe('Routes: children.sleep', () => {
                         expect(res.body.error[1].description).to.eql('Sleep validation failed: type, pattern is required!')
                         expect(res.body.error[2].message).to.eql('Date field is invalid...')
                         expect(res.body.error[2].description).to.eql('Date validation failed: The end_time parameter can not contain ' +
-                            'a older date than that the start_time parameter!')
+                            'an older date than that the start_time parameter!')
                         expect(res.body.error[3].message).to.eql('Duration field is invalid...')
                         expect(res.body.error[3].description).to.eql('Duration validation failed: Activity duration value does not ' +
                             'match values passed in start_time and end_time parameters!')
@@ -1406,55 +1364,6 @@ describe('Routes: children.sleep', () => {
     /**
      * PATCH route
      */
-    describe('NO CONNECTION TO RABBITMQ -> PATCH /v1/children/:child_id/sleep/:sleep_id', () => {
-        context('when this sleep exists in the database and is updated successfully', () => {
-            let result
-
-            before(async () => {
-                try {
-                    await deleteAllSleep()
-
-                    // Sleep to be updated
-                    result = await createSleepToBeUpdated(defaultSleep)
-                } catch (err) {
-                    throw new Error('Failure on children.sleep routes test: ' + err.message)
-                }
-            })
-            it('should return status code 200 and the updated Sleep (and show an error log about unable to send ' +
-                'UpdateSleep event)', () => {
-                // Sleep to update
-                const body = {
-                    start_time: otherSleep.start_time,
-                    end_time: otherSleep.end_time,
-                    duration: otherSleep.duration,
-                    pattern: defaultSleep.pattern,
-                    type: defaultSleep.type
-                }
-
-                return request
-                    .patch(`/v1/children/${result.child_id}/sleep/${result.id}`)
-                    .send(body)
-                    .set('Content-Type', 'application/json')
-                    .expect(200)
-                    .then(res => {
-                        expect(res.body).to.have.property('id')
-                        expect(res.body.start_time).to.eql(otherSleep.start_time!.toISOString())
-                        expect(res.body.end_time).to.eql(otherSleep.end_time!.toISOString())
-                        expect(res.body.duration).to.eql(otherSleep.duration)
-                        let index = 0
-                        for (const elem of defaultSleep.pattern!.data_set) {
-                            expect(res.body.pattern.data_set[index].start_time).to.eql(elem.start_time.toISOString())
-                            expect(res.body.pattern.data_set[index].name).to.eql(elem.name)
-                            expect(res.body.pattern.data_set[index].duration).to.eql(elem.duration)
-                            index++
-                        }
-                        expect(res.body.type).to.eql(defaultSleep.type)
-                        expect(res.body.child_id).to.eql(defaultSleep.child_id)
-                    })
-            })
-        })
-    })
-
     describe('RABBITMQ PUBLISHER -> PATCH /v1/children/:child_id/sleep/:sleep_id', () => {
         context('when this sleep exists in the database, is updated successfully and published to the bus', () => {
             // Sleep to update
@@ -1532,7 +1441,8 @@ describe('Routes: children.sleep', () => {
     })
 
     describe('PATCH /v1/children/:child_id/sleep/:sleep_id', () => {
-        context('when this sleep exists in the database and is updated successfully', () => {
+        context('when this sleep exists in the database and is updated successfully (there is no connection to RabbitMQ)',
+            () => {
             let result
 
             before(async () => {
@@ -1546,7 +1456,8 @@ describe('Routes: children.sleep', () => {
                 }
             })
 
-            it('should return status code 200 and the updated Sleep', async () => {
+            it('should return status code 200 and the updated Sleep (and show an error log about unable to send ' +
+                'UpdateSleep event)', async () => {
                 // Sleep to update
                 const body = {
                     start_time: otherSleep.start_time,
@@ -2009,40 +1920,6 @@ describe('Routes: children.sleep', () => {
     /**
      * DELETE route
      */
-    describe('NO CONNECTION TO RABBITMQ -> DELETE /v1/children/:child_id/sleep/:sleep_id', () => {
-        context('when the sleep was deleted successfully', () => {
-            let result
-
-            before(async () => {
-                try {
-                    await deleteAllSleep()
-
-                    result = await createSleep({
-                        start_time: defaultSleep.start_time,
-                        end_time: defaultSleep.end_time,
-                        duration: defaultSleep.duration,
-                        pattern: defaultSleep.pattern!.data_set,
-                        type: defaultSleep.type,
-                        child_id: defaultSleep.child_id
-                    })
-                } catch (err) {
-                    throw new Error('Failure on children.sleep routes test: ' + err.message)
-                }
-            })
-
-            it('should return status code 204 and no content for sleep (and show an error log about unable to send ' +
-                'DeleteSleep event)', () => {
-                return request
-                    .delete(`/v1/children/${result.child_id}/sleep/${result.id}`)
-                    .set('Content-Type', 'application/json')
-                    .expect(204)
-                    .then(res => {
-                        expect(res.body).to.eql({})
-                    })
-            })
-        })
-    })
-
     describe('RABBITMQ PUBLISHER -> DELETE /v1/children/:child_id/sleep/:sleep_id', () => {
         context('when the sleep was deleted successfully and your ID is published on the bus', () => {
             let result
@@ -2104,7 +1981,7 @@ describe('Routes: children.sleep', () => {
     })
 
     describe('DELETE /v1/children/:child_id/sleep/:sleep_id', () => {
-        context('when the sleep was deleted successfully', () => {
+        context('when the sleep was deleted successfully (there is no connection to RabbitMQ)', () => {
             let result
 
             before(async () => {
@@ -2124,7 +2001,8 @@ describe('Routes: children.sleep', () => {
                 }
             })
 
-            it('should return status code 204 and no content for sleep', async () => {
+            it('should return status code 204 and no content for sleep (and show an error log about unable to send ' +
+                'DeleteSleep event)', async () => {
                 return request
                     .delete(`/v1/children/${result.child_id}/sleep/${result.id}`)
                     .set('Content-Type', 'application/json')
