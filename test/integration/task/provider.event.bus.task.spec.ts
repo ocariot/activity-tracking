@@ -138,7 +138,7 @@ describe('PROVIDER EVENT BUS TASK', () => {
                     await deleteAllActivities()
 
                     const activity1: PhysicalActivity = new PhysicalActivityMock()
-                    activity1.start_time = new Date(1516417200000  + Math.floor((Math.random() * 1000)))
+                    activity1.start_time = new Date(1516417200000)
                     activity1.end_time = new Date(new Date(activity1.start_time)
                         .setMilliseconds(Math.floor(Math.random() * 35 + 10) * 60000)) // 10-45min in milliseconds
                     activity1.duration = 900000
@@ -149,7 +149,7 @@ describe('PROVIDER EVENT BUS TASK', () => {
                     activity1.heart_rate!.average = 80
 
                     const activity2: PhysicalActivity = new PhysicalActivityMock()
-                    activity2.start_time = new Date(1516417200000  + Math.floor((Math.random() * 1000)))
+                    activity2.start_time = new Date(1516449600000)
                     activity2.end_time = new Date(new Date(activity2.start_time)
                         .setMilliseconds(Math.floor(Math.random() * 35 + 10) * 60000))
                     activity2.duration = 899999
@@ -160,7 +160,7 @@ describe('PROVIDER EVENT BUS TASK', () => {
                     activity2.heart_rate!.average = 90
 
                     const activity3: PhysicalActivity = new PhysicalActivityMock()
-                    activity3.start_time = new Date(1516417200000  + Math.floor((Math.random() * 1000)))
+                    activity3.start_time = new Date(1516471200000)
                     activity3.end_time = new Date(new Date(activity3.start_time)
                         .setMilliseconds(Math.floor(Math.random() * 35 + 10) * 60000))
                     activity3.duration = 899999
@@ -171,7 +171,7 @@ describe('PROVIDER EVENT BUS TASK', () => {
                     activity3.heart_rate!.average = 78
 
                     const activity4: PhysicalActivity = new PhysicalActivityMock()
-                    activity4.start_time = new Date(1547953200000 + Math.floor((Math.random() * 1000)))
+                    activity4.start_time = new Date(1547953200000)
                     activity4.end_time = new Date(new Date(activity4.start_time)
                         .setMilliseconds(Math.floor(Math.random() * 35 + 10) * 60000))
                     activity4.duration = 920000
@@ -182,7 +182,7 @@ describe('PROVIDER EVENT BUS TASK', () => {
                     activity4.heart_rate!.average = 105
 
                     const activity5: PhysicalActivity = new PhysicalActivityMock()
-                    activity5.start_time = new Date(1547953200000 + Math.floor((Math.random() * 1000)))
+                    activity5.start_time = new Date(1547985600000)
                     activity5.end_time = new Date(new Date(activity5.start_time)
                         .setMilliseconds(Math.floor(Math.random() * 35 + 10) * 60000))
                     activity5.duration = 930000
@@ -193,7 +193,7 @@ describe('PROVIDER EVENT BUS TASK', () => {
                     activity5.heart_rate!.average = 115
 
                     const activity6: PhysicalActivity = new PhysicalActivityMock()
-                    activity6.start_time = new Date(1547953200000 + Math.floor((Math.random() * 1000)))
+                    activity6.start_time = new Date(1548007200000)
                     activity6.end_time = new Date(new Date(activity6.start_time)
                         .setMilliseconds(Math.floor(Math.random() * 35 + 10) * 60000))
                     activity6.duration = 820000
@@ -598,42 +598,42 @@ describe('PROVIDER EVENT BUS TASK', () => {
                     await deleteAllSleep()
 
                     const sleep1: Sleep = new SleepMock()
-                    sleep1.start_time = new Date(1516417200000  + Math.floor((Math.random() * 1000)))
+                    sleep1.start_time = new Date(1516417200000)
                     sleep1.end_time = new Date(new Date(sleep1.start_time)
                         .setMilliseconds(Math.floor(Math.random() * 35 + 10) * 60000)) // 10-45min in milliseconds
                     sleep1.duration = 28800000
                     sleep1.child_id = '5a62be07d6f33400146c9b61'
 
                     const sleep2: Sleep = new SleepMock()
-                    sleep2.start_time = new Date(1516417200000  + Math.floor((Math.random() * 1000)))
+                    sleep2.start_time = new Date(1516449600000)
                     sleep2.end_time = new Date(new Date(sleep2.start_time)
                         .setMilliseconds(Math.floor(Math.random() * 35 + 10) * 60000))
                     sleep2.duration = 27800000
                     sleep2.child_id = '5a62be07d6f33400146c9b61'
 
                     const sleep3: Sleep = new SleepMock()
-                    sleep3.start_time = new Date(1516417200000  + Math.floor((Math.random() * 1000)))
+                    sleep3.start_time = new Date(1516471200000)
                     sleep3.end_time = new Date(new Date(sleep3.start_time)
                         .setMilliseconds(Math.floor(Math.random() * 35 + 10) * 60000))
                     sleep3.duration = 28810000
                     sleep3.child_id = '5a62be07de34500146d9c544'
 
                     const sleep4: Sleep = new SleepMock()
-                    sleep4.start_time = new Date(1547953200000 + Math.floor((Math.random() * 1000)))
+                    sleep4.start_time = new Date(1547953200000)
                     sleep4.end_time = new Date(new Date(sleep4.start_time)
                         .setMilliseconds(Math.floor(Math.random() * 35 + 10) * 60000))
                     sleep4.duration = 27900000
                     sleep4.child_id = '5a62be07de34500146d9c544'
 
                     const sleep5: Sleep = new SleepMock()
-                    sleep5.start_time = new Date(1547953200000 + Math.floor((Math.random() * 1000)))
+                    sleep5.start_time = new Date(1547985600000)
                     sleep5.end_time = new Date(new Date(sleep5.start_time)
                         .setMilliseconds(Math.floor(Math.random() * 35 + 10) * 60000))
                     sleep5.duration = 27895000
                     sleep5.child_id = '5a62be07d6f33400146c9b61'
 
                     const sleep6: Sleep = new SleepMock()
-                    sleep6.start_time = new Date(1547953200000 + Math.floor((Math.random() * 1000)))
+                    sleep6.start_time = new Date(1548007200000)
                     sleep6.end_time = new Date(new Date(sleep6.start_time)
                         .setMilliseconds(Math.floor(Math.random() * 35 + 10) * 60000))
                     sleep6.duration = 28820000
@@ -920,32 +920,32 @@ describe('PROVIDER EVENT BUS TASK', () => {
                     await deleteAllWeights()
 
                     const weight1: Weight = new WeightMock()
-                    weight1.timestamp = new Date(1516417200000  + Math.floor((Math.random() * 1000)))
+                    weight1.timestamp = new Date(1516417200000)
                     weight1.value = 60
                     weight1.child_id = '5a62be07d6f33400146c9b61'
 
                     const weight2: Weight = new WeightMock()
-                    weight2.timestamp = new Date(1516417200000  + Math.floor((Math.random() * 1000)))
+                    weight2.timestamp = new Date(1516449600000)
                     weight2.value = 59
                     weight2.child_id = '5a62be07d6f33400146c9b61'
 
                     const weight3: Weight = new WeightMock()
-                    weight3.timestamp = new Date(1516417200000  + Math.floor((Math.random() * 1000)))
+                    weight3.timestamp = new Date(1516471200000)
                     weight3.value = 61
                     weight3.child_id = '5a62be07de34500146d9c544'
 
                     const weight4: Weight = new WeightMock()
-                    weight4.timestamp = new Date(1547953200000 + Math.floor((Math.random() * 1000)))
+                    weight4.timestamp = new Date(1547953200000)
                     weight4.value = 54
                     weight4.child_id = '5a62be07de34500146d9c544'
 
                     const weight5: Weight = new WeightMock()
-                    weight5.timestamp = new Date(1548990000000 + Math.floor((Math.random() * 1000)))
+                    weight5.timestamp = new Date(1547985600000)
                     weight5.value = 64
                     weight5.child_id = '5a62be07d6f33400146c9b61'
 
                     const weight6: Weight = new WeightMock()
-                    weight6.timestamp = new Date(1547953200000 + Math.floor((Math.random() * 1000)))
+                    weight6.timestamp = new Date(1548007200000)
                     weight6.value = 55
                     weight6.child_id = '5a62be07de34500146d9c544'
 
@@ -1202,34 +1202,34 @@ describe('PROVIDER EVENT BUS TASK', () => {
                     environment1.institution_id = '5a62be07d6f33400146c9b61'
                     environment1.location = new Location('Indoor', 'Room 40')
                     environment1.climatized = true
-                    environment1.timestamp = new Date(1547953200000 + Math.floor((Math.random() * 1000)))
+                    environment1.timestamp = new Date(1547953200000)
 
                     const environment2: Environment = new EnvironmentMock()
                     environment2.institution_id = '5a62be07d6f33400146c9b61'
                     environment2.location = new Location('Indoor', 'Room 40')
                     environment2.climatized = true
-                    environment2.timestamp = new Date(1547953200000 + Math.floor((Math.random() * 1000)))
+                    environment2.timestamp = new Date(1547985600000)
 
                     const environment3: Environment = new EnvironmentMock()
                     environment3.institution_id = '5a62be07de34500146d9c544'
                     environment3.climatized = true
-                    environment3.timestamp = new Date(1516417200000  + Math.floor((Math.random() * 1000)))
+                    environment3.timestamp = new Date(1516417200000)
 
                     const environment4: Environment = new EnvironmentMock()
                     environment4.institution_id = '5a62be07de34500146d9c544'
                     environment4.climatized = false
-                    environment4.timestamp = new Date(1516417200000  + Math.floor((Math.random() * 1000)))
+                    environment4.timestamp = new Date(1516449600000)
 
                     const environment5: Environment = new EnvironmentMock()
                     environment5.institution_id = '5a62be07d6f33400146c9b61'
                     environment5.location = new Location('Indoor', 'Room 35')
                     environment5.climatized = true
-                    environment5.timestamp = new Date(1547953200000 + Math.floor((Math.random() * 1000)))
+                    environment5.timestamp = new Date(1548007200000)
 
                     const environment6: Environment = new EnvironmentMock()
                     environment6.institution_id = '5a62be07de34500146d9c544'
                     environment6.climatized = false
-                    environment6.timestamp = new Date(1516417200000  + Math.floor((Math.random() * 1000)))
+                    environment6.timestamp = new Date(1516471200000)
 
                     await environmentRepository.create(environment1)
                     await environmentRepository.create(environment2)
