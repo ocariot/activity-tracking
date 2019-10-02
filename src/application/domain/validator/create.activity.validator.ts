@@ -20,7 +20,7 @@ export class CreateActivityValidator {
                 const durationValidate: number = activity.end_time.getTime() - activity.start_time.getTime()
                 if (durationValidate < 0) {
                     throw new ValidationException('Date field is invalid...',
-                        'Date validation failed: The end_time parameter can not contain a older date than that the start_time parameter!')
+                        'Date validation failed: The end_time parameter can not contain an older date than that the start_time parameter!')
                 }
                 if (activity.duration !== durationValidate) {
                     throw new ValidationException('Duration field is invalid...',

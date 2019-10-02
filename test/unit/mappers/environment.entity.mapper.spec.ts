@@ -69,7 +69,7 @@ describe('Mappers: EnvironmentEntityMapper', () => {
             })
         })
 
-        context('when the parameter is a undefined', () => {
+        context('when the parameter is an undefined', () => {
             it('should normally execute the method, returning an empty Environment as a result of the transformation', () => {
                 const result: Environment = new EnvironmentEntityMapper().transform(undefined)
                 assert.propertyVal(result, 'id', undefined)

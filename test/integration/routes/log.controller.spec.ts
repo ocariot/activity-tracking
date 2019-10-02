@@ -7,31 +7,28 @@ import { LogRepoModel } from '../../../src/infrastructure/database/schema/log.sc
 import { DIContainer } from '../../../src/di/di'
 import { Identifier } from '../../../src/di/identifiers'
 import { App } from '../../../src/app'
-import { PhysicalActivity } from '../../../src/application/domain/model/physical.activity'
-import { PhysicalActivityMock } from '../../mocks/physical.activity.mock'
 import { IDatabase } from '../../../src/infrastructure/port/database.interface'
 import { Default } from '../../../src/utils/default'
+import { LogEntityMapper } from '../../../src/infrastructure/entity/mapper/log.entity.mapper'
 
 const dbConnection: IDatabase = DIContainer.get(Identifier.MONGODB_CONNECTION)
 const app: App = DIContainer.get(Identifier.APP)
 const request = require('supertest')(app.getExpress())
 
 describe('Routes: children.logs', () => {
-
-    // Mock objects for PhysicalActivity routes
-    const defaultActivity: PhysicalActivity = new PhysicalActivityMock()
-
     /**
      * Mock objects for Log routes
      */
-    const correctLogsArr: Array<Log> = new Array<Log>()
-    for (let i = 0; i < 5; i ++) {
-        correctLogsArr.push(new LogMock())
-    }
+    let correctLogsArr: Array<Log> = new Array<Log>()
+    correctLogsArr.push(new LogMock(LogType.STEPS))
+    correctLogsArr.push(new LogMock(LogType.CALORIES))
+    correctLogsArr.push(new LogMock(LogType.ACTIVE_MINUTES))
+    correctLogsArr.push(new LogMock(LogType.LIGHTLY_ACTIVE_MINUTES))
+    correctLogsArr.push(new LogMock(LogType.SEDENTARY_MINUTES))
 
     // Mock correct and incorrect logs array
     const mixedLogsArr: Array<Log> = new Array<Log>()
-    for (let i = 0; i < 3; i ++) {
+    for (let i = 0; i < 3; i++) {
         mixedLogsArr.push(new LogMock())
     }
 
@@ -43,13 +40,13 @@ describe('Routes: children.logs', () => {
     // Mock other incorrect log with negative value
     const logJSON: any = {
         date: '2019-03-18',
-        value: -1000,
+        value: -1000
     }
 
     // Mock other incorrect log with invalid value
     const otherLogJSON: any = {
         date: '2019-03-18',
-        value: 'invalid_value',
+        value: 'invalid_value'
     }
 
     const incorrectLog2: Log = new Log().fromJSON(logJSON)
@@ -60,7 +57,7 @@ describe('Routes: children.logs', () => {
     // Start services
     before(async () => {
         try {
-            await dbConnection.connect(process.env.MONGODB_URI_TEST || Default.MONGODB_URI_TEST)
+            await dbConnection.connect(process.env.MONGODB_URI_TEST || Default.MONGODB_URI_TEST, { interval: 100 })
             await deleteAllLogs()
         } catch (err) {
             throw new Error('Failure on children.logs routes test: ' + err.message)
@@ -88,9 +85,8 @@ describe('Routes: children.logs', () => {
                     throw new Error('Failure on children.logs routes test: ' + err.message)
                 }
             })
-
-            it('should return status code 201 and a response of type MultiStatus<Log> with the description of success in ' +
-                'sending each log', async () => {
+            it('should return status code 207 and a response of type MultiStatus<Log> with the description of success in ' +
+                'sending each log', () => {
                 const body: any = []
 
                 correctLogsArr.forEach(log => {
@@ -102,7 +98,7 @@ describe('Routes: children.logs', () => {
                 })
 
                 return request
-                    .post(`/v1/children/${defaultActivity.child_id}/logs/${LogType.STEPS}`)
+                    .post(`/v1/children/${correctLogsArr[0].child_id}/logs/${LogType.STEPS}`)
                     .send(body)
                     .set('Content-Type', 'application/json')
                     .expect(207)
@@ -118,38 +114,134 @@ describe('Routes: children.logs', () => {
         })
 
         context('when all the logs in the body are correct and already exist in the repository', () => {
-            it('should return status code 201, update the value of items in the repository and return a response of type ' +
-                'MultiStatus<Log> with the description of success in sending each log', async () => {
-                const body: any = []
+            before(async () => {
+                try {
+                    await deleteAllLogs()
 
-                correctLogsArr.forEach(log => {
-                    const bodyElem = {
-                        date: log.date,
-                        value: log.value,
+                    for (const log of correctLogsArr) {
+                        await createLog({
+                            type: log.type,
+                            date: new Date(log.date),
+                            value: log.value,
+                            child_id: log.child_id
+                        })
                     }
-                    body.push(bodyElem)
-                })
+                } catch (err) {
+                    throw new Error('Failure on children.logs routes test: ' + err.message)
+                }
+            })
+            it('should return status code 207, update the \'steps\' item value in the repository and ' +
+                'return a response of type MultiStatus<Log> with the description of success in sending log', () => {
+                const body: any = [{
+                    date: correctLogsArr[0].date,
+                    value: correctLogsArr[0].value
+                }]
 
-                return request
-                    .post(`/v1/children/${defaultActivity.child_id}/logs/${LogType.STEPS}`)
+                request
+                    .post(`/v1/children/${correctLogsArr[0].child_id}/logs/${correctLogsArr[0].type}`)
                     .send(body)
                     .set('Content-Type', 'application/json')
                     .expect(207)
                     .then(res => {
-                        for (let i = 0; i < res.body.success.length; i++) {
-                            expect(res.body.success[i].code).to.eql(HttpStatus.CREATED)
-                            expect(res.body.success[i].item.date).to.eql(correctLogsArr[i].date)
-                            expect(res.body.success[i].item.value).to.eql(correctLogsArr[i].value)
-                        }
+                        expect(res.body.success[0].code).to.eql(HttpStatus.CREATED)
+                        expect(res.body.success[0].item.date).to.eql(correctLogsArr[0].date)
+                        expect(res.body.success[0].item.value).to.eql(correctLogsArr[0].value)
+                        expect(res.body.error.length).to.eql(0)
+                    })
+            })
+
+            it('should return status code 207, update the \'calories\' item value in the repository and ' +
+                'return a response of type MultiStatus<Log> with the description of success in sending log', () => {
+                const body: any = [{
+                    date: correctLogsArr[1].date,
+                    value: correctLogsArr[1].value
+                }]
+
+                request
+                    .post(`/v1/children/${correctLogsArr[1].child_id}/logs/${correctLogsArr[1].type}`)
+                    .send(body)
+                    .set('Content-Type', 'application/json')
+                    .expect(207)
+                    .then(res => {
+                        expect(res.body.success[0].code).to.eql(HttpStatus.CREATED)
+                        expect(res.body.success[0].item.date).to.eql(correctLogsArr[1].date)
+                        expect(res.body.success[0].item.value).to.eql(correctLogsArr[1].value)
+                        expect(res.body.error.length).to.eql(0)
+                    })
+            })
+
+            it('should return status code 207, update the \'active_minutes\' item value in the repository and ' +
+                'return a response of type MultiStatus<Log> with the description of success in sending log', () => {
+                const body: any = [{
+                    date: correctLogsArr[2].date,
+                    value: correctLogsArr[2].value
+                }]
+
+                request
+                    .post(`/v1/children/${correctLogsArr[2].child_id}/logs/${correctLogsArr[2].type}`)
+                    .send(body)
+                    .set('Content-Type', 'application/json')
+                    .expect(207)
+                    .then(res => {
+                        expect(res.body.success[0].code).to.eql(HttpStatus.CREATED)
+                        expect(res.body.success[0].item.date).to.eql(correctLogsArr[2].date)
+                        expect(res.body.success[0].item.value).to.eql(correctLogsArr[2].value)
+                        expect(res.body.error.length).to.eql(0)
+                    })
+            })
+
+            it('should return status code 207, update the \'lightly_active_minutes\' item value in the repository ' +
+                'and return a response of type MultiStatus<Log> with the description of success in sending log', () => {
+                const body: any = [{
+                    date: correctLogsArr[3].date,
+                    value: correctLogsArr[3].value
+                }]
+
+                request
+                    .post(`/v1/children/${correctLogsArr[3].child_id}/logs/${correctLogsArr[3].type}`)
+                    .send(body)
+                    .set('Content-Type', 'application/json')
+                    .expect(207)
+                    .then(res => {
+                        expect(res.body.success[0].code).to.eql(HttpStatus.CREATED)
+                        expect(res.body.success[0].item.date).to.eql(correctLogsArr[3].date)
+                        expect(res.body.success[0].item.value).to.eql(correctLogsArr[3].value)
+                        expect(res.body.error.length).to.eql(0)
+                    })
+            })
+
+            it('should return status code 207, update the \'sedentary_minutes\' item value in the repository and ' +
+                'return a response of type MultiStatus<Log> with the description of success in sending log', () => {
+                const body: any = [{
+                    date: correctLogsArr[4].date,
+                    value: correctLogsArr[4].value
+                }]
+
+                request
+                    .post(`/v1/children/${correctLogsArr[4].child_id}/logs/${correctLogsArr[4].type}`)
+                    .send(body)
+                    .set('Content-Type', 'application/json')
+                    .expect(207)
+                    .then(res => {
+                        expect(res.body.success[0].code).to.eql(HttpStatus.CREATED)
+                        expect(res.body.success[0].item.date).to.eql(correctLogsArr[4].date)
+                        expect(res.body.success[0].item.value).to.eql(correctLogsArr[4].value)
                         expect(res.body.error.length).to.eql(0)
                     })
             })
         })
 
         context('when all the logs in the body are correct and have the same date', () => {
-            it('should return status code 201, create or update (if already exists) the first element, update its value ' +
+            before(async () => {
+                try {
+                    await deleteAllLogs()
+                } catch (err) {
+                    throw new Error('Failure on children.logs routes test: ' + err.message)
+                }
+            })
+            it('should return status code 207, create or update (if already exists) the first element, update its value ' +
                 'with the value of the next logs and return a response of type MultiStatus<Log> with the description of success ' +
-                'in sending each log', async () => {
+                'in sending each log', () => {
                 const body: any = []
 
                 correctLogsArr.forEach(log => {
@@ -159,13 +251,13 @@ describe('Routes: children.logs', () => {
                 correctLogsArr.forEach(log => {
                     const bodyElem = {
                         date: log.date,
-                        value: log.value,
+                        value: log.value
                     }
                     body.push(bodyElem)
                 })
 
                 return request
-                    .post(`/v1/children/${defaultActivity.child_id}/logs/${LogType.STEPS}`)
+                    .post(`/v1/children/${correctLogsArr[0].child_id}/logs/${LogType.STEPS}`)
                     .send(body)
                     .set('Content-Type', 'application/json')
                     .expect(207)
@@ -181,8 +273,22 @@ describe('Routes: children.logs', () => {
         })
 
         context('when all the logs in the body are correct and some of them already exist in the repository', () => {
-            it('should return status code 201, update the value of the items already in the repository, create the new ones, ' +
-                'and return a response of type MultiStatus<Log> with the description of success in sending each log', async () => {
+            before(async () => {
+                try {
+                    await deleteAllLogs()
+
+                    await createLog({
+                        type: correctLogsArr[0].type,
+                        date: new Date(correctLogsArr[0].date),
+                        value: correctLogsArr[0].value,
+                        child_id: correctLogsArr[0].child_id
+                    })
+                } catch (err) {
+                    throw new Error('Failure on children.logs routes test: ' + err.message)
+                }
+            })
+            it('should return status code 207, update the value of the items already in the repository, create the new ones, ' +
+                'and return a response of type MultiStatus<Log> with the description of success in sending each log', () => {
                 const newLog: Log = new LogMock()
                 newLog.date = '2019-10-02'
                 correctLogsArr.push(newLog)
@@ -192,13 +298,13 @@ describe('Routes: children.logs', () => {
                 correctLogsArr.forEach(log => {
                     const bodyElem = {
                         date: log.date,
-                        value: log.value,
+                        value: log.value
                     }
                     body.push(bodyElem)
                 })
 
                 return request
-                    .post(`/v1/children/${defaultActivity.child_id}/logs/${LogType.STEPS}`)
+                    .post(`/v1/children/${correctLogsArr[0].child_id}/logs/${correctLogsArr[0].type}`)
                     .send(body)
                     .set('Content-Type', 'application/json')
                     .expect(207)
@@ -214,21 +320,28 @@ describe('Routes: children.logs', () => {
         })
 
         context('when some of the logs in the body are incorrect (the date and value are invalid)', () => {
-            it('should return status code 201, perform the operations of creating and updating normally for the correct logs ' +
+            before(async () => {
+                try {
+                    await deleteAllLogs()
+                } catch (err) {
+                    throw new Error('Failure on children.logs routes test: ' + err.message)
+                }
+            })
+            it('should return status code 207, perform the operations of creating and updating normally for the correct logs ' +
                 'and returning a response of type MultiStatus<Log> with the description of success and error cases of each log',
-                async () => {
+                () => {
                     const body: any = []
 
                     mixedLogsArr.forEach(log => {
                         const bodyElem = {
                             date: log.date,
-                            value: log.value,
+                            value: log.value
                         }
                         body.push(bodyElem)
                     })
 
                     return request
-                        .post(`/v1/children/${defaultActivity.child_id}/logs/${LogType.STEPS}`)
+                        .post(`/v1/children/${mixedLogsArr[0].child_id}/logs/${LogType.STEPS}`)
                         .send(body)
                         .set('Content-Type', 'application/json')
                         .expect(207)
@@ -258,15 +371,22 @@ describe('Routes: children.logs', () => {
         })
 
         context('when some of the logs in the body are incorrect (the child_id is invalid)', () => {
-            it('should return status code 201, perform the operations of creating and updating normally for the correct logs ' +
+            before(async () => {
+                try {
+                    await deleteAllLogs()
+                } catch (err) {
+                    throw new Error('Failure on children.logs routes test: ' + err.message)
+                }
+            })
+            it('should return status code 207, perform the operations of creating and updating normally for the correct logs ' +
                 'and returning a response of type MultiStatus<Log> with the description of success and error cases of each log',
-                async () => {
+                () => {
                     const body: any = []
 
                     correctLogsArr.forEach(log => {
                         const bodyElem = {
                             date: log.date,
-                            value: log.value,
+                            value: log.value
                         }
                         body.push(bodyElem)
                     })
@@ -290,21 +410,28 @@ describe('Routes: children.logs', () => {
         })
 
         context('when some of the logs in the body are incorrect (the type is invalid)', () => {
-            it('should return status code 201, perform the operations of creating and updating normally for the correct logs ' +
+            before(async () => {
+                try {
+                    await deleteAllLogs()
+                } catch (err) {
+                    throw new Error('Failure on children.logs routes test: ' + err.message)
+                }
+            })
+            it('should return status code 207, perform the operations of creating and updating normally for the correct logs ' +
                 'and returning a response of type MultiStatus<Log> with the description of success and error cases of each log',
-                async () => {
+                () => {
                     const body: any = []
 
                     correctLogsArr.forEach(log => {
                         const bodyElem = {
                             date: log.date,
-                            value: log.value,
+                            value: log.value
                         }
                         body.push(bodyElem)
                     })
 
                     return request
-                        .post(`/v1/children/${defaultActivity.child_id}/logs/step`)
+                        .post(`/v1/children/${correctLogsArr[0].child_id}/logs/step`)
                         .send(body)
                         .set('Content-Type', 'application/json')
                         .expect(207)
@@ -325,9 +452,16 @@ describe('Routes: children.logs', () => {
         })
 
         context('when some of the logs in the array are incorrect (missing fields)', () => {
-            it('should return status code 201, perform the operations of creating and updating normally for the correct logs ' +
+            before(async () => {
+                try {
+                    await deleteAllLogs()
+                } catch (err) {
+                    throw new Error('Failure on children.logs routes test: ' + err.message)
+                }
+            })
+            it('should return status code 207, perform the operations of creating and updating normally for the correct logs ' +
                 'and returning a response of type MultiStatus<Log> with the description of success and error cases of each log',
-                async () => {
+                () => {
                     const emptyLog: Log = new Log()
                     correctLogsArr.push(emptyLog)
 
@@ -336,13 +470,13 @@ describe('Routes: children.logs', () => {
                     correctLogsArr.forEach(log => {
                         const bodyElem = {
                             date: log.date,
-                            value: log.value,
+                            value: log.value
                         }
                         body.push(bodyElem)
                     })
 
                     return request
-                        .post(`/v1/children/${defaultActivity.child_id}/logs/${LogType.CALORIES}`)
+                        .post(`/v1/children/${correctLogsArr[0].child_id}/logs/${LogType.CALORIES}`)
                         .send(body)
                         .set('Content-Type', 'application/json')
                         .expect(207)
@@ -363,9 +497,33 @@ describe('Routes: children.logs', () => {
      * GET route for Log
      */
     describe('GET /v1/children/:child_id/logs/date/:date_start/:date_end', () => {
+        before(() => {
+            correctLogsArr = new Array<Log>()
+            correctLogsArr.push(new LogMock(LogType.STEPS))
+            correctLogsArr.push(new LogMock(LogType.CALORIES))
+            correctLogsArr.push(new LogMock(LogType.ACTIVE_MINUTES))
+            correctLogsArr.push(new LogMock(LogType.LIGHTLY_ACTIVE_MINUTES))
+            correctLogsArr.push(new LogMock(LogType.SEDENTARY_MINUTES))
+        })
         context('when the parameters are correct and there are corresponding logs with the query', () => {
-            it('should return status code 200 and a ChildLog with steps and/or calories logs', async () => {
-                const basePath = `/v1/children/${defaultActivity.child_id}/logs`
+            before(async () => {
+                try {
+                    await deleteAllLogs()
+
+                    for (const log of correctLogsArr) {
+                        await createLog({
+                            type: log.type,
+                            date: new Date(log.date),
+                            value: log.value,
+                            child_id: log.child_id
+                        })
+                    }
+                } catch (err) {
+                    throw new Error('Failure on children.logs routes test: ' + err.message)
+                }
+            })
+            it('should return status code 200 and a ChildLog with the log arrays', () => {
+                const basePath = `/v1/children/${correctLogsArr[0].child_id}/logs`
                 const specificPath = `/date/${correctLogsArr[0].date}/${correctLogsArr[0].date}`
                 const url = `${basePath}${specificPath}`
 
@@ -374,15 +532,30 @@ describe('Routes: children.logs', () => {
                     .set('Content-Type', 'application/json')
                     .expect(200)
                     .then(res => {
-                        expect(res.body.steps).is.an.instanceOf(Array)
-                        expect(res.body.calories).is.an.instanceOf(Array)
+                        expect(res.body.steps[0].date).to.be.eql(correctLogsArr[0].date)
+                        expect(res.body.steps[0].value).to.be.eql(correctLogsArr[0].value)
+                        expect(res.body.calories[0].date).to.be.eql(correctLogsArr[1].date)
+                        expect(res.body.calories[0].value).to.be.eql(correctLogsArr[1].value)
+                        expect(res.body.active_minutes[0].date).to.be.eql(correctLogsArr[2].date)
+                        expect(res.body.active_minutes[0].value).to.be.eql(correctLogsArr[2].value)
+                        expect(res.body.lightly_active_minutes[0].date).to.be.eql(correctLogsArr[3].date)
+                        expect(res.body.lightly_active_minutes[0].value).to.be.eql(correctLogsArr[3].value)
+                        expect(res.body.sedentary_minutes[0].date).to.be.eql(correctLogsArr[4].date)
+                        expect(res.body.sedentary_minutes[0].value).to.be.eql(correctLogsArr[4].value)
                     })
             })
         })
 
         context('when the parameters are correct but there are no corresponding logs with the query', () => {
-            it('should return status code 200 and an empty ChildLog', async () => {
-                const basePath = `/v1/children/${defaultActivity.child_id}/logs`
+            before(async () => {
+                try {
+                    await deleteAllLogs()
+                } catch (err) {
+                    throw new Error('Failure on children.logs routes test: ' + err.message)
+                }
+            })
+            it('should return status code 200 and an empty ChildLog', () => {
+                const basePath = `/v1/children/${correctLogsArr[0].child_id}/logs`
                 const specificPath = `/date/2005-10-01/2005-10-10`
                 const url = `${basePath}${specificPath}`
 
@@ -393,12 +566,22 @@ describe('Routes: children.logs', () => {
                     .then(res => {
                         expect(res.body.steps.length).to.eql(0)
                         expect(res.body.calories.length).to.eql(0)
+                        expect(res.body.active_minutes.length).to.eql(0)
+                        expect(res.body.lightly_active_minutes.length).to.eql(0)
+                        expect(res.body.sedentary_minutes.length).to.eql(0)
                     })
             })
         })
 
         context('when the parameters are incorrect (child_id is invalid)', () => {
-            it('should return status code 400 and an info message about the invalid child_id', async () => {
+            before(async () => {
+                try {
+                    await deleteAllLogs()
+                } catch (err) {
+                    throw new Error('Failure on children.logs routes test: ' + err.message)
+                }
+            })
+            it('should return status code 400 and an info message about the invalid child_id', () => {
                 const basePath = `/v1/children/123/logs`
                 const specificPath = `/date/${correctLogsArr[0].date}/${correctLogsArr[0].date}`
                 const url = `${basePath}${specificPath}`
@@ -416,8 +599,15 @@ describe('Routes: children.logs', () => {
         })
 
         context('when the parameters are incorrect (date_start is invalid)', () => {
-            it('should return status code 400 and an info message about the invalid date_start', async () => {
-                const basePath = `/v1/children/${defaultActivity.child_id}/logs`
+            before(async () => {
+                try {
+                    await deleteAllLogs()
+                } catch (err) {
+                    throw new Error('Failure on children.logs routes test: ' + err.message)
+                }
+            })
+            it('should return status code 400 and an info message about the invalid date_start', () => {
+                const basePath = `/v1/children/${correctLogsArr[0].child_id}/logs`
                 const specificPath = `/date/20199-10-01/${correctLogsArr[0].date}`
                 const url = `${basePath}${specificPath}`
 
@@ -434,8 +624,15 @@ describe('Routes: children.logs', () => {
         })
 
         context('when the parameters are incorrect (date_end is invalid)', () => {
-            it('should return status code 400 and an info message about the invalid date_end', async () => {
-                const basePath = `/v1/children/${defaultActivity.child_id}/logs`
+            before(async () => {
+                try {
+                    await deleteAllLogs()
+                } catch (err) {
+                    throw new Error('Failure on children.logs routes test: ' + err.message)
+                }
+            })
+            it('should return status code 400 and an info message about the invalid date_end', () => {
+                const basePath = `/v1/children/${correctLogsArr[0].child_id}/logs`
                 const specificPath = `/date/${correctLogsArr[0].date}/20199-10-01`
                 const url = `${basePath}${specificPath}`
 
@@ -452,8 +649,15 @@ describe('Routes: children.logs', () => {
         })
 
         context('when the parameters are invalid (date range is invalid)', () => {
-            it('should return status code 400 and an info message about the invalid date_end', async () => {
-                const basePath = `/v1/children/${defaultActivity.child_id}/logs`
+            before(async () => {
+                try {
+                    await deleteAllLogs()
+                } catch (err) {
+                    throw new Error('Failure on children.logs routes test: ' + err.message)
+                }
+            })
+            it('should return status code 400 and an info message about the invalid date_end', () => {
+                const basePath = `/v1/children/${correctLogsArr[0].child_id}/logs`
                 const specificPath = `/date/2018-03-18/2019-03-27`
                 const url = `${basePath}${specificPath}`
 
@@ -473,8 +677,24 @@ describe('Routes: children.logs', () => {
          * query-strings-parser library test
          */
         context('when get all logs in a time interval using the "query-strings-parser" library', () => {
-            it('should return status code 200 and the result as needed in the query', async () => {
-                const basePath = `/v1/children/${defaultActivity.child_id}/logs`
+            before(async () => {
+                try {
+                    await deleteAllLogs()
+
+                    for (const log of correctLogsArr) {
+                        await createLog({
+                            type: log.type,
+                            date: new Date(log.date),
+                            value: log.value,
+                            child_id: log.child_id
+                        })
+                    }
+                } catch (err) {
+                    throw new Error('Failure on children.logs routes test: ' + err.message)
+                }
+            })
+            it('should return status code 200 and the result as needed in the query', () => {
+                const basePath = `/v1/children/${correctLogsArr[0].child_id}/logs`
                 const specificPath = `/date/${correctLogsArr[0].date}/${correctLogsArr[0].date}`
                 let url = `${basePath}${specificPath}?date=${correctLogsArr[0].date}`
                 url += '&sort=date&page=1&limit=2'
@@ -484,16 +704,31 @@ describe('Routes: children.logs', () => {
                     .set('Content-Type', 'application/json')
                     .expect(200)
                     .then(res => {
-                        expect(res.body.steps).is.an.instanceOf(Array)
-                        expect(res.body.calories).is.an.instanceOf(Array)
+                        expect(res.body.steps[0].date).to.be.eql(correctLogsArr[0].date)
+                        expect(res.body.steps[0].value).to.be.eql(correctLogsArr[0].value)
+                        expect(res.body.calories[0].date).to.be.eql(correctLogsArr[1].date)
+                        expect(res.body.calories[0].value).to.be.eql(correctLogsArr[1].value)
+                        expect(res.body.active_minutes[0].date).to.be.eql(correctLogsArr[2].date)
+                        expect(res.body.active_minutes[0].value).to.be.eql(correctLogsArr[2].value)
+                        expect(res.body.lightly_active_minutes[0].date).to.be.eql(correctLogsArr[3].date)
+                        expect(res.body.lightly_active_minutes[0].value).to.be.eql(correctLogsArr[3].value)
+                        expect(res.body.sedentary_minutes[0].date).to.be.eql(correctLogsArr[4].date)
+                        expect(res.body.sedentary_minutes[0].value).to.be.eql(correctLogsArr[4].value)
                     })
             })
         })
 
         context('when there is an attempt to get all logs in a time interval using the "query-strings-parser" library but there ' +
             'are no corresponding logs with the query in the database', () => {
-            it('should return status code 200 and an empty ChildLog', async () => {
-                const basePath = `/v1/children/${defaultActivity.child_id}/logs`
+            before(async () => {
+                try {
+                    await deleteAllLogs()
+                } catch (err) {
+                    throw new Error('Failure on children.logs routes test: ' + err.message)
+                }
+            })
+            it('should return status code 200 and an empty ChildLog', () => {
+                const basePath = `/v1/children/${correctLogsArr[0].child_id}/logs`
                 const specificPath = `/date/2005-10-01/2005-10-10`
                 let url = `${basePath}${specificPath}?date=${correctLogsArr[0].date}`
                 url += '&sort=date&page=1&limit=2'
@@ -505,13 +740,23 @@ describe('Routes: children.logs', () => {
                     .then(res => {
                         expect(res.body.steps.length).to.eql(0)
                         expect(res.body.calories.length).to.eql(0)
+                        expect(res.body.active_minutes.length).to.eql(0)
+                        expect(res.body.lightly_active_minutes.length).to.eql(0)
+                        expect(res.body.sedentary_minutes.length).to.eql(0)
                     })
             })
         })
 
         context('when there is an attempt to get all logs in a time interval using the "query-strings-parser" library ' +
             'but the parameters are incorrect (child_id is invalid)', () => {
-            it('should return status code 400 and an info message about the invalid child_id', async () => {
+            before(async () => {
+                try {
+                    await deleteAllLogs()
+                } catch (err) {
+                    throw new Error('Failure on children.logs routes test: ' + err.message)
+                }
+            })
+            it('should return status code 400 and an info message about the invalid child_id', () => {
                 const basePath = `/v1/children/123/logs`
                 const specificPath = `/date/${correctLogsArr[0].date}/${correctLogsArr[0].date}`
                 let url = `${basePath}${specificPath}?date=${correctLogsArr[0].date}`
@@ -531,8 +776,15 @@ describe('Routes: children.logs', () => {
 
         context('when there is an attempt to get all logs in a time interval using the "query-strings-parser" library ' +
             'but the parameters are incorrect (date_start is invalid)', () => {
-            it('should return status code 400 and an info message about the invalid date_start', async () => {
-                const basePath = `/v1/children/${defaultActivity.child_id}/logs`
+            before(async () => {
+                try {
+                    await deleteAllLogs()
+                } catch (err) {
+                    throw new Error('Failure on children.logs routes test: ' + err.message)
+                }
+            })
+            it('should return status code 400 and an info message about the invalid date_start', () => {
+                const basePath = `/v1/children/${correctLogsArr[0].child_id}/logs`
                 const specificPath = `/date/20199-10-01/${correctLogsArr[0].date}`
                 let url = `${basePath}${specificPath}?date=${correctLogsArr[0].date}`
                 url += '&sort=date&page=1&limit=2'
@@ -551,8 +803,15 @@ describe('Routes: children.logs', () => {
 
         context('when there is an attempt to get all logs in a time interval using the "query-strings-parser" library ' +
             'but the parameters are incorrect (date_end is invalid)', () => {
-            it('should return status code 400 and an info message about the invalid date_end', async () => {
-                const basePath = `/v1/children/${defaultActivity.child_id}/logs`
+            before(async () => {
+                try {
+                    await deleteAllLogs()
+                } catch (err) {
+                    throw new Error('Failure on children.logs routes test: ' + err.message)
+                }
+            })
+            it('should return status code 400 and an info message about the invalid date_end', () => {
+                const basePath = `/v1/children/${correctLogsArr[0].child_id}/logs`
                 const specificPath = `/date/${correctLogsArr[0].date}/20199-10-01`
                 let url = `${basePath}${specificPath}?date=${correctLogsArr[0].date}`
                 url += '&sort=date&page=1&limit=2'
@@ -571,8 +830,15 @@ describe('Routes: children.logs', () => {
 
         context('when there is an attempt to get all logs in a time interval using the "query-strings-parser" library ' +
             'but the parameters are invalid (date range is invalid)', () => {
-            it('should return status code 400 and an info message about the invalid date_end', async () => {
-                const basePath = `/v1/children/${defaultActivity.child_id}/logs`
+            before(async () => {
+                try {
+                    await deleteAllLogs()
+                } catch (err) {
+                    throw new Error('Failure on children.logs routes test: ' + err.message)
+                }
+            })
+            it('should return status code 400 and an info message about the invalid date_end', () => {
+                const basePath = `/v1/children/${correctLogsArr[0].child_id}/logs`
                 const specificPath = `/date/2018-03-18/2019-03-27`
                 let url = `${basePath}${specificPath}?date=${correctLogsArr[0].date}`
                 url += '&sort=date&page=1&limit=2'
@@ -595,8 +861,24 @@ describe('Routes: children.logs', () => {
      */
     describe('GET /v1/children/:child_id/logs/:resource/date/:date_start/:date_end', () => {
         context('when the parameters are correct and there are corresponding logs with the query', () => {
-            it('should return status code 200 and an array of Logs with steps and/or calories logs', async () => {
-                const basePath = `/v1/children/${defaultActivity.child_id}/logs/${LogType.CALORIES}`
+            before(async () => {
+                try {
+                    await deleteAllLogs()
+
+                    for (const log of correctLogsArr) {
+                        await createLog({
+                            type: log.type,
+                            date: new Date(log.date),
+                            value: log.value,
+                            child_id: log.child_id
+                        })
+                    }
+                } catch (err) {
+                    throw new Error('Failure on children.logs routes test: ' + err.message)
+                }
+            })
+            it('should return status code 200 and an array of steps logs', () => {
+                const basePath = `/v1/children/${correctLogsArr[0].child_id}/logs/${correctLogsArr[0].type}`
                 const specificPath = `/date/${correctLogsArr[0].date}/${correctLogsArr[0].date}`
                 const url = `${basePath}${specificPath}`
 
@@ -605,15 +887,82 @@ describe('Routes: children.logs', () => {
                     .set('Content-Type', 'application/json')
                     .expect(200)
                     .then(res => {
-                        expect(res.body).is.an.instanceOf(Array)
-                        expect(res.body.length).to.not.eql(0)
+                        expect(res.body[0].date).to.be.eql(correctLogsArr[0].date)
+                        expect(res.body[0].value).to.be.eql(correctLogsArr[0].value)
+                    })
+            })
+
+            it('should return status code 200 and an array of calories logs', () => {
+                const basePath = `/v1/children/${correctLogsArr[1].child_id}/logs/${correctLogsArr[1].type}`
+                const specificPath = `/date/${correctLogsArr[1].date}/${correctLogsArr[1].date}`
+                const url = `${basePath}${specificPath}`
+
+                return request
+                    .get(url)
+                    .set('Content-Type', 'application/json')
+                    .expect(200)
+                    .then(res => {
+                        expect(res.body[0].date).to.be.eql(correctLogsArr[1].date)
+                        expect(res.body[0].value).to.be.eql(correctLogsArr[1].value)
+                    })
+            })
+
+            it('should return status code 200 and an array of active_minutes logs', () => {
+                const basePath = `/v1/children/${correctLogsArr[2].child_id}/logs/${correctLogsArr[2].type}`
+                const specificPath = `/date/${correctLogsArr[2].date}/${correctLogsArr[2].date}`
+                const url = `${basePath}${specificPath}`
+
+                return request
+                    .get(url)
+                    .set('Content-Type', 'application/json')
+                    .expect(200)
+                    .then(res => {
+                        expect(res.body[0].date).to.be.eql(correctLogsArr[2].date)
+                        expect(res.body[0].value).to.be.eql(correctLogsArr[2].value)
+                    })
+            })
+
+            it('should return status code 200 and an array of lightly_active_minutes logs', () => {
+                const basePath = `/v1/children/${correctLogsArr[3].child_id}/logs/${correctLogsArr[3].type}`
+                const specificPath = `/date/${correctLogsArr[3].date}/${correctLogsArr[3].date}`
+                const url = `${basePath}${specificPath}`
+
+                return request
+                    .get(url)
+                    .set('Content-Type', 'application/json')
+                    .expect(200)
+                    .then(res => {
+                        expect(res.body[0].date).to.be.eql(correctLogsArr[3].date)
+                        expect(res.body[0].value).to.be.eql(correctLogsArr[3].value)
+                    })
+            })
+
+            it('should return status code 200 and an array of sedentary_minutes logs', () => {
+                const basePath = `/v1/children/${correctLogsArr[4].child_id}/logs/${correctLogsArr[4].type}`
+                const specificPath = `/date/${correctLogsArr[4].date}/${correctLogsArr[4].date}`
+                const url = `${basePath}${specificPath}`
+
+                return request
+                    .get(url)
+                    .set('Content-Type', 'application/json')
+                    .expect(200)
+                    .then(res => {
+                        expect(res.body[0].date).to.be.eql(correctLogsArr[4].date)
+                        expect(res.body[0].value).to.be.eql(correctLogsArr[4].value)
                     })
             })
         })
 
         context('when the parameters are correct but there are no corresponding logs with the query', () => {
-            it('should return status code 200 and an empty array of logs', async () => {
-                const basePath = `/v1/children/${defaultActivity.child_id}/logs/${correctLogsArr[0].type}`
+            before(async () => {
+                try {
+                    await deleteAllLogs()
+                } catch (err) {
+                    throw new Error('Failure on children.logs routes test: ' + err.message)
+                }
+            })
+            it('should return status code 200 and an empty array of logs', () => {
+                const basePath = `/v1/children/${correctLogsArr[0].child_id}/logs/${correctLogsArr[0].type}`
                 const specificPath = `/date/2005-10-01/2005-10-10`
                 const url = `${basePath}${specificPath}`
 
@@ -628,7 +977,14 @@ describe('Routes: children.logs', () => {
         })
 
         context('when the parameters are incorrect (child_id is invalid)', () => {
-            it('should return status code 400 and an info message about the invalid child_id', async () => {
+            before(async () => {
+                try {
+                    await deleteAllLogs()
+                } catch (err) {
+                    throw new Error('Failure on children.logs routes test: ' + err.message)
+                }
+            })
+            it('should return status code 400 and an info message about the invalid child_id', () => {
                 const basePath = `/v1/children/123/logs/${correctLogsArr[0].type}`
                 const specificPath = `/date/${correctLogsArr[0].date}/${correctLogsArr[0].date}`
                 const url = `${basePath}${specificPath}`
@@ -646,8 +1002,15 @@ describe('Routes: children.logs', () => {
         })
 
         context('when the parameters are incorrect (resource is invalid)', () => {
-            it('should return status code 400 and an info message about the invalid resource', async () => {
-                const basePath = `/v1/children/${defaultActivity.child_id}/logs/step`
+            before(async () => {
+                try {
+                    await deleteAllLogs()
+                } catch (err) {
+                    throw new Error('Failure on children.logs routes test: ' + err.message)
+                }
+            })
+            it('should return status code 400 and an info message about the invalid resource', () => {
+                const basePath = `/v1/children/${correctLogsArr[0].child_id}/logs/step`
                 const specificPath = `/date/${correctLogsArr[0].date}/${correctLogsArr[0].date}`
                 const url = `${basePath}${specificPath}`
 
@@ -666,8 +1029,15 @@ describe('Routes: children.logs', () => {
         })
 
         context('when the parameters are incorrect (date_start is invalid)', () => {
-            it('should return status code 400 and an info message about the invalid date_start', async () => {
-                const basePath = `/v1/children/${defaultActivity.child_id}/logs/${correctLogsArr[0].type}`
+            before(async () => {
+                try {
+                    await deleteAllLogs()
+                } catch (err) {
+                    throw new Error('Failure on children.logs routes test: ' + err.message)
+                }
+            })
+            it('should return status code 400 and an info message about the invalid date_start', () => {
+                const basePath = `/v1/children/${correctLogsArr[0].child_id}/logs/${correctLogsArr[0].type}`
                 const specificPath = `/date/20199-10-01/${correctLogsArr[0].date}`
                 const url = `${basePath}${specificPath}`
 
@@ -684,8 +1054,15 @@ describe('Routes: children.logs', () => {
         })
 
         context('when the parameters are incorrect (date_end is invalid)', () => {
-            it('should return status code 400 and an info message about the invalid date_end', async () => {
-                const basePath = `/v1/children/${defaultActivity.child_id}/logs/${correctLogsArr[0].type}`
+            before(async () => {
+                try {
+                    await deleteAllLogs()
+                } catch (err) {
+                    throw new Error('Failure on children.logs routes test: ' + err.message)
+                }
+            })
+            it('should return status code 400 and an info message about the invalid date_end', () => {
+                const basePath = `/v1/children/${correctLogsArr[0].child_id}/logs/${correctLogsArr[0].type}`
                 const specificPath = `/date/${correctLogsArr[0].date}/20199-10-01`
                 const url = `${basePath}${specificPath}`
 
@@ -702,8 +1079,15 @@ describe('Routes: children.logs', () => {
         })
 
         context('when the parameters are invalid (date range is invalid)', () => {
-            it('should return status code 400 and an info message about the invalid date_end', async () => {
-                const basePath = `/v1/children/${defaultActivity.child_id}/logs/${correctLogsArr[0].type}`
+            before(async () => {
+                try {
+                    await deleteAllLogs()
+                } catch (err) {
+                    throw new Error('Failure on children.logs routes test: ' + err.message)
+                }
+            })
+            it('should return status code 400 and an info message about the invalid date_end', () => {
+                const basePath = `/v1/children/${correctLogsArr[0].child_id}/logs/${correctLogsArr[0].type}`
                 const specificPath = `/date/2018-03-18/2019-03-27`
                 const url = `${basePath}${specificPath}`
 
@@ -723,8 +1107,25 @@ describe('Routes: children.logs', () => {
          * query-strings-parser library test
          */
         context('when get all logs in a time interval using the "query-strings-parser" library', () => {
-            it('should return status code 200 and the result as needed in the query', async () => {
-                const basePath = `/v1/children/${defaultActivity.child_id}/logs/${LogType.CALORIES}`
+            before(async () => {
+                try {
+                    await deleteAllLogs()
+
+                    for (const log of correctLogsArr) {
+                        await createLog({
+                            type: log.type,
+                            date: new Date(log.date),
+                            value: log.value,
+                            child_id: log.child_id
+                        })
+                    }
+                } catch (err) {
+                    throw new Error('Failure on children.logs routes test: ' + err.message)
+                }
+            })
+            it('should return status code 200 and the result as needed in the query ' +
+                '(response with steps array)', () => {
+                const basePath = `/v1/children/${correctLogsArr[0].child_id}/logs/${correctLogsArr[0].type}`
                 const specificPath = `/date/${correctLogsArr[0].date}/${correctLogsArr[0].date}`
                 let url = `${basePath}${specificPath}?date=${correctLogsArr[0].date}`
                 url += '&sort=date&page=1&limit=2'
@@ -734,8 +1135,76 @@ describe('Routes: children.logs', () => {
                     .set('Content-Type', 'application/json')
                     .expect(200)
                     .then(res => {
-                        expect(res.body).is.an.instanceOf(Array)
-                        expect(res.body.length).to.not.eql(0)
+                        expect(res.body[0].date).to.be.eql(correctLogsArr[0].date)
+                        expect(res.body[0].value).to.be.eql(correctLogsArr[0].value)
+                    })
+            })
+
+            it('should return status code 200 and the result as needed in the query ' +
+                '(response with calories array)', () => {
+                const basePath = `/v1/children/${correctLogsArr[1].child_id}/logs/${correctLogsArr[1].type}`
+                const specificPath = `/date/${correctLogsArr[1].date}/${correctLogsArr[1].date}`
+                let url = `${basePath}${specificPath}?date=${correctLogsArr[1].date}`
+                url += '&sort=date&page=1&limit=2'
+
+                return request
+                    .get(url)
+                    .set('Content-Type', 'application/json')
+                    .expect(200)
+                    .then(res => {
+                        expect(res.body[0].date).to.be.eql(correctLogsArr[1].date)
+                        expect(res.body[0].value).to.be.eql(correctLogsArr[1].value)
+                    })
+            })
+
+            it('should return status code 200 and the result as needed in the query ' +
+                '(response with active_minutes array)', () => {
+                const basePath = `/v1/children/${correctLogsArr[2].child_id}/logs/${correctLogsArr[2].type}`
+                const specificPath = `/date/${correctLogsArr[2].date}/${correctLogsArr[2].date}`
+                let url = `${basePath}${specificPath}?date=${correctLogsArr[2].date}`
+                url += '&sort=date&page=1&limit=2'
+
+                return request
+                    .get(url)
+                    .set('Content-Type', 'application/json')
+                    .expect(200)
+                    .then(res => {
+                        expect(res.body[0].date).to.be.eql(correctLogsArr[2].date)
+                        expect(res.body[0].value).to.be.eql(correctLogsArr[2].value)
+                    })
+            })
+
+            it('should return status code 200 and the result as needed in the query ' +
+                '(response with lightly_active_minutes array)', () => {
+                const basePath = `/v1/children/${correctLogsArr[3].child_id}/logs/${correctLogsArr[3].type}`
+                const specificPath = `/date/${correctLogsArr[3].date}/${correctLogsArr[3].date}`
+                let url = `${basePath}${specificPath}?date=${correctLogsArr[3].date}`
+                url += '&sort=date&page=1&limit=2'
+
+                return request
+                    .get(url)
+                    .set('Content-Type', 'application/json')
+                    .expect(200)
+                    .then(res => {
+                        expect(res.body[0].date).to.be.eql(correctLogsArr[3].date)
+                        expect(res.body[0].value).to.be.eql(correctLogsArr[3].value)
+                    })
+            })
+
+            it('should return status code 200 and the result as needed in the query ' +
+                '(response with sedentary_minutes array)', () => {
+                const basePath = `/v1/children/${correctLogsArr[4].child_id}/logs/${correctLogsArr[4].type}`
+                const specificPath = `/date/${correctLogsArr[4].date}/${correctLogsArr[4].date}`
+                let url = `${basePath}${specificPath}?date=${correctLogsArr[4].date}`
+                url += '&sort=date&page=1&limit=2'
+
+                return request
+                    .get(url)
+                    .set('Content-Type', 'application/json')
+                    .expect(200)
+                    .then(res => {
+                        expect(res.body[0].date).to.be.eql(correctLogsArr[4].date)
+                        expect(res.body[0].value).to.be.eql(correctLogsArr[4].value)
                     })
             })
         })
@@ -750,8 +1219,8 @@ describe('Routes: children.logs', () => {
                 }
             })
 
-            it('should return status code 200 and an empty array of logs', async () => {
-                const basePath = `/v1/children/${defaultActivity.child_id}/logs/${correctLogsArr[0].type}`
+            it('should return status code 200 and an empty array of logs', () => {
+                const basePath = `/v1/children/${correctLogsArr[0].child_id}/logs/${correctLogsArr[0].type}`
                 const specificPath = `/date/2005-10-01/2005-10-10`
                 let url = `${basePath}${specificPath}?date=${correctLogsArr[0].date}`
                 url += '&sort=date&page=1&limit=2'
@@ -776,7 +1245,7 @@ describe('Routes: children.logs', () => {
                 }
             })
 
-            it('should return status code 400 and an info message about the invalid child_id', async () => {
+            it('should return status code 400 and an info message about the invalid child_id', () => {
                 const basePath = `/v1/children/123/logs/${correctLogsArr[0].type}`
                 const specificPath = `/date/${correctLogsArr[0].date}/${correctLogsArr[0].date}`
                 let url = `${basePath}${specificPath}?date=${correctLogsArr[0].date}`
@@ -804,8 +1273,8 @@ describe('Routes: children.logs', () => {
                 }
             })
 
-            it('should return status code 400 and an info message about the invalid resource', async () => {
-                const basePath = `/v1/children/${defaultActivity.child_id}/logs/calorie`
+            it('should return status code 400 and an info message about the invalid resource', () => {
+                const basePath = `/v1/children/${correctLogsArr[0].child_id}/logs/calorie`
                 const specificPath = `/date/${correctLogsArr[0].date}/${correctLogsArr[0].date}`
                 let url = `${basePath}${specificPath}?date=${correctLogsArr[0].date}`
                 url += '&sort=date&page=1&limit=2'
@@ -834,8 +1303,8 @@ describe('Routes: children.logs', () => {
                 }
             })
 
-            it('should return status code 400 and an info message about the invalid date_start', async () => {
-                const basePath = `/v1/children/${defaultActivity.child_id}/logs/${correctLogsArr[0].type}`
+            it('should return status code 400 and an info message about the invalid date_start', () => {
+                const basePath = `/v1/children/${correctLogsArr[0].child_id}/logs/${correctLogsArr[0].type}`
                 const specificPath = `/date/20199-10-01/${correctLogsArr[0].date}`
                 let url = `${basePath}${specificPath}?date=${correctLogsArr[0].date}`
                 url += '&sort=date&page=1&limit=2'
@@ -862,8 +1331,8 @@ describe('Routes: children.logs', () => {
                 }
             })
 
-            it('should return status code 400 and an info message about the invalid date_end', async () => {
-                const basePath = `/v1/children/${defaultActivity.child_id}/logs/${correctLogsArr[0].type}`
+            it('should return status code 400 and an info message about the invalid date_end', () => {
+                const basePath = `/v1/children/${correctLogsArr[0].child_id}/logs/${correctLogsArr[0].type}`
                 const specificPath = `/date/${correctLogsArr[0].date}/20199-10-01`
                 let url = `${basePath}${specificPath}?date=${correctLogsArr[0].date}`
                 url += '&sort=date&page=1&limit=2'
@@ -890,8 +1359,8 @@ describe('Routes: children.logs', () => {
                 }
             })
 
-            it('should return status code 400 and an info message about the invalid date_end', async () => {
-                const basePath = `/v1/children/${defaultActivity.child_id}/logs/${correctLogsArr[0].type}`
+            it('should return status code 400 and an info message about the invalid date_end', () => {
+                const basePath = `/v1/children/${correctLogsArr[0].child_id}/logs/${correctLogsArr[0].type}`
                 const specificPath = `/date/2018-03-18/2019-03-27`
                 let url = `${basePath}${specificPath}?date=${correctLogsArr[0].date}`
                 url += '&sort=date&page=1&limit=2'
@@ -910,6 +1379,13 @@ describe('Routes: children.logs', () => {
         })
     })
 })
+
+async function createLog(item): Promise<any> {
+    const logMapper: LogEntityMapper = new LogEntityMapper()
+    const resultModel = logMapper.transform(item)
+    const resultModelEntity = logMapper.transform(resultModel)
+    return Promise.resolve(LogRepoModel.create(resultModelEntity))
+}
 
 async function deleteAllLogs() {
     return LogRepoModel.deleteMany({})

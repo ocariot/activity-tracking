@@ -52,10 +52,8 @@ export class EnvironmentMock extends Environment {
     private generateTemp(): Measurement {
         const measurement: Measurement = new Measurement()
         measurement.type = MeasurementType.TEMPERATURE
-        measurement.timestamp = new Date()
         measurement.value = Math.random() * 13 + 19 // 19-31
         measurement.unit = '°C'
-        measurement.child_id = this.generateObjectId()
 
         return measurement
     }
@@ -63,10 +61,8 @@ export class EnvironmentMock extends Environment {
     private generateHumi(): Measurement {
         const measurement: Measurement = new Measurement()
         measurement.type = MeasurementType.HUMIDITY
-        measurement.timestamp = new Date()
         measurement.value = Math.random() * 16 + 30 // 30-45
         measurement.unit = '%'
-        measurement.child_id = this.generateObjectId()
 
         return measurement
     }
@@ -74,10 +70,8 @@ export class EnvironmentMock extends Environment {
     private generatePm1(): Measurement {
         const measurement: Measurement = new Measurement()
         measurement.type = MeasurementType.PM1
-        measurement.timestamp = new Date()
         measurement.value = Math.random() // 0-1
         measurement.unit = 'µm'
-        measurement.child_id = this.generateObjectId()
 
         return measurement
     }
@@ -85,10 +79,8 @@ export class EnvironmentMock extends Environment {
     private generatePm2_5(): Measurement {
         const measurement: Measurement = new Measurement()
         measurement.type = MeasurementType.PM2_5
-        measurement.timestamp = new Date()
         measurement.value = Math.random() * 2.6 // 0-2.5
         measurement.unit = 'µm'
-        measurement.child_id = this.generateObjectId()
 
         return measurement
     }
@@ -96,10 +88,8 @@ export class EnvironmentMock extends Environment {
     private generatePm10(): Measurement {
         const measurement: Measurement = new Measurement()
         measurement.type = MeasurementType.PM10
-        measurement.timestamp = new Date()
         measurement.value = Math.random() * 11 // 0-10
         measurement.unit = 'µm'
-        measurement.child_id = this.generateObjectId()
 
         return measurement
     }

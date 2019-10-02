@@ -72,10 +72,10 @@ export class WeightService implements IWeightService {
         for (const elem of weight) {
             try {
                 // Add each weight from the array
-                await this.addWeight(elem)
+                const weightResult = await this.addWeight(elem)
 
                 // Create a StatusSuccess object for the construction of the MultiStatus response.
-                const statusSuccess: StatusSuccess<Weight> = new StatusSuccess<Weight>(HttpStatus.CREATED, elem)
+                const statusSuccess: StatusSuccess<Weight> = new StatusSuccess<Weight>(HttpStatus.CREATED, weightResult)
                 statusSuccessArr.push(statusSuccess)
             } catch (err) {
                 let statusCode: number = HttpStatus.INTERNAL_SERVER_ERROR

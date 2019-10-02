@@ -27,7 +27,7 @@ describe('Routes: environments', () => {
     /**
      * Mock objects for POST route with multiple environments
      */
-    // Array with correct environments
+        // Array with correct environments
     const correctEnvironmentsArr: Array<Environment> = new Array<EnvironmentMock>()
     for (let i = 0; i < 3; i++) {
         correctEnvironmentsArr.push(new EnvironmentMock())
@@ -65,8 +65,11 @@ describe('Routes: environments', () => {
     // Start services
     before(async () => {
         try {
-            await dbConnection.connect(process.env.MONGODB_URI_TEST || Default.MONGODB_URI_TEST)
-            await rabbitmq.initialize(process.env.RABBITMQ_URI || Default.RABBITMQ_URI, { sslOptions: { ca: [] } })
+            await dbConnection.connect(process.env.MONGODB_URI_TEST || Default.MONGODB_URI_TEST,
+                { interval: 100 })
+
+            await rabbitmq.initialize('amqp://invalidUser:guest@localhost', { retries: 1, interval: 100 })
+
             await deleteAllEnvironments()
         } catch (err) {
             throw new Error('Failure on environments routes test: ' + err.message)
@@ -79,19 +82,89 @@ describe('Routes: environments', () => {
             await dbConnection.dispose()
             await rabbitmq.dispose()
         } catch (err) {
-            throw new Error('Failure on children.logs routes test: ' + err.message)
+            throw new Error('Failure on environments routes test: ' + err.message)
         }
     })
     /**
      * POST route with only one Environment in the body
      */
-    describe('NO CONNECTION TO RABBITMQ -> POST /v1/environments with only one Environment in the body', () => {
-        context('when posting a new Environment with success', () => {
+    describe('RABBITMQ PUBLISHER -> POST /v1/environments with only one Environment in the body', () => {
+        context('when posting a new Environment with success and publishing it to the bus', () => {
+            const body = {
+                institution_id: defaultEnvironment.institution_id,
+                location: defaultEnvironment.location,
+                measurements: defaultEnvironment.measurements,
+                climatized: defaultEnvironment.climatized,
+                timestamp: defaultEnvironment.timestamp
+            }
+
             before(async () => {
                 try {
-                    await rabbitmq.dispose()
+                    await deleteAllEnvironments()
 
+                    await rabbitmq.initialize(process.env.RABBITMQ_URI || Default.RABBITMQ_URI,
+                        { interval: 100, receiveFromYourself: true, sslOptions: { ca: [] } })
+                } catch (err) {
+                    throw new Error('Failure on environments routes test: ' + err.message)
+                }
+            })
+
+            after(async () => {
+                try {
+                    await rabbitmq.dispose()
                     await rabbitmq.initialize('amqp://invalidUser:guest@localhost', { retries: 1, interval: 100 })
+                } catch (err) {
+                    throw new Error('Failure on environments test: ' + err.message)
+                }
+            })
+
+            it('The subscriber should receive a message in the correct format and with the same values as the environment ' +
+                'published on the bus', (done) => {
+                rabbitmq.bus
+                    .subSaveEnvironment(message => {
+                        try {
+                            expect(message.event_name).to.eql('EnvironmentSaveEvent')
+                            expect(message).to.have.property('timestamp')
+                            expect(message).to.have.property('environment')
+                            expect(message.environment).to.have.property('id')
+                            expect(message.environment.institution_id).to.eql(defaultEnvironment.institution_id)
+                            expect(message.environment.location.local).to.eql(defaultEnvironment.location!.local)
+                            expect(message.environment.location.room).to.eql(defaultEnvironment.location!.room)
+                            expect(message.environment.location.latitude).to.eql(defaultEnvironment.location!.latitude)
+                            expect(message.environment.location.longitude).to.eql(defaultEnvironment.location!.longitude)
+                            let index = 0
+                            for (const measurement of message.environment.measurements) {
+                                expect(measurement.type).to.eql(defaultEnvironment.measurements![index].type)
+                                expect(measurement.value).to.eql(defaultEnvironment.measurements![index].value)
+                                expect(measurement.unit).to.eql(defaultEnvironment.measurements![index].unit)
+                                index++
+                            }
+                            expect(message.environment.climatized).to.eql(defaultEnvironment.climatized)
+                            expect(message.environment.timestamp).to.eql(defaultEnvironment.timestamp.toISOString())
+                            done()
+                        } catch (err) {
+                            done(err)
+                        }
+                    })
+                    .then(() => {
+                        request
+                            .post('/v1/environments')
+                            .send(body)
+                            .set('Content-Type', 'application/json')
+                            .expect(201)
+                            .then()
+                            .catch(done)
+                    })
+                    .catch(done)
+            })
+        })
+    })
+
+    describe('POST /v1/environments with only one Environment in the body', () => {
+        context('when posting a new Environment with success (there is no connection to RabbitMQ)', () => {
+            before(async () => {
+                try {
+                    await deleteAllEnvironments()
                 } catch (err) {
                     throw new Error('Failure on environments routes test: ' + err.message)
                 }
@@ -112,136 +185,19 @@ describe('Routes: environments', () => {
                     .set('Content-Type', 'application/json')
                     .expect(201)
                     .then(res => {
-                        defaultEnvironment.id = res.body.id
-                        expect(res.body.id).to.eql(defaultEnvironment.id)
+                        expect(res.body).to.have.property('id')
                         expect(res.body.institution_id).to.eql(defaultEnvironment.institution_id)
                         expect(res.body.location.local).to.eql(defaultEnvironment.location!.local)
                         expect(res.body.location.room).to.eql(defaultEnvironment.location!.room)
                         expect(res.body.location.latitude).to.eql(defaultEnvironment.location!.latitude)
                         expect(res.body.location.longitude).to.eql(defaultEnvironment.location!.longitude)
-                        expect(res.body.measurements[0].type).to.eql(defaultEnvironment.measurements![0].type)
-                        expect(res.body.measurements[0].value).to.eql(defaultEnvironment.measurements![0].value)
-                        expect(res.body.measurements[0].unit).to.eql(defaultEnvironment.measurements![0].unit)
-                        expect(res.body.measurements[1].type).to.eql(defaultEnvironment.measurements![1].type)
-                        expect(res.body.measurements[1].value).to.eql(defaultEnvironment.measurements![1].value)
-                        expect(res.body.measurements[1].unit).to.eql(defaultEnvironment.measurements![1].unit)
-                        expect(res.body.measurements[2].type).to.eql(defaultEnvironment.measurements![2].type)
-                        expect(res.body.measurements[2].value).to.eql(defaultEnvironment.measurements![2].value)
-                        expect(res.body.measurements[2].unit).to.eql(defaultEnvironment.measurements![2].unit)
-                        expect(res.body.climatized).to.eql(defaultEnvironment.climatized)
-                        expect(res.body.timestamp).to.eql(defaultEnvironment.timestamp.toISOString())
-                    })
-            })
-        })
-    })
-
-    describe('RABBITMQ PUBLISHER -> POST /v1/environments with only one Environment in the body', () => {
-        context('when posting a new Environment with success and publishing it to the bus', () => {
-            const body = {
-                institution_id: defaultEnvironment.institution_id,
-                location: defaultEnvironment.location,
-                measurements: defaultEnvironment.measurements,
-                climatized: defaultEnvironment.climatized,
-                timestamp: defaultEnvironment.timestamp
-            }
-
-            before(async () => {
-                try {
-                    await deleteAllEnvironments()
-
-                    await rabbitmq.initialize(process.env.RABBITMQ_URI || Default.RABBITMQ_URI,
-                        { receiveFromYourself: true, sslOptions: { ca: [] } })
-                } catch (err) {
-                    throw new Error('Failure on environments routes test: ' + err.message)
-                }
-            })
-
-            it('The subscriber should receive a message in the correct format and with the same values as the environment ' +
-                'published on the bus', (done) => {
-                rabbitmq.bus
-                    .subSaveEnvironment(message => {
-                        expect(message.event_name).to.eql('EnvironmentSaveEvent')
-                        expect(message).to.have.property('timestamp')
-                        expect(message).to.have.property('environment')
-                        defaultEnvironment.id = message.environment.id
-                        expect(message.environment.id).to.eql(defaultEnvironment.id)
-                        expect(message.environment.institution_id).to.eql(defaultEnvironment.institution_id)
-                        expect(message.environment.location.local).to.eql(defaultEnvironment.location!.local)
-                        expect(message.environment.location.room).to.eql(defaultEnvironment.location!.room)
-                        expect(message.environment.location.latitude).to.eql(defaultEnvironment.location!.latitude)
-                        expect(message.environment.location.longitude).to.eql(defaultEnvironment.location!.longitude)
-                        expect(message.environment.measurements[0].type).to.eql(defaultEnvironment.measurements![0].type)
-                        expect(message.environment.measurements[0].value).to.eql(defaultEnvironment.measurements![0].value)
-                        expect(message.environment.measurements[0].unit).to.eql(defaultEnvironment.measurements![0].unit)
-                        expect(message.environment.measurements[1].type).to.eql(defaultEnvironment.measurements![1].type)
-                        expect(message.environment.measurements[1].value).to.eql(defaultEnvironment.measurements![1].value)
-                        expect(message.environment.measurements[1].unit).to.eql(defaultEnvironment.measurements![1].unit)
-                        expect(message.environment.measurements[2].type).to.eql(defaultEnvironment.measurements![2].type)
-                        expect(message.environment.measurements[2].value).to.eql(defaultEnvironment.measurements![2].value)
-                        expect(message.environment.measurements[2].unit).to.eql(defaultEnvironment.measurements![2].unit)
-                        expect(message.environment.climatized).to.eql(defaultEnvironment.climatized)
-                        expect(message.environment.timestamp).to.eql(defaultEnvironment.timestamp.toISOString())
-                        done()
-                    })
-                    .then(() => {
-                        request
-                            .post('/v1/environments')
-                            .send(body)
-                            .set('Content-Type', 'application/json')
-                            .expect(201)
-                            .then()
-                    })
-                    .catch((err) => {
-                        done(err)
-                    })
-            })
-        })
-    })
-
-    describe('POST /v1/environments with only one Environment in the body', () => {
-        context('when posting a new Environment with success', () => {
-            before(async () => {
-                try {
-                    await deleteAllEnvironments()
-
-                    await rabbitmq.dispose()
-
-                    await rabbitmq.initialize(process.env.RABBITMQ_URI || Default.RABBITMQ_URI, { sslOptions: { ca: [] } })
-                } catch (err) {
-                    throw new Error('Failure on children.weights routes test: ' + err.message)
-                }
-            })
-            it('should return status code 201 and the saved Environment', () => {
-                const body = {
-                    institution_id: defaultEnvironment.institution_id,
-                    location: defaultEnvironment.location,
-                    measurements: defaultEnvironment.measurements,
-                    climatized: defaultEnvironment.climatized,
-                    timestamp: defaultEnvironment.timestamp
-                }
-
-                return request
-                    .post('/v1/environments')
-                    .send(body)
-                    .set('Content-Type', 'application/json')
-                    .expect(201)
-                    .then(res => {
-                        defaultEnvironment.id = res.body.id
-                        expect(res.body.id).to.eql(defaultEnvironment.id)
-                        expect(res.body.institution_id).to.eql(defaultEnvironment.institution_id)
-                        expect(res.body.location.local).to.eql(defaultEnvironment.location!.local)
-                        expect(res.body.location.room).to.eql(defaultEnvironment.location!.room)
-                        expect(res.body.location.latitude).to.eql(defaultEnvironment.location!.latitude)
-                        expect(res.body.location.longitude).to.eql(defaultEnvironment.location!.longitude)
-                        expect(res.body.measurements[0].type).to.eql(defaultEnvironment.measurements![0].type)
-                        expect(res.body.measurements[0].value).to.eql(defaultEnvironment.measurements![0].value)
-                        expect(res.body.measurements[0].unit).to.eql(defaultEnvironment.measurements![0].unit)
-                        expect(res.body.measurements[1].type).to.eql(defaultEnvironment.measurements![1].type)
-                        expect(res.body.measurements[1].value).to.eql(defaultEnvironment.measurements![1].value)
-                        expect(res.body.measurements[1].unit).to.eql(defaultEnvironment.measurements![1].unit)
-                        expect(res.body.measurements[2].type).to.eql(defaultEnvironment.measurements![2].type)
-                        expect(res.body.measurements[2].value).to.eql(defaultEnvironment.measurements![2].value)
-                        expect(res.body.measurements[2].unit).to.eql(defaultEnvironment.measurements![2].unit)
+                        let index = 0
+                        for (const measurement of res.body.measurements) {
+                            expect(measurement.type).to.eql(defaultEnvironment.measurements![index].type)
+                            expect(measurement.value).to.eql(defaultEnvironment.measurements![index].value)
+                            expect(measurement.unit).to.eql(defaultEnvironment.measurements![index].unit)
+                            index++
+                        }
                         expect(res.body.climatized).to.eql(defaultEnvironment.climatized)
                         expect(res.body.timestamp).to.eql(defaultEnvironment.timestamp.toISOString())
                     })
@@ -249,6 +205,21 @@ describe('Routes: environments', () => {
         })
 
         context('when a duplicate error occurs', () => {
+            before(async () => {
+                try {
+                    await deleteAllEnvironments()
+
+                    await createEnvironment({
+                        institution_id: defaultEnvironment.institution_id,
+                        location: defaultEnvironment.location,
+                        measurements: defaultEnvironment.measurements,
+                        climatized: defaultEnvironment.climatized,
+                        timestamp: defaultEnvironment.timestamp
+                    })
+                } catch (err) {
+                    throw new Error('Failure on environments routes test: ' + err.message)
+                }
+            })
             it('should return status code 409 and an info message about duplicate items', () => {
                 const body = {
                     institution_id: defaultEnvironment.institution_id,
@@ -397,13 +368,12 @@ describe('Routes: environments', () => {
                 }
             })
 
-            it('should return status code 201, create each environment and return a response of type MultiStatus<Environment> ' +
+            it('should return status code 207, create each environment and return a response of type MultiStatus<Environment> ' +
                 'with the description of success in sending each one of them', () => {
                 const body: any = []
 
                 correctEnvironmentsArr.forEach(environment => {
                     const bodyElem = {
-                        id: environment.id,
                         institution_id: environment.institution_id,
                         location: environment.location,
                         measurements: environment.measurements,
@@ -421,18 +391,16 @@ describe('Routes: environments', () => {
                     .then(res => {
                         for (let i = 0; i < res.body.success.length; i++) {
                             expect(res.body.success[i].code).to.eql(HttpStatus.CREATED)
-                            expect(res.body.success[i].item.id).to.eql(correctEnvironmentsArr[i].id)
+                            expect(res.body.success[i].item).to.have.property('id')
                             expect(res.body.success[i].item.institution_id).to.eql(correctEnvironmentsArr[i].institution_id)
                             expect(res.body.success[i].item.location).to.eql(correctEnvironmentsArr[i].location!.toJSON())
-                            expect(res.body.success[i].item.measurements[0].type).to.eql(correctEnvironmentsArr[i].measurements![0].type)
-                            expect(res.body.success[i].item.measurements[0].value).to.eql(correctEnvironmentsArr[i].measurements![0].value)
-                            expect(res.body.success[i].item.measurements[0].unit).to.eql(correctEnvironmentsArr[i].measurements![0].unit)
-                            expect(res.body.success[i].item.measurements[1].type).to.eql(correctEnvironmentsArr[i].measurements![1].type)
-                            expect(res.body.success[i].item.measurements[1].value).to.eql(correctEnvironmentsArr[i].measurements![1].value)
-                            expect(res.body.success[i].item.measurements[1].unit).to.eql(correctEnvironmentsArr[i].measurements![1].unit)
-                            expect(res.body.success[i].item.measurements[2].type).to.eql(correctEnvironmentsArr[i].measurements![2].type)
-                            expect(res.body.success[i].item.measurements[2].value).to.eql(correctEnvironmentsArr[i].measurements![2].value)
-                            expect(res.body.success[i].item.measurements[2].unit).to.eql(correctEnvironmentsArr[i].measurements![2].unit)
+                            let index = 0
+                            for (const measurement of res.body.success[i].item.measurements) {
+                                expect(measurement.type).to.eql(correctEnvironmentsArr[i].measurements![index].type)
+                                expect(measurement.value).to.eql(correctEnvironmentsArr[i].measurements![index].value)
+                                expect(measurement.unit).to.eql(correctEnvironmentsArr[i].measurements![index].unit)
+                                index++
+                            }
                             if (res.body.success[i].item.climatized)
                                 expect(res.body.success[i].item.climatized).to.eql(correctEnvironmentsArr[i].climatized)
                             expect(res.body.success[i].item.timestamp).to.eql(correctEnvironmentsArr[i].timestamp.toISOString())
@@ -444,13 +412,29 @@ describe('Routes: environments', () => {
         })
 
         context('when all the environments are correct but already exists in the repository', () => {
+            before(async () => {
+                try {
+                    await deleteAllEnvironments()
+
+                    for (const environment of correctEnvironmentsArr) {
+                        createEnvironment({
+                            institution_id: environment.institution_id,
+                            location: environment.location,
+                            measurements: environment.measurements,
+                            climatized: environment.climatized,
+                            timestamp: environment.timestamp
+                        })
+                    }
+                } catch (err) {
+                    throw new Error('Failure on environments routes test: ' + err.message)
+                }
+            })
             it('should return status code 201 and return a response of type MultiStatus<Environment> with the description ' +
                 'of conflict in sending each one of them', () => {
                 const body: any = []
 
                 correctEnvironmentsArr.forEach(environment => {
                     const bodyElem = {
-                        id: environment.id,
                         institution_id: environment.institution_id,
                         location: environment.location,
                         measurements: environment.measurements,
@@ -469,18 +453,15 @@ describe('Routes: environments', () => {
                         for (let i = 0; i < res.body.error.length; i++) {
                             expect(res.body.error[i].code).to.eql(HttpStatus.CONFLICT)
                             expect(res.body.error[i].message).to.eql(Strings.ENVIRONMENT.ALREADY_REGISTERED)
-                            expect(res.body.error[i].item.id).to.eql(correctEnvironmentsArr[i].id)
                             expect(res.body.error[i].item.institution_id).to.eql(correctEnvironmentsArr[i].institution_id)
                             expect(res.body.error[i].item.location).to.eql(correctEnvironmentsArr[i].location!.toJSON())
-                            expect(res.body.error[i].item.measurements[0].type).to.eql(correctEnvironmentsArr[i].measurements![0].type)
-                            expect(res.body.error[i].item.measurements[0].value).to.eql(correctEnvironmentsArr[i].measurements![0].value)
-                            expect(res.body.error[i].item.measurements[0].unit).to.eql(correctEnvironmentsArr[i].measurements![0].unit)
-                            expect(res.body.error[i].item.measurements[1].type).to.eql(correctEnvironmentsArr[i].measurements![1].type)
-                            expect(res.body.error[i].item.measurements[1].value).to.eql(correctEnvironmentsArr[i].measurements![1].value)
-                            expect(res.body.error[i].item.measurements[1].unit).to.eql(correctEnvironmentsArr[i].measurements![1].unit)
-                            expect(res.body.error[i].item.measurements[2].type).to.eql(correctEnvironmentsArr[i].measurements![2].type)
-                            expect(res.body.error[i].item.measurements[2].value).to.eql(correctEnvironmentsArr[i].measurements![2].value)
-                            expect(res.body.error[i].item.measurements[2].unit).to.eql(correctEnvironmentsArr[i].measurements![2].unit)
+                            let index = 0
+                            for (const measurement of res.body.error[i].item.measurements) {
+                                expect(measurement.type).to.eql(correctEnvironmentsArr[i].measurements![index].type)
+                                expect(measurement.value).to.eql(correctEnvironmentsArr[i].measurements![index].value)
+                                expect(measurement.unit).to.eql(correctEnvironmentsArr[i].measurements![index].unit)
+                                index++
+                            }
                             if (res.body.error[i].item.climatized)
                                 expect(res.body.error[i].item.climatized).to.eql(correctEnvironmentsArr[i].climatized)
                             expect(res.body.error[i].item.timestamp).to.eql(correctEnvironmentsArr[i].timestamp.toISOString())
@@ -506,7 +487,6 @@ describe('Routes: environments', () => {
 
                 mixedEnvironmentsArr.forEach(environment => {
                     const bodyElem = {
-                        id: environment.id,
                         institution_id: environment.institution_id,
                         location: environment.location,
                         measurements: environment.measurements,
@@ -524,18 +504,16 @@ describe('Routes: environments', () => {
                     .then(res => {
                         // Success item
                         expect(res.body.success[0].code).to.eql(HttpStatus.CREATED)
-                        expect(res.body.success[0].item.id).to.eql(mixedEnvironmentsArr[0].id)
+                        expect(res.body.success[0].item).to.have.property('id')
                         expect(res.body.success[0].item.institution_id).to.eql(mixedEnvironmentsArr[0].institution_id)
                         expect(res.body.success[0].item.location).to.eql(mixedEnvironmentsArr[0].location!.toJSON())
-                        expect(res.body.success[0].item.measurements[0].type).to.eql(mixedEnvironmentsArr[0].measurements![0].type)
-                        expect(res.body.success[0].item.measurements[0].value).to.eql(mixedEnvironmentsArr[0].measurements![0].value)
-                        expect(res.body.success[0].item.measurements[0].unit).to.eql(mixedEnvironmentsArr[0].measurements![0].unit)
-                        expect(res.body.success[0].item.measurements[1].type).to.eql(mixedEnvironmentsArr[0].measurements![1].type)
-                        expect(res.body.success[0].item.measurements[1].value).to.eql(mixedEnvironmentsArr[0].measurements![1].value)
-                        expect(res.body.success[0].item.measurements[1].unit).to.eql(mixedEnvironmentsArr[0].measurements![1].unit)
-                        expect(res.body.success[0].item.measurements[2].type).to.eql(mixedEnvironmentsArr[0].measurements![2].type)
-                        expect(res.body.success[0].item.measurements[2].value).to.eql(mixedEnvironmentsArr[0].measurements![2].value)
-                        expect(res.body.success[0].item.measurements[2].unit).to.eql(mixedEnvironmentsArr[0].measurements![2].unit)
+                        let index = 0
+                        for (const measurement of res.body.success[0].item.measurements) {
+                            expect(measurement.type).to.eql(mixedEnvironmentsArr[0].measurements![index].type)
+                            expect(measurement.value).to.eql(mixedEnvironmentsArr[0].measurements![index].value)
+                            expect(measurement.unit).to.eql(mixedEnvironmentsArr[0].measurements![index].unit)
+                            index++
+                        }
                         if (res.body.success[0].item.climatized)
                             expect(res.body.success[0].item.climatized).to.eql(mixedEnvironmentsArr[0].climatized)
                         expect(res.body.success[0].item.timestamp).to.eql(mixedEnvironmentsArr[0].timestamp.toISOString())
@@ -564,7 +542,6 @@ describe('Routes: environments', () => {
 
                 incorrectEnvironmentsArr.forEach(environment => {
                     const bodyElem = {
-                        id: environment.id,
                         institution_id: environment.institution_id,
                         location: environment.location,
                         measurements: environment.measurements,
@@ -601,11 +578,10 @@ describe('Routes: environments', () => {
                             .to.eql('Required fields were not provided...')
                         expect(res.body.error[4].description)
                             .to.eql('Validation of environment failed: ' +
-                                          'measurement type, measurement value, measurement unit required!')
+                            'measurement type, measurement value, measurement unit required!')
 
                         for (let i = 0; i < res.body.error.length; i++) {
                             expect(res.body.error[i].code).to.eql(HttpStatus.BAD_REQUEST)
-                            expect(res.body.error[i].item.id).to.eql(incorrectEnvironmentsArr[i].id)
                             expect(res.body.error[i].item.institution_id).to.eql(incorrectEnvironmentsArr[i].institution_id)
                             if (i !== 0) expect(res.body.error[i].item.location).to.eql(incorrectEnvironmentsArr[i].location!.toJSON())
                             if (res.body.error[i].item.climatized)
@@ -613,24 +589,13 @@ describe('Routes: environments', () => {
                             if (i !== 0) expect(res.body.error[i].item.timestamp)
                                 .to.eql(incorrectEnvironmentsArr[i].timestamp.toISOString())
                             if (i !== 0 && i !== 3) {
-                                expect(res.body.error[i].item.measurements[0].type)
-                                    .to.eql(incorrectEnvironmentsArr[i].measurements![0].type)
-                                expect(res.body.error[i].item.measurements[0].value)
-                                    .to.eql(incorrectEnvironmentsArr[i].measurements![0].value)
-                                expect(res.body.error[i].item.measurements[0].unit)
-                                    .to.eql(incorrectEnvironmentsArr[i].measurements![0].unit)
-                                expect(res.body.error[i].item.measurements[1].type)
-                                    .to.eql(incorrectEnvironmentsArr[i].measurements![1].type)
-                                expect(res.body.error[i].item.measurements[1].value)
-                                    .to.eql(incorrectEnvironmentsArr[i].measurements![1].value)
-                                expect(res.body.error[i].item.measurements[1].unit)
-                                    .to.eql(incorrectEnvironmentsArr[i].measurements![1].unit)
-                                expect(res.body.error[i].item.measurements[2].type)
-                                    .to.eql(incorrectEnvironmentsArr[i].measurements![2].type)
-                                expect(res.body.error[i].item.measurements[2].value)
-                                    .to.eql(incorrectEnvironmentsArr[i].measurements![2].value)
-                                expect(res.body.error[i].item.measurements[2].unit)
-                                    .to.eql(incorrectEnvironmentsArr[i].measurements![2].unit)
+                                let index = 0
+                                for (const measurement of res.body.error[i].item.measurements) {
+                                    expect(measurement.type).to.eql(incorrectEnvironmentsArr[i].measurements![index].type)
+                                    expect(measurement.value).to.eql(incorrectEnvironmentsArr[i].measurements![index].value)
+                                    expect(measurement.unit).to.eql(incorrectEnvironmentsArr[i].measurements![index].unit)
+                                    index++
+                                }
                             }
                         }
 
@@ -644,20 +609,17 @@ describe('Routes: environments', () => {
      */
     describe('GET /v1/environments', () => {
         context('when get all environment of the database successfully', () => {
-            it('should return status code 200 and a list of environments found', async () => {
+            before(async () => {
                 try {
+                    await deleteAllEnvironments()
+
                     await createEnvironment({
                         institution_id: defaultEnvironment.institution_id,
-                        location: {
-                            local: 'Indoor',
-                            room: 'room 01',
-                            latitude: defaultEnvironment.location!.latitude,
-                            longitude: defaultEnvironment.location!.longitude
-                        },
+                        location: defaultEnvironment.location,
                         measurements: [
                             {
                                 type: MeasurementType.TEMPERATURE,
-                                value: 25, // 19-31,
+                                value: 25,
                                 unit: '°C'
                             },
                             {
@@ -667,24 +629,23 @@ describe('Routes: environments', () => {
                             }
                         ],
                         climatized: defaultEnvironment.climatized,
-                        timestamp: new Date(2019)
+                        timestamp: defaultEnvironment.timestamp
                     })
                 } catch (err) {
                     throw new Error('Failure on environments routes test: ' + err.message)
                 }
-
+            })
+            it('should return status code 200 and a list of environments found', () => {
                 return request
                     .get('/v1/environments')
                     .set('Content-Type', 'application/json')
                     .expect(200)
                     .then(res => {
-                        defaultEnvironment.id = res.body[0].id
-                        expect(res.body).is.an.instanceOf(Array)
                         expect(res.body.length).to.not.eql(0)
                         // Check for the existence of properties only in the first element of the array
                         // because there is a guarantee that there will be at least one object (created
                         // in the case of the successful POST route test or with the create method above).
-                        expect(res.body[0].id).to.eql(defaultEnvironment.id)
+                        expect(res.body[0]).to.have.property('id')
                         expect(res.body[0].institution_id).to.eql(defaultEnvironment.institution_id)
                         expect(res.body[0].location.local).to.eql(defaultEnvironment.location!.local)
                         expect(res.body[0].location.room).to.eql(defaultEnvironment.location!.room)
@@ -697,7 +658,7 @@ describe('Routes: environments', () => {
                         expect(res.body[0].measurements[1].value).to.eql(33)
                         expect(res.body[0].measurements[1].unit).to.eql('%')
                         expect(res.body[0].climatized).to.eql(defaultEnvironment.climatized)
-                        expect(res.body[0].timestamp).to.eql((new Date(2019)).toISOString())
+                        expect(res.body[0].timestamp).to.eql(defaultEnvironment.timestamp.toISOString())
                     })
             })
         })
@@ -711,7 +672,7 @@ describe('Routes: environments', () => {
                 }
             })
 
-            it('should return status code 200 and an empty list', async () => {
+            it('should return status code 200 and an empty list', () => {
                 return request
                     .get('/v1/environments')
                     .set('Content-Type', 'application/json')
@@ -726,16 +687,13 @@ describe('Routes: environments', () => {
          * query-strings-parser library test
          */
         context('when get environment using the "query-strings-parser" library', () => {
-            it('should return status code 200 and the result as needed in the query', async () => {
+            before(async () => {
                 try {
+                    await deleteAllEnvironments()
+
                     await createEnvironment({
                         institution_id: defaultEnvironment.institution_id,
-                        location: {
-                            local: 'Indoor',
-                            room: 'room 01',
-                            latitude: defaultEnvironment.location!.latitude,
-                            longitude: defaultEnvironment.location!.longitude
-                        },
+                        location: defaultEnvironment.location,
                         measurements: [
                             {
                                 type: MeasurementType.TEMPERATURE,
@@ -778,7 +736,8 @@ describe('Routes: environments', () => {
                 } catch (err) {
                     throw new Error('Failure on environments routes test: ' + err.message)
                 }
-
+            })
+            it('should return status code 200 and the result as needed in the query', () => {
                 const url = '/v1/environments?climatized=true&sort=institution_id&page=1&limit=3'
 
                 return request
@@ -786,14 +745,13 @@ describe('Routes: environments', () => {
                     .set('Content-Type', 'application/json')
                     .expect(200)
                     .then(res => {
-                        defaultEnvironment.id = res.body[0].id
                         expect(res.body).is.an.instanceOf(Array)
                         expect(res.body.length).to.not.eql(0)
                         // Check for the existence of properties only in the first element of the array
                         // because there is a guarantee that there will be at least one object (created
                         // in the case of the successful POST route test or with the create method above)
                         // with the property 'climatized' = true (the only query filter)
-                        expect(res.body[0].id).to.eql(defaultEnvironment.id)
+                        expect(res.body[0]).to.have.property('id')
                         expect(res.body[0].institution_id).to.eql(defaultEnvironment.institution_id)
                         expect(res.body[0].location.local).to.eql(defaultEnvironment.location!.local)
                         expect(res.body[0].location.room).to.eql(defaultEnvironment.location!.room)
@@ -821,7 +779,7 @@ describe('Routes: environments', () => {
                 }
             })
 
-            it('should return status code 200 and an empty list', async () => {
+            it('should return status code 200 and an empty list', () => {
                 const url = '/v1/environments?climatized=true&sort=institution_id&page=1&limit=3'
 
                 return request
@@ -838,56 +796,6 @@ describe('Routes: environments', () => {
     /**
      * DELETE route
      */
-    describe('NO CONNECTION TO RABBITMQ -> DELETE /v1/environments/:environment_id', () => {
-        context('when the environment was deleted successfully', () => {
-            let result
-
-            before(async () => {
-                try {
-                    result = await createEnvironment({
-                        institution_id: defaultEnvironment.institution_id,
-                        location: {
-                            local: (defaultEnvironment.location) ? defaultEnvironment.location.local : '',
-                            room: (defaultEnvironment.location) ? defaultEnvironment.location.room : '',
-                            latitude: (defaultEnvironment.location) ? defaultEnvironment.location.latitude : '',
-                            longitude: (defaultEnvironment.location) ? defaultEnvironment.location.longitude : ''
-                        },
-                        measurements: [
-                            {
-                                type: MeasurementType.HUMIDITY,
-                                value: 34,
-                                unit: '%'
-                            },
-                            {
-                                type: MeasurementType.TEMPERATURE,
-                                value: 40,
-                                unit: '°C'
-                            }
-                        ],
-                        climatized: true,
-                        timestamp: defaultEnvironment.timestamp
-                    })
-
-                    await rabbitmq.dispose()
-
-                    await rabbitmq.initialize('amqp://invalidUser:guest@localhost', { retries: 1, interval: 100 })
-                } catch (err) {
-                    throw new Error('Failure on environments routes test: ' + err.message)
-                }
-            })
-            it('should return status code 204 and no content for environment (and show an error log about unable to send ' +
-                'DeleteEnvironment event)', () => {
-                return request
-                    .delete(`/v1/environments/${result.id}`)
-                    .set('Content-Type', 'application/json')
-                    .expect(204)
-                    .then(res => {
-                        expect(res.body).to.eql({})
-                    })
-            })
-        })
-    })
-
     describe('RABBITMQ PUBLISHER -> DELETE /v1/environments/:environment_id', () => {
         context('when the environment was deleted successfully and your ID is published on the bus', () => {
             let result
@@ -898,12 +806,7 @@ describe('Routes: environments', () => {
 
                     result = await createEnvironment({
                         institution_id: defaultEnvironment.institution_id,
-                        location: {
-                            local: (defaultEnvironment.location) ? defaultEnvironment.location.local : '',
-                            room: (defaultEnvironment.location) ? defaultEnvironment.location.room : '',
-                            latitude: (defaultEnvironment.location) ? defaultEnvironment.location.latitude : '',
-                            longitude: (defaultEnvironment.location) ? defaultEnvironment.location.longitude : ''
-                        },
+                        location: defaultEnvironment.location,
                         measurements: [
                             {
                                 type: MeasurementType.HUMIDITY,
@@ -916,14 +819,23 @@ describe('Routes: environments', () => {
                                 unit: '°C'
                             }
                         ],
-                        climatized: true,
+                        climatized: defaultEnvironment.climatized,
                         timestamp: defaultEnvironment.timestamp
                     })
 
                     await rabbitmq.initialize(process.env.RABBITMQ_URI || Default.RABBITMQ_URI,
-                        { receiveFromYourself: true, sslOptions: { ca: [] } })
+                        { interval: 100, receiveFromYourself: true, sslOptions: { ca: [] } })
                 } catch (err) {
-                    throw new Error('Failure on children.weights routes test: ' + err.message)
+                    throw new Error('Failure on environments routes test: ' + err.message)
+                }
+            })
+
+            after(async () => {
+                try {
+                    await rabbitmq.dispose()
+                    await rabbitmq.initialize('amqp://invalidUser:guest@localhost', { retries: 1, interval: 100 })
+                } catch (err) {
+                    throw new Error('Failure on environments test: ' + err.message)
                 }
             })
 
@@ -931,12 +843,15 @@ describe('Routes: environments', () => {
                 'published on the bus', (done) => {
                 rabbitmq.bus
                     .subDeleteEnvironment(message => {
-                        expect(message.event_name).to.eql('EnvironmentDeleteEvent')
-                        expect(message).to.have.property('timestamp')
-                        expect(message).to.have.property('environment')
-                        defaultEnvironment.id = message.environment.id
-                        expect(message.environment.id).to.eql(defaultEnvironment.id)
-                        done()
+                        try {
+                            expect(message.event_name).to.eql('EnvironmentDeleteEvent')
+                            expect(message).to.have.property('timestamp')
+                            expect(message).to.have.property('environment')
+                            expect(message.environment).to.have.property('id')
+                            done()
+                        } catch (err) {
+                            done(err)
+                        }
                     })
                     .then(() => {
                         request
@@ -944,30 +859,24 @@ describe('Routes: environments', () => {
                             .set('Content-Type', 'application/json')
                             .expect(204)
                             .then()
+                            .catch(done)
                     })
-                    .catch((err) => {
-                        done(err)
-                    })
+                    .catch(done)
             })
         })
     })
 
     describe('DELETE /v1/environments/:environment_id', () => {
-        context('when the environment was deleted successfully', () => {
-            it('should return status code 204 and no content for environment', async () => {
-                let result
+        context('when the environment was deleted successfully (there is no connection to RabbitMQ)', () => {
+            let result
 
+            before(async () => {
                 try {
                     await deleteAllEnvironments()
 
                     result = await createEnvironment({
                         institution_id: defaultEnvironment.institution_id,
-                        location: {
-                            local: (defaultEnvironment.location) ? defaultEnvironment.location.local : '',
-                            room: (defaultEnvironment.location) ? defaultEnvironment.location.room : '',
-                            latitude: (defaultEnvironment.location) ? defaultEnvironment.location.latitude : '',
-                            longitude: (defaultEnvironment.location) ? defaultEnvironment.location.longitude : ''
-                        },
+                        location: defaultEnvironment.location,
                         measurements: [
                             {
                                 type: MeasurementType.HUMIDITY,
@@ -980,17 +889,15 @@ describe('Routes: environments', () => {
                                 unit: '°C'
                             }
                         ],
-                        climatized: true,
+                        climatized: defaultEnvironment.climatized,
                         timestamp: defaultEnvironment.timestamp
                     })
-
-                    await rabbitmq.dispose()
-
-                    await rabbitmq.initialize(process.env.RABBITMQ_URI || Default.RABBITMQ_URI, { sslOptions: { ca: [] } })
                 } catch (err) {
                     throw new Error('Failure on environments routes test: ' + err.message)
                 }
-
+            })
+            it('should return status code 204 and no content for environment (and show an error log about unable to send ' +
+                'DeleteEnvironment event)', () => {
                 return request
                     .delete(`/v1/environments/${result.id}`)
                     .set('Content-Type', 'application/json')
@@ -1030,7 +937,7 @@ describe('Routes: environments', () => {
                 }
             })
 
-            it('should return status code 400 and info message about the invalid environment id', async () => {
+            it('should return status code 400 and info message about the invalid environment id', () => {
                 return request
                     .delete(`/v1/environments/123`)
                     .set('Content-Type', 'application/json')

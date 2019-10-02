@@ -69,10 +69,10 @@ export class SleepService implements ISleepService {
         for (const elem of sleep) {
             try {
                 // Add each sleep from the array
-                await this.addSleep(elem)
+                const sleepResult = await this.addSleep(elem)
 
                 // Create a StatusSuccess object for the construction of the MultiStatus response.
-                const statusSuccess: StatusSuccess<Sleep> = new StatusSuccess<Sleep>(HttpStatus.CREATED, elem)
+                const statusSuccess: StatusSuccess<Sleep> = new StatusSuccess<Sleep>(HttpStatus.CREATED, sleepResult)
                 statusSuccessArr.push(statusSuccess)
             } catch (err) {
                 let statusCode: number = HttpStatus.INTERNAL_SERVER_ERROR

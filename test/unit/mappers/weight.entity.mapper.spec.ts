@@ -81,7 +81,7 @@ describe('Mappers: WeightEntityMapper', () => {
             })
         })
 
-        context('when the parameter is a undefined', () => {
+        context('when the parameter is an undefined', () => {
             it('should normally execute the method, returning an empty Weight as a result of the transformation', () => {
                 const result: Weight = new WeightEntityMapper().transform(undefined)
 

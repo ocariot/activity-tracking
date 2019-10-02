@@ -68,10 +68,11 @@ export class PhysicalActivityService implements IPhysicalActivityService {
         for (const elem of activity) {
             try {
                 // 1. Add each activity from the array
-                await this.addActivity(elem)
+                const activityResult = await this.addActivity(elem)
 
                 // 2. Create a StatusSuccess object for the construction of the MultiStatus response.
-                const statusSuccess: StatusSuccess<PhysicalActivity> = new StatusSuccess<PhysicalActivity>(HttpStatus.CREATED, elem)
+                const statusSuccess: StatusSuccess<PhysicalActivity> =
+                    new StatusSuccess<PhysicalActivity>(HttpStatus.CREATED, activityResult)
                 statusSuccessArr.push(statusSuccess)
             } catch (err) {
                 let statusCode: number = HttpStatus.INTERNAL_SERVER_ERROR

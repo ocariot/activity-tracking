@@ -52,17 +52,17 @@ export class LogService implements ILogService {
                 if (log) { // If exists.
                     // 3a. Update child log.
                     log.value = elem.value
-                    await this._logRepository.update(log)
+                    const logResult = await this._logRepository.update(log)
 
                     // 4a. Creates a StatusSuccess object for the construction of the MultiStatus response.
-                    const statusSuccess: StatusSuccess<Log> = new StatusSuccess<Log>(HttpStatus.CREATED, elem)
+                    const statusSuccess: StatusSuccess<Log> = new StatusSuccess<Log>(HttpStatus.CREATED, logResult)
                     statusSuccessArr.push(statusSuccess)
                 } else {
                     // 3b. Creates new child log.
-                    await this._logRepository.create(elem)
+                    const logResult = await this._logRepository.create(elem)
 
                     // 4b. Creates a StatusSuccess object for the construction of the MultiStatus response.
-                    const statusSuccess: StatusSuccess<Log> = new StatusSuccess<Log>(HttpStatus.CREATED, elem)
+                    const statusSuccess: StatusSuccess<Log> = new StatusSuccess<Log>(HttpStatus.CREATED, logResult)
                     statusSuccessArr.push(statusSuccess)
                 }
             } catch (err) {
@@ -124,6 +124,7 @@ export class LogService implements ILogService {
             DateValidator.validate(dateEnd)
             LogDateRangeValidator.validate(dateStart, dateEnd)
 
+            query.ordination = new Map<string, string>().set('date', 'desc')
             query.addFilter({
                 child_id: childId,
                 $and: [
@@ -182,6 +183,7 @@ export class LogService implements ILogService {
         DateValidator.validate(dateEnd)
         LogDateRangeValidator.validate(dateStart, dateEnd)
 
+        query.ordination = new Map<string, string>().set('date', 'desc')
         query.addFilter({
             child_id: childId,
             type: desiredResource,

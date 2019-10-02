@@ -58,12 +58,12 @@ export class WeightRepository extends BaseRepository<Weight, WeightEntity> imple
             if (weight.timestamp && weight.child_id && weight.type) {
                 query.filters = { timestamp: weight.timestamp, child_id: weight.child_id, type: weight.type }
             }
-            super.findOne(query)
+            this.findOne(query)
                 .then((result: Weight) => {
                     if (result) return resolve(true)
                     return resolve(false)
                 })
-                .catch(err => reject(super.mongoDBErrorListener(err)))
+                .catch(err => reject(err))
         })
     }
 

@@ -50,7 +50,7 @@ export class SleepPatternDataSet implements IJSONSerializable, IJSONDeserializab
 
         if (json.start_time !== undefined && !(json.start_time instanceof Date)) {
             this.start_time = this.convertDatetimeString(json.start_time)
-        } else {
+        } else if (json.start_time !== undefined && json.start_time instanceof Date) {
             this.start_time = json.start_time
         }
         if (json.name !== undefined) this.name = json.name

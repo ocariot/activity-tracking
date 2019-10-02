@@ -35,7 +35,7 @@ describe('Services: SleepService', () => {
     /**
      * For POST route with multiple sleep objects
      */
-    // Array with correct sleep objects
+        // Array with correct sleep objects
     const correctSleepArr: Array<Sleep> = new Array<SleepMock>()
     for (let i = 0; i < 3; i++) {
         correctSleepArr.push(new SleepMock())
@@ -92,9 +92,9 @@ describe('Services: SleepService', () => {
 
     const incorrectSleep12: Sleep = new SleepMock()     // The sleep pattern data set array has an invalid item with an invalid name
     const wrongDataSetItemJSON: any = {
-        start_time : new Date('2018-08-18T01:30:30Z'),
-        name : 'restlesss',
-        duration : Math.floor(Math.random() * 5 + 1) * 60000 // 1-5min
+        start_time: new Date('2018-08-18T01:30:30Z'),
+        name: 'restlesss',
+        duration: Math.floor(Math.random() * 5 + 1) * 60000 // 1-5min
     }
     incorrectSleep12.pattern!.data_set = [new SleepPatternDataSet().fromJSON(wrongDataSetItemJSON)]
 
@@ -110,9 +110,9 @@ describe('Services: SleepService', () => {
     }
     const incorrectSleep13: Sleep = new Sleep().fromJSON(wrongSleepJSON)
     const wrongDataSetItem13JSON: any = {
-        start_time : new Date('2018-08-18T01:30:30Z'),
-        name : 'deeps',
-        duration : Math.floor(Math.random() * 5 + 1) * 60000 // 1-5min
+        start_time: new Date('2018-08-18T01:30:30Z'),
+        name: 'deeps',
+        duration: Math.floor(Math.random() * 5 + 1) * 60000 // 1-5min
     }
     incorrectSleep13.pattern!.data_set = new Array<SleepPatternDataSet>()
     incorrectSleep13.pattern!.data_set[0] = new SleepPatternDataSet().fromJSON(wrongDataSetItem13JSON)
@@ -197,19 +197,18 @@ describe('Services: SleepService', () => {
         })
 
         context('when the Sleep is incorrect (missing all fields)', () => {
-            it('should throw a ValidationException', async () => {
-                try {
-                    return await sleepService.add(incorrectSleep)
-                } catch (err) {
-                    assert.propertyVal(err, 'message', 'Required fields were not provided...')
-                    assert.propertyVal(err, 'description', 'Activity validation failed: start_time, end_time, ' +
-                        'duration, child_id is required!')
-                }
+            it('should throw a ValidationException', () => {
+                return sleepService.add(incorrectSleep)
+                    .catch(err => {
+                        assert.propertyVal(err, 'message', 'Required fields were not provided...')
+                        assert.propertyVal(err, 'description', 'Activity validation failed: start_time, end_time, ' +
+                            'duration, child_id is required!')
+                    })
             })
         })
 
         context('when the Sleep is incorrect (missing sleep fields)', () => {
-            it('should throw a ValidationException', async () => {
+            it('should throw a ValidationException', () => {
                 const sleepJSON: any = {
                     id: new ObjectID(),
                     start_time: sleep.start_time,
@@ -221,76 +220,71 @@ describe('Services: SleepService', () => {
                 }
                 incorrectSleep = new Sleep().fromJSON(sleepJSON)
 
-                try {
-                    return await sleepService.add(incorrectSleep)
-                } catch (err) {
-                    assert.propertyVal(err, 'message', 'Required fields were not provided...')
-                    assert.propertyVal(err, 'description', 'Sleep validation failed: type, pattern is required!')
-                }
+                return sleepService.add(incorrectSleep)
+                    .catch(err => {
+                        assert.propertyVal(err, 'message', 'Required fields were not provided...')
+                        assert.propertyVal(err, 'description', 'Sleep validation failed: type, pattern is required!')
+                    })
             })
         })
 
         context('when the Sleep is incorrect (start_time with a date newer than end_time)', () => {
-            it('should throw a ValidationException', async () => {
+            it('should throw a ValidationException', () => {
                 incorrectSleep = new SleepMock()
                 incorrectSleep.start_time = new Date('2018-12-15T12:52:59Z')
                 incorrectSleep.end_time = new Date('2018-12-14T13:12:37Z')
 
-                try {
-                    return await sleepService.add(incorrectSleep)
-                } catch (err) {
-                    assert.propertyVal(err, 'message', 'Date field is invalid...')
-                    assert.propertyVal(err, 'description', 'Date validation failed: The end_time parameter can not contain ' +
-                        'a older date than that the start_time parameter!')
-                }
+                return sleepService.add(incorrectSleep)
+                    .catch(err => {
+                        assert.propertyVal(err, 'message', 'Date field is invalid...')
+                        assert.propertyVal(err, 'description', 'Date validation failed: The end_time parameter can not contain ' +
+                            'an older date than that the start_time parameter!')
+                    })
             })
         })
 
         context('when the Sleep is incorrect (the duration is incompatible with the start_time and end_time parameters)', () => {
-            it('should throw a ValidationException', async () => {
+            it('should throw a ValidationException', () => {
                 incorrectSleep = new SleepMock()
                 incorrectSleep.duration = 11780000
 
-                try {
-                    return await sleepService.add(incorrectSleep)
-                } catch (err) {
-                    assert.propertyVal(err, 'message', 'Duration field is invalid...')
-                    assert.propertyVal(err, 'description', 'Duration validation failed: Activity duration value does not ' +
-                        'match values passed in start_time and end_time parameters!')
-                }
+                return sleepService.add(incorrectSleep)
+                    .catch(err => {
+                        assert.propertyVal(err, 'message', 'Duration field is invalid...')
+                        assert.propertyVal(err, 'description', 'Duration validation failed: Activity duration value does not ' +
+                            'match values passed in start_time and end_time parameters!')
+                    })
             })
         })
 
         context('when the Sleep is incorrect (the duration is negative)', () => {
-            it('should throw a ValidationException', async () => {
+            it('should throw a ValidationException', () => {
                 incorrectSleep = new SleepMock()
                 incorrectSleep.duration = -11780000
 
-                try {
-                    return await sleepService.add(incorrectSleep)
-                } catch (err) {
-                    assert.propertyVal(err, 'message', 'Duration field is invalid...')
-                    assert.propertyVal(err, 'description', 'Activity validation failed: The value provided has a negative value!')
-                }
+                return sleepService.add(incorrectSleep)
+                    .catch(err => {
+                        assert.propertyVal(err, 'message', 'Duration field is invalid...')
+                        assert.propertyVal(err, 'description', 'Activity validation failed: The value provided has a negative value!')
+                    })
             })
         })
 
         context('when the Sleep is incorrect (child_id is invalid)', () => {
-            it('should throw a ValidationException', async () => {
+            it('should throw a ValidationException', () => {
                 incorrectSleep = new SleepMock()
                 incorrectSleep.child_id = '5a62be07de34500146d9c5442'           // Make child_id invalid
 
-                try {
-                    return await sleepService.add(incorrectSleep)
-                } catch (err) {
-                    assert.propertyVal(err, 'message', Strings.CHILD.PARAM_ID_NOT_VALID_FORMAT)
-                    assert.propertyVal(err, 'description', Strings.ERROR_MESSAGE.UUID_NOT_VALID_FORMAT_DESC)
-                }
+                return sleepService.add(incorrectSleep)
+                    .catch(err => {
+                        assert.propertyVal(err, 'message', Strings.CHILD.PARAM_ID_NOT_VALID_FORMAT)
+                        assert.propertyVal(err, 'description', Strings.ERROR_MESSAGE.UUID_NOT_VALID_FORMAT_DESC)
+                    })
             })
         })
 
         context('when the Sleep is incorrect (type is invalid)', () => {
-            it('should throw a ValidationException', async () => {
+            it('should throw a ValidationException', () => {
                 const sleepJSON: any = {
                     id: new ObjectID(),
                     start_time: sleep.start_time,
@@ -302,101 +296,95 @@ describe('Services: SleepService', () => {
                 }
                 incorrectSleep = new Sleep().fromJSON(sleepJSON)
 
-                try {
-                    return await sleepService.add(incorrectSleep)
-                } catch (err) {
-                    assert.propertyVal(err, 'message', 'The type provided "classics" is not supported...')
-                    assert.propertyVal(err, 'description', 'The allowed Sleep Pattern types are: classic, stages.')
-                }
+                return sleepService.add(incorrectSleep)
+                    .catch(err => {
+                        assert.propertyVal(err, 'message', 'The type provided "classics" is not supported...')
+                        assert.propertyVal(err, 'description', 'The allowed Sleep Pattern types are: classic, stages.')
+                    })
             })
         })
 
         context('when the Sleep is incorrect (missing data_set of pattern)', () => {
-            it('should throw a ValidationException', async () => {
+            it('should throw a ValidationException', () => {
                 incorrectSleep = new SleepMock()
                 incorrectSleep.child_id = '5a62be07de34500146d9c544'           // Make child_id valid
                 incorrectSleep.pattern = new SleepPattern()
 
-                try {
-                    return await sleepService.add(incorrectSleep)
-                } catch (err) {
-                    assert.propertyVal(err, 'message', 'Pattern are not in a format that is supported...')
-                    assert.propertyVal(err, 'description', 'Validation of the standard of sleep failed: data_set is required!')
-                }
+                return sleepService.add(incorrectSleep)
+                    .catch(err => {
+                        assert.propertyVal(err, 'message', 'Pattern are not in a format that is supported...')
+                        assert.propertyVal(err, 'description', 'Validation of the standard of sleep failed: data_set is required!')
+                    })
             })
         })
 
         context('when the Sleep is incorrect (the pattern has an empty data_set array)', () => {
-            it('should throw a ValidationException', async () => {
+            it('should throw a ValidationException', () => {
                 incorrectSleep.pattern!.data_set = new Array<SleepPatternDataSet>()
 
-                try {
-                    return await sleepService.add(incorrectSleep)
-                } catch (err) {
-                    assert.propertyVal(err, 'message', 'Dataset are not in a format that is supported!')
-                    assert.propertyVal(err, 'description', 'The data_set collection must not be empty!')
-                }
+                return sleepService.add(incorrectSleep)
+                    .catch(err => {
+                        assert.propertyVal(err, 'message', 'Dataset are not in a format that is supported!')
+                        assert.propertyVal(err, 'description', 'The data_set collection must not be empty!')
+                    })
             })
         })
 
         context('when the Sleep is incorrect (missing fields of some item from the data_set array of pattern)', () => {
-            it('should throw a ValidationException', async () => {
+            it('should throw a ValidationException', () => {
                 const dataSetItemTest: SleepPatternDataSet = new SleepPatternDataSet()
 
                 incorrectSleep.pattern!.data_set = [dataSetItemTest]
 
-                try {
-                    return await sleepService.add(incorrectSleep)
-                } catch (err) {
-                    assert.propertyVal(err, 'message', 'Dataset are not in a format that is supported!')
-                    assert.propertyVal(err, 'description', 'Validation of the sleep pattern dataset failed: ' +
-                        'data_set start_time, data_set name, data_set duration is required!')
-                }
+                return sleepService.add(incorrectSleep)
+                    .catch(err => {
+                        assert.propertyVal(err, 'message', 'Dataset are not in a format that is supported!')
+                        assert.propertyVal(err, 'description', 'Validation of the sleep pattern dataset failed: ' +
+                            'data_set start_time, data_set name, data_set duration is required!')
+                    })
             })
         })
 
         context('when the Sleep is incorrect (there is a negative duration on some item from the data_set array of pattern)', () => {
-            it('should throw a ValidationException', async () => {
+            it('should throw a ValidationException', () => {
                 const dataSetItemTest: SleepPatternDataSet = new SleepPatternDataSet()
                 dataSetItemTest.start_time = new Date(sleep.start_time!)
                 dataSetItemTest.name = incorrectSleep.pattern!.data_set[0].name
                 dataSetItemTest.duration = -(Math.floor(Math.random() * 5 + 1) * 60000)
                 incorrectSleep.pattern!.data_set = [dataSetItemTest]
 
-                try {
-                    return await sleepService.add(incorrectSleep)
-                } catch (err) {
-                    assert.propertyVal(err, 'message', 'Some (or several) duration field of sleep pattern is invalid...')
-                    assert.propertyVal(err, 'description', 'Sleep Pattern dataset validation failed: The value provided ' +
-                        'has a negative value!')
-                }
+                return sleepService.add(incorrectSleep)
+                    .catch(err => {
+                        assert.propertyVal(err, 'message', 'Some (or several) duration field of sleep pattern is invalid...')
+                        assert.propertyVal(err, 'description', 'Sleep Pattern dataset validation failed: The value provided ' +
+                            'has a negative value!')
+                    })
             })
         })
 
         context('when the Sleep is incorrect (the sleep pattern data set array has an invalid item with an invalid name)', () => {
-            it('should throw a ValidationException', async () => {
+            it('should throw a ValidationException', () => {
                 const dataSetItemJSON: any = {
-                    start_time : new Date('2018-08-18T01:30:30Z'),
-                    name : 'restlesss',
-                    duration : Math.floor(Math.random() * 5 + 1) * 60000 // 1-5min
+                    start_time: new Date('2018-08-18T01:30:30Z'),
+                    name: 'restlesss',
+                    duration: Math.floor(Math.random() * 5 + 1) * 60000 // 1-5min
                 }
                 incorrectSleep.pattern!.data_set = [new SleepPatternDataSet().fromJSON(dataSetItemJSON)]
 
-                try {
-                    return await sleepService.add(incorrectSleep)
-                } catch (err) {
-                    assert.propertyVal(err, 'message', 'The sleep pattern name provided "restlesss" is not supported...')
-                    if (incorrectSleep.type === SleepType.CLASSIC)
-                        assert.propertyVal(err, 'description', 'The names of the allowed patterns are: asleep, restless, awake.')
-                    else
-                        assert.propertyVal(err, 'description', 'The names of the allowed patterns are: deep, light, rem, awake.')
-                }
+                return sleepService.add(incorrectSleep)
+                    .catch(err => {
+                        assert.propertyVal(err, 'message', 'The sleep pattern name provided "restlesss" is not supported...')
+                        if (incorrectSleep.type === SleepType.CLASSIC)
+                            assert.propertyVal(err, 'description', 'The names of the allowed patterns are: asleep, restless, awake.')
+                        else
+                            assert.propertyVal(err, 'description', 'The names of the allowed patterns are: deep, light, rem, awake.')
+                    })
             })
         })
 
         context('when the Sleep is incorrect (the sleep pattern data set array has an invalid item with an invalid name ' +
             'and the sleep type is "stages")', () => {
-            it('should throw a ValidationException', async () => {
+            it('should throw a ValidationException', () => {
                 const sleepJSON: any = {
                     id: new ObjectID(),
                     start_time: sleep.start_time,
@@ -408,19 +396,18 @@ describe('Services: SleepService', () => {
                 }
                 incorrectSleep = new Sleep().fromJSON(sleepJSON)
                 const dataSetItemJSON: any = {
-                    start_time : new Date('2018-08-18T01:30:30Z'),
-                    name : 'deeps',
-                    duration : Math.floor(Math.random() * 5 + 1) * 60000 // 1-5min
+                    start_time: new Date('2018-08-18T01:30:30Z'),
+                    name: 'deeps',
+                    duration: Math.floor(Math.random() * 5 + 1) * 60000 // 1-5min
                 }
                 incorrectSleep.pattern!.data_set = new Array<SleepPatternDataSet>()
                 incorrectSleep.pattern!.data_set[0] = new SleepPatternDataSet().fromJSON(dataSetItemJSON)
 
-                try {
-                    return await sleepService.add(incorrectSleep)
-                } catch (err) {
-                    assert.propertyVal(err, 'message', 'The sleep pattern name provided "deeps" is not supported...')
-                    assert.propertyVal(err, 'description', 'The names of the allowed patterns are: deep, light, rem, awake.')
-                }
+                return sleepService.add(incorrectSleep)
+                    .catch(err => {
+                        assert.propertyVal(err, 'message', 'The sleep pattern name provided "deeps" is not supported...')
+                        assert.propertyVal(err, 'description', 'The names of the allowed patterns are: deep, light, rem, awake.')
+                    })
             })
         })
     })
@@ -517,7 +504,7 @@ describe('Services: SleepService', () => {
                         assert.propertyVal(result.error[1], 'description', 'Sleep validation failed: type, pattern is required!')
                         assert.propertyVal(result.error[2], 'message', 'Date field is invalid...')
                         assert.propertyVal(result.error[2], 'description', 'Date validation failed: The end_time parameter can not ' +
-                            'contain a older date than that the start_time parameter!')
+                            'contain an older date than that the start_time parameter!')
                         assert.propertyVal(result.error[3], 'message', 'Duration field is invalid...')
                         assert.propertyVal(result.error[3], 'description', 'Duration validation failed: Activity duration value does ' +
                             'not match values passed in start_time and end_time parameters!')
@@ -605,7 +592,7 @@ describe('Services: SleepService', () => {
         })
 
         context('when the sleep id is invalid', () => {
-            it('should throw a ValidationException', () => {
+            it('should throw a ValidationException', async () => {
                 sleep.id = '5a62be07de34500146d9c5442'       // Make sleep id invalid
                 const query: IQuery = new Query()
                 query.filters = {
@@ -614,7 +601,7 @@ describe('Services: SleepService', () => {
                 }
 
                 try {
-                    return sleepService.getByIdAndChild(sleep.id!, sleep.child_id, query)
+                    await sleepService.getByIdAndChild(sleep.id!, sleep.child_id, query)
                 } catch (err) {
                     assert.propertyVal(err, 'message', Strings.SLEEP.PARAM_ID_NOT_VALID_FORMAT)
                     assert.propertyVal(err, 'description', Strings.ERROR_MESSAGE.UUID_NOT_VALID_FORMAT_DESC)
@@ -623,7 +610,7 @@ describe('Services: SleepService', () => {
         })
 
         context('when the sleep child_id is invalid', () => {
-            it('should throw a ValidationException', () => {
+            it('should throw a ValidationException', async () => {
                 sleep.child_id = '5a62be07de34500146d9c5442'     // Make child_id invalid
                 const query: IQuery = new Query()
                 query.filters = {
@@ -632,7 +619,7 @@ describe('Services: SleepService', () => {
                 }
 
                 try {
-                    return sleepService.getByIdAndChild(sleep.id!, sleep.child_id, query)
+                    await sleepService.getByIdAndChild(sleep.id!, sleep.child_id, query)
                 } catch (err) {
                     assert.propertyVal(err, 'message', Strings.CHILD.PARAM_ID_NOT_VALID_FORMAT)
                     assert.propertyVal(err, 'description', Strings.ERROR_MESSAGE.UUID_NOT_VALID_FORMAT_DESC)
@@ -677,7 +664,7 @@ describe('Services: SleepService', () => {
         })
 
         context('when the sleep child_id is invalid', () => {
-            it('should throw a ValidationException', () => {
+            it('should throw a ValidationException', async () => {
                 sleep.child_id = '5a62be07de34500146d9c5442'     // Make child_id invalid again
                 const query: IQuery = new Query()
                 query.filters = {
@@ -686,7 +673,7 @@ describe('Services: SleepService', () => {
                 }
 
                 try {
-                    return sleepService.getAllByChild(sleep.child_id, query)
+                    await sleepService.getAllByChild(sleep.child_id, query)
                 } catch (err) {
                     assert.propertyVal(err, 'message', Strings.CHILD.PARAM_ID_NOT_VALID_FORMAT)
                     assert.propertyVal(err, 'description', Strings.ERROR_MESSAGE.UUID_NOT_VALID_FORMAT_DESC)
@@ -744,7 +731,7 @@ describe('Services: SleepService', () => {
                 incorrectSleep.id = '5a62be07de34500146d9c5442'           // Make sleep id invalid
 
                 return sleepService.updateByChild(incorrectSleep)
-                    .catch (err => {
+                    .catch(err => {
                         assert.propertyVal(err, 'message', Strings.SLEEP.PARAM_ID_NOT_VALID_FORMAT)
                         assert.propertyVal(err, 'description', Strings.ERROR_MESSAGE.UUID_NOT_VALID_FORMAT_DESC)
                     })
@@ -757,7 +744,7 @@ describe('Services: SleepService', () => {
                 incorrectSleep.child_id = '5a62be07de34500146d9c5442'           // Make sleep child_id invalid
 
                 return sleepService.updateByChild(incorrectSleep)
-                    .catch (err => {
+                    .catch(err => {
                         assert.propertyVal(err, 'message', Strings.CHILD.PARAM_ID_NOT_VALID_FORMAT)
                         assert.propertyVal(err, 'description', Strings.ERROR_MESSAGE.UUID_NOT_VALID_FORMAT_DESC)
                     })
@@ -770,7 +757,7 @@ describe('Services: SleepService', () => {
                 incorrectSleep.duration = -11780000
 
                 return sleepService.updateByChild(incorrectSleep)
-                    .catch (err => {
+                    .catch(err => {
                         assert.propertyVal(err, 'message', 'Duration field is invalid...')
                         assert.propertyVal(err, 'description', 'Sleep validation failed: The value provided has a negative value!')
                     })
@@ -778,7 +765,7 @@ describe('Services: SleepService', () => {
         })
 
         context('when the Sleep is incorrect (type is invalid)', () => {
-            it('should throw a ValidationException', async () => {
+            it('should throw a ValidationException', () => {
                 const sleepJSON: any = {
                     id: new ObjectID(),
                     start_time: sleep.start_time,
@@ -790,12 +777,11 @@ describe('Services: SleepService', () => {
                 }
                 incorrectSleep = new Sleep().fromJSON(sleepJSON)
 
-                try {
-                    return await sleepService.updateByChild(incorrectSleep)
-                } catch (err) {
-                    assert.propertyVal(err, 'message', 'The type provided "classics" is not supported...')
-                    assert.propertyVal(err, 'description', 'The allowed Sleep Pattern types are: classic, stages.')
-                }
+                return sleepService.updateByChild(incorrectSleep)
+                    .catch(err => {
+                        assert.propertyVal(err, 'message', 'The type provided "classics" is not supported...')
+                        assert.propertyVal(err, 'description', 'The allowed Sleep Pattern types are: classic, stages.')
+                    })
             })
         })
 
@@ -805,7 +791,7 @@ describe('Services: SleepService', () => {
                 incorrectSleep.pattern = new SleepPattern()
 
                 return sleepService.updateByChild(incorrectSleep)
-                    .catch (err => {
+                    .catch(err => {
                         assert.propertyVal(err, 'message', 'Pattern are not in a format that is supported...')
                         assert.propertyVal(err, 'description', 'Validation of the standard of sleep failed: data_set is required!')
                     })
@@ -817,7 +803,7 @@ describe('Services: SleepService', () => {
                 incorrectSleep.pattern!.data_set = new Array<SleepPatternDataSet>()
 
                 return sleepService.updateByChild(incorrectSleep)
-                    .catch (err => {
+                    .catch(err => {
                         assert.propertyVal(err, 'message', 'Dataset are not in a format that is supported!')
                         assert.propertyVal(err, 'description', 'The data_set collection must not be empty!')
                     })
@@ -831,7 +817,7 @@ describe('Services: SleepService', () => {
                 incorrectSleep.pattern!.data_set = [dataSetItemTest]
 
                 return sleepService.updateByChild(incorrectSleep)
-                    .catch (err => {
+                    .catch(err => {
                         assert.propertyVal(err, 'message', 'Dataset are not in a format that is supported!')
                         assert.propertyVal(err, 'description', 'Validation of the sleep pattern dataset failed: ' +
                             'data_set start_time, data_set name, data_set duration is required!')
@@ -848,7 +834,7 @@ describe('Services: SleepService', () => {
                 incorrectSleep.pattern!.data_set = [dataSetItemTest]
 
                 return sleepService.updateByChild(incorrectSleep)
-                    .catch (err => {
+                    .catch(err => {
                         assert.propertyVal(err, 'message', 'Some (or several) duration field of sleep pattern is invalid...')
                         assert.propertyVal(err, 'description', 'Sleep Pattern dataset validation failed: The value provided ' +
                             'has a negative value!')
@@ -859,14 +845,14 @@ describe('Services: SleepService', () => {
         context('when the Sleep is incorrect (the sleep pattern data set array has an invalid item with an invalid name)', () => {
             it('should throw a ValidationException', () => {
                 const dataSetItemJSON: any = {
-                    start_time : new Date('2018-08-18T01:30:30Z'),
-                    name : 'restlesss',
-                    duration : Math.floor(Math.random() * 5 + 1) * 60000 // 1-5min
+                    start_time: new Date('2018-08-18T01:30:30Z'),
+                    name: 'restlesss',
+                    duration: Math.floor(Math.random() * 5 + 1) * 60000 // 1-5min
                 }
                 incorrectSleep.pattern!.data_set = [new SleepPatternDataSet().fromJSON(dataSetItemJSON)]
 
                 return sleepService.updateByChild(incorrectSleep)
-                    .catch (err => {
+                    .catch(err => {
                         assert.propertyVal(err, 'message', 'The sleep pattern name provided "restlesss" is not supported...')
                         if (incorrectSleep.type === SleepType.CLASSIC)
                             assert.propertyVal(err, 'description', 'The names of the allowed patterns are: asleep, restless, awake.')
@@ -890,15 +876,15 @@ describe('Services: SleepService', () => {
                 }
                 incorrectSleep = new Sleep().fromJSON(sleepJSON)
                 const dataSetItemJSON: any = {
-                    start_time : new Date('2018-08-18T01:30:30Z'),
-                    name : 'deeps',
-                    duration : Math.floor(Math.random() * 5 + 1) * 60000 // 1-5min
+                    start_time: new Date('2018-08-18T01:30:30Z'),
+                    name: 'deeps',
+                    duration: Math.floor(Math.random() * 5 + 1) * 60000 // 1-5min
                 }
                 incorrectSleep.pattern!.data_set = new Array<SleepPatternDataSet>()
                 incorrectSleep.pattern!.data_set[0] = new SleepPatternDataSet().fromJSON(dataSetItemJSON)
 
                 return sleepService.updateByChild(incorrectSleep)
-                    .catch (err => {
+                    .catch(err => {
                         assert.propertyVal(err, 'message', 'The sleep pattern name provided "deeps" is not supported...')
                         assert.propertyVal(err, 'description', 'The names of the allowed patterns are: deep, light, rem, awake.')
                     })
@@ -938,7 +924,7 @@ describe('Services: SleepService', () => {
                 incorrectSleep.child_id = '5a62be07de34500146d9c5442'     // Make child_id invalid
 
                 return sleepService.removeByChild(incorrectSleep.id!, incorrectSleep.child_id)
-                    .catch (err => {
+                    .catch(err => {
                         assert.propertyVal(err, 'message', Strings.CHILD.PARAM_ID_NOT_VALID_FORMAT)
                         assert.propertyVal(err, 'description', Strings.ERROR_MESSAGE.UUID_NOT_VALID_FORMAT_DESC)
                     })
@@ -951,7 +937,7 @@ describe('Services: SleepService', () => {
                 incorrectSleep.id = '5a62be07de34500146d9c5442'       // Make sleep id invalid
 
                 return sleepService.removeByChild(incorrectSleep.id!, incorrectSleep.child_id)
-                    .catch (err => {
+                    .catch(err => {
                         assert.propertyVal(err, 'message', Strings.SLEEP.PARAM_ID_NOT_VALID_FORMAT)
                         assert.propertyVal(err, 'description', Strings.ERROR_MESSAGE.UUID_NOT_VALID_FORMAT_DESC)
                     })

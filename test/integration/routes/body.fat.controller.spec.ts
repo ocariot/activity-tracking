@@ -41,8 +41,8 @@ describe('Routes: children.bodyfats', () => {
     // Start services
     before(async () => {
         try {
-            await dbConnection.connect(process.env.MONGODB_URI_TEST || Default.MONGODB_URI_TEST)
-            await deleteAllBodyFat()
+            await dbConnection.connect(process.env.MONGODB_URI_TEST || Default.MONGODB_URI_TEST, { interval: 100 })
+            await deleteAllBodyFats()
         } catch (err) {
             throw new Error('Failure on children.bodyfats routes test: ' + err.message)
         }
@@ -51,7 +51,7 @@ describe('Routes: children.bodyfats', () => {
     // Delete all database BodyFat objects
     after(async () => {
         try {
-            await deleteAllBodyFat()
+            await deleteAllBodyFats()
             await dbConnection.dispose()
         } catch (err) {
             throw new Error('Failure on children.bodyfats routes test: ' + err.message)
@@ -62,6 +62,13 @@ describe('Routes: children.bodyfats', () => {
      */
     describe('POST /v1/children/:child_id/bodyfats with only one BodyFat in the body', () => {
         context('when posting a new BodyFat with success', () => {
+            before(async () => {
+                try {
+                    await deleteAllBodyFats()
+                } catch (err) {
+                    throw new Error('Failure on children.bodyfats routes test: ' + err.message)
+                }
+            })
             it('should return status code 201 and the saved BodyFat', () => {
                 const body = {
                     timestamp: defaultBodyFat.timestamp,
@@ -75,8 +82,7 @@ describe('Routes: children.bodyfats', () => {
                     .set('Content-Type', 'application/json')
                     .expect(201)
                     .then(res => {
-                        defaultBodyFat.id = res.body.id
-                        expect(res.body.id).to.eql(defaultBodyFat.id)
+                        expect(res.body).to.have.property('id')
                         expect(res.body.timestamp).to.eql(defaultBodyFat.timestamp!.toISOString())
                         expect(res.body.value).to.eql(defaultBodyFat.value)
                         expect(res.body.unit).to.eql(defaultBodyFat.unit)
@@ -86,6 +92,20 @@ describe('Routes: children.bodyfats', () => {
         })
 
         context('when a duplicate error occurs', () => {
+            before(async () => {
+                try {
+                    await deleteAllBodyFats()
+
+                    await createBodyFat({
+                        timestamp: defaultBodyFat.timestamp,
+                        value: defaultBodyFat.value,
+                        unit: defaultBodyFat.unit,
+                        child_id: defaultBodyFat.child_id
+                    })
+                } catch (err) {
+                    throw new Error('Failure on children.bodyfats routes test: ' + err.message)
+                }
+            })
             it('should return status code 409 and an info message about duplicate items', () => {
                 const body = {
                     timestamp: defaultBodyFat.timestamp,
@@ -150,13 +170,13 @@ describe('Routes: children.bodyfats', () => {
         context('when all the BodyFat objects are correct and still do not exist in the repository', () => {
             before(async () => {
                 try {
-                    await deleteAllBodyFat()
+                    await deleteAllBodyFats()
                 } catch (err) {
                     throw new Error('Failure on children.bodyfats routes test: ' + err.message)
                 }
             })
 
-            it('should return status code 201, create each BodyFat and return a response of type MultiStatus<BodyFat> ' +
+            it('should return status code 207, create each BodyFat and return a response of type MultiStatus<BodyFat> ' +
                 'with the description of success in sending each one of them', () => {
                 const body: any = []
 
@@ -177,6 +197,7 @@ describe('Routes: children.bodyfats', () => {
                     .then(res => {
                         for (let i = 0; i < res.body.success.length; i++) {
                             expect(res.body.success[i].code).to.eql(HttpStatus.CREATED)
+                            expect(res.body.success[i].item).to.have.property('id')
                             expect(res.body.success[i].item.timestamp).to.eql(correctBodyFatArr[i].timestamp!.toISOString())
                             expect(res.body.success[i].item.value).to.eql(correctBodyFatArr[i].value)
                             expect(res.body.success[i].item.unit).to.eql(correctBodyFatArr[i].unit)
@@ -189,6 +210,22 @@ describe('Routes: children.bodyfats', () => {
         })
 
         context('when all the BodyFat objects are correct but already exists in the repository', () => {
+            before(async () => {
+                try {
+                    await deleteAllBodyFats()
+
+                    for (const bodyFat of correctBodyFatArr) {
+                        await createBodyFat({
+                            timestamp: bodyFat.timestamp,
+                            value: bodyFat.value,
+                            unit: bodyFat.unit,
+                            child_id: bodyFat.child_id
+                        })
+                    }
+                } catch (err) {
+                    throw new Error('Failure on children.bodyfats routes test: ' + err.message)
+                }
+            })
             it('should return status code 201 and return a response of type MultiStatus<BodyFat> with the ' +
                 'description of conflict in sending each one of them', () => {
                 const body: any = []
@@ -225,7 +262,7 @@ describe('Routes: children.bodyfats', () => {
         context('when there are correct and incorrect BodyFat objects in the body', () => {
             before(async () => {
                 try {
-                    await deleteAllBodyFat()
+                    await deleteAllBodyFats()
                 } catch (err) {
                     throw new Error('Failure on children.bodyfats routes test: ' + err.message)
                 }
@@ -252,6 +289,7 @@ describe('Routes: children.bodyfats', () => {
                     .then(res => {
                         // Success item
                         expect(res.body.success[0].code).to.eql(HttpStatus.CREATED)
+                        expect(res.body.success[0].item).to.have.property('id')
                         expect(res.body.success[0].item.timestamp).to.eql(mixedBodyFatArr[0].timestamp!.toISOString())
                         expect(res.body.success[0].item.value).to.eql(mixedBodyFatArr[0].value)
                         expect(res.body.success[0].item.unit).to.eql(mixedBodyFatArr[0].unit)
@@ -270,8 +308,10 @@ describe('Routes: children.bodyfats', () => {
      */
     describe('GET /v1/children/:child_id/bodyfats', () => {
         context('when get all BodyFat of a child successfully', () => {
-            it('should return status code 200 and a list of all BodyFat objects found', async () => {
-                try{
+            before(async () => {
+                try {
+                    await deleteAllBodyFats()
+
                     await createBodyFat({
                         timestamp: defaultBodyFat.timestamp,
                         value: defaultBodyFat.value,
@@ -281,19 +321,18 @@ describe('Routes: children.bodyfats', () => {
                 } catch (err) {
                     throw new Error('Failure on children.bodyfats routes test: ' + err.message)
                 }
-
+            })
+            it('should return status code 200 and a list of all BodyFat objects found', () => {
                 return request
                     .get(`/v1/children/${defaultBodyFat.child_id}/bodyfats`)
                     .set('Content-Type', 'application/json')
                     .expect(200)
                     .then(res => {
-                        defaultBodyFat.id = res.body[0].id
-                        expect(res.body).is.an.instanceOf(Array)
                         expect(res.body.length).to.not.eql(0)
                         // Check for the existence of properties only in the first element of the array
                         // because there is a guarantee that there will be at least one object (created
                         // in the case of a successful POST route test or using the create method above).
-                        expect(res.body[0].id).to.eql(defaultBodyFat.id)
+                        expect(res.body[0]).to.have.property('id')
                         expect(res.body[0].timestamp).to.eql(defaultBodyFat.timestamp!.toISOString())
                         expect(res.body[0].value).to.eql(defaultBodyFat.value)
                         expect(res.body[0].unit).to.eql(defaultBodyFat.unit)
@@ -305,13 +344,13 @@ describe('Routes: children.bodyfats', () => {
         context('when there are no BodyFat associated with the child in the database', () => {
             before(async () => {
                 try {
-                    await deleteAllBodyFat()
+                    await deleteAllBodyFats()
                 } catch (err) {
                     throw new Error('Failure on children.bodyfats routes test: ' + err.message)
                 }
             })
 
-            it('should return status code 200 and an empty list', async () => {
+            it('should return status code 200 and an empty list', () => {
                 return request
                     .get(`/v1/children/${defaultBodyFat.child_id}/bodyfats`)
                     .set('Content-Type', 'application/json')
@@ -326,24 +365,13 @@ describe('Routes: children.bodyfats', () => {
         context('when the child_id is invalid', () => {
             before(async () => {
                 try {
-                    await deleteAllBodyFat()
+                    await deleteAllBodyFats()
                 } catch (err) {
                     throw new Error('Failure on children.bodyfats routes test: ' + err.message)
                 }
             })
 
-            it('should return status code 400 and an info message about the invalid child_id', async () => {
-                try {
-                    await createBodyFat({
-                        timestamp: defaultBodyFat.timestamp,
-                        value: defaultBodyFat.value,
-                        unit: defaultBodyFat.unit,
-                        child_id: defaultBodyFat.child_id
-                    })
-                } catch (err) {
-                    throw new Error('Failure on children.bodyfats routes test: ' + err.message)
-                }
-
+            it('should return status code 400 and an info message about the invalid child_id', () => {
                 return request
                     .get(`/v1/children/123/bodyfats`)
                     .set('Content-Type', 'application/json')
@@ -361,14 +389,8 @@ describe('Routes: children.bodyfats', () => {
         context('when get BodyFat of a child using the "query-strings-parser" library', () => {
             before(async () => {
                 try {
-                    await deleteAllBodyFat()
-                } catch (err) {
-                    throw new Error('Failure on children.bodyfats routes test: ' + err.message)
-                }
-            })
+                    await deleteAllBodyFats()
 
-            it('should return status code 200 and the result as needed in the query', async () => {
-                try {
                     await createBodyFat({
                         timestamp: defaultBodyFat.timestamp,
                         value: defaultBodyFat.value,
@@ -385,22 +407,23 @@ describe('Routes: children.bodyfats', () => {
                 } catch (err) {
                     throw new Error('Failure on children.bodyfats routes test: ' + err.message)
                 }
+            })
 
-                const url = `/v1/children/${defaultBodyFat.child_id}/bodyfats?child_id=${defaultBodyFat.child_id}
-                    &sort=child_id&page=1&limit=3`
+            it('should return status code 200 and the result as needed in the query', () => {
+                const url = `/v1/children/${defaultBodyFat.child_id}/bodyfats?child_id=${defaultBodyFat.child_id}`
+                    .concat(`&sort=child_id&page=1&limit=3`)
 
                 return request
                     .get(url)
                     .set('Content-Type', 'application/json')
                     .expect(200)
                     .then(res => {
-                        defaultBodyFat.id = res.body[0].id
                         expect(res.body).is.an.instanceOf(Array)
                         expect(res.body.length).to.not.eql(0)
                         // Check for the existence of properties only in the first element of the array
                         // because there is a guarantee that there will be at least one object (created
                         // in the case of a successful POST route test or using the create method above).
-                        expect(res.body[0].id).to.eql(defaultBodyFat.id)
+                        expect(res.body[0]).to.have.property('id')
                         expect(res.body[0].timestamp).to.eql(defaultBodyFat.timestamp!.toISOString())
                         expect(res.body[0].value).to.eql(defaultBodyFat.value)
                         expect(res.body[0].unit).to.eql(defaultBodyFat.unit)
@@ -413,15 +436,15 @@ describe('Routes: children.bodyfats', () => {
             'associated with the child in the database', () => {
             before(async () => {
                 try {
-                    await deleteAllBodyFat()
+                    await deleteAllBodyFats()
                 } catch (err) {
                     throw new Error('Failure on children.bodyfats routes test: ' + err.message)
                 }
             })
 
-            it('should return status code 200 and an empty list', async () => {
-                const url = `/v1/children/${defaultBodyFat.child_id}/bodyfats?child_id=${defaultBodyFat.child_id}
-                    &sort=child_id&page=1&limit=3`
+            it('should return status code 200 and an empty list', () => {
+                const url = `/v1/children/${defaultBodyFat.child_id}/bodyfats?child_id=${defaultBodyFat.child_id}`
+                    .concat(`&sort=child_id&page=1&limit=3`)
 
                 return request
                     .get(url)
@@ -438,24 +461,13 @@ describe('Routes: children.bodyfats', () => {
             'but the child_id is invalid', () => {
             before(async () => {
                 try {
-                    await deleteAllBodyFat()
+                    await deleteAllBodyFats()
                 } catch (err) {
                     throw new Error('Failure on children.bodyfats routes test: ' + err.message)
                 }
             })
 
-            it('should return status code 400 and an info message about the invalid child_id', async () => {
-                try {
-                    await createBodyFat({
-                        timestamp: defaultBodyFat.timestamp,
-                        value: defaultBodyFat.value,
-                        unit: defaultBodyFat.unit,
-                        child_id: defaultBodyFat.child_id
-                    })
-                } catch (err) {
-                    throw new Error('Failure on children.bodyfats routes test: ' + err.message)
-                }
-
+            it('should return status code 400 and an info message about the invalid child_id', () => {
                 const url = `/v1/children/123/bodyfats?child_id=${defaultBodyFat.child_id}&sort=child_id&page=1&limit=3`
 
                 return request
@@ -475,18 +487,12 @@ describe('Routes: children.bodyfats', () => {
      */
     describe('GET /v1/children/:child_id/bodyfats/:bodyfat_id', () => {
         context('when get a specific BodyFat of a child of the database successfully', () => {
+            let result
+
             before(async () => {
                 try {
-                    await deleteAllBodyFat()
-                } catch (err) {
-                    throw new Error('Failure on children.bodyfats routes test: ' + err.message)
-                }
-            })
+                    await deleteAllBodyFats()
 
-            it('should return status code 200 and that specific BodyFat of that child', async () => {
-                let result
-
-                try {
                     result = await createBodyFat({
                         timestamp: defaultBodyFat.timestamp,
                         value: defaultBodyFat.value,
@@ -496,7 +502,9 @@ describe('Routes: children.bodyfats', () => {
                 } catch (err) {
                     throw new Error('Failure on children.bodyfats routes test: ' + err.message)
                 }
+            })
 
+            it('should return status code 200 and that specific BodyFat of that child', () => {
                 return request
                     .get(`/v1/children/${result.child_id}/bodyfats/${result.id}`)
                     .set('Content-Type', 'application/json')
@@ -505,7 +513,7 @@ describe('Routes: children.bodyfats', () => {
                         // Check for the existence of properties only in the first element of the array
                         // because there is a guarantee that there will be at least one object (created
                         // in the case of a successful POST route test or using the create method above).
-                        expect(res.body.id).to.eql(result.id)
+                        expect(res.body).to.have.property('id')
                         expect(res.body.timestamp).to.eql(result.timestamp!.toISOString())
                         expect(res.body.value).to.eql(result.value)
                         expect(res.body.unit).to.eql(result.unit)
@@ -517,13 +525,13 @@ describe('Routes: children.bodyfats', () => {
         context('when there is no that specific BodyFat associated with that child in the database', () => {
             before(async () => {
                 try {
-                    await deleteAllBodyFat()
+                    await deleteAllBodyFats()
                 } catch (err) {
                     throw new Error('Failure on children.bodyfats routes test: ' + err.message)
                 }
             })
 
-            it('should return status code 404 and an info message describing that BodyFat was not found', async () => {
+            it('should return status code 404 and an info message describing that BodyFat was not found', () => {
                 return request
                     .get(`/v1/children/${defaultBodyFat.child_id}/bodyfats/${defaultBodyFat.id}`)
                     .set('Content-Type', 'application/json')
@@ -540,28 +548,15 @@ describe('Routes: children.bodyfats', () => {
         context('when the child_id is invalid', () => {
             before(async () => {
                 try {
-                    await deleteAllBodyFat()
+                    await deleteAllBodyFats()
                 } catch (err) {
                     throw new Error('Failure on children.bodyfats routes test: ' + err.message)
                 }
             })
 
-            it('should return status code 400 and an info message about the invalid child_id', async () => {
-                let result
-
-                try {
-                    result = await createBodyFat({
-                        timestamp: defaultBodyFat.timestamp,
-                        value: defaultBodyFat.value,
-                        unit: defaultBodyFat.unit,
-                        child_id: defaultBodyFat.child_id
-                    })
-                } catch (err) {
-                    throw new Error('Failure on children.bodyfats routes test: ' + err.message)
-                }
-
+            it('should return status code 400 and an info message about the invalid child_id', () => {
                 return request
-                    .get(`/v1/children/123/bodyfats/${result.id}`)
+                    .get(`/v1/children/123/bodyfats/${defaultBodyFat.id}`)
                     .set('Content-Type', 'application/json')
                     .expect(400)
                     .then(err => {
@@ -575,28 +570,15 @@ describe('Routes: children.bodyfats', () => {
         context('when the BodyFat id is invalid', () => {
             before(async () => {
                 try {
-                    await deleteAllBodyFat()
+                    await deleteAllBodyFats()
                 } catch (err) {
                     throw new Error('Failure on children.bodyfats routes test: ' + err.message)
                 }
             })
 
-            it('should return status code 400 and an info message about the invalid BodyFat id', async () => {
-                let result
-
-                try {
-                    result = await createBodyFat({
-                        timestamp: defaultBodyFat.timestamp,
-                        value: defaultBodyFat.value,
-                        unit: defaultBodyFat.unit,
-                        child_id: defaultBodyFat.child_id
-                    })
-                } catch (err) {
-                    throw new Error('Failure on children.bodyfats routes test: ' + err.message)
-                }
-
+            it('should return status code 400 and an info message about the invalid BodyFat id', () => {
                 return request
-                    .get(`/v1/children/${result.child_id}/bodyfats/123`)
+                    .get(`/v1/children/${defaultBodyFat.child_id}/bodyfats/123`)
                     .set('Content-Type', 'application/json')
                     .expect(400)
                     .then(err => {
@@ -610,18 +592,12 @@ describe('Routes: children.bodyfats', () => {
          * query-strings-parser library test
          */
         context('when get a specific BodyFat of a child using the "query-strings-parser" library', () => {
+            let result
+
             before(async () => {
                 try {
-                    await deleteAllBodyFat()
-                } catch (err) {
-                    throw new Error('Failure on children.bodyfats routes test: ' + err.message)
-                }
-            })
+                    await deleteAllBodyFats()
 
-            it('should return status code 200 and the result as needed in the query', async () => {
-                let result
-
-                try {
                     result = await createBodyFat({
                         timestamp: defaultBodyFat.timestamp,
                         value: defaultBodyFat.value,
@@ -631,16 +607,17 @@ describe('Routes: children.bodyfats', () => {
                 } catch (err) {
                     throw new Error('Failure on children.bodyfats routes test: ' + err.message)
                 }
-
-                const url = `/v1/children/${result.child_id}/bodyfats/${result.id}?child_id=${result.child_id}
-                    &sort=child_id&page=1&limit=3`
+            })
+            it('should return status code 200 and the result as needed in the query', () => {
+                const url = `/v1/children/${result.child_id}/bodyfats/${result.id}?child_id=${result.child_id}`
+                    .concat(`&sort=child_id&page=1&limit=3`)
 
                 return request
                     .get(url)
                     .set('Content-Type', 'application/json')
                     .expect(200)
                     .then(res => {
-                        expect(res.body.id).to.eql(result.id)
+                        expect(res.body).to.have.property('id')
                         expect(res.body.timestamp).to.eql(result.timestamp!.toISOString())
                         expect(res.body.value).to.eql(result.value)
                         expect(res.body.unit).to.eql(result.unit)
@@ -653,15 +630,15 @@ describe('Routes: children.bodyfats', () => {
             'does not exist', () => {
             before(async () => {
                 try {
-                    await deleteAllBodyFat()
+                    await deleteAllBodyFats()
                 } catch (err) {
                     throw new Error('Failure on children.bodyfats routes test: ' + err.message)
                 }
             })
 
-            it('should return status code 404 and an info message describing that BodyFat was not found', async () => {
-                const url = `/v1/children/${defaultBodyFat.child_id}/bodyfats/${defaultBodyFat.id}?child_id=${defaultBodyFat.child_id}
-                    &sort=child_id&page=1&limit=3`
+            it('should return status code 404 and an info message describing that BodyFat was not found', () => {
+                const url = `/v1/children/${defaultBodyFat.child_id}/bodyfats/${defaultBodyFat.id}?child_id=${defaultBodyFat.child_id}`
+                    .concat(`&sort=child_id&page=1&limit=3`)
 
                 return request
                     .get(url)
@@ -680,28 +657,15 @@ describe('Routes: children.bodyfats', () => {
             'child_id is invalid', () => {
             before(async () => {
                 try {
-                    await deleteAllBodyFat()
+                    await deleteAllBodyFats()
                 } catch (err) {
                     throw new Error('Failure on children.bodyfats routes test: ' + err.message)
                 }
             })
 
-            it('should return status code 400 and an info message about the invalid child_id', async () => {
-                let result
-
-                try {
-                    result = await createBodyFat({
-                        timestamp: defaultBodyFat.timestamp,
-                        value: defaultBodyFat.value,
-                        unit: defaultBodyFat.unit,
-                        child_id: defaultBodyFat.child_id
-                    })
-                } catch (err) {
-                    throw new Error('Failure on children.bodyfats routes test: ' + err.message)
-                }
-
-                const url = `/v1/children/123/bodyfats/${result.id}?child_id=${result.child_id}
-                    &sort=child_id&page=1&limit=3`
+            it('should return status code 400 and an info message about the invalid child_id', () => {
+                const url = `/v1/children/123/bodyfats/${defaultBodyFat.id}?child_id=${defaultBodyFat.child_id}`
+                    .concat(`&sort=child_id&page=1&limit=3`)
 
                 return request
                     .get(url)
@@ -719,28 +683,15 @@ describe('Routes: children.bodyfats', () => {
             'BodyFat id is invalid', () => {
             before(async () => {
                 try {
-                    await deleteAllBodyFat()
+                    await deleteAllBodyFats()
                 } catch (err) {
                     throw new Error('Failure on children.bodyfats routes test: ' + err.message)
                 }
             })
 
-            it('should return status code 400 and an info message about the invalid BodyFat id', async () => {
-                let result
-
-                try {
-                    result = await createBodyFat({
-                        timestamp: defaultBodyFat.timestamp,
-                        value: defaultBodyFat.value,
-                        unit: defaultBodyFat.unit,
-                        child_id: defaultBodyFat.child_id
-                    })
-                } catch (err) {
-                    throw new Error('Failure on children.bodyfats routes test: ' + err.message)
-                }
-
-                const url = `/v1/children/${result.child_id}/bodyfats/123?child_id=${result.child_id}
-                    &sort=child_id&page=1&limit=3`
+            it('should return status code 400 and an info message about the invalid BodyFat id', () => {
+                const url = `/v1/children/${defaultBodyFat.child_id}/bodyfats/123?child_id=${defaultBodyFat.child_id}`
+                    .concat(`&sort=child_id&page=1&limit=3`)
 
                 return request
                     .get(url)
@@ -759,18 +710,12 @@ describe('Routes: children.bodyfats', () => {
      */
     describe('DELETE /v1/children/:child_id/bodyfats/:bodyfat_id', () => {
         context('when the BodyFat was deleted successfully', () => {
+            let result
+
             before(async () => {
                 try {
-                    await deleteAllBodyFat()
-                } catch (err) {
-                    throw new Error('Failure on children.bodyfats routes test: ' + err.message)
-                }
-            })
+                    await deleteAllBodyFats()
 
-            it('should return status code 204 and no content for BodyFat', async () => {
-                let result
-
-                try {
                     result = await createBodyFat({
                         timestamp: defaultBodyFat.timestamp,
                         value: defaultBodyFat.value,
@@ -780,7 +725,9 @@ describe('Routes: children.bodyfats', () => {
                 } catch (err) {
                     throw new Error('Failure on children.bodyfats routes test: ' + err.message)
                 }
+            })
 
+            it('should return status code 204 and no content for BodyFat', () => {
                 return request
                     .delete(`/v1/children/${result.child_id}/bodyfats/${result.id}`)
                     .set('Content-Type', 'application/json')
@@ -794,13 +741,13 @@ describe('Routes: children.bodyfats', () => {
         context('when the BodyFat is not found', () => {
             before(async () => {
                 try {
-                    await deleteAllBodyFat()
+                    await deleteAllBodyFats()
                 } catch (err) {
                     throw new Error('Failure on children.bodyfats routes test: ' + err.message)
                 }
             })
 
-            it('should return status code 204 and no content for BodyFat', async () => {
+            it('should return status code 204 and no content for BodyFat', () => {
                 return request
                     .delete(`/v1/children/${defaultBodyFat.child_id}/bodyfats/${defaultBodyFat.id}`)
                     .set('Content-Type', 'application/json')
@@ -814,28 +761,15 @@ describe('Routes: children.bodyfats', () => {
         context('when the child_id is invalid', () => {
             before(async () => {
                 try {
-                    await deleteAllBodyFat()
+                    await deleteAllBodyFats()
                 } catch (err) {
                     throw new Error('Failure on children.bodyfats routes test: ' + err.message)
                 }
             })
 
-            it('should return status code 400 and an info message about the invalid child_id', async () => {
-                let result
-
-                try {
-                    result = await createBodyFat({
-                        timestamp: defaultBodyFat.timestamp,
-                        value: defaultBodyFat.value,
-                        unit: defaultBodyFat.unit,
-                        child_id: defaultBodyFat.child_id
-                    })
-                } catch (err) {
-                    throw new Error('Failure on children.bodyfats routes test: ' + err.message)
-                }
-
+            it('should return status code 400 and an info message about the invalid child_id', () => {
                 return request
-                    .delete(`/v1/children/123/bodyfats/${result.id}`)
+                    .delete(`/v1/children/123/bodyfats/${defaultBodyFat.id}`)
                     .set('Content-Type', 'application/json')
                     .expect(400)
                     .then(err => {
@@ -849,28 +783,15 @@ describe('Routes: children.bodyfats', () => {
         context('when the BodyFat id is invalid', () => {
             before(async () => {
                 try {
-                    await deleteAllBodyFat()
+                    await deleteAllBodyFats()
                 } catch (err) {
                     throw new Error('Failure on children.bodyfats routes test: ' + err.message)
                 }
             })
 
-            it('should return status code 400 and an info message about the invalid BodyFat id', async () => {
-                let result
-
-                try {
-                    result = await createBodyFat({
-                        timestamp: defaultBodyFat.timestamp,
-                        value: defaultBodyFat.value,
-                        unit: defaultBodyFat.unit,
-                        child_id: defaultBodyFat.child_id
-                    })
-                } catch (err) {
-                    throw new Error('Failure on children.bodyfats routes test: ' + err.message)
-                }
-
+            it('should return status code 400 and an info message about the invalid BodyFat id', () => {
                 return request
-                    .delete(`/v1/children/${result.child_id}/bodyfats/123`)
+                    .delete(`/v1/children/${defaultBodyFat.child_id}/bodyfats/123`)
                     .set('Content-Type', 'application/json')
                     .expect(400)
                     .then(err => {
@@ -890,6 +811,6 @@ async function createBodyFat(item): Promise<any> {
     return await Promise.resolve(MeasurementRepoModel.create(resultModelEntity))
 }
 
-async function deleteAllBodyFat() {
+async function deleteAllBodyFats() {
     return MeasurementRepoModel.deleteMany({})
 }

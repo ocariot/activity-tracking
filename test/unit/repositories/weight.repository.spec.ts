@@ -200,7 +200,7 @@ describe('Repositories: WeightRepository', () => {
         })
 
         context('when there are no Weight objects in database', () => {
-            it('should return a empty list', () => {
+            it('should return an empty list', () => {
                 sinon
                     .mock(modelFake)
                     .expects('find')

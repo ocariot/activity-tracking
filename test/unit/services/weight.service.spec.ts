@@ -107,7 +107,7 @@ describe('Services: WeightService', () => {
                 return weightService.add(weight)
                     .then((result: Weight | Array<Weight>) => {
                         result = result as Weight
-                        assert.property(result, 'id')
+                        assert.propertyVal(result, 'id', weight.id)
                         assert.propertyVal(result, 'type', weight.type)
                         assert.propertyVal(result, 'timestamp', weight.timestamp)
                         assert.propertyVal(result, 'value', weight.value)
@@ -125,7 +125,7 @@ describe('Services: WeightService', () => {
                 return weightService.add(weight)
                     .then((result: Weight | Array<Weight>) => {
                         result = result as Weight
-                        assert.property(result, 'id')
+                        assert.propertyVal(result, 'id', weight.id)
                         assert.propertyVal(result, 'type', weight.type)
                         assert.propertyVal(result, 'timestamp', weight.timestamp)
                         assert.propertyVal(result, 'value', weight.value)
@@ -143,7 +143,7 @@ describe('Services: WeightService', () => {
                 return weightService.add(weight)
                     .then((result: Weight | Array<Weight>) => {
                         result = result as Weight
-                        assert.property(result, 'id')
+                        assert.propertyVal(result, 'id', weight.id)
                         assert.propertyVal(result, 'type', weight.type)
                         assert.propertyVal(result, 'timestamp', weight.timestamp)
                         assert.propertyVal(result, 'value', weight.value)
@@ -161,7 +161,7 @@ describe('Services: WeightService', () => {
                 return weightService.add(weight)
                     .then((result: Weight | Array<Weight>) => {
                         result = result as Weight
-                        assert.property(result, 'id')
+                        assert.propertyVal(result, 'id', weight.id)
                         assert.propertyVal(result, 'type', weight.type)
                         assert.propertyVal(result, 'timestamp', weight.timestamp)
                         assert.propertyVal(result, 'value', weight.value)
@@ -179,7 +179,7 @@ describe('Services: WeightService', () => {
                 return weightService.add(weight)
                     .then((result: Weight | Array<Weight>) => {
                         result = result as Weight
-                        assert.property(result, 'id')
+                        assert.propertyVal(result, 'id', weight.id)
                         assert.propertyVal(result, 'type', weight.type)
                         assert.propertyVal(result, 'timestamp', weight.timestamp)
                         assert.propertyVal(result, 'value', weight.value)
@@ -213,74 +213,68 @@ describe('Services: WeightService', () => {
         })
 
         context('when the Weight is incorrect (missing all fields)', () => {
-            it('should throw a ValidationException', async () => {
-                try {
-                    return await weightService.add(incorrectWeight1)
-                } catch (err) {
-                    assert.propertyVal(err, 'message', 'Required fields were not provided...')
-                    assert.propertyVal(err, 'description', 'Measurement validation failed: type, timestamp, value, unit, ' +
-                        'child_id is required!')
-                }
+            it('should throw a ValidationException', () => {
+                return weightService.add(incorrectWeight1)
+                    .catch(err => {
+                        assert.propertyVal(err, 'message', 'Required fields were not provided...')
+                        assert.propertyVal(err, 'description', 'Measurement validation failed: type, timestamp, value, unit, ' +
+                            'child_id is required!')
+                    })
             })
         })
 
         context('when the Weight is incorrect (child_id is invalid)', () => {
-            it('should throw a ValidationException', async () => {
-                try {
-                    return await weightService.add(incorrectWeight2)
-                } catch (err) {
-                    assert.propertyVal(err, 'message', Strings.CHILD.PARAM_ID_NOT_VALID_FORMAT)
-                    assert.propertyVal(err, 'description', Strings.ERROR_MESSAGE.UUID_NOT_VALID_FORMAT_DESC)
-                }
+            it('should throw a ValidationException', () => {
+                return weightService.add(incorrectWeight2)
+                    .catch(err => {
+                        assert.propertyVal(err, 'message', Strings.CHILD.PARAM_ID_NOT_VALID_FORMAT)
+                        assert.propertyVal(err, 'description', Strings.ERROR_MESSAGE.UUID_NOT_VALID_FORMAT_DESC)
+                    })
             })
         })
 
         context('when the Weight is incorrect (type is invalid)', () => {
-            it('should throw a ValidationException', async () => {
-                try {
-                    return await weightService.add(incorrectWeight3)
-                } catch (err) {
-                    assert.propertyVal(err, 'message',
-                        'The type of measurement provided "invalidtype" is not supported...')
-                    assert.propertyVal(err, 'description',
-                        'The allowed types are: temperature, humidity, pm1, pm2.5, pm10, body_fat, weight.')
-                }
+            it('should throw a ValidationException', () => {
+                return weightService.add(incorrectWeight3)
+                    .catch(err => {
+                        assert.propertyVal(err, 'message',
+                            'The type of measurement provided "invalidtype" is not supported...')
+                        assert.propertyVal(err, 'description',
+                            'The allowed types are: temperature, humidity, pm1, pm2.5, pm10, body_fat, weight.')
+                    })
             })
         })
 
         context('when the Weight is incorrect (body_fat of the Weight without all required fields)', () => {
-            it('should throw a ValidationException', async () => {
-                try {
-                    return await weightService.add(incorrectWeight4)
-                } catch (err) {
-                    assert.propertyVal(err, 'message', 'Required fields were not provided...')
-                    assert.propertyVal(err, 'description', 'Measurement validation failed: type, timestamp, value, unit, ' +
-                        'child_id is required!')
-                }
+            it('should throw a ValidationException', () => {
+                return weightService.add(incorrectWeight4)
+                    .catch(err => {
+                        assert.propertyVal(err, 'message', 'Required fields were not provided...')
+                        assert.propertyVal(err, 'description', 'Measurement validation failed: type, timestamp, value, unit, ' +
+                            'child_id is required!')
+                    })
             })
         })
 
         context('when the Weight is incorrect (body_fat of the Weight with an invalid child_id)', () => {
-            it('should throw a ValidationException', async () => {
-                try {
-                    return await weightService.add(incorrectWeight5)
-                } catch (err) {
-                    assert.propertyVal(err, 'message', Strings.CHILD.PARAM_ID_NOT_VALID_FORMAT)
-                    assert.propertyVal(err, 'description', Strings.ERROR_MESSAGE.UUID_NOT_VALID_FORMAT_DESC)
-                }
+            it('should throw a ValidationException', () => {
+                return weightService.add(incorrectWeight5)
+                    .catch(err => {
+                        assert.propertyVal(err, 'message', Strings.CHILD.PARAM_ID_NOT_VALID_FORMAT)
+                        assert.propertyVal(err, 'description', Strings.ERROR_MESSAGE.UUID_NOT_VALID_FORMAT_DESC)
+                    })
             })
         })
 
         context('when the Weight is incorrect (body_fat of the Weight with an invalid type)', () => {
-            it('should throw a ValidationException', async () => {
-                try {
-                    return await weightService.add(incorrectWeight6)
-                } catch (err) {
-                    assert.propertyVal(err, 'message',
-                        'The type of measurement provided "invalidtype" is not supported...')
-                    assert.propertyVal(err, 'description',
-                        'The allowed types are: temperature, humidity, pm1, pm2.5, pm10, body_fat, weight.')
-                }
+            it('should throw a ValidationException', () => {
+                return weightService.add(incorrectWeight6)
+                    .catch(err => {
+                        assert.propertyVal(err, 'message',
+                            'The type of measurement provided "invalidtype" is not supported...')
+                        assert.propertyVal(err, 'description',
+                            'The allowed types are: temperature, humidity, pm1, pm2.5, pm10, body_fat, weight.')
+                    })
             })
         })
     })
@@ -475,7 +469,7 @@ describe('Services: WeightService', () => {
         })
 
         context('when the Weight id is invalid', () => {
-            it('should throw a ValidationException', () => {
+            it('should throw a ValidationException', async () => {
                 weight.id = '5a62be07de34500146d9c5442'       // Make weight id invalid
                 const query: IQuery = new Query()
                 query.filters = {
@@ -484,7 +478,7 @@ describe('Services: WeightService', () => {
                 }
 
                 try {
-                    return weightService.getByIdAndChild(weight.id, weight.child_id!, query)
+                    await weightService.getByIdAndChild(weight.id, weight.child_id!, query)
                 } catch (err) {
                     assert.propertyVal(err, 'message', Strings.WEIGHT.PARAM_ID_NOT_VALID_FORMAT)
                     assert.propertyVal(err, 'description', Strings.ERROR_MESSAGE.UUID_NOT_VALID_FORMAT_DESC)
@@ -493,7 +487,7 @@ describe('Services: WeightService', () => {
         })
 
         context('when the weight child_id is invalid', () => {
-            it('should throw a ValidationException', () => {
+            it('should throw a ValidationException', async () => {
                 weight.id = '5a62be07de34500146d9c544'            // Make weight id valid again
                 weight.child_id = '5a62be07de34500146d9c5442'     // Make child_id invalid
                 const query: IQuery = new Query()
@@ -503,7 +497,7 @@ describe('Services: WeightService', () => {
                 }
 
                 try {
-                    return weightService.getByIdAndChild(weight.id, weight.child_id, query)
+                    await weightService.getByIdAndChild(weight.id, weight.child_id, query)
                 } catch (err) {
                     assert.propertyVal(err, 'message', Strings.CHILD.PARAM_ID_NOT_VALID_FORMAT)
                     assert.propertyVal(err, 'description', Strings.ERROR_MESSAGE.UUID_NOT_VALID_FORMAT_DESC)
@@ -550,7 +544,7 @@ describe('Services: WeightService', () => {
         })
 
         context('when the Weight child_id is invalid', () => {
-            it('should throw a ValidationException', () => {
+            it('should throw a ValidationException', async () => {
                 weight.child_id = '5a62be07de34500146d9c5442'     // Make child_id invalid
                 const query: IQuery = new Query()
                 query.filters = {
@@ -559,7 +553,7 @@ describe('Services: WeightService', () => {
                 }
 
                 try {
-                    return weightService.getAllByChild(weight.child_id, query)
+                    await weightService.getAllByChild(weight.child_id, query)
                 } catch (err) {
                     assert.propertyVal(err, 'message', Strings.CHILD.PARAM_ID_NOT_VALID_FORMAT)
                     assert.propertyVal(err, 'description', Strings.ERROR_MESSAGE.UUID_NOT_VALID_FORMAT_DESC)
@@ -598,7 +592,7 @@ describe('Services: WeightService', () => {
         context('when the Weight is incorrect (child_id is invalid)', () => {
             it('should throw a ValidationException', () => {
                 return weightService.removeByChild(incorrectWeight2.id!, incorrectWeight2.child_id!)
-                    .catch (err => {
+                    .catch(err => {
                         assert.propertyVal(err, 'message', Strings.CHILD.PARAM_ID_NOT_VALID_FORMAT)
                         assert.propertyVal(err, 'description', Strings.ERROR_MESSAGE.UUID_NOT_VALID_FORMAT_DESC)
                     })
@@ -611,7 +605,7 @@ describe('Services: WeightService', () => {
                 incorrectWeight2.child_id = '5a62be07de34500146d9c544'
 
                 return weightService.removeByChild(incorrectWeight2.id!, incorrectWeight2.child_id!)
-                    .catch (err => {
+                    .catch(err => {
                         assert.propertyVal(err, 'message', Strings.WEIGHT.PARAM_ID_NOT_VALID_FORMAT)
                         assert.propertyVal(err, 'description', Strings.ERROR_MESSAGE.UUID_NOT_VALID_FORMAT_DESC)
                     })

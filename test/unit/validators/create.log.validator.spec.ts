@@ -41,7 +41,7 @@ describe('Validators: CreateLogValidator', () => {
             })
         })
 
-        context('When the log has a invalid type', () => {
+        context('When the log has an invalid type', () => {
             it('should throw a ValidationException', () => {
                 // Mock through JSON
                 const logJSON: any = {
@@ -65,7 +65,7 @@ describe('Validators: CreateLogValidator', () => {
             })
         })
 
-        context('When the log has a invalid value (the value received is not a number)', () => {
+        context('When the log has an invalid value (the value received is not a number)', () => {
             it('should throw a ValidationException', () => {
                 // Mock through JSON
                 const logJSON: any = {
@@ -87,7 +87,7 @@ describe('Validators: CreateLogValidator', () => {
             })
         })
 
-        context('When the log has a invalid date', () => {
+        context('When the log has an invalid date', () => {
             it('should throw a ValidationException', () => {
                 // Mock through JSON
                 const logJSON: any = {

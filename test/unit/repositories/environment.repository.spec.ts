@@ -22,11 +22,13 @@ describe('Repositories: EnvironmentRepository', () => {
                 fields: {},
                 ordination: {},
                 pagination: { page: 1, limit: 100, skip: 0 },
-                filters: {  'timestamp': defaultEnvironment.timestamp,
-                            'location.local': defaultEnvironment.location!.local,
-                            'location.room': defaultEnvironment.location!.room,
-                            'location.latitude': defaultEnvironment.location!.latitude,
-                            'location.longitude': defaultEnvironment.location!.longitude }
+                filters: {
+                    'timestamp': defaultEnvironment.timestamp,
+                    'location.local': defaultEnvironment.location!.local,
+                    'location.room': defaultEnvironment.location!.room,
+                    'location.latitude': defaultEnvironment.location!.latitude,
+                    'location.longitude': defaultEnvironment.location!.longitude
+                }
             }
         }
     }
@@ -69,23 +71,22 @@ describe('Repositories: EnvironmentRepository', () => {
         })
 
         context('when a database error occurs', () => {
-            it('should throw a RepositoryException', async () => {
-                defaultEnvironment.timestamp = undefined!
-
+            it('should throw a RepositoryException', () => {
                 sinon
                     .mock(modelFake)
                     .expects('findOne')
                     .withArgs(queryMock.toJSON().filters)
                     .chain('exec')
-                    .rejects({ message: 'An internal error has occurred in the database!',
-                               description: 'Please try again later...' })
+                    .rejects({
+                        message: 'An internal error has occurred in the database!',
+                        description: 'Please try again later...'
+                    })
 
-                try {
-                    await environmentRepo.checkExist(defaultEnvironment)
-                } catch (err) {
-                    assert.propertyVal(err, 'message', 'An internal error has occurred in the database!')
-                    assert.propertyVal(err, 'description', 'Please try again later...')
-                }
+                environmentRepo.checkExist(defaultEnvironment)
+                    .catch(err => {
+                        assert.propertyVal(err, 'message', 'An internal error has occurred in the database!')
+                        assert.propertyVal(err, 'description', 'Please try again later...')
+                    })
             })
         })
     })
@@ -130,11 +131,13 @@ describe('Repositories: EnvironmentRepository', () => {
                     .mock(modelFake)
                     .expects('deleteMany')
                     .withArgs({ institution_id: defaultEnvironment.institution_id })
-                    .rejects({ message: 'An internal error has occurred in the database!',
-                               description: 'Please try again later...' })
+                    .rejects({
+                        message: 'An internal error has occurred in the database!',
+                        description: 'Please try again later...'
+                    })
 
                 return environmentRepo.removeAllEnvironmentsFromInstitution(defaultEnvironment.institution_id!)
-                    .catch (err => {
+                    .catch(err => {
                         assert.propertyVal(err, 'message', 'An internal error has occurred in the database!')
                         assert.propertyVal(err, 'description', 'Please try again later...')
                     })
@@ -182,11 +185,13 @@ describe('Repositories: EnvironmentRepository', () => {
                     .expects('countDocuments')
                     .withArgs()
                     .chain('exec')
-                    .rejects({ message: 'An internal error has occurred in the database!',
-                               description: 'Please try again later...' })
+                    .rejects({
+                        message: 'An internal error has occurred in the database!',
+                        description: 'Please try again later...'
+                    })
 
                 return environmentRepo.count()
-                    .catch (err => {
+                    .catch(err => {
                         assert.propertyVal(err, 'message', 'An internal error has occurred in the database!')
                         assert.propertyVal(err, 'description', 'Please try again later...')
                     })

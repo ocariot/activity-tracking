@@ -46,9 +46,16 @@ export class ProviderEventBusTask implements IBackgroundTask {
         // Providing physical activity resource.
         this._eventBus.bus
             .providePhysicalActivities(async (query) => {
-                const _query: IQuery = new Query().fromJSON({ ...qs.parser(query) })
-                const result: Array<PhysicalActivity> = await this._activityRepository.find(_query)
-                return result.map(item => item.toJSON())
+                try {
+                    const _query: IQuery = new Query().fromJSON({
+                        ...qs.parser(query, {},
+                            { date_fields: { start_at: 'start_time', end_at: 'start_time' } })
+                    })
+                    const result: Array<PhysicalActivity> = await this._activityRepository.find(_query)
+                    return result.map(item => item.toJSON())
+                } catch (err) {
+                    return err
+                }
             })
             .then(() => this._logger.info('PhysicalActivity resource provided successfully!'))
             .catch((err) => this._logger.error(`Error trying to provide PhysicalActivity resource: ${err.message}`))
@@ -56,9 +63,14 @@ export class ProviderEventBusTask implements IBackgroundTask {
         // Providing sleep resource.
         this._eventBus.bus
             .provideSleep(async (query) => {
-                const _query: IQuery = new Query().fromJSON({ ...qs.parser(query) })
-                const result: Array<Sleep> = await this._sleepRepository.find(_query)
-                return result.map(item => item.toJSON())
+                try {
+                    const _query: IQuery = new Query().fromJSON({ ...qs.parser(query, {},
+                            { date_fields: { start_at: 'start_time', end_at: 'start_time'}}) })
+                    const result: Array<Sleep> = await this._sleepRepository.find(_query)
+                    return result.map(item => item.toJSON())
+                } catch (err) {
+                    return err
+                }
             })
             .then(() => this._logger.info('Sleep resource provided successfully!'))
             .catch((err) => this._logger.error(`Error trying to provide Sleep resource: ${err.message}`))
@@ -66,9 +78,14 @@ export class ProviderEventBusTask implements IBackgroundTask {
         // Providing weight resource.
         this._eventBus.bus
             .provideWeights(async (query) => {
-                const _query: IQuery = new Query().fromJSON({ ...qs.parser(query) })
-                const result: Array<Weight> = await this._weightRepository.find(_query)
-                return result.map(item => item.toJSON())
+                try {
+                    const _query: IQuery = new Query().fromJSON({ ...qs.parser(query, {},
+                            { date_fields: { start_at: 'timestamp', end_at: 'timestamp'}}) })
+                    const result: Array<Weight> = await this._weightRepository.find(_query)
+                    return result.map(item => item.toJSON())
+                } catch (err) {
+                    return err
+                }
             })
             .then(() => this._logger.info('Weight resource provided successfully!'))
             .catch((err) => this._logger.error(`Error trying to provide Weight resource: ${err.message}`))
@@ -76,9 +93,14 @@ export class ProviderEventBusTask implements IBackgroundTask {
         // Providing environment resource.
         this._eventBus.bus
             .provideEnvironments(async (query) => {
-                const _query: IQuery = new Query().fromJSON({ ...qs.parser(query) })
-                const result: Array<Environment> = await this._environmentRepository.find(_query)
-                return result.map(item => item.toJSON())
+                try {
+                    const _query: IQuery = new Query().fromJSON({ ...qs.parser(query, {},
+                            { date_fields: { start_at: 'timestamp', end_at: 'timestamp'}}) })
+                    const result: Array<Environment> = await this._environmentRepository.find(_query)
+                    return result.map(item => item.toJSON())
+                } catch (err) {
+                    return err
+                }
             })
             .then(() => this._logger.info('Environment resource provided successfully!'))
             .catch((err) => this._logger.error(`Error trying to provide Environment resource: ${err.message}`))
@@ -86,9 +108,14 @@ export class ProviderEventBusTask implements IBackgroundTask {
         // Providing logs resource.
         this._eventBus.bus
             .provideLogs(async (query) => {
-                const _query: IQuery = new Query().fromJSON({ ...qs.parser(query) })
-                const result: Array<Log> = await this._logRepository.find(_query)
-                return result.map(item => item.toJSON())
+                try {
+                    const _query: IQuery = new Query().fromJSON({ ...qs.parser(query, {},
+                            { date_fields: { start_at: 'date', end_at: 'date'}}) })
+                    const result: Array<Log> = await this._logRepository.find(_query)
+                    return result.map(item => item.toJSON())
+                } catch (err) {
+                    return err
+                }
             })
             .then(() => this._logger.info('Log resource provided successfully!'))
             .catch((err) => this._logger.error(`Error trying to provide Log resource: ${err.message}`))

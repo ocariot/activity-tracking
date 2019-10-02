@@ -23,7 +23,7 @@ export class UpdatePhysicalActivityValidator {
                 const durationValidate: number = physicalActivity.end_time.getTime() - physicalActivity.start_time.getTime()
                 if (durationValidate < 0) {
                     throw new ValidationException('Date field is invalid...',
-                        'Date validation failed: The end_time parameter can not contain a older date than that the start_time parameter!')
+                        'Date validation failed: The end_time parameter can not contain an older date than that the start_time parameter!')
                 }
                 if (physicalActivity.duration !== durationValidate) {
                     throw new ValidationException('Duration field is invalid...',
@@ -41,6 +41,11 @@ export class UpdatePhysicalActivityValidator {
         if (physicalActivity.steps && physicalActivity.steps < 0) {
                 throw new ValidationException('Steps field is invalid...',
                     'Physical Activity validation failed: '.concat(Strings.ERROR_MESSAGE.NEGATIVE_PARAMETER))
+        }
+
+        if (physicalActivity.distance && physicalActivity.distance < 0) {
+            throw new ValidationException('Distance field is invalid...',
+                'Physical Activity validation failed: '.concat(Strings.ERROR_MESSAGE.NEGATIVE_PARAMETER))
         }
 
         if (physicalActivity.levels && physicalActivity.levels.length) {

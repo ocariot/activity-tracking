@@ -108,6 +108,19 @@ describe('Validators: UpdatePhysicalActivityValidator', () => {
             })
         })
 
+        context('when the physical activity has an invalid parameter (negative distance)', () => {
+            it('should throw a ValidationException', () => {
+                activity.distance = -1000
+                try {
+                    UpdatePhysicalActivityValidator.validate(activity)
+                } catch (err) {
+                    assert.equal(err.message, 'Distance field is invalid...')
+                    assert.equal(err.description, 'Physical Activity validation failed: The value provided has a negative value!')
+                }
+                activity.distance = 1000
+            })
+        })
+
         context('when the physical activity has an invalid level (invalid type)', () => {
             it('should throw a ValidationException', () => {
                 // Mock through JSON

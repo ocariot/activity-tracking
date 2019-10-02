@@ -14,7 +14,7 @@ export class LogMock extends Log {
         super.date = this.generateDate()
         super.value = Math.floor(Math.random() * 10 + 1) * 100
         super.type = type
-        super.child_id = this.generateObjectId()
+        super.child_id = '5a62be07de34500146d9c544'
     }
 
     private generateObjectId(): string {
@@ -27,11 +27,7 @@ export class LogMock extends Log {
     }
 
     private generateDate(): string {
-        const dateStart = new Date(2018, 4, 15)
-        const dateEnd = new Date()
-        const randomDateMilliseconds = dateEnd.getTime() + Math.floor(Math.random() * (dateEnd.getTime() - dateStart.getTime()))
-
-        const date = new Date(randomDateMilliseconds)
+        const date = new Date(1560826800000 + Math.floor((Math.random() * 1000)))
 
         const month = date.getMonth() + 1
         let monthString = month.toString()

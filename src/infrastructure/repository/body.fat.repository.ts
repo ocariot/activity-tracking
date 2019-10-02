@@ -44,7 +44,7 @@ export class BodyFatRepository extends BaseRepository<BodyFat, BodyFatEntity> im
                     if (result) return resolve(true)
                     return resolve(false)
                 })
-                .catch(err => reject(super.mongoDBErrorListener(err)))
+                .catch(err => reject(err))
         })
     }
 

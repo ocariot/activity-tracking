@@ -131,8 +131,11 @@ describe('Routes: children.sleep', () => {
     // Start services
     before(async () => {
         try {
-            await dbConnection.connect(process.env.MONGODB_URI_TEST || Default.MONGODB_URI_TEST)
-            await rabbitmq.initialize(process.env.RABBITMQ_URI || Default.RABBITMQ_URI, { sslOptions: { ca: [] } })
+            await dbConnection.connect(process.env.MONGODB_URI_TEST || Default.MONGODB_URI_TEST,
+                { interval: 100 })
+
+            await rabbitmq.initialize('amqp://invalidUser:guest@localhost', { retries: 1, interval: 100 })
+
             await deleteAllSleep()
         } catch (err) {
             throw new Error('Failure on children.sleep routes test: ' + err.message)
@@ -152,13 +155,81 @@ describe('Routes: children.sleep', () => {
     /**
      * POST route with only one Sleep in the body
      */
-    describe('NO CONNECTION TO RABBITMQ -> POST /v1/children/:child_id/sleep with only one Sleep in the body', () => {
-        context('when posting a new Sleep with success', () => {
+    describe('RABBITMQ PUBLISHER -> POST /v1/children/:child_id/sleep with only one Sleep in the body', () => {
+        context('when posting a new Sleep with success and publishing it to the bus', () => {
+            const body = {
+                start_time: defaultSleep.start_time,
+                end_time: defaultSleep.end_time,
+                duration: defaultSleep.duration,
+                pattern: defaultSleep.pattern,
+                type: defaultSleep.type
+            }
+
             before(async () => {
                 try {
-                    await rabbitmq.dispose()
+                    await deleteAllSleep()
 
+                    await rabbitmq.initialize(process.env.RABBITMQ_URI || Default.RABBITMQ_URI,
+                        { interval: 100, receiveFromYourself: true, sslOptions: { ca: [] } })
+                } catch (err) {
+                    throw new Error('Failure on children.sleep routes test: ' + err.message)
+                }
+            })
+
+            after(async () => {
+                try {
+                    await rabbitmq.dispose()
                     await rabbitmq.initialize('amqp://invalidUser:guest@localhost', { retries: 1, interval: 100 })
+                } catch (err) {
+                    throw new Error('Failure on children.sleep test: ' + err.message)
+                }
+            })
+
+            it('The subscriber should receive a message in the correct format and with the same values as the sleep ' +
+                'published on the bus', (done) => {
+                rabbitmq.bus
+                    .subSaveSleep(message => {
+                        try {
+                            expect(message.event_name).to.eql('SleepSaveEvent')
+                            expect(message).to.have.property('timestamp')
+                            expect(message).to.have.property('sleep')
+                            expect(message.sleep).to.have.property('id')
+                            expect(message.sleep.start_time).to.eql(defaultSleep.start_time!.toISOString())
+                            expect(message.sleep.end_time).to.eql(defaultSleep.end_time!.toISOString())
+                            expect(message.sleep.duration).to.eql(defaultSleep.duration)
+                            let index = 0
+                            for (const elem of defaultSleep.pattern!.data_set) {
+                                expect(message.sleep.pattern.data_set[index].start_time).to.eql(elem.start_time.toISOString())
+                                expect(message.sleep.pattern.data_set[index].name).to.eql(elem.name)
+                                expect(message.sleep.pattern.data_set[index].duration).to.eql(elem.duration)
+                                index++
+                            }
+                            expect(message.sleep.type).to.eql(defaultSleep.type)
+                            expect(message.sleep.child_id).to.eql(defaultSleep.child_id)
+                            done()
+                        } catch (err) {
+                            done(err)
+                        }
+                    })
+                    .then(() => {
+                        request
+                            .post(`/v1/children/${defaultSleep.child_id}/sleep`)
+                            .send(body)
+                            .set('Content-Type', 'application/json')
+                            .expect(201)
+                            .then()
+                            .catch(done)
+                    })
+                    .catch(done)
+            })
+        })
+    })
+
+    describe('POST /v1/children/:child_id/sleep with only one Sleep in the body', () => {
+        context('when posting a new Sleep with success (there is no connection to RabbitMQ)', () => {
+            before(async () => {
+                try {
+                    await deleteAllSleep()
                 } catch (err) {
                     throw new Error('Failure on children.sleep routes test: ' + err.message)
                 }
@@ -179,8 +250,7 @@ describe('Routes: children.sleep', () => {
                     .set('Content-Type', 'application/json')
                     .expect(201)
                     .then(res => {
-                        defaultSleep.id = res.body.id
-                        expect(res.body.id).to.eql(defaultSleep.id)
+                        expect(res.body).to.have.property('id')
                         expect(res.body.start_time).to.eql(defaultSleep.start_time!.toISOString())
                         expect(res.body.end_time).to.eql(defaultSleep.end_time!.toISOString())
                         expect(res.body.duration).to.eql(defaultSleep.duration)
@@ -191,111 +261,15 @@ describe('Routes: children.sleep', () => {
                             expect(res.body.pattern.data_set[index].duration).to.eql(elem.duration)
                             index++
                         }
-                        expect(res.body.type).to.eql(defaultSleep.type)
-                        expect(res.body.child_id).to.eql(defaultSleep.child_id)
-                    })
-            })
-        })
-    })
-
-    describe('RABBITMQ PUBLISHER -> POST /v1/children/:child_id/sleep with only one Sleep in the body', () => {
-        context('when posting a new Sleep with success and publishing it to the bus', () => {
-            const body = {
-                start_time: defaultSleep.start_time,
-                end_time: defaultSleep.end_time,
-                duration: defaultSleep.duration,
-                pattern: defaultSleep.pattern,
-                type: defaultSleep.type
-            }
-
-            before(async () => {
-                try {
-                    await deleteAllSleep()
-
-                    await rabbitmq.initialize(process.env.RABBITMQ_URI || Default.RABBITMQ_URI,
-                        { receiveFromYourself: true, sslOptions: { ca: [] } })
-                } catch (err) {
-                    throw new Error('Failure on children.sleep routes test: ' + err.message)
-                }
-            })
-
-            it('The subscriber should receive a message in the correct format and with the same values as the sleep ' +
-                'published on the bus', (done) => {
-                rabbitmq.bus
-                    .subSaveSleep(message => {
-                        expect(message.event_name).to.eql('SleepSaveEvent')
-                        expect(message).to.have.property('timestamp')
-                        expect(message).to.have.property('sleep')
-                        defaultSleep.id = message.sleep.id
-                        expect(message.sleep.id).to.eql(defaultSleep.id)
-                        expect(message.sleep.start_time).to.eql(defaultSleep.start_time!.toISOString())
-                        expect(message.sleep.end_time).to.eql(defaultSleep.end_time!.toISOString())
-                        expect(message.sleep.duration).to.eql(defaultSleep.duration)
-                        let index = 0
-                        for (const elem of defaultSleep.pattern!.data_set) {
-                            expect(message.sleep.pattern.data_set[index].start_time).to.eql(elem.start_time.toISOString())
-                            expect(message.sleep.pattern.data_set[index].name).to.eql(elem.name)
-                            expect(message.sleep.pattern.data_set[index].duration).to.eql(elem.duration)
-                            index++
-                        }
-                        expect(message.sleep.type).to.eql(defaultSleep.type)
-                        expect(message.sleep.child_id).to.eql(defaultSleep.child_id)
-                        done()
-                    })
-                    .then(() => {
-                        request
-                            .post(`/v1/children/${defaultSleep.child_id}/sleep`)
-                            .send(body)
-                            .set('Content-Type', 'application/json')
-                            .expect(201)
-                            .then()
-                    })
-                    .catch((err) => {
-                        done(err)
-                    })
-            })
-        })
-    })
-
-    describe('POST /v1/children/:child_id/sleep with only one Sleep in the body', () => {
-        context('when posting a new Sleep with success', () => {
-            before(async () => {
-                try {
-                    await deleteAllSleep()
-
-                    await rabbitmq.dispose()
-
-                    await rabbitmq.initialize(process.env.RABBITMQ_URI || Default.RABBITMQ_URI, { sslOptions: { ca: [] } })
-                } catch (err) {
-                    throw new Error('Failure on children.sleep routes test: ' + err.message)
-                }
-            })
-            it('should return status code 201 and the saved Sleep', () => {
-                const body = {
-                    start_time: defaultSleep.start_time,
-                    end_time: defaultSleep.end_time,
-                    duration: defaultSleep.duration,
-                    pattern: defaultSleep.pattern,
-                    type: defaultSleep.type
-                }
-
-                return request
-                    .post(`/v1/children/${defaultSleep.child_id}/sleep`)
-                    .send(body)
-                    .set('Content-Type', 'application/json')
-                    .expect(201)
-                    .then(res => {
-                        defaultSleep.id = res.body.id
-                        expect(res.body.id).to.eql(defaultSleep.id)
-                        expect(res.body.start_time).to.eql(defaultSleep.start_time!.toISOString())
-                        expect(res.body.end_time).to.eql(defaultSleep.end_time!.toISOString())
-                        expect(res.body.duration).to.eql(defaultSleep.duration)
-                        let index = 0
-                        for (const elem of defaultSleep.pattern!.data_set) {
-                            expect(res.body.pattern.data_set[index].start_time).to.eql(elem.start_time.toISOString())
-                            expect(res.body.pattern.data_set[index].name).to.eql(elem.name)
-                            expect(res.body.pattern.data_set[index].duration).to.eql(elem.duration)
-                            index++
+                        if (defaultSleep.type === SleepType.CLASSIC) {
+                            expect(res.body.pattern.summary).to.have.property('awake')
+                            expect(res.body.pattern.summary).to.have.property('asleep')
+                            expect(res.body.pattern.summary).to.have.property('restless')
+                        } else {
+                            expect(res.body.pattern.summary).to.have.property('deep')
+                            expect(res.body.pattern.summary).to.have.property('light')
+                            expect(res.body.pattern.summary).to.have.property('rem')
+                            expect(res.body.pattern.summary).to.have.property('awake')
                         }
                         expect(res.body.type).to.eql(defaultSleep.type)
                         expect(res.body.child_id).to.eql(defaultSleep.child_id)
@@ -304,6 +278,22 @@ describe('Routes: children.sleep', () => {
         })
 
         context('when a duplicate error occurs', () => {
+            before(async () => {
+                try {
+                    await deleteAllSleep()
+
+                    await createSleep({
+                        start_time: defaultSleep.start_time,
+                        end_time: defaultSleep.end_time,
+                        duration: defaultSleep.duration,
+                        pattern: defaultSleep.pattern!.data_set,
+                        type: defaultSleep.type,
+                        child_id: defaultSleep.child_id
+                    })
+                } catch (err) {
+                    throw new Error('Failure on children.sleep routes test: ' + err.message)
+                }
+            })
             it('should return status code 409 and an info message about duplicate items', () => {
                 const body = {
                     start_time: defaultSleep.start_time,
@@ -382,7 +372,7 @@ describe('Routes: children.sleep', () => {
                         expect(err.body.code).to.eql(400)
                         expect(err.body.message).to.eql('Date field is invalid...')
                         expect(err.body.description).to.eql('Date validation failed: The end_time parameter can not ' +
-                            'contain a older date than that the start_time parameter!')
+                            'contain an older date than that the start_time parameter!')
                     })
             })
         })
@@ -650,7 +640,7 @@ describe('Routes: children.sleep', () => {
                 }
             })
 
-            it('should return status code 201, create each Sleep and return a response of type MultiStatus<Sleep> ' +
+            it('should return status code 207, create each Sleep and return a response of type MultiStatus<Sleep> ' +
                 'with the description of success in sending each one of them', () => {
                 const body: any = []
 
@@ -673,6 +663,7 @@ describe('Routes: children.sleep', () => {
                     .then(res => {
                         for (let i = 0; i < res.body.success.length; i++) {
                             expect(res.body.success[i].code).to.eql(HttpStatus.CREATED)
+                            expect(res.body.success[i].item).to.have.property('id')
                             expect(res.body.success[i].item.start_time).to.eql(correctSleepArr[i].start_time!.toISOString())
                             expect(res.body.success[i].item.end_time).to.eql(correctSleepArr[i].end_time!.toISOString())
                             expect(res.body.success[i].item.duration).to.eql(correctSleepArr[i].duration)
@@ -682,6 +673,16 @@ describe('Routes: children.sleep', () => {
                                 expect(res.body.success[i].item.pattern.data_set[index].name).to.eql(elem.name)
                                 expect(res.body.success[i].item.pattern.data_set[index].duration).to.eql(elem.duration)
                                 index++
+                            }
+                            if (correctSleepArr[i].type === SleepType.CLASSIC) {
+                                expect(res.body.success[i].item.pattern.summary).to.have.property('awake')
+                                expect(res.body.success[i].item.pattern.summary).to.have.property('asleep')
+                                expect(res.body.success[i].item.pattern.summary).to.have.property('restless')
+                            } else {
+                                expect(res.body.success[i].item.pattern.summary).to.have.property('deep')
+                                expect(res.body.success[i].item.pattern.summary).to.have.property('light')
+                                expect(res.body.success[i].item.pattern.summary).to.have.property('rem')
+                                expect(res.body.success[i].item.pattern.summary).to.have.property('awake')
                             }
                             expect(res.body.success[i].item.type).to.eql(correctSleepArr[i].type)
                             expect(res.body.success[i].item.child_id).to.eql(correctSleepArr[i].child_id)
@@ -693,6 +694,24 @@ describe('Routes: children.sleep', () => {
         })
 
         context('when all the sleep objects are correct but already exists in the repository', () => {
+            before(async () => {
+                try {
+                    await deleteAllSleep()
+
+                    for (const sleep of correctSleepArr) {
+                        await createSleep({
+                            start_time: sleep.start_time,
+                            end_time: sleep.end_time,
+                            duration: sleep.duration,
+                            pattern: sleep.pattern!.data_set,
+                            type: sleep.type,
+                            child_id: sleep.child_id
+                        })
+                    }
+                } catch (err) {
+                    throw new Error('Failure on children.sleep routes test: ' + err.message)
+                }
+            })
             it('should return status code 201 and return a response of type MultiStatus<Sleep> with the ' +
                 'description of conflict in sending each one of them', () => {
                 const body: any = []
@@ -768,6 +787,7 @@ describe('Routes: children.sleep', () => {
                     .then(res => {
                         // Success item
                         expect(res.body.success[0].code).to.eql(HttpStatus.CREATED)
+                        expect(res.body.success[0].item).to.have.property('id')
                         expect(res.body.success[0].item.start_time).to.eql(mixedSleepArr[0].start_time!.toISOString())
                         expect(res.body.success[0].item.end_time).to.eql(mixedSleepArr[0].end_time!.toISOString())
                         expect(res.body.success[0].item.duration).to.eql(mixedSleepArr[0].duration)
@@ -777,6 +797,16 @@ describe('Routes: children.sleep', () => {
                             expect(res.body.success[0].item.pattern.data_set[index].name).to.eql(elem.name)
                             expect(res.body.success[0].item.pattern.data_set[index].duration).to.eql(elem.duration)
                             index++
+                        }
+                        if (mixedSleepArr[0].type === SleepType.CLASSIC) {
+                            expect(res.body.success[0].item.pattern.summary).to.have.property('awake')
+                            expect(res.body.success[0].item.pattern.summary).to.have.property('asleep')
+                            expect(res.body.success[0].item.pattern.summary).to.have.property('restless')
+                        } else {
+                            expect(res.body.success[0].item.pattern.summary).to.have.property('deep')
+                            expect(res.body.success[0].item.pattern.summary).to.have.property('light')
+                            expect(res.body.success[0].item.pattern.summary).to.have.property('rem')
+                            expect(res.body.success[0].item.pattern.summary).to.have.property('awake')
                         }
                         expect(res.body.success[0].item.type).to.eql(mixedSleepArr[0].type)
                         expect(res.body.success[0].item.child_id).to.eql(mixedSleepArr[0].child_id)
@@ -827,7 +857,7 @@ describe('Routes: children.sleep', () => {
                         expect(res.body.error[1].description).to.eql('Sleep validation failed: type, pattern is required!')
                         expect(res.body.error[2].message).to.eql('Date field is invalid...')
                         expect(res.body.error[2].description).to.eql('Date validation failed: The end_time parameter can not contain ' +
-                            'a older date than that the start_time parameter!')
+                            'an older date than that the start_time parameter!')
                         expect(res.body.error[3].message).to.eql('Duration field is invalid...')
                         expect(res.body.error[3].description).to.eql('Duration validation failed: Activity duration value does not ' +
                             'match values passed in start_time and end_time parameters!')
@@ -888,13 +918,7 @@ describe('Routes: children.sleep', () => {
             before(async () => {
                 try {
                     await deleteAllSleep()
-                } catch (err) {
-                    throw new Error('Failure on children.sleep routes test: ' + err.message)
-                }
-            })
 
-            it('should return status code 200 and a list of all sleep of that specific child', async () => {
-                try {
                     await createSleep({
                         start_time: defaultSleep.start_time,
                         end_time: defaultSleep.end_time,
@@ -906,19 +930,20 @@ describe('Routes: children.sleep', () => {
                 } catch (err) {
                     throw new Error('Failure on children.sleep routes test: ' + err.message)
                 }
+            })
 
+            it('should return status code 200 and a list of all sleep of that specific child', () => {
                 return request
                     .get(`/v1/children/${defaultSleep.child_id}/sleep`)
                     .set('Content-Type', 'application/json')
                     .expect(200)
                     .then(res => {
-                        defaultSleep.id = res.body[0].id
                         expect(res.body).is.an.instanceOf(Array)
                         expect(res.body.length).to.not.eql(0)
                         // Check for the existence of properties only in the first element of the array
                         // because there is a guarantee that there will be at least one object (created
                         // in the case of the successful POST route test or with the create method above).
-                        expect(res.body[0].id).to.eql(defaultSleep.id)
+                        expect(res.body[0]).to.have.property('id')
                         expect(res.body[0].start_time).to.eql(defaultSleep.start_time!.toISOString())
                         expect(res.body[0].end_time).to.eql(defaultSleep.end_time!.toISOString())
                         expect(res.body[0].duration).to.eql(defaultSleep.duration)
@@ -944,7 +969,7 @@ describe('Routes: children.sleep', () => {
                 }
             })
 
-            it('should return status code 200 and an empty list', async () => {
+            it('should return status code 200 and an empty list', () => {
                 return request
                     .get(`/v1/children/${defaultSleep.child_id}/sleep`)
                     .set('Content-Type', 'application/json')
@@ -965,20 +990,7 @@ describe('Routes: children.sleep', () => {
                 }
             })
 
-            it('should return status code 400 and an info message about the invalid child_id', async () => {
-                try {
-                    await createSleep({
-                        start_time: defaultSleep.start_time,
-                        end_time: defaultSleep.end_time,
-                        duration: defaultSleep.duration,
-                        pattern: defaultSleep.pattern!.data_set,
-                        type: defaultSleep.type,
-                        child_id: defaultSleep.child_id
-                    })
-                } catch (err) {
-                    throw new Error('Failure on children.sleep routes test: ' + err.message)
-                }
-
+            it('should return status code 400 and an info message about the invalid child_id', () => {
                 return request
                     .get(`/v1/children/123/sleep`)
                     .set('Content-Type', 'application/json')
@@ -997,13 +1009,7 @@ describe('Routes: children.sleep', () => {
             before(async () => {
                 try {
                     await deleteAllSleep()
-                } catch (err) {
-                    throw new Error('Failure on children.sleep routes test: ' + err.message)
-                }
-            })
 
-            it('should return status code 200 and the result as needed in the query', async () => {
-                try {
                     await createSleep({
                         start_time: defaultSleep.start_time,
                         end_time: defaultSleep.end_time,
@@ -1015,22 +1021,23 @@ describe('Routes: children.sleep', () => {
                 } catch (err) {
                     throw new Error('Failure on children.sleep routes test: ' + err.message)
                 }
+            })
 
-                const url = `/v1/children/${defaultSleep.child_id}/sleep?child_id=${defaultSleep.child_id}
-                    &sort=child_id&page=1&limit=3`
+            it('should return status code 200 and the result as needed in the query', () => {
+                const url = `/v1/children/${defaultSleep.child_id}/sleep?child_id=${defaultSleep.child_id}`
+                    .concat(`&sort=child_id&page=1&limit=3`)
 
                 return request
                     .get(url)
                     .set('Content-Type', 'application/json')
                     .expect(200)
                     .then(res => {
-                        defaultSleep.id = res.body[0].id
                         expect(res.body).is.an.instanceOf(Array)
                         expect(res.body.length).to.not.eql(0)
                         // Check for the existence of properties only in the first element of the array
                         // because there is a guarantee that there will be at least one object (created
                         // in the case of the successful POST route test or with the create method above).
-                        expect(res.body[0].id).to.eql(defaultSleep.id)
+                        expect(res.body[0]).to.have.property('id')
                         expect(res.body[0].start_time).to.eql(defaultSleep.start_time!.toISOString())
                         expect(res.body[0].end_time).to.eql(defaultSleep.end_time!.toISOString())
                         expect(res.body[0].duration).to.eql(defaultSleep.duration)
@@ -1057,9 +1064,9 @@ describe('Routes: children.sleep', () => {
                 }
             })
 
-            it('should return status code 200 and an empty list', async () => {
-                const url = `/v1/children/${defaultSleep.child_id}/sleep?child_id=${defaultSleep.child_id}
-                    &sort=child_id&page=1&limit=3`
+            it('should return status code 200 and an empty list', () => {
+                const url = `/v1/children/${defaultSleep.child_id}/sleep?child_id=${defaultSleep.child_id}`
+                    .concat(`&sort=child_id&page=1&limit=3`)
 
                 return request
                     .get(url)
@@ -1082,22 +1089,9 @@ describe('Routes: children.sleep', () => {
                 }
             })
 
-            it('should return status code 400 and an info message about the invalid child_id', async () => {
-                try {
-                    await createSleep({
-                        start_time: defaultSleep.start_time,
-                        end_time: defaultSleep.end_time,
-                        duration: defaultSleep.duration,
-                        pattern: defaultSleep.pattern!.data_set,
-                        type: defaultSleep.type,
-                        child_id: defaultSleep.child_id
-                    })
-                } catch (err) {
-                    throw new Error('Failure on children.sleep routes test: ' + err.message)
-                }
-
-                const url = `/v1/children/123/sleep?child_id=${defaultSleep.child_id}
-                    &sort=child_id&page=1&limit=3`
+            it('should return status code 400 and an info message about the invalid child_id', () => {
+                const url = `/v1/children/123/sleep?child_id=${defaultSleep.child_id}`
+                    .concat(`&sort=child_id&page=1&limit=3`)
 
                 return request
                     .get(url)
@@ -1116,18 +1110,12 @@ describe('Routes: children.sleep', () => {
      */
     describe('GET /v1/children/:child_id/sleep/:sleep_id', () => {
         context('when get a specific sleep of a child of the database successfully', () => {
+            let result
+
             before(async () => {
                 try {
                     await deleteAllSleep()
-                } catch (err) {
-                    throw new Error('Failure on children.sleep routes test: ' + err.message)
-                }
-            })
 
-            it('should return status code 200 and that specific sleep of that child', async () => {
-                let result
-
-                try {
                     result = await createSleep({
                         start_time: defaultSleep.start_time,
                         end_time: defaultSleep.end_time,
@@ -1139,7 +1127,8 @@ describe('Routes: children.sleep', () => {
                 } catch (err) {
                     throw new Error('Failure on children.sleep routes test: ' + err.message)
                 }
-
+            })
+            it('should return status code 200 and that specific sleep of that child', () => {
                 return request
                     .get(`/v1/children/${result.child_id}/sleep/${result.id}`)
                     .set('Content-Type', 'application/json')
@@ -1148,7 +1137,7 @@ describe('Routes: children.sleep', () => {
                         // Check for the existence of properties only in the first element of the array
                         // because there is a guarantee that there will be at least one object (created
                         // in the case of the successful POST route test or with the create method above).
-                        expect(res.body.id).to.eql(result.id)
+                        expect(res.body).to.have.property('id')
                         expect(res.body.start_time).to.eql(result.start_time!.toISOString())
                         expect(res.body.end_time).to.eql(result.end_time!.toISOString())
                         expect(res.body.duration).to.eql(result.duration)
@@ -1174,7 +1163,7 @@ describe('Routes: children.sleep', () => {
                 }
             })
 
-            it('should return status code 404 and an info message describing that sleep was not found', async () => {
+            it('should return status code 404 and an info message describing that sleep was not found', () => {
                 return request
                     .get(`/v1/children/${defaultSleep.child_id}/sleep/${defaultSleep.id}`)
                     .set('Content-Type', 'application/json')
@@ -1197,24 +1186,9 @@ describe('Routes: children.sleep', () => {
                 }
             })
 
-            it('should return status code 400 and an info message about the invalid child_id', async () => {
-                let result
-
-                try {
-                    result = await createSleep({
-                        start_time: defaultSleep.start_time,
-                        end_time: defaultSleep.end_time,
-                        duration: defaultSleep.duration,
-                        pattern: defaultSleep.pattern!.data_set,
-                        type: defaultSleep.type,
-                        child_id: defaultSleep.child_id
-                    })
-                } catch (err) {
-                    throw new Error('Failure on children.sleep routes test: ' + err.message)
-                }
-
+            it('should return status code 400 and an info message about the invalid child_id', () => {
                 return request
-                    .get(`/v1/children/123/sleep/${result.id}`)
+                    .get(`/v1/children/123/sleep/${defaultSleep.id}`)
                     .set('Content-Type', 'application/json')
                     .expect(400)
                     .then(err => {
@@ -1234,24 +1208,9 @@ describe('Routes: children.sleep', () => {
                 }
             })
 
-            it('should return status code 400 and an info message about the invalid sleep id', async () => {
-                let result
-
-                try {
-                    result = await createSleep({
-                        start_time: defaultSleep.start_time,
-                        end_time: defaultSleep.end_time,
-                        duration: defaultSleep.duration,
-                        pattern: defaultSleep.pattern!.data_set,
-                        type: defaultSleep.type,
-                        child_id: defaultSleep.child_id
-                    })
-                } catch (err) {
-                    throw new Error('Failure on children.sleep routes test: ' + err.message)
-                }
-
+            it('should return status code 400 and an info message about the invalid sleep id', () => {
                 return request
-                    .get(`/v1/children/${result.child_id}/sleep/123`)
+                    .get(`/v1/children/${defaultSleep.child_id}/sleep/123`)
                     .set('Content-Type', 'application/json')
                     .expect(400)
                     .then(err => {
@@ -1265,18 +1224,12 @@ describe('Routes: children.sleep', () => {
          * query-strings-parser library test
          */
         context('when get a specific sleep of a child using the "query-strings-parser" library', () => {
+            let result
+
             before(async () => {
                 try {
                     await deleteAllSleep()
-                } catch (err) {
-                    throw new Error('Failure on children.sleep routes test: ' + err.message)
-                }
-            })
 
-            it('should return status code 200 and the result as needed in the query', async () => {
-                let result
-
-                try {
                     result = await createSleep({
                         start_time: defaultSleep.start_time,
                         end_time: defaultSleep.end_time,
@@ -1288,16 +1241,18 @@ describe('Routes: children.sleep', () => {
                 } catch (err) {
                     throw new Error('Failure on children.sleep routes test: ' + err.message)
                 }
+            })
 
-                const url = `/v1/children/${result.child_id}/sleep/${result.id}?child_id=${result.child_id}
-                    &sort=child_id&page=1&limit=3`
+            it('should return status code 200 and the result as needed in the query', () => {
+                const url = `/v1/children/${result.child_id}/sleep/${result.id}?child_id=${result.child_id}`
+                    .concat(`&sort=child_id&page=1&limit=3`)
 
                 return request
                     .get(url)
                     .set('Content-Type', 'application/json')
                     .expect(200)
                     .then(res => {
-                        expect(res.body.id).to.eql(result.id)
+                        expect(res.body).to.have.property('id')
                         expect(res.body.start_time).to.eql(result.start_time!.toISOString())
                         expect(res.body.end_time).to.eql(result.end_time!.toISOString())
                         expect(res.body.duration).to.eql(result.duration)
@@ -1324,9 +1279,9 @@ describe('Routes: children.sleep', () => {
                 }
             })
 
-            it('should return status code 404 and an info message describing that sleep was not found', async () => {
-                const url = `/v1/children/${defaultSleep.child_id}/sleep/${defaultSleep.id}?child_id=${defaultSleep.child_id}
-                    &sort=child_id&page=1&limit=3`
+            it('should return status code 404 and an info message describing that sleep was not found', () => {
+                const url = `/v1/children/${defaultSleep.child_id}/sleep/${defaultSleep.id}?child_id=${defaultSleep.child_id}`
+                    .concat(`&sort=child_id&page=1&limit=3`)
 
                 return request
                     .get(url)
@@ -1351,24 +1306,9 @@ describe('Routes: children.sleep', () => {
                 }
             })
 
-            it('should return status code 400 and an info message about the invalid child_id', async () => {
-                let result
-
-                try {
-                    result = await createSleep({
-                        start_time: defaultSleep.start_time,
-                        end_time: defaultSleep.end_time,
-                        duration: defaultSleep.duration,
-                        pattern: defaultSleep.pattern!.data_set,
-                        type: defaultSleep.type,
-                        child_id: defaultSleep.child_id
-                    })
-                } catch (err) {
-                    throw new Error('Failure on children.sleep routes test: ' + err.message)
-                }
-
-                const url = `/v1/children/123/sleep/${result.id}?child_id=${result.child_id}
-                    &sort=child_id&page=1&limit=3`
+            it('should return status code 400 and an info message about the invalid child_id', () => {
+                const url = `/v1/children/123/sleep/${defaultSleep.id}?child_id=${defaultSleep.child_id}`
+                    .concat(`&sort=child_id&page=1&limit=3`)
 
                 return request
                     .get(url)
@@ -1392,24 +1332,9 @@ describe('Routes: children.sleep', () => {
                 }
             })
 
-            it('should return status code 400 and an info message about the invalid sleep id', async () => {
-                let result
-
-                try {
-                    result = await createSleep({
-                        start_time: defaultSleep.start_time,
-                        end_time: defaultSleep.end_time,
-                        duration: defaultSleep.duration,
-                        pattern: defaultSleep.pattern!.data_set,
-                        type: defaultSleep.type,
-                        child_id: defaultSleep.child_id
-                    })
-                } catch (err) {
-                    throw new Error('Failure on children.sleep routes test: ' + err.message)
-                }
-
-                const url = `/v1/children/${result.child_id}/sleep/123?child_id=${result.child_id}
-                    &sort=child_id&page=1&limit=3`
+            it('should return status code 400 and an info message about the invalid sleep id', () => {
+                const url = `/v1/children/${defaultSleep.child_id}/sleep/123?child_id=${defaultSleep.child_id}`
+                    .concat(`&sort=child_id&page=1&limit=3`)
 
                 return request
                     .get(url)
@@ -1426,60 +1351,6 @@ describe('Routes: children.sleep', () => {
     /**
      * PATCH route
      */
-    describe('NO CONNECTION TO RABBITMQ -> PATCH /v1/children/:child_id/sleep/:sleep_id', () => {
-        context('when this sleep exists in the database and is updated successfully', () => {
-            let result
-
-            before(async () => {
-                try {
-                    await deleteAllSleep()
-
-                    // Sleep to be updated
-                    result = await createSleepToBeUpdated(defaultSleep)
-
-                    await rabbitmq.dispose()
-
-                    await rabbitmq.initialize('amqp://invalidUser:guest@localhost', { retries: 1, interval: 100 })
-                } catch (err) {
-                    throw new Error('Failure on children.sleep routes test: ' + err.message)
-                }
-            })
-            it('should return status code 200 and the updated Sleep (and show an error log about unable to send ' +
-                'UpdateSleep event)', () => {
-                // Sleep to update
-                const body = {
-                    start_time: otherSleep.start_time,
-                    end_time: otherSleep.end_time,
-                    duration: otherSleep.duration,
-                    pattern: defaultSleep.pattern,
-                    type: defaultSleep.type
-                }
-
-                return request
-                    .patch(`/v1/children/${result.child_id}/sleep/${result.id}`)
-                    .send(body)
-                    .set('Content-Type', 'application/json')
-                    .expect(200)
-                    .then(res => {
-                        defaultSleep.id = res.body.id
-                        expect(res.body.id).to.eql(defaultSleep.id)
-                        expect(res.body.start_time).to.eql(otherSleep.start_time!.toISOString())
-                        expect(res.body.end_time).to.eql(otherSleep.end_time!.toISOString())
-                        expect(res.body.duration).to.eql(otherSleep.duration)
-                        let index = 0
-                        for (const elem of defaultSleep.pattern!.data_set) {
-                            expect(res.body.pattern.data_set[index].start_time).to.eql(elem.start_time.toISOString())
-                            expect(res.body.pattern.data_set[index].name).to.eql(elem.name)
-                            expect(res.body.pattern.data_set[index].duration).to.eql(elem.duration)
-                            index++
-                        }
-                        expect(res.body.type).to.eql(defaultSleep.type)
-                        expect(res.body.child_id).to.eql(defaultSleep.child_id)
-                    })
-            })
-        })
-    })
-
     describe('RABBITMQ PUBLISHER -> PATCH /v1/children/:child_id/sleep/:sleep_id', () => {
         context('when this sleep exists in the database, is updated successfully and published to the bus', () => {
             // Sleep to update
@@ -1501,9 +1372,18 @@ describe('Routes: children.sleep', () => {
                     result = await createSleepToBeUpdated(defaultSleep)
 
                     await rabbitmq.initialize(process.env.RABBITMQ_URI || Default.RABBITMQ_URI,
-                        { receiveFromYourself: true, sslOptions: { ca: [] } })
+                        { interval: 100, receiveFromYourself: true, sslOptions: { ca: [] } })
                 } catch (err) {
                     throw new Error('Failure on children.sleep routes test: ' + err.message)
+                }
+            })
+
+            after(async () => {
+                try {
+                    await rabbitmq.dispose()
+                    await rabbitmq.initialize('amqp://invalidUser:guest@localhost', { retries: 1, interval: 100 })
+                } catch (err) {
+                    throw new Error('Failure on children.sleep test: ' + err.message)
                 }
             })
 
@@ -1511,24 +1391,27 @@ describe('Routes: children.sleep', () => {
                 'published on the bus', (done) => {
                 rabbitmq.bus
                     .subUpdateSleep(message => {
-                        expect(message.event_name).to.eql('SleepUpdateEvent')
-                        expect(message).to.have.property('timestamp')
-                        expect(message).to.have.property('sleep')
-                        defaultSleep.id = message.sleep.id
-                        expect(message.sleep.id).to.eql(defaultSleep.id)
-                        expect(message.sleep.start_time).to.eql(otherSleep.start_time!.toISOString())
-                        expect(message.sleep.end_time).to.eql(otherSleep.end_time!.toISOString())
-                        expect(message.sleep.duration).to.eql(otherSleep.duration)
-                        let index = 0
-                        for (const elem of defaultSleep.pattern!.data_set) {
-                            expect(message.sleep.pattern.data_set[index].start_time).to.eql(elem.start_time.toISOString())
-                            expect(message.sleep.pattern.data_set[index].name).to.eql(elem.name)
-                            expect(message.sleep.pattern.data_set[index].duration).to.eql(elem.duration)
-                            index++
+                        try {
+                            expect(message.event_name).to.eql('SleepUpdateEvent')
+                            expect(message).to.have.property('timestamp')
+                            expect(message).to.have.property('sleep')
+                            expect(message.sleep).to.have.property('id')
+                            expect(message.sleep.start_time).to.eql(otherSleep.start_time!.toISOString())
+                            expect(message.sleep.end_time).to.eql(otherSleep.end_time!.toISOString())
+                            expect(message.sleep.duration).to.eql(otherSleep.duration)
+                            let index = 0
+                            for (const elem of defaultSleep.pattern!.data_set) {
+                                expect(message.sleep.pattern.data_set[index].start_time).to.eql(elem.start_time.toISOString())
+                                expect(message.sleep.pattern.data_set[index].name).to.eql(elem.name)
+                                expect(message.sleep.pattern.data_set[index].duration).to.eql(elem.duration)
+                                index++
+                            }
+                            expect(message.sleep.type).to.eql(defaultSleep.type)
+                            expect(message.sleep.child_id).to.eql(defaultSleep.child_id)
+                            done()
+                        } catch (err) {
+                            done(err)
                         }
-                        expect(message.sleep.type).to.eql(defaultSleep.type)
-                        expect(message.sleep.child_id).to.eql(defaultSleep.child_id)
-                        done()
                     })
                     .then(() => {
                         request
@@ -1537,16 +1420,16 @@ describe('Routes: children.sleep', () => {
                             .set('Content-Type', 'application/json')
                             .expect(200)
                             .then()
+                            .catch(done)
                     })
-                    .catch((err) => {
-                        done(err)
-                    })
+                    .catch(done)
             })
         })
     })
 
     describe('PATCH /v1/children/:child_id/sleep/:sleep_id', () => {
-        context('when this sleep exists in the database and is updated successfully', () => {
+        context('when this sleep exists in the database and is updated successfully (there is no connection to RabbitMQ)',
+            () => {
             let result
 
             before(async () => {
@@ -1555,16 +1438,13 @@ describe('Routes: children.sleep', () => {
 
                     // Sleep to be updated
                     result = await createSleepToBeUpdated(defaultSleep)
-
-                    await rabbitmq.dispose()
-
-                    await rabbitmq.initialize(process.env.RABBITMQ_URI || Default.RABBITMQ_URI, { sslOptions: { ca: [] } })
                 } catch (err) {
                     throw new Error('Failure on children.sleep routes test: ' + err.message)
                 }
             })
 
-            it('should return status code 200 and the updated Sleep', async () => {
+            it('should return status code 200 and the updated Sleep (and show an error log about unable to send ' +
+                'UpdateSleep event)', () => {
                 // Sleep to update
                 const body = {
                     start_time: otherSleep.start_time,
@@ -1580,8 +1460,7 @@ describe('Routes: children.sleep', () => {
                     .set('Content-Type', 'application/json')
                     .expect(200)
                     .then(res => {
-                        defaultSleep.id = res.body.id
-                        expect(res.body.id).to.eql(defaultSleep.id)
+                        expect(res.body).to.have.property('id')
                         expect(res.body.start_time).to.eql(otherSleep.start_time!.toISOString())
                         expect(res.body.end_time).to.eql(otherSleep.end_time!.toISOString())
                         expect(res.body.duration).to.eql(otherSleep.duration)
@@ -1599,23 +1478,33 @@ describe('Routes: children.sleep', () => {
         })
 
         context('when this sleep already exists in the database', () => {
-            it('should return status status code 409 and an info message about the conflict', async () => {
-                let result
+            let result
 
+            before(async () => {
                 try {
+                    await deleteAllSleep()
+
+                    await createSleep({
+                        start_time: otherSleep.start_time,
+                        end_time: otherSleep.end_time,
+                        duration: otherSleep.duration,
+                        pattern: defaultSleep.pattern!.data_set,
+                        type: defaultSleep.type,
+                        child_id: defaultSleep.child_id
+                    })
+
                     // Sleep to be updated
                     result = await createSleepToBeUpdated(defaultSleep)
                 } catch (err) {
                     throw new Error('Failure on children.sleep routes test: ' + err.message)
                 }
-
+            })
+            it('should return status status code 409 and an info message about the conflict', () => {
                 // Sleep to update
                 const body = {
                     start_time: otherSleep.start_time,
                     end_time: otherSleep.end_time,
                     duration: otherSleep.duration,
-                    pattern: defaultSleep.pattern,
-                    type: defaultSleep.type
                 }
 
                 return request
@@ -1639,7 +1528,7 @@ describe('Routes: children.sleep', () => {
                 }
             })
 
-            it('should return status code 404 and an info message about the error on the search', async () => {
+            it('should return status code 404 and an info message about the error on the search', () => {
                 // Sleep to update
                 const body = {
                     start_time: defaultSleep.start_time,
@@ -1672,16 +1561,7 @@ describe('Routes: children.sleep', () => {
                 }
             })
 
-            it('should return status code 400 and an info message about the invalid child_id', async () => {
-                let result
-
-                try {
-                    // Sleep to be updated
-                    result = await createSleepToBeUpdated(defaultSleep)
-                } catch (err) {
-                    throw new Error('Failure on children.sleep routes test: ' + err.message)
-                }
-
+            it('should return status code 400 and an info message about the invalid child_id', () => {
                 // Sleep to update
                 const body = {
                     start_time: defaultSleep.start_time,
@@ -1692,7 +1572,7 @@ describe('Routes: children.sleep', () => {
                 }
 
                 return request
-                    .patch(`/v1/children/123/sleep/${result.id}`)
+                    .patch(`/v1/children/123/sleep/${defaultSleep.id}`)
                     .send(body)
                     .set('Content-Type', 'application/json')
                     .expect(400)
@@ -1713,16 +1593,7 @@ describe('Routes: children.sleep', () => {
                 }
             })
 
-            it('should return status code 400 and an info message about the invalid sleep id', async () => {
-                let result
-
-                try {
-                    // Sleep to be updated
-                    result = await createSleepToBeUpdated(defaultSleep)
-                } catch (err) {
-                    throw new Error('Failure on children.sleep routes test: ' + err.message)
-                }
-
+            it('should return status code 400 and an info message about the invalid sleep id', () => {
                 // Sleep to update
                 const body = {
                     start_time: defaultSleep.start_time,
@@ -1733,7 +1604,7 @@ describe('Routes: children.sleep', () => {
                 }
 
                 return request
-                    .patch(`/v1/children/${result.child_id}/sleep/123`)
+                    .patch(`/v1/children/${defaultSleep.child_id}/sleep/123`)
                     .send(body)
                     .set('Content-Type', 'application/json')
                     .expect(400)
@@ -1754,16 +1625,7 @@ describe('Routes: children.sleep', () => {
                 }
             })
 
-            it('should return status code 400 and info message about the invalid duration', async () => {
-                let result
-
-                try {
-                    // Sleep to be updated
-                    result = await createSleepToBeUpdated(defaultSleep)
-                } catch (err) {
-                    throw new Error('Failure on children.sleep routes test: ' + err.message)
-                }
-
+            it('should return status code 400 and info message about the invalid duration', () => {
                 // Sleep to update
                 const body = {
                     start_time: defaultSleep.start_time,
@@ -1774,7 +1636,7 @@ describe('Routes: children.sleep', () => {
                 }
 
                 return request
-                    .patch(`/v1/children/${result.child_id}/sleep/${result.id}`)
+                    .patch(`/v1/children/${defaultSleep.child_id}/sleep/${defaultSleep.id}`)
                     .send(body)
                     .set('Content-Type', 'application/json')
                     .expect(400)
@@ -1795,16 +1657,7 @@ describe('Routes: children.sleep', () => {
                 }
             })
 
-            it('should return status code 400 and info message about the invalid duration', async () => {
-                let result
-
-                try {
-                    // Sleep to be updated
-                    result = await createSleepToBeUpdated(defaultSleep)
-                } catch (err) {
-                    throw new Error('Failure on children.sleep routes test: ' + err.message)
-                }
-
+            it('should return status code 400 and info message about the invalid duration', () => {
                 // Sleep to update
                 const body = {
                     start_time: defaultSleep.start_time,
@@ -1815,7 +1668,7 @@ describe('Routes: children.sleep', () => {
                 }
 
                 return request
-                    .patch(`/v1/children/${result.child_id}/sleep/${result.id}`)
+                    .patch(`/v1/children/${defaultSleep.child_id}/sleep/${defaultSleep.id}`)
                     .send(body)
                     .set('Content-Type', 'application/json')
                     .expect(400)
@@ -1836,16 +1689,7 @@ describe('Routes: children.sleep', () => {
                 }
             })
 
-            it('should return status code 400 and info message about the invalid pattern', async () => {
-                let result
-
-                try {
-                    // Sleep to be updated
-                    result = await createSleepToBeUpdated(defaultSleep)
-                } catch (err) {
-                    throw new Error('Failure on children.sleep routes test: ' + err.message)
-                }
-
+            it('should return status code 400 and info message about the invalid pattern', () => {
                 // Sleep to update
                 const body = {
                     start_time: defaultSleep.start_time,
@@ -1856,7 +1700,7 @@ describe('Routes: children.sleep', () => {
                 }
 
                 return request
-                    .patch(`/v1/children/${result.child_id}/sleep/${result.id}`)
+                    .patch(`/v1/children/${defaultSleep.child_id}/sleep/${defaultSleep.id}`)
                     .send(body)
                     .set('Content-Type', 'application/json')
                     .expect(400)
@@ -1877,16 +1721,7 @@ describe('Routes: children.sleep', () => {
                 }
             })
 
-            it('should return status code 400 and info message about the invalid data_set array of pattern', async () => {
-                let result
-
-                try {
-                    // Sleep to be updated
-                    result = await createSleepToBeUpdated(defaultSleep)
-                } catch (err) {
-                    throw new Error('Failure on children.sleep routes test: ' + err.message)
-                }
-
+            it('should return status code 400 and info message about the invalid data_set array of pattern', () => {
                 // Sleep to update
                 const body = {
                     start_time: defaultSleep.start_time,
@@ -1899,7 +1734,7 @@ describe('Routes: children.sleep', () => {
                 }
 
                 return request
-                    .patch(`/v1/children/${result.child_id}/sleep/${result.id}`)
+                    .patch(`/v1/children/${defaultSleep.child_id}/sleep/${defaultSleep.id}`)
                     .send(body)
                     .set('Content-Type', 'application/json')
                     .expect(400)
@@ -1920,16 +1755,7 @@ describe('Routes: children.sleep', () => {
                 }
             })
 
-            it('should return status code 400 and info message about the invalid data_set array of pattern', async () => {
-                let result
-
-                try {
-                    // Sleep to be updated
-                    result = await createSleepToBeUpdated(defaultSleep)
-                } catch (err) {
-                    throw new Error('Failure on children.sleep routes test: ' + err.message)
-                }
-
+            it('should return status code 400 and info message about the invalid data_set array of pattern', () => {
                 // Sleep to update
                 const body = {
                     start_time: defaultSleep.start_time,
@@ -1944,7 +1770,7 @@ describe('Routes: children.sleep', () => {
                 }
 
                 return request
-                    .patch(`/v1/children/${result.child_id}/sleep/${result.id}`)
+                    .patch(`/v1/children/${defaultSleep.child_id}/sleep/${defaultSleep.id}`)
                     .send(body)
                     .set('Content-Type', 'application/json')
                     .expect(400)
@@ -1966,16 +1792,7 @@ describe('Routes: children.sleep', () => {
                 }
             })
 
-            it('should return status code 400 and info message about the invalid data_set array of pattern', async () => {
-                let result
-
-                try {
-                    // Sleep to be updated
-                    result = await createSleepToBeUpdated(defaultSleep)
-                } catch (err) {
-                    throw new Error('Failure on children.sleep routes test: ' + err.message)
-                }
-
+            it('should return status code 400 and info message about the invalid data_set array of pattern', () => {
                 // Sleep to update
                 const body = {
                     start_time: defaultSleep.start_time,
@@ -1994,7 +1811,7 @@ describe('Routes: children.sleep', () => {
                 }
 
                 return request
-                    .patch(`/v1/children/${result.child_id}/sleep/${result.id}`)
+                    .patch(`/v1/children/${defaultSleep.child_id}/sleep/${defaultSleep.id}`)
                     .send(body)
                     .set('Content-Type', 'application/json')
                     .expect(400)
@@ -2016,16 +1833,7 @@ describe('Routes: children.sleep', () => {
                 }
             })
 
-            it('should return status code 400 and info message about the invalid data_set array of pattern', async () => {
-                let result
-
-                try {
-                    // Sleep to be updated
-                    result = await createSleepToBeUpdated(defaultSleep)
-                } catch (err) {
-                    throw new Error('Failure on children.sleep routes test: ' + err.message)
-                }
-
+            it('should return status code 400 and info message about the invalid data_set array of pattern', () => {
                 // Sleep to update
                 const body = {
                     start_time: defaultSleep.start_time,
@@ -2044,7 +1852,7 @@ describe('Routes: children.sleep', () => {
                 }
 
                 return request
-                    .patch(`/v1/children/${result.child_id}/sleep/${result.id}`)
+                    .patch(`/v1/children/${defaultSleep.child_id}/sleep/${defaultSleep.id}`)
                     .send(body)
                     .set('Content-Type', 'application/json')
                     .expect(400)
@@ -2066,16 +1874,7 @@ describe('Routes: children.sleep', () => {
                 }
             })
 
-            it('should return status code 400 and info message about the invalid data_set array of pattern', async () => {
-                let result
-
-                try {
-                    // Sleep to be updated
-                    result = await createSleepToBeUpdated(defaultSleep)
-                } catch (err) {
-                    throw new Error('Failure on children.sleep routes test: ' + err.message)
-                }
-
+            it('should return status code 400 and info message about the invalid data_set array of pattern', () => {
                 // Sleep to update
                 const body = {
                     start_time: defaultSleep.start_time,
@@ -2094,7 +1893,7 @@ describe('Routes: children.sleep', () => {
                 }
 
                 return request
-                    .patch(`/v1/children/${result.child_id}/sleep/${result.id}`)
+                    .patch(`/v1/children/${defaultSleep.child_id}/sleep/${defaultSleep.id}`)
                     .send(body)
                     .set('Content-Type', 'application/json')
                     .expect(400)
@@ -2109,44 +1908,6 @@ describe('Routes: children.sleep', () => {
     /**
      * DELETE route
      */
-    describe('NO CONNECTION TO RABBITMQ -> DELETE /v1/children/:child_id/sleep/:sleep_id', () => {
-        context('when the sleep was deleted successfully', () => {
-            let result
-
-            before(async () => {
-                try {
-                    await deleteAllSleep()
-
-                    result = await createSleep({
-                        start_time: defaultSleep.start_time,
-                        end_time: defaultSleep.end_time,
-                        duration: defaultSleep.duration,
-                        pattern: defaultSleep.pattern!.data_set,
-                        type: defaultSleep.type,
-                        child_id: defaultSleep.child_id
-                    })
-
-                    await rabbitmq.dispose()
-
-                    await rabbitmq.initialize('amqp://invalidUser:guest@localhost', { retries: 1, interval: 100 })
-                } catch (err) {
-                    throw new Error('Failure on children.sleep routes test: ' + err.message)
-                }
-            })
-
-            it('should return status code 204 and no content for sleep (and show an error log about unable to send ' +
-                'DeleteSleep event)', () => {
-                return request
-                    .delete(`/v1/children/${result.child_id}/sleep/${result.id}`)
-                    .set('Content-Type', 'application/json')
-                    .expect(204)
-                    .then(res => {
-                        expect(res.body).to.eql({})
-                    })
-            })
-        })
-    })
-
     describe('RABBITMQ PUBLISHER -> DELETE /v1/children/:child_id/sleep/:sleep_id', () => {
         context('when the sleep was deleted successfully and your ID is published on the bus', () => {
             let result
@@ -2165,9 +1926,18 @@ describe('Routes: children.sleep', () => {
                     })
 
                     await rabbitmq.initialize(process.env.RABBITMQ_URI || Default.RABBITMQ_URI,
-                        { receiveFromYourself: true, sslOptions: { ca: [] } })
+                        { interval: 100, receiveFromYourself: true, sslOptions: { ca: [] } })
                 } catch (err) {
                     throw new Error('Failure on children.sleep routes test: ' + err.message)
+                }
+            })
+
+            after(async () => {
+                try {
+                    await rabbitmq.dispose()
+                    await rabbitmq.initialize('amqp://invalidUser:guest@localhost', { retries: 1, interval: 100 })
+                } catch (err) {
+                    throw new Error('Failure on children.sleep test: ' + err.message)
                 }
             })
 
@@ -2175,12 +1945,15 @@ describe('Routes: children.sleep', () => {
                 'published on the bus', (done) => {
                 rabbitmq.bus
                     .subDeleteSleep(message => {
-                        expect(message.event_name).to.eql('SleepDeleteEvent')
-                        expect(message).to.have.property('timestamp')
-                        expect(message).to.have.property('sleep')
-                        defaultSleep.id = message.sleep.id
-                        expect(message.sleep.id).to.eql(defaultSleep.id)
-                        done()
+                        try {
+                            expect(message.event_name).to.eql('SleepDeleteEvent')
+                            expect(message).to.have.property('timestamp')
+                            expect(message).to.have.property('sleep')
+                            expect(message.sleep).to.have.property('id')
+                            done()
+                        } catch (err) {
+                            done(err)
+                        }
                     })
                     .then(() => {
                         request
@@ -2188,16 +1961,15 @@ describe('Routes: children.sleep', () => {
                             .set('Content-Type', 'application/json')
                             .expect(204)
                             .then()
+                            .catch(done)
                     })
-                    .catch((err) => {
-                        done(err)
-                    })
+                    .catch(done)
             })
         })
     })
 
     describe('DELETE /v1/children/:child_id/sleep/:sleep_id', () => {
-        context('when the sleep was deleted successfully', () => {
+        context('when the sleep was deleted successfully (there is no connection to RabbitMQ)', () => {
             let result
 
             before(async () => {
@@ -2212,16 +1984,13 @@ describe('Routes: children.sleep', () => {
                         type: defaultSleep.type,
                         child_id: defaultSleep.child_id
                     })
-
-                    await rabbitmq.dispose()
-
-                    await rabbitmq.initialize(process.env.RABBITMQ_URI || Default.RABBITMQ_URI, { sslOptions: { ca: [] } })
                 } catch (err) {
                     throw new Error('Failure on children.sleep routes test: ' + err.message)
                 }
             })
 
-            it('should return status code 204 and no content for sleep', async () => {
+            it('should return status code 204 and no content for sleep (and show an error log about unable to send ' +
+                'DeleteSleep event)', () => {
                 return request
                     .delete(`/v1/children/${result.child_id}/sleep/${result.id}`)
                     .set('Content-Type', 'application/json')
@@ -2241,7 +2010,7 @@ describe('Routes: children.sleep', () => {
                 }
             })
 
-            it('should return status code 204 and no content for sleep', async () => {
+            it('should return status code 204 and no content for sleep', () => {
                 return request
                     .delete(`/v1/children/${defaultSleep.child_id}/sleep/${defaultSleep.id}`)
                     .set('Content-Type', 'application/json')
@@ -2261,24 +2030,9 @@ describe('Routes: children.sleep', () => {
                 }
             })
 
-            it('should return status code 400 and an info message about the invalid child_id', async () => {
-                let result
-
-                try {
-                    result = await createSleep({
-                        start_time: defaultSleep.start_time,
-                        end_time: defaultSleep.end_time,
-                        duration: defaultSleep.duration,
-                        pattern: defaultSleep.pattern!.data_set,
-                        type: defaultSleep.type,
-                        child_id: defaultSleep.child_id
-                    })
-                } catch (err) {
-                    throw new Error('Failure on children.sleep routes test: ' + err.message)
-                }
-
+            it('should return status code 400 and an info message about the invalid child_id', () => {
                 return request
-                    .delete(`/v1/children/123/sleep/${result.id}`)
+                    .delete(`/v1/children/123/sleep/${defaultSleep.id}`)
                     .set('Content-Type', 'application/json')
                     .expect(400)
                     .then(err => {
@@ -2298,24 +2052,9 @@ describe('Routes: children.sleep', () => {
                 }
             })
 
-            it('should return status code 400 and an info message about the invalid sleep id', async () => {
-                let result
-
-                try {
-                    result = await createSleep({
-                        start_time: defaultSleep.start_time,
-                        end_time: defaultSleep.end_time,
-                        duration: defaultSleep.duration,
-                        pattern: defaultSleep.pattern!.data_set,
-                        type: defaultSleep.type,
-                        child_id: defaultSleep.child_id
-                    })
-                } catch (err) {
-                    throw new Error('Failure on children.sleep routes test: ' + err.message)
-                }
-
+            it('should return status code 400 and an info message about the invalid sleep id', () => {
                 return request
-                    .delete(`/v1/children/${result.child_id}/sleep/123`)
+                    .delete(`/v1/children/${defaultSleep.child_id}/sleep/123`)
                     .set('Content-Type', 'application/json')
                     .expect(400)
                     .then(err => {

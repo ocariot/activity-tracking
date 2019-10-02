@@ -10,6 +10,7 @@ import { Entity } from '../../../src/application/domain/model/entity'
 import { Sleep } from '../../../src/application/domain/model/sleep'
 import { SleepMock } from '../../mocks/sleep.mock'
 import { SleepRepoModel } from '../../../src/infrastructure/database/schema/sleep.schema'
+import { Strings } from '../../../src/utils/strings'
 
 require('sinon-mongoose')
 
@@ -46,7 +47,7 @@ describe('Repositories: BaseRepository', () => {
     })
 
     describe('create(item: T)', () => {
-        context('when create a item with success', () => {
+        context('when create an item with success', () => {
             it('should return a sleep object.', () => {
 
                 sinon
@@ -58,13 +59,13 @@ describe('Repositories: BaseRepository', () => {
                 return repo.create(defaultSleep)
                     .then(sleep => {
                         sleep = sleep.toJSON()
-                        assert.propertyVal(sleep, 'id', sleep.id)
-                        assert.propertyVal(sleep, 'start_time', sleep.start_time)
-                        assert.propertyVal(sleep, 'end_time', sleep.end_time)
-                        assert.propertyVal(sleep, 'duration', sleep.duration)
-                        assert.propertyVal(sleep, 'pattern', sleep.pattern)
-                        assert.propertyVal(sleep, 'type', sleep.type)
-                        assert.propertyVal(sleep, 'child_id', sleep.child_id)
+                        assert.propertyVal(sleep, 'id', defaultSleep.id)
+                        assert.propertyVal(sleep, 'start_time', defaultSleep.start_time)
+                        assert.propertyVal(sleep, 'end_time', defaultSleep.end_time)
+                        assert.propertyVal(sleep, 'duration', defaultSleep.duration)
+                        assert.deepPropertyVal(sleep, 'pattern', defaultSleep.pattern!.toJSON())
+                        assert.propertyVal(sleep, 'type', defaultSleep.type)
+                        assert.propertyVal(sleep, 'child_id', defaultSleep.child_id)
                     })
             })
         })
@@ -120,7 +121,7 @@ describe('Repositories: BaseRepository', () => {
         })
 
         context('when there are no sleep activities in database', () => {
-            it('should return a empty list', () => {
+            it('should return an empty list', () => {
                 sinon
                     .mock(modelFake)
                     .expects('find')
@@ -167,7 +168,7 @@ describe('Repositories: BaseRepository', () => {
     describe('findOne(query: IQuery)', () => {
         queryMock.filters = { id: defaultSleep.id }
 
-        it('should return a unique sleep', () => {
+        it('should return an unique sleep', () => {
             sinon
                 .mock(modelFake)
                 .expects('findOne')
@@ -178,13 +179,13 @@ describe('Repositories: BaseRepository', () => {
             return repo.findOne(queryMock)
                 .then(sleep => {
                     sleep = sleep.toJSON()
-                    assert.propertyVal(sleep, 'id', sleep.id)
-                    assert.propertyVal(sleep, 'start_time', sleep.start_time)
-                    assert.propertyVal(sleep, 'end_time', sleep.end_time)
-                    assert.propertyVal(sleep, 'duration', sleep.duration)
-                    assert.propertyVal(sleep, 'pattern', sleep.pattern)
-                    assert.propertyVal(sleep, 'type', sleep.type)
-                    assert.propertyVal(sleep, 'child_id', sleep.child_id)
+                    assert.propertyVal(sleep, 'id', defaultSleep.id)
+                    assert.propertyVal(sleep, 'start_time', defaultSleep.start_time)
+                    assert.propertyVal(sleep, 'end_time', defaultSleep.end_time)
+                    assert.propertyVal(sleep, 'duration', defaultSleep.duration)
+                    assert.deepPropertyVal(sleep, 'pattern', defaultSleep.pattern!.toJSON())
+                    assert.propertyVal(sleep, 'type', defaultSleep.type)
+                    assert.propertyVal(sleep, 'child_id', defaultSleep.child_id)
                 })
         })
 
@@ -235,13 +236,13 @@ describe('Repositories: BaseRepository', () => {
             return repo.update(defaultSleep)
                 .then(sleep => {
                     sleep = sleep.toJSON()
-                    assert.propertyVal(sleep, 'id', sleep.id)
-                    assert.propertyVal(sleep, 'start_time', sleep.start_time)
-                    assert.propertyVal(sleep, 'end_time', sleep.end_time)
-                    assert.propertyVal(sleep, 'duration', sleep.duration)
-                    assert.propertyVal(sleep, 'pattern', sleep.pattern)
-                    assert.propertyVal(sleep, 'type', sleep.type)
-                    assert.propertyVal(sleep, 'child_id', sleep.child_id)
+                    assert.propertyVal(sleep, 'id', defaultSleep.id)
+                    assert.propertyVal(sleep, 'start_time', defaultSleep.start_time)
+                    assert.propertyVal(sleep, 'end_time', defaultSleep.end_time)
+                    assert.propertyVal(sleep, 'duration', defaultSleep.duration)
+                    assert.deepPropertyVal(sleep, 'pattern', defaultSleep.pattern!.toJSON())
+                    assert.propertyVal(sleep, 'type', defaultSleep.type)
+                    assert.propertyVal(sleep, 'child_id', defaultSleep.child_id)
                 })
         })
 
@@ -276,7 +277,8 @@ describe('Repositories: BaseRepository', () => {
 
                 return repo.update(defaultSleep)
                     .catch((err: any) => {
-                        assert.equal(err.message, 'Some ID provided, does not have a valid format.')
+                        assert.equal(err.message, Strings.ERROR_MESSAGE.UUID_NOT_VALID_FORMAT)
+                        assert.equal(err.description, Strings.ERROR_MESSAGE.UUID_NOT_VALID_FORMAT_DESC)
                     })
             })
         })
@@ -354,7 +356,8 @@ describe('Repositories: BaseRepository', () => {
 
                 return repo.delete(invalidId)
                     .catch((err: any) => {
-                        assert.equal(err.message, 'Some ID provided, does not have a valid format.')
+                        assert.equal(err.message, Strings.ERROR_MESSAGE.UUID_NOT_VALID_FORMAT)
+                        assert.equal(err.description, Strings.ERROR_MESSAGE.UUID_NOT_VALID_FORMAT_DESC)
                     })
             })
         })

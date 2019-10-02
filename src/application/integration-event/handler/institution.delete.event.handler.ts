@@ -32,7 +32,7 @@ export const institutionDeleteEventHandler = async (event: any) => {
                 // 3. If got here, it's because the action was successful.
                 logger.info(`Action for event ${event.event_name} successfully held!`)})
             .catch((err) => {
-                logger.error(`Error trying to remove all environments from institution. ${err.message}`)
+                logger.error(`Error trying to remove all environments from institution with ID: ${institutionId}. ${err.message}`)
             })
     } catch (err) {
         logger.warn(`An error occurred while attempting `

@@ -13,13 +13,13 @@ import { Strings } from '../../../src/utils/strings'
 describe('Services: Log', () => {
     // Mock correct logs array
     const correctLogsArr: Array<Log> = new Array<Log>()
-    for (let i = 0; i < 5; i++ ) {
+    for (let i = 0; i < 5; i++) {
         correctLogsArr.push(new LogMock())
     }
 
     // Mock correct and incorrect logs array
     const mixedLogsArr: Array<Log> = new Array<Log>()
-    for (let i = 0; i < 4; i++ ) {
+    for (let i = 0; i < 4; i++) {
         mixedLogsArr.push(new LogMock())
     }
 
@@ -34,7 +34,7 @@ describe('Services: Log', () => {
         date: '2019-03-18',
         value: 1000,
         type: 'step',
-        child_id: '5a62be07de34500146d9c544',
+        child_id: '5a62be07de34500146d9c544'
     }
 
     let otherIncorrectLog = new Log()
@@ -55,16 +55,16 @@ describe('Services: Log', () => {
      */
     describe('addLogs(logs: Array<Log>)', () => {
         context('when all the logs in the array are correct and it still does not exist in the repository', () => {
-            it('should return a response of type MultiStatus<Log> with the description of success in sending each log',  () => {
-                return  logService.addLogs(correctLogsArr)
+            it('should return a response of type MultiStatus<Log> with the description of success in sending each log', () => {
+                return logService.addLogs(correctLogsArr)
                     .then(result => {
                         for (let i = 0; i < result.success.length; i++) {
                             assert.propertyVal(result.success[i], 'code', HttpStatus.CREATED)
-                            assert.propertyVal(result.success[i].item, 'id', correctLogsArr[i].id)
-                            assert.propertyVal(result.success[i].item, 'date', correctLogsArr[i].date)
-                            assert.propertyVal(result.success[i].item, 'value', correctLogsArr[i].value)
-                            assert.propertyVal(result.success[i].item, 'type', correctLogsArr[i].type)
-                            assert.propertyVal(result.success[i].item, 'child_id', correctLogsArr[i].child_id)
+                            assert.property(result.success[i].item, 'id')
+                            assert.property(result.success[i].item, 'date')
+                            assert.property(result.success[i].item, 'value')
+                            assert.property(result.success[i].item, 'type')
+                            assert.property(result.success[i].item, 'child_id')
                         }
                         assert.isEmpty(result.error)
                     })
@@ -73,20 +73,20 @@ describe('Services: Log', () => {
 
         context('when all the logs in the array are correct and already exist in the repository', () => {
             it('should update the value of items in the repository and return a response of type MultiStatus<Log> with the description ' +
-                'of success in sending each log',  () => {
+                'of success in sending each log', () => {
                 correctLogsArr.forEach(elem => {
                     elem.date = '2018-03-10'
                 })
 
-                return  logService.addLogs(correctLogsArr)
+                return logService.addLogs(correctLogsArr)
                     .then(result => {
                         for (let i = 0; i < result.success.length; i++) {
                             assert.propertyVal(result.success[i], 'code', HttpStatus.CREATED)
-                            assert.propertyVal(result.success[i].item, 'id', correctLogsArr[i].id)
-                            assert.propertyVal(result.success[i].item, 'date', correctLogsArr[i].date)
-                            assert.propertyVal(result.success[i].item, 'value', correctLogsArr[i].value)
-                            assert.propertyVal(result.success[i].item, 'type', correctLogsArr[i].type)
-                            assert.propertyVal(result.success[i].item, 'child_id', correctLogsArr[i].child_id)
+                            assert.property(result.success[i].item, 'id')
+                            assert.property(result.success[i].item, 'date')
+                            assert.property(result.success[i].item, 'value')
+                            assert.property(result.success[i].item, 'type')
+                            assert.property(result.success[i].item, 'child_id')
                         }
                         assert.isEmpty(result.error)
                     })
@@ -95,18 +95,18 @@ describe('Services: Log', () => {
 
         context('when all the logs in the array are correct and some of them already exist in the repository', () => {
             it('should update the value of the existing items already in the repository, create the new ones, and return a ' +
-                'response of type MultiStatus<Log> with the description of success in sending each log',  () => {
+                'response of type MultiStatus<Log> with the description of success in sending each log', () => {
                 correctLogsArr.push(new LogMock(LogType.STEPS))
 
-                return  logService.addLogs(correctLogsArr)
+                return logService.addLogs(correctLogsArr)
                     .then(result => {
                         for (let i = 0; i < result.success.length; i++) {
                             assert.propertyVal(result.success[i], 'code', HttpStatus.CREATED)
-                            assert.propertyVal(result.success[i].item, 'id', correctLogsArr[i].id)
-                            assert.propertyVal(result.success[i].item, 'date', correctLogsArr[i].date)
-                            assert.propertyVal(result.success[i].item, 'value', correctLogsArr[i].value)
-                            assert.propertyVal(result.success[i].item, 'type', correctLogsArr[i].type)
-                            assert.propertyVal(result.success[i].item, 'child_id', correctLogsArr[i].child_id)
+                            assert.property(result.success[i].item, 'id')
+                            assert.property(result.success[i].item, 'date')
+                            assert.property(result.success[i].item, 'value')
+                            assert.property(result.success[i].item, 'type')
+                            assert.property(result.success[i].item, 'child_id')
                         }
                         assert.isEmpty(result.error)
                     })
@@ -114,10 +114,10 @@ describe('Services: Log', () => {
         })
 
         context('when all the logs in the array are incorrect', () => {
-            it('should return a response of type MultiStatus<Log> with the description of error in sending each log',  () => {
+            it('should return a response of type MultiStatus<Log> with the description of error in sending each log', () => {
                 correctLogsArr.push(new LogMock(LogType.STEPS))
 
-                return  logService.addLogs(incorrectLogsArr)
+                return logService.addLogs(incorrectLogsArr)
                     .then(result => {
                         assert.propertyVal(result.error[0], 'message',
                             'Date parameter: 20199-03-08, is not in valid ISO 8601 format.')
@@ -145,16 +145,16 @@ describe('Services: Log', () => {
 
         context('when some of the logs in the array are incorrect (date and type are invalid)', () => {
             it('should perform the operations of creating and updating normally for the correct logs and returning a response ' +
-                'of type MultiStatus<Log> with the description of success and error cases of each log',  () => {
-                return  logService.addLogs(mixedLogsArr)
+                'of type MultiStatus<Log> with the description of success and error cases of each log', () => {
+                return logService.addLogs(mixedLogsArr)
                     .then(result => {
                         for (let i = 0; i < result.success.length; i++) {
                             assert.propertyVal(result.success[i], 'code', HttpStatus.CREATED)
-                            assert.propertyVal(result.success[i].item, 'id', mixedLogsArr[i].id)
-                            assert.propertyVal(result.success[i].item, 'date', mixedLogsArr[i].date)
-                            assert.propertyVal(result.success[i].item, 'value', mixedLogsArr[i].value)
-                            assert.propertyVal(result.success[i].item, 'type', mixedLogsArr[i].type)
-                            assert.propertyVal(result.success[i].item, 'child_id', mixedLogsArr[i].child_id)
+                            assert.property(result.success[i].item, 'id')
+                            assert.property(result.success[i].item, 'date')
+                            assert.property(result.success[i].item, 'value')
+                            assert.property(result.success[i].item, 'type')
+                            assert.property(result.success[i].item, 'child_id')
                         }
 
                         assert.propertyVal(result.error[0], 'message',
@@ -181,19 +181,19 @@ describe('Services: Log', () => {
 
         context('when some of the logs in the array are incorrect (negative value)', () => {
             it('should perform the operations of creating and updating normally for the correct logs and returning a response ' +
-                'of type MultiStatus<Log> with the description of success and error cases of each log',  () => {
+                'of type MultiStatus<Log> with the description of success and error cases of each log', () => {
                 incorrectLog.date = '2019-03-10'
                 incorrectLog.value = -((Math.floor(Math.random() * 10 + 1)) * 100)
 
-                return  logService.addLogs(mixedLogsArr)
+                return logService.addLogs(mixedLogsArr)
                     .then(result => {
                         for (let i = 0; i < result.success.length; i++) {
                             assert.propertyVal(result.success[i], 'code', HttpStatus.CREATED)
-                            assert.propertyVal(result.success[i].item, 'id', mixedLogsArr[i].id)
-                            assert.propertyVal(result.success[i].item, 'date', mixedLogsArr[i].date)
-                            assert.propertyVal(result.success[i].item, 'value', mixedLogsArr[i].value)
-                            assert.propertyVal(result.success[i].item, 'type', mixedLogsArr[i].type)
-                            assert.propertyVal(result.success[i].item, 'child_id', mixedLogsArr[i].child_id)
+                            assert.property(result.success[i].item, 'id')
+                            assert.property(result.success[i].item, 'date')
+                            assert.property(result.success[i].item, 'value')
+                            assert.property(result.success[i].item, 'type')
+                            assert.property(result.success[i].item, 'child_id')
                         }
 
                         assert.propertyVal(result.error[0], 'message',
@@ -220,19 +220,19 @@ describe('Services: Log', () => {
 
         context('when some of the logs in the array are incorrect (child_id is invalid)', () => {
             it('should perform the operations of creating and updating normally for the correct logs and returning a response ' +
-                'of type MultiStatus<Log> with the description of success and error cases of each log',  () => {
+                'of type MultiStatus<Log> with the description of success and error cases of each log', () => {
                 incorrectLog.value = ((Math.floor(Math.random() * 10 + 1)) * 100)
                 incorrectLog.child_id = '507f1f77bcf86cd7994390112'
 
-                return  logService.addLogs(mixedLogsArr)
+                return logService.addLogs(mixedLogsArr)
                     .then(result => {
                         for (let i = 0; i < result.success.length; i++) {
                             assert.propertyVal(result.success[i], 'code', HttpStatus.CREATED)
-                            assert.propertyVal(result.success[i].item, 'id', mixedLogsArr[i].id)
-                            assert.propertyVal(result.success[i].item, 'date', mixedLogsArr[i].date)
-                            assert.propertyVal(result.success[i].item, 'value', mixedLogsArr[i].value)
-                            assert.propertyVal(result.success[i].item, 'type', mixedLogsArr[i].type)
-                            assert.propertyVal(result.success[i].item, 'child_id', mixedLogsArr[i].child_id)
+                            assert.property(result.success[i].item, 'id')
+                            assert.property(result.success[i].item, 'date')
+                            assert.property(result.success[i].item, 'value')
+                            assert.property(result.success[i].item, 'type')
+                            assert.property(result.success[i].item, 'child_id')
                         }
 
                         assert.propertyVal(result.error[0], 'message', Strings.CHILD.PARAM_ID_NOT_VALID_FORMAT)
@@ -258,21 +258,21 @@ describe('Services: Log', () => {
 
         context('when some of the logs in the array are incorrect (missing fields)', () => {
             it('should perform the operations of creating and updating normally for the correct logs and returning a response ' +
-                'of type MultiStatus<Log> with the description of success and error cases of each log',  () => {
+                'of type MultiStatus<Log> with the description of success and error cases of each log', () => {
                 incorrectLog.date = ''
                 incorrectLog.value = undefined!
                 incorrectLog.type = undefined!
                 incorrectLog.child_id = ''
 
-                return  logService.addLogs(mixedLogsArr)
+                return logService.addLogs(mixedLogsArr)
                     .then(result => {
                         for (let i = 0; i < result.success.length; i++) {
                             assert.propertyVal(result.success[i], 'code', HttpStatus.CREATED)
-                            assert.propertyVal(result.success[i].item, 'id', mixedLogsArr[i].id)
-                            assert.propertyVal(result.success[i].item, 'date', mixedLogsArr[i].date)
-                            assert.propertyVal(result.success[i].item, 'value', mixedLogsArr[i].value)
-                            assert.propertyVal(result.success[i].item, 'type', mixedLogsArr[i].type)
-                            assert.propertyVal(result.success[i].item, 'child_id', mixedLogsArr[i].child_id)
+                            assert.property(result.success[i].item, 'id')
+                            assert.property(result.success[i].item, 'date')
+                            assert.property(result.success[i].item, 'value')
+                            assert.property(result.success[i].item, 'type')
+                            assert.property(result.success[i].item, 'child_id')
                         }
 
                         assert.propertyVal(result.error[0], 'message',
@@ -313,7 +313,7 @@ describe('Services: Log', () => {
         }
 
         context('when the parameters are correct and there are corresponding logs with the query', () => {
-            it('should return a ChildLog with steps and/or calories logs',  () => {
+            it('should return a ChildLog with steps and/or calories logs', () => {
 
                 return logService.getByChildAndDate(correctLogsArr[0].child_id, correctLogsArr[0].date,
                     correctLogsArr[1].date, query)
@@ -328,7 +328,7 @@ describe('Services: Log', () => {
         })
 
         context('when the parameters are correct but there are no corresponding logs with the query', () => {
-            it('should return an empty ChildLog',  () => {
+            it('should return an empty ChildLog', () => {
                 correctLogsArr[0].child_id = '507f1f77bcf86cd799439011'
 
                 return logService.getByChildAndDate(correctLogsArr[0].child_id, correctLogsArr[0].date,
@@ -341,12 +341,12 @@ describe('Services: Log', () => {
         })
 
         context('when the parameters are incorrect (child_id is invalid)', () => {
-            it('should throw a ValidationException', async () => {
+            it('should throw a ValidationException', () => {
                 correctLogsArr[0].child_id = '507f1f77bcf86cd7994390112'
 
                 return logService.getByChildAndDate(correctLogsArr[0].child_id, correctLogsArr[0].date,
-                        correctLogsArr[1].date, query)
-                    .catch (err => {
+                    correctLogsArr[1].date, query)
+                    .catch(err => {
                         assert.propertyVal(err, 'message', Strings.CHILD.PARAM_ID_NOT_VALID_FORMAT)
                         assert.propertyVal(err, 'description', Strings.ERROR_MESSAGE.UUID_NOT_VALID_FORMAT_DESC)
                     })
@@ -354,47 +354,43 @@ describe('Services: Log', () => {
         })
 
         context('when the parameters are incorrect (dateStart is invalid)', () => {
-            it('should throw a ValidationException', async () => {
+            it('should throw a ValidationException', () => {
                 correctLogsArr[0].child_id = '507f1f77bcf86cd799439011'
                 correctLogsArr[0].date = '20199-03-18'
 
-                try {
-                    return await logService.getByChildAndDate(correctLogsArr[0].child_id, correctLogsArr[0].date,
-                        correctLogsArr[1].date, query)
-                } catch (err) {
-                    assert.propertyVal(err, 'message', 'Date parameter: 20199-03-18, is not in valid ISO 8601 format.')
-                    assert.propertyVal(err, 'description', 'Date must be in the format: yyyy-MM-dd')
-                }
+                return logService.getByChildAndDate(correctLogsArr[0].child_id, correctLogsArr[0].date,
+                    correctLogsArr[1].date, query)
+                    .catch(err => {
+                        assert.propertyVal(err, 'message', 'Date parameter: 20199-03-18, is not in valid ISO 8601 format.')
+                        assert.propertyVal(err, 'description', 'Date must be in the format: yyyy-MM-dd')
+                    })
             })
         })
 
         context('when the parameters are incorrect (dateEnd is invalid)', () => {
-            it('should throw a ValidationException', async () => {
+            it('should throw a ValidationException', () => {
                 correctLogsArr[0].child_id = '507f1f77bcf86cd799439011'
                 correctLogsArr[0].date = '2019-03-18'
                 correctLogsArr[1].date = '20199-03-18'
 
-                try {
-                    return await logService.getByChildAndDate(correctLogsArr[0].child_id, correctLogsArr[0].date,
-                        correctLogsArr[1].date, query)
-                } catch (err) {
-                    assert.propertyVal(err, 'message', 'Date parameter: 20199-03-18, is not in valid ISO 8601 format.')
-                    assert.propertyVal(err, 'description', 'Date must be in the format: yyyy-MM-dd')
-                }
+                return logService.getByChildAndDate(correctLogsArr[0].child_id, correctLogsArr[0].date,
+                    correctLogsArr[1].date, query)
+                    .catch(err => {
+                        assert.propertyVal(err, 'message', 'Date parameter: 20199-03-18, is not in valid ISO 8601 format.')
+                        assert.propertyVal(err, 'description', 'Date must be in the format: yyyy-MM-dd')
+                    })
             })
         })
 
         context('when the parameters are invalid (date range is invalid)', () => {
-            it('should throw a ValidationException', async () => {
-
-                try {
-                    return await logService.getByChildAndDate(correctLogsArr[0].child_id, '2018-03-18',
-                        '2019-03-27', query)
-                } catch (err) {
-                    assert.propertyVal(err, 'message', 'Date range is invalid...')
-                    assert.propertyVal(err, 'description', 'Log dates range validation failed: ' +
-                        'The period between the received dates is longer than one year')
-                }
+            it('should throw a ValidationException', () => {
+                return logService.getByChildAndDate(correctLogsArr[0].child_id, '2018-03-18',
+                    '2019-03-27', query)
+                    .catch(err => {
+                        assert.propertyVal(err, 'message', 'Date range is invalid...')
+                        assert.propertyVal(err, 'description', 'Log dates range validation failed: ' +
+                            'The period between the received dates is longer than one year')
+                    })
             })
         })
     })
