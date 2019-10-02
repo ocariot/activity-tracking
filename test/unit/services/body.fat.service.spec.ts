@@ -26,7 +26,7 @@ describe('Services: BodyFatService', () => {
     /**
      * For POST route with multiple BodyFat objects
      */
-    // Array with correct BodyFat objects
+        // Array with correct BodyFat objects
     const correctBodyFatArr: Array<BodyFat> = new Array<BodyFatMock>()
     for (let i = 0; i < 3; i++) {
         correctBodyFatArr.push(new BodyFatMock())
@@ -101,44 +101,41 @@ describe('Services: BodyFatService', () => {
         })
 
         context('when the BodyFat is incorrect (missing all fields)', () => {
-            it('should throw a ValidationException', async () => {
-                try {
-                    return await bodyFatService.add(incorrectBodyFat)
-                } catch (err) {
-                    assert.propertyVal(err, 'message', 'Required fields were not provided...')
-                    assert.propertyVal(err, 'description', 'Measurement validation failed: type, timestamp, value, unit, ' +
-                        'child_id is required!')
-                }
+            it('should throw a ValidationException', () => {
+                return bodyFatService.add(incorrectBodyFat)
+                    .catch(err => {
+                        assert.propertyVal(err, 'message', 'Required fields were not provided...')
+                        assert.propertyVal(err, 'description', 'Measurement validation failed: type, timestamp, value, unit, ' +
+                            'child_id is required!')
+                    })
             })
         })
 
         context('when the BodyFat is incorrect (child_id is invalid)', () => {
-            it('should throw a ValidationException', async () => {
+            it('should throw a ValidationException', () => {
                 incorrectBodyFat = new BodyFatMock()
                 incorrectBodyFat.child_id = '5a62be07de34500146d9c5442'           // Make child_id invalid
 
-                try {
-                    return await bodyFatService.add(incorrectBodyFat)
-                } catch (err) {
-                    assert.propertyVal(err, 'message', Strings.CHILD.PARAM_ID_NOT_VALID_FORMAT)
-                    assert.propertyVal(err, 'description', Strings.ERROR_MESSAGE.UUID_NOT_VALID_FORMAT_DESC)
-                }
+                return bodyFatService.add(incorrectBodyFat)
+                    .catch(err => {
+                        assert.propertyVal(err, 'message', Strings.CHILD.PARAM_ID_NOT_VALID_FORMAT)
+                        assert.propertyVal(err, 'description', Strings.ERROR_MESSAGE.UUID_NOT_VALID_FORMAT_DESC)
+                    })
             })
         })
 
         context('when the BodyFat is incorrect (type is invalid)', () => {
-            it('should throw a ValidationException', async () => {
+            it('should throw a ValidationException', () => {
                 incorrectBodyFat.child_id = '5a62be07de34500146d9c544'           // Make child_id valid
                 incorrectBodyFat.type = 'invalidType'
 
-                try {
-                    return await bodyFatService.add(incorrectBodyFat)
-                } catch (err) {
-                    assert.propertyVal(err, 'message',
-                        'The type of measurement provided "invalidtype" is not supported...')
-                    assert.propertyVal(err, 'description',
-                        'The allowed types are: temperature, humidity, pm1, pm2.5, pm10, body_fat, weight.')
-                }
+                return bodyFatService.add(incorrectBodyFat)
+                    .catch(err => {
+                        assert.propertyVal(err, 'message',
+                            'The type of measurement provided "invalidtype" is not supported...')
+                        assert.propertyVal(err, 'description',
+                            'The allowed types are: temperature, humidity, pm1, pm2.5, pm10, body_fat, weight.')
+                    })
             })
         })
 
@@ -422,7 +419,7 @@ describe('Services: BodyFatService', () => {
                 incorrectBodyFat.child_id = '5a62be07de34500146d9c5442'     // Make child_id invalid
 
                 return bodyFatService.removeByChild(incorrectBodyFat.id!, incorrectBodyFat.child_id)
-                    .catch (err => {
+                    .catch(err => {
                         assert.propertyVal(err, 'message', Strings.CHILD.PARAM_ID_NOT_VALID_FORMAT)
                         assert.propertyVal(err, 'description', Strings.ERROR_MESSAGE.UUID_NOT_VALID_FORMAT_DESC)
                     })
@@ -435,7 +432,7 @@ describe('Services: BodyFatService', () => {
                 incorrectBodyFat.id = '5a62be07de34500146d9c5442'       // Make bodyFat id invalid
 
                 return bodyFatService.removeByChild(incorrectBodyFat.id!, incorrectBodyFat.child_id!)
-                    .catch (err => {
+                    .catch(err => {
                         assert.propertyVal(err, 'message', Strings.BODY_FAT.PARAM_ID_NOT_VALID_FORMAT)
                         assert.propertyVal(err, 'description', Strings.ERROR_MESSAGE.UUID_NOT_VALID_FORMAT_DESC)
                     })

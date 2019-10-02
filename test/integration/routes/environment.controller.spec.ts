@@ -368,7 +368,7 @@ describe('Routes: environments', () => {
                 }
             })
 
-            it('should return status code 201, create each environment and return a response of type MultiStatus<Environment> ' +
+            it('should return status code 207, create each environment and return a response of type MultiStatus<Environment> ' +
                 'with the description of success in sending each one of them', () => {
                 const body: any = []
 
@@ -609,7 +609,7 @@ describe('Routes: environments', () => {
      */
     describe('GET /v1/environments', () => {
         context('when get all environment of the database successfully', () => {
-            it('should return status code 200 and a list of environments found', async () => {
+            before(async () => {
                 try {
                     await deleteAllEnvironments()
 
@@ -634,13 +634,13 @@ describe('Routes: environments', () => {
                 } catch (err) {
                     throw new Error('Failure on environments routes test: ' + err.message)
                 }
-
+            })
+            it('should return status code 200 and a list of environments found', () => {
                 return request
                     .get('/v1/environments')
                     .set('Content-Type', 'application/json')
                     .expect(200)
                     .then(res => {
-                        expect(res.body).is.an.instanceOf(Array)
                         expect(res.body.length).to.not.eql(0)
                         // Check for the existence of properties only in the first element of the array
                         // because there is a guarantee that there will be at least one object (created
@@ -672,7 +672,7 @@ describe('Routes: environments', () => {
                 }
             })
 
-            it('should return status code 200 and an empty list', async () => {
+            it('should return status code 200 and an empty list', () => {
                 return request
                     .get('/v1/environments')
                     .set('Content-Type', 'application/json')
@@ -687,7 +687,7 @@ describe('Routes: environments', () => {
          * query-strings-parser library test
          */
         context('when get environment using the "query-strings-parser" library', () => {
-            it('should return status code 200 and the result as needed in the query', async () => {
+            before(async () => {
                 try {
                     await deleteAllEnvironments()
 
@@ -736,7 +736,8 @@ describe('Routes: environments', () => {
                 } catch (err) {
                     throw new Error('Failure on environments routes test: ' + err.message)
                 }
-
+            })
+            it('should return status code 200 and the result as needed in the query', () => {
                 const url = '/v1/environments?climatized=true&sort=institution_id&page=1&limit=3'
 
                 return request
@@ -778,7 +779,7 @@ describe('Routes: environments', () => {
                 }
             })
 
-            it('should return status code 200 and an empty list', async () => {
+            it('should return status code 200 and an empty list', () => {
                 const url = '/v1/environments?climatized=true&sort=institution_id&page=1&limit=3'
 
                 return request
@@ -896,7 +897,7 @@ describe('Routes: environments', () => {
                 }
             })
             it('should return status code 204 and no content for environment (and show an error log about unable to send ' +
-                'DeleteEnvironment event)', async () => {
+                'DeleteEnvironment event)', () => {
                 return request
                     .delete(`/v1/environments/${result.id}`)
                     .set('Content-Type', 'application/json')
@@ -936,7 +937,7 @@ describe('Routes: environments', () => {
                 }
             })
 
-            it('should return status code 400 and info message about the invalid environment id', async () => {
+            it('should return status code 400 and info message about the invalid environment id', () => {
                 return request
                     .delete(`/v1/environments/123`)
                     .set('Content-Type', 'application/json')

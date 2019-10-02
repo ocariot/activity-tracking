@@ -291,7 +291,7 @@ describe('Routes: children.weights', () => {
                 }
             })
 
-            it('should return status code 201, create each Weight and return a response of type MultiStatus<Weight> ' +
+            it('should return status code 207, create each Weight and return a response of type MultiStatus<Weight> ' +
                 'with the description of success in sending each one of them', () => {
                 const body: any = []
 
@@ -458,7 +458,7 @@ describe('Routes: children.weights', () => {
                     throw new Error('Failure on children.weights routes test: ' + err.message)
                 }
             })
-            it('should return status code 200 and a list of all Weight objects found', async () => {
+            it('should return status code 200 and a list of all Weight objects found', () => {
                 return request
                     .get(`/v1/children/${defaultWeight.child_id}/weights`)
                     .set('Content-Type', 'application/json')
@@ -488,7 +488,7 @@ describe('Routes: children.weights', () => {
                 }
             })
 
-            it('should return status code 200 and an empty list', async () => {
+            it('should return status code 200 and an empty list', () => {
                 return request
                     .get(`/v1/children/${defaultWeight.child_id}/weights`)
                     .set('Content-Type', 'application/json')
@@ -509,7 +509,7 @@ describe('Routes: children.weights', () => {
                 }
             })
 
-            it('should return status code 400 and an info message about the invalid child_id', async () => {
+            it('should return status code 400 and an info message about the invalid child_id', () => {
                 return request
                     .get(`/v1/children/123/weights`)
                     .set('Content-Type', 'application/json')
@@ -556,7 +556,7 @@ describe('Routes: children.weights', () => {
                 }
             })
 
-            it('should return status code 200 and the result as needed in the query', async () => {
+            it('should return status code 200 and the result as needed in the query', () => {
                 const url = `/v1/children/${defaultWeight.child_id}/weights?child_id=${defaultWeight.child_id}`
                     .concat(`&sort=child_id&page=1&limit=3`)
 
@@ -590,7 +590,7 @@ describe('Routes: children.weights', () => {
                 }
             })
 
-            it('should return status code 200 and an empty list', async () => {
+            it('should return status code 200 and an empty list', () => {
                 const url = `/v1/children/${defaultWeight.child_id}/weights?child_id=${defaultWeight.child_id}`
                     .concat(`&sort=child_id&page=1&limit=3`)
 
@@ -615,7 +615,7 @@ describe('Routes: children.weights', () => {
                 }
             })
 
-            it('should return status code 400 and an info message about the invalid child_id', async () => {
+            it('should return status code 400 and an info message about the invalid child_id', () => {
                 const url = `/v1/children/123/weights?child_id=${defaultWeight.child_id}&sort=child_id&page=1&limit=3`
 
                 return request
@@ -659,7 +659,7 @@ describe('Routes: children.weights', () => {
                 }
             })
 
-            it('should return status code 200 and that specific Weight of that child', async () => {
+            it('should return status code 200 and that specific Weight of that child', () => {
                 return request
                     .get(`/v1/children/${result.child_id}/weights/${result.id}`)
                     .set('Content-Type', 'application/json')
@@ -687,7 +687,7 @@ describe('Routes: children.weights', () => {
                 }
             })
 
-            it('should return status code 404 and an info message describing that Weight was not found', async () => {
+            it('should return status code 404 and an info message describing that Weight was not found', () => {
                 return request
                     .get(`/v1/children/${defaultWeight.child_id}/weights/${defaultWeight.id}`)
                     .set('Content-Type', 'application/json')
@@ -710,7 +710,7 @@ describe('Routes: children.weights', () => {
                 }
             })
 
-            it('should return status code 400 and an info message about the invalid child_id', async () => {
+            it('should return status code 400 and an info message about the invalid child_id', () => {
                 return request
                     .get(`/v1/children/123/weights/${defaultWeight.id}`)
                     .set('Content-Type', 'application/json')
@@ -732,7 +732,7 @@ describe('Routes: children.weights', () => {
                 }
             })
 
-            it('should return status code 400 and an info message about the invalid Weight id', async () => {
+            it('should return status code 400 and an info message about the invalid Weight id', () => {
                 return request
                     .get(`/v1/children/${defaultWeight.child_id}/weights/123`)
                     .set('Content-Type', 'application/json')
@@ -772,7 +772,7 @@ describe('Routes: children.weights', () => {
                 }
             })
 
-            it('should return status code 200 and the result as needed in the query', async () => {
+            it('should return status code 200 and the result as needed in the query', () => {
                 const url = `/v1/children/${result.child_id}/weights/${result.id}?child_id=${result.child_id}`
                     .concat(`&sort=child_id&page=1&limit=3`)
 
@@ -801,7 +801,7 @@ describe('Routes: children.weights', () => {
                 }
             })
 
-            it('should return status code 404 and an info message describing that Weight was not found', async () => {
+            it('should return status code 404 and an info message describing that Weight was not found', () => {
                 const url = `/v1/children/${defaultWeight.child_id}/weights/${defaultWeight.id}?child_id=${defaultWeight.child_id}`
                     .concat(`&sort=child_id&page=1&limit=3`)
 
@@ -828,7 +828,7 @@ describe('Routes: children.weights', () => {
                 }
             })
 
-            it('should return status code 400 and an info message about the invalid child_id', async () => {
+            it('should return status code 400 and an info message about the invalid child_id', () => {
                 const url = `/v1/children/123/weights/${defaultWeight.id}?child_id=${defaultWeight.child_id}
                     &sort=child_id&page=1&limit=3`
 
@@ -854,7 +854,7 @@ describe('Routes: children.weights', () => {
                 }
             })
 
-            it('should return status code 400 and an info message about the invalid Weight id', async () => {
+            it('should return status code 400 and an info message about the invalid Weight id', () => {
                 const url = `/v1/children/${defaultWeight.child_id}/weights/123?child_id=${defaultWeight.child_id}`
                     .concat(`&sort=child_id&page=1&limit=3`)
 
@@ -967,7 +967,7 @@ describe('Routes: children.weights', () => {
             })
 
             it('should return status code 204 and no content for Weight (and show an error log about unable to send ' +
-                'DeleteWeight event)', async () => {
+                'DeleteWeight event)', () => {
                 return request
                     .delete(`/v1/children/${result.child_id}/weights/${result.id}`)
                     .set('Content-Type', 'application/json')
@@ -987,7 +987,7 @@ describe('Routes: children.weights', () => {
                 }
             })
 
-            it('should return status code 204 and no content for Weight', async () => {
+            it('should return status code 204 and no content for Weight', () => {
                 return request
                     .delete(`/v1/children/${defaultWeight.child_id}/weights/${defaultWeight.id}`)
                     .set('Content-Type', 'application/json')
@@ -1007,7 +1007,7 @@ describe('Routes: children.weights', () => {
                 }
             })
 
-            it('should return status code 400 and an info message about the invalid child_id', async () => {
+            it('should return status code 400 and an info message about the invalid child_id', () => {
                 return request
                     .delete(`/v1/children/123/weights/${defaultWeight.id}`)
                     .set('Content-Type', 'application/json')
@@ -1029,7 +1029,7 @@ describe('Routes: children.weights', () => {
                 }
             })
 
-            it('should return status code 400 and an info message about the invalid Weight id', async () => {
+            it('should return status code 400 and an info message about the invalid Weight id', () => {
                 return request
                     .delete(`/v1/children/${defaultWeight.child_id}/weights/123`)
                     .set('Content-Type', 'application/json')
