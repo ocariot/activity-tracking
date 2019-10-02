@@ -640,7 +640,7 @@ describe('Routes: children.sleep', () => {
                 }
             })
 
-            it('should return status code 201, create each Sleep and return a response of type MultiStatus<Sleep> ' +
+            it('should return status code 207, create each Sleep and return a response of type MultiStatus<Sleep> ' +
                 'with the description of success in sending each one of them', () => {
                 const body: any = []
 
@@ -932,7 +932,7 @@ describe('Routes: children.sleep', () => {
                 }
             })
 
-            it('should return status code 200 and a list of all sleep of that specific child', async () => {
+            it('should return status code 200 and a list of all sleep of that specific child', () => {
                 return request
                     .get(`/v1/children/${defaultSleep.child_id}/sleep`)
                     .set('Content-Type', 'application/json')
@@ -969,7 +969,7 @@ describe('Routes: children.sleep', () => {
                 }
             })
 
-            it('should return status code 200 and an empty list', async () => {
+            it('should return status code 200 and an empty list', () => {
                 return request
                     .get(`/v1/children/${defaultSleep.child_id}/sleep`)
                     .set('Content-Type', 'application/json')
@@ -990,20 +990,7 @@ describe('Routes: children.sleep', () => {
                 }
             })
 
-            it('should return status code 400 and an info message about the invalid child_id', async () => {
-                try {
-                    await createSleep({
-                        start_time: defaultSleep.start_time,
-                        end_time: defaultSleep.end_time,
-                        duration: defaultSleep.duration,
-                        pattern: defaultSleep.pattern!.data_set,
-                        type: defaultSleep.type,
-                        child_id: defaultSleep.child_id
-                    })
-                } catch (err) {
-                    throw new Error('Failure on children.sleep routes test: ' + err.message)
-                }
-
+            it('should return status code 400 and an info message about the invalid child_id', () => {
                 return request
                     .get(`/v1/children/123/sleep`)
                     .set('Content-Type', 'application/json')
@@ -1036,7 +1023,7 @@ describe('Routes: children.sleep', () => {
                 }
             })
 
-            it('should return status code 200 and the result as needed in the query', async () => {
+            it('should return status code 200 and the result as needed in the query', () => {
                 const url = `/v1/children/${defaultSleep.child_id}/sleep?child_id=${defaultSleep.child_id}`
                     .concat(`&sort=child_id&page=1&limit=3`)
 
@@ -1077,7 +1064,7 @@ describe('Routes: children.sleep', () => {
                 }
             })
 
-            it('should return status code 200 and an empty list', async () => {
+            it('should return status code 200 and an empty list', () => {
                 const url = `/v1/children/${defaultSleep.child_id}/sleep?child_id=${defaultSleep.child_id}`
                     .concat(`&sort=child_id&page=1&limit=3`)
 
@@ -1102,7 +1089,7 @@ describe('Routes: children.sleep', () => {
                 }
             })
 
-            it('should return status code 400 and an info message about the invalid child_id', async () => {
+            it('should return status code 400 and an info message about the invalid child_id', () => {
                 const url = `/v1/children/123/sleep?child_id=${defaultSleep.child_id}`
                     .concat(`&sort=child_id&page=1&limit=3`)
 
@@ -1141,7 +1128,7 @@ describe('Routes: children.sleep', () => {
                     throw new Error('Failure on children.sleep routes test: ' + err.message)
                 }
             })
-            it('should return status code 200 and that specific sleep of that child', async () => {
+            it('should return status code 200 and that specific sleep of that child', () => {
                 return request
                     .get(`/v1/children/${result.child_id}/sleep/${result.id}`)
                     .set('Content-Type', 'application/json')
@@ -1176,7 +1163,7 @@ describe('Routes: children.sleep', () => {
                 }
             })
 
-            it('should return status code 404 and an info message describing that sleep was not found', async () => {
+            it('should return status code 404 and an info message describing that sleep was not found', () => {
                 return request
                     .get(`/v1/children/${defaultSleep.child_id}/sleep/${defaultSleep.id}`)
                     .set('Content-Type', 'application/json')
@@ -1199,7 +1186,7 @@ describe('Routes: children.sleep', () => {
                 }
             })
 
-            it('should return status code 400 and an info message about the invalid child_id', async () => {
+            it('should return status code 400 and an info message about the invalid child_id', () => {
                 return request
                     .get(`/v1/children/123/sleep/${defaultSleep.id}`)
                     .set('Content-Type', 'application/json')
@@ -1221,7 +1208,7 @@ describe('Routes: children.sleep', () => {
                 }
             })
 
-            it('should return status code 400 and an info message about the invalid sleep id', async () => {
+            it('should return status code 400 and an info message about the invalid sleep id', () => {
                 return request
                     .get(`/v1/children/${defaultSleep.child_id}/sleep/123`)
                     .set('Content-Type', 'application/json')
@@ -1256,7 +1243,7 @@ describe('Routes: children.sleep', () => {
                 }
             })
 
-            it('should return status code 200 and the result as needed in the query', async () => {
+            it('should return status code 200 and the result as needed in the query', () => {
                 const url = `/v1/children/${result.child_id}/sleep/${result.id}?child_id=${result.child_id}`
                     .concat(`&sort=child_id&page=1&limit=3`)
 
@@ -1292,7 +1279,7 @@ describe('Routes: children.sleep', () => {
                 }
             })
 
-            it('should return status code 404 and an info message describing that sleep was not found', async () => {
+            it('should return status code 404 and an info message describing that sleep was not found', () => {
                 const url = `/v1/children/${defaultSleep.child_id}/sleep/${defaultSleep.id}?child_id=${defaultSleep.child_id}`
                     .concat(`&sort=child_id&page=1&limit=3`)
 
@@ -1319,7 +1306,7 @@ describe('Routes: children.sleep', () => {
                 }
             })
 
-            it('should return status code 400 and an info message about the invalid child_id', async () => {
+            it('should return status code 400 and an info message about the invalid child_id', () => {
                 const url = `/v1/children/123/sleep/${defaultSleep.id}?child_id=${defaultSleep.child_id}`
                     .concat(`&sort=child_id&page=1&limit=3`)
 
@@ -1345,7 +1332,7 @@ describe('Routes: children.sleep', () => {
                 }
             })
 
-            it('should return status code 400 and an info message about the invalid sleep id', async () => {
+            it('should return status code 400 and an info message about the invalid sleep id', () => {
                 const url = `/v1/children/${defaultSleep.child_id}/sleep/123?child_id=${defaultSleep.child_id}`
                     .concat(`&sort=child_id&page=1&limit=3`)
 
@@ -1457,7 +1444,7 @@ describe('Routes: children.sleep', () => {
             })
 
             it('should return status code 200 and the updated Sleep (and show an error log about unable to send ' +
-                'UpdateSleep event)', async () => {
+                'UpdateSleep event)', () => {
                 // Sleep to update
                 const body = {
                     start_time: otherSleep.start_time,
@@ -1491,9 +1478,9 @@ describe('Routes: children.sleep', () => {
         })
 
         context('when this sleep already exists in the database', () => {
-            it('should return status status code 409 and an info message about the conflict', async () => {
-                let result
+            let result
 
+            before(async () => {
                 try {
                     await deleteAllSleep()
 
@@ -1511,7 +1498,8 @@ describe('Routes: children.sleep', () => {
                 } catch (err) {
                     throw new Error('Failure on children.sleep routes test: ' + err.message)
                 }
-
+            })
+            it('should return status status code 409 and an info message about the conflict', () => {
                 // Sleep to update
                 const body = {
                     start_time: otherSleep.start_time,
@@ -1540,7 +1528,7 @@ describe('Routes: children.sleep', () => {
                 }
             })
 
-            it('should return status code 404 and an info message about the error on the search', async () => {
+            it('should return status code 404 and an info message about the error on the search', () => {
                 // Sleep to update
                 const body = {
                     start_time: defaultSleep.start_time,
@@ -1573,7 +1561,7 @@ describe('Routes: children.sleep', () => {
                 }
             })
 
-            it('should return status code 400 and an info message about the invalid child_id', async () => {
+            it('should return status code 400 and an info message about the invalid child_id', () => {
                 // Sleep to update
                 const body = {
                     start_time: defaultSleep.start_time,
@@ -1605,7 +1593,7 @@ describe('Routes: children.sleep', () => {
                 }
             })
 
-            it('should return status code 400 and an info message about the invalid sleep id', async () => {
+            it('should return status code 400 and an info message about the invalid sleep id', () => {
                 // Sleep to update
                 const body = {
                     start_time: defaultSleep.start_time,
@@ -1637,7 +1625,7 @@ describe('Routes: children.sleep', () => {
                 }
             })
 
-            it('should return status code 400 and info message about the invalid duration', async () => {
+            it('should return status code 400 and info message about the invalid duration', () => {
                 // Sleep to update
                 const body = {
                     start_time: defaultSleep.start_time,
@@ -1669,7 +1657,7 @@ describe('Routes: children.sleep', () => {
                 }
             })
 
-            it('should return status code 400 and info message about the invalid duration', async () => {
+            it('should return status code 400 and info message about the invalid duration', () => {
                 // Sleep to update
                 const body = {
                     start_time: defaultSleep.start_time,
@@ -1701,7 +1689,7 @@ describe('Routes: children.sleep', () => {
                 }
             })
 
-            it('should return status code 400 and info message about the invalid pattern', async () => {
+            it('should return status code 400 and info message about the invalid pattern', () => {
                 // Sleep to update
                 const body = {
                     start_time: defaultSleep.start_time,
@@ -1733,7 +1721,7 @@ describe('Routes: children.sleep', () => {
                 }
             })
 
-            it('should return status code 400 and info message about the invalid data_set array of pattern', async () => {
+            it('should return status code 400 and info message about the invalid data_set array of pattern', () => {
                 // Sleep to update
                 const body = {
                     start_time: defaultSleep.start_time,
@@ -1767,7 +1755,7 @@ describe('Routes: children.sleep', () => {
                 }
             })
 
-            it('should return status code 400 and info message about the invalid data_set array of pattern', async () => {
+            it('should return status code 400 and info message about the invalid data_set array of pattern', () => {
                 // Sleep to update
                 const body = {
                     start_time: defaultSleep.start_time,
@@ -1804,7 +1792,7 @@ describe('Routes: children.sleep', () => {
                 }
             })
 
-            it('should return status code 400 and info message about the invalid data_set array of pattern', async () => {
+            it('should return status code 400 and info message about the invalid data_set array of pattern', () => {
                 // Sleep to update
                 const body = {
                     start_time: defaultSleep.start_time,
@@ -1845,7 +1833,7 @@ describe('Routes: children.sleep', () => {
                 }
             })
 
-            it('should return status code 400 and info message about the invalid data_set array of pattern', async () => {
+            it('should return status code 400 and info message about the invalid data_set array of pattern', () => {
                 // Sleep to update
                 const body = {
                     start_time: defaultSleep.start_time,
@@ -1886,7 +1874,7 @@ describe('Routes: children.sleep', () => {
                 }
             })
 
-            it('should return status code 400 and info message about the invalid data_set array of pattern', async () => {
+            it('should return status code 400 and info message about the invalid data_set array of pattern', () => {
                 // Sleep to update
                 const body = {
                     start_time: defaultSleep.start_time,
@@ -2002,7 +1990,7 @@ describe('Routes: children.sleep', () => {
             })
 
             it('should return status code 204 and no content for sleep (and show an error log about unable to send ' +
-                'DeleteSleep event)', async () => {
+                'DeleteSleep event)', () => {
                 return request
                     .delete(`/v1/children/${result.child_id}/sleep/${result.id}`)
                     .set('Content-Type', 'application/json')
@@ -2022,7 +2010,7 @@ describe('Routes: children.sleep', () => {
                 }
             })
 
-            it('should return status code 204 and no content for sleep', async () => {
+            it('should return status code 204 and no content for sleep', () => {
                 return request
                     .delete(`/v1/children/${defaultSleep.child_id}/sleep/${defaultSleep.id}`)
                     .set('Content-Type', 'application/json')
@@ -2042,7 +2030,7 @@ describe('Routes: children.sleep', () => {
                 }
             })
 
-            it('should return status code 400 and an info message about the invalid child_id', async () => {
+            it('should return status code 400 and an info message about the invalid child_id', () => {
                 return request
                     .delete(`/v1/children/123/sleep/${defaultSleep.id}`)
                     .set('Content-Type', 'application/json')
@@ -2064,7 +2052,7 @@ describe('Routes: children.sleep', () => {
                 }
             })
 
-            it('should return status code 400 and an info message about the invalid sleep id', async () => {
+            it('should return status code 400 and an info message about the invalid sleep id', () => {
                 return request
                     .delete(`/v1/children/${defaultSleep.child_id}/sleep/123`)
                     .set('Content-Type', 'application/json')

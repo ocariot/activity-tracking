@@ -193,7 +193,7 @@ describe('SUBSCRIBE EVENT BUS TASK', () => {
             it('should return an array with three physical activities', (done) => {
                 rabbitmq.bus.pubSavePhysicalActivity([activity1, activity2, activity3])
                     .then(async () => {
-                        await timeout(5000)
+                        await timeout(6000)
                         const result = await activityRepository.find(new Query())
                         expect(result.length).to.eql(3)
                         done()
@@ -318,7 +318,7 @@ describe('SUBSCRIBE EVENT BUS TASK', () => {
             it('should return an array with three sleep objects', (done) => {
                 rabbitmq.bus.pubSaveSleep([sleep1, sleep2, sleep3])
                     .then(async () => {
-                        await timeout(5000)
+                        await timeout(6000)
                         const result = await sleepRepository.find(new Query())
                         expect(result.length).to.eql(3)
                         done()
@@ -442,7 +442,7 @@ describe('SUBSCRIBE EVENT BUS TASK', () => {
             it('should return an array with three weight objects', (done) => {
                 rabbitmq.bus.pubSaveWeight([weight1, weight2, weight3])
                     .then(async () => {
-                        await timeout(5000)
+                        await timeout(6000)
                         const result = await weightRepository.find(new Query())
                         expect(result.length).to.eql(3)
                         done()
@@ -573,7 +573,7 @@ describe('SUBSCRIBE EVENT BUS TASK', () => {
             it('should return an array with three logs', (done) => {
                 rabbitmq.bus.pubSaveLog([log1, log2, log3])
                     .then(async () => {
-                        await timeout(5000)
+                        await timeout(6000)
                         const result = await logRepository.find(new Query())
                         expect(result.length).to.eql(3)
                         done()

@@ -837,7 +837,7 @@ describe('Routes: children.physicalactivities', () => {
                 }
             })
 
-            it('should return status code 201, create each PhysicalActivity and return a response of type ' +
+            it('should return status code 207, create each PhysicalActivity and return a response of type ' +
                 'MultiStatus<PhysicalActivity> with the description of success in sending each one of them', () => {
                 const body: any = []
 
@@ -1173,7 +1173,7 @@ describe('Routes: children.physicalactivities', () => {
                 }
             })
 
-            it('should return status code 200 and a list of all physical activity of that specific child', async () => {
+            it('should return status code 200 and a list of all physical activity of that specific child', () => {
                 return request
                     .get(`/v1/children/${defaultActivity.child_id}/physicalactivities`)
                     .set('Content-Type', 'application/json')
@@ -1215,7 +1215,7 @@ describe('Routes: children.physicalactivities', () => {
                 }
             })
 
-            it('should return status code 200 and an empty list', async () => {
+            it('should return status code 200 and an empty list', () => {
                 return request
                     .get(`/v1/children/${defaultActivity.child_id}/physicalactivities`)
                     .set('Content-Type', 'application/json')
@@ -1235,7 +1235,7 @@ describe('Routes: children.physicalactivities', () => {
                     throw new Error('Failure on children.physicalactivities routes test: ' + err.message)
                 }
             })
-            it('should return status code 400 and an info message about the invalid child_id', async () => {
+            it('should return status code 400 and an info message about the invalid child_id', () => {
                 return request
                     .get(`/v1/children/123/physicalactivities`)
                     .set('Content-Type', 'application/json')
@@ -1284,7 +1284,7 @@ describe('Routes: children.physicalactivities', () => {
                     throw new Error('Failure on children.physicalactivities routes test: ' + err.message)
                 }
             })
-            it('should return status code 200 and the result as needed in the query', async () => {
+            it('should return status code 200 and the result as needed in the query', () => {
                 const url = `/v1/children/${defaultActivity.child_id}/physicalactivities?child_id=${defaultActivity.child_id}`
                     .concat(`&sort=child_id&page=1&limit=3`)
 
@@ -1330,7 +1330,7 @@ describe('Routes: children.physicalactivities', () => {
                 }
             })
 
-            it('should return status code 200 and an empty list', async () => {
+            it('should return status code 200 and an empty list', () => {
                 const url = `/v1/children/${defaultActivity.child_id}/physicalactivities?child_id=${defaultActivity.child_id}`
                     .concat(`&sort=child_id&page=1&limit=3`)
 
@@ -1355,7 +1355,7 @@ describe('Routes: children.physicalactivities', () => {
                 }
             })
 
-            it('should return status code 400 and an info message about the invalid child_id', async () => {
+            it('should return status code 400 and an info message about the invalid child_id', () => {
                 const url = `/v1/children/123/physicalactivities?child_id=${defaultActivity.child_id}&sort=child_id&page=1&limit=3`
 
                 return request
@@ -1397,7 +1397,7 @@ describe('Routes: children.physicalactivities', () => {
                     throw new Error('Failure on children.physicalactivities routes test: ' + err.message)
                 }
             })
-            it('should return status code 200 and the specific physical activity of that child', async () => {
+            it('should return status code 200 and the specific physical activity of that child', () => {
                 return request
                     .get(`/v1/children/${result.child_id}/physicalactivities/${result.id}`)
                     .set('Content-Type', 'application/json')
@@ -1437,7 +1437,7 @@ describe('Routes: children.physicalactivities', () => {
                 }
             })
 
-            it('should return status code 404 and an info message describing that physical activity was not found', async () => {
+            it('should return status code 404 and an info message describing that physical activity was not found', () => {
                 return request
                     .get(`/v1/children/${defaultActivity.child_id}/physicalactivities/${defaultActivity.id}`)
                     .set('Content-Type', 'application/json')
@@ -1460,7 +1460,7 @@ describe('Routes: children.physicalactivities', () => {
                 }
             })
 
-            it('should return status code 400 and an info message about the invalid child_id', async () => {
+            it('should return status code 400 and an info message about the invalid child_id', () => {
                 return request
                     .get(`/v1/children/123/physicalactivities/${defaultActivity.id}`)
                     .set('Content-Type', 'application/json')
@@ -1482,7 +1482,7 @@ describe('Routes: children.physicalactivities', () => {
                 }
             })
 
-            it('should return status code 400 and an info message about the invalid physical activity id', async () => {
+            it('should return status code 400 and an info message about the invalid physical activity id', () => {
                 return request
                     .get(`/v1/children/${defaultActivity.child_id}/physicalactivities/123`)
                     .set('Content-Type', 'application/json')
@@ -1521,7 +1521,7 @@ describe('Routes: children.physicalactivities', () => {
                 }
             })
 
-            it('should return status code 200 and the result as needed in the query', async () => {
+            it('should return status code 200 and the result as needed in the query', () => {
                 const url = `/v1/children/${result.child_id}/physicalactivities/${result.id}?child_id=${result.child_id}`
                     .concat(`&sort=child_id&page=1&limit=3`)
 
@@ -1562,7 +1562,7 @@ describe('Routes: children.physicalactivities', () => {
                 }
             })
 
-            it('should return status code 404 and an info message describing that physical activity was not found', async () => {
+            it('should return status code 404 and an info message describing that physical activity was not found', () => {
                 const url = `/v1/children/${defaultActivity.child_id}/physicalactivities/${defaultActivity.id}`
                     .concat(`?child_id=${defaultActivity.child_id}&sort=child_id&page=1&limit=3`)
 
@@ -1589,7 +1589,7 @@ describe('Routes: children.physicalactivities', () => {
                 }
             })
 
-            it('should return status code 400 and an info message about the invalid child_id', async () => {
+            it('should return status code 400 and an info message about the invalid child_id', () => {
                 const url = `/v1/children/123/physicalactivities/${defaultActivity.id}?child_id=${defaultActivity.child_id}`
                     .concat(`&sort=child_id&page=1&limit=3`)
 
@@ -1615,7 +1615,7 @@ describe('Routes: children.physicalactivities', () => {
                 }
             })
 
-            it('should return status code 400 and an info message about the invalid physical activity id', async () => {
+            it('should return status code 400 and an info message about the invalid physical activity id', () => {
                 const url = `/v1/children/${defaultActivity.child_id}/physicalactivities/123?child_id=${defaultActivity.child_id}`
                     .concat(`&sort=child_id&page=1&limit=3`)
 
@@ -1733,7 +1733,7 @@ describe('Routes: children.physicalactivities', () => {
             })
 
             it('should return status code 200 and the updated physical activity (and show an error log about unable to send ' +
-                'UpdatePhysicalActivity event)', async () => {
+                'UpdatePhysicalActivity event)', () => {
                 // physical activity to update
                 const body = {
                     name: defaultActivity.name,
@@ -1775,9 +1775,9 @@ describe('Routes: children.physicalactivities', () => {
         })
 
         context('when physical activity already exists in the database', () => {
-            it('should return status status code 409 and an info message about the conflict', async () => {
-                let result
+            let result
 
+            before(async () => {
                 try {
                     await deleteAllActivities()
 
@@ -1799,7 +1799,8 @@ describe('Routes: children.physicalactivities', () => {
                 } catch (err) {
                     throw new Error('Failure on children.physicalactivities routes test: ' + err.message)
                 }
-
+            })
+            it('should return status status code 409 and an info message about the conflict', () => {
                 // physical activity to update
                 const body = {
                     start_time: otherActivity.start_time,
@@ -1828,7 +1829,7 @@ describe('Routes: children.physicalactivities', () => {
                 }
             })
 
-            it('should return status code 404 and an info message about the error on the search', async () => {
+            it('should return status code 404 and an info message about the error on the search', () => {
                 // physical activity to update
                 const body = {
                     name: defaultActivity.name,
@@ -1864,7 +1865,7 @@ describe('Routes: children.physicalactivities', () => {
                     throw new Error('Failure on children.physicalactivities routes test: ' + err.message)
                 }
             })
-            it('should return status code 400 and an info message about the invalid child_id', async () => {
+            it('should return status code 400 and an info message about the invalid child_id', () => {
                 // physical activity to update
                 const body = {
                     name: defaultActivity.name,
@@ -1899,7 +1900,7 @@ describe('Routes: children.physicalactivities', () => {
                     throw new Error('Failure on children.physicalactivities routes test: ' + err.message)
                 }
             })
-            it('should return status code 400 and an info message about the invalid physical activity id', async () => {
+            it('should return status code 400 and an info message about the invalid physical activity id', () => {
                 // physical activity to update
                 const body = {
                     name: defaultActivity.name,
@@ -1934,7 +1935,7 @@ describe('Routes: children.physicalactivities', () => {
                     throw new Error('Failure on children.physicalactivities routes test: ' + err.message)
                 }
             })
-            it('should return status code 400 and info message about the invalid duration', async () => {
+            it('should return status code 400 and info message about the invalid duration', () => {
                 // physical activity to update
                 const body = {
                     duration: -(defaultActivity.duration!)
@@ -1962,7 +1963,7 @@ describe('Routes: children.physicalactivities', () => {
                     throw new Error('Failure on children.physicalactivities routes test: ' + err.message)
                 }
             })
-            it('should return status code 400 and info message about the invalid calories parameter', async () => {
+            it('should return status code 400 and info message about the invalid calories parameter', () => {
                 // physical activity to update
                 const body = {
                     calories: -(defaultActivity.calories!)
@@ -1990,7 +1991,7 @@ describe('Routes: children.physicalactivities', () => {
                     throw new Error('Failure on children.physicalactivities routes test: ' + err.message)
                 }
             })
-            it('should return status code 400 and info message about the invalid steps parameter', async () => {
+            it('should return status code 400 and info message about the invalid steps parameter', () => {
                 // physical activity to update
                 const body = {
                     steps: -200
@@ -2019,7 +2020,7 @@ describe('Routes: children.physicalactivities', () => {
                 }
             })
 
-            it('should return status code 400 and info message about the invalid levels array', async () => {
+            it('should return status code 400 and info message about the invalid levels array', () => {
                 // physical activity to update
                 const body = {
                     levels: incorrectActivity8.levels ? incorrectActivity8.levels : undefined,
@@ -2047,7 +2048,7 @@ describe('Routes: children.physicalactivities', () => {
                 }
             })
 
-            it('should return status code 400 and info message about the invalid levels array', async () => {
+            it('should return status code 400 and info message about the invalid levels array', () => {
                 // physical activity to update
                 const body = {
                     levels: incorrectActivity9.levels ? incorrectActivity9.levels : undefined,
@@ -2075,7 +2076,7 @@ describe('Routes: children.physicalactivities', () => {
                     throw new Error('Failure on children.physicalactivities routes test: ' + err.message)
                 }
             })
-            it('should return status code 400 and info message about the invalid levels array', async () => {
+            it('should return status code 400 and info message about the invalid levels array', () => {
                 // physical activity to update
                 const body = {
                     levels: incorrectActivity10.levels ? incorrectActivity10.levels : undefined,
@@ -2103,7 +2104,7 @@ describe('Routes: children.physicalactivities', () => {
                     throw new Error('Failure on children.physicalactivities routes test: ' + err.message)
                 }
             })
-            it('should return status code 400 and info message about the invalid levels array', async () => {
+            it('should return status code 400 and info message about the invalid levels array', () => {
                 const body = {
                     heart_rate: incorrectActivity11.heart_rate ? incorrectActivity11.heart_rate : undefined
                 }
@@ -2130,7 +2131,7 @@ describe('Routes: children.physicalactivities', () => {
                     throw new Error('Failure on children.physicalactivities routes test: ' + err.message)
                 }
             })
-            it('should return status code 400 and info message about the invalid levels array', async () => {
+            it('should return status code 400 and info message about the invalid levels array', () => {
                 const body = {
                     heart_rate: incorrectActivity12.heart_rate ? incorrectActivity12.heart_rate : undefined
                 }
@@ -2157,7 +2158,7 @@ describe('Routes: children.physicalactivities', () => {
                     throw new Error('Failure on children.physicalactivities routes test: ' + err.message)
                 }
             })
-            it('should return status code 400 and info message about the invalid levels array', async () => {
+            it('should return status code 400 and info message about the invalid levels array', () => {
                 const body = {
                     heart_rate: incorrectActivity13.heart_rate ? incorrectActivity13.heart_rate : undefined
                 }
@@ -2185,7 +2186,7 @@ describe('Routes: children.physicalactivities', () => {
                     throw new Error('Failure on children.physicalactivities routes test: ' + err.message)
                 }
             })
-            it('should return status code 400 and info message about the invalid levels array', async () => {
+            it('should return status code 400 and info message about the invalid levels array', () => {
                 const body = {
                     heart_rate: incorrectActivity14.heart_rate ? incorrectActivity14.heart_rate : undefined
                 }
@@ -2297,7 +2298,7 @@ describe('Routes: children.physicalactivities', () => {
             })
 
             it('should return status code 204 and no content for physical activity (and show an error log about unable to send ' +
-                'DeletePhysicalActivity event)', async () => {
+                'DeletePhysicalActivity event)', () => {
                 return request
                     .delete(`/v1/children/${result.child_id}/physicalactivities/${result.id}`)
                     .set('Content-Type', 'application/json')
@@ -2317,7 +2318,7 @@ describe('Routes: children.physicalactivities', () => {
                 }
             })
 
-            it('should return status code 204 and no content for physical activity', async () => {
+            it('should return status code 204 and no content for physical activity', () => {
                 return request
                     .delete(`/v1/children/${defaultActivity.child_id}/physicalactivities/${defaultActivity.id}`)
                     .set('Content-Type', 'application/json')
@@ -2337,7 +2338,7 @@ describe('Routes: children.physicalactivities', () => {
                 }
             })
 
-            it('should return status code 400 and an info message about the invalid child_id', async () => {
+            it('should return status code 400 and an info message about the invalid child_id', () => {
                 return request
                     .delete(`/v1/children/123/physicalactivities/${defaultActivity.id}`)
                     .set('Content-Type', 'application/json')
@@ -2358,7 +2359,7 @@ describe('Routes: children.physicalactivities', () => {
                     throw new Error('Failure on children.physicalactivities routes test: ' + err.message)
                 }
             })
-            it('should return status code 400 and an info message about the invalid physical activity id', async () => {
+            it('should return status code 400 and an info message about the invalid physical activity id', () => {
                 return request
                     .delete(`/v1/children/${defaultActivity.child_id}/physicalactivities/123`)
                     .set('Content-Type', 'application/json')

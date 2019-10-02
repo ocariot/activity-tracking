@@ -176,7 +176,7 @@ describe('Routes: children.bodyfats', () => {
                 }
             })
 
-            it('should return status code 201, create each BodyFat and return a response of type MultiStatus<BodyFat> ' +
+            it('should return status code 207, create each BodyFat and return a response of type MultiStatus<BodyFat> ' +
                 'with the description of success in sending each one of them', () => {
                 const body: any = []
 
@@ -308,8 +308,8 @@ describe('Routes: children.bodyfats', () => {
      */
     describe('GET /v1/children/:child_id/bodyfats', () => {
         context('when get all BodyFat of a child successfully', () => {
-            it('should return status code 200 and a list of all BodyFat objects found', async () => {
-                try{
+            before(async () => {
+                try {
                     await deleteAllBodyFats()
 
                     await createBodyFat({
@@ -321,13 +321,13 @@ describe('Routes: children.bodyfats', () => {
                 } catch (err) {
                     throw new Error('Failure on children.bodyfats routes test: ' + err.message)
                 }
-
+            })
+            it('should return status code 200 and a list of all BodyFat objects found', () => {
                 return request
                     .get(`/v1/children/${defaultBodyFat.child_id}/bodyfats`)
                     .set('Content-Type', 'application/json')
                     .expect(200)
                     .then(res => {
-                        expect(res.body).is.an.instanceOf(Array)
                         expect(res.body.length).to.not.eql(0)
                         // Check for the existence of properties only in the first element of the array
                         // because there is a guarantee that there will be at least one object (created
@@ -350,7 +350,7 @@ describe('Routes: children.bodyfats', () => {
                 }
             })
 
-            it('should return status code 200 and an empty list', async () => {
+            it('should return status code 200 and an empty list', () => {
                 return request
                     .get(`/v1/children/${defaultBodyFat.child_id}/bodyfats`)
                     .set('Content-Type', 'application/json')
@@ -371,7 +371,7 @@ describe('Routes: children.bodyfats', () => {
                 }
             })
 
-            it('should return status code 400 and an info message about the invalid child_id', async () => {
+            it('should return status code 400 and an info message about the invalid child_id', () => {
                 return request
                     .get(`/v1/children/123/bodyfats`)
                     .set('Content-Type', 'application/json')
@@ -409,7 +409,7 @@ describe('Routes: children.bodyfats', () => {
                 }
             })
 
-            it('should return status code 200 and the result as needed in the query', async () => {
+            it('should return status code 200 and the result as needed in the query', () => {
                 const url = `/v1/children/${defaultBodyFat.child_id}/bodyfats?child_id=${defaultBodyFat.child_id}`
                     .concat(`&sort=child_id&page=1&limit=3`)
 
@@ -442,7 +442,7 @@ describe('Routes: children.bodyfats', () => {
                 }
             })
 
-            it('should return status code 200 and an empty list', async () => {
+            it('should return status code 200 and an empty list', () => {
                 const url = `/v1/children/${defaultBodyFat.child_id}/bodyfats?child_id=${defaultBodyFat.child_id}`
                     .concat(`&sort=child_id&page=1&limit=3`)
 
@@ -467,7 +467,7 @@ describe('Routes: children.bodyfats', () => {
                 }
             })
 
-            it('should return status code 400 and an info message about the invalid child_id', async () => {
+            it('should return status code 400 and an info message about the invalid child_id', () => {
                 const url = `/v1/children/123/bodyfats?child_id=${defaultBodyFat.child_id}&sort=child_id&page=1&limit=3`
 
                 return request
@@ -504,7 +504,7 @@ describe('Routes: children.bodyfats', () => {
                 }
             })
 
-            it('should return status code 200 and that specific BodyFat of that child', async () => {
+            it('should return status code 200 and that specific BodyFat of that child', () => {
                 return request
                     .get(`/v1/children/${result.child_id}/bodyfats/${result.id}`)
                     .set('Content-Type', 'application/json')
@@ -531,7 +531,7 @@ describe('Routes: children.bodyfats', () => {
                 }
             })
 
-            it('should return status code 404 and an info message describing that BodyFat was not found', async () => {
+            it('should return status code 404 and an info message describing that BodyFat was not found', () => {
                 return request
                     .get(`/v1/children/${defaultBodyFat.child_id}/bodyfats/${defaultBodyFat.id}`)
                     .set('Content-Type', 'application/json')
@@ -554,7 +554,7 @@ describe('Routes: children.bodyfats', () => {
                 }
             })
 
-            it('should return status code 400 and an info message about the invalid child_id', async () => {
+            it('should return status code 400 and an info message about the invalid child_id', () => {
                 return request
                     .get(`/v1/children/123/bodyfats/${defaultBodyFat.id}`)
                     .set('Content-Type', 'application/json')
@@ -576,7 +576,7 @@ describe('Routes: children.bodyfats', () => {
                 }
             })
 
-            it('should return status code 400 and an info message about the invalid BodyFat id', async () => {
+            it('should return status code 400 and an info message about the invalid BodyFat id', () => {
                 return request
                     .get(`/v1/children/${defaultBodyFat.child_id}/bodyfats/123`)
                     .set('Content-Type', 'application/json')
@@ -608,7 +608,7 @@ describe('Routes: children.bodyfats', () => {
                     throw new Error('Failure on children.bodyfats routes test: ' + err.message)
                 }
             })
-            it('should return status code 200 and the result as needed in the query', async () => {
+            it('should return status code 200 and the result as needed in the query', () => {
                 const url = `/v1/children/${result.child_id}/bodyfats/${result.id}?child_id=${result.child_id}`
                     .concat(`&sort=child_id&page=1&limit=3`)
 
@@ -636,7 +636,7 @@ describe('Routes: children.bodyfats', () => {
                 }
             })
 
-            it('should return status code 404 and an info message describing that BodyFat was not found', async () => {
+            it('should return status code 404 and an info message describing that BodyFat was not found', () => {
                 const url = `/v1/children/${defaultBodyFat.child_id}/bodyfats/${defaultBodyFat.id}?child_id=${defaultBodyFat.child_id}`
                     .concat(`&sort=child_id&page=1&limit=3`)
 
@@ -663,7 +663,7 @@ describe('Routes: children.bodyfats', () => {
                 }
             })
 
-            it('should return status code 400 and an info message about the invalid child_id', async () => {
+            it('should return status code 400 and an info message about the invalid child_id', () => {
                 const url = `/v1/children/123/bodyfats/${defaultBodyFat.id}?child_id=${defaultBodyFat.child_id}`
                     .concat(`&sort=child_id&page=1&limit=3`)
 
@@ -689,7 +689,7 @@ describe('Routes: children.bodyfats', () => {
                 }
             })
 
-            it('should return status code 400 and an info message about the invalid BodyFat id', async () => {
+            it('should return status code 400 and an info message about the invalid BodyFat id', () => {
                 const url = `/v1/children/${defaultBodyFat.child_id}/bodyfats/123?child_id=${defaultBodyFat.child_id}`
                     .concat(`&sort=child_id&page=1&limit=3`)
 
@@ -727,7 +727,7 @@ describe('Routes: children.bodyfats', () => {
                 }
             })
 
-            it('should return status code 204 and no content for BodyFat', async () => {
+            it('should return status code 204 and no content for BodyFat', () => {
                 return request
                     .delete(`/v1/children/${result.child_id}/bodyfats/${result.id}`)
                     .set('Content-Type', 'application/json')
@@ -747,7 +747,7 @@ describe('Routes: children.bodyfats', () => {
                 }
             })
 
-            it('should return status code 204 and no content for BodyFat', async () => {
+            it('should return status code 204 and no content for BodyFat', () => {
                 return request
                     .delete(`/v1/children/${defaultBodyFat.child_id}/bodyfats/${defaultBodyFat.id}`)
                     .set('Content-Type', 'application/json')
@@ -767,7 +767,7 @@ describe('Routes: children.bodyfats', () => {
                 }
             })
 
-            it('should return status code 400 and an info message about the invalid child_id', async () => {
+            it('should return status code 400 and an info message about the invalid child_id', () => {
                 return request
                     .delete(`/v1/children/123/bodyfats/${defaultBodyFat.id}`)
                     .set('Content-Type', 'application/json')
@@ -789,7 +789,7 @@ describe('Routes: children.bodyfats', () => {
                 }
             })
 
-            it('should return status code 400 and an info message about the invalid BodyFat id', async () => {
+            it('should return status code 400 and an info message about the invalid BodyFat id', () => {
                 return request
                     .delete(`/v1/children/${defaultBodyFat.child_id}/bodyfats/123`)
                     .set('Content-Type', 'application/json')
