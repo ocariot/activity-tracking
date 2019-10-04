@@ -13,6 +13,7 @@ import { BodyFatEntityMapper } from '../../../src/infrastructure/entity/mapper/b
 import { IDatabase } from '../../../src/infrastructure/port/database.interface'
 import { IEventBus } from '../../../src/infrastructure/port/eventbus.interface'
 import { Default } from '../../../src/utils/default'
+import { MeasurementType } from '../../../src/application/domain/model/measurement'
 
 const dbConnection: IDatabase = DIContainer.get(Identifier.MONGODB_CONNECTION)
 const rabbitmq: IEventBus = DIContainer.get(Identifier.RABBITMQ_EVENT_BUS)
@@ -202,6 +203,7 @@ describe('Routes: children.weights', () => {
                     await deleteAllWeights()
 
                     const result = await createBodyFat({
+                        type: MeasurementType.BODY_FAT,
                         timestamp: defaultWeight.timestamp,
                         value: defaultWeight.body_fat!.value,
                         unit: defaultWeight.body_fat!.unit,
@@ -209,6 +211,7 @@ describe('Routes: children.weights', () => {
                     })
 
                     await createWeight({
+                        type: MeasurementType.WEIGHT,
                         timestamp: defaultWeight.timestamp,
                         value: defaultWeight.value,
                         unit: defaultWeight.unit,
@@ -333,6 +336,7 @@ describe('Routes: children.weights', () => {
 
                     for (const weight of correctWeightArr) {
                         const result = await createBodyFat({
+                            type: MeasurementType.BODY_FAT,
                             timestamp: weight.timestamp,
                             value: weight.body_fat!.value,
                             unit: weight.body_fat!.unit,
@@ -340,6 +344,7 @@ describe('Routes: children.weights', () => {
                         })
 
                         await createWeight({
+                            type: MeasurementType.WEIGHT,
                             timestamp: weight.timestamp,
                             value: weight.value,
                             unit: weight.unit,
@@ -439,8 +444,12 @@ describe('Routes: children.weights', () => {
         context('when get all Weight of a child successfully', () => {
             before(async () => {
                 let result
+
+                await deleteAllWeights()
+
                 try {
                     result = await createBodyFat({
+                        type: MeasurementType.BODY_FAT,
                         timestamp: defaultWeight.timestamp,
                         value: defaultWeight.body_fat!.value,
                         unit: defaultWeight.body_fat!.unit,
@@ -448,6 +457,7 @@ describe('Routes: children.weights', () => {
                     })
 
                     await createWeight({
+                        type: MeasurementType.WEIGHT,
                         timestamp: defaultWeight.timestamp,
                         value: defaultWeight.value,
                         unit: defaultWeight.unit,
@@ -464,11 +474,7 @@ describe('Routes: children.weights', () => {
                     .set('Content-Type', 'application/json')
                     .expect(200)
                     .then(res => {
-                        expect(res.body).is.an.instanceOf(Array)
-                        expect(res.body.length).to.not.eql(0)
-                        // Check for the existence of properties only in the first element of the array
-                        // because there is a guarantee that there will be at least one object (created
-                        // in the case of the successful POST route test or using the create method above).
+                        expect(res.body.length).to.eql(1)
                         expect(res.body[0]).to.have.property('id')
                         expect(res.body[0].timestamp).to.eql(defaultWeight.timestamp!.toISOString())
                         expect(res.body[0].value).to.eql(defaultWeight.value)
@@ -494,7 +500,6 @@ describe('Routes: children.weights', () => {
                     .set('Content-Type', 'application/json')
                     .expect(200)
                     .then(res => {
-                        expect(res.body).is.an.instanceOf(Array)
                         expect(res.body.length).to.eql(0)
                     })
             })
@@ -524,20 +529,24 @@ describe('Routes: children.weights', () => {
         /**
          * query-strings-parser library test
          */
-        context('when get Weight of a child using the "query-strings-parser" library', () => {
+        context('when use "query-strings-parser" library', () => {
+            let resultWeight
+
             before(async () => {
                 try {
                     await deleteAllWeights()
 
                     const result = await createBodyFat({
+                        type: MeasurementType.BODY_FAT,
                         timestamp: defaultWeight.timestamp,
                         value: defaultWeight.body_fat!.value,
                         unit: defaultWeight.body_fat!.unit,
                         child_id: defaultWeight.child_id
                     })
 
-                    await createWeight({
-                        timestamp: defaultWeight.timestamp,
+                    resultWeight = await createWeight({
+                        type: MeasurementType.WEIGHT,
+                        timestamp: new Date(1547953200000),
                         value: defaultWeight.value,
                         unit: defaultWeight.unit,
                         child_id: defaultWeight.child_id,
@@ -545,7 +554,8 @@ describe('Routes: children.weights', () => {
                     })
 
                     await createWeight({
-                        timestamp: defaultWeight.timestamp,
+                        type: MeasurementType.WEIGHT,
+                        timestamp: new Date(1516417200000),
                         value: defaultWeight.value,
                         unit: defaultWeight.unit,
                         child_id: new ObjectID(),
@@ -556,67 +566,45 @@ describe('Routes: children.weights', () => {
                 }
             })
 
-            it('should return status code 200 and the result as needed in the query', () => {
-                const url = `/v1/children/${defaultWeight.child_id}/weights?child_id=${defaultWeight.child_id}`
-                    .concat(`&sort=child_id&page=1&limit=3`)
+            it('should return status code 200 and the result as needed in the query (all weight registers in one day)',
+                () => {
+                const url = `/v1/children/${defaultWeight.child_id}/weights`
+                    .concat('?timestamp=gte:2019-01-20T00:00:00.000Z&timestamp=lt:2019-01-20T23:59:59.999Z')
+                    .concat('&sort=child_id&page=1&limit=3')
 
                 return request
                     .get(url)
                     .set('Content-Type', 'application/json')
                     .expect(200)
                     .then(res => {
-                        expect(res.body).is.an.instanceOf(Array)
-                        expect(res.body.length).to.not.eql(0)
-                        // Check for the existence of properties only in the first element of the array
-                        // because there is a guarantee that there will be at least one object (created
-                        // in the case of the successful POST route test or using the create method above).
+                        expect(res.body.length).to.eql(1)
                         expect(res.body[0]).to.have.property('id')
-                        expect(res.body[0].timestamp).to.eql(defaultWeight.timestamp!.toISOString())
+                        expect(res.body[0].timestamp).to.eql(resultWeight.timestamp!.toISOString())
                         expect(res.body[0].value).to.eql(defaultWeight.value)
                         expect(res.body[0].unit).to.eql(defaultWeight.unit)
                         expect(res.body[0].child_id).to.eql(defaultWeight.child_id)
                         expect(res.body[0].body_fat).to.eql(defaultWeight.body_fat!.value)
                     })
             })
-        })
 
-        context('when there is an attempt to get Weight of a child using the "query-strings-parser" library but there is no Weight ' +
-            'in the database', () => {
-            before(async () => {
-                try {
-                    await deleteAllWeights()
-                } catch (err) {
-                    throw new Error('Failure on children.weights routes test: ' + err.message)
-                }
-            })
-
-            it('should return status code 200 and an empty list', () => {
-                const url = `/v1/children/${defaultWeight.child_id}/weights?child_id=${defaultWeight.child_id}`
-                    .concat(`&sort=child_id&page=1&limit=3`)
+            it('should return status code 200 and an empty list (when no weight register is found)', () => {
+                const url = `/v1/children/${defaultWeight.child_id}/weights`
+                    .concat('?timestamp=gte:2017-01-20T00:00:00.000Z&timestamp=lt:2017-01-20T23:59:59.999Z')
+                    .concat('&sort=child_id&page=1&limit=3')
 
                 return request
                     .get(url)
                     .set('Content-Type', 'application/json')
                     .expect(200)
                     .then(res => {
-                        expect(res.body).is.an.instanceOf(Array)
                         expect(res.body.length).to.eql(0)
                     })
             })
-        })
 
-        context('when there is an attempt to get Weight of a child using the "query-strings-parser" library ' +
-            'but the child_id is invalid', () => {
-            before(async () => {
-                try {
-                    await deleteAllWeights()
-                } catch (err) {
-                    throw new Error('Failure on children.weights routes test: ' + err.message)
-                }
-            })
-
-            it('should return status code 400 and an info message about the invalid child_id', () => {
-                const url = `/v1/children/123/weights?child_id=${defaultWeight.child_id}&sort=child_id&page=1&limit=3`
+            it('should return status code 400 and an error message (when child_id is invalid)', () => {
+                const url = '/v1/children/123/weights'
+                    .concat('?timestamp=gte:2019-01-20T00:00:00.000Z&timestamp=lt:2019-01-20T23:59:59.999Z')
+                    .concat('&sort=child_id&page=1&limit=3')
 
                 return request
                     .get(url)
@@ -641,6 +629,7 @@ describe('Routes: children.weights', () => {
                     await deleteAllWeights()
 
                     const bodyFat = await createBodyFat({
+                        type: MeasurementType.BODY_FAT,
                         timestamp: defaultWeight.timestamp,
                         value: defaultWeight.body_fat!.value,
                         unit: defaultWeight.body_fat!.unit,
@@ -648,6 +637,7 @@ describe('Routes: children.weights', () => {
                     })
 
                     result = await createWeight({
+                        type: MeasurementType.WEIGHT,
                         timestamp: defaultWeight.timestamp,
                         value: defaultWeight.value,
                         unit: defaultWeight.unit,
@@ -665,9 +655,6 @@ describe('Routes: children.weights', () => {
                     .set('Content-Type', 'application/json')
                     .expect(200)
                     .then(res => {
-                        // Check for the existence of properties only in the first element of the array
-                        // because there is a guarantee that there will be at least one object (created
-                        // in the case of the successful POST route test or using the create method above).
                         expect(res.body).to.have.property('id')
                         expect(res.body.timestamp).to.eql(defaultWeight.timestamp!.toISOString())
                         expect(res.body.value).to.eql(defaultWeight.value)
@@ -744,131 +731,6 @@ describe('Routes: children.weights', () => {
                     })
             })
         })
-        /**
-         * query-strings-parser library test
-         */
-        context('when get a specific Weight of a child using the "query-strings-parser" library', () => {
-            let result
-            before(async () => {
-                try {
-                    await deleteAllWeights()
-
-                    const bodyFat = await createBodyFat({
-                        timestamp: defaultWeight.timestamp,
-                        value: defaultWeight.body_fat!.value,
-                        unit: defaultWeight.body_fat!.unit,
-                        child_id: defaultWeight.child_id
-                    })
-
-                    result = await createWeight({
-                        timestamp: defaultWeight.timestamp,
-                        value: defaultWeight.value,
-                        unit: defaultWeight.unit,
-                        child_id: defaultWeight.child_id,
-                        body_fat: bodyFat
-                    })
-                } catch (err) {
-                    throw new Error('Failure on children.weights routes test: ' + err.message)
-                }
-            })
-
-            it('should return status code 200 and the result as needed in the query', () => {
-                const url = `/v1/children/${result.child_id}/weights/${result.id}?child_id=${result.child_id}`
-                    .concat(`&sort=child_id&page=1&limit=3`)
-
-                return request
-                    .get(url)
-                    .set('Content-Type', 'application/json')
-                    .expect(200)
-                    .then(res => {
-                        expect(res.body).to.have.property('id')
-                        expect(res.body.timestamp).to.eql(defaultWeight.timestamp!.toISOString())
-                        expect(res.body.value).to.eql(defaultWeight.value)
-                        expect(res.body.unit).to.eql(defaultWeight.unit)
-                        expect(res.body.child_id).to.eql(defaultWeight.child_id!.toString())
-                        expect(res.body.body_fat).to.eql(defaultWeight.body_fat!.value)
-                    })
-            })
-        })
-
-        context('when there is an attempt to get a specific Weight using the "query-strings-parser" library but this Weight ' +
-            'does not exist', () => {
-            before(async () => {
-                try {
-                    await deleteAllWeights()
-                } catch (err) {
-                    throw new Error('Failure on children.weights routes test: ' + err.message)
-                }
-            })
-
-            it('should return status code 404 and an info message describing that Weight was not found', () => {
-                const url = `/v1/children/${defaultWeight.child_id}/weights/${defaultWeight.id}?child_id=${defaultWeight.child_id}`
-                    .concat(`&sort=child_id&page=1&limit=3`)
-
-                return request
-                    .get(url)
-                    .set('Content-Type', 'application/json')
-                    .expect(404)
-                    .then(err => {
-                        expect(err.body.code).to.eql(404)
-                        expect(err.body.message).to.eql('Weight not found!')
-                        expect(err.body.description).to.eql('Weight not found or already removed. A new operation for ' +
-                            'the same resource is not required!')
-                    })
-            })
-        })
-
-        context('when there is an attempt to get a specific Weight using the "query-strings-parser" library but the ' +
-            'child_id is invalid', () => {
-            before(async () => {
-                try {
-                    await deleteAllWeights()
-                } catch (err) {
-                    throw new Error('Failure on children.weights routes test: ' + err.message)
-                }
-            })
-
-            it('should return status code 400 and an info message about the invalid child_id', () => {
-                const url = `/v1/children/123/weights/${defaultWeight.id}?child_id=${defaultWeight.child_id}
-                    &sort=child_id&page=1&limit=3`
-
-                return request
-                    .get(url)
-                    .set('Content-Type', 'application/json')
-                    .expect(400)
-                    .then(err => {
-                        expect(err.body.code).to.eql(400)
-                        expect(err.body.message).to.eql(Strings.CHILD.PARAM_ID_NOT_VALID_FORMAT)
-                        expect(err.body.description).to.eql(Strings.ERROR_MESSAGE.UUID_NOT_VALID_FORMAT_DESC)
-                    })
-            })
-        })
-
-        context('when there is an attempt to get a specific Weight using the "query-strings-parser" library but the ' +
-            'Weight id is invalid', () => {
-            before(async () => {
-                try {
-                    await deleteAllWeights()
-                } catch (err) {
-                    throw new Error('Failure on children.weights routes test: ' + err.message)
-                }
-            })
-
-            it('should return status code 400 and an info message about the invalid Weight id', () => {
-                const url = `/v1/children/${defaultWeight.child_id}/weights/123?child_id=${defaultWeight.child_id}`
-                    .concat(`&sort=child_id&page=1&limit=3`)
-
-                return request
-                    .get(url)
-                    .set('Content-Type', 'application/json')
-                    .expect(400)
-                    .then(err => {
-                        expect(err.body.code).to.eql(400)
-                        expect(err.body.message).to.eql(Strings.WEIGHT.PARAM_ID_NOT_VALID_FORMAT)
-                        expect(err.body.description).to.eql(Strings.ERROR_MESSAGE.UUID_NOT_VALID_FORMAT_DESC)
-                    })
-            })
-        })
     })
     /**
      * DELETE route
@@ -882,6 +744,7 @@ describe('Routes: children.weights', () => {
                     await deleteAllWeights()
 
                     const bodyFat = await createBodyFat({
+                        type: MeasurementType.BODY_FAT,
                         timestamp: defaultWeight.timestamp,
                         value: defaultWeight.body_fat!.value,
                         unit: defaultWeight.body_fat!.unit,
@@ -889,6 +752,7 @@ describe('Routes: children.weights', () => {
                     })
 
                     result = await createWeight({
+                        type: MeasurementType.WEIGHT,
                         timestamp: defaultWeight.timestamp,
                         value: defaultWeight.value,
                         unit: defaultWeight.unit,
@@ -948,6 +812,7 @@ describe('Routes: children.weights', () => {
                     await deleteAllWeights()
 
                     const bodyFat = await createBodyFat({
+                        type: MeasurementType.BODY_FAT,
                         timestamp: defaultWeight.timestamp,
                         value: defaultWeight.body_fat!.value,
                         unit: defaultWeight.body_fat!.unit,
@@ -955,6 +820,7 @@ describe('Routes: children.weights', () => {
                     })
 
                     result = await createWeight({
+                        type: MeasurementType.WEIGHT,
                         timestamp: defaultWeight.timestamp,
                         value: defaultWeight.value,
                         unit: defaultWeight.unit,

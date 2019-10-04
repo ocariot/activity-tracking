@@ -938,11 +938,7 @@ describe('Routes: children.sleep', () => {
                     .set('Content-Type', 'application/json')
                     .expect(200)
                     .then(res => {
-                        expect(res.body).is.an.instanceOf(Array)
-                        expect(res.body.length).to.not.eql(0)
-                        // Check for the existence of properties only in the first element of the array
-                        // because there is a guarantee that there will be at least one object (created
-                        // in the case of the successful POST route test or with the create method above).
+                        expect(res.body.length).to.eql(1)
                         expect(res.body[0]).to.have.property('id')
                         expect(res.body[0].start_time).to.eql(defaultSleep.start_time!.toISOString())
                         expect(res.body[0].end_time).to.eql(defaultSleep.end_time!.toISOString())
@@ -975,7 +971,6 @@ describe('Routes: children.sleep', () => {
                     .set('Content-Type', 'application/json')
                     .expect(200)
                     .then(res => {
-                        expect(res.body).is.an.instanceOf(Array)
                         expect(res.body.length).to.eql(0)
                     })
             })
@@ -1005,14 +1000,37 @@ describe('Routes: children.sleep', () => {
         /**
          * query-strings-parser library test
          */
-        context('when get sleep using the "query-strings-parser" library', () => {
+        context('when use "query-strings-parser" library', () => {
+            let result3
+
             before(async () => {
                 try {
                     await deleteAllSleep()
 
                     await createSleep({
-                        start_time: defaultSleep.start_time,
-                        end_time: defaultSleep.end_time,
+                        start_time: new Date(1516417200000),
+                        end_time: new Date(new Date(1516417200000)
+                            .setMilliseconds(Math.floor(Math.random() * 35 + 10) * 60000)),
+                        duration: defaultSleep.duration,
+                        pattern: defaultSleep.pattern!.data_set,
+                        type: defaultSleep.type,
+                        child_id: defaultSleep.child_id
+                    })
+
+                    await createSleep({
+                        start_time: new Date(1516449600000),
+                        end_time: new Date(new Date(1516449600000)
+                            .setMilliseconds(Math.floor(Math.random() * 35 + 10) * 60000)),
+                        duration: defaultSleep.duration,
+                        pattern: defaultSleep.pattern!.data_set,
+                        type: defaultSleep.type,
+                        child_id: defaultSleep.child_id
+                    })
+
+                    result3 = await createSleep({
+                        start_time: new Date(1547953200000),
+                        end_time: new Date(new Date(1547953200000)
+                            .setMilliseconds(Math.floor(Math.random() * 35 + 10) * 60000)),
                         duration: defaultSleep.duration,
                         pattern: defaultSleep.pattern!.data_set,
                         type: defaultSleep.type,
@@ -1023,23 +1041,21 @@ describe('Routes: children.sleep', () => {
                 }
             })
 
-            it('should return status code 200 and the result as needed in the query', () => {
-                const url = `/v1/children/${defaultSleep.child_id}/sleep?child_id=${defaultSleep.child_id}`
-                    .concat(`&sort=child_id&page=1&limit=3`)
+            it('should return status code 200 and the result as needed in the query ' +
+                '(all sleep records in one day)', () => {
+                const url = `/v1/children/${defaultSleep.child_id}/sleep`
+                    .concat('?start_time=gte:2019-01-20T00:00:00.000Z&end_time=lt:2019-01-20T23:59:59.999Z')
+                    .concat('&sort=child_id&page=1&limit=3')
 
                 return request
                     .get(url)
                     .set('Content-Type', 'application/json')
                     .expect(200)
                     .then(res => {
-                        expect(res.body).is.an.instanceOf(Array)
-                        expect(res.body.length).to.not.eql(0)
-                        // Check for the existence of properties only in the first element of the array
-                        // because there is a guarantee that there will be at least one object (created
-                        // in the case of the successful POST route test or with the create method above).
+                        expect(res.body.length).to.eql(1)
                         expect(res.body[0]).to.have.property('id')
-                        expect(res.body[0].start_time).to.eql(defaultSleep.start_time!.toISOString())
-                        expect(res.body[0].end_time).to.eql(defaultSleep.end_time!.toISOString())
+                        expect(res.body[0].start_time).to.eql(result3.start_time!.toISOString())
+                        expect(res.body[0].end_time).to.eql(result3.end_time!.toISOString())
                         expect(res.body[0].duration).to.eql(defaultSleep.duration)
                         let index = 0
                         for (const elem of defaultSleep.pattern!.data_set) {
@@ -1052,46 +1068,25 @@ describe('Routes: children.sleep', () => {
                         expect(res.body[0].child_id).to.eql(defaultSleep.child_id)
                     })
             })
-        })
 
-        context('when there is an attempt to get sleep of a specific child using the "query-strings-parser" library but ' +
-            'this sleep does not exist', () => {
-            before(async () => {
-                try {
-                    await deleteAllSleep()
-                } catch (err) {
-                    throw new Error('Failure on children.sleep routes test: ' + err.message)
-                }
-            })
-
-            it('should return status code 200 and an empty list', () => {
-                const url = `/v1/children/${defaultSleep.child_id}/sleep?child_id=${defaultSleep.child_id}`
-                    .concat(`&sort=child_id&page=1&limit=3`)
+            it('should return status code 200 and an empty list (when no sleep record is found)', () => {
+                const url = `/v1/children/${defaultSleep.child_id}/sleep`
+                    .concat('?start_time=gte:2017-01-20T00:00:00.000Z&end_time=lt:2017-01-20T23:59:59.999Z')
+                    .concat('&sort=child_id&page=1&limit=3')
 
                 return request
                     .get(url)
                     .set('Content-Type', 'application/json')
                     .expect(200)
                     .then(res => {
-                        expect(res.body).is.an.instanceOf(Array)
                         expect(res.body.length).to.eql(0)
                     })
             })
-        })
 
-        context('when there is an attempt to get sleep of a specific child using the "query-strings-parser" library ' +
-            'but the child_id is invalid', () => {
-            before(async () => {
-                try {
-                    await deleteAllSleep()
-                } catch (err) {
-                    throw new Error('Failure on children.sleep routes test: ' + err.message)
-                }
-            })
-
-            it('should return status code 400 and an info message about the invalid child_id', () => {
-                const url = `/v1/children/123/sleep?child_id=${defaultSleep.child_id}`
-                    .concat(`&sort=child_id&page=1&limit=3`)
+            it('should return status code 400 and an error message (when child_id is invalid)', () => {
+                const url = '/v1/children/123/sleep'
+                    .concat('?start_time=gte:2019-01-20T00:00:00.000Z&end_time=lt:2019-01-20T23:59:59.999Z')
+                    .concat('&sort=child_id&page=1&limit=3')
 
                 return request
                     .get(url)
@@ -1134,9 +1129,6 @@ describe('Routes: children.sleep', () => {
                     .set('Content-Type', 'application/json')
                     .expect(200)
                     .then(res => {
-                        // Check for the existence of properties only in the first element of the array
-                        // because there is a guarantee that there will be at least one object (created
-                        // in the case of the successful POST route test or with the create method above).
                         expect(res.body).to.have.property('id')
                         expect(res.body.start_time).to.eql(result.start_time!.toISOString())
                         expect(res.body.end_time).to.eql(result.end_time!.toISOString())
@@ -1211,133 +1203,6 @@ describe('Routes: children.sleep', () => {
             it('should return status code 400 and an info message about the invalid sleep id', () => {
                 return request
                     .get(`/v1/children/${defaultSleep.child_id}/sleep/123`)
-                    .set('Content-Type', 'application/json')
-                    .expect(400)
-                    .then(err => {
-                        expect(err.body.code).to.eql(400)
-                        expect(err.body.message).to.eql(Strings.SLEEP.PARAM_ID_NOT_VALID_FORMAT)
-                        expect(err.body.description).to.eql(Strings.ERROR_MESSAGE.UUID_NOT_VALID_FORMAT_DESC)
-                    })
-            })
-        })
-        /**
-         * query-strings-parser library test
-         */
-        context('when get a specific sleep of a child using the "query-strings-parser" library', () => {
-            let result
-
-            before(async () => {
-                try {
-                    await deleteAllSleep()
-
-                    result = await createSleep({
-                        start_time: defaultSleep.start_time,
-                        end_time: defaultSleep.end_time,
-                        duration: defaultSleep.duration,
-                        pattern: defaultSleep.pattern!.data_set,
-                        type: defaultSleep.type,
-                        child_id: defaultSleep.child_id
-                    })
-                } catch (err) {
-                    throw new Error('Failure on children.sleep routes test: ' + err.message)
-                }
-            })
-
-            it('should return status code 200 and the result as needed in the query', () => {
-                const url = `/v1/children/${result.child_id}/sleep/${result.id}?child_id=${result.child_id}`
-                    .concat(`&sort=child_id&page=1&limit=3`)
-
-                return request
-                    .get(url)
-                    .set('Content-Type', 'application/json')
-                    .expect(200)
-                    .then(res => {
-                        expect(res.body).to.have.property('id')
-                        expect(res.body.start_time).to.eql(result.start_time!.toISOString())
-                        expect(res.body.end_time).to.eql(result.end_time!.toISOString())
-                        expect(res.body.duration).to.eql(result.duration)
-                        let index = 0
-                        for (const elem of defaultSleep.pattern!.data_set) {
-                            expect(res.body.pattern.data_set[index].start_time).to.eql(elem.start_time.toISOString())
-                            expect(res.body.pattern.data_set[index].name).to.eql(elem.name)
-                            expect(res.body.pattern.data_set[index].duration).to.eql(elem.duration)
-                            index++
-                        }
-                        expect(res.body.type).to.eql(result.type)
-                        expect(res.body.child_id).to.eql(result.child_id.toString())
-                    })
-            })
-        })
-
-        context('when there is an attempt to get a specific sleep using the "query-strings-parser" library but this sleep ' +
-            'does not exist', () => {
-            before(async () => {
-                try {
-                    await deleteAllSleep()
-                } catch (err) {
-                    throw new Error('Failure on children.sleep routes test: ' + err.message)
-                }
-            })
-
-            it('should return status code 404 and an info message describing that sleep was not found', () => {
-                const url = `/v1/children/${defaultSleep.child_id}/sleep/${defaultSleep.id}?child_id=${defaultSleep.child_id}`
-                    .concat(`&sort=child_id&page=1&limit=3`)
-
-                return request
-                    .get(url)
-                    .set('Content-Type', 'application/json')
-                    .expect(404)
-                    .then(err => {
-                        expect(err.body.code).to.eql(404)
-                        expect(err.body.message).to.eql('Sleep not found!')
-                        expect(err.body.description).to.eql('Sleep not found or already removed. A new operation for ' +
-                            'the same resource is not required!')
-                    })
-            })
-        })
-
-        context('when there is an attempt to get a specific sleep using the "query-strings-parser" library but the ' +
-            'child_id is invalid', () => {
-            before(async () => {
-                try {
-                    await deleteAllSleep()
-                } catch (err) {
-                    throw new Error('Failure on children.sleep routes test: ' + err.message)
-                }
-            })
-
-            it('should return status code 400 and an info message about the invalid child_id', () => {
-                const url = `/v1/children/123/sleep/${defaultSleep.id}?child_id=${defaultSleep.child_id}`
-                    .concat(`&sort=child_id&page=1&limit=3`)
-
-                return request
-                    .get(url)
-                    .set('Content-Type', 'application/json')
-                    .expect(400)
-                    .then(err => {
-                        expect(err.body.code).to.eql(400)
-                        expect(err.body.message).to.eql(Strings.CHILD.PARAM_ID_NOT_VALID_FORMAT)
-                        expect(err.body.description).to.eql(Strings.ERROR_MESSAGE.UUID_NOT_VALID_FORMAT_DESC)
-                    })
-            })
-        })
-
-        context('when there is an attempt to get a specific sleep using the "query-strings-parser" library but the ' +
-            'sleep id is invalid', () => {
-            before(async () => {
-                try {
-                    await deleteAllSleep()
-                } catch (err) {
-                    throw new Error('Failure on children.sleep routes test: ' + err.message)
-                }
-            })
-
-            it('should return status code 400 and an info message about the invalid sleep id', () => {
-                const url = `/v1/children/${defaultSleep.child_id}/sleep/123?child_id=${defaultSleep.child_id}`
-                    .concat(`&sort=child_id&page=1&limit=3`)
-
-                return request
-                    .get(url)
                     .set('Content-Type', 'application/json')
                     .expect(400)
                     .then(err => {

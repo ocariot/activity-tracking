@@ -11,6 +11,7 @@ import { MeasurementRepoModel } from '../../../src/infrastructure/database/schem
 import { Strings } from '../../../src/utils/strings'
 import { IDatabase } from '../../../src/infrastructure/port/database.interface'
 import { Default } from '../../../src/utils/default'
+import { MeasurementType } from '../../../src/application/domain/model/measurement'
 
 const dbConnection: IDatabase = DIContainer.get(Identifier.MONGODB_CONNECTION)
 const app: App = DIContainer.get(Identifier.APP)
@@ -97,6 +98,7 @@ describe('Routes: children.bodyfats', () => {
                     await deleteAllBodyFats()
 
                     await createBodyFat({
+                        type: MeasurementType.BODY_FAT,
                         timestamp: defaultBodyFat.timestamp,
                         value: defaultBodyFat.value,
                         unit: defaultBodyFat.unit,
@@ -216,6 +218,7 @@ describe('Routes: children.bodyfats', () => {
 
                     for (const bodyFat of correctBodyFatArr) {
                         await createBodyFat({
+                            type: MeasurementType.BODY_FAT,
                             timestamp: bodyFat.timestamp,
                             value: bodyFat.value,
                             unit: bodyFat.unit,
@@ -313,6 +316,7 @@ describe('Routes: children.bodyfats', () => {
                     await deleteAllBodyFats()
 
                     await createBodyFat({
+                        type: MeasurementType.BODY_FAT,
                         timestamp: defaultBodyFat.timestamp,
                         value: defaultBodyFat.value,
                         unit: defaultBodyFat.unit,
@@ -328,10 +332,7 @@ describe('Routes: children.bodyfats', () => {
                     .set('Content-Type', 'application/json')
                     .expect(200)
                     .then(res => {
-                        expect(res.body.length).to.not.eql(0)
-                        // Check for the existence of properties only in the first element of the array
-                        // because there is a guarantee that there will be at least one object (created
-                        // in the case of a successful POST route test or using the create method above).
+                        expect(res.body.length).to.eql(1)
                         expect(res.body[0]).to.have.property('id')
                         expect(res.body[0].timestamp).to.eql(defaultBodyFat.timestamp!.toISOString())
                         expect(res.body[0].value).to.eql(defaultBodyFat.value)
@@ -356,7 +357,6 @@ describe('Routes: children.bodyfats', () => {
                     .set('Content-Type', 'application/json')
                     .expect(200)
                     .then(res => {
-                        expect(res.body).is.an.instanceOf(Array)
                         expect(res.body.length).to.eql(0)
                     })
             })
@@ -387,19 +387,23 @@ describe('Routes: children.bodyfats', () => {
          * query-strings-parser library test
          */
         context('when get BodyFat of a child using the "query-strings-parser" library', () => {
+            let result
+
             before(async () => {
                 try {
                     await deleteAllBodyFats()
 
-                    await createBodyFat({
-                        timestamp: defaultBodyFat.timestamp,
+                    result = await createBodyFat({
+                        type: MeasurementType.BODY_FAT,
+                        timestamp: new Date(1547953200000),
                         value: defaultBodyFat.value,
                         unit: defaultBodyFat.unit,
                         child_id: defaultBodyFat.child_id
                     })
 
                     await createBodyFat({
-                        timestamp: defaultBodyFat.timestamp,
+                        type: MeasurementType.BODY_FAT,
+                        timestamp: new Date(1516417200000),
                         value: defaultBodyFat.value,
                         unit: defaultBodyFat.unit,
                         child_id: new ObjectID()
@@ -409,66 +413,44 @@ describe('Routes: children.bodyfats', () => {
                 }
             })
 
-            it('should return status code 200 and the result as needed in the query', () => {
-                const url = `/v1/children/${defaultBodyFat.child_id}/bodyfats?child_id=${defaultBodyFat.child_id}`
-                    .concat(`&sort=child_id&page=1&limit=3`)
+            it('should return status code 200 and the result as needed in the query (all body fat registers in one day)',
+                () => {
+                const url = `/v1/children/${defaultBodyFat.child_id}/bodyfats`
+                    .concat('?timestamp=gte:2019-01-20T00:00:00.000Z&timestamp=lt:2019-01-20T23:59:59.999Z')
+                    .concat('&sort=child_id&page=1&limit=3')
 
                 return request
                     .get(url)
                     .set('Content-Type', 'application/json')
                     .expect(200)
                     .then(res => {
-                        expect(res.body).is.an.instanceOf(Array)
-                        expect(res.body.length).to.not.eql(0)
-                        // Check for the existence of properties only in the first element of the array
-                        // because there is a guarantee that there will be at least one object (created
-                        // in the case of a successful POST route test or using the create method above).
+                        expect(res.body.length).to.eql(1)
                         expect(res.body[0]).to.have.property('id')
-                        expect(res.body[0].timestamp).to.eql(defaultBodyFat.timestamp!.toISOString())
+                        expect(res.body[0].timestamp).to.eql(result.timestamp.toISOString())
                         expect(res.body[0].value).to.eql(defaultBodyFat.value)
                         expect(res.body[0].unit).to.eql(defaultBodyFat.unit)
                         expect(res.body[0].child_id).to.eql(defaultBodyFat.child_id)
                     })
             })
-        })
 
-        context('when there is an attempt to get BodyFat of a child using the "query-strings-parser" library but there is no BodyFat ' +
-            'associated with the child in the database', () => {
-            before(async () => {
-                try {
-                    await deleteAllBodyFats()
-                } catch (err) {
-                    throw new Error('Failure on children.bodyfats routes test: ' + err.message)
-                }
-            })
-
-            it('should return status code 200 and an empty list', () => {
-                const url = `/v1/children/${defaultBodyFat.child_id}/bodyfats?child_id=${defaultBodyFat.child_id}`
-                    .concat(`&sort=child_id&page=1&limit=3`)
+            it('should return status code 200 and an empty list (when no body fat register is found)', () => {
+                const url = `/v1/children/${defaultBodyFat.child_id}/bodyfats`
+                    .concat('?timestamp=gte:2017-01-20T00:00:00.000Z&timestamp=lt:2017-01-20T23:59:59.999Z')
+                    .concat('&sort=child_id&page=1&limit=3')
 
                 return request
                     .get(url)
                     .set('Content-Type', 'application/json')
                     .expect(200)
                     .then(res => {
-                        expect(res.body).is.an.instanceOf(Array)
                         expect(res.body.length).to.eql(0)
                     })
             })
-        })
 
-        context('when there is an attempt to get BodyFat of a child using the "query-strings-parser" library ' +
-            'but the child_id is invalid', () => {
-            before(async () => {
-                try {
-                    await deleteAllBodyFats()
-                } catch (err) {
-                    throw new Error('Failure on children.bodyfats routes test: ' + err.message)
-                }
-            })
-
-            it('should return status code 400 and an info message about the invalid child_id', () => {
-                const url = `/v1/children/123/bodyfats?child_id=${defaultBodyFat.child_id}&sort=child_id&page=1&limit=3`
+            it('should return status code 400 and an error message (when child_id is invalid)', () => {
+                const url = '/v1/children/123/bodyfats'
+                    .concat('?timestamp=gte:2019-01-20T00:00:00.000Z&timestamp=lt:2019-01-20T23:59:59.999Z')
+                    .concat('&sort=child_id&page=1&limit=3')
 
                 return request
                     .get(url)
@@ -494,6 +476,7 @@ describe('Routes: children.bodyfats', () => {
                     await deleteAllBodyFats()
 
                     result = await createBodyFat({
+                        type: MeasurementType.BODY_FAT,
                         timestamp: defaultBodyFat.timestamp,
                         value: defaultBodyFat.value,
                         unit: defaultBodyFat.unit,
@@ -510,11 +493,8 @@ describe('Routes: children.bodyfats', () => {
                     .set('Content-Type', 'application/json')
                     .expect(200)
                     .then(res => {
-                        // Check for the existence of properties only in the first element of the array
-                        // because there is a guarantee that there will be at least one object (created
-                        // in the case of a successful POST route test or using the create method above).
                         expect(res.body).to.have.property('id')
-                        expect(res.body.timestamp).to.eql(result.timestamp!.toISOString())
+                        expect(res.body.timestamp).to.eql(result.timestamp.toISOString())
                         expect(res.body.value).to.eql(result.value)
                         expect(res.body.unit).to.eql(result.unit)
                         expect(res.body.child_id).to.eql(result.child_id.toString())
@@ -588,122 +568,6 @@ describe('Routes: children.bodyfats', () => {
                     })
             })
         })
-        /**
-         * query-strings-parser library test
-         */
-        context('when get a specific BodyFat of a child using the "query-strings-parser" library', () => {
-            let result
-
-            before(async () => {
-                try {
-                    await deleteAllBodyFats()
-
-                    result = await createBodyFat({
-                        timestamp: defaultBodyFat.timestamp,
-                        value: defaultBodyFat.value,
-                        unit: defaultBodyFat.unit,
-                        child_id: defaultBodyFat.child_id
-                    })
-                } catch (err) {
-                    throw new Error('Failure on children.bodyfats routes test: ' + err.message)
-                }
-            })
-            it('should return status code 200 and the result as needed in the query', () => {
-                const url = `/v1/children/${result.child_id}/bodyfats/${result.id}?child_id=${result.child_id}`
-                    .concat(`&sort=child_id&page=1&limit=3`)
-
-                return request
-                    .get(url)
-                    .set('Content-Type', 'application/json')
-                    .expect(200)
-                    .then(res => {
-                        expect(res.body).to.have.property('id')
-                        expect(res.body.timestamp).to.eql(result.timestamp!.toISOString())
-                        expect(res.body.value).to.eql(result.value)
-                        expect(res.body.unit).to.eql(result.unit)
-                        expect(res.body.child_id).to.eql(result.child_id.toString())
-                    })
-            })
-        })
-
-        context('when there is an attempt to get a specific BodyFat using the "query-strings-parser" library but this BodyFat ' +
-            'does not exist', () => {
-            before(async () => {
-                try {
-                    await deleteAllBodyFats()
-                } catch (err) {
-                    throw new Error('Failure on children.bodyfats routes test: ' + err.message)
-                }
-            })
-
-            it('should return status code 404 and an info message describing that BodyFat was not found', () => {
-                const url = `/v1/children/${defaultBodyFat.child_id}/bodyfats/${defaultBodyFat.id}?child_id=${defaultBodyFat.child_id}`
-                    .concat(`&sort=child_id&page=1&limit=3`)
-
-                return request
-                    .get(url)
-                    .set('Content-Type', 'application/json')
-                    .expect(404)
-                    .then(err => {
-                        expect(err.body.code).to.eql(404)
-                        expect(err.body.message).to.eql('BodyFat not found!')
-                        expect(err.body.description).to.eql('BodyFat not found or already removed. A new operation for ' +
-                            'the same resource is not required!')
-                    })
-            })
-        })
-
-        context('when there is an attempt to get a specific BodyFat using the "query-strings-parser" library but the ' +
-            'child_id is invalid', () => {
-            before(async () => {
-                try {
-                    await deleteAllBodyFats()
-                } catch (err) {
-                    throw new Error('Failure on children.bodyfats routes test: ' + err.message)
-                }
-            })
-
-            it('should return status code 400 and an info message about the invalid child_id', () => {
-                const url = `/v1/children/123/bodyfats/${defaultBodyFat.id}?child_id=${defaultBodyFat.child_id}`
-                    .concat(`&sort=child_id&page=1&limit=3`)
-
-                return request
-                    .get(url)
-                    .set('Content-Type', 'application/json')
-                    .expect(400)
-                    .then(err => {
-                        expect(err.body.code).to.eql(400)
-                        expect(err.body.message).to.eql(Strings.CHILD.PARAM_ID_NOT_VALID_FORMAT)
-                        expect(err.body.description).to.eql(Strings.ERROR_MESSAGE.UUID_NOT_VALID_FORMAT_DESC)
-                    })
-            })
-        })
-
-        context('when there is an attempt to get a specific BodyFat using the "query-strings-parser" library but the ' +
-            'BodyFat id is invalid', () => {
-            before(async () => {
-                try {
-                    await deleteAllBodyFats()
-                } catch (err) {
-                    throw new Error('Failure on children.bodyfats routes test: ' + err.message)
-                }
-            })
-
-            it('should return status code 400 and an info message about the invalid BodyFat id', () => {
-                const url = `/v1/children/${defaultBodyFat.child_id}/bodyfats/123?child_id=${defaultBodyFat.child_id}`
-                    .concat(`&sort=child_id&page=1&limit=3`)
-
-                return request
-                    .get(url)
-                    .set('Content-Type', 'application/json')
-                    .expect(400)
-                    .then(err => {
-                        expect(err.body.code).to.eql(400)
-                        expect(err.body.message).to.eql(Strings.BODY_FAT.PARAM_ID_NOT_VALID_FORMAT)
-                        expect(err.body.description).to.eql(Strings.ERROR_MESSAGE.UUID_NOT_VALID_FORMAT_DESC)
-                    })
-            })
-        })
     })
     /**
      * DELETE route
@@ -717,6 +581,7 @@ describe('Routes: children.bodyfats', () => {
                     await deleteAllBodyFats()
 
                     result = await createBodyFat({
+                        type: MeasurementType.BODY_FAT,
                         timestamp: defaultBodyFat.timestamp,
                         value: defaultBodyFat.value,
                         unit: defaultBodyFat.unit,
