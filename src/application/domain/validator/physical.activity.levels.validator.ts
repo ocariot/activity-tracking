@@ -20,7 +20,10 @@ export class PhysicalActivityLevelsValidator {
                     `The names of the allowed levels are: ${levelsTypes.join(', ')}.`)
             }
             if (level.duration === undefined) fields.push('level duration')
-            else if (level.duration < 0) {
+            else if (isNaN(level.duration)) {
+                throw new ValidationException('Some (or several) duration field of levels array is invalid...',
+                    'Physical Activity Level validation failed: '.concat(Strings.ERROR_MESSAGE.INVALID_NUMBER))
+            } else if (level.duration < 0) {
                 throw new ValidationException('Some (or several) duration field of levels array is invalid...',
                     'Physical Activity Level validation failed: '.concat(Strings.ERROR_MESSAGE.NEGATIVE_PARAMETER))
             }

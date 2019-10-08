@@ -27,7 +27,10 @@ export class SleepPatternDataSetValidator {
                         'The names of the allowed patterns are: '.concat(stagesPatternTypes.join(', ').concat('.')))
             }
             if (data.duration === undefined) fields.push('data_set duration')
-            else if (data.duration < 0) {
+            else if (isNaN(data.duration)) {
+                throw new ValidationException('Some (or several) duration field of sleep pattern is invalid...',
+                    'Sleep Pattern dataset validation failed: '.concat(Strings.ERROR_MESSAGE.INVALID_NUMBER))
+            } else if (data.duration < 0) {
                 throw new ValidationException('Some (or several) duration field of sleep pattern is invalid...',
                     'Sleep Pattern dataset validation failed: '.concat(Strings.ERROR_MESSAGE.NEGATIVE_PARAMETER))
             }

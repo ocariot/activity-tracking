@@ -263,11 +263,28 @@ describe('Routes: children.physicalactivities', () => {
                     name: defaultActivity.name,
                     start_time: defaultActivity.start_time,
                     end_time: defaultActivity.end_time,
-                    duration: defaultActivity.duration,
+                    duration: `${defaultActivity.duration}`,
                     calories: defaultActivity.calories,
                     steps: defaultActivity.steps ? defaultActivity.steps : undefined,
                     distance: defaultActivity.distance ? defaultActivity.distance : undefined,
-                    levels: defaultActivity.levels ? defaultActivity.levels : undefined,
+                    levels: [
+                        {
+                            name: ActivityLevelType.SEDENTARY,
+                            duration: Math.floor((Math.random() * 10) * 60000)
+                        },
+                        {
+                            name: ActivityLevelType.LIGHTLY,
+                            duration: Math.floor((Math.random() * 10) * 60000)
+                        },
+                        {
+                            name: ActivityLevelType.FAIRLY,
+                            duration: Math.floor((Math.random() * 10) * 60000)
+                        },
+                        {
+                            name: ActivityLevelType.VERY,
+                            duration: Math.floor((Math.random() * 10) * 60000)
+                        }
+                    ],
                     heart_rate: defaultActivity.heart_rate ? defaultActivity.heart_rate : undefined
                 }
 
@@ -385,6 +402,34 @@ describe('Routes: children.physicalactivities', () => {
             })
         })
 
+        context('when a validation error occurs (duration does not have a valid number)', () => {
+            it('should return status code 400 and info message about the invalid duration', () => {
+                const body = {
+                    name: defaultActivity.name,
+                    start_time: defaultActivity.start_time,
+                    end_time: defaultActivity.end_time,
+                    duration: `${defaultActivity.duration}a`,
+                    calories: defaultActivity.calories,
+                    steps: defaultActivity.steps ? defaultActivity.steps : undefined,
+                    distance: defaultActivity.distance ? defaultActivity.distance : undefined,
+                    levels: defaultActivity.levels ? defaultActivity.levels : undefined,
+                    heart_rate: defaultActivity.heart_rate ? defaultActivity.heart_rate : undefined
+                }
+
+                return request
+                    .post(`/v1/children/${defaultActivity.child_id}/physicalactivities`)
+                    .send(body)
+                    .set('Content-Type', 'application/json')
+                    .expect(400)
+                    .then(err => {
+                        expect(err.body.code).to.eql(400)
+                        expect(err.body.message).to.eql('Duration field is invalid...')
+                        expect(err.body.description).to.eql('Activity validation failed: '
+                            .concat(Strings.ERROR_MESSAGE.INVALID_NUMBER))
+                    })
+            })
+        })
+
         context('when a validation error occurs (start_time with a date newer than end_time)', () => {
             it('should return status code 400 and info message about the invalid date', () => {
                 const body = {
@@ -494,6 +539,34 @@ describe('Routes: children.physicalactivities', () => {
             })
         })
 
+        context('when a validation error occurs (the calories parameter does not have a valid number)', () => {
+            it('should return status code 400 and info message about the invalid parameter of calories', () => {
+                const body = {
+                    name: defaultActivity.name,
+                    start_time: defaultActivity.start_time,
+                    end_time: defaultActivity.end_time,
+                    duration: defaultActivity.duration,
+                    calories: `${defaultActivity.calories}a`,
+                    steps: defaultActivity.steps ? defaultActivity.steps : undefined,
+                    distance: defaultActivity.distance ? defaultActivity.distance : undefined,
+                    levels: defaultActivity.levels ? defaultActivity.levels : undefined,
+                    heart_rate: defaultActivity.heart_rate ? defaultActivity.heart_rate : undefined
+                }
+
+                return request
+                    .post(`/v1/children/${defaultActivity.child_id}/physicalactivities`)
+                    .send(body)
+                    .set('Content-Type', 'application/json')
+                    .expect(400)
+                    .then(err => {
+                        expect(err.body.code).to.eql(400)
+                        expect(err.body.message).to.eql('Calories field is invalid...')
+                        expect(err.body.description).to.eql('Physical Activity validation failed: '
+                            .concat(Strings.ERROR_MESSAGE.INVALID_NUMBER))
+                    })
+            })
+        })
+
         context('when a validation error occurs (the calories parameter is negative)', () => {
             it('should return status code 400 and info message about the invalid parameter of calories', () => {
                 const body = {
@@ -517,6 +590,34 @@ describe('Routes: children.physicalactivities', () => {
                         expect(err.body.code).to.eql(400)
                         expect(err.body.message).to.eql('Calories field is invalid...')
                         expect(err.body.description).to.eql('Physical Activity validation failed: The value provided has a negative value!')
+                    })
+            })
+        })
+
+        context('when a validation error occurs (the steps parameter does not have a valid number)', () => {
+            it('should return status code 400 and info message about the invalid parameter of steps', () => {
+                const body = {
+                    name: defaultActivity.name,
+                    start_time: defaultActivity.start_time,
+                    end_time: defaultActivity.end_time,
+                    duration: defaultActivity.duration,
+                    calories: defaultActivity.calories,
+                    steps: '200a',
+                    distance: defaultActivity.distance ? defaultActivity.distance : undefined,
+                    levels: defaultActivity.levels ? defaultActivity.levels : undefined,
+                    heart_rate: defaultActivity.heart_rate ? defaultActivity.heart_rate : undefined
+                }
+
+                return request
+                    .post(`/v1/children/${defaultActivity.child_id}/physicalactivities`)
+                    .send(body)
+                    .set('Content-Type', 'application/json')
+                    .expect(400)
+                    .then(err => {
+                        expect(err.body.code).to.eql(400)
+                        expect(err.body.message).to.eql('Steps field is invalid...')
+                        expect(err.body.description).to.eql('Physical Activity validation failed: '
+                            .concat(Strings.ERROR_MESSAGE.INVALID_NUMBER))
                     })
             })
         })
@@ -545,6 +646,34 @@ describe('Routes: children.physicalactivities', () => {
                         expect(err.body.message).to.eql('Steps field is invalid...')
                         expect(err.body.description).to.eql('Physical Activity validation failed: The value provided ' +
                             'has a negative value!')
+                    })
+            })
+        })
+
+        context('when a validation error occurs (the distance parameter does not have a valid number)', () => {
+            it('should return status code 400 and info message about the invalid parameter of distance', () => {
+                const body = {
+                    name: defaultActivity.name,
+                    start_time: defaultActivity.start_time,
+                    end_time: defaultActivity.end_time,
+                    duration: defaultActivity.duration,
+                    calories: defaultActivity.calories,
+                    steps: defaultActivity.steps ? defaultActivity.steps : undefined,
+                    distance: '1000a',
+                    levels: defaultActivity.levels ? defaultActivity.levels : undefined,
+                    heart_rate: defaultActivity.heart_rate ? defaultActivity.heart_rate : undefined
+                }
+
+                return request
+                    .post(`/v1/children/${defaultActivity.child_id}/physicalactivities`)
+                    .send(body)
+                    .set('Content-Type', 'application/json')
+                    .expect(400)
+                    .then(err => {
+                        expect(err.body.code).to.eql(400)
+                        expect(err.body.message).to.eql('Distance field is invalid...')
+                        expect(err.body.description).to.eql('Physical Activity validation failed: '
+                            .concat(Strings.ERROR_MESSAGE.INVALID_NUMBER))
                     })
             })
         })
@@ -617,6 +746,51 @@ describe('Routes: children.physicalactivities', () => {
                         expect(err.body.code).to.eql(400)
                         expect(err.body.message).to.eql('The name of level provided "sedentaries" is not supported...')
                         expect(err.body.description).to.eql('The names of the allowed levels are: sedentary, lightly, fairly, very.')
+                    })
+            })
+        })
+
+        context('when a validation error occurs (the levels array has an item with an invalid duration)', () => {
+            it('should return status code 400 and info message about the invalid levels array', () => {
+                const body = {
+                    name: defaultActivity.name,
+                    start_time: defaultActivity.start_time,
+                    end_time: defaultActivity.end_time,
+                    duration: defaultActivity.duration,
+                    calories: defaultActivity.calories,
+                    steps: defaultActivity.steps ? defaultActivity.steps : undefined,
+                    distance: defaultActivity.distance ? defaultActivity.distance : undefined,
+                    levels: [
+                        {
+                            name: ActivityLevelType.SEDENTARY,
+                            duration: Math.floor((Math.random() * 10) * 60000)
+                        },
+                        {
+                            name: ActivityLevelType.LIGHTLY,
+                            duration: `${Math.floor((Math.random() * 10) * 60000)}a`
+                        },
+                        {
+                            name: ActivityLevelType.FAIRLY,
+                            duration: Math.floor((Math.random() * 10) * 60000)
+                        },
+                        {
+                            name: ActivityLevelType.VERY,
+                            duration: Math.floor((Math.random() * 10) * 60000)
+                        }
+                    ],
+                    heart_rate: defaultActivity.heart_rate ? defaultActivity.heart_rate : undefined
+                }
+
+                return request
+                    .post(`/v1/children/${defaultActivity.child_id}/physicalactivities`)
+                    .send(body)
+                    .set('Content-Type', 'application/json')
+                    .expect(400)
+                    .then(err => {
+                        expect(err.body.code).to.eql(400)
+                        expect(err.body.message).to.eql('Some (or several) duration field of levels array is invalid...')
+                        expect(err.body.description).to.eql('Physical Activity Level validation failed: '
+                            .concat(Strings.ERROR_MESSAGE.INVALID_NUMBER))
                     })
             })
         })
@@ -1491,13 +1665,10 @@ describe('Routes: children.physicalactivities', () => {
             // physical activity to update
             const body = {
                 name: defaultActivity.name,
-                start_time: otherActivity.start_time,
-                end_time: otherActivity.end_time,
-                duration: otherActivity.duration,
                 calories: defaultActivity.calories,
                 steps: defaultActivity.steps ? defaultActivity.steps : undefined,
                 distance: defaultActivity.distance ? defaultActivity.distance : undefined,
-                levels: defaultActivity.levels ? defaultActivity.levels : undefined,
+                levels: [],
                 heart_rate: defaultActivity.heart_rate ? defaultActivity.heart_rate : undefined
             }
 
@@ -1536,18 +1707,15 @@ describe('Routes: children.physicalactivities', () => {
                             expect(message).to.have.property('physicalactivity')
                             expect(message.physicalactivity).to.have.property('id')
                             expect(message.physicalactivity.name).to.eql(defaultActivity.name)
-                            expect(message.physicalactivity.start_time).to.eql(otherActivity.start_time!.toISOString())
-                            expect(message.physicalactivity.end_time).to.eql(otherActivity.end_time!.toISOString())
-                            expect(message.physicalactivity.duration).to.eql(otherActivity.duration)
+                            expect(message.physicalactivity.start_time).to.eql(result.start_time!.toISOString())
+                            expect(message.physicalactivity.end_time).to.eql(result.end_time!.toISOString())
+                            expect(message.physicalactivity.duration).to.eql(result.duration)
                             expect(message.physicalactivity.calories).to.eql(defaultActivity.calories)
                             if (message.physicalactivity.steps) {
                                 expect(message.physicalactivity.steps).to.eql(defaultActivity.steps)
                             }
                             expect(message.physicalactivity.distance).to.eql(defaultActivity.distance)
-                            if (defaultActivity.levels) {
-                                expect(message.physicalactivity.levels)
-                                    .to.eql(defaultActivity.levels.map((elem: PhysicalActivityLevel) => elem.toJSON()))
-                            }
+                            expect(message.physicalactivity).to.not.have.property('levels')
                             expect(message.physicalactivity.heart_rate).to.eql(defaultActivity.heart_rate!.toJSON())
                             expect(message.physicalactivity.child_id).to.eql(defaultActivity.child_id)
                             done()
@@ -1589,13 +1757,10 @@ describe('Routes: children.physicalactivities', () => {
                 // physical activity to update
                 const body = {
                     name: defaultActivity.name,
-                    start_time: otherActivity.start_time,
-                    end_time: otherActivity.end_time,
-                    duration: otherActivity.duration,
                     calories: defaultActivity.calories,
                     steps: defaultActivity.steps ? defaultActivity.steps : undefined,
                     distance: defaultActivity.distance ? defaultActivity.distance : undefined,
-                    levels: defaultActivity.levels ? defaultActivity.levels : undefined,
+                    levels: [],
                     heart_rate: defaultActivity.heart_rate ? defaultActivity.heart_rate : undefined
                 }
 
@@ -1606,68 +1771,20 @@ describe('Routes: children.physicalactivities', () => {
                     .expect(200)
                     .then(res => {
                         expect(res.body).to.have.property('id')
-                        expect(res.body.start_time).to.eql(otherActivity.start_time!.toISOString())
-                        expect(res.body.end_time).to.eql(otherActivity.end_time!.toISOString())
-                        expect(res.body.duration).to.eql(otherActivity.duration)
+                        expect(res.body.start_time).to.eql(result.start_time!.toISOString())
+                        expect(res.body.end_time).to.eql(result.end_time!.toISOString())
+                        expect(res.body.duration).to.eql(result.duration)
+                        expect(res.body.name).to.eql(defaultActivity.name)
                         expect(res.body.calories).to.eql(defaultActivity.calories)
                         if (defaultActivity.steps) {
                             expect(res.body.steps).to.eql(defaultActivity.steps)
                         }
                         expect(res.body.distance).to.eql(defaultActivity.distance)
-                        if (defaultActivity.levels) {
-                            expect(res.body.levels)
-                                .to.eql(defaultActivity.levels.map((elem: PhysicalActivityLevel) => elem.toJSON()))
-                        }
+                        expect(res.body).to.not.have.property('levels')
                         if (defaultActivity.heart_rate) {
                             expect(res.body.heart_rate).to.eql(defaultActivity.heart_rate.toJSON())
                         }
                         expect(res.body.child_id).to.eql(defaultActivity.child_id)
-                    })
-            })
-        })
-
-        context('when physical activity already exists in the database', () => {
-            let result
-
-            before(async () => {
-                try {
-                    await deleteAllActivities()
-
-                    await createActivity({
-                        name: defaultActivity.name,
-                        start_time: otherActivity.start_time,
-                        end_time: otherActivity.end_time,
-                        duration: otherActivity.duration,
-                        calories: defaultActivity.calories,
-                        steps: defaultActivity.steps ? defaultActivity.steps : undefined,
-                        distance: defaultActivity.distance ? defaultActivity.distance : undefined,
-                        levels: defaultActivity.levels ? defaultActivity.levels : undefined,
-                        heart_rate: defaultActivity.heart_rate ? defaultActivity.heart_rate : undefined,
-                        child_id: defaultActivity.child_id
-                    })
-
-                    // physical activity to be updated
-                    result = await createActivityToBeUpdated(defaultActivity)
-                } catch (err) {
-                    throw new Error('Failure on children.physicalactivities routes test: ' + err.message)
-                }
-            })
-            it('should return status status code 409 and an info message about the conflict', () => {
-                // physical activity to update
-                const body = {
-                    start_time: otherActivity.start_time,
-                    end_time: otherActivity.end_time,
-                    duration: otherActivity.duration
-                }
-
-                return request
-                    .patch(`/v1/children/${result.child_id}/physicalactivities/${result.id}`)
-                    .send(body)
-                    .set('Content-Type', 'application/json')
-                    .expect(409)
-                    .then(err => {
-                        expect(err.body.code).to.eql(409)
-                        expect(err.body.message).to.eql('A registration with the same unique data already exists!')
                     })
             })
         })
@@ -1685,13 +1802,10 @@ describe('Routes: children.physicalactivities', () => {
                 // physical activity to update
                 const body = {
                     name: defaultActivity.name,
-                    start_time: defaultActivity.start_time,
-                    end_time: defaultActivity.end_time,
-                    duration: defaultActivity.duration,
                     calories: defaultActivity.calories,
                     steps: defaultActivity.steps ? defaultActivity.steps : undefined,
                     distance: defaultActivity.distance ? defaultActivity.distance : undefined,
-                    levels: defaultActivity.levels ? defaultActivity.levels : undefined,
+                    levels: [],
                     heart_rate: defaultActivity.heart_rate ? defaultActivity.heart_rate : undefined
                 }
 
@@ -1779,7 +1893,7 @@ describe('Routes: children.physicalactivities', () => {
             })
         })
 
-        context('when a validation error occurs (the duration is negative)', () => {
+        context('when a validation error occurs (attempt to update start_time)', () => {
             before(async () => {
                 try {
                     await deleteAllActivities()
@@ -1787,10 +1901,10 @@ describe('Routes: children.physicalactivities', () => {
                     throw new Error('Failure on children.physicalactivities routes test: ' + err.message)
                 }
             })
-            it('should return status code 400 and info message about the invalid duration', () => {
+            it('should return status code 400 and info message about the impossibility of updating', () => {
                 // physical activity to update
                 const body = {
-                    duration: -(defaultActivity.duration!)
+                    start_time: defaultActivity.start_time
                 }
 
                 return request
@@ -1800,9 +1914,121 @@ describe('Routes: children.physicalactivities', () => {
                     .expect(400)
                     .then(err => {
                         expect(err.body.code).to.eql(400)
-                        expect(err.body.message).to.eql('Duration field is invalid...')
-                        expect(err.body.description).to.eql('Physical Activity validation failed: The value provided ' +
-                            'has a negative value!')
+                        expect(err.body.message).to.eql(Strings.ERROR_MESSAGE.UNABLE_UPDATE)
+                        expect(err.body.description).to.eql('Physical Activity validation failed: '
+                            .concat(Strings.ERROR_MESSAGE.UNABLE_UPDATE_DESC))
+                    })
+            })
+        })
+
+        context('when a validation error occurs (attempt to update end_time)', () => {
+            before(async () => {
+                try {
+                    await deleteAllActivities()
+                } catch (err) {
+                    throw new Error('Failure on children.physicalactivities routes test: ' + err.message)
+                }
+            })
+            it('should return status code 400 and info message about the impossibility of updating', () => {
+                // physical activity to update
+                const body = {
+                    end_time: defaultActivity.end_time
+                }
+
+                return request
+                    .patch(`/v1/children/${defaultActivity.child_id}/physicalactivities/${defaultActivity.id}`)
+                    .send(body)
+                    .set('Content-Type', 'application/json')
+                    .expect(400)
+                    .then(err => {
+                        expect(err.body.code).to.eql(400)
+                        expect(err.body.message).to.eql(Strings.ERROR_MESSAGE.UNABLE_UPDATE)
+                        expect(err.body.description).to.eql('Physical Activity validation failed: '
+                            .concat(Strings.ERROR_MESSAGE.UNABLE_UPDATE_DESC))
+                    })
+            })
+        })
+
+        context('when a validation error occurs (attempt to update duration)', () => {
+            before(async () => {
+                try {
+                    await deleteAllActivities()
+                } catch (err) {
+                    throw new Error('Failure on children.physicalactivities routes test: ' + err.message)
+                }
+            })
+            it('should return status code 400 and info message about the impossibility of updating', () => {
+                // physical activity to update
+                const body = {
+                    duration: defaultActivity.duration
+                }
+
+                return request
+                    .patch(`/v1/children/${defaultActivity.child_id}/physicalactivities/${defaultActivity.id}`)
+                    .send(body)
+                    .set('Content-Type', 'application/json')
+                    .expect(400)
+                    .then(err => {
+                        expect(err.body.code).to.eql(400)
+                        expect(err.body.message).to.eql(Strings.ERROR_MESSAGE.UNABLE_UPDATE)
+                        expect(err.body.description).to.eql('Physical Activity validation failed: '
+                            .concat(Strings.ERROR_MESSAGE.UNABLE_UPDATE_DESC))
+                    })
+            })
+        })
+
+        context('when a validation error occurs (the name parameter does not have a valid value)', () => {
+            before(async () => {
+                try {
+                    await deleteAllActivities()
+                } catch (err) {
+                    throw new Error('Failure on children.physicalactivities routes test: ' + err.message)
+                }
+            })
+            it('should return status code 400 and info message about the invalid name parameter', () => {
+                // physical activity to update
+                const body = {
+                    name: ''
+                }
+
+                return request
+                    .patch(`/v1/children/${defaultActivity.child_id}/physicalactivities/${defaultActivity.id}`)
+                    .send(body)
+                    .set('Content-Type', 'application/json')
+                    .expect(400)
+                    .then(err => {
+                        expect(err.body.code).to.eql(400)
+                        expect(err.body.message).to.eql('Name field is invalid...')
+                        expect(err.body.description).to.eql('Physical Activity validation failed: ' +
+                            'Name must be at least one character.')
+                    })
+            })
+        })
+
+        context('when a validation error occurs (the calories parameter does not have a valid number)', () => {
+            before(async () => {
+                try {
+                    await deleteAllActivities()
+                } catch (err) {
+                    throw new Error('Failure on children.physicalactivities routes test: ' + err.message)
+                }
+            })
+            it('should return status code 400 and info message about the invalid calories parameter', () => {
+                // physical activity to update
+                const body = {
+                    calories: `${defaultActivity.calories}a`
+                }
+
+                return request
+                    .patch(`/v1/children/${defaultActivity.child_id}/physicalactivities/${defaultActivity.id}`)
+                    .send(body)
+                    .set('Content-Type', 'application/json')
+                    .expect(400)
+                    .then(err => {
+                        expect(err.body.code).to.eql(400)
+                        expect(err.body.message).to.eql('Calories field is invalid...')
+                        expect(err.body.description).to.eql('Physical Activity validation failed: '
+                            .concat(Strings.ERROR_MESSAGE.INVALID_NUMBER))
                     })
             })
         })
@@ -1835,6 +2061,34 @@ describe('Routes: children.physicalactivities', () => {
             })
         })
 
+        context('when a validation error occurs (the steps parameter does not have a valid number)', () => {
+            before(async () => {
+                try {
+                    await deleteAllActivities()
+                } catch (err) {
+                    throw new Error('Failure on children.physicalactivities routes test: ' + err.message)
+                }
+            })
+            it('should return status code 400 and info message about the invalid steps parameter', () => {
+                // physical activity to update
+                const body = {
+                    steps: `100a`
+                }
+
+                return request
+                    .patch(`/v1/children/${defaultActivity.child_id}/physicalactivities/${defaultActivity.id}`)
+                    .send(body)
+                    .set('Content-Type', 'application/json')
+                    .expect(400)
+                    .then(err => {
+                        expect(err.body.code).to.eql(400)
+                        expect(err.body.message).to.eql('Steps field is invalid...')
+                        expect(err.body.description).to.eql('Physical Activity validation failed: '
+                            .concat(Strings.ERROR_MESSAGE.INVALID_NUMBER))
+                    })
+            })
+        })
+
         context('when a validation error occurs (the steps parameter is negative)', () => {
             before(async () => {
                 try {
@@ -1863,7 +2117,7 @@ describe('Routes: children.physicalactivities', () => {
             })
         })
 
-        context('when a validation error occurs (the levels array has an item with an invalid type)', () => {
+        context('when a validation error occurs (the distance parameter does not have a valid number)', () => {
             before(async () => {
                 try {
                     await deleteAllActivities()
@@ -1871,11 +2125,10 @@ describe('Routes: children.physicalactivities', () => {
                     throw new Error('Failure on children.physicalactivities routes test: ' + err.message)
                 }
             })
-
-            it('should return status code 400 and info message about the invalid levels array', () => {
+            it('should return status code 400 and info message about the invalid distance parameter', () => {
                 // physical activity to update
                 const body = {
-                    levels: incorrectActivity8.levels ? incorrectActivity8.levels : undefined
+                    distance: `100a`
                 }
 
                 return request
@@ -1885,13 +2138,14 @@ describe('Routes: children.physicalactivities', () => {
                     .expect(400)
                     .then(err => {
                         expect(err.body.code).to.eql(400)
-                        expect(err.body.message).to.eql('The name of level provided "sedentaries" is not supported...')
-                        expect(err.body.description).to.eql('The names of the allowed levels are: sedentary, lightly, fairly, very.')
+                        expect(err.body.message).to.eql('Distance field is invalid...')
+                        expect(err.body.description).to.eql('Physical Activity validation failed: '
+                            .concat(Strings.ERROR_MESSAGE.INVALID_NUMBER))
                     })
             })
         })
 
-        context('when a validation error occurs (the levels array has an item that contains empty fields)', () => {
+        context('when a validation error occurs (the distance parameter is negative)', () => {
             before(async () => {
                 try {
                     await deleteAllActivities()
@@ -1899,11 +2153,10 @@ describe('Routes: children.physicalactivities', () => {
                     throw new Error('Failure on children.physicalactivities routes test: ' + err.message)
                 }
             })
-
-            it('should return status code 400 and info message about the invalid levels array', () => {
+            it('should return status code 400 and info message about the invalid distance parameter', () => {
                 // physical activity to update
                 const body = {
-                    levels: incorrectActivity9.levels ? incorrectActivity9.levels : undefined
+                    distance: -200
                 }
 
                 return request
@@ -1913,40 +2166,42 @@ describe('Routes: children.physicalactivities', () => {
                     .expect(400)
                     .then(err => {
                         expect(err.body.code).to.eql(400)
-                        expect(err.body.message).to.eql('Level are not in a format that is supported!')
-                        expect(err.body.description).to.eql('Must have values ​​for the following levels: sedentary, ' +
-                            'lightly, fairly, very.')
+                        expect(err.body.message).to.eql('Distance field is invalid...')
+                        expect(err.body.description).to.eql('Physical Activity validation failed: The value provided ' +
+                            'has a negative value!')
                     })
             })
         })
 
-        context('when a validation error occurs (the levels array has an item that contains negative duration)', () => {
-            before(async () => {
-                try {
-                    await deleteAllActivities()
-                } catch (err) {
-                    throw new Error('Failure on children.physicalactivities routes test: ' + err.message)
-                }
-            })
-            it('should return status code 400 and info message about the invalid levels array', () => {
-                // physical activity to update
-                const body = {
-                    levels: incorrectActivity10.levels ? incorrectActivity10.levels : undefined
-                }
+        context('when a validation error occurs (attempt to update levels with an array containing at least 1 item)',
+            () => {
+                before(async () => {
+                    try {
+                        await deleteAllActivities()
+                    } catch (err) {
+                        throw new Error('Failure on children.physicalactivities routes test: ' + err.message)
+                    }
+                })
 
-                return request
-                    .patch(`/v1/children/${defaultActivity.child_id}/physicalactivities/${defaultActivity.id}`)
-                    .send(body)
-                    .set('Content-Type', 'application/json')
-                    .expect(400)
-                    .then(err => {
-                        expect(err.body.code).to.eql(400)
-                        expect(err.body.message).to.eql('Some (or several) duration field of levels array is invalid...')
-                        expect(err.body.description).to.eql('Physical Activity Level validation failed: The value ' +
-                            'provided has a negative value!')
-                    })
+                it('should return status code 400 and info message about the invalid levels array', () => {
+                    // physical activity to update
+                    const body = {
+                        levels: defaultActivity.levels
+                    }
+
+                    return request
+                        .patch(`/v1/children/${defaultActivity.child_id}/physicalactivities/${defaultActivity.id}`)
+                        .send(body)
+                        .set('Content-Type', 'application/json')
+                        .expect(400)
+                        .then(err => {
+                            expect(err.body.code).to.eql(400)
+                            expect(err.body.message).to.eql(Strings.ERROR_MESSAGE.UNABLE_UPDATE)
+                            expect(err.body.description).to.eql('Physical Activity validation failed: '
+                                .concat(Strings.ERROR_MESSAGE.UNABLE_UPDATE_DESC))
+                        })
+                })
             })
-        })
 
         context('when a validation error occurs (the PhysicalActivityHeartRate is empty)', () => {
             before(async () => {

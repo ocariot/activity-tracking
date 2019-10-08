@@ -359,7 +359,7 @@ describe('Routes: children.logs', () => {
                                 'provided has a negative value!')
                             expect(res.body.error[2].message).to.eql('Value field is invalid...')
                             expect(res.body.error[2].description).to.eql('Child log validation failed: ' +
-                                'The value received is not a number')
+                                Strings.ERROR_MESSAGE.INVALID_NUMBER)
 
                             for (let i = 0; i < res.body.error.length; i++) {
                                 expect(res.body.error[i].code).to.eql(HttpStatus.BAD_REQUEST)

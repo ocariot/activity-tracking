@@ -45,6 +45,10 @@ export abstract class Strings {
     public static readonly ERROR_MESSAGE: any = {
         UNEXPECTED: 'An unexpected error has occurred. Please try again later...',
         NEGATIVE_PARAMETER: 'The value provided has a negative value!',
+        INVALID_NUMBER: 'The value provided is not a valid number!',
+        UNABLE_UPDATE: 'Unable to update this attribute.',
+        UNABLE_UPDATE_DESC: 'Updateable attributes are: name, calories, steps, distance, levels ' +
+            '(only if the update is from an empty array) and heart_rate.',
         UUID_NOT_VALID_FORMAT: 'Some ID provided does not have a valid format!',
         UUID_NOT_VALID_FORMAT_DESC: 'A 24-byte hex ID similar to this: 507f191e810c19729de860ea is expected.'
     }
