@@ -329,6 +329,41 @@ describe('Routes: environments', () => {
             })
         })
 
+        context('when a validation error occurs (measurements array has an item that has an invalid value)', () => {
+            it('should return status code 400 and info message about the invalid measurements array', () => {
+                const body = {
+                    institution_id: defaultEnvironment.institution_id,
+                    location: defaultEnvironment.location,
+                    measurements: [
+                        {
+                            type: MeasurementType.HUMIDITY,
+                            value: '32a',
+                            unit: '%'
+                        },
+                        {
+                            type: MeasurementType.TEMPERATURE,
+                            value: 38,
+                            unit: '°C'
+                        }
+                    ],
+                    climatized: defaultEnvironment.climatized,
+                    timestamp: defaultEnvironment.timestamp
+                }
+
+                return request
+                    .post('/v1/environments')
+                    .send(body)
+                    .set('Content-Type', 'application/json')
+                    .expect(400)
+                    .then(err => {
+                        expect(err.body.code).to.eql(400)
+                        expect(err.body.message).to.eql('Measurement value field is invalid...')
+                        expect(err.body.description).to.eql('Validation of environment failed: '
+                            .concat(Strings.ERROR_MESSAGE.INVALID_NUMBER))
+                    })
+            })
+        })
+
         context('when a validation error occurs (measurements array has an item that has missing required fields)', () => {
             it('should return status code 400 and info message about the invalid measurements array', () => {
                 defaultMeasurements[1] = new Measurement()

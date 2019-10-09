@@ -59,7 +59,30 @@ describe('Routes: children.physicalactivities', () => {
                     name: ActivityLevelType.VERY,
                     duration: Math.floor((Math.random() * 10) * 60000)
                 }
-            ]
+            ],
+            heart_rate: {
+                average: 107,
+                out_of_range_zone: {
+                    min: 30,
+                    max: 91,
+                    duration: 0
+                },
+                fat_burn_zone: {
+                    min: 91,
+                    max: 127,
+                    duration: 0
+                },
+                cardio_zone: {
+                    min: 127,
+                    max: 154,
+                    duration: 0
+                },
+                peak_zone: {
+                    min: 154,
+                    max: 220,
+                    duration: 0
+                },
+            }
         }
 
     // Array with correct activities
@@ -223,10 +246,8 @@ describe('Routes: children.physicalactivities', () => {
                                 expect(message.physicalactivity.steps).to.eql(defaultActivity.steps)
                             }
                             expect(message.physicalactivity.distance).to.eql(defaultActivity.distance)
-                            if (defaultActivity.levels) {
-                                expect(message.physicalactivity.levels)
-                                    .to.eql(defaultActivity.levels.map((elem: PhysicalActivityLevel) => elem.toJSON()))
-                            }
+                            expect(message.physicalactivity.levels)
+                                .to.eql(defaultActivity.levels!.map((elem: PhysicalActivityLevel) => elem.toJSON()))
                             expect(message.physicalactivity.heart_rate).to.eql(defaultActivity.heart_rate!.toJSON())
                             expect(message.physicalactivity.child_id).to.eql(defaultActivity.child_id)
                             done()
@@ -304,10 +325,7 @@ describe('Routes: children.physicalactivities', () => {
                             expect(res.body.steps).to.eql(defaultActivity.steps)
                         }
                         expect(res.body.distance).to.eql(defaultActivity.distance)
-                        if (defaultActivity.levels) {
-                            expect(res.body.levels)
-                                .to.eql(defaultActivity.levels.map((elem: PhysicalActivityLevel) => elem.toJSON()))
-                        }
+                        expect(res.body).to.have.property('levels')
                         expect(res.body.heart_rate).to.eql(defaultActivity.heart_rate!.toJSON())
                         expect(res.body.child_id).to.eql(defaultActivity.child_id)
                     })
@@ -886,7 +904,8 @@ describe('Routes: children.physicalactivities', () => {
         })
 
         context('when a validation error occurs (the PhysicalActivityHeartRate is empty)', () => {
-            it('should return status code 400 and info message about the invalid levels array', () => {
+            it('should return status code 400 and info message about the invalid PhysicalActivityHeartRate parameter',
+                () => {
                 const body = {
                     name: incorrectActivity11.name,
                     start_time: incorrectActivity11.start_time,
@@ -913,8 +932,44 @@ describe('Routes: children.physicalactivities', () => {
             })
         })
 
+        context('when a validation error occurs (the PhysicalActivityHeartRate has an invalid average parameter)', () => {
+            before(() => {
+                incorrectActivityJSON.heart_rate.average = 'abc'
+            })
+            after(() => {
+                incorrectActivityJSON.heart_rate.average = 107
+            })
+            it('should return status code 400 and info message about the invalid PhysicalActivityHeartRate parameter',
+                () => {
+                const body = {
+                    name: incorrectActivity12.name,
+                    start_time: incorrectActivity12.start_time,
+                    end_time: incorrectActivity12.end_time,
+                    duration: incorrectActivity12.duration,
+                    calories: incorrectActivity12.calories,
+                    steps: incorrectActivity12.steps ? incorrectActivity12.steps : undefined,
+                    distance: defaultActivity.distance ? defaultActivity.distance : undefined,
+                    levels: incorrectActivity12.levels ? incorrectActivity12.levels : undefined,
+                    heart_rate: incorrectActivityJSON.heart_rate
+                }
+
+                return request
+                    .post(`/v1/children/${incorrectActivity12.child_id}/physicalactivities`)
+                    .send(body)
+                    .set('Content-Type', 'application/json')
+                    .expect(400)
+                    .then(err => {
+                        expect(err.body.code).to.eql(400)
+                        expect(err.body.message).to.eql('Average field is invalid...')
+                        expect(err.body.description).to.eql('PhysicalActivityHeartRate validation failed: ' +
+                            Strings.ERROR_MESSAGE.INVALID_NUMBER)
+                    })
+            })
+        })
+
         context('when a validation error occurs (the PhysicalActivityHeartRate has a negative average parameter)', () => {
-            it('should return status code 400 and info message about the invalid levels array', () => {
+            it('should return status code 400 and info message about the invalid PhysicalActivityHeartRate parameter',
+                () => {
                 const body = {
                     name: incorrectActivity12.name,
                     start_time: incorrectActivity12.start_time,
@@ -942,7 +997,8 @@ describe('Routes: children.physicalactivities', () => {
         })
 
         context('when a validation error occurs (the "Fat Burn Zone" parameter of PhysicalActivityHeartRate is empty)', () => {
-            it('should return status code 400 and info message about the invalid levels array', () => {
+            it('should return status code 400 and info message about the invalid PhysicalActivityHeartRate parameter',
+                () => {
                 const body = {
                     name: incorrectActivity13.name,
                     start_time: incorrectActivity13.start_time,
@@ -970,8 +1026,189 @@ describe('Routes: children.physicalactivities', () => {
         })
 
         context('when a validation error occurs (the "Fat Burn Zone" parameter of PhysicalActivityHeartRate ' +
+            'has an invalid min)', () => {
+            before(() => {
+                incorrectActivityJSON.heart_rate.fat_burn_zone.min = 'abc'
+            })
+            after(() => {
+                incorrectActivityJSON.heart_rate.fat_burn_zone.min = 91
+            })
+            it('should return status code 400 and info message about the invalid PhysicalActivityHeartRate parameter',
+                () => {
+                const body = {
+                    name: incorrectActivity14.name,
+                    start_time: incorrectActivity14.start_time,
+                    end_time: incorrectActivity14.end_time,
+                    duration: incorrectActivity14.duration,
+                    calories: incorrectActivity14.calories,
+                    steps: incorrectActivity14.steps ? incorrectActivity14.steps : undefined,
+                    distance: defaultActivity.distance ? defaultActivity.distance : undefined,
+                    levels: incorrectActivity14.levels ? incorrectActivity14.levels : undefined,
+                    heart_rate: incorrectActivityJSON.heart_rate
+                }
+
+                return request
+                    .post(`/v1/children/${incorrectActivity14.child_id}/physicalactivities`)
+                    .send(body)
+                    .set('Content-Type', 'application/json')
+                    .expect(400)
+                    .then(err => {
+                        expect(err.body.code).to.eql(400)
+                        expect(err.body.message).to.eql('Min field is invalid...')
+                        expect(err.body.description).to.eql('HeartRateZone validation failed: ' +
+                            Strings.ERROR_MESSAGE.INVALID_NUMBER)
+                    })
+            })
+        })
+
+        context('when a validation error occurs (the "Fat Burn Zone" parameter of PhysicalActivityHeartRate ' +
+            'has a negative min)', () => {
+            before(() => {
+                incorrectActivityJSON.heart_rate.fat_burn_zone.min = -91
+            })
+            after(() => {
+                incorrectActivityJSON.heart_rate.fat_burn_zone.min = 91
+            })
+            it('should return status code 400 and info message about the invalid PhysicalActivityHeartRate parameter',
+                () => {
+                    const body = {
+                        name: incorrectActivity14.name,
+                        start_time: incorrectActivity14.start_time,
+                        end_time: incorrectActivity14.end_time,
+                        duration: incorrectActivity14.duration,
+                        calories: incorrectActivity14.calories,
+                        steps: incorrectActivity14.steps ? incorrectActivity14.steps : undefined,
+                        distance: defaultActivity.distance ? defaultActivity.distance : undefined,
+                        levels: incorrectActivity14.levels ? incorrectActivity14.levels : undefined,
+                        heart_rate: incorrectActivityJSON.heart_rate
+                    }
+
+                    return request
+                        .post(`/v1/children/${incorrectActivity14.child_id}/physicalactivities`)
+                        .send(body)
+                        .set('Content-Type', 'application/json')
+                        .expect(400)
+                        .then(err => {
+                            expect(err.body.code).to.eql(400)
+                            expect(err.body.message).to.eql('Min field is invalid...')
+                            expect(err.body.description).to.eql('HeartRateZone validation failed: ' +
+                                Strings.ERROR_MESSAGE.NEGATIVE_PARAMETER)
+                        })
+                })
+        })
+
+        context('when a validation error occurs (the "Fat Burn Zone" parameter of PhysicalActivityHeartRate ' +
+            'has an invalid max)', () => {
+            before(() => {
+                incorrectActivityJSON.heart_rate.fat_burn_zone.max = 'abc'
+            })
+            after(() => {
+                incorrectActivityJSON.heart_rate.fat_burn_zone.max = 127
+            })
+            it('should return status code 400 and info message about the invalid PhysicalActivityHeartRate parameter',
+                () => {
+                    const body = {
+                        name: incorrectActivity14.name,
+                        start_time: incorrectActivity14.start_time,
+                        end_time: incorrectActivity14.end_time,
+                        duration: incorrectActivity14.duration,
+                        calories: incorrectActivity14.calories,
+                        steps: incorrectActivity14.steps ? incorrectActivity14.steps : undefined,
+                        distance: defaultActivity.distance ? defaultActivity.distance : undefined,
+                        levels: incorrectActivity14.levels ? incorrectActivity14.levels : undefined,
+                        heart_rate: incorrectActivityJSON.heart_rate
+                    }
+
+                    return request
+                        .post(`/v1/children/${incorrectActivity14.child_id}/physicalactivities`)
+                        .send(body)
+                        .set('Content-Type', 'application/json')
+                        .expect(400)
+                        .then(err => {
+                            expect(err.body.code).to.eql(400)
+                            expect(err.body.message).to.eql('Max field is invalid...')
+                            expect(err.body.description).to.eql('HeartRateZone validation failed: ' +
+                                Strings.ERROR_MESSAGE.INVALID_NUMBER)
+                        })
+                })
+        })
+
+        context('when a validation error occurs (the "Fat Burn Zone" parameter of PhysicalActivityHeartRate ' +
+            'has a negative max)', () => {
+            before(() => {
+                incorrectActivityJSON.heart_rate.fat_burn_zone.max = -127
+            })
+            after(() => {
+                incorrectActivityJSON.heart_rate.fat_burn_zone.max = 127
+            })
+            it('should return status code 400 and info message about the invalid PhysicalActivityHeartRate parameter',
+                () => {
+                    const body = {
+                        name: incorrectActivity14.name,
+                        start_time: incorrectActivity14.start_time,
+                        end_time: incorrectActivity14.end_time,
+                        duration: incorrectActivity14.duration,
+                        calories: incorrectActivity14.calories,
+                        steps: incorrectActivity14.steps ? incorrectActivity14.steps : undefined,
+                        distance: defaultActivity.distance ? defaultActivity.distance : undefined,
+                        levels: incorrectActivity14.levels ? incorrectActivity14.levels : undefined,
+                        heart_rate: incorrectActivityJSON.heart_rate
+                    }
+
+                    return request
+                        .post(`/v1/children/${incorrectActivity14.child_id}/physicalactivities`)
+                        .send(body)
+                        .set('Content-Type', 'application/json')
+                        .expect(400)
+                        .then(err => {
+                            expect(err.body.code).to.eql(400)
+                            expect(err.body.message).to.eql('Max field is invalid...')
+                            expect(err.body.description).to.eql('HeartRateZone validation failed: ' +
+                                Strings.ERROR_MESSAGE.NEGATIVE_PARAMETER)
+                        })
+                })
+        })
+
+        context('when a validation error occurs (the "Fat Burn Zone" parameter of PhysicalActivityHeartRate ' +
+            'has an invalid duration)', () => {
+            before(() => {
+                incorrectActivityJSON.heart_rate.fat_burn_zone.duration = 'abc'
+            })
+            after(() => {
+                incorrectActivityJSON.heart_rate.fat_burn_zone.duration = 0
+            })
+            it('should return status code 400 and info message about the invalid PhysicalActivityHeartRate parameter',
+                () => {
+                    const body = {
+                        name: incorrectActivity14.name,
+                        start_time: incorrectActivity14.start_time,
+                        end_time: incorrectActivity14.end_time,
+                        duration: incorrectActivity14.duration,
+                        calories: incorrectActivity14.calories,
+                        steps: incorrectActivity14.steps ? incorrectActivity14.steps : undefined,
+                        distance: defaultActivity.distance ? defaultActivity.distance : undefined,
+                        levels: incorrectActivity14.levels ? incorrectActivity14.levels : undefined,
+                        heart_rate: incorrectActivityJSON.heart_rate
+                    }
+
+                    return request
+                        .post(`/v1/children/${incorrectActivity14.child_id}/physicalactivities`)
+                        .send(body)
+                        .set('Content-Type', 'application/json')
+                        .expect(400)
+                        .then(err => {
+                            expect(err.body.code).to.eql(400)
+                            expect(err.body.message).to.eql('Duration field is invalid...')
+                            expect(err.body.description).to.eql('HeartRateZone validation failed: ' +
+                                Strings.ERROR_MESSAGE.INVALID_NUMBER)
+                        })
+                })
+        })
+
+        context('when a validation error occurs (the "Fat Burn Zone" parameter of PhysicalActivityHeartRate ' +
             'has a negative duration)', () => {
-            it('should return status code 400 and info message about the invalid levels array', () => {
+            it('should return status code 400 and info message about the invalid PhysicalActivityHeartRate parameter',
+                () => {
                 const body = {
                     name: incorrectActivity14.name,
                     start_time: incorrectActivity14.start_time,
@@ -993,7 +1230,7 @@ describe('Routes: children.physicalactivities', () => {
                         expect(err.body.code).to.eql(400)
                         expect(err.body.message).to.eql('Duration field is invalid...')
                         expect(err.body.description).to.eql('HeartRateZone validation failed: ' +
-                            'The value provided has a negative value!')
+                            Strings.ERROR_MESSAGE.NEGATIVE_PARAMETER)
                     })
             })
         })

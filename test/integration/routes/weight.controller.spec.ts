@@ -259,6 +259,29 @@ describe('Routes: children.weights', () => {
             })
         })
 
+        context('when a validation error occurs (value is invalid)', () => {
+            it('should return status code 400 and info message about the invalid value', () => {
+                const body = {
+                    timestamp: defaultWeight.timestamp,
+                    value: `${defaultWeight.value}a`,
+                    unit: defaultWeight.unit,
+                    body_fat: defaultWeight.body_fat!.value
+                }
+
+                return request
+                    .post(`/v1/children/${defaultWeight.child_id}/weights`)
+                    .send(body)
+                    .set('Content-Type', 'application/json')
+                    .expect(400)
+                    .then(err => {
+                        expect(err.body.code).to.eql(400)
+                        expect(err.body.message).to.eql('Measurement value field is invalid...')
+                        expect(err.body.description).to.eql('Measurement validation failed: '
+                            .concat(Strings.ERROR_MESSAGE.INVALID_NUMBER))
+                    })
+            })
+        })
+
         context('when a validation error occurs (child_id is invalid)', () => {
             it('should return status code 400 and info message about the missing fields', () => {
                 const body = {
