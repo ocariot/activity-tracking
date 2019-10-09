@@ -46,8 +46,8 @@ describe('Services: Environment', () => {
     incorrectEnv2.institution_id = '5c6dd16ea1a67d0034e6108bc'
 
     const incorrectEnv3: Environment = new EnvironmentMock()   // location invalid
-    incorrectEnv3.location!.local = ''
-    incorrectEnv3.location!.room = ''
+    incorrectEnv3.location!.local = undefined!
+    incorrectEnv3.location!.room = undefined!
 
     const incorrectEnv4: Environment = new EnvironmentMock()   // Measurement invalid (empty array)
     incorrectEnv4.measurements = new Array<Measurement>()
@@ -152,8 +152,8 @@ describe('Services: Environment', () => {
         context('when the Environment is incorrect (the location is invalid)', () => {
             it('should throw a ValidationException', () => {
                 incorrectEnvironment.institution_id = '507f1f77bcf86cd799439011'
-                incorrectEnvironment.location!.local = ''
-                incorrectEnvironment.location!.room = ''
+                incorrectEnvironment.location!.local = undefined!
+                incorrectEnvironment.location!.room = undefined!
 
                 return environmentService.add(incorrectEnvironment)
                     .catch(err => {

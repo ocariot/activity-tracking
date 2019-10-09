@@ -40,8 +40,8 @@ describe('Routes: environments', () => {
     incorrectEnv2.institution_id = '5c6dd16ea1a67d0034e6108bc'
 
     const incorrectEnv3: Environment = new EnvironmentMock()   // location invalid
-    incorrectEnv3.location!.local = ''
-    incorrectEnv3.location!.room = ''
+    incorrectEnv3.location!.local = undefined!
+    incorrectEnv3.location!.room = undefined!
 
     const incorrectEnv4: Environment = new EnvironmentMock()   // Measurement invalid (empty array)
     incorrectEnv4.measurements = new Array<Measurement>()
@@ -243,8 +243,7 @@ describe('Routes: environments', () => {
 
         context('when a validation error occurs (missing required fields)', () => {
             it('should return status code 400 and info message about missing fields', () => {
-                const body = {
-                }
+                const body = {}
 
                 return request
                     .post('/v1/environments')
@@ -302,6 +301,60 @@ describe('Routes: environments', () => {
                         expect(err.body.code).to.eql(400)
                         expect(err.body.message).to.eql('Location are not in a format that is supported...')
                         expect(err.body.description).to.eql('Validation of location failed: location local, location room is required!')
+                    })
+            })
+        })
+
+        context('when a validation error occurs (location local is invalid)', () => {
+            it('should return status code 400 and info message about the invalid location', () => {
+                const body = {
+                    institution_id: defaultEnvironment.institution_id,
+                    location: {
+                        local: '',
+                        room: defaultEnvironment.location!.room
+                    },
+                    measurements: defaultEnvironment.measurements,
+                    climatized: defaultEnvironment.climatized,
+                    timestamp: defaultEnvironment.timestamp
+                }
+
+                return request
+                    .post('/v1/environments')
+                    .send(body)
+                    .set('Content-Type', 'application/json')
+                    .expect(400)
+                    .then(err => {
+                        expect(err.body.code).to.eql(400)
+                        expect(err.body.message).to.eql('Location local field is invalid...')
+                        expect(err.body.description).to.eql('Validation of location failed: ' +
+                            'Location local must be at least one character.')
+                    })
+            })
+        })
+
+        context('when a validation error occurs (location room is invalid)', () => {
+            it('should return status code 400 and info message about the invalid location', () => {
+                const body = {
+                    institution_id: defaultEnvironment.institution_id,
+                    location: {
+                        local: defaultEnvironment.location!.local,
+                        room: ''
+                    },
+                    measurements: defaultEnvironment.measurements,
+                    climatized: defaultEnvironment.climatized,
+                    timestamp: defaultEnvironment.timestamp
+                }
+
+                return request
+                    .post('/v1/environments')
+                    .send(body)
+                    .set('Content-Type', 'application/json')
+                    .expect(400)
+                    .then(err => {
+                        expect(err.body.code).to.eql(400)
+                        expect(err.body.message).to.eql('Location room field is invalid...')
+                        expect(err.body.description).to.eql('Validation of location failed: ' +
+                            'Location room must be at least one character.')
                     })
             })
         })
@@ -618,7 +671,15 @@ describe('Routes: environments', () => {
                         for (let i = 0; i < res.body.error.length; i++) {
                             expect(res.body.error[i].code).to.eql(HttpStatus.BAD_REQUEST)
                             expect(res.body.error[i].item.institution_id).to.eql(incorrectEnvironmentsArr[i].institution_id)
-                            if (i !== 0) expect(res.body.error[i].item.location).to.eql(incorrectEnvironmentsArr[i].location!.toJSON())
+                            if (i === 2) {
+                                expect(res.body.error[i].item.location.latitude)
+                                    .to.eql(incorrectEnvironmentsArr[i].location!.latitude)
+                                expect(res.body.error[i].item.location.longitude)
+                                    .to.eql(incorrectEnvironmentsArr[i].location!.longitude)
+                            } else if (i !== 0) {
+                                expect(res.body.error[i].item.location)
+                                    .to.eql(incorrectEnvironmentsArr[i].location!.toJSON())
+                            }
                             if (res.body.error[i].item.climatized)
                                 expect(res.body.error[i].item.climatized).to.eql(incorrectEnvironmentsArr[i].climatized)
                             if (i !== 0) expect(res.body.error[i].item.timestamp)

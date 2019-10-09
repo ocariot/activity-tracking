@@ -81,7 +81,7 @@ describe('Services: PhysicalActivityService', () => {
     const incorrectActivity1: PhysicalActivity = new PhysicalActivity()        // Without all required fields
 
     const incorrectActivity2: PhysicalActivity = new PhysicalActivityMock()    // Without PhysicalActivity fields
-    incorrectActivity2.name = ''
+    incorrectActivity2.name = undefined
     incorrectActivity2.calories = undefined
 
     const incorrectActivity3: PhysicalActivity = new PhysicalActivityMock()    // start_time with a date newer than end_time
@@ -233,7 +233,7 @@ describe('Services: PhysicalActivityService', () => {
         context('when the physical activity is incorrect (missing physical activity fields)', () => {
             it('should throw a ValidationException', () => {
                 incorrectActivity = new PhysicalActivityMock()
-                incorrectActivity.name = ''
+                incorrectActivity.name = undefined
                 incorrectActivity.calories = undefined
 
                 return activityService.add(incorrectActivity)

@@ -69,8 +69,8 @@ describe('Validators: CreateEnvironmentValidator', () => {
                 environment.measurements = measurements_aux
                 environment.timestamp = timestamp_aux
                 if (environment.location) {
-                    environment.location.local = ''
-                    environment.location.room = ''
+                    environment.location.local = undefined!
+                    environment.location.room = undefined!
                 }
                 try {
                     CreateEnvironmentValidator.validate(environment)

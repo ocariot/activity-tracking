@@ -17,7 +17,7 @@ describe('Validators: LocationValidator', () => {
 
         context('when the location does not have all the required parameters (in this case missing local)', () => {
             it('should throw a ValidationException', () => {
-                location.local = ''
+                location.local = undefined!
                 try {
                     LocationValidator.validate(location)
                 } catch (err) {
@@ -29,7 +29,7 @@ describe('Validators: LocationValidator', () => {
 
         context('when the location does not have any of the required parameters', () => {
             it('should throw a ValidationException', () => {
-                location.room = ''
+                location.room = undefined!
                 try {
                     LocationValidator.validate(location)
                 } catch (err) {

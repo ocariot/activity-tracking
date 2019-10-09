@@ -95,7 +95,7 @@ describe('Routes: children.physicalactivities', () => {
     const incorrectActivity1: PhysicalActivity = new PhysicalActivity()        // Without all required fields
 
     const incorrectActivity2: PhysicalActivity = new PhysicalActivityMock()    // Without PhysicalActivity fields
-    incorrectActivity2.name = ''
+    incorrectActivity2.name = undefined
     incorrectActivity2.calories = undefined
 
     const incorrectActivity3: PhysicalActivity = new PhysicalActivityMock()    // start_time with a date newer than end_time
@@ -553,6 +553,34 @@ describe('Routes: children.physicalactivities', () => {
                         expect(err.body.code).to.eql(400)
                         expect(err.body.message).to.eql(Strings.CHILD.PARAM_ID_NOT_VALID_FORMAT)
                         expect(err.body.description).to.eql(Strings.ERROR_MESSAGE.UUID_NOT_VALID_FORMAT_DESC)
+                    })
+            })
+        })
+
+        context('when a validation error occurs (the name parameter does not have a valid value)', () => {
+            it('should return status code 400 and info message about the invalid parameter of name', () => {
+                const body = {
+                    name: '',
+                    start_time: defaultActivity.start_time,
+                    end_time: defaultActivity.end_time,
+                    duration: defaultActivity.duration,
+                    calories: defaultActivity.calories,
+                    steps: defaultActivity.steps ? defaultActivity.steps : undefined,
+                    distance: defaultActivity.distance ? defaultActivity.distance : undefined,
+                    levels: defaultActivity.levels ? defaultActivity.levels : undefined,
+                    heart_rate: defaultActivity.heart_rate ? defaultActivity.heart_rate : undefined
+                }
+
+                return request
+                    .post(`/v1/children/${defaultActivity.child_id}/physicalactivities`)
+                    .send(body)
+                    .set('Content-Type', 'application/json')
+                    .expect(400)
+                    .then(err => {
+                        expect(err.body.code).to.eql(400)
+                        expect(err.body.message).to.eql('Name field is invalid...')
+                        expect(err.body.description).to.eql('Physical Activity validation failed: ' +
+                            'Name must be at least one character.')
                     })
             })
         })
