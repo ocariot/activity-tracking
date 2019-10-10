@@ -10,7 +10,7 @@
 export abstract class Strings {
     public static readonly APP: any = {
         TITLE: 'Tracking Service',
-        APP_DESCRIPTION: 'Micro-service for physical activity, sleep and environmental measurements (temperature and humidity).'
+        APP_DESCRIPTION: 'Micro-service for physical activity, sleep and environmental measurements.'
     }
 
     public static readonly CHILD: any = {
@@ -40,6 +40,10 @@ export abstract class Strings {
     public static readonly ENVIRONMENT: any = {
         ALREADY_REGISTERED: 'Environment is already registered...',
         PARAM_ID_NOT_VALID_FORMAT: 'Parameter {environment_id} is not in valid format!'
+    }
+
+    public static readonly INSTITUTION: any = {
+        PARAM_ID_NOT_VALID_FORMAT: 'Parameter {institution_id} is not in valid format!'
     }
 
     public static readonly ERROR_MESSAGE: any = {

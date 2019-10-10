@@ -13,7 +13,7 @@ export class CreatePhysicalActivityValidator {
         if (activity.name === undefined) fields.push('name')
         else if (activity.name.length === 0) {
             throw new ValidationException('Name field is invalid...',
-                'Physical Activity validation failed: Name must be at least one character.')
+                'Physical Activity validation failed: Name must have at least one character.')
         }
         if (activity.calories === undefined) fields.push('calories')
         else if (isNaN(activity.calories)) {

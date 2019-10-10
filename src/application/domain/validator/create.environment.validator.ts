@@ -13,7 +13,7 @@ export class CreateEnvironmentValidator {
         // validate null
         if (!environment.timestamp) fields.push('timestamp')
         if (!environment.institution_id) fields.push('institution_id')
-        else ObjectIdValidator.validate(environment.institution_id)
+        else ObjectIdValidator.validate(environment.institution_id, Strings.INSTITUTION.PARAM_ID_NOT_VALID_FORMAT)
         if (!environment.location) fields.push('location')
         else LocationValidator.validate(environment.location)
         if (!environment.measurements) fields.push('measurements')

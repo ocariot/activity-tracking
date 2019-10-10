@@ -56,7 +56,7 @@ describe('Validators: CreateEnvironmentValidator', () => {
                 try {
                     CreateEnvironmentValidator.validate(environment)
                 } catch (err) {
-                    assert.equal(err.message, Strings.ERROR_MESSAGE.UUID_NOT_VALID_FORMAT)
+                    assert.equal(err.message, Strings.INSTITUTION.PARAM_ID_NOT_VALID_FORMAT)
                     assert.equal(err.description, Strings.ERROR_MESSAGE.UUID_NOT_VALID_FORMAT_DESC)
                 }
             })

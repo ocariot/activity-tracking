@@ -9,12 +9,12 @@ export class LocationValidator {
         if (location.local === undefined) fields.push('location local')
         else if (location.local.length === 0) {
             throw new ValidationException('Location local field is invalid...',
-                'Validation of location failed: Location local must be at least one character.')
+                'Validation of location failed: Location local must have at least one character.')
         }
         if (location.room === undefined) fields.push('location room')
         else if (location.room.length === 0) {
             throw new ValidationException('Location room field is invalid...',
-                'Validation of location failed: Location room must be at least one character.')
+                'Validation of location failed: Location room must have at least one character.')
         }
 
         if (fields.length > 0) {

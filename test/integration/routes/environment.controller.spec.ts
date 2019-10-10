@@ -276,7 +276,7 @@ describe('Routes: environments', () => {
                     .expect(400)
                     .then(err => {
                         expect(err.body.code).to.eql(400)
-                        expect(err.body.message).to.eql(Strings.ERROR_MESSAGE.UUID_NOT_VALID_FORMAT)
+                        expect(err.body.message).to.eql(Strings.INSTITUTION.PARAM_ID_NOT_VALID_FORMAT)
                         expect(err.body.description).to.eql(Strings.ERROR_MESSAGE.UUID_NOT_VALID_FORMAT_DESC)
                     })
             })
@@ -327,7 +327,7 @@ describe('Routes: environments', () => {
                         expect(err.body.code).to.eql(400)
                         expect(err.body.message).to.eql('Location local field is invalid...')
                         expect(err.body.description).to.eql('Validation of location failed: ' +
-                            'Location local must be at least one character.')
+                            'Location local must have at least one character.')
                     })
             })
         })
@@ -354,7 +354,7 @@ describe('Routes: environments', () => {
                         expect(err.body.code).to.eql(400)
                         expect(err.body.message).to.eql('Location room field is invalid...')
                         expect(err.body.description).to.eql('Validation of location failed: ' +
-                            'Location room must be at least one character.')
+                            'Location room must have at least one character.')
                     })
             })
         })
@@ -651,7 +651,7 @@ describe('Routes: environments', () => {
                             .to.eql('Validation of environment failed: ' +
                             'timestamp, institution_id, location, measurements required!')
                         expect(res.body.error[1].message)
-                            .to.eql(Strings.ERROR_MESSAGE.UUID_NOT_VALID_FORMAT)
+                            .to.eql(Strings.INSTITUTION.PARAM_ID_NOT_VALID_FORMAT)
                         expect(res.body.error[1].description)
                             .to.eql(Strings.ERROR_MESSAGE.UUID_NOT_VALID_FORMAT_DESC)
                         expect(res.body.error[2].message)

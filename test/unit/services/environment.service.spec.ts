@@ -143,7 +143,7 @@ describe('Services: Environment', () => {
 
                 return environmentService.add(incorrectEnvironment)
                     .catch(err => {
-                        assert.propertyVal(err, 'message', Strings.ERROR_MESSAGE.UUID_NOT_VALID_FORMAT)
+                        assert.propertyVal(err, 'message', Strings.INSTITUTION.PARAM_ID_NOT_VALID_FORMAT)
                         assert.propertyVal(err, 'description', Strings.ERROR_MESSAGE.UUID_NOT_VALID_FORMAT_DESC)
                     })
             })
@@ -296,7 +296,7 @@ describe('Services: Environment', () => {
                         assert.propertyVal(result.error[0], 'description',
                             'Validation of environment failed: timestamp, institution_id, location, measurements required!')
                         assert.propertyVal(result.error[1], 'message',
-                            Strings.ERROR_MESSAGE.UUID_NOT_VALID_FORMAT)
+                            Strings.INSTITUTION.PARAM_ID_NOT_VALID_FORMAT)
                         assert.propertyVal(result.error[1], 'description',
                             Strings.ERROR_MESSAGE.UUID_NOT_VALID_FORMAT_DESC)
                         assert.propertyVal(result.error[2], 'message',

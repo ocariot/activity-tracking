@@ -580,7 +580,7 @@ describe('Routes: children.physicalactivities', () => {
                         expect(err.body.code).to.eql(400)
                         expect(err.body.message).to.eql('Name field is invalid...')
                         expect(err.body.description).to.eql('Physical Activity validation failed: ' +
-                            'Name must be at least one character.')
+                            'Name must have at least one character.')
                     })
             })
         })
@@ -2265,7 +2265,7 @@ describe('Routes: children.physicalactivities', () => {
                         expect(err.body.code).to.eql(400)
                         expect(err.body.message).to.eql('Name field is invalid...')
                         expect(err.body.description).to.eql('Physical Activity validation failed: ' +
-                            'Name must be at least one character.')
+                            'Name must have at least one character.')
                     })
             })
         })
