@@ -7,17 +7,28 @@ export class HeartRateZoneValidator {
         const fields: Array<string> = []
 
         if (heartRateZone.min === undefined) fields.push('min')
-        else if (heartRateZone.min < 0) {
+        else if (isNaN(heartRateZone.min)) {
+            throw new ValidationException('Min field is invalid...',
+                'HeartRateZone validation failed: '.concat(Strings.ERROR_MESSAGE.INVALID_NUMBER))
+        } else if (heartRateZone.min < 0) {
             throw new ValidationException('Min field is invalid...',
                 'HeartRateZone validation failed: '.concat(Strings.ERROR_MESSAGE.NEGATIVE_PARAMETER))
         }
+
         if (heartRateZone.max === undefined) fields.push('max')
-        else if (heartRateZone.max < 0) {
+        else if (isNaN(heartRateZone.max)) {
+            throw new ValidationException('Max field is invalid...',
+                'HeartRateZone validation failed: '.concat(Strings.ERROR_MESSAGE.INVALID_NUMBER))
+        } else if (heartRateZone.max < 0) {
             throw new ValidationException('Max field is invalid...',
                 'HeartRateZone validation failed: '.concat(Strings.ERROR_MESSAGE.NEGATIVE_PARAMETER))
         }
+
         if (heartRateZone.duration === undefined) fields.push('duration')
-        else if (heartRateZone.duration < 0) {
+        else if (isNaN(heartRateZone.duration)) {
+            throw new ValidationException('Duration field is invalid...',
+                'HeartRateZone validation failed: '.concat(Strings.ERROR_MESSAGE.INVALID_NUMBER))
+        } else if (heartRateZone.duration < 0) {
             throw new ValidationException('Duration field is invalid...',
                 'HeartRateZone validation failed: '.concat(Strings.ERROR_MESSAGE.NEGATIVE_PARAMETER))
         }

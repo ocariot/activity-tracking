@@ -3,6 +3,7 @@ import { Environment } from '../model/environment'
 import { LocationValidator } from './location.validator'
 import { ObjectIdValidator } from './object.id.validator'
 import { Measurement } from '../model/measurement'
+import { Strings } from '../../../utils/strings'
 
 export class CreateEnvironmentValidator {
     public static validate(environment: Environment): void | ValidationException {
@@ -12,7 +13,7 @@ export class CreateEnvironmentValidator {
         // validate null
         if (!environment.timestamp) fields.push('timestamp')
         if (!environment.institution_id) fields.push('institution_id')
-        else ObjectIdValidator.validate(environment.institution_id)
+        else ObjectIdValidator.validate(environment.institution_id, Strings.INSTITUTION.PARAM_ID_NOT_VALID_FORMAT)
         if (!environment.location) fields.push('location')
         else LocationValidator.validate(environment.location)
         if (!environment.measurements) fields.push('measurements')
@@ -24,6 +25,10 @@ export class CreateEnvironmentValidator {
                 // validate null
                 if (!measurement.type) fields.push('measurement type')
                 if (measurement.value === undefined) fields.push('measurement value')
+                else if (isNaN(measurement.value)) {
+                    throw new ValidationException('Measurement value field is invalid...',
+                        'Validation of environment failed: '.concat(Strings.ERROR_MESSAGE.INVALID_NUMBER))
+                }
                 if (!measurement.unit) fields.push('measurement unit')
             })
         }

@@ -10,20 +10,40 @@ export class CreatePhysicalActivityValidator {
         const fields: Array<string> = []
 
         CreateActivityValidator.validate(activity)
-        if (!activity.name) fields.push('name')
+        if (activity.name === undefined) fields.push('name')
+        else if (activity.name.length === 0) {
+            throw new ValidationException('Name field is invalid...',
+                'Physical Activity validation failed: Name must have at least one character.')
+        }
         if (activity.calories === undefined) fields.push('calories')
-        else if (activity.calories < 0) {
+        else if (isNaN(activity.calories)) {
+            throw new ValidationException('Calories field is invalid...',
+                'Physical Activity validation failed: '.concat(Strings.ERROR_MESSAGE.INVALID_NUMBER))
+        } else if (activity.calories < 0) {
             throw new ValidationException('Calories field is invalid...',
                 'Physical Activity validation failed: '.concat(Strings.ERROR_MESSAGE.NEGATIVE_PARAMETER))
         }
-        if (activity.steps !== undefined && activity.steps < 0) {
-            throw new ValidationException('Steps field is invalid...',
-                'Physical Activity validation failed: '.concat(Strings.ERROR_MESSAGE.NEGATIVE_PARAMETER))
+
+        if (activity.steps) {
+            if (isNaN(activity.steps)) {
+                throw new ValidationException('Steps field is invalid...',
+                    'Physical Activity validation failed: '.concat(Strings.ERROR_MESSAGE.INVALID_NUMBER))
+            } else if (activity.steps < 0) {
+                throw new ValidationException('Steps field is invalid...',
+                    'Physical Activity validation failed: '.concat(Strings.ERROR_MESSAGE.NEGATIVE_PARAMETER))
+            }
         }
-        if (activity.distance !== undefined && activity.distance < 0) {
-            throw new ValidationException('Distance field is invalid...',
-                'Physical Activity validation failed: '.concat(Strings.ERROR_MESSAGE.NEGATIVE_PARAMETER))
+
+        if (activity.distance) {
+            if (isNaN(activity.distance)) {
+                throw new ValidationException('Distance field is invalid...',
+                    'Physical Activity validation failed: '.concat(Strings.ERROR_MESSAGE.INVALID_NUMBER))
+            } else if (activity.distance < 0) {
+                throw new ValidationException('Distance field is invalid...',
+                    'Physical Activity validation failed: '.concat(Strings.ERROR_MESSAGE.NEGATIVE_PARAMETER))
+            }
         }
+
         if (activity.levels && activity.levels.length > 0) PhysicalActivityLevelsValidator.validate(activity.levels)
         if (activity.heart_rate) PhysicalActivityHeartRateValidator.validate(activity.heart_rate)
 

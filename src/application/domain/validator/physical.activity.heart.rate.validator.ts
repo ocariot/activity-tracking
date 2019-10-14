@@ -8,7 +8,10 @@ export class PhysicalActivityHeartRateValidator {
         const fields: Array<string> = []
 
         if (activityHeartRate.average === undefined) fields.push('average')
-        else if (activityHeartRate.average < 0) {
+        else if (isNaN(activityHeartRate.average)) {
+            throw new ValidationException('Average field is invalid...',
+                'PhysicalActivityHeartRate validation failed: '.concat(Strings.ERROR_MESSAGE.INVALID_NUMBER))
+        } else if (activityHeartRate.average < 0) {
             throw new ValidationException('Average field is invalid...',
                 'PhysicalActivityHeartRate validation failed: '.concat(Strings.ERROR_MESSAGE.NEGATIVE_PARAMETER))
         }

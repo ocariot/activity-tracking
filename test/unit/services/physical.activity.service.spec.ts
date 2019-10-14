@@ -25,6 +25,10 @@ import { Default } from '../../../src/utils/default'
 describe('Services: PhysicalActivityService', () => {
     const activity: PhysicalActivity = new PhysicalActivityMock()
     const otherActivity: PhysicalActivity = new PhysicalActivityMock()
+    otherActivity.start_time = undefined
+    otherActivity.end_time = undefined
+    otherActivity.duration = undefined
+    otherActivity.levels = []
     let incorrectActivity: PhysicalActivity = new PhysicalActivity()
 
     // Mock through JSON
@@ -77,7 +81,7 @@ describe('Services: PhysicalActivityService', () => {
     const incorrectActivity1: PhysicalActivity = new PhysicalActivity()        // Without all required fields
 
     const incorrectActivity2: PhysicalActivity = new PhysicalActivityMock()    // Without PhysicalActivity fields
-    incorrectActivity2.name = ''
+    incorrectActivity2.name = undefined
     incorrectActivity2.calories = undefined
 
     const incorrectActivity3: PhysicalActivity = new PhysicalActivityMock()    // start_time with a date newer than end_time
@@ -229,7 +233,7 @@ describe('Services: PhysicalActivityService', () => {
         context('when the physical activity is incorrect (missing physical activity fields)', () => {
             it('should throw a ValidationException', () => {
                 incorrectActivity = new PhysicalActivityMock()
-                incorrectActivity.name = ''
+                incorrectActivity.name = undefined
                 incorrectActivity.calories = undefined
 
                 return activityService.add(incorrectActivity)
@@ -752,10 +756,9 @@ describe('Services: PhysicalActivityService', () => {
 
         context('when physical activity does not exist in the database', () => {
             it('should return undefined', () => {
-                activity.id = '5a62be07de34500146d9c544'            // Make mock return undefined
-                activity.child_id = '5a62be07de34500146d9c544'      // Make child_id valid again
+                otherActivity.child_id = '5a62be07de34500146d9c544'      // Make child_id valid again
 
-                return activityService.updateByChild(activity)
+                return activityService.updateByChild(otherActivity)
                     .then(result => {
                         assert.isUndefined(result)
                     })
@@ -787,95 +790,12 @@ describe('Services: PhysicalActivityService', () => {
             })
         })
 
-        context('when the physical activity is incorrect (duration is negative)', () => {
-            it('should throw a ValidationException', () => {
-                incorrectActivity.child_id = '5a62be07de34500146d9c544'     // Make child_id valid again
-                incorrectActivity.duration = -11780000
-
-                return activityService.updateByChild(incorrectActivity)
-                    .catch(err => {
-                        assert.propertyVal(err, 'message', 'Duration field is invalid...')
-                        assert.propertyVal(err, 'description', 'Physical Activity validation failed: The value provided ' +
-                            'has a negative value!')
-                    })
-            })
-        })
-
-        context('when the physical activity is incorrect (calories is negative)', () => {
-            it('should throw a ValidationException', () => {
-                incorrectActivity = new PhysicalActivityMock()
-                incorrectActivity.calories = -200
-
-                return activityService.updateByChild(incorrectActivity)
-                    .catch(err => {
-                        assert.propertyVal(err, 'message', 'Calories field is invalid...')
-                        assert.propertyVal(err, 'description', 'Physical Activity validation failed: The value provided ' +
-                            'has a negative value!')
-                    })
-            })
-        })
-
-        context('when the physical activity is incorrect (steps is negative)', () => {
-            it('should throw a ValidationException', () => {
-                incorrectActivity = new PhysicalActivityMock()
-                incorrectActivity.calories = 200
-                incorrectActivity.steps = -1000
-
-                return activityService.updateByChild(incorrectActivity)
-                    .catch(err => {
-                        assert.propertyVal(err, 'message', 'Steps field is invalid...')
-                        assert.propertyVal(err, 'description', 'Physical Activity validation failed: The value provided ' +
-                            'has a negative value!')
-                    })
-            })
-        })
-
-        context('when the physical activity is incorrect (the levels array has an item with an invalid type)', () => {
-            it('should throw a ValidationException', () => {
-                incorrectActivityJSON.levels[0].name = 'sedentaries'
-                incorrectActivityJSON.levels[0].duration = Math.floor((Math.random() * 10) * 60000)
-                incorrectActivity = incorrectActivity.fromJSON(incorrectActivityJSON)
-
-                return activityService.updateByChild(incorrectActivity)
-                    .catch(err => {
-                        assert.propertyVal(err, 'message', 'The name of level provided "sedentaries" is not supported...')
-                        assert.propertyVal(err, 'description', 'The names of the allowed levels are: sedentary, lightly, fairly, very.')
-                    })
-            })
-        })
-
-        context('when the physical activity is incorrect (the levels array has an item that contains empty fields)', () => {
-            it('should throw a ValidationException', () => {
-                incorrectActivityJSON.levels[0].name = ''
-                incorrectActivityJSON.levels[0].duration = undefined
-                incorrectActivity = incorrectActivity.fromJSON(incorrectActivityJSON)
-
-                return activityService.updateByChild(incorrectActivity)
-                    .catch(err => {
-                        assert.propertyVal(err, 'message', 'Level are not in a format that is supported!')
-                        assert.propertyVal(err, 'description', 'Must have values ​​for the following levels: sedentary, ' +
-                            'lightly, fairly, very.')
-                    })
-            })
-        })
-
-        context('when the physical activity is incorrect (the levels array has an item that contains negative duration)', () => {
-            it('should throw a ValidationException', () => {
-                incorrectActivityJSON.levels[0].name = ActivityLevelType.SEDENTARY
-                incorrectActivityJSON.levels[0].duration = -(Math.floor((Math.random() * 10 + 1) * 60000))
-                incorrectActivity = incorrectActivity.fromJSON(incorrectActivityJSON)
-
-                return activityService.updateByChild(incorrectActivity)
-                    .catch(err => {
-                        assert.propertyVal(err, 'message', 'Some (or several) duration field of levels array is invalid...')
-                        assert.propertyVal(err, 'description', 'Physical Activity Level validation failed: The value provided ' +
-                            'has a negative value!')
-                    })
-            })
-        })
-
         context('when the physical activity is incorrect (the PhysicalActivityHeartRate is empty)', () => {
             it('should throw a ValidationException', () => {
+                incorrectActivity12.start_time = undefined
+                incorrectActivity12.end_time = undefined
+                incorrectActivity12.duration = undefined
+                incorrectActivity12.levels = []
                 return activityService.updateByChild(incorrectActivity12)
                     .catch(err => {
                         assert.propertyVal(err, 'message', 'Required fields were not provided...')
@@ -887,6 +807,10 @@ describe('Services: PhysicalActivityService', () => {
 
         context('when the physical activity is incorrect (the PhysicalActivityHeartRate has a negative average parameter)', () => {
             it('should throw a ValidationException', () => {
+                incorrectActivity13.start_time = undefined
+                incorrectActivity13.end_time = undefined
+                incorrectActivity13.duration = undefined
+                incorrectActivity13.levels = []
                 return activityService.updateByChild(incorrectActivity13)
                     .catch(err => {
                         assert.propertyVal(err, 'message', 'Average field is invalid...')
@@ -898,6 +822,10 @@ describe('Services: PhysicalActivityService', () => {
 
         context('when the physical activity is incorrect (the "Fat Burn Zone" parameter of PhysicalActivityHeartRate is empty)', () => {
             it('should throw a ValidationException', () => {
+                incorrectActivity14.start_time = undefined
+                incorrectActivity14.end_time = undefined
+                incorrectActivity14.duration = undefined
+                incorrectActivity14.levels = []
                 return activityService.updateByChild(incorrectActivity14)
                     .catch(err => {
                         assert.propertyVal(err, 'message', 'Required fields were not provided...')
@@ -909,6 +837,10 @@ describe('Services: PhysicalActivityService', () => {
         context('when the physical activity is incorrect ' +
             '(the "Fat Burn Zone" parameter of PhysicalActivityHeartRate has a negative duration)', () => {
             it('should throw a ValidationException', () => {
+                incorrectActivity15.start_time = undefined
+                incorrectActivity15.end_time = undefined
+                incorrectActivity15.duration = undefined
+                incorrectActivity15.levels = []
                 return activityService.updateByChild(incorrectActivity15)
                     .catch(err => {
                         assert.propertyVal(err, 'message', 'Duration field is invalid...')

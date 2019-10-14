@@ -40,8 +40,8 @@ describe('Routes: environments', () => {
     incorrectEnv2.institution_id = '5c6dd16ea1a67d0034e6108bc'
 
     const incorrectEnv3: Environment = new EnvironmentMock()   // location invalid
-    incorrectEnv3.location!.local = ''
-    incorrectEnv3.location!.room = ''
+    incorrectEnv3.location!.local = undefined!
+    incorrectEnv3.location!.room = undefined!
 
     const incorrectEnv4: Environment = new EnvironmentMock()   // Measurement invalid (empty array)
     incorrectEnv4.measurements = new Array<Measurement>()
@@ -243,8 +243,7 @@ describe('Routes: environments', () => {
 
         context('when a validation error occurs (missing required fields)', () => {
             it('should return status code 400 and info message about missing fields', () => {
-                const body = {
-                }
+                const body = {}
 
                 return request
                     .post('/v1/environments')
@@ -277,7 +276,7 @@ describe('Routes: environments', () => {
                     .expect(400)
                     .then(err => {
                         expect(err.body.code).to.eql(400)
-                        expect(err.body.message).to.eql(Strings.ERROR_MESSAGE.UUID_NOT_VALID_FORMAT)
+                        expect(err.body.message).to.eql(Strings.INSTITUTION.PARAM_ID_NOT_VALID_FORMAT)
                         expect(err.body.description).to.eql(Strings.ERROR_MESSAGE.UUID_NOT_VALID_FORMAT_DESC)
                     })
             })
@@ -306,6 +305,60 @@ describe('Routes: environments', () => {
             })
         })
 
+        context('when a validation error occurs (location local is invalid)', () => {
+            it('should return status code 400 and info message about the invalid location', () => {
+                const body = {
+                    institution_id: defaultEnvironment.institution_id,
+                    location: {
+                        local: '',
+                        room: defaultEnvironment.location!.room
+                    },
+                    measurements: defaultEnvironment.measurements,
+                    climatized: defaultEnvironment.climatized,
+                    timestamp: defaultEnvironment.timestamp
+                }
+
+                return request
+                    .post('/v1/environments')
+                    .send(body)
+                    .set('Content-Type', 'application/json')
+                    .expect(400)
+                    .then(err => {
+                        expect(err.body.code).to.eql(400)
+                        expect(err.body.message).to.eql('Location local field is invalid...')
+                        expect(err.body.description).to.eql('Validation of location failed: ' +
+                            'Location local must have at least one character.')
+                    })
+            })
+        })
+
+        context('when a validation error occurs (location room is invalid)', () => {
+            it('should return status code 400 and info message about the invalid location', () => {
+                const body = {
+                    institution_id: defaultEnvironment.institution_id,
+                    location: {
+                        local: defaultEnvironment.location!.local,
+                        room: ''
+                    },
+                    measurements: defaultEnvironment.measurements,
+                    climatized: defaultEnvironment.climatized,
+                    timestamp: defaultEnvironment.timestamp
+                }
+
+                return request
+                    .post('/v1/environments')
+                    .send(body)
+                    .set('Content-Type', 'application/json')
+                    .expect(400)
+                    .then(err => {
+                        expect(err.body.code).to.eql(400)
+                        expect(err.body.message).to.eql('Location room field is invalid...')
+                        expect(err.body.description).to.eql('Validation of location failed: ' +
+                            'Location room must have at least one character.')
+                    })
+            })
+        })
+
         context('when a validation error occurs (measurements array is empty)', () => {
             it('should return status code 400 and info message about the invalid measurements array', () => {
                 const body = {
@@ -325,6 +378,41 @@ describe('Routes: environments', () => {
                         expect(err.body.code).to.eql(400)
                         expect(err.body.message).to.eql('Measurement are not in a format that is supported!')
                         expect(err.body.description).to.eql('The measurements collection must not be empty!')
+                    })
+            })
+        })
+
+        context('when a validation error occurs (measurements array has an item that has an invalid value)', () => {
+            it('should return status code 400 and info message about the invalid measurements array', () => {
+                const body = {
+                    institution_id: defaultEnvironment.institution_id,
+                    location: defaultEnvironment.location,
+                    measurements: [
+                        {
+                            type: MeasurementType.HUMIDITY,
+                            value: '32a',
+                            unit: '%'
+                        },
+                        {
+                            type: MeasurementType.TEMPERATURE,
+                            value: 38,
+                            unit: '°C'
+                        }
+                    ],
+                    climatized: defaultEnvironment.climatized,
+                    timestamp: defaultEnvironment.timestamp
+                }
+
+                return request
+                    .post('/v1/environments')
+                    .send(body)
+                    .set('Content-Type', 'application/json')
+                    .expect(400)
+                    .then(err => {
+                        expect(err.body.code).to.eql(400)
+                        expect(err.body.message).to.eql('Measurement value field is invalid...')
+                        expect(err.body.description).to.eql('Validation of environment failed: '
+                            .concat(Strings.ERROR_MESSAGE.INVALID_NUMBER))
                     })
             })
         })
@@ -563,7 +651,7 @@ describe('Routes: environments', () => {
                             .to.eql('Validation of environment failed: ' +
                             'timestamp, institution_id, location, measurements required!')
                         expect(res.body.error[1].message)
-                            .to.eql(Strings.ERROR_MESSAGE.UUID_NOT_VALID_FORMAT)
+                            .to.eql(Strings.INSTITUTION.PARAM_ID_NOT_VALID_FORMAT)
                         expect(res.body.error[1].description)
                             .to.eql(Strings.ERROR_MESSAGE.UUID_NOT_VALID_FORMAT_DESC)
                         expect(res.body.error[2].message)
@@ -583,7 +671,15 @@ describe('Routes: environments', () => {
                         for (let i = 0; i < res.body.error.length; i++) {
                             expect(res.body.error[i].code).to.eql(HttpStatus.BAD_REQUEST)
                             expect(res.body.error[i].item.institution_id).to.eql(incorrectEnvironmentsArr[i].institution_id)
-                            if (i !== 0) expect(res.body.error[i].item.location).to.eql(incorrectEnvironmentsArr[i].location!.toJSON())
+                            if (i === 2) {
+                                expect(res.body.error[i].item.location.latitude)
+                                    .to.eql(incorrectEnvironmentsArr[i].location!.latitude)
+                                expect(res.body.error[i].item.location.longitude)
+                                    .to.eql(incorrectEnvironmentsArr[i].location!.longitude)
+                            } else if (i !== 0) {
+                                expect(res.body.error[i].item.location)
+                                    .to.eql(incorrectEnvironmentsArr[i].location!.toJSON())
+                            }
                             if (res.body.error[i].item.climatized)
                                 expect(res.body.error[i].item.climatized).to.eql(incorrectEnvironmentsArr[i].climatized)
                             if (i !== 0) expect(res.body.error[i].item.timestamp)
@@ -641,10 +737,7 @@ describe('Routes: environments', () => {
                     .set('Content-Type', 'application/json')
                     .expect(200)
                     .then(res => {
-                        expect(res.body.length).to.not.eql(0)
-                        // Check for the existence of properties only in the first element of the array
-                        // because there is a guarantee that there will be at least one object (created
-                        // in the case of the successful POST route test or with the create method above).
+                        expect(res.body.length).to.eql(1)
                         expect(res.body[0]).to.have.property('id')
                         expect(res.body[0].institution_id).to.eql(defaultEnvironment.institution_id)
                         expect(res.body[0].location.local).to.eql(defaultEnvironment.location!.local)
@@ -678,7 +771,6 @@ describe('Routes: environments', () => {
                     .set('Content-Type', 'application/json')
                     .expect(200)
                     .then(res => {
-                        expect(res.body).is.an.instanceOf(Array)
                         expect(res.body.length).to.eql(0)
                     })
             })
@@ -686,37 +778,20 @@ describe('Routes: environments', () => {
         /**
          * query-strings-parser library test
          */
-        context('when get environment using the "query-strings-parser" library', () => {
+        context('when use "query-strings-parser" library', () => {
+            let result1
+
             before(async () => {
                 try {
                     await deleteAllEnvironments()
 
-                    await createEnvironment({
-                        institution_id: defaultEnvironment.institution_id,
-                        location: defaultEnvironment.location,
-                        measurements: [
-                            {
-                                type: MeasurementType.TEMPERATURE,
-                                value: 34,
-                                unit: '°C'
-                            },
-                            {
-                                type: MeasurementType.HUMIDITY,
-                                value: 40,
-                                unit: '%'
-                            }
-                        ],
-                        climatized: true,
-                        timestamp: defaultEnvironment.timestamp
-                    })
-
-                    await createEnvironment({
+                    result1 = await createEnvironment({
                         institution_id: defaultEnvironment.institution_id,
                         location: {
-                            local: 'indoor',
-                            room: 'room 01',
-                            latitude: '34.54323217',
-                            longitude: '7.54534798'
+                            local: 'Indoor',
+                            room: 'Room 40',
+                            latitude: 34.54323217,
+                            longitude: 7.54534798
                         },
                         measurements: [
                             {
@@ -731,63 +806,102 @@ describe('Routes: environments', () => {
                             }
                         ],
                         climatized: false,
-                        timestamp: defaultEnvironment.timestamp
+                        timestamp: new Date(1547953200000)
+                    })
+
+                    await createEnvironment({
+                        institution_id: defaultEnvironment.institution_id,
+                        location: {
+                            local: 'Indoor',
+                            room: 'Room 39',
+                            latitude: 34.54323217,
+                            longitude: 7.54534798
+                        },
+                        measurements: [
+                            {
+                                type: MeasurementType.HUMIDITY,
+                                value: 32,
+                                unit: '%'
+                            },
+                            {
+                                type: MeasurementType.TEMPERATURE,
+                                value: 38,
+                                unit: '°C'
+                            }
+                        ],
+                        climatized: false,
+                        timestamp: new Date(1548007200000)
                     })
                 } catch (err) {
                     throw new Error('Failure on environments routes test: ' + err.message)
                 }
             })
-            it('should return status code 200 and the result as needed in the query', () => {
-                const url = '/v1/environments?climatized=true&sort=institution_id&page=1&limit=3'
+            it('should return status code 200 and the result as needed in the query ' +
+                '(all the environment records of an institution in one day)', () => {
+                const url = '/v1/environments'
+                    .concat(`?institution_id=${defaultEnvironment.institution_id}`)
+                    .concat('&timestamp=gte:2019-01-20T00:00:00.000Z&timestamp=lt:2019-01-20T23:59:59.999Z')
+                    .concat('&sort=institution_id&page=1&limit=3')
 
                 return request
                     .get(url)
                     .set('Content-Type', 'application/json')
                     .expect(200)
                     .then(res => {
-                        expect(res.body).is.an.instanceOf(Array)
-                        expect(res.body.length).to.not.eql(0)
-                        // Check for the existence of properties only in the first element of the array
-                        // because there is a guarantee that there will be at least one object (created
-                        // in the case of the successful POST route test or with the create method above)
-                        // with the property 'climatized' = true (the only query filter)
+                        expect(res.body.length).to.eql(2)
+                        for (const env of res.body) {
+                            expect(env).to.have.property('id')
+                            expect(env).to.have.property('institution_id')
+                            expect(env).to.have.property('location')
+                            expect(env).to.have.property('measurements')
+                            expect(env).to.have.property('climatized')
+                            expect(env).to.have.property('timestamp')
+                        }
+                    })
+            })
+
+            it('should return status code 200 and the result as needed in the query ' +
+                '(all the environment records of a room in one day)', () => {
+                const url = '/v1/environments'
+                    .concat(`?institution_id=${defaultEnvironment.institution_id}`)
+                    .concat('&location.local=Indoor&location.room=Room 40')
+                    .concat('&timestamp=gte:2019-01-20T00:00:00.000Z&timestamp=lt:2019-01-20T23:59:59.999Z')
+                    .concat('&sort=institution_id&page=1&limit=3')
+
+                return request
+                    .get(url)
+                    .set('Content-Type', 'application/json')
+                    .expect(200)
+                    .then(res => {
+                        expect(res.body.length).to.eql(1)
                         expect(res.body[0]).to.have.property('id')
                         expect(res.body[0].institution_id).to.eql(defaultEnvironment.institution_id)
-                        expect(res.body[0].location.local).to.eql(defaultEnvironment.location!.local)
-                        expect(res.body[0].location.room).to.eql(defaultEnvironment.location!.room)
-                        expect(res.body[0].location.latitude).to.eql(defaultEnvironment.location!.latitude)
-                        expect(res.body[0].location.longitude).to.eql(defaultEnvironment.location!.longitude)
-                        expect(res.body[0].measurements[0].type).to.eql(MeasurementType.TEMPERATURE)
-                        expect(res.body[0].measurements[0].value).to.eql(34)
-                        expect(res.body[0].measurements[0].unit).to.eql('°C')
-                        expect(res.body[0].measurements[1].type).to.eql(MeasurementType.HUMIDITY)
-                        expect(res.body[0].measurements[1].value).to.eql(40)
-                        expect(res.body[0].measurements[1].unit).to.eql('%')
-                        expect(res.body[0].climatized).to.eql(true)
-                        expect(res.body[0].timestamp).to.eql(defaultEnvironment.timestamp.toISOString())
+                        expect(res.body[0].location.local).to.eql('Indoor')
+                        expect(res.body[0].location.room).to.eql('Room 40')
+                        expect(res.body[0].location.latitude).to.eql(34.54323217)
+                        expect(res.body[0].location.longitude).to.eql(7.54534798)
+                        expect(res.body[0].measurements[0].type).to.eql(MeasurementType.HUMIDITY)
+                        expect(res.body[0].measurements[0].value).to.eql(32)
+                        expect(res.body[0].measurements[0].unit).to.eql('%')
+                        expect(res.body[0].measurements[1].type).to.eql(MeasurementType.TEMPERATURE)
+                        expect(res.body[0].measurements[1].value).to.eql(38)
+                        expect(res.body[0].measurements[1].unit).to.eql('°C')
+                        expect(res.body[0].climatized).to.eql(false)
+                        expect(res.body[0].timestamp).to.eql(result1.timestamp.toISOString())
                     })
             })
-        })
 
-        context('when there is an attempt to get environment using the "query-strings-parser" library but there is no ' +
-            'environment in the database', () => {
-            before(async () => {
-                try {
-                    await deleteAllEnvironments()
-                } catch (err) {
-                    throw new Error('Failure on environments routes test: ' + err.message)
-                }
-            })
-
-            it('should return status code 200 and an empty list', () => {
-                const url = '/v1/environments?climatized=true&sort=institution_id&page=1&limit=3'
+            it('should return status code 200 and an empty list (when no environment record is found)', () => {
+                const url = '/v1/environments?'
+                    .concat('?timestamp=gte:2017-01-20T00:00:00.000Z&timestamp=lt:2017-01-20T23:59:59.999Z')
+                    .concat(`&institution_id=${defaultEnvironment.institution_id}`)
+                    .concat('&sort=institution_id&page=1&limit=3')
 
                 return request
                     .get(url)
                     .set('Content-Type', 'application/json')
                     .expect(200)
                     .then(res => {
-                        expect(res.body).is.an.instanceOf(Array)
                         expect(res.body.length).to.eql(0)
                     })
             })

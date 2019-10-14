@@ -16,6 +16,10 @@ export class CreateMeasurementValidator {
         }
         if (!measurement.timestamp) fields.push('timestamp')
         if (measurement.value === undefined) fields.push('value')
+        else if (isNaN(measurement.value)) {
+            throw new ValidationException('Measurement value field is invalid...',
+                'Measurement validation failed: '.concat(Strings.ERROR_MESSAGE.INVALID_NUMBER))
+        }
         if (!measurement.unit) fields.push('unit')
 
         if (!measurement.child_id) fields.push('child_id')

@@ -12,17 +12,19 @@ export class CreateLogValidator {
         // validate null and correct attribute types.
         if (!childLog.type) fields.push('type')
         else LogTypeValidator.validate((childLog.type))
+
         if (!childLog.date) fields.push('date')
         else DateValidator.validate(childLog.date)
+
         if (childLog.value === undefined) fields.push('value')
-        if (typeof childLog.value === 'string') {
+        else if (isNaN(childLog.value)) {
             throw new ValidationException('Value field is invalid...',
-                'Child log validation failed: The value received is not a number')
-        }
-        else if (childLog.value < 0) {
+                'Child log validation failed: '.concat(Strings.ERROR_MESSAGE.INVALID_NUMBER))
+        } else if (childLog.value < 0) {
             throw new ValidationException('Value field is invalid...',
                 'Child log validation failed: '.concat(Strings.ERROR_MESSAGE.NEGATIVE_PARAMETER))
         }
+
         if (!childLog.child_id) fields.push('child_id')
         else ObjectIdValidator.validate(childLog.child_id, Strings.CHILD.PARAM_ID_NOT_VALID_FORMAT)
 

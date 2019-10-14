@@ -28,7 +28,7 @@ export class PhysicalActivity extends Activity implements IJSONSerializable, IJS
     }
 
     set name(value: string | undefined) {
-        this._name = value
+        this._name = value ? value.trim() : value
     }
 
     get calories(): number | undefined {

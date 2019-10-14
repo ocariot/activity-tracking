@@ -82,7 +82,7 @@ describe('Validators: CreateLogValidator', () => {
                     CreateLogValidator.validate(logTest)
                 } catch (err) {
                     assert.equal(err.message, 'Value field is invalid...')
-                    assert.equal(err.description, 'Child log validation failed: The value received is not a number')
+                    assert.equal(err.description, 'Child log validation failed: '.concat(Strings.ERROR_MESSAGE.INVALID_NUMBER))
                 }
             })
         })
