@@ -72,22 +72,4 @@ export class LogRepository extends BaseRepository<Log, LogEntity>
                 .catch(err => reject(super.mongoDBErrorListener(err)))
         })
     }
-
-    /**
-     * Returns the total of logs of a child in a period by resource.
-     *
-     * @param childId Child id associated with physical activities.
-     * @param desiredResource Desired resource.
-     * @param dateStart Range start date.
-     * @param dateEnd Range end date.
-     * @return {Promise<number>}
-     * @throws {RepositoryException}
-     */
-    public countLogsByResource(childId: string, desiredResource: string, dateStart: string, dateEnd: string): Promise<number> {
-        return super.count(new Query().fromJSON({ filters: { child_id: childId, type: desiredResource,
-                $and: [
-                    { date: { $lte: dateEnd.concat('T00:00:00') } },
-                    { date: { $gte: dateStart.concat('T00:00:00') } }
-                ] } }))
-    }
 }

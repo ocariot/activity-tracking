@@ -95,9 +95,6 @@ export class LogController {
             const result: Array<Log> = await this._logService
                 .getByChildResourceAndDate(req.params.child_id, req.params.resource, req.params.date_start, req.params.date_end,
                     new Query().fromJSON(req.query))
-            const count: number = await this._logService.countLogsByResource(
-                req.params.child_id, req.params.resource, req.params.date_start, req.params.date_end)
-            res.setHeader('X-Total-Count', count)
             return res.status(HttpStatus.OK).send(result)
         } catch (err) {
             const handlerError = ApiExceptionManager.build(err)

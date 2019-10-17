@@ -151,11 +151,14 @@ export class LogService implements ILogService {
                 else if (item.type === LogType.SEDENTARY_MINUTES) sedentaryMinutesArr.push(item)
             })
 
-            childLog.steps = stepsArr
-            childLog.calories = caloriesArr
-            childLog.active_minutes = activeMinutesArr
-            childLog.lightly_active_minutes = lightlyActiveMinutesArr
-            childLog.sedentary_minutes = sedentaryMinutesArr
+            childLog.steps = this.createLogsArrayInRange(childId, LogType.STEPS, dateStart, dateEnd, stepsArr)
+            childLog.calories = this.createLogsArrayInRange(childId, LogType.CALORIES, dateStart, dateEnd, caloriesArr)
+            childLog.active_minutes =
+                this.createLogsArrayInRange(childId, LogType.ACTIVE_MINUTES, dateStart, dateEnd, activeMinutesArr)
+            childLog.lightly_active_minutes =
+                this.createLogsArrayInRange(childId, LogType.LIGHTLY_ACTIVE_MINUTES, dateStart, dateEnd, lightlyActiveMinutesArr)
+            childLog.sedentary_minutes =
+                this.createLogsArrayInRange(childId, LogType.SEDENTARY_MINUTES, dateStart, dateEnd, sedentaryMinutesArr)
 
             return Promise.resolve(childLog)
         } catch (err) {
@@ -175,8 +178,8 @@ export class LogService implements ILogService {
      * @return {Promise<Array<Log>>}
      * @throws {RepositoryException}
      */
-    public getByChildResourceAndDate(childId: string, desiredResource: string, dateStart: string,
-                                     dateEnd: string, query: IQuery): Promise<Array<Log>> {
+    public async getByChildResourceAndDate(childId: string, desiredResource: string, dateStart: string,
+                                           dateEnd: string, query: IQuery): Promise<Array<Log>> {
         ObjectIdValidator.validate(childId, Strings.CHILD.PARAM_ID_NOT_VALID_FORMAT)
         LogTypeValidator.validate(desiredResource)
         DateValidator.validate(dateStart)
@@ -194,7 +197,10 @@ export class LogService implements ILogService {
         })
         query.pagination.limit = Number.MAX_SAFE_INTEGER
 
-        return this._logRepository.find(query)
+        const logsFind: Array<Log> = await this._logRepository.find(query)
+        const totalLogs: Array<Log> = this.createLogsArrayInRange(childId, desiredResource, dateStart, dateEnd, logsFind)
+
+        return Promise.resolve(totalLogs)
     }
 
     /**
@@ -212,7 +218,36 @@ export class LogService implements ILogService {
         throw new Error('Unsupported feature!')
     }
 
-    public countLogsByResource(childId: string, desiredResource: string, dateStart: string, dateEnd: string): Promise<number> {
-        return this._logRepository.countLogsByResource(childId, desiredResource, dateStart, dateEnd)
+    private createLogsArrayInRange(childId: string, desiredResource: string, dateStart: string, dateEnd: string,
+                                   logsFind: Array<Log>): Array<Log> {
+        const logsInRange: Array<Log> = []
+        const dateEndMilli: number = new Date(dateEnd).getTime()
+        let dateStartMilli: number = new Date(dateStart).getTime()
+        let date_start: Date = new Date(dateStart)
+
+        while (dateStartMilli <= dateEndMilli) {
+            let month_date_start: string = String(date_start.getUTCMonth() + 1)
+            if (month_date_start.length === 1) month_date_start = month_date_start.padStart(2, '0')
+
+            let day_date_start: string = String(date_start.getUTCDate())
+            if (day_date_start.length === 1) day_date_start = day_date_start.padStart(2, '0')
+
+            const log: Log = new Log()
+            log.date = `${date_start.getFullYear()}-${month_date_start}-${day_date_start}`
+            log.value = 0
+            log.type = desiredResource
+            log.child_id = childId
+            logsInRange.push(log)
+
+            dateStartMilli += 86400000      // Increment one day
+            date_start = new Date(dateStartMilli)       // Create a new date for the next iteration
+        }
+
+        for (const log of logsFind) {
+            const index = logsInRange.findIndex(item => item.date === log.date)
+            if (index !== -1) logsInRange[index].value = log.value
+        }
+
+        return logsInRange
     }
 }

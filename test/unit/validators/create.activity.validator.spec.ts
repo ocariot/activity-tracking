@@ -24,8 +24,8 @@ describe('Validators: CreateActivityValidator', () => {
                 try {
                     CreateActivityValidator.validate(activity)
                 } catch (err) {
-                    assert.equal(err.message, 'Required fields were not provided...')
-                    assert.equal(err.description, 'Activity validation failed: start_time is required!')
+                    assert.equal(err.message, 'REQUIRED_FIELDS')
+                    assert.equal(err.description, 'start_time')
                 }
             })
         })
@@ -38,9 +38,8 @@ describe('Validators: CreateActivityValidator', () => {
                 try {
                     CreateActivityValidator.validate(activity)
                 } catch (err) {
-                    assert.equal(err.message, 'Required fields were not provided...')
-                    assert.equal(err.description, 'Activity validation failed: start_time, end_time, ' +
-                        'duration, child_id is required!')
+                    assert.equal(err.message, 'REQUIRED_FIELDS')
+                    assert.equal(err.description, 'start_time, end_time, duration, child_id')
                 }
             })
         })

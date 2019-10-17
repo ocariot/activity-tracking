@@ -334,8 +334,11 @@ describe('Services: Log', () => {
                 return logService.getByChildAndDate(correctLogsArr[0].child_id, correctLogsArr[0].date,
                     correctLogsArr[1].date, query)
                     .then(result => {
-                        assert.isEmpty(result.steps)
-                        assert.isEmpty(result.calories)
+                        assert.isNotEmpty(result.steps)
+                        assert.isNotEmpty(result.calories)
+                        assert.isNotEmpty(result.active_minutes)
+                        assert.isNotEmpty(result.lightly_active_minutes)
+                        assert.isNotEmpty(result.sedentary_minutes)
                     })
             })
         })
@@ -433,7 +436,7 @@ describe('Services: Log', () => {
                     correctLogsArr[0].date, correctLogsArr[1].date, query)
                     .then(result => {
                         assert.isArray(result)
-                        assert.isEmpty(result)
+                        assert.isNotEmpty(result)
                     })
             })
         })
@@ -442,13 +445,12 @@ describe('Services: Log', () => {
             it('should throw a ValidationException', () => {
                 correctLogsArr[0].child_id = '507f1f77bcf86cd7994390112'
 
-                try {
-                    return logService.getByChildResourceAndDate(correctLogsArr[0].child_id, correctLogsArr[0].type,
-                        correctLogsArr[0].date, correctLogsArr[1].date, query)
-                } catch (err) {
-                    assert.propertyVal(err, 'message', Strings.CHILD.PARAM_ID_NOT_VALID_FORMAT)
-                    assert.propertyVal(err, 'description', Strings.ERROR_MESSAGE.UUID_NOT_VALID_FORMAT_DESC)
-                }
+                return logService.getByChildResourceAndDate(correctLogsArr[0].child_id, correctLogsArr[0].type,
+                    correctLogsArr[0].date, correctLogsArr[1].date, query)
+                    .catch(err => {
+                        assert.propertyVal(err, 'message', Strings.CHILD.PARAM_ID_NOT_VALID_FORMAT)
+                        assert.propertyVal(err, 'description', Strings.ERROR_MESSAGE.UUID_NOT_VALID_FORMAT_DESC)
+                    })
             })
         })
 
@@ -456,16 +458,15 @@ describe('Services: Log', () => {
             it('should throw a ValidationException', () => {
                 correctLogsArr[0].child_id = '507f1f77bcf86cd799439011'
 
-                try {
-                    return logService.getByChildResourceAndDate(correctLogsArr[0].child_id, otherIncorrectLog.type,
-                        correctLogsArr[0].date, correctLogsArr[1].date, query)
-                } catch (err) {
-                    assert.propertyVal(err, 'message',
-                        'The name of type provided "step" is not supported...')
-                    assert.propertyVal(err, 'description',
-                        'The names of the allowed types are: ' +
-                        'steps, calories, active_minutes, lightly_active_minutes, sedentary_minutes.')
-                }
+                return logService.getByChildResourceAndDate(correctLogsArr[0].child_id, otherIncorrectLog.type,
+                    correctLogsArr[0].date, correctLogsArr[1].date, query)
+                    .catch(err => {
+                        assert.propertyVal(err, 'message',
+                            'The name of type provided "step" is not supported...')
+                        assert.propertyVal(err, 'description',
+                            'The names of the allowed types are: ' +
+                            'steps, calories, active_minutes, lightly_active_minutes, sedentary_minutes.')
+                    })
             })
         })
 
@@ -473,13 +474,12 @@ describe('Services: Log', () => {
             it('should throw a ValidationException', () => {
                 correctLogsArr[0].date = '20199-03-18'
 
-                try {
-                    return logService.getByChildResourceAndDate(correctLogsArr[0].child_id, correctLogsArr[0].type,
-                        correctLogsArr[0].date, correctLogsArr[1].date, query)
-                } catch (err) {
-                    assert.propertyVal(err, 'message', 'Date parameter: 20199-03-18, is not in valid ISO 8601 format.')
-                    assert.propertyVal(err, 'description', 'Date must be in the format: yyyy-MM-dd')
-                }
+                return logService.getByChildResourceAndDate(correctLogsArr[0].child_id, correctLogsArr[0].type,
+                    correctLogsArr[0].date, correctLogsArr[1].date, query)
+                    .catch(err => {
+                        assert.propertyVal(err, 'message', 'Date parameter: 20199-03-18, is not in valid ISO 8601 format.')
+                        assert.propertyVal(err, 'description', 'Date must be in the format: yyyy-MM-dd')
+                    })
             })
         })
 
@@ -488,38 +488,24 @@ describe('Services: Log', () => {
                 correctLogsArr[0].date = '2019-03-18'
                 correctLogsArr[1].date = '20199-03-18'
 
-                try {
-                    return logService.getByChildResourceAndDate(correctLogsArr[0].child_id, correctLogsArr[0].type,
-                        correctLogsArr[0].date, correctLogsArr[1].date, query)
-                } catch (err) {
-                    assert.propertyVal(err, 'message', 'Date parameter: 20199-03-18, is not in valid ISO 8601 format.')
-                    assert.propertyVal(err, 'description', 'Date must be in the format: yyyy-MM-dd')
-                }
+                return logService.getByChildResourceAndDate(correctLogsArr[0].child_id, correctLogsArr[0].type,
+                    correctLogsArr[0].date, correctLogsArr[1].date, query)
+                    .catch(err => {
+                        assert.propertyVal(err, 'message', 'Date parameter: 20199-03-18, is not in valid ISO 8601 format.')
+                        assert.propertyVal(err, 'description', 'Date must be in the format: yyyy-MM-dd')
+                    })
             })
         })
 
         context('when the parameters are invalid (date range is invalid)', () => {
             it('should throw a ValidationException', () => {
 
-                try {
-                    return logService.getByChildResourceAndDate(correctLogsArr[0].child_id, correctLogsArr[0].type,
-                        '2018-03-18', '2019-03-27', query)
-                } catch (err) {
-                    assert.propertyVal(err, 'message', 'Date range is invalid...')
-                    assert.propertyVal(err, 'description', 'Log dates range validation failed: ' +
-                        'The period between the received dates is longer than one year')
-                }
-            })
-        })
-    })
-
-    describe('countLogsByResource(childId: string, desiredResource: string, dateStart: string, dateEnd: string)', () => {
-        context('when there is at least one log of the received type associated with the received child', () => {
-            it('should return how many logs of the received type are associated with such child in the database', () => {
-                return logService.countLogsByResource(correctLogsArr[0].child_id, correctLogsArr[0].type,
-                    correctLogsArr[0].date, correctLogsArr[1].date)
-                    .then(res => {
-                        assert.equal(res, 1)
+                return logService.getByChildResourceAndDate(correctLogsArr[0].child_id, correctLogsArr[0].type,
+                    '2018-03-18', '2019-03-27', query)
+                    .catch(err => {
+                        assert.propertyVal(err, 'message', 'Date range is invalid...')
+                        assert.propertyVal(err, 'description', 'Log dates range validation failed: ' +
+                            'The period between the received dates is longer than one year')
                     })
             })
         })

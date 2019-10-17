@@ -28,16 +28,4 @@ export interface ILogRepository extends IRepository<Log> {
      * @throws {ValidationException | RepositoryException}
      */
     removeAllLogsFromChild(childId: string): Promise<boolean>
-
-    /**
-     * Returns the total of logs of a child in a period by resource.
-     *
-     * @param childId Child id associated with logs.
-     * @param desiredResource Desired resource.
-     * @param dateStart Range start date.
-     * @param dateEnd Range end date.
-     * @return {Promise<number>}
-     * @throws {RepositoryException}
-     */
-    countLogsByResource(childId: string, desiredResource: string, dateStart: string, dateEnd: string): Promise<number>
 }
