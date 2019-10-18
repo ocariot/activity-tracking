@@ -168,7 +168,6 @@ export class PhysicalActivityService implements IPhysicalActivityService {
         ObjectIdValidator.validate(childId, Strings.CHILD.PARAM_ID_NOT_VALID_FORMAT)
         ObjectIdValidator.validate(activityId, Strings.PHYSICAL_ACTIVITY.PARAM_ID_NOT_VALID_FORMAT)
 
-        query.addFilter({ _id: activityId, child_id: childId })
         return this._activityRepository.findOne(query)
     }
 
@@ -183,7 +182,6 @@ export class PhysicalActivityService implements IPhysicalActivityService {
     public getAllByChild(childId: string, query: IQuery): Promise<Array<PhysicalActivity>> {
         ObjectIdValidator.validate(childId, Strings.CHILD.PARAM_ID_NOT_VALID_FORMAT)
 
-        query.addFilter({ child_id: childId })
         return this._activityRepository.find(query)
     }
 

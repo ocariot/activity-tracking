@@ -156,7 +156,6 @@ export class BodyFatService implements IBodyFatService {
         ObjectIdValidator.validate(childId, Strings.CHILD.PARAM_ID_NOT_VALID_FORMAT)
         ObjectIdValidator.validate(bodyFatId, Strings.BODY_FAT.PARAM_ID_NOT_VALID_FORMAT)
 
-        query.addFilter({ _id: bodyFatId, child_id: childId })
         return this._bodyFatRepository.findOne(query)
     }
 
@@ -171,7 +170,6 @@ export class BodyFatService implements IBodyFatService {
     public getAllByChild(childId: string, query: IQuery): Promise<Array<BodyFat>> {
         ObjectIdValidator.validate(childId, Strings.CHILD.PARAM_ID_NOT_VALID_FORMAT)
 
-        query.addFilter({ child_id: childId, type: MeasurementType.BODY_FAT })
         return this._bodyFatRepository.find(query)
     }
 

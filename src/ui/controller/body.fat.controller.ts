@@ -10,6 +10,8 @@ import { Query } from '../../infrastructure/repository/query/query'
 import { MultiStatus } from '../../application/domain/model/multi.status'
 import { IBodyFatService } from '../../application/port/body.fat.service.interface'
 import { BodyFat } from '../../application/domain/model/body.fat'
+import { IQuery } from '../../application/port/query.interface'
+import { MeasurementType } from '../../application/domain/model/measurement'
 
 /**
  * Controller that implements BodyFat feature operations.
@@ -77,8 +79,10 @@ export class BodyFatController {
     @httpGet('/:child_id/bodyfats')
     public async getAllBodyFatOfChild(@request() req: Request, @response() res: Response): Promise<Response> {
         try {
+            const query: IQuery = new Query().fromJSON(req.query)
+            query.addFilter({ child_id: req.params.child_id, type: MeasurementType.BODY_FAT })
             const result = await this._bodyFatService
-                .getAllByChild(req.params.child_id, new Query().fromJSON(req.query))
+                .getAllByChild(req.params.child_id, query)
             const count: number = await this._bodyFatService.countBodyFats(req.params.child_id)
             res.setHeader('X-Total-Count', count)
             return res.status(HttpStatus.OK).send(result)
@@ -100,8 +104,10 @@ export class BodyFatController {
     @httpGet('/:child_id/bodyfats/:bodyfat_id')
     public async getBodyFatById(@request() req: Request, @response() res: Response): Promise<Response> {
         try {
+            const query: IQuery = new Query().fromJSON(req.query)
+            query.addFilter({ _id: req.params.bodyfat_id, child_id: req.params.child_id })
             const result: BodyFat = await this._bodyFatService
-                .getByIdAndChild(req.params.bodyfat_id, req.params.child_id, new Query().fromJSON(req.query))
+                .getByIdAndChild(req.params.bodyfat_id, req.params.child_id, query)
             if (!result) return res.status(HttpStatus.NOT_FOUND).send(this.getMessageBodyFatNotFound())
             return res.status(HttpStatus.OK).send(result)
         } catch (err) {

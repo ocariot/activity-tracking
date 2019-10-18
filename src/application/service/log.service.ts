@@ -124,16 +124,6 @@ export class LogService implements ILogService {
             DateValidator.validate(dateEnd)
             LogDateRangeValidator.validate(dateStart, dateEnd)
 
-            query.ordination = new Map<string, string>().set('date', 'desc')
-            query.addFilter({
-                child_id: childId,
-                $and: [
-                    { date: { $lte: dateEnd.toString().concat('T00:00:00') } },
-                    { date: { $gte: dateStart.toString().concat('T00:00:00') } }
-                ]
-            })
-            query.pagination.limit = Number.MAX_SAFE_INTEGER
-
             // Creates a ChildLog object with all the resources listed with arrays.
             const childLog: ChildLog = new ChildLog()
             const stepsArr: Array<Log> = new Array<Log>()
@@ -185,17 +175,6 @@ export class LogService implements ILogService {
         DateValidator.validate(dateStart)
         DateValidator.validate(dateEnd)
         LogDateRangeValidator.validate(dateStart, dateEnd)
-
-        query.ordination = new Map<string, string>().set('date', 'desc')
-        query.addFilter({
-            child_id: childId,
-            type: desiredResource,
-            $and: [
-                { date: { $lte: dateEnd.concat('T00:00:00') } },
-                { date: { $gte: dateStart.concat('T00:00:00') } }
-            ]
-        })
-        query.pagination.limit = Number.MAX_SAFE_INTEGER
 
         const logsFind: Array<Log> = await this._logRepository.find(query)
         const totalLogs: Array<Log> = this.createLogsArrayInRange(childId, desiredResource, dateStart, dateEnd, logsFind)

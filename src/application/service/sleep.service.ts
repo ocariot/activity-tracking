@@ -168,7 +168,6 @@ export class SleepService implements ISleepService {
         ObjectIdValidator.validate(childId, Strings.CHILD.PARAM_ID_NOT_VALID_FORMAT)
         ObjectIdValidator.validate(sleepId, Strings.SLEEP.PARAM_ID_NOT_VALID_FORMAT)
 
-        query.addFilter({ _id: sleepId, child_id: childId })
         return this._sleepRepository.findOne(query)
     }
 
@@ -183,7 +182,6 @@ export class SleepService implements ISleepService {
     public getAllByChild(childId: string, query: IQuery): Promise<Array<Sleep>> {
         ObjectIdValidator.validate(childId, Strings.CHILD.PARAM_ID_NOT_VALID_FORMAT)
 
-        query.addFilter({ child_id: childId })
         return this._sleepRepository.find(query)
     }
 

@@ -10,6 +10,7 @@ import { PhysicalActivity } from '../../application/domain/model/physical.activi
 import { IPhysicalActivityService } from '../../application/port/physical.activity.service.interface'
 import { ILogger } from '../../utils/custom.logger'
 import { MultiStatus } from '../../application/domain/model/multi.status'
+import { IQuery } from '../../application/port/query.interface'
 
 /**
  * Controller that implements PhysicalActivity feature operations.
@@ -77,8 +78,10 @@ export class ActivityController {
     @httpGet('/:child_id/physicalactivities')
     public async getAllPhysicalActivitiesOfChild(@request() req: Request, @response() res: Response): Promise<Response> {
         try {
+            const query: IQuery = new Query().fromJSON(req.query)
+            query.addFilter({ child_id: req.params.child_id })
             const result = await this._activityService
-                .getAllByChild(req.params.child_id, new Query().fromJSON(req.query))
+                .getAllByChild(req.params.child_id, query)
             const count: number = await this._activityService.countActivities(req.params.child_id)
             res.setHeader('X-Total-Count', count)
             return res.status(HttpStatus.OK).send(result)
@@ -100,8 +103,10 @@ export class ActivityController {
     @httpGet('/:child_id/physicalactivities/:physicalactivity_id')
     public async getPhysicalActivityById(@request() req: Request, @response() res: Response): Promise<Response> {
         try {
+            const query: IQuery = new Query().fromJSON(req.query)
+            query.addFilter({ _id: req.params.physicalactivity_id, child_id: req.params.child_id })
             const result: PhysicalActivity = await this._activityService
-                .getByIdAndChild(req.params.physicalactivity_id, req.params.child_id, new Query().fromJSON(req.query))
+                .getByIdAndChild(req.params.physicalactivity_id, req.params.child_id, query)
             if (!result) return res.status(HttpStatus.NOT_FOUND).send(this.getMessageNotActivityFound())
             return res.status(HttpStatus.OK).send(result)
         } catch (err) {
