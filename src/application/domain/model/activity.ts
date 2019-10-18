@@ -15,11 +15,9 @@ export class Activity extends Entity implements IJSONSerializable, IJSONDeserial
     private _end_time?: Date // PhysicalActivity end time according to the UTC.
     private _duration?: number // Total time in milliseconds spent in the activity.
     private _child_id!: string // Child ID belonging to activity.
-    private _isFromEventBus: boolean // Boolean that defines whether the object comes from the event bus or not
 
     constructor() {
         super()
-        this._isFromEventBus = false
     }
 
     get start_time(): Date | undefined {
@@ -52,14 +50,6 @@ export class Activity extends Entity implements IJSONSerializable, IJSONDeserial
 
     set child_id(value: string) {
         this._child_id = value
-    }
-
-    get isFromEventBus(): boolean {
-        return this._isFromEventBus
-    }
-
-    set isFromEventBus(value: boolean) {
-        this._isFromEventBus = value
     }
 
     public convertDatetimeString(value: string): Date {

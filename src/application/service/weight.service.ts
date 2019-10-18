@@ -136,7 +136,7 @@ export class WeightService implements IWeightService {
             const weightSaved: Weight = await this._weightRepository.create(weight)
 
             // 5. If created successfully, the object is published on the message bus.
-            if (weightSaved && !weight.isFromEventBus) {
+            if (weightSaved) {
                 this._eventBus.bus
                     .pubSaveWeight(weightSaved)
                     .then(() => {

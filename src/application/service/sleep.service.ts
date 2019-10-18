@@ -115,7 +115,7 @@ export class SleepService implements ISleepService {
             const sleepSaved: Sleep = await this._sleepRepository.create(sleep)
 
             // 4. If created successfully, the object is published on the message bus.
-            if (sleepSaved && !sleep.isFromEventBus) {
+            if (sleepSaved) {
                 this._eventBus.bus
                     .pubSaveSleep(sleepSaved)
                     .then(() => {
@@ -201,7 +201,7 @@ export class SleepService implements ISleepService {
             const sleepUpdated: Sleep = await this._sleepRepository.updateByChild(sleep)
 
             // 4. If updated successfully, the object is published on the message bus.
-            if (sleepUpdated && !sleep.isFromEventBus) {
+            if (sleepUpdated) {
                 this._eventBus.bus
                     .pubUpdateSleep(sleepUpdated)
                     .then(() => {

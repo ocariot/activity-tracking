@@ -5,12 +5,10 @@ import { MultiStatus } from '../../application/domain/model/multi.status'
 import HttpStatus from 'http-status-codes'
 import { ApiExceptionManager } from '../exception/api.exception.manager'
 import { ChildLog } from '../../application/domain/model/child.log'
-import { Query } from '../../infrastructure/repository/query/query'
 import { inject } from 'inversify'
 import { Identifier } from '../../di/identifiers'
 import { ILogService } from '../../application/port/log.service.interface'
 import { ILogger } from '../../utils/custom.logger'
-import { IQuery } from '../../application/port/query.interface'
 
 /**
  * Controller that implements PhysicalActivity feature operations.
@@ -63,8 +61,6 @@ export class LogController {
 
     /**
      * Recover the logs.
-     * For the query strings, the query-strings-parser middleware was used.
-     * @see {@link https://www.npmjs.com/package/query-strings-parser} for further information.
      *
      * @param {Request} req
      * @param {Response} res
@@ -72,17 +68,8 @@ export class LogController {
     @httpGet('/:child_id/logs/date/:date_start/:date_end')
     public async getLogs(@request() req: Request, @response() res: Response): Promise<Response> {
         try {
-            const query: IQuery = new Query().fromJSON(req.query)
-            query.ordination = new Map<string, string>().set('date', 'desc')
-            query.addFilter({
-                child_id: req.params.child_id,
-                $and: [
-                    { date: { $lte: req.params.date_end.toString().concat('T00:00:00') } },
-                    { date: { $gte: req.params.date_start.toString().concat('T00:00:00') } }
-                ]
-            })
             const result: ChildLog = await this._logService
-                .getByChildAndDate(req.params.child_id, req.params.date_start, req.params.date_end, query)
+                .getByChildAndDate(req.params.child_id, req.params.date_start, req.params.date_end)
             return res.status(HttpStatus.OK).send(result)
         } catch (err) {
             const handlerError = ApiExceptionManager.build(err)
@@ -93,8 +80,6 @@ export class LogController {
 
     /**
      * Recover the logs by type.
-     * For the query strings, the query-strings-parser middleware was used.
-     * @see {@link https://www.npmjs.com/package/query-strings-parser} for further information.
      *
      * @param {Request} req
      * @param {Response} res
@@ -102,19 +87,9 @@ export class LogController {
     @httpGet('/:child_id/logs/:resource/date/:date_start/:date_end')
     public async getLogsByResource(@request() req: Request, @response() res: Response): Promise<Response> {
         try {
-            const query: IQuery = new Query().fromJSON(req.query)
-            query.ordination = new Map<string, string>().set('date', 'desc')
-            query.addFilter({
-                child_id: req.params.child_id,
-                type: req.params.resource,
-                $and: [
-                    { date: { $lte: req.params.date_end.concat('T00:00:00') } },
-                    { date: { $gte: req.params.date_start.concat('T00:00:00') } }
-                ]
-            })
             const result: Array<Log> = await this._logService
                 .getByChildResourceAndDate(req.params.child_id, req.params.resource, req.params.date_start,
-                    req.params.date_end, query)
+                    req.params.date_end)
             return res.status(HttpStatus.OK).send(result)
         } catch (err) {
             const handlerError = ApiExceptionManager.build(err)

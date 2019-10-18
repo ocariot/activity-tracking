@@ -6,8 +6,6 @@ import { ILogRepository } from '../../../src/application/port/log.repository.int
 import { LogRepositoryMock } from '../../mocks/log.repository.mock'
 import { ILogService } from '../../../src/application/port/log.service.interface'
 import { LogService } from '../../../src/application/service/log.service'
-import { IQuery } from '../../../src/application/port/query.interface'
-import { Query } from '../../../src/infrastructure/repository/query/query'
 import { Strings } from '../../../src/utils/strings'
 
 describe('Services: Log', () => {
@@ -302,21 +300,10 @@ describe('Services: Log', () => {
      * Method: getByChildAndDate(childId: string, dateStart: Date, dateEnd: Date, query: IQuery)
      */
     describe('getByChildAndDate(childId: string, dateStart: Date, dateEnd: Date, query: IQuery)', () => {
-
-        const query: IQuery = new Query()
-        query.filters = {
-            child_id: correctLogsArr[0].child_id,
-            $and: [
-                { date: { $lte: correctLogsArr[0].date.toString().concat('T00:00:00') } },
-                { date: { $gte: correctLogsArr[1].date.toString().concat('T00:00:00') } }
-            ]
-        }
-
         context('when the parameters are correct and there are corresponding logs with the query', () => {
             it('should return a ChildLog with steps and/or calories logs', () => {
 
-                return logService.getByChildAndDate(correctLogsArr[0].child_id, correctLogsArr[0].date,
-                    correctLogsArr[1].date, query)
+                return logService.getByChildAndDate(correctLogsArr[0].child_id, correctLogsArr[0].date, correctLogsArr[1].date)
                     .then(result => {
                         assert.property(result, 'steps')
                         assert.property(result, 'calories')
@@ -331,8 +318,7 @@ describe('Services: Log', () => {
             it('should return an empty ChildLog', () => {
                 correctLogsArr[0].child_id = '507f1f77bcf86cd799439011'
 
-                return logService.getByChildAndDate(correctLogsArr[0].child_id, correctLogsArr[0].date,
-                    correctLogsArr[1].date, query)
+                return logService.getByChildAndDate(correctLogsArr[0].child_id, correctLogsArr[0].date, correctLogsArr[1].date)
                     .then(result => {
                         assert.isNotEmpty(result.steps)
                         assert.isNotEmpty(result.calories)
@@ -347,8 +333,7 @@ describe('Services: Log', () => {
             it('should throw a ValidationException', () => {
                 correctLogsArr[0].child_id = '507f1f77bcf86cd7994390112'
 
-                return logService.getByChildAndDate(correctLogsArr[0].child_id, correctLogsArr[0].date,
-                    correctLogsArr[1].date, query)
+                return logService.getByChildAndDate(correctLogsArr[0].child_id, correctLogsArr[0].date, correctLogsArr[1].date)
                     .catch(err => {
                         assert.propertyVal(err, 'message', Strings.CHILD.PARAM_ID_NOT_VALID_FORMAT)
                         assert.propertyVal(err, 'description', Strings.ERROR_MESSAGE.UUID_NOT_VALID_FORMAT_DESC)
@@ -361,8 +346,7 @@ describe('Services: Log', () => {
                 correctLogsArr[0].child_id = '507f1f77bcf86cd799439011'
                 correctLogsArr[0].date = '20199-03-18'
 
-                return logService.getByChildAndDate(correctLogsArr[0].child_id, correctLogsArr[0].date,
-                    correctLogsArr[1].date, query)
+                return logService.getByChildAndDate(correctLogsArr[0].child_id, correctLogsArr[0].date, correctLogsArr[1].date)
                     .catch(err => {
                         assert.propertyVal(err, 'message', 'Date parameter: 20199-03-18, is not in valid ISO 8601 format.')
                         assert.propertyVal(err, 'description', 'Date must be in the format: yyyy-MM-dd')
@@ -376,8 +360,7 @@ describe('Services: Log', () => {
                 correctLogsArr[0].date = '2019-03-18'
                 correctLogsArr[1].date = '20199-03-18'
 
-                return logService.getByChildAndDate(correctLogsArr[0].child_id, correctLogsArr[0].date,
-                    correctLogsArr[1].date, query)
+                return logService.getByChildAndDate(correctLogsArr[0].child_id, correctLogsArr[0].date, correctLogsArr[1].date)
                     .catch(err => {
                         assert.propertyVal(err, 'message', 'Date parameter: 20199-03-18, is not in valid ISO 8601 format.')
                         assert.propertyVal(err, 'description', 'Date must be in the format: yyyy-MM-dd')
@@ -387,8 +370,7 @@ describe('Services: Log', () => {
 
         context('when the parameters are invalid (date range is invalid)', () => {
             it('should throw a ValidationException', () => {
-                return logService.getByChildAndDate(correctLogsArr[0].child_id, '2018-03-18',
-                    '2019-03-27', query)
+                return logService.getByChildAndDate(correctLogsArr[0].child_id, '2018-03-18', '2019-03-27')
                     .catch(err => {
                         assert.propertyVal(err, 'message', 'Date range is invalid...')
                         assert.propertyVal(err, 'description', 'Log dates range validation failed: ' +
@@ -403,24 +385,13 @@ describe('Services: Log', () => {
      */
     describe('getByChildResourceAndDate(childId: string, desiredResource: LogType, dateStart: string, dateEnd: string, ' +
         'query: IQuery)', () => {
-
-        const query: IQuery = new Query()
-        query.filters = {
-            child_id: correctLogsArr[0].child_id,
-            type: correctLogsArr[0].type,
-            $and: [
-                { date: { $lte: correctLogsArr[0].date.toString().concat('T00:00:00') } },
-                { date: { $gte: correctLogsArr[1].date.toString().concat('T00:00:00') } }
-            ]
-        }
-
         context('when the parameters are correct and there are corresponding logs with the query', () => {
             it('should return the logs array', () => {
                 correctLogsArr[0].child_id = '507f1f77bcf86cd799439012'
                 correctLogsArr[1].date = '2019-03-20'
 
                 return logService.getByChildResourceAndDate(correctLogsArr[0].child_id, correctLogsArr[0].type,
-                    correctLogsArr[0].date, correctLogsArr[1].date, query)
+                    correctLogsArr[0].date, correctLogsArr[1].date)
                     .then(result => {
                         assert.isArray(result)
                         assert.isNotEmpty(result)
@@ -433,7 +404,7 @@ describe('Services: Log', () => {
                 correctLogsArr[0].child_id = '507f1f77bcf86cd799439011'
 
                 return logService.getByChildResourceAndDate(correctLogsArr[0].child_id, correctLogsArr[0].type,
-                    correctLogsArr[0].date, correctLogsArr[1].date, query)
+                    correctLogsArr[0].date, correctLogsArr[1].date)
                     .then(result => {
                         assert.isArray(result)
                         assert.isNotEmpty(result)
@@ -446,7 +417,7 @@ describe('Services: Log', () => {
                 correctLogsArr[0].child_id = '507f1f77bcf86cd7994390112'
 
                 return logService.getByChildResourceAndDate(correctLogsArr[0].child_id, correctLogsArr[0].type,
-                    correctLogsArr[0].date, correctLogsArr[1].date, query)
+                    correctLogsArr[0].date, correctLogsArr[1].date)
                     .catch(err => {
                         assert.propertyVal(err, 'message', Strings.CHILD.PARAM_ID_NOT_VALID_FORMAT)
                         assert.propertyVal(err, 'description', Strings.ERROR_MESSAGE.UUID_NOT_VALID_FORMAT_DESC)
@@ -459,7 +430,7 @@ describe('Services: Log', () => {
                 correctLogsArr[0].child_id = '507f1f77bcf86cd799439011'
 
                 return logService.getByChildResourceAndDate(correctLogsArr[0].child_id, otherIncorrectLog.type,
-                    correctLogsArr[0].date, correctLogsArr[1].date, query)
+                    correctLogsArr[0].date, correctLogsArr[1].date)
                     .catch(err => {
                         assert.propertyVal(err, 'message',
                             'The name of type provided "step" is not supported...')
@@ -475,7 +446,7 @@ describe('Services: Log', () => {
                 correctLogsArr[0].date = '20199-03-18'
 
                 return logService.getByChildResourceAndDate(correctLogsArr[0].child_id, correctLogsArr[0].type,
-                    correctLogsArr[0].date, correctLogsArr[1].date, query)
+                    correctLogsArr[0].date, correctLogsArr[1].date)
                     .catch(err => {
                         assert.propertyVal(err, 'message', 'Date parameter: 20199-03-18, is not in valid ISO 8601 format.')
                         assert.propertyVal(err, 'description', 'Date must be in the format: yyyy-MM-dd')
@@ -489,7 +460,7 @@ describe('Services: Log', () => {
                 correctLogsArr[1].date = '20199-03-18'
 
                 return logService.getByChildResourceAndDate(correctLogsArr[0].child_id, correctLogsArr[0].type,
-                    correctLogsArr[0].date, correctLogsArr[1].date, query)
+                    correctLogsArr[0].date, correctLogsArr[1].date)
                     .catch(err => {
                         assert.propertyVal(err, 'message', 'Date parameter: 20199-03-18, is not in valid ISO 8601 format.')
                         assert.propertyVal(err, 'description', 'Date must be in the format: yyyy-MM-dd')
@@ -501,7 +472,7 @@ describe('Services: Log', () => {
             it('should throw a ValidationException', () => {
 
                 return logService.getByChildResourceAndDate(correctLogsArr[0].child_id, correctLogsArr[0].type,
-                    '2018-03-18', '2019-03-27', query)
+                    '2018-03-18', '2019-03-27')
                     .catch(err => {
                         assert.propertyVal(err, 'message', 'Date range is invalid...')
                         assert.propertyVal(err, 'description', 'Log dates range validation failed: ' +

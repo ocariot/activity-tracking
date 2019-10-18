@@ -1,6 +1,5 @@
 import { IService } from './service.interface'
 import { Log } from 'application/domain/model/log'
-import { IQuery } from './query.interface'
 import { MultiStatus } from '../domain/model/multi.status'
 import { ChildLog } from '../domain/model/child.log'
 
@@ -31,7 +30,7 @@ export interface ILogService extends IService<Log> {
      * @return {Promise<ChildLog>}
      * @throws {RepositoryException}
      */
-    getByChildAndDate(childId: string, dateStart: string, dateEnd: string, query: IQuery): Promise<ChildLog>
+    getByChildAndDate(childId: string, dateStart: string, dateEnd: string): Promise<ChildLog>
 
     /**
      * List the child logs with information on the total steps, calories, active_minutes, lightly_active_minutes,
@@ -46,5 +45,5 @@ export interface ILogService extends IService<Log> {
      * @throws {RepositoryException}
      */
     getByChildResourceAndDate(childId: string, desiredResource: string, dateStart: string,
-                              dateEnd: string, query: IQuery): Promise<Array<Log>>
+                              dateEnd: string): Promise<Array<Log>>
 }

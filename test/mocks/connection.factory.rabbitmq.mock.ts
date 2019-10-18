@@ -37,7 +37,7 @@ export class ConnectionFactoryRabbitMQMock implements IConnectionFactory {
         getInstitutions(query: string, callback?: (err: any, institutions: any) => void): any {
             return Promise.resolve({})
         },
-        getLogs(childId: string, query: string, callback?: (err: any, result: any) => void): any {
+        getLogs(childId: string, dateStart: string, dateEnd: string, callback?: (err: any, result: any) => void): any {
             return Promise.resolve({})
         },
         getPhysicalActivities(query: string, callback?: (err: any, result: any) => void): any {
@@ -91,7 +91,7 @@ export class ConnectionFactoryRabbitMQMock implements IConnectionFactory {
         provideInstitutions(listener: (query: string) => any): Promise<void> {
             return Promise.resolve()
         },
-        provideLogs(listener: (query: string) => any): Promise<void> {
+        provideLogs(listener: (childId: string, dateStart: string, dateEnd: string) => any): Promise<void> {
             return Promise.resolve()
         },
         providePhysicalActivities(listener: (query: string) => any): Promise<void> {

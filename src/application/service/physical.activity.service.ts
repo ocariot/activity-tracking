@@ -115,7 +115,7 @@ export class PhysicalActivityService implements IPhysicalActivityService {
             const activitySaved: PhysicalActivity = await this._activityRepository.create(activity)
 
             // 4. If created successfully, the object is published on the message bus.
-            if (activitySaved && !activity.isFromEventBus) {
+            if (activitySaved) {
                 this._eventBus.bus
                     .pubSavePhysicalActivity(activitySaved)
                     .then(() => {
@@ -201,7 +201,7 @@ export class PhysicalActivityService implements IPhysicalActivityService {
             const activityUpdated: PhysicalActivity = await this._activityRepository.updateByChild(activity)
 
             // 4. If updated successfully, the object is published on the message bus.
-            if (activityUpdated && !activity.isFromEventBus) {
+            if (activityUpdated) {
                 this._eventBus.bus
                     .pubUpdatePhysicalActivity(activityUpdated)
                     .then(() => {
