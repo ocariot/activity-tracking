@@ -136,7 +136,7 @@ export class WeightService implements IWeightService {
             const weightSaved: Weight = await this._weightRepository.create(weight)
 
             // 5. If created successfully, the object is published on the message bus.
-            if (weightSaved && !weight.isFromEventBus) {
+            if (weightSaved) {
                 this._eventBus.bus
                     .pubSaveWeight(weightSaved)
                     .then(() => {
@@ -189,7 +189,6 @@ export class WeightService implements IWeightService {
         ObjectIdValidator.validate(childId, Strings.CHILD.PARAM_ID_NOT_VALID_FORMAT)
         ObjectIdValidator.validate(weightId, Strings.WEIGHT.PARAM_ID_NOT_VALID_FORMAT)
 
-        query.addFilter({ _id: weightId, child_id: childId })
         return this._weightRepository.findOne(query)
     }
 
@@ -204,7 +203,6 @@ export class WeightService implements IWeightService {
     public getAllByChild(childId: string, query: IQuery): Promise<Array<Weight>> {
         ObjectIdValidator.validate(childId, Strings.CHILD.PARAM_ID_NOT_VALID_FORMAT)
 
-        query.addFilter({ child_id: childId })
         return this._weightRepository.find(query)
     }
 

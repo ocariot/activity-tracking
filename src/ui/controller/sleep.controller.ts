@@ -10,6 +10,7 @@ import { ISleepService } from '../../application/port/sleep.service.interface'
 import { Query } from '../../infrastructure/repository/query/query'
 import { Sleep } from '../../application/domain/model/sleep'
 import { MultiStatus } from '../../application/domain/model/multi.status'
+import { IQuery } from '../../application/port/query.interface'
 
 /**
  * Controller that implements Sleep feature operations.
@@ -77,8 +78,10 @@ export class SleepController {
     @httpGet('/:child_id/sleep')
     public async getAllSleepOfChild(@request() req: Request, @response() res: Response): Promise<Response> {
         try {
+            const query: IQuery = new Query().fromJSON(req.query)
+            query.addFilter({ child_id: req.params.child_id })
             const result = await this._sleepService
-                .getAllByChild(req.params.child_id, new Query().fromJSON(req.query))
+                .getAllByChild(req.params.child_id, query)
             const count: number = await this._sleepService.countSleep(req.params.child_id)
             res.setHeader('X-Total-Count', count)
             return res.status(HttpStatus.OK).send(result)
@@ -100,8 +103,10 @@ export class SleepController {
     @httpGet('/:child_id/sleep/:sleep_id')
     public async getSleepById(@request() req: Request, @response() res: Response): Promise<Response> {
         try {
+            const query: IQuery = new Query().fromJSON(req.query)
+            query.addFilter({ _id: req.params.sleep_id, child_id: req.params.child_id })
             const result: Sleep = await this._sleepService
-                .getByIdAndChild(req.params.sleep_id, req.params.child_id, new Query().fromJSON(req.query))
+                .getByIdAndChild(req.params.sleep_id, req.params.child_id, query)
             if (!result) return res.status(HttpStatus.NOT_FOUND).send(this.getMessageSleepNotFound())
             return res.status(HttpStatus.OK).send(result)
         } catch (err) {

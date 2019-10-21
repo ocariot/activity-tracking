@@ -114,7 +114,7 @@ export class EnvironmentService implements IEnvironmentService {
             const environmentSaved: Environment = await this._environmentRepository.create(environment)
 
             // 4. If created successfully, the object is published on the message bus.
-            if (environmentSaved && !environment.isFromEventBus) {
+            if (environmentSaved) {
                 this._eventBus.bus
                     .pubSaveEnvironment(environmentSaved)
                     .then(() => {

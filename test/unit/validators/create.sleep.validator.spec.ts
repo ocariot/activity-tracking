@@ -29,7 +29,7 @@ describe('Validators: CreateSleepValidator', () => {
                     CreateSleepValidator.validate(sleep)
                 } catch (err) {
                     assert.equal(err.message, 'Required fields were not provided...')
-                    assert.equal(err.description, 'Activity validation failed: start_time is required!')
+                    assert.equal(err.description, 'Sleep validation failed: start_time is required!')
                 }
             })
         })
@@ -43,8 +43,8 @@ describe('Validators: CreateSleepValidator', () => {
                     CreateSleepValidator.validate(sleep)
                 } catch (err) {
                     assert.equal(err.message, 'Required fields were not provided...')
-                    assert.equal(err.description, 'Activity validation failed: start_time, end_time, duration, ' +
-                        'child_id is required!')
+                    assert.equal(err.description, 'Sleep validation failed: ' +
+                        'start_time, end_time, duration, child_id is required!')
                 }
             })
         })

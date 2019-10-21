@@ -6,11 +6,11 @@ import { ValidationException } from '../../domain/exception/validation.exception
 import { IWeightService } from '../../port/weight.service.interface'
 
 /**
- * Handler for WeightSaveEvent operation.
+ * Handler for WeightSyncEvent operation.
  *
  * @param event
  */
-export const weightSaveEventHandler = async (event: any) => {
+export const weightSyncEventHandler = async (event: any) => {
     const weightService: IWeightService = DIContainer.get<IWeightService>(Identifier.WEIGHT_SERVICE)
     const logger: ILogger = DIContainer.get<ILogger>(Identifier.LOGGER)
 
@@ -23,7 +23,6 @@ export const weightSaveEventHandler = async (event: any) => {
             // 1. Convert weight array json to object.
             const weightArr: Array<Weight> = event.weight.map(item => {
                 const weightItem: Weight = new Weight().fromJSON(item)
-                weightItem.isFromEventBus = true
                 return weightItem
             })
 
@@ -41,7 +40,6 @@ export const weightSaveEventHandler = async (event: any) => {
         else {
             // 1. Convert weight json to object.
             const weight: Weight = new Weight().fromJSON(event.weight)
-            weight.isFromEventBus = true
 
             // 2. Try to add the weight
             await weightService.add(weight)

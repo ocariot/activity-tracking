@@ -115,7 +115,7 @@ export class SleepService implements ISleepService {
             const sleepSaved: Sleep = await this._sleepRepository.create(sleep)
 
             // 4. If created successfully, the object is published on the message bus.
-            if (sleepSaved && !sleep.isFromEventBus) {
+            if (sleepSaved) {
                 this._eventBus.bus
                     .pubSaveSleep(sleepSaved)
                     .then(() => {
@@ -168,7 +168,6 @@ export class SleepService implements ISleepService {
         ObjectIdValidator.validate(childId, Strings.CHILD.PARAM_ID_NOT_VALID_FORMAT)
         ObjectIdValidator.validate(sleepId, Strings.SLEEP.PARAM_ID_NOT_VALID_FORMAT)
 
-        query.addFilter({ _id: sleepId, child_id: childId })
         return this._sleepRepository.findOne(query)
     }
 
@@ -183,7 +182,6 @@ export class SleepService implements ISleepService {
     public getAllByChild(childId: string, query: IQuery): Promise<Array<Sleep>> {
         ObjectIdValidator.validate(childId, Strings.CHILD.PARAM_ID_NOT_VALID_FORMAT)
 
-        query.addFilter({ child_id: childId })
         return this._sleepRepository.find(query)
     }
 
@@ -203,7 +201,7 @@ export class SleepService implements ISleepService {
             const sleepUpdated: Sleep = await this._sleepRepository.updateByChild(sleep)
 
             // 4. If updated successfully, the object is published on the message bus.
-            if (sleepUpdated && !sleep.isFromEventBus) {
+            if (sleepUpdated) {
                 this._eventBus.bus
                     .pubUpdateSleep(sleepUpdated)
                     .then(() => {

@@ -10,6 +10,7 @@ import { Query } from '../../infrastructure/repository/query/query'
 import { MultiStatus } from '../../application/domain/model/multi.status'
 import { IWeightService } from '../../application/port/weight.service.interface'
 import { Weight } from '../../application/domain/model/weight'
+import { IQuery } from '../../application/port/query.interface'
 
 /**
  * Controller that implements Weight feature operations.
@@ -79,8 +80,10 @@ export class WeightController {
     @httpGet('/:child_id/weights')
     public async getAllWeightOfChild(@request() req: Request, @response() res: Response): Promise<Response> {
         try {
+            const query: IQuery = new Query().fromJSON(req.query)
+            query.addFilter({ child_id: req.params.child_id })
             const result = await this._weightService
-                .getAllByChild(req.params.child_id, new Query().fromJSON(req.query))
+                .getAllByChild(req.params.child_id, query)
             const count: number = await this._weightService.countWeights(req.params.child_id)
             res.setHeader('X-Total-Count', count)
             return res.status(HttpStatus.OK).send(result)
@@ -102,8 +105,10 @@ export class WeightController {
     @httpGet('/:child_id/weights/:weight_id')
     public async getWeightById(@request() req: Request, @response() res: Response): Promise<Response> {
         try {
+            const query: IQuery = new Query().fromJSON(req.query)
+            query.addFilter({ _id: req.params.weight_id, child_id: req.params.child_id })
             const result: Weight = await this._weightService
-                .getByIdAndChild(req.params.weight_id, req.params.child_id, new Query().fromJSON(req.query))
+                .getByIdAndChild(req.params.weight_id, req.params.child_id, query)
             if (!result) return res.status(HttpStatus.NOT_FOUND).send(this.getMessageWeightNotFound())
             return res.status(HttpStatus.OK).send(result)
         } catch (err) {

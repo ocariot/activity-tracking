@@ -6,11 +6,11 @@ import { ValidationException } from '../../domain/exception/validation.exception
 import { IPhysicalActivityService } from '../../port/physical.activity.service.interface'
 
 /**
- * Handler for PhysicalActivitySaveEvent operation.
+ * Handler for PhysicalActivitySyncEvent operation.
  *
  * @param event
  */
-export const physicalActivitySaveEventHandler = async (event: any) => {
+export const physicalActivitySyncEventHandler = async (event: any) => {
     const activityService: IPhysicalActivityService = DIContainer.get<IPhysicalActivityService>(Identifier.ACTIVITY_SERVICE)
     const logger: ILogger = DIContainer.get<ILogger>(Identifier.LOGGER)
 
@@ -23,7 +23,6 @@ export const physicalActivitySaveEventHandler = async (event: any) => {
             // 1. Convert physical activity array json to object.
             const activitiesArr: Array<PhysicalActivity> = event.physicalactivity.map(item => {
                 const activityItem: PhysicalActivity = new PhysicalActivity().fromJSON(item)
-                activityItem.isFromEventBus = true
                 return activityItem
             })
 
@@ -41,7 +40,6 @@ export const physicalActivitySaveEventHandler = async (event: any) => {
         else {
             // 1. Convert physical activity json to object.
             const activity: PhysicalActivity = new PhysicalActivity().fromJSON(event.physicalactivity)
-            activity.isFromEventBus = true
 
             // 2. Try to add the activity
             await activityService.add(activity)

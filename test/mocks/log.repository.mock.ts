@@ -1,6 +1,8 @@
 import { ILogRepository } from '../../src/application/port/log.repository.interface'
 import { Log, LogType } from '../../src/application/domain/model/log'
 import { LogMock } from './log.mock'
+import { ChildLogMock } from './child.log.mock'
+import { ChildLog } from '../../src/application/domain/model/child.log'
 
 export class LogRepositoryMock implements ILogRepository {
     public count(query: any): Promise<number> {
@@ -51,6 +53,12 @@ export class LogRepositoryMock implements ILogRepository {
 
     public selectByChild(child_id: string, type: string, date: string): Promise<Log> {
         return Promise.resolve(new LogMock())
+    }
+
+    public findByChild(childId: string, dateStart: string, dateEnd: string, desiredResource?: string):
+        Promise<Array<Log> | ChildLog> {
+        if (desiredResource) return Promise.resolve([ new LogMock(), new LogMock(), new LogMock() ])
+        return Promise.resolve(new ChildLogMock())
     }
 
     public removeAllLogsFromChild(childId: string): Promise<boolean> {

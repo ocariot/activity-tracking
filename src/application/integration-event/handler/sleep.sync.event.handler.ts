@@ -6,11 +6,11 @@ import { ValidationException } from '../../domain/exception/validation.exception
 import { ISleepService } from '../../port/sleep.service.interface'
 
 /**
- * Handler for SleepSaveEvent operation.
+ * Handler for SleepSyncEvent operation.
  *
  * @param event
  */
-export const sleepSaveEventHandler = async (event: any) => {
+export const sleepSyncEventHandler = async (event: any) => {
     const sleepService: ISleepService = DIContainer.get<ISleepService>(Identifier.SLEEP_SERVICE)
     const logger: ILogger = DIContainer.get<ILogger>(Identifier.LOGGER)
 
@@ -23,7 +23,6 @@ export const sleepSaveEventHandler = async (event: any) => {
             // 1. Convert sleep array json to object.
             const sleepArr: Array<Sleep> = event.sleep.map(item => {
                 const sleepItem: Sleep = new Sleep().fromJSON(item)
-                sleepItem.isFromEventBus = true
                 return sleepItem
             })
 
@@ -41,7 +40,6 @@ export const sleepSaveEventHandler = async (event: any) => {
         else {
             // 1. Convert sleep json to object.
             const sleep: Sleep = new Sleep().fromJSON(event.sleep)
-            sleep.isFromEventBus = true
 
             // 2. Try to add the sleep
             await sleepService.add(sleep)

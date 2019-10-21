@@ -1500,17 +1500,28 @@ describe('PROVIDER EVENT BUS TASK', () => {
                     throw new Error('Failure on Provider Log test: ' + err.message)
                 }
             })
-            it('should return an array with one log', (done) => {
-                const log: Log = new LogMock()
+            it('should return a ChildLog with one active_minutes log', (done) => {
+                const log: Log = new LogMock(LogType.ACTIVE_MINUTES)
                 log.child_id = '5a62be07d6f33400146c9b61'
 
                 logRepository.create(log)
                     .then(async () => {
-                        const result = await rabbitmq.bus.getLogs('?child_id=5a62be07d6f33400146c9b61')
-                        expect(result.length).to.eql(1)
-                        // Comparing the resources
-                        expect(result[0].date).to.eql(log.date)
-                        expect(result[0].value).to.eql(log.value)
+                        const result = await rabbitmq.bus.getLogs(log.child_id, log.date, log.date)
+                        expect(result.steps.length).to.eql(1)
+                        expect(result.steps[0].date).to.eql(log.date)
+                        expect(result.steps[0].value).to.eql(0)
+                        expect(result.calories.length).to.eql(1)
+                        expect(result.calories[0].date).to.eql(log.date)
+                        expect(result.calories[0].value).to.eql(0)
+                        expect(result.active_minutes.length).to.eql(1)
+                        expect(result.active_minutes[0].date).to.eql(log.date)
+                        expect(result.active_minutes[0].value).to.eql(log.value)
+                        expect(result.lightly_active_minutes.length).to.eql(1)
+                        expect(result.lightly_active_minutes[0].date).to.eql(log.date)
+                        expect(result.lightly_active_minutes[0].value).to.eql(0)
+                        expect(result.sedentary_minutes.length).to.eql(1)
+                        expect(result.sedentary_minutes[0].date).to.eql(log.date)
+                        expect(result.sedentary_minutes[0].value).to.eql(0)
                         done()
                     })
                     .catch(done)
@@ -1545,14 +1556,17 @@ describe('PROVIDER EVENT BUS TASK', () => {
                     log5.child_id = '5a62be07d6f33400146c9b61'
 
                     const log6: Log = new LogMock(LogType.STEPS)
+                    log6.date = '2019-01-21'
                     log6.value = 60
                     log6.child_id = '5a62be07de34500146d9c544'
 
                     const log7: Log = new LogMock(LogType.ACTIVE_MINUTES)
+                    log7.date = '2019-01-22'
                     log7.value = 59
                     log7.child_id = '5a62be07de34500146d9c544'
 
                     const log8: Log = new LogMock(LogType.LIGHTLY_ACTIVE_MINUTES)
+                    log8.date = '2019-01-23'
                     log8.value = 61
                     log8.child_id = '5a62be07de34500146d9c544'
 
@@ -1605,106 +1619,50 @@ describe('PROVIDER EVENT BUS TASK', () => {
                     throw new Error('Failure on Provider Log test: ' + err.message)
                 }
             })
-            it('should return an array with thirteen logs (regardless of association with a child)', (done) => {
-                rabbitmq.bus.getLogs('')
+            it('should return a ChildLog with empty logs (no log matches query)', (done) => {
+                rabbitmq.bus.getLogs('5a62be07d6f33400146c9b64', '2019-01-01', '2019-01-01')
                     .then(result => {
-                        expect(result.length).to.eql(13)
+                        expect(result.steps.length).to.eql(1)
+                        expect(result.steps[0].date).to.eql('2019-01-01')
+                        expect(result.steps[0].value).to.eql(0)
+                        expect(result.calories.length).to.eql(1)
+                        expect(result.calories[0].date).to.eql('2019-01-01')
+                        expect(result.calories[0].value).to.eql(0)
+                        expect(result.active_minutes.length).to.eql(1)
+                        expect(result.active_minutes[0].date).to.eql('2019-01-01')
+                        expect(result.active_minutes[0].value).to.eql(0)
+                        expect(result.lightly_active_minutes.length).to.eql(1)
+                        expect(result.lightly_active_minutes[0].date).to.eql('2019-01-01')
+                        expect(result.lightly_active_minutes[0].value).to.eql(0)
+                        expect(result.sedentary_minutes.length).to.eql(1)
+                        expect(result.sedentary_minutes[0].date).to.eql('2019-01-01')
+                        expect(result.sedentary_minutes[0].value).to.eql(0)
                         done()
                     })
                     .catch(done)
             })
 
-            it('should return an empty array (no log matches query)', (done) => {
-                rabbitmq.bus.getLogs('?child_id=5a62be07d6f33400146c9b64')
+            it('should return a ChildLog with some logs (query all logs of a child in one month)', (done) => {
+                rabbitmq.bus.getLogs('5a62be07de34500146d9c544', '2019-01-20', '2019-02-18')
                     .then(result => {
-                        expect(result.length).to.eql(0)
+                        expect(result.steps.length).to.eql(30)
+                        expect(result.calories.length).to.eql(30)
+                        expect(result.active_minutes.length).to.eql(30)
+                        expect(result.lightly_active_minutes.length).to.eql(30)
+                        expect(result.sedentary_minutes.length).to.eql(30)
                         done()
                     })
                     .catch(done)
             })
-
-            it('should return an array with eight logs (query all logs by child_id)', (done) => {
-                rabbitmq.bus.getLogs('?child_id=5a62be07de34500146d9c544')
-                    .then(result => {
-                        expect(result.length).to.eql(8)
-                        done()
-                    })
-                    .catch(done)
-            })
-
-            it('should return an array with three logs (query all logs by type)', (done) => {
-                rabbitmq.bus.getLogs('?type=sedentary_minutes')
-                    .then(result => {
-                        expect(result.length).to.eql(3)
-                        done()
-                    })
-                    .catch(done)
-            })
-
-            it('should return an array with two logs (query logs of a child by type)', (done) => {
-                rabbitmq.bus.getLogs('?type=sedentary_minutes&child_id=5a62be07de34500146d9c544')
-                    .then(result => {
-                        expect(result.length).to.eql(2)
-                        done()
-                    })
-                    .catch(done)
-            })
-
-            it('should return an array with seven logs (query all logs in one month)', (done) => {
-                rabbitmq.bus.getLogs('?start_at=2019-01-20T00:00:00.000Z&period=1m')
-                    .then(result => {
-                        expect(result.length).to.eql(7)
-                        done()
-                    })
-                    .catch(done)
-            })
-
-            it('should return an array with five log (query all logs of a child in one month)', (done) => {
-                rabbitmq.bus.getLogs('?start_at=2019-01-20T00:00:00.000Z&period=1m&child_id=5a62be07de34500146d9c544')
-                    .then(result => {
-                        expect(result.length).to.eql(5)
-                        done()
-                    })
-                    .catch(done)
-            })
-
-            it('should return an array with two log (query all logs of a child by type in one month)', (done) => {
-                rabbitmq.bus
-                    .getLogs('?start_at=2019-01-20T00:00:00.000Z&period=1m&child_id=5a62be07de34500146d9c544&type=sedentary_minutes')
-                    .then(result => {
-                        expect(result.length).to.eql(2)
-                        done()
-                    })
-                    .catch(done)
-            })
-
-            it('should return an array with two log (query all calories logs over 100)',
-                (done) => {
-                    rabbitmq.bus.getLogs('?type=calories&value=gt:100')
-                        .then(result => {
-                            expect(result.length).to.eql(2)
-                            done()
-                        })
-                        .catch(done)
-                })
-
-            it('should return an array with two log (query all calories logs of a child over 100)',
-                (done) => {
-                    rabbitmq.bus.getLogs('?type=calories&value=gt:100&child_id=5a62be07de34500146d9c544')
-                        .then(result => {
-                            expect(result.length).to.eql(2)
-                            done()
-                        })
-                        .catch(done)
-                })
         })
 
         context('when trying to retrieve logs through invalid query', () => {
+            let log
             before(async () => {
                 try {
                     await deleteAllLogs()
 
-                    const log: Log = new LogMock(LogType.STEPS)
+                    log = new LogMock(LogType.STEPS)
 
                     await logRepository.create(log)
                 } catch (err) {
@@ -1720,32 +1678,19 @@ describe('PROVIDER EVENT BUS TASK', () => {
                 }
             })
             it('should return a ValidationException (query with an invalid date (date))', (done) => {
-                rabbitmq.bus.getLogs('?date=invalidDate')
+                rabbitmq.bus.getLogs('5a62be07d6f33400146c9b64', 'invalidDateStart', 'invalidDateEnd')
                     .then(result => {
-                        expect(result.length).to.eql(0)
+                        expect(result.steps.length).to.eql(1)
+                        expect(result.calories.length).to.eql(1)
+                        expect(result.active_minutes.length).to.eql(1)
+                        expect(result.lightly_active_minutes.length).to.eql(1)
+                        expect(result.sedentary_minutes.length).to.eql(1)
                         done(new Error('The find method of the repository should not function normally'))
                     })
                     .catch((err) => {
                         try {
                             expect(err.message).to.eql('Error: '
-                                .concat('Datetime: invalidDate is not in valid ISO 8601 format.'))
-                            done()
-                        } catch (err) {
-                            done(err)
-                        }
-                    })
-            })
-
-            it('should return a ValidationException (query with an invalid number (value))', (done) => {
-                rabbitmq.bus.getLogs('?value=invalidValue')
-                    .then(result => {
-                        expect(result.length).to.eql(0)
-                        done(new Error('The find method of the repository should not function normally'))
-                    })
-                    .catch((err) => {
-                        try {
-                            expect(err.message).to.eql('Error: '
-                                .concat('The value \'invalidValue\' of value field is not a number.'))
+                                .concat('Date parameter: invalidDateStart, is not in valid ISO 8601 format.'))
                             done()
                         } catch (err) {
                             done(err)
@@ -1754,9 +1699,13 @@ describe('PROVIDER EVENT BUS TASK', () => {
             })
 
             it('should return a ValidationException (query with an invalid child id)', (done) => {
-                rabbitmq.bus.getLogs('?child_id=invalidChildId')
+                rabbitmq.bus.getLogs('invalidChildId', log.date, log.date)
                     .then(result => {
-                        expect(result.length).to.eql(0)
+                        expect(result.steps.length).to.eql(1)
+                        expect(result.calories.length).to.eql(1)
+                        expect(result.active_minutes.length).to.eql(1)
+                        expect(result.lightly_active_minutes.length).to.eql(1)
+                        expect(result.sedentary_minutes.length).to.eql(1)
                         done(new Error('The find method of the repository should not function normally'))
                     })
                     .catch((err) => {
@@ -1788,7 +1737,7 @@ describe('PROVIDER EVENT BUS TASK', () => {
                     }
                 })
                 it('should return a rpc timeout error', (done) => {
-                    rabbitmq.bus.getLogs('?child_id=5a62be07d6f33400146c9b61')
+                    rabbitmq.bus.getLogs('5a62be07d6f33400146c9b61', '2019-01-01', '2019-01-05')
                         .then(() => {
                             done(new Error('RPC should not function normally'))
                         })

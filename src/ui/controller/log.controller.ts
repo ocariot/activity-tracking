@@ -5,7 +5,6 @@ import { MultiStatus } from '../../application/domain/model/multi.status'
 import HttpStatus from 'http-status-codes'
 import { ApiExceptionManager } from '../exception/api.exception.manager'
 import { ChildLog } from '../../application/domain/model/child.log'
-import { Query } from '../../infrastructure/repository/query/query'
 import { inject } from 'inversify'
 import { Identifier } from '../../di/identifiers'
 import { ILogService } from '../../application/port/log.service.interface'
@@ -62,8 +61,6 @@ export class LogController {
 
     /**
      * Recover the logs.
-     * For the query strings, the query-strings-parser middleware was used.
-     * @see {@link https://www.npmjs.com/package/query-strings-parser} for further information.
      *
      * @param {Request} req
      * @param {Response} res
@@ -72,7 +69,7 @@ export class LogController {
     public async getLogs(@request() req: Request, @response() res: Response): Promise<Response> {
         try {
             const result: ChildLog = await this._logService
-                .getByChildAndDate(req.params.child_id, req.params.date_start, req.params.date_end, new Query().fromJSON(req.query))
+                .getByChildAndDate(req.params.child_id, req.params.date_start, req.params.date_end)
             return res.status(HttpStatus.OK).send(result)
         } catch (err) {
             const handlerError = ApiExceptionManager.build(err)
@@ -83,8 +80,6 @@ export class LogController {
 
     /**
      * Recover the logs by type.
-     * For the query strings, the query-strings-parser middleware was used.
-     * @see {@link https://www.npmjs.com/package/query-strings-parser} for further information.
      *
      * @param {Request} req
      * @param {Response} res
@@ -93,11 +88,8 @@ export class LogController {
     public async getLogsByResource(@request() req: Request, @response() res: Response): Promise<Response> {
         try {
             const result: Array<Log> = await this._logService
-                .getByChildResourceAndDate(req.params.child_id, req.params.resource, req.params.date_start, req.params.date_end,
-                    new Query().fromJSON(req.query))
-            const count: number = await this._logService.countLogsByResource(
-                req.params.child_id, req.params.resource, req.params.date_start, req.params.date_end)
-            res.setHeader('X-Total-Count', count)
+                .getByChildResourceAndDate(req.params.child_id, req.params.resource, req.params.date_start,
+                    req.params.date_end)
             return res.status(HttpStatus.OK).send(result)
         } catch (err) {
             const handlerError = ApiExceptionManager.build(err)

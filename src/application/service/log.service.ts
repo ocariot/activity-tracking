@@ -4,7 +4,7 @@ import { Identifier } from '../../di/identifiers'
 import { Strings } from '../../utils/strings'
 import { ILogService } from '../port/log.service.interface'
 import { IQuery } from '../port/query.interface'
-import { Log, LogType } from '../domain/model/log'
+import { Log } from '../domain/model/log'
 import { ILogRepository } from '../port/log.repository.interface'
 import { CreateLogValidator } from '../domain/validator/create.log.validator'
 import { DateValidator } from '../domain/validator/date.validator'
@@ -117,47 +117,16 @@ export class LogService implements ILogService {
      * @return {Promise<ChildLog>}
      * @throws {RepositoryException}
      */
-    public async getByChildAndDate(childId: string, dateStart: string, dateEnd: string, query: IQuery): Promise<ChildLog> {
+    public async getByChildAndDate(childId: string, dateStart: string, dateEnd: string): Promise<ChildLog> {
         try {
             ObjectIdValidator.validate(childId, Strings.CHILD.PARAM_ID_NOT_VALID_FORMAT)
             DateValidator.validate(dateStart)
             DateValidator.validate(dateEnd)
             LogDateRangeValidator.validate(dateStart, dateEnd)
 
-            query.ordination = new Map<string, string>().set('date', 'desc')
-            query.addFilter({
-                child_id: childId,
-                $and: [
-                    { date: { $lte: dateEnd.toString().concat('T00:00:00') } },
-                    { date: { $gte: dateStart.toString().concat('T00:00:00') } }
-                ]
-            })
-            query.pagination.limit = Number.MAX_SAFE_INTEGER
+            const result: ChildLog = await this._logRepository.findByChild(childId, dateStart, dateEnd) as ChildLog
 
-            // Creates a ChildLog object with all the resources listed with arrays.
-            const childLog: ChildLog = new ChildLog()
-            const stepsArr: Array<Log> = new Array<Log>()
-            const caloriesArr: Array<Log> = new Array<Log>()
-            const activeMinutesArr: Array<Log> = new Array<Log>()
-            const lightlyActiveMinutesArr: Array<Log> = new Array<Log>()
-            const sedentaryMinutesArr: Array<Log> = new Array<Log>()
-
-            const logs: Array<Log> = await this._logRepository.find(query)
-            logs.forEach(item => {
-                if (item.type === LogType.STEPS) stepsArr.push(item)
-                else if (item.type === LogType.CALORIES) caloriesArr.push(item)
-                else if (item.type === LogType.ACTIVE_MINUTES) activeMinutesArr.push(item)
-                else if (item.type === LogType.LIGHTLY_ACTIVE_MINUTES) lightlyActiveMinutesArr.push(item)
-                else if (item.type === LogType.SEDENTARY_MINUTES) sedentaryMinutesArr.push(item)
-            })
-
-            childLog.steps = stepsArr
-            childLog.calories = caloriesArr
-            childLog.active_minutes = activeMinutesArr
-            childLog.lightly_active_minutes = lightlyActiveMinutesArr
-            childLog.sedentary_minutes = sedentaryMinutesArr
-
-            return Promise.resolve(childLog)
+            return Promise.resolve(result)
         } catch (err) {
             return Promise.reject(err)
         }
@@ -175,26 +144,22 @@ export class LogService implements ILogService {
      * @return {Promise<Array<Log>>}
      * @throws {RepositoryException}
      */
-    public getByChildResourceAndDate(childId: string, desiredResource: string, dateStart: string,
-                                     dateEnd: string, query: IQuery): Promise<Array<Log>> {
-        ObjectIdValidator.validate(childId, Strings.CHILD.PARAM_ID_NOT_VALID_FORMAT)
-        LogTypeValidator.validate(desiredResource)
-        DateValidator.validate(dateStart)
-        DateValidator.validate(dateEnd)
-        LogDateRangeValidator.validate(dateStart, dateEnd)
+    public async getByChildResourceAndDate(childId: string, desiredResource: string, dateStart: string,
+                                           dateEnd: string): Promise<Array<Log>> {
+        try {
+            ObjectIdValidator.validate(childId, Strings.CHILD.PARAM_ID_NOT_VALID_FORMAT)
+            LogTypeValidator.validate(desiredResource)
+            DateValidator.validate(dateStart)
+            DateValidator.validate(dateEnd)
+            LogDateRangeValidator.validate(dateStart, dateEnd)
 
-        query.ordination = new Map<string, string>().set('date', 'desc')
-        query.addFilter({
-            child_id: childId,
-            type: desiredResource,
-            $and: [
-                { date: { $lte: dateEnd.concat('T00:00:00') } },
-                { date: { $gte: dateStart.concat('T00:00:00') } }
-            ]
-        })
-        query.pagination.limit = Number.MAX_SAFE_INTEGER
+            const result: Array<Log> = await this._logRepository.findByChild(
+                childId, dateStart, dateEnd, desiredResource) as Array<Log>
 
-        return this._logRepository.find(query)
+            return Promise.resolve(result)
+        } catch (err) {
+            return Promise.reject(err)
+        }
     }
 
     /**
@@ -210,9 +175,5 @@ export class LogService implements ILogService {
 
     public async remove(id: string): Promise<boolean> {
         throw new Error('Unsupported feature!')
-    }
-
-    public countLogsByResource(childId: string, desiredResource: string, dateStart: string, dateEnd: string): Promise<number> {
-        return this._logRepository.countLogsByResource(childId, desiredResource, dateStart, dateEnd)
     }
 }

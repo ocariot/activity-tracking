@@ -564,11 +564,11 @@ describe('Routes: children.logs', () => {
                     .set('Content-Type', 'application/json')
                     .expect(200)
                     .then(res => {
-                        expect(res.body.steps.length).to.eql(0)
-                        expect(res.body.calories.length).to.eql(0)
-                        expect(res.body.active_minutes.length).to.eql(0)
-                        expect(res.body.lightly_active_minutes.length).to.eql(0)
-                        expect(res.body.sedentary_minutes.length).to.eql(0)
+                        expect(res.body.steps.length).to.eql(10)
+                        expect(res.body.calories.length).to.eql(10)
+                        expect(res.body.active_minutes.length).to.eql(10)
+                        expect(res.body.lightly_active_minutes.length).to.eql(10)
+                        expect(res.body.sedentary_minutes.length).to.eql(10)
                     })
             })
         })
@@ -648,7 +648,7 @@ describe('Routes: children.logs', () => {
             })
         })
 
-        context('when the parameters are invalid (date range is invalid)', () => {
+        context('when the parameters are invalid (date range is invalid (period longer than 1 year and 5 days))', () => {
             before(async () => {
                 try {
                     await deleteAllLogs()
@@ -670,6 +670,32 @@ describe('Routes: children.logs', () => {
                         expect(err.body.message).to.eql('Date range is invalid...')
                         expect(err.body.description).to.eql('Log dates range validation failed: ' +
                             'The period between the received dates is longer than one year')
+                    })
+            })
+        })
+
+        context('when the parameters are invalid (date range is invalid (date_end has an older date than date_start))', () => {
+            before(async () => {
+                try {
+                    await deleteAllLogs()
+                } catch (err) {
+                    throw new Error('Failure on children.logs routes test: ' + err.message)
+                }
+            })
+            it('should return status code 400 and an info message about the invalid date_end', () => {
+                const basePath = `/v1/children/${correctLogsArr[0].child_id}/logs`
+                const specificPath = `/date/2018-03-18/2017-03-27`
+                const url = `${basePath}${specificPath}`
+
+                return request
+                    .get(url)
+                    .set('Content-Type', 'application/json')
+                    .expect(400)
+                    .then(err => {
+                        expect(err.body.code).to.eql(400)
+                        expect(err.body.message).to.eql('Date range is invalid...')
+                        expect(err.body.description).to.eql('Log dates range validation failed: ' +
+                            'The date_end parameter can not contain an older date than that the date_start parameter!')
                     })
             })
         })
@@ -789,7 +815,7 @@ describe('Routes: children.logs', () => {
                     .set('Content-Type', 'application/json')
                     .expect(200)
                     .then(res => {
-                        expect(res.body.length).to.eql(0)
+                        expect(res.body.length).to.eql(10)
                     })
             })
         })

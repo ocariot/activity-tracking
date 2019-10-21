@@ -390,7 +390,8 @@ describe('Routes: children.physicalactivities', () => {
                     .then(err => {
                         expect(err.body.code).to.eql(400)
                         expect(err.body.message).to.eql('Required fields were not provided...')
-                        expect(err.body.description).to.eql('Activity validation failed: start_time, end_time, duration is required!')
+                        expect(err.body.description).to.eql('Physical Activity validation failed: ' +
+                            'start_time, end_time, duration, name, calories is required!')
                     })
             })
         })
@@ -1461,8 +1462,8 @@ describe('Routes: children.physicalactivities', () => {
                         // Error item
                         expect(res.body.error[0].code).to.eql(HttpStatus.BAD_REQUEST)
                         expect(res.body.error[0].message).to.eql('Required fields were not provided...')
-                        expect(res.body.error[0].description).to.eql('Activity validation failed: start_time, end_time, ' +
-                            'duration is required!')
+                        expect(res.body.error[0].description).to.eql('Physical Activity validation failed: ' +
+                            'start_time, end_time, duration, name, calories is required!')
                     })
             })
         })
@@ -1502,8 +1503,8 @@ describe('Routes: children.physicalactivities', () => {
                     .expect(207)
                     .then(res => {
                         expect(res.body.error[0].message).to.eql('Required fields were not provided...')
-                        expect(res.body.error[0].description).to.eql('Activity validation failed: ' +
-                            'start_time, end_time, duration is required!')
+                        expect(res.body.error[0].description).to.eql('Physical Activity validation failed: ' +
+                            'start_time, end_time, duration, name, calories is required!')
                         expect(res.body.error[1].message).to.eql('Required fields were not provided...')
                         expect(res.body.error[1].description).to.eql('Physical Activity validation failed: name, calories is required!')
                         expect(res.body.error[2].message).to.eql('Date field is invalid...')

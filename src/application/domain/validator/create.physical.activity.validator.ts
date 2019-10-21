@@ -9,7 +9,13 @@ export class CreatePhysicalActivityValidator {
     public static validate(activity: PhysicalActivity): void | ValidationException {
         const fields: Array<string> = []
 
-        CreateActivityValidator.validate(activity)
+        try {
+            CreateActivityValidator.validate(activity)
+        } catch (err) {
+            if (err.message !== 'REQUIRED_FIELDS') throw err
+            fields.push(err.description.split(','))
+        }
+
         if (activity.name === undefined) fields.push('name')
         else if (activity.name.length === 0) {
             throw new ValidationException('Name field is invalid...',

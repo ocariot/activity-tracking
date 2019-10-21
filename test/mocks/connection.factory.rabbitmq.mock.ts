@@ -37,7 +37,7 @@ export class ConnectionFactoryRabbitMQMock implements IConnectionFactory {
         getInstitutions(query: string, callback?: (err: any, institutions: any) => void): any {
             return Promise.resolve({})
         },
-        getLogs(query: string, callback?: (err: any, result: any) => void): any {
+        getLogs(childId: string, dateStart: string, dateEnd: string, callback?: (err: any, result: any) => void): any {
             return Promise.resolve({})
         },
         getPhysicalActivities(query: string, callback?: (err: any, result: any) => void): any {
@@ -91,7 +91,7 @@ export class ConnectionFactoryRabbitMQMock implements IConnectionFactory {
         provideInstitutions(listener: (query: string) => any): Promise<void> {
             return Promise.resolve()
         },
-        provideLogs(listener: (query: string) => any): Promise<void> {
+        provideLogs(listener: (childId: string, dateStart: string, dateEnd: string) => any): Promise<void> {
             return Promise.resolve()
         },
         providePhysicalActivities(listener: (query: string) => any): Promise<void> {
@@ -142,6 +142,9 @@ export class ConnectionFactoryRabbitMQMock implements IConnectionFactory {
         pubSaveSleep(sleep: any): Promise<void> {
             return Promise.resolve()
         },
+        pubSaveEnvironment(environment: any): Promise<void> {
+            return Promise.resolve()
+        },
         pubSaveWeight(weight: any): Promise<void> {
             return Promise.resolve()
         },
@@ -164,6 +167,18 @@ export class ConnectionFactoryRabbitMQMock implements IConnectionFactory {
             return Promise.resolve()
         },
         pubUpdateSleep(sleep: any): Promise<void> {
+            return Promise.resolve()
+        },
+        pubSyncLog(log: any): Promise<void> {
+            return Promise.resolve()
+        },
+        pubSyncPhysicalActivity(activity: any): Promise<void> {
+            return Promise.resolve()
+        },
+        pubSyncSleep(sleep: any): Promise<void> {
+            return Promise.resolve()
+        },
+        pubSyncWeight(weight: any): Promise<void> {
             return Promise.resolve()
         },
         sub(routingKey: string, callback: (message: any) => void): Promise<void> {
@@ -232,7 +247,16 @@ export class ConnectionFactoryRabbitMQMock implements IConnectionFactory {
         subUpdateSleep(callback: (message: any) => void): Promise<void> {
             return Promise.resolve()
         },
-        pubSaveEnvironment(environment: any): Promise<void> {
+        subSyncLog(callback: (message: any) => void): Promise<void> {
+            return Promise.resolve()
+        },
+        subSyncPhysicalActivity(callback: (message: any) => void): Promise<void> {
+            return Promise.resolve()
+        },
+        subSyncSleep(callback: (message: any) => void): Promise<void> {
+            return Promise.resolve()
+        },
+        subSyncWeight(callback: (message: any) => void): Promise<void> {
             return Promise.resolve()
         }
     }

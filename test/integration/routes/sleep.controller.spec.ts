@@ -327,7 +327,8 @@ describe('Routes: children.sleep', () => {
                     .then(err => {
                         expect(err.body.code).to.eql(400)
                         expect(err.body.message).to.eql('Required fields were not provided...')
-                        expect(err.body.description).to.eql('Activity validation failed: start_time, end_time, duration is required!')
+                        expect(err.body.description).to.eql('Sleep validation failed: ' +
+                            'start_time, end_time, duration, type, pattern is required!')
                     })
             })
         })
@@ -848,8 +849,8 @@ describe('Routes: children.sleep', () => {
                         // Error item
                         expect(res.body.error[0].code).to.eql(HttpStatus.BAD_REQUEST)
                         expect(res.body.error[0].message).to.eql('Required fields were not provided...')
-                        expect(res.body.error[0].description).to.eql('Activity validation failed: start_time, end_time, ' +
-                            'duration is required!')
+                        expect(res.body.error[0].description).to.eql('Sleep validation failed: ' +
+                            'start_time, end_time, duration, type, pattern is required!')
                     })
             })
         })
@@ -885,8 +886,8 @@ describe('Routes: children.sleep', () => {
                     .expect(207)
                     .then(res => {
                         expect(res.body.error[0].message).to.eql('Required fields were not provided...')
-                        expect(res.body.error[0].description).to.eql('Activity validation failed: start_time, end_time, ' +
-                            'duration is required!')
+                        expect(res.body.error[0].description).to.eql('Sleep validation failed: ' +
+                            'start_time, end_time, duration, type, pattern is required!')
                         expect(res.body.error[1].message).to.eql('Required fields were not provided...')
                         expect(res.body.error[1].description).to.eql('Sleep validation failed: type, pattern is required!')
                         expect(res.body.error[2].message).to.eql('Date field is invalid...')

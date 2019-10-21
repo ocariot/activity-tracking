@@ -110,7 +110,7 @@ describe('SUBSCRIBE EVENT BUS TASK', () => {
         context('when receiving a PhysicalActivitySaveEvent with one physical activity successfully', () => {
             const activity: PhysicalActivity = new PhysicalActivityMock()
             it('should return an array with one physical activity', (done) => {
-                rabbitmq.bus.pubSavePhysicalActivity(activity)
+                rabbitmq.bus.pubSyncPhysicalActivity(activity)
                     .then(async () => {
                         // Wait for 2000 milliseconds for the task to be executed
                         await timeout(2000)
@@ -138,7 +138,7 @@ describe('SUBSCRIBE EVENT BUS TASK', () => {
         context('when receiving a PhysicalActivitySaveEvent with one invalid physical activity', () => {
             const activity: PhysicalActivity = new PhysicalActivity()       // Invalid activity
             it('should return an empty array', (done) => {
-                rabbitmq.bus.pubSavePhysicalActivity(activity)
+                rabbitmq.bus.pubSyncPhysicalActivity(activity)
                     .then(async () => {
                         await timeout(2000)
                         const result = await activityRepository.find(new Query())
@@ -160,7 +160,7 @@ describe('SUBSCRIBE EVENT BUS TASK', () => {
             })
             const activity: PhysicalActivity = new PhysicalActivityMock()
             it('should return an array with one physical activity', (done) => {
-                rabbitmq.bus.pubSavePhysicalActivity(activity)
+                rabbitmq.bus.pubSyncPhysicalActivity(activity)
                     .then(async () => {
                         await timeout(1000)
                         await dbConnection.connect(process.env.MONGODB_URI_TEST || Default.MONGODB_URI_TEST,
@@ -188,10 +188,22 @@ describe('SUBSCRIBE EVENT BUS TASK', () => {
 
         context('when receiving a PhysicalActivitySaveEvent with some correct physical activities successfully', () => {
             const activity1: PhysicalActivity = new PhysicalActivityMock()
+            activity1.start_time = new Date(1516417200000)
+            activity1.end_time = new Date(new Date(activity1.start_time)
+                .setMilliseconds(Math.floor(Math.random() * 35 + 10) * 60000)) // 10-45min in milliseconds
+            activity1.duration = activity1.end_time.getTime() - activity1.start_time.getTime()
             const activity2: PhysicalActivity = new PhysicalActivityMock()
+            activity2.start_time = new Date(1516449600000)
+            activity2.end_time = new Date(new Date(activity2.start_time)
+                .setMilliseconds(Math.floor(Math.random() * 35 + 10) * 60000))
+            activity2.duration = activity2.end_time.getTime() - activity2.start_time.getTime()
             const activity3: PhysicalActivity = new PhysicalActivityMock()
+            activity3.start_time = new Date(1516471200000)
+            activity3.end_time = new Date(new Date(activity3.start_time)
+                .setMilliseconds(Math.floor(Math.random() * 35 + 10) * 60000))
+            activity3.duration = activity3.end_time.getTime() - activity3.start_time.getTime()
             it('should return an array with three physical activities', (done) => {
-                rabbitmq.bus.pubSavePhysicalActivity([activity1, activity2, activity3])
+                rabbitmq.bus.pubSyncPhysicalActivity([activity1, activity2, activity3])
                     .then(async () => {
                         await timeout(6000)
                         const result = await activityRepository.find(new Query())
@@ -204,10 +216,18 @@ describe('SUBSCRIBE EVENT BUS TASK', () => {
 
         context('when receiving a PhysicalActivitySaveEvent with some incorrect physical activities successfully', () => {
             const activity1: PhysicalActivity = new PhysicalActivityMock()
+            activity1.start_time = new Date(1516417200000)
+            activity1.end_time = new Date(new Date(activity1.start_time)
+                .setMilliseconds(Math.floor(Math.random() * 35 + 10) * 60000)) // 10-45min in milliseconds
+            activity1.duration = activity1.end_time.getTime() - activity1.start_time.getTime()
             const activity2: PhysicalActivity = new PhysicalActivity()
             const activity3: PhysicalActivity = new PhysicalActivityMock()
+            activity3.start_time = new Date(1516471200000)
+            activity3.end_time = new Date(new Date(activity3.start_time)
+                .setMilliseconds(Math.floor(Math.random() * 35 + 10) * 60000))
+            activity3.duration = activity3.end_time.getTime() - activity3.start_time.getTime()
             it('should return an array with two physical activities', (done) => {
-                rabbitmq.bus.pubSavePhysicalActivity([activity1, activity2, activity3])
+                rabbitmq.bus.pubSyncPhysicalActivity([activity1, activity2, activity3])
                     .then(async () => {
                         await timeout(6000)
                         const result = await activityRepository.find(new Query())
@@ -239,7 +259,7 @@ describe('SUBSCRIBE EVENT BUS TASK', () => {
         context('when receiving a SleepSaveEvent with one sleep object successfully', () => {
             const sleep: Sleep = new SleepMock()
             it('should return an array with one sleep object', (done) => {
-                rabbitmq.bus.pubSaveSleep(sleep)
+                rabbitmq.bus.pubSyncSleep(sleep)
                     .then(async () => {
                         // Wait for 2000 milliseconds for the task to be executed
                         await timeout(2000)
@@ -265,7 +285,7 @@ describe('SUBSCRIBE EVENT BUS TASK', () => {
         context('when receiving a SleepSaveEvent with one invalid sleep object', () => {
             const sleep: Sleep = new Sleep()       // Invalid sleep object
             it('should return an empty array', (done) => {
-                rabbitmq.bus.pubSaveSleep(sleep)
+                rabbitmq.bus.pubSyncSleep(sleep)
                     .then(async () => {
                         await timeout(2000)
                         const result = await sleepRepository.find(new Query())
@@ -287,7 +307,7 @@ describe('SUBSCRIBE EVENT BUS TASK', () => {
             })
             const sleep: Sleep = new SleepMock()
             it('should return an array with one sleep object', (done) => {
-                rabbitmq.bus.pubSaveSleep(sleep)
+                rabbitmq.bus.pubSyncSleep(sleep)
                     .then(async () => {
                         await timeout(1000)
                         await dbConnection.connect(process.env.MONGODB_URI_TEST || Default.MONGODB_URI_TEST,
@@ -313,10 +333,22 @@ describe('SUBSCRIBE EVENT BUS TASK', () => {
 
         context('when receiving a SleepSaveEvent with some correct sleep objects successfully', () => {
             const sleep1: Sleep = new SleepMock()
+            sleep1.start_time = new Date(1516417200000)
+            sleep1.end_time = new Date(new Date(sleep1.start_time)
+                .setMilliseconds(Math.floor(Math.random() * 35 + 10) * 60000)) // 10-45min in milliseconds
+            sleep1.duration = sleep1.end_time.getTime() - sleep1.start_time.getTime()
             const sleep2: Sleep = new SleepMock()
+            sleep2.start_time = new Date(1516449600000)
+            sleep2.end_time = new Date(new Date(sleep2.start_time)
+                .setMilliseconds(Math.floor(Math.random() * 35 + 10) * 60000))
+            sleep2.duration = sleep2.end_time.getTime() - sleep2.start_time.getTime()
             const sleep3: Sleep = new SleepMock()
+            sleep3.start_time = new Date(1516471200000)
+            sleep3.end_time = new Date(new Date(sleep3.start_time)
+                .setMilliseconds(Math.floor(Math.random() * 35 + 10) * 60000))
+            sleep3.duration = sleep3.end_time.getTime() - sleep3.start_time.getTime()
             it('should return an array with three sleep objects', (done) => {
-                rabbitmq.bus.pubSaveSleep([sleep1, sleep2, sleep3])
+                rabbitmq.bus.pubSyncSleep([sleep1, sleep2, sleep3])
                     .then(async () => {
                         await timeout(6000)
                         const result = await sleepRepository.find(new Query())
@@ -329,10 +361,18 @@ describe('SUBSCRIBE EVENT BUS TASK', () => {
 
         context('when receiving a SleepSaveEvent with some incorrect sleep objects successfully', () => {
             const sleep1: Sleep = new SleepMock()
+            sleep1.start_time = new Date(1516417200000)
+            sleep1.end_time = new Date(new Date(sleep1.start_time)
+                .setMilliseconds(Math.floor(Math.random() * 35 + 10) * 60000)) // 10-45min in milliseconds
+            sleep1.duration = sleep1.end_time.getTime() - sleep1.start_time.getTime()
             const sleep2: Sleep = new Sleep()
             const sleep3: Sleep = new SleepMock()
+            sleep3.start_time = new Date(1516471200000)
+            sleep3.end_time = new Date(new Date(sleep3.start_time)
+                .setMilliseconds(Math.floor(Math.random() * 35 + 10) * 60000))
+            sleep3.duration = sleep3.end_time.getTime() - sleep3.start_time.getTime()
             it('should return an array with two sleep objects', (done) => {
-                rabbitmq.bus.pubSaveSleep([sleep1, sleep2, sleep3])
+                rabbitmq.bus.pubSyncSleep([sleep1, sleep2, sleep3])
                     .then(async () => {
                         await timeout(6000)
                         const result = await sleepRepository.find(new Query())
@@ -365,7 +405,7 @@ describe('SUBSCRIBE EVENT BUS TASK', () => {
         context('when receiving a WeightSaveEvent with one weight object successfully', () => {
             const weight: Weight = new WeightMock()
             it('should return an array with one weight object', (done) => {
-                rabbitmq.bus.pubSaveWeight(weight)
+                rabbitmq.bus.pubSyncWeight(weight)
                     .then(async () => {
                         // Wait for 2000 milliseconds for the task to be executed
                         await timeout(2000)
@@ -390,7 +430,7 @@ describe('SUBSCRIBE EVENT BUS TASK', () => {
         context('when receiving a WeightSaveEvent with one invalid weight object', () => {
             const weight: Weight = new Weight()       // Invalid weight object
             it('should return an empty array', (done) => {
-                rabbitmq.bus.pubSaveWeight(weight)
+                rabbitmq.bus.pubSyncWeight(weight)
                     .then(async () => {
                         await timeout(2000)
                         const result = await weightRepository.find(new Query())
@@ -412,7 +452,7 @@ describe('SUBSCRIBE EVENT BUS TASK', () => {
             })
             const weight: Weight = new WeightMock()
             it('should return an array with one weight object', (done) => {
-                rabbitmq.bus.pubSaveWeight(weight)
+                rabbitmq.bus.pubSyncWeight(weight)
                     .then(async () => {
                         await timeout(1000)
                         await dbConnection.connect(process.env.MONGODB_URI_TEST || Default.MONGODB_URI_TEST,
@@ -437,10 +477,13 @@ describe('SUBSCRIBE EVENT BUS TASK', () => {
 
         context('when receiving a WeightSaveEvent with some correct weight objects successfully', () => {
             const weight1: Weight = new WeightMock()
+            weight1.timestamp = new Date(1516417200000)
             const weight2: Weight = new WeightMock()
+            weight2.timestamp = new Date(1516449600000)
             const weight3: Weight = new WeightMock()
+            weight3.timestamp = new Date(1516471200000)
             it('should return an array with three weight objects', (done) => {
-                rabbitmq.bus.pubSaveWeight([weight1, weight2, weight3])
+                rabbitmq.bus.pubSyncWeight([weight1, weight2, weight3])
                     .then(async () => {
                         await timeout(6000)
                         const result = await weightRepository.find(new Query())
@@ -453,10 +496,12 @@ describe('SUBSCRIBE EVENT BUS TASK', () => {
 
         context('when receiving a WeightSaveEvent with some incorrect weight objects successfully', () => {
             const weight1: Weight = new WeightMock()
+            weight1.timestamp = new Date(1516417200000)
             const weight2: Weight = new Weight()
             const weight3: Weight = new WeightMock()
+            weight3.timestamp = new Date(1516471200000)
             it('should return an array with two weight objects', (done) => {
-                rabbitmq.bus.pubSaveWeight([weight1, weight2, weight3])
+                rabbitmq.bus.pubSyncWeight([weight1, weight2, weight3])
                     .then(async () => {
                         await timeout(6000)
                         const result = await weightRepository.find(new Query())
@@ -490,7 +535,7 @@ describe('SUBSCRIBE EVENT BUS TASK', () => {
                                 date: '2019-09-16',
                                 child_id: '5d7fb75ae48591c21a793f70' }
             it('should return an array with one log', (done) => {
-                rabbitmq.bus.pubSaveLog([ log ])
+                rabbitmq.bus.pubSyncLog([ log ])
                     .then(async () => {
                         // Wait for 2000 milliseconds for the task to be executed
                         await timeout(2000)
@@ -512,7 +557,7 @@ describe('SUBSCRIBE EVENT BUS TASK', () => {
         context('when receiving a LogSaveEvent with one invalid log', () => {
             const log: Log = new Log()       // Invalid log
             it('should return an empty array', (done) => {
-                rabbitmq.bus.pubSaveLog([ log ])
+                rabbitmq.bus.pubSyncLog([ log ])
                     .then(async () => {
                         await timeout(2000)
                         const result = await logRepository.find(new Query())
@@ -537,7 +582,7 @@ describe('SUBSCRIBE EVENT BUS TASK', () => {
                                 date: '2019-09-16',
                                 child_id: '5d7fb75ae48591c21a793f70' }
             it('should return an array with one log', (done) => {
-                rabbitmq.bus.pubSaveLog([ log ])
+                rabbitmq.bus.pubSyncLog([ log ])
                     .then(async () => {
                         await timeout(1000)
                         await dbConnection.connect(process.env.MONGODB_URI_TEST || Default.MONGODB_URI_TEST,
@@ -571,7 +616,7 @@ describe('SUBSCRIBE EVENT BUS TASK', () => {
                                  date: '2019-09-16',
                                  child_id: '5d7fb75ae48591c21a793f70' }
             it('should return an array with three logs', (done) => {
-                rabbitmq.bus.pubSaveLog([log1, log2, log3])
+                rabbitmq.bus.pubSyncLog([log1, log2, log3])
                     .then(async () => {
                         await timeout(6000)
                         const result = await logRepository.find(new Query())
@@ -593,7 +638,7 @@ describe('SUBSCRIBE EVENT BUS TASK', () => {
                                  date: '2019-09-16',
                                  child_id: '5d7fb75ae48591c21a793f70' }
             it('should return an array with two logs', (done) => {
-                rabbitmq.bus.pubSaveLog([log1, log2, log3])
+                rabbitmq.bus.pubSyncLog([log1, log2, log3])
                     .then(async () => {
                         await timeout(6000)
                         const result = await logRepository.find(new Query())
@@ -625,11 +670,12 @@ describe('SUBSCRIBE EVENT BUS TASK', () => {
             'saved environments', () => {
             before(async () => {
                 try {
-                    const institution_id: string = '5d7fb75ae48591c21a793f70'
                     const env1: Environment = new EnvironmentMock()
-                    env1.institution_id = institution_id
+                    env1.institution_id = '5d7fb75ae48591c21a793f70'
+                    env1.timestamp = new Date(1516417200000)
                     const env2: Environment = new EnvironmentMock()
                     env2.institution_id = '5d7fb75ae48591c21a793f70'
+                    env2.timestamp = new Date(1516471200000)
                     await environmentRepository.create(env1)
                     await environmentRepository.create(env2)
                 } catch (err) {
@@ -660,11 +706,12 @@ describe('SUBSCRIBE EVENT BUS TASK', () => {
             'saved environments', () => {
             before(async () => {
                 try {
-                    const institution_id: string = '5d7fb75ae48591c21a793f70'
                     const env1: Environment = new EnvironmentMock()
-                    env1.institution_id = institution_id
+                    env1.institution_id = '5d7fb75ae48591c21a793f70'
+                    env1.timestamp = new Date(1516417200000)
                     const env2: Environment = new EnvironmentMock()
                     env2.institution_id = '5d7fb75ae48591c21a793f72'
+                    env2.timestamp = new Date(1516471200000)
                     await environmentRepository.create(env1)
                     await environmentRepository.create(env2)
                 } catch (err) {
@@ -716,11 +763,12 @@ describe('SUBSCRIBE EVENT BUS TASK', () => {
             'saved environments (without MongoDB connection, at first)', () => {
             before(async () => {
                 try {
-                    const institution_id: string = '5d7fb75ae48591c21a793f70'
                     const env1: Environment = new EnvironmentMock()
-                    env1.institution_id = institution_id
+                    env1.institution_id = '5d7fb75ae48591c21a793f70'
+                    env1.timestamp = new Date(1516417200000)
                     const env2: Environment = new EnvironmentMock()
                     env2.institution_id = '5d7fb75ae48591c21a793f70'
+                    env2.timestamp = new Date(1516471200000)
                     await environmentRepository.create(env1)
                     await environmentRepository.create(env2)
 
@@ -783,8 +831,16 @@ describe('SUBSCRIBE EVENT BUS TASK', () => {
                     const user_id: string = '5d7fb75ae48591c21a793f70'
                     const activity1: PhysicalActivity = new PhysicalActivityMock()
                     activity1.child_id = user_id
+                    activity1.start_time = new Date(1516417200000)
+                    activity1.end_time = new Date(new Date(activity1.start_time)
+                        .setMilliseconds(Math.floor(Math.random() * 35 + 10) * 60000)) // 10-45min in milliseconds
+                    activity1.duration = activity1.end_time.getTime() - activity1.start_time.getTime()
                     const activity2: PhysicalActivity = new PhysicalActivityMock()
                     activity2.child_id = user_id
+                    activity2.start_time = new Date(1516471200000)
+                    activity2.end_time = new Date(new Date(activity2.start_time)
+                        .setMilliseconds(Math.floor(Math.random() * 35 + 10) * 60000))
+                    activity2.duration = activity2.end_time.getTime() - activity2.start_time.getTime()
                     const sleep: Sleep = new SleepMock()
                     sleep.child_id = user_id
                     const weight: Weight = new WeightMock()
@@ -845,8 +901,16 @@ describe('SUBSCRIBE EVENT BUS TASK', () => {
                     const user_id: string = '5d7fb75ae48591c21a793f70'
                     const activity1: PhysicalActivity = new PhysicalActivityMock()
                     activity1.child_id = user_id
+                    activity1.start_time = new Date(1516417200000)
+                    activity1.end_time = new Date(new Date(activity1.start_time)
+                        .setMilliseconds(Math.floor(Math.random() * 35 + 10) * 60000)) // 10-45min in milliseconds
+                    activity1.duration = activity1.end_time.getTime() - activity1.start_time.getTime()
                     const activity2: PhysicalActivity = new PhysicalActivityMock()
                     activity2.child_id = '5d7fb75ae48591c21a793f71'
+                    activity2.start_time = new Date(1516471200000)
+                    activity2.end_time = new Date(new Date(activity2.start_time)
+                        .setMilliseconds(Math.floor(Math.random() * 35 + 10) * 60000))
+                    activity2.duration = activity2.end_time.getTime() - activity2.start_time.getTime()
                     const sleep: Sleep = new SleepMock()
                     sleep.child_id = '5d7fb75ae48591c21a793f71'
                     const weight: Weight = new WeightMock()
@@ -927,8 +991,16 @@ describe('SUBSCRIBE EVENT BUS TASK', () => {
                     const user_id: string = '5d7fb75ae48591c21a793f70'
                     const activity1: PhysicalActivity = new PhysicalActivityMock()
                     activity1.child_id = user_id
+                    activity1.start_time = new Date(1516417200000)
+                    activity1.end_time = new Date(new Date(activity1.start_time)
+                        .setMilliseconds(Math.floor(Math.random() * 35 + 10) * 60000)) // 10-45min in milliseconds
+                    activity1.duration = activity1.end_time.getTime() - activity1.start_time.getTime()
                     const activity2: PhysicalActivity = new PhysicalActivityMock()
                     activity2.child_id = user_id
+                    activity2.start_time = new Date(1516471200000)
+                    activity2.end_time = new Date(new Date(activity2.start_time)
+                        .setMilliseconds(Math.floor(Math.random() * 35 + 10) * 60000))
+                    activity2.duration = activity2.end_time.getTime() - activity2.start_time.getTime()
                     const sleep: Sleep = new SleepMock()
                     sleep.child_id = user_id
                     const weight: Weight = new WeightMock()

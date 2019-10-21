@@ -224,8 +224,8 @@ describe('Services: PhysicalActivityService', () => {
                 return activityService.add(incorrectActivity)
                     .catch(err => {
                         assert.propertyVal(err, 'message', 'Required fields were not provided...')
-                        assert.propertyVal(err, 'description', 'Activity validation failed: start_time, end_time, ' +
-                            'duration, child_id is required!')
+                        assert.propertyVal(err, 'description', 'Physical Activity validation failed: ' +
+                            'start_time, end_time, duration, child_id, name, calories is required!')
                     })
             })
         })
@@ -511,8 +511,8 @@ describe('Services: PhysicalActivityService', () => {
 
                         assert.propertyVal(result.error[0], 'code', HttpStatus.BAD_REQUEST)
                         assert.propertyVal(result.error[0], 'message', 'Required fields were not provided...')
-                        assert.propertyVal(result.error[0], 'description', 'Activity validation failed: start_time, end_time, ' +
-                            'duration, child_id is required!')
+                        assert.propertyVal(result.error[0], 'description', 'Physical Activity validation failed: ' +
+                            'start_time, end_time, duration, child_id, name, calories is required!')
                     })
             })
         })
@@ -525,8 +525,8 @@ describe('Services: PhysicalActivityService', () => {
                         result = result as MultiStatus<PhysicalActivity>
 
                         assert.propertyVal(result.error[0], 'message', 'Required fields were not provided...')
-                        assert.propertyVal(result.error[0], 'description', 'Activity validation failed: ' +
-                            'start_time, end_time, duration, child_id is required!')
+                        assert.propertyVal(result.error[0], 'description', 'Physical Activity validation failed: ' +
+                            'start_time, end_time, duration, child_id, name, calories is required!')
                         assert.propertyVal(result.error[1], 'message', 'Required fields were not provided...')
                         assert.propertyVal(result.error[1], 'description', 'Physical Activity validation failed: ' +
                             'name, calories is required!')

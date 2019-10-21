@@ -8,8 +8,13 @@ export class CreateSleepValidator {
         const fields: Array<string> = []
         const sleepPatternTypes = Object.values(SleepType)
 
-        // Validate common attributes of the activity.
-        CreateActivityValidator.validate(sleep)
+        try {
+            // Validate common attributes of the activity.
+            CreateActivityValidator.validate(sleep)
+        } catch (err) {
+            if (err.message !== 'REQUIRED_FIELDS') throw err
+            fields.push(err.description.split(','))
+        }
 
         // Validate Sleep attributes
         if (!sleep.type) fields.push('type')

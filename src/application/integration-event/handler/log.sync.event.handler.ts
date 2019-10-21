@@ -6,11 +6,11 @@ import { ILogService } from '../../port/log.service.interface'
 import { Log } from '../../domain/model/log'
 
 /**
- * Handler for LogSaveEvent operation.
+ * Handler for LogSyncEvent operation.
  *
  * @param event
  */
-export const logSaveEventHandler = async (event: any) => {
+export const logSyncEventHandler = async (event: any) => {
     const logService: ILogService = DIContainer.get<ILogService>(Identifier.LOG_SERVICE)
     const logger: ILogger = DIContainer.get<ILogger>(Identifier.LOGGER)
 

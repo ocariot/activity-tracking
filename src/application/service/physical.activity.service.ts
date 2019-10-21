@@ -115,7 +115,7 @@ export class PhysicalActivityService implements IPhysicalActivityService {
             const activitySaved: PhysicalActivity = await this._activityRepository.create(activity)
 
             // 4. If created successfully, the object is published on the message bus.
-            if (activitySaved && !activity.isFromEventBus) {
+            if (activitySaved) {
                 this._eventBus.bus
                     .pubSavePhysicalActivity(activitySaved)
                     .then(() => {
@@ -168,7 +168,6 @@ export class PhysicalActivityService implements IPhysicalActivityService {
         ObjectIdValidator.validate(childId, Strings.CHILD.PARAM_ID_NOT_VALID_FORMAT)
         ObjectIdValidator.validate(activityId, Strings.PHYSICAL_ACTIVITY.PARAM_ID_NOT_VALID_FORMAT)
 
-        query.addFilter({ _id: activityId, child_id: childId })
         return this._activityRepository.findOne(query)
     }
 
@@ -183,7 +182,6 @@ export class PhysicalActivityService implements IPhysicalActivityService {
     public getAllByChild(childId: string, query: IQuery): Promise<Array<PhysicalActivity>> {
         ObjectIdValidator.validate(childId, Strings.CHILD.PARAM_ID_NOT_VALID_FORMAT)
 
-        query.addFilter({ child_id: childId })
         return this._activityRepository.find(query)
     }
 
@@ -203,7 +201,7 @@ export class PhysicalActivityService implements IPhysicalActivityService {
             const activityUpdated: PhysicalActivity = await this._activityRepository.updateByChild(activity)
 
             // 4. If updated successfully, the object is published on the message bus.
-            if (activityUpdated && !activity.isFromEventBus) {
+            if (activityUpdated) {
                 this._eventBus.bus
                     .pubUpdatePhysicalActivity(activityUpdated)
                     .then(() => {

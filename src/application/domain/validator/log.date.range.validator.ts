@@ -5,8 +5,13 @@ export class LogDateRangeValidator {
         const rangeDates: number = new Date(dateEnd).getTime() - new Date(dateStart).getTime()
         const period: number = rangeDates / 31970881440     // Should not be longer than 1 year and 5 days
 
-        if (period > 1)
+        if (rangeDates < 0) {
+            throw new ValidationException('Date range is invalid...',
+                'Log dates range validation failed: The date_end parameter can not contain an older date ' +
+                'than that the date_start parameter!')
+        } else if (period > 1) {
             throw new ValidationException('Date range is invalid...',
                 'Log dates range validation failed: The period between the received dates is longer than one year')
+        }
     }
 }

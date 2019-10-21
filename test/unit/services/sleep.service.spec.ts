@@ -201,8 +201,8 @@ describe('Services: SleepService', () => {
                 return sleepService.add(incorrectSleep)
                     .catch(err => {
                         assert.propertyVal(err, 'message', 'Required fields were not provided...')
-                        assert.propertyVal(err, 'description', 'Activity validation failed: start_time, end_time, ' +
-                            'duration, child_id is required!')
+                        assert.propertyVal(err, 'description', 'Sleep validation failed: ' +
+                            'start_time, end_time, duration, child_id, type, pattern is required!')
                     })
             })
         })
@@ -485,8 +485,8 @@ describe('Services: SleepService', () => {
 
                         assert.propertyVal(result.error[0], 'code', HttpStatus.BAD_REQUEST)
                         assert.propertyVal(result.error[0], 'message', 'Required fields were not provided...')
-                        assert.propertyVal(result.error[0], 'description', 'Activity validation failed: start_time, end_time, ' +
-                            'duration, child_id is required!')
+                        assert.propertyVal(result.error[0], 'description', 'Sleep validation failed: ' +
+                            'start_time, end_time, duration, child_id, type, pattern is required!')
                     })
             })
         })
@@ -498,8 +498,8 @@ describe('Services: SleepService', () => {
                         result = result as MultiStatus<Sleep>
 
                         assert.propertyVal(result.error[0], 'message', 'Required fields were not provided...')
-                        assert.propertyVal(result.error[0], 'description', 'Activity validation failed: start_time, end_time, ' +
-                            'duration, child_id is required!')
+                        assert.propertyVal(result.error[0], 'description', 'Sleep validation failed: ' +
+                            'start_time, end_time, duration, child_id, type, pattern is required!')
                         assert.propertyVal(result.error[1], 'message', 'Required fields were not provided...')
                         assert.propertyVal(result.error[1], 'description', 'Sleep validation failed: type, pattern is required!')
                         assert.propertyVal(result.error[2], 'message', 'Date field is invalid...')
