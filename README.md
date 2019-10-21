@@ -28,8 +28,9 @@ Application settings are defined by environment variables.. To define the settin
 | `PORT_HTTPS` | Port used to listen for HTTPS requests. Do not forget to provide the private key and the SSL/TLS certificate. See the topic [generate certificates](#generate-certificates). | `4001` |
 | `HOST_WHITELIST` | Access control based on IP addresses. Only allow IP requests in the unlock list. You can define IP or host, for example: `[127.0.0.1, api.ocariot.com]`. To accept requests from any customer, use the character `*`. | `[*]` |
 | `SSL_KEY_PATH` | SSL/TLS certificate private key. | `.certs/server.key` |
-| `SSL_CERT_PATH` | SSL/TLS certificate. | `.certs/server.crt` 
+| `SSL_CERT_PATH` | SSL/TLS certificate. | `.certs/server.crt` |
 | `RABBITMQ_URI` | URI containing the parameters for connection to the message channel RabbitMQ. The [URI specifications ](https://www.rabbitmq.com/uri-spec.html) defined by RabbitMQ are accepted. For example: `amqp://user:pass@host:port` | `amqp://guest:guest`<br/>`@127.0.0.1:5672` |
+| `RABBIMQ_CA_PATH` | RabbitMQ CA file location. Must always be provided when using `amqps` protocol. | `.certs/rabbitmqca.crt` |
 | `MONGODB_URI` | Database connection URI used if the application is running in development or production environment. The [URI specifications ](https://docs.mongodb.com/manual/reference/connection-string) defined by MongoDB are accepted. For example: `mongodb://user:pass@host:port/database?options` | `mongodb://127.0.0.1:27017`<br/>`/ocariot-iot-tracking` |
 | `MONGODB_URI_TEST` | Database connection URI used if the application is running in test environment. The [URI specifications ](https://docs.mongodb.com/manual/reference/connection-string) defined by MongoDB are accepted. For example: `mongodb://user:pass@host:port/database?options` | `mongodb://127.0.0.1:27017`<br/>`/ocariot-iot-tracking-test` |
 
