@@ -1251,660 +1251,660 @@ describe('Routes: children.sleep', () => {
     /**
      * PATCH route
      */
-    describe('RABBITMQ PUBLISHER -> PATCH /v1/children/:child_id/sleep/:sleep_id', () => {
-        context('when this sleep exists in the database, is updated successfully and published to the bus', () => {
-            // Sleep to update
-            const body = {
-                start_time: otherSleep.start_time,
-                end_time: otherSleep.end_time,
-                duration: otherSleep.duration,
-                pattern: defaultSleep.pattern,
-                type: defaultSleep.type
-            }
-
-            let result
-
-            before(async () => {
-                try {
-                    await deleteAllSleep()
-
-                    // Sleep to be updated
-                    result = await createSleepToBeUpdated(defaultSleep)
-
-                    await rabbitmq.initialize(process.env.RABBITMQ_URI || Default.RABBITMQ_URI,
-                        { interval: 100, receiveFromYourself: true, sslOptions: { ca: [] } })
-                } catch (err) {
-                    throw new Error('Failure on children.sleep routes test: ' + err.message)
-                }
-            })
-
-            after(async () => {
-                try {
-                    await rabbitmq.dispose()
-                    await rabbitmq.initialize('amqp://invalidUser:guest@localhost', { retries: 1, interval: 100 })
-                } catch (err) {
-                    throw new Error('Failure on children.sleep test: ' + err.message)
-                }
-            })
-
-            it('The subscriber should receive a message in the correct format and with the same values as the sleep ' +
-                'published on the bus', (done) => {
-                rabbitmq.bus
-                    .subUpdateSleep(message => {
-                        try {
-                            expect(message.event_name).to.eql('SleepUpdateEvent')
-                            expect(message).to.have.property('timestamp')
-                            expect(message).to.have.property('sleep')
-                            expect(message.sleep).to.have.property('id')
-                            expect(message.sleep.start_time).to.eql(otherSleep.start_time!.toISOString())
-                            expect(message.sleep.end_time).to.eql(otherSleep.end_time!.toISOString())
-                            expect(message.sleep.duration).to.eql(otherSleep.duration)
-                            let index = 0
-                            for (const elem of defaultSleep.pattern!.data_set) {
-                                expect(message.sleep.pattern.data_set[index].start_time).to.eql(elem.start_time.toISOString())
-                                expect(message.sleep.pattern.data_set[index].name).to.eql(elem.name)
-                                expect(message.sleep.pattern.data_set[index].duration).to.eql(elem.duration)
-                                index++
-                            }
-                            expect(message.sleep.type).to.eql(defaultSleep.type)
-                            expect(message.sleep.child_id).to.eql(defaultSleep.child_id)
-                            done()
-                        } catch (err) {
-                            done(err)
-                        }
-                    })
-                    .then(() => {
-                        request
-                            .patch(`/v1/children/${result.child_id}/sleep/${result.id}`)
-                            .send(body)
-                            .set('Content-Type', 'application/json')
-                            .expect(200)
-                            .then()
-                            .catch(done)
-                    })
-                    .catch(done)
-            })
-        })
-    })
-
-    describe('PATCH /v1/children/:child_id/sleep/:sleep_id', () => {
-        context('when this sleep exists in the database and is updated successfully (there is no connection to RabbitMQ)',
-            () => {
-                let result
-
-                before(async () => {
-                    try {
-                        await deleteAllSleep()
-
-                        // Sleep to be updated
-                        result = await createSleepToBeUpdated(defaultSleep)
-                    } catch (err) {
-                        throw new Error('Failure on children.sleep routes test: ' + err.message)
-                    }
-                })
-
-                it('should return status code 200 and the updated Sleep (and show an error log about unable to send ' +
-                    'UpdateSleep event)', () => {
-                    // Sleep to update
-                    const body = {
-                        start_time: otherSleep.start_time,
-                        end_time: otherSleep.end_time,
-                        duration: otherSleep.duration,
-                        pattern: defaultSleep.pattern,
-                        type: defaultSleep.type
-                    }
-
-                    return request
-                        .patch(`/v1/children/${result.child_id}/sleep/${result.id}`)
-                        .send(body)
-                        .set('Content-Type', 'application/json')
-                        .expect(200)
-                        .then(res => {
-                            expect(res.body).to.have.property('id')
-                            expect(res.body.start_time).to.eql(otherSleep.start_time!.toISOString())
-                            expect(res.body.end_time).to.eql(otherSleep.end_time!.toISOString())
-                            expect(res.body.duration).to.eql(otherSleep.duration)
-                            let index = 0
-                            for (const elem of defaultSleep.pattern!.data_set) {
-                                expect(res.body.pattern.data_set[index].start_time).to.eql(elem.start_time.toISOString())
-                                expect(res.body.pattern.data_set[index].name).to.eql(elem.name)
-                                expect(res.body.pattern.data_set[index].duration).to.eql(elem.duration)
-                                index++
-                            }
-                            expect(res.body.type).to.eql(defaultSleep.type)
-                            expect(res.body.child_id).to.eql(defaultSleep.child_id)
-                        })
-                })
-            })
-
-        context('when this sleep already exists in the database', () => {
-            let result
-
-            before(async () => {
-                try {
-                    await deleteAllSleep()
-
-                    await createSleep({
-                        start_time: otherSleep.start_time,
-                        end_time: otherSleep.end_time,
-                        duration: otherSleep.duration,
-                        pattern: defaultSleep.pattern!.data_set,
-                        type: defaultSleep.type,
-                        child_id: defaultSleep.child_id
-                    })
-
-                    // Sleep to be updated
-                    result = await createSleepToBeUpdated(defaultSleep)
-                } catch (err) {
-                    throw new Error('Failure on children.sleep routes test: ' + err.message)
-                }
-            })
-            it('should return status status code 409 and an info message about the conflict', () => {
-                // Sleep to update
-                const body = {
-                    start_time: otherSleep.start_time,
-                    end_time: otherSleep.end_time,
-                    duration: otherSleep.duration
-                }
-
-                return request
-                    .patch(`/v1/children/${result.child_id}/sleep/${result.id}`)
-                    .send(body)
-                    .set('Content-Type', 'application/json')
-                    .expect(409)
-                    .then(err => {
-                        expect(err.body.code).to.eql(409)
-                        expect(err.body.message).to.eql('A registration with the same unique data already exists!')
-                    })
-            })
-        })
-
-        context('when sleep does not exist in the database', () => {
-            before(async () => {
-                try {
-                    await deleteAllSleep()
-                } catch (err) {
-                    throw new Error('Failure on children.sleep routes test: ' + err.message)
-                }
-            })
-
-            it('should return status code 404 and an info message about the error on the search', () => {
-                // Sleep to update
-                const body = {
-                    start_time: defaultSleep.start_time,
-                    end_time: defaultSleep.end_time,
-                    duration: defaultSleep.duration,
-                    pattern: defaultSleep.pattern,
-                    type: defaultSleep.type
-                }
-
-                return request
-                    .patch(`/v1/children/${defaultSleep.child_id}/sleep/${defaultSleep.id}`)
-                    .send(body)
-                    .set('Content-Type', 'application/json')
-                    .expect(404)
-                    .then(err => {
-                        expect(err.body.code).to.eql(404)
-                        expect(err.body.message).to.eql('Sleep not found!')
-                        expect(err.body.description).to.eql('Sleep not found or already removed. A new operation for ' +
-                            'the same resource is not required!')
-                    })
-            })
-        })
-
-        context('when the child_id is invalid', () => {
-            before(async () => {
-                try {
-                    await deleteAllSleep()
-                } catch (err) {
-                    throw new Error('Failure on children.sleep routes test: ' + err.message)
-                }
-            })
-
-            it('should return status code 400 and an info message about the invalid child_id', () => {
-                // Sleep to update
-                const body = {
-                    start_time: defaultSleep.start_time,
-                    end_time: defaultSleep.end_time,
-                    duration: defaultSleep.duration,
-                    pattern: defaultSleep.pattern,
-                    type: defaultSleep.type
-                }
-
-                return request
-                    .patch(`/v1/children/123/sleep/${defaultSleep.id}`)
-                    .send(body)
-                    .set('Content-Type', 'application/json')
-                    .expect(400)
-                    .then(err => {
-                        expect(err.body.code).to.eql(400)
-                        expect(err.body.message).to.eql(Strings.CHILD.PARAM_ID_NOT_VALID_FORMAT)
-                        expect(err.body.description).to.eql(Strings.ERROR_MESSAGE.UUID_NOT_VALID_FORMAT_DESC)
-                    })
-            })
-        })
-
-        context('when the sleep id is invalid', () => {
-            before(async () => {
-                try {
-                    await deleteAllSleep()
-                } catch (err) {
-                    throw new Error('Failure on children.sleep routes test: ' + err.message)
-                }
-            })
-
-            it('should return status code 400 and an info message about the invalid sleep id', () => {
-                // Sleep to update
-                const body = {
-                    start_time: defaultSleep.start_time,
-                    end_time: defaultSleep.end_time,
-                    duration: defaultSleep.duration,
-                    pattern: defaultSleep.pattern,
-                    type: defaultSleep.type
-                }
-
-                return request
-                    .patch(`/v1/children/${defaultSleep.child_id}/sleep/123`)
-                    .send(body)
-                    .set('Content-Type', 'application/json')
-                    .expect(400)
-                    .then(err => {
-                        expect(err.body.code).to.eql(400)
-                        expect(err.body.message).to.eql(Strings.SLEEP.PARAM_ID_NOT_VALID_FORMAT)
-                        expect(err.body.description).to.eql(Strings.ERROR_MESSAGE.UUID_NOT_VALID_FORMAT_DESC)
-                    })
-            })
-        })
-
-        context('when a validation error occurs (the duration is invalid)', () => {
-            before(async () => {
-                try {
-                    await deleteAllSleep()
-                } catch (err) {
-                    throw new Error('Failure on children.sleep routes test: ' + err.message)
-                }
-            })
-
-            it('should return status code 400 and info message about the invalid duration', () => {
-                // Sleep to update
-                const body = {
-                    start_time: defaultSleep.start_time,
-                    end_time: defaultSleep.end_time,
-                    duration: `${defaultSleep.duration!}a`,
-                    pattern: defaultSleep.pattern,
-                    type: defaultSleep.type
-                }
-
-                return request
-                    .patch(`/v1/children/${defaultSleep.child_id}/sleep/${defaultSleep.id}`)
-                    .send(body)
-                    .set('Content-Type', 'application/json')
-                    .expect(400)
-                    .then(err => {
-                        expect(err.body.code).to.eql(400)
-                        expect(err.body.message).to.eql('Duration field is invalid...')
-                        expect(err.body.description).to.eql('Sleep validation failed: '
-                            .concat(Strings.ERROR_MESSAGE.INVALID_NUMBER))
-                    })
-            })
-        })
-
-        context('when a validation error occurs (the duration is negative)', () => {
-            before(async () => {
-                try {
-                    await deleteAllSleep()
-                } catch (err) {
-                    throw new Error('Failure on children.sleep routes test: ' + err.message)
-                }
-            })
-
-            it('should return status code 400 and info message about the invalid duration', () => {
-                // Sleep to update
-                const body = {
-                    start_time: defaultSleep.start_time,
-                    end_time: defaultSleep.end_time,
-                    duration: -(defaultSleep.duration!),
-                    pattern: defaultSleep.pattern,
-                    type: defaultSleep.type
-                }
-
-                return request
-                    .patch(`/v1/children/${defaultSleep.child_id}/sleep/${defaultSleep.id}`)
-                    .send(body)
-                    .set('Content-Type', 'application/json')
-                    .expect(400)
-                    .then(err => {
-                        expect(err.body.code).to.eql(400)
-                        expect(err.body.message).to.eql('Duration field is invalid...')
-                        expect(err.body.description).to.eql('Sleep validation failed: The value provided has a negative value!')
-                    })
-            })
-        })
-
-        context('when a validation error occurs (the start_time is older than end_time)', () => {
-            before(async () => {
-                try {
-                    await deleteAllSleep()
-                } catch (err) {
-                    throw new Error('Failure on children.sleep routes test: ' + err.message)
-                }
-            })
-
-            it('should return status code 400 and info message about the invalid dates', () => {
-                // Sleep to update
-                const body = {
-                    start_time: new Date(2020),
-                    end_time: new Date(2019),
-                    duration: defaultSleep.duration,
-                    pattern: defaultSleep.pattern,
-                    type: defaultSleep.type
-                }
-
-                return request
-                    .patch(`/v1/children/${defaultSleep.child_id}/sleep/${defaultSleep.id}`)
-                    .send(body)
-                    .set('Content-Type', 'application/json')
-                    .expect(400)
-                    .then(err => {
-                        expect(err.body.code).to.eql(400)
-                        expect(err.body.message).to.eql('Date field is invalid...')
-                        expect(err.body.description).to.eql('Date validation failed: ' +
-                            'The end_time parameter can not contain an older date than that the start_time parameter!')
-                    })
-            })
-        })
-
-        context('when a validation error occurs (the duration is incompatible with the start_time and end_time parameters)',
-            () => {
-            before(async () => {
-                try {
-                    await deleteAllSleep()
-                } catch (err) {
-                    throw new Error('Failure on children.sleep routes test: ' + err.message)
-                }
-            })
-
-            it('should return status code 400 and info message about the invalid duration', () => {
-                // Sleep to update
-                const body = {
-                    start_time: defaultSleep.start_time,
-                    end_time: defaultSleep.end_time,
-                    duration: Math.floor(Math.random() * 180 + 1) * 60000,
-                    pattern: defaultSleep.pattern,
-                    type: defaultSleep.type
-                }
-
-                return request
-                    .patch(`/v1/children/${defaultSleep.child_id}/sleep/${defaultSleep.id}`)
-                    .send(body)
-                    .set('Content-Type', 'application/json')
-                    .expect(400)
-                    .then(err => {
-                        expect(err.body.code).to.eql(400)
-                        expect(err.body.message).to.eql('Duration field is invalid...')
-                        expect(err.body.description).to.eql('Duration validation failed: ' +
-                            'Activity duration value does not match values passed in start_time and end_time parameters!')
-                    })
-            })
-        })
-
-        context('when a validation error occurs (the sleep type is invalid)', () => {
-            before(async () => {
-                try {
-                    await deleteAllSleep()
-                } catch (err) {
-                    throw new Error('Failure on children.sleep routes test: ' + err.message)
-                }
-            })
-
-            it('should return status code 400 and info message about the invalid duration', () => {
-                // Sleep to update
-                const body = {
-                    start_time: defaultSleep.start_time,
-                    end_time: defaultSleep.end_time,
-                    duration: defaultSleep.duration,
-                    pattern: defaultSleep.pattern,
-                    type: 'deeps'
-                }
-
-                return request
-                    .patch(`/v1/children/${defaultSleep.child_id}/sleep/${defaultSleep.id}`)
-                    .send(body)
-                    .set('Content-Type', 'application/json')
-                    .expect(400)
-                    .then(err => {
-                        expect(err.body.code).to.eql(400)
-                        expect(err.body.message).to.eql('The type provided "deeps" is not supported...')
-                        expect(err.body.description).to.eql('The allowed Sleep Pattern types are: classic, stages.')
-                    })
-            })
-        })
-
-        context('when a validation error occurs (missing data_set of pattern)', () => {
-            before(async () => {
-                try {
-                    await deleteAllSleep()
-                } catch (err) {
-                    throw new Error('Failure on children.sleep routes test: ' + err.message)
-                }
-            })
-
-            it('should return status code 400 and info message about the invalid pattern', () => {
-                // Sleep to update
-                const body = {
-                    start_time: defaultSleep.start_time,
-                    end_time: defaultSleep.end_time,
-                    duration: defaultSleep.duration,
-                    pattern: new SleepPattern(),
-                    type: defaultSleep.type
-                }
-
-                return request
-                    .patch(`/v1/children/${defaultSleep.child_id}/sleep/${defaultSleep.id}`)
-                    .send(body)
-                    .set('Content-Type', 'application/json')
-                    .expect(400)
-                    .then(err => {
-                        expect(err.body.code).to.eql(400)
-                        expect(err.body.message).to.eql('Pattern are not in a format that is supported...')
-                        expect(err.body.description).to.eql('Validation of the standard of sleep failed: data_set is required!')
-                    })
-            })
-        })
-
-        context('when a validation error occurs (the pattern has an empty data_set array)', () => {
-            before(async () => {
-                try {
-                    await deleteAllSleep()
-                } catch (err) {
-                    throw new Error('Failure on children.sleep routes test: ' + err.message)
-                }
-            })
-
-            it('should return status code 400 and info message about the invalid data_set array of pattern', () => {
-                // Sleep to update
-                const body = {
-                    start_time: defaultSleep.start_time,
-                    end_time: defaultSleep.end_time,
-                    duration: defaultSleep.duration,
-                    pattern: {
-                        data_set: []
-                    },
-                    type: defaultSleep.type
-                }
-
-                return request
-                    .patch(`/v1/children/${defaultSleep.child_id}/sleep/${defaultSleep.id}`)
-                    .send(body)
-                    .set('Content-Type', 'application/json')
-                    .expect(400)
-                    .then(err => {
-                        expect(err.body.code).to.eql(400)
-                        expect(err.body.message).to.eql('Dataset are not in a format that is supported!')
-                        expect(err.body.description).to.eql('The data_set collection must not be empty!')
-                    })
-            })
-        })
-
-        context('when a validation error occurs (missing fields of some item from the data_set array of pattern)', () => {
-            before(async () => {
-                try {
-                    await deleteAllSleep()
-                } catch (err) {
-                    throw new Error('Failure on children.sleep routes test: ' + err.message)
-                }
-            })
-
-            it('should return status code 400 and info message about the invalid data_set array of pattern', () => {
-                // Sleep to update
-                const body = {
-                    start_time: defaultSleep.start_time,
-                    end_time: defaultSleep.end_time,
-                    duration: defaultSleep.duration,
-                    pattern: {
-                        data_set: [
-                            {}
-                        ]
-                    },
-                    type: defaultSleep.type
-                }
-
-                return request
-                    .patch(`/v1/children/${defaultSleep.child_id}/sleep/${defaultSleep.id}`)
-                    .send(body)
-                    .set('Content-Type', 'application/json')
-                    .expect(400)
-                    .then(err => {
-                        expect(err.body.code).to.eql(400)
-                        expect(err.body.message).to.eql('Dataset are not in a format that is supported!')
-                        expect(err.body.description).to.eql('Validation of the sleep pattern dataset failed: data_set ' +
-                            'start_time, data_set name, data_set duration is required!')
-                    })
-            })
-        })
-
-        context('when a validation error occurs (there is a negative duration on some item from the data_set array of pattern)', () => {
-            before(async () => {
-                try {
-                    await deleteAllSleep()
-                } catch (err) {
-                    throw new Error('Failure on children.sleep routes test: ' + err.message)
-                }
-            })
-
-            it('should return status code 400 and info message about the invalid data_set array of pattern', () => {
-                // Sleep to update
-                const body = {
-                    start_time: defaultSleep.start_time,
-                    end_time: defaultSleep.end_time,
-                    duration: defaultSleep.duration,
-                    pattern: {
-                        data_set: [
-                            {
-                                start_time: '2018-08-18T01:40:30.00Z',
-                                name: 'restless',
-                                duration: -(Math.floor(Math.random() * 5 + 1) * 60000)
-                            }
-                        ]
-                    },
-                    type: SleepType.CLASSIC
-                }
-
-                return request
-                    .patch(`/v1/children/${defaultSleep.child_id}/sleep/${defaultSleep.id}`)
-                    .send(body)
-                    .set('Content-Type', 'application/json')
-                    .expect(400)
-                    .then(err => {
-                        expect(err.body.code).to.eql(400)
-                        expect(err.body.message).to.eql('Some (or several) duration field of sleep pattern is invalid...')
-                        expect(err.body.description).to.eql('Sleep Pattern dataset validation failed: The value provided ' +
-                            'has a negative value!')
-                    })
-            })
-        })
-
-        context('when a validation error occurs (the sleep pattern data set array has an invalid item with an invalid name)', () => {
-            before(async () => {
-                try {
-                    await deleteAllSleep()
-                } catch (err) {
-                    throw new Error('Failure on children.sleep routes test: ' + err.message)
-                }
-            })
-
-            it('should return status code 400 and info message about the invalid data_set array of pattern', () => {
-                // Sleep to update
-                const body = {
-                    start_time: defaultSleep.start_time,
-                    end_time: defaultSleep.end_time,
-                    duration: defaultSleep.duration,
-                    pattern: {
-                        data_set: [
-                            {
-                                start_time: '2018-08-18T01:40:30.00Z',
-                                name: 'restlesss',
-                                duration: (Math.floor(Math.random() * 5 + 1) * 60000)
-                            }
-                        ]
-                    },
-                    type: SleepType.CLASSIC
-                }
-
-                return request
-                    .patch(`/v1/children/${defaultSleep.child_id}/sleep/${defaultSleep.id}`)
-                    .send(body)
-                    .set('Content-Type', 'application/json')
-                    .expect(400)
-                    .then(err => {
-                        expect(err.body.code).to.eql(400)
-                        expect(err.body.message).to.eql('The sleep pattern name provided "restlesss" is not supported...')
-                        expect(err.body.description).to.eql('The names of the allowed patterns are: asleep, restless, awake.')
-                    })
-            })
-        })
-
-        context('when a validation error occurs (the sleep pattern data set array has an invalid item with an invalid name' +
-            ' and the sleep type is "stages")', () => {
-            before(async () => {
-                try {
-                    await deleteAllSleep()
-                } catch (err) {
-                    throw new Error('Failure on children.sleep routes test: ' + err.message)
-                }
-            })
-
-            it('should return status code 400 and info message about the invalid data_set array of pattern', () => {
-                // Sleep to update
-                const body = {
-                    start_time: defaultSleep.start_time,
-                    end_time: defaultSleep.end_time,
-                    duration: defaultSleep.duration,
-                    pattern: {
-                        data_set: [
-                            {
-                                start_time: '2018-08-18T01:40:30.00Z',
-                                name: 'deeps',
-                                duration: (Math.floor(Math.random() * 5 + 1) * 60000)
-                            }
-                        ]
-                    },
-                    type: SleepType.STAGES
-                }
-
-                return request
-                    .patch(`/v1/children/${defaultSleep.child_id}/sleep/${defaultSleep.id}`)
-                    .send(body)
-                    .set('Content-Type', 'application/json')
-                    .expect(400)
-                    .then(err => {
-                        expect(err.body.code).to.eql(400)
-                        expect(err.body.message).to.eql('The sleep pattern name provided "deeps" is not supported...')
-                        expect(err.body.description).to.eql('The names of the allowed patterns are: deep, light, rem, awake.')
-                    })
-            })
-        })
-    })
+    // describe('RABBITMQ PUBLISHER -> PATCH /v1/children/:child_id/sleep/:sleep_id', () => {
+    //     context('when this sleep exists in the database, is updated successfully and published to the bus', () => {
+    //         // Sleep to update
+    //         const body = {
+    //             start_time: otherSleep.start_time,
+    //             end_time: otherSleep.end_time,
+    //             duration: otherSleep.duration,
+    //             pattern: defaultSleep.pattern,
+    //             type: defaultSleep.type
+    //         }
+    //
+    //         let result
+    //
+    //         before(async () => {
+    //             try {
+    //                 await deleteAllSleep()
+    //
+    //                 // Sleep to be updated
+    //                 result = await createSleepToBeUpdated(defaultSleep)
+    //
+    //                 await rabbitmq.initialize(process.env.RABBITMQ_URI || Default.RABBITMQ_URI,
+    //                     { interval: 100, receiveFromYourself: true, sslOptions: { ca: [] } })
+    //             } catch (err) {
+    //                 throw new Error('Failure on children.sleep routes test: ' + err.message)
+    //             }
+    //         })
+    //
+    //         after(async () => {
+    //             try {
+    //                 await rabbitmq.dispose()
+    //                 await rabbitmq.initialize('amqp://invalidUser:guest@localhost', { retries: 1, interval: 100 })
+    //             } catch (err) {
+    //                 throw new Error('Failure on children.sleep test: ' + err.message)
+    //             }
+    //         })
+    //
+    //         it('The subscriber should receive a message in the correct format and with the same values as the sleep ' +
+    //             'published on the bus', (done) => {
+    //             rabbitmq.bus
+    //                 .subUpdateSleep(message => {
+    //                     try {
+    //                         expect(message.event_name).to.eql('SleepUpdateEvent')
+    //                         expect(message).to.have.property('timestamp')
+    //                         expect(message).to.have.property('sleep')
+    //                         expect(message.sleep).to.have.property('id')
+    //                         expect(message.sleep.start_time).to.eql(otherSleep.start_time!.toISOString())
+    //                         expect(message.sleep.end_time).to.eql(otherSleep.end_time!.toISOString())
+    //                         expect(message.sleep.duration).to.eql(otherSleep.duration)
+    //                         let index = 0
+    //                         for (const elem of defaultSleep.pattern!.data_set) {
+    //                             expect(message.sleep.pattern.data_set[index].start_time).to.eql(elem.start_time.toISOString())
+    //                             expect(message.sleep.pattern.data_set[index].name).to.eql(elem.name)
+    //                             expect(message.sleep.pattern.data_set[index].duration).to.eql(elem.duration)
+    //                             index++
+    //                         }
+    //                         expect(message.sleep.type).to.eql(defaultSleep.type)
+    //                         expect(message.sleep.child_id).to.eql(defaultSleep.child_id)
+    //                         done()
+    //                     } catch (err) {
+    //                         done(err)
+    //                     }
+    //                 })
+    //                 .then(() => {
+    //                     request
+    //                         .patch(`/v1/children/${result.child_id}/sleep/${result.id}`)
+    //                         .send(body)
+    //                         .set('Content-Type', 'application/json')
+    //                         .expect(200)
+    //                         .then()
+    //                         .catch(done)
+    //                 })
+    //                 .catch(done)
+    //         })
+    //     })
+    // })
+    //
+    // describe('PATCH /v1/children/:child_id/sleep/:sleep_id', () => {
+    //     context('when this sleep exists in the database and is updated successfully (there is no connection to RabbitMQ)',
+    //         () => {
+    //             let result
+    //
+    //             before(async () => {
+    //                 try {
+    //                     await deleteAllSleep()
+    //
+    //                     // Sleep to be updated
+    //                     result = await createSleepToBeUpdated(defaultSleep)
+    //                 } catch (err) {
+    //                     throw new Error('Failure on children.sleep routes test: ' + err.message)
+    //                 }
+    //             })
+    //
+    //             it('should return status code 200 and the updated Sleep (and show an error log about unable to send ' +
+    //                 'UpdateSleep event)', () => {
+    //                 // Sleep to update
+    //                 const body = {
+    //                     start_time: otherSleep.start_time,
+    //                     end_time: otherSleep.end_time,
+    //                     duration: otherSleep.duration,
+    //                     pattern: defaultSleep.pattern,
+    //                     type: defaultSleep.type
+    //                 }
+    //
+    //                 return request
+    //                     .patch(`/v1/children/${result.child_id}/sleep/${result.id}`)
+    //                     .send(body)
+    //                     .set('Content-Type', 'application/json')
+    //                     .expect(200)
+    //                     .then(res => {
+    //                         expect(res.body).to.have.property('id')
+    //                         expect(res.body.start_time).to.eql(otherSleep.start_time!.toISOString())
+    //                         expect(res.body.end_time).to.eql(otherSleep.end_time!.toISOString())
+    //                         expect(res.body.duration).to.eql(otherSleep.duration)
+    //                         let index = 0
+    //                         for (const elem of defaultSleep.pattern!.data_set) {
+    //                             expect(res.body.pattern.data_set[index].start_time).to.eql(elem.start_time.toISOString())
+    //                             expect(res.body.pattern.data_set[index].name).to.eql(elem.name)
+    //                             expect(res.body.pattern.data_set[index].duration).to.eql(elem.duration)
+    //                             index++
+    //                         }
+    //                         expect(res.body.type).to.eql(defaultSleep.type)
+    //                         expect(res.body.child_id).to.eql(defaultSleep.child_id)
+    //                     })
+    //             })
+    //         })
+    //
+    //     context('when this sleep already exists in the database', () => {
+    //         let result
+    //
+    //         before(async () => {
+    //             try {
+    //                 await deleteAllSleep()
+    //
+    //                 await createSleep({
+    //                     start_time: otherSleep.start_time,
+    //                     end_time: otherSleep.end_time,
+    //                     duration: otherSleep.duration,
+    //                     pattern: defaultSleep.pattern!.data_set,
+    //                     type: defaultSleep.type,
+    //                     child_id: defaultSleep.child_id
+    //                 })
+    //
+    //                 // Sleep to be updated
+    //                 result = await createSleepToBeUpdated(defaultSleep)
+    //             } catch (err) {
+    //                 throw new Error('Failure on children.sleep routes test: ' + err.message)
+    //             }
+    //         })
+    //         it('should return status status code 409 and an info message about the conflict', () => {
+    //             // Sleep to update
+    //             const body = {
+    //                 start_time: otherSleep.start_time,
+    //                 end_time: otherSleep.end_time,
+    //                 duration: otherSleep.duration
+    //             }
+    //
+    //             return request
+    //                 .patch(`/v1/children/${result.child_id}/sleep/${result.id}`)
+    //                 .send(body)
+    //                 .set('Content-Type', 'application/json')
+    //                 .expect(409)
+    //                 .then(err => {
+    //                     expect(err.body.code).to.eql(409)
+    //                     expect(err.body.message).to.eql('A registration with the same unique data already exists!')
+    //                 })
+    //         })
+    //     })
+    //
+    //     context('when sleep does not exist in the database', () => {
+    //         before(async () => {
+    //             try {
+    //                 await deleteAllSleep()
+    //             } catch (err) {
+    //                 throw new Error('Failure on children.sleep routes test: ' + err.message)
+    //             }
+    //         })
+    //
+    //         it('should return status code 404 and an info message about the error on the search', () => {
+    //             // Sleep to update
+    //             const body = {
+    //                 start_time: defaultSleep.start_time,
+    //                 end_time: defaultSleep.end_time,
+    //                 duration: defaultSleep.duration,
+    //                 pattern: defaultSleep.pattern,
+    //                 type: defaultSleep.type
+    //             }
+    //
+    //             return request
+    //                 .patch(`/v1/children/${defaultSleep.child_id}/sleep/${defaultSleep.id}`)
+    //                 .send(body)
+    //                 .set('Content-Type', 'application/json')
+    //                 .expect(404)
+    //                 .then(err => {
+    //                     expect(err.body.code).to.eql(404)
+    //                     expect(err.body.message).to.eql('Sleep not found!')
+    //                     expect(err.body.description).to.eql('Sleep not found or already removed. A new operation for ' +
+    //                         'the same resource is not required!')
+    //                 })
+    //         })
+    //     })
+    //
+    //     context('when the child_id is invalid', () => {
+    //         before(async () => {
+    //             try {
+    //                 await deleteAllSleep()
+    //             } catch (err) {
+    //                 throw new Error('Failure on children.sleep routes test: ' + err.message)
+    //             }
+    //         })
+    //
+    //         it('should return status code 400 and an info message about the invalid child_id', () => {
+    //             // Sleep to update
+    //             const body = {
+    //                 start_time: defaultSleep.start_time,
+    //                 end_time: defaultSleep.end_time,
+    //                 duration: defaultSleep.duration,
+    //                 pattern: defaultSleep.pattern,
+    //                 type: defaultSleep.type
+    //             }
+    //
+    //             return request
+    //                 .patch(`/v1/children/123/sleep/${defaultSleep.id}`)
+    //                 .send(body)
+    //                 .set('Content-Type', 'application/json')
+    //                 .expect(400)
+    //                 .then(err => {
+    //                     expect(err.body.code).to.eql(400)
+    //                     expect(err.body.message).to.eql(Strings.CHILD.PARAM_ID_NOT_VALID_FORMAT)
+    //                     expect(err.body.description).to.eql(Strings.ERROR_MESSAGE.UUID_NOT_VALID_FORMAT_DESC)
+    //                 })
+    //         })
+    //     })
+    //
+    //     context('when the sleep id is invalid', () => {
+    //         before(async () => {
+    //             try {
+    //                 await deleteAllSleep()
+    //             } catch (err) {
+    //                 throw new Error('Failure on children.sleep routes test: ' + err.message)
+    //             }
+    //         })
+    //
+    //         it('should return status code 400 and an info message about the invalid sleep id', () => {
+    //             // Sleep to update
+    //             const body = {
+    //                 start_time: defaultSleep.start_time,
+    //                 end_time: defaultSleep.end_time,
+    //                 duration: defaultSleep.duration,
+    //                 pattern: defaultSleep.pattern,
+    //                 type: defaultSleep.type
+    //             }
+    //
+    //             return request
+    //                 .patch(`/v1/children/${defaultSleep.child_id}/sleep/123`)
+    //                 .send(body)
+    //                 .set('Content-Type', 'application/json')
+    //                 .expect(400)
+    //                 .then(err => {
+    //                     expect(err.body.code).to.eql(400)
+    //                     expect(err.body.message).to.eql(Strings.SLEEP.PARAM_ID_NOT_VALID_FORMAT)
+    //                     expect(err.body.description).to.eql(Strings.ERROR_MESSAGE.UUID_NOT_VALID_FORMAT_DESC)
+    //                 })
+    //         })
+    //     })
+    //
+    //     context('when a validation error occurs (the duration is invalid)', () => {
+    //         before(async () => {
+    //             try {
+    //                 await deleteAllSleep()
+    //             } catch (err) {
+    //                 throw new Error('Failure on children.sleep routes test: ' + err.message)
+    //             }
+    //         })
+    //
+    //         it('should return status code 400 and info message about the invalid duration', () => {
+    //             // Sleep to update
+    //             const body = {
+    //                 start_time: defaultSleep.start_time,
+    //                 end_time: defaultSleep.end_time,
+    //                 duration: `${defaultSleep.duration!}a`,
+    //                 pattern: defaultSleep.pattern,
+    //                 type: defaultSleep.type
+    //             }
+    //
+    //             return request
+    //                 .patch(`/v1/children/${defaultSleep.child_id}/sleep/${defaultSleep.id}`)
+    //                 .send(body)
+    //                 .set('Content-Type', 'application/json')
+    //                 .expect(400)
+    //                 .then(err => {
+    //                     expect(err.body.code).to.eql(400)
+    //                     expect(err.body.message).to.eql('Duration field is invalid...')
+    //                     expect(err.body.description).to.eql('Sleep validation failed: '
+    //                         .concat(Strings.ERROR_MESSAGE.INVALID_NUMBER))
+    //                 })
+    //         })
+    //     })
+    //
+    //     context('when a validation error occurs (the duration is negative)', () => {
+    //         before(async () => {
+    //             try {
+    //                 await deleteAllSleep()
+    //             } catch (err) {
+    //                 throw new Error('Failure on children.sleep routes test: ' + err.message)
+    //             }
+    //         })
+    //
+    //         it('should return status code 400 and info message about the invalid duration', () => {
+    //             // Sleep to update
+    //             const body = {
+    //                 start_time: defaultSleep.start_time,
+    //                 end_time: defaultSleep.end_time,
+    //                 duration: -(defaultSleep.duration!),
+    //                 pattern: defaultSleep.pattern,
+    //                 type: defaultSleep.type
+    //             }
+    //
+    //             return request
+    //                 .patch(`/v1/children/${defaultSleep.child_id}/sleep/${defaultSleep.id}`)
+    //                 .send(body)
+    //                 .set('Content-Type', 'application/json')
+    //                 .expect(400)
+    //                 .then(err => {
+    //                     expect(err.body.code).to.eql(400)
+    //                     expect(err.body.message).to.eql('Duration field is invalid...')
+    //                     expect(err.body.description).to.eql('Sleep validation failed: The value provided has a negative value!')
+    //                 })
+    //         })
+    //     })
+    //
+    //     context('when a validation error occurs (the start_time is older than end_time)', () => {
+    //         before(async () => {
+    //             try {
+    //                 await deleteAllSleep()
+    //             } catch (err) {
+    //                 throw new Error('Failure on children.sleep routes test: ' + err.message)
+    //             }
+    //         })
+    //
+    //         it('should return status code 400 and info message about the invalid dates', () => {
+    //             // Sleep to update
+    //             const body = {
+    //                 start_time: new Date(2020),
+    //                 end_time: new Date(2019),
+    //                 duration: defaultSleep.duration,
+    //                 pattern: defaultSleep.pattern,
+    //                 type: defaultSleep.type
+    //             }
+    //
+    //             return request
+    //                 .patch(`/v1/children/${defaultSleep.child_id}/sleep/${defaultSleep.id}`)
+    //                 .send(body)
+    //                 .set('Content-Type', 'application/json')
+    //                 .expect(400)
+    //                 .then(err => {
+    //                     expect(err.body.code).to.eql(400)
+    //                     expect(err.body.message).to.eql('Date field is invalid...')
+    //                     expect(err.body.description).to.eql('Date validation failed: ' +
+    //                         'The end_time parameter can not contain an older date than that the start_time parameter!')
+    //                 })
+    //         })
+    //     })
+    //
+    //     context('when a validation error occurs (the duration is incompatible with the start_time and end_time parameters)',
+    //         () => {
+    //         before(async () => {
+    //             try {
+    //                 await deleteAllSleep()
+    //             } catch (err) {
+    //                 throw new Error('Failure on children.sleep routes test: ' + err.message)
+    //             }
+    //         })
+    //
+    //         it('should return status code 400 and info message about the invalid duration', () => {
+    //             // Sleep to update
+    //             const body = {
+    //                 start_time: defaultSleep.start_time,
+    //                 end_time: defaultSleep.end_time,
+    //                 duration: Math.floor(Math.random() * 180 + 1) * 60000,
+    //                 pattern: defaultSleep.pattern,
+    //                 type: defaultSleep.type
+    //             }
+    //
+    //             return request
+    //                 .patch(`/v1/children/${defaultSleep.child_id}/sleep/${defaultSleep.id}`)
+    //                 .send(body)
+    //                 .set('Content-Type', 'application/json')
+    //                 .expect(400)
+    //                 .then(err => {
+    //                     expect(err.body.code).to.eql(400)
+    //                     expect(err.body.message).to.eql('Duration field is invalid...')
+    //                     expect(err.body.description).to.eql('Duration validation failed: ' +
+    //                         'Activity duration value does not match values passed in start_time and end_time parameters!')
+    //                 })
+    //         })
+    //     })
+    //
+    //     context('when a validation error occurs (the sleep type is invalid)', () => {
+    //         before(async () => {
+    //             try {
+    //                 await deleteAllSleep()
+    //             } catch (err) {
+    //                 throw new Error('Failure on children.sleep routes test: ' + err.message)
+    //             }
+    //         })
+    //
+    //         it('should return status code 400 and info message about the invalid duration', () => {
+    //             // Sleep to update
+    //             const body = {
+    //                 start_time: defaultSleep.start_time,
+    //                 end_time: defaultSleep.end_time,
+    //                 duration: defaultSleep.duration,
+    //                 pattern: defaultSleep.pattern,
+    //                 type: 'deeps'
+    //             }
+    //
+    //             return request
+    //                 .patch(`/v1/children/${defaultSleep.child_id}/sleep/${defaultSleep.id}`)
+    //                 .send(body)
+    //                 .set('Content-Type', 'application/json')
+    //                 .expect(400)
+    //                 .then(err => {
+    //                     expect(err.body.code).to.eql(400)
+    //                     expect(err.body.message).to.eql('The type provided "deeps" is not supported...')
+    //                     expect(err.body.description).to.eql('The allowed Sleep Pattern types are: classic, stages.')
+    //                 })
+    //         })
+    //     })
+    //
+    //     context('when a validation error occurs (missing data_set of pattern)', () => {
+    //         before(async () => {
+    //             try {
+    //                 await deleteAllSleep()
+    //             } catch (err) {
+    //                 throw new Error('Failure on children.sleep routes test: ' + err.message)
+    //             }
+    //         })
+    //
+    //         it('should return status code 400 and info message about the invalid pattern', () => {
+    //             // Sleep to update
+    //             const body = {
+    //                 start_time: defaultSleep.start_time,
+    //                 end_time: defaultSleep.end_time,
+    //                 duration: defaultSleep.duration,
+    //                 pattern: new SleepPattern(),
+    //                 type: defaultSleep.type
+    //             }
+    //
+    //             return request
+    //                 .patch(`/v1/children/${defaultSleep.child_id}/sleep/${defaultSleep.id}`)
+    //                 .send(body)
+    //                 .set('Content-Type', 'application/json')
+    //                 .expect(400)
+    //                 .then(err => {
+    //                     expect(err.body.code).to.eql(400)
+    //                     expect(err.body.message).to.eql('Pattern are not in a format that is supported...')
+    //                     expect(err.body.description).to.eql('Validation of the standard of sleep failed: data_set is required!')
+    //                 })
+    //         })
+    //     })
+    //
+    //     context('when a validation error occurs (the pattern has an empty data_set array)', () => {
+    //         before(async () => {
+    //             try {
+    //                 await deleteAllSleep()
+    //             } catch (err) {
+    //                 throw new Error('Failure on children.sleep routes test: ' + err.message)
+    //             }
+    //         })
+    //
+    //         it('should return status code 400 and info message about the invalid data_set array of pattern', () => {
+    //             // Sleep to update
+    //             const body = {
+    //                 start_time: defaultSleep.start_time,
+    //                 end_time: defaultSleep.end_time,
+    //                 duration: defaultSleep.duration,
+    //                 pattern: {
+    //                     data_set: []
+    //                 },
+    //                 type: defaultSleep.type
+    //             }
+    //
+    //             return request
+    //                 .patch(`/v1/children/${defaultSleep.child_id}/sleep/${defaultSleep.id}`)
+    //                 .send(body)
+    //                 .set('Content-Type', 'application/json')
+    //                 .expect(400)
+    //                 .then(err => {
+    //                     expect(err.body.code).to.eql(400)
+    //                     expect(err.body.message).to.eql('Dataset are not in a format that is supported!')
+    //                     expect(err.body.description).to.eql('The data_set collection must not be empty!')
+    //                 })
+    //         })
+    //     })
+    //
+    //     context('when a validation error occurs (missing fields of some item from the data_set array of pattern)', () => {
+    //         before(async () => {
+    //             try {
+    //                 await deleteAllSleep()
+    //             } catch (err) {
+    //                 throw new Error('Failure on children.sleep routes test: ' + err.message)
+    //             }
+    //         })
+    //
+    //         it('should return status code 400 and info message about the invalid data_set array of pattern', () => {
+    //             // Sleep to update
+    //             const body = {
+    //                 start_time: defaultSleep.start_time,
+    //                 end_time: defaultSleep.end_time,
+    //                 duration: defaultSleep.duration,
+    //                 pattern: {
+    //                     data_set: [
+    //                         {}
+    //                     ]
+    //                 },
+    //                 type: defaultSleep.type
+    //             }
+    //
+    //             return request
+    //                 .patch(`/v1/children/${defaultSleep.child_id}/sleep/${defaultSleep.id}`)
+    //                 .send(body)
+    //                 .set('Content-Type', 'application/json')
+    //                 .expect(400)
+    //                 .then(err => {
+    //                     expect(err.body.code).to.eql(400)
+    //                     expect(err.body.message).to.eql('Dataset are not in a format that is supported!')
+    //                     expect(err.body.description).to.eql('Validation of the sleep pattern dataset failed: data_set ' +
+    //                         'start_time, data_set name, data_set duration is required!')
+    //                 })
+    //         })
+    //     })
+    //
+    //     context('when a validation error occurs (there is a negative duration on some item from the data_set array of pattern)', () => {
+    //         before(async () => {
+    //             try {
+    //                 await deleteAllSleep()
+    //             } catch (err) {
+    //                 throw new Error('Failure on children.sleep routes test: ' + err.message)
+    //             }
+    //         })
+    //
+    //         it('should return status code 400 and info message about the invalid data_set array of pattern', () => {
+    //             // Sleep to update
+    //             const body = {
+    //                 start_time: defaultSleep.start_time,
+    //                 end_time: defaultSleep.end_time,
+    //                 duration: defaultSleep.duration,
+    //                 pattern: {
+    //                     data_set: [
+    //                         {
+    //                             start_time: '2018-08-18T01:40:30.00Z',
+    //                             name: 'restless',
+    //                             duration: -(Math.floor(Math.random() * 5 + 1) * 60000)
+    //                         }
+    //                     ]
+    //                 },
+    //                 type: SleepType.CLASSIC
+    //             }
+    //
+    //             return request
+    //                 .patch(`/v1/children/${defaultSleep.child_id}/sleep/${defaultSleep.id}`)
+    //                 .send(body)
+    //                 .set('Content-Type', 'application/json')
+    //                 .expect(400)
+    //                 .then(err => {
+    //                     expect(err.body.code).to.eql(400)
+    //                     expect(err.body.message).to.eql('Some (or several) duration field of sleep pattern is invalid...')
+    //                     expect(err.body.description).to.eql('Sleep Pattern dataset validation failed: The value provided ' +
+    //                         'has a negative value!')
+    //                 })
+    //         })
+    //     })
+    //
+    //     context('when a validation error occurs (the sleep pattern data set array has an invalid item with an invalid name)', () => {
+    //         before(async () => {
+    //             try {
+    //                 await deleteAllSleep()
+    //             } catch (err) {
+    //                 throw new Error('Failure on children.sleep routes test: ' + err.message)
+    //             }
+    //         })
+    //
+    //         it('should return status code 400 and info message about the invalid data_set array of pattern', () => {
+    //             // Sleep to update
+    //             const body = {
+    //                 start_time: defaultSleep.start_time,
+    //                 end_time: defaultSleep.end_time,
+    //                 duration: defaultSleep.duration,
+    //                 pattern: {
+    //                     data_set: [
+    //                         {
+    //                             start_time: '2018-08-18T01:40:30.00Z',
+    //                             name: 'restlesss',
+    //                             duration: (Math.floor(Math.random() * 5 + 1) * 60000)
+    //                         }
+    //                     ]
+    //                 },
+    //                 type: SleepType.CLASSIC
+    //             }
+    //
+    //             return request
+    //                 .patch(`/v1/children/${defaultSleep.child_id}/sleep/${defaultSleep.id}`)
+    //                 .send(body)
+    //                 .set('Content-Type', 'application/json')
+    //                 .expect(400)
+    //                 .then(err => {
+    //                     expect(err.body.code).to.eql(400)
+    //                     expect(err.body.message).to.eql('The sleep pattern name provided "restlesss" is not supported...')
+    //                     expect(err.body.description).to.eql('The names of the allowed patterns are: asleep, restless, awake.')
+    //                 })
+    //         })
+    //     })
+    //
+    //     context('when a validation error occurs (the sleep pattern data set array has an invalid item with an invalid name' +
+    //         ' and the sleep type is "stages")', () => {
+    //         before(async () => {
+    //             try {
+    //                 await deleteAllSleep()
+    //             } catch (err) {
+    //                 throw new Error('Failure on children.sleep routes test: ' + err.message)
+    //             }
+    //         })
+    //
+    //         it('should return status code 400 and info message about the invalid data_set array of pattern', () => {
+    //             // Sleep to update
+    //             const body = {
+    //                 start_time: defaultSleep.start_time,
+    //                 end_time: defaultSleep.end_time,
+    //                 duration: defaultSleep.duration,
+    //                 pattern: {
+    //                     data_set: [
+    //                         {
+    //                             start_time: '2018-08-18T01:40:30.00Z',
+    //                             name: 'deeps',
+    //                             duration: (Math.floor(Math.random() * 5 + 1) * 60000)
+    //                         }
+    //                     ]
+    //                 },
+    //                 type: SleepType.STAGES
+    //             }
+    //
+    //             return request
+    //                 .patch(`/v1/children/${defaultSleep.child_id}/sleep/${defaultSleep.id}`)
+    //                 .send(body)
+    //                 .set('Content-Type', 'application/json')
+    //                 .expect(400)
+    //                 .then(err => {
+    //                     expect(err.body.code).to.eql(400)
+    //                     expect(err.body.message).to.eql('The sleep pattern name provided "deeps" is not supported...')
+    //                     expect(err.body.description).to.eql('The names of the allowed patterns are: deep, light, rem, awake.')
+    //                 })
+    //         })
+    //     })
+    // })
     /**
      * DELETE route
      */
@@ -2074,19 +2074,19 @@ async function createSleep(item): Promise<any> {
     return await Promise.resolve(SleepRepoModel.create(resultModelEntity))
 }
 
-async function createSleepToBeUpdated(defaultSleep: Sleep): Promise<any> {
-    // Sleep to be updated
-    const result = createSleep({
-        start_time: defaultSleep.start_time,
-        end_time: defaultSleep.end_time,
-        duration: defaultSleep.duration,
-        pattern: defaultSleep.pattern!.data_set,
-        type: defaultSleep.type,
-        child_id: defaultSleep.child_id
-    })
-
-    return await Promise.resolve(result)
-}
+// async function createSleepToBeUpdated(defaultSleep: Sleep): Promise<any> {
+//     // Sleep to be updated
+//     const result = createSleep({
+//         start_time: defaultSleep.start_time,
+//         end_time: defaultSleep.end_time,
+//         duration: defaultSleep.duration,
+//         pattern: defaultSleep.pattern!.data_set,
+//         type: defaultSleep.type,
+//         child_id: defaultSleep.child_id
+//     })
+//
+//     return await Promise.resolve(result)
+// }
 
 async function deleteAllSleep() {
     return SleepRepoModel.deleteMany({})

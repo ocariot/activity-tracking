@@ -11,6 +11,7 @@ import { Query } from '../../infrastructure/repository/query/query'
 import { Sleep } from '../../application/domain/model/sleep'
 import { MultiStatus } from '../../application/domain/model/multi.status'
 import { IQuery } from '../../application/port/query.interface'
+import { Strings } from '../../utils/strings'
 
 /**
  * Controller that implements Sleep feature operations.
@@ -124,19 +125,21 @@ export class SleepController {
      */
     @httpPatch('/:child_id/sleep/:sleep_id')
     public async updatesleepOfChild(@request() req: Request, @response() res: Response): Promise<Response> {
-        try {
-            const sleepUpdate: Sleep = new Sleep().fromJSON(req.body)
-            sleepUpdate.id = req.params.sleep_id
-            sleepUpdate.child_id = req.params.child_id
-
-            const result = await this._sleepService.updateByChild(sleepUpdate)
-            if (!result) return res.status(HttpStatus.NOT_FOUND).send(this.getMessageSleepNotFound())
-            return res.status(HttpStatus.OK).send(result)
-        } catch (err) {
-            const handlerError = ApiExceptionManager.build(err)
-            return res.status(handlerError.code)
-                .send(handlerError.toJson())
-        }
+        // try {
+        //     const sleepUpdate: Sleep = new Sleep().fromJSON(req.body)
+        //     sleepUpdate.id = req.params.sleep_id
+        //     sleepUpdate.child_id = req.params.child_id
+        //
+        //     const result = await this._sleepService.updateByChild(sleepUpdate)
+        //     if (!result) return res.status(HttpStatus.NOT_FOUND).send(this.getMessageSleepNotFound())
+        //     return res.status(HttpStatus.OK).send(result)
+        // } catch (err) {
+        //     const handlerError = ApiExceptionManager.build(err)
+        //     return res.status(handlerError.code)
+        //         .send(handlerError.toJson())
+        // }
+        return res.status(HttpStatus.METHOD_NOT_ALLOWED)
+            .send(new ApiException(HttpStatus.METHOD_NOT_ALLOWED, Strings.ERROR_MESSAGE.DISCONTINUED_METHOD).toJson())
     }
 
     /**

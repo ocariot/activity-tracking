@@ -54,6 +54,7 @@ export abstract class Strings {
         UNABLE_UPDATE_DESC: 'Updateable attributes are: name, calories, steps, distance, levels ' +
             '(only if the update is from an empty array) and heart_rate.',
         UUID_NOT_VALID_FORMAT: 'Some ID provided does not have a valid format!',
-        UUID_NOT_VALID_FORMAT_DESC: 'A 24-byte hex ID similar to this: 507f191e810c19729de860ea is expected.'
+        UUID_NOT_VALID_FORMAT_DESC: 'A 24-byte hex ID similar to this: 507f191e810c19729de860ea is expected.',
+        DISCONTINUED_METHOD: 'Support for this method has been discontinued.'
     }
 }

@@ -11,6 +11,7 @@ import { IPhysicalActivityService } from '../../application/port/physical.activi
 import { ILogger } from '../../utils/custom.logger'
 import { MultiStatus } from '../../application/domain/model/multi.status'
 import { IQuery } from '../../application/port/query.interface'
+import { Strings } from '../../utils/strings'
 
 /**
  * Controller that implements PhysicalActivity feature operations.
@@ -124,19 +125,21 @@ export class ActivityController {
      */
     @httpPatch('/:child_id/physicalactivities/:physicalactivity_id')
     public async updatePhysicalActivityOfChild(@request() req: Request, @response() res: Response): Promise<Response> {
-        try {
-            const physicalActivity: PhysicalActivity = new PhysicalActivity().fromJSON(req.body)
-            physicalActivity.id = req.params.physicalactivity_id
-            physicalActivity.child_id = req.params.child_id
-
-            const result = await this._activityService.updateByChild(physicalActivity)
-            if (!result) return res.status(HttpStatus.NOT_FOUND).send(this.getMessageNotActivityFound())
-            return res.status(HttpStatus.OK).send(result)
-        } catch (err) {
-            const handlerError = ApiExceptionManager.build(err)
-            return res.status(handlerError.code)
-                .send(handlerError.toJson())
-        }
+        // try {
+        //     const physicalActivity: PhysicalActivity = new PhysicalActivity().fromJSON(req.body)
+        //     physicalActivity.id = req.params.physicalactivity_id
+        //     physicalActivity.child_id = req.params.child_id
+        //
+        //     const result = await this._activityService.updateByChild(physicalActivity)
+        //     if (!result) return res.status(HttpStatus.NOT_FOUND).send(this.getMessageNotActivityFound())
+        //     return res.status(HttpStatus.OK).send(result)
+        // } catch (err) {
+        //     const handlerError = ApiExceptionManager.build(err)
+        //     return res.status(handlerError.code)
+        //         .send(handlerError.toJson())
+        // }
+        return res.status(HttpStatus.METHOD_NOT_ALLOWED)
+            .send(new ApiException(HttpStatus.METHOD_NOT_ALLOWED, Strings.ERROR_MESSAGE.DISCONTINUED_METHOD).toJson())
     }
 
     /**

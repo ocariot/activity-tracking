@@ -1926,658 +1926,658 @@ describe('Routes: children.physicalactivities', () => {
     /**
      * PATCH route for PhysicalActivity
      */
-    describe('RABBITMQ PUBLISHER -> PATCH /v1/children/:child_id/physicalactivities/:physicalactivity_id', () => {
-        context('when this physical activity is updated successfully and published to the bus', () => {
-            // physical activity to update
-            const body = {
-                name: defaultActivity.name,
-                calories: defaultActivity.calories,
-                steps: defaultActivity.steps ? defaultActivity.steps : undefined,
-                distance: defaultActivity.distance ? defaultActivity.distance : undefined,
-                levels: [],
-                heart_rate: defaultActivity.heart_rate ? defaultActivity.heart_rate : undefined
-            }
-
-            let result
-
-            before(async () => {
-                try {
-                    await deleteAllActivities()
-
-                    // physical activity to be updated
-                    result = await createActivityToBeUpdated(defaultActivity)
-
-                    await rabbitmq.initialize(process.env.RABBITMQ_URI || Default.RABBITMQ_URI,
-                        { interval: 100, receiveFromYourself: true, sslOptions: { ca: [] } })
-                } catch (err) {
-                    throw new Error('Failure on children.physicalactivities routes test: ' + err.message)
-                }
-            })
-
-            after(async () => {
-                try {
-                    await rabbitmq.dispose()
-                    await rabbitmq.initialize('amqp://invalidUser:guest@localhost', { retries: 1, interval: 100 })
-                } catch (err) {
-                    throw new Error('Failure on children.physicalactivities test: ' + err.message)
-                }
-            })
-
-            it('The subscriber should receive a message in the correct format and with the same values as the activity ' +
-                'published on the bus', (done) => {
-                rabbitmq.bus
-                    .subUpdatePhysicalActivity(message => {
-                        try {
-                            expect(message.event_name).to.eql('PhysicalActivityUpdateEvent')
-                            expect(message).to.have.property('timestamp')
-                            expect(message).to.have.property('physicalactivity')
-                            expect(message.physicalactivity).to.have.property('id')
-                            expect(message.physicalactivity.name).to.eql(defaultActivity.name)
-                            expect(message.physicalactivity.start_time).to.eql(result.start_time!.toISOString())
-                            expect(message.physicalactivity.end_time).to.eql(result.end_time!.toISOString())
-                            expect(message.physicalactivity.duration).to.eql(result.duration)
-                            expect(message.physicalactivity.calories).to.eql(defaultActivity.calories)
-                            if (message.physicalactivity.steps) {
-                                expect(message.physicalactivity.steps).to.eql(defaultActivity.steps)
-                            }
-                            expect(message.physicalactivity.distance).to.eql(defaultActivity.distance)
-                            expect(message.physicalactivity).to.not.have.property('levels')
-                            expect(message.physicalactivity.heart_rate).to.eql(defaultActivity.heart_rate!.toJSON())
-                            expect(message.physicalactivity.child_id).to.eql(defaultActivity.child_id)
-                            done()
-                        } catch (err) {
-                            done(err)
-                        }
-                    })
-                    .then(() => {
-                        request
-                            .patch(`/v1/children/${result.child_id}/physicalactivities/${result.id}`)
-                            .send(body)
-                            .set('Content-Type', 'application/json')
-                            .expect(200)
-                            .then()
-                            .catch(done)
-                    })
-                    .catch(done)
-            })
-        })
-    })
-
-    describe('PATCH /v1/children/:child_id/physicalactivities/:physicalactivity_id', () => {
-        context('when this physical activity is updated successfully (there is no connection to RabbitMQ)', () => {
-            let result
-
-            before(async () => {
-                try {
-                    await deleteAllActivities()
-
-                    // physical activity to be updated
-                    result = await createActivityToBeUpdated(defaultActivity)
-                } catch (err) {
-                    throw new Error('Failure on children.physicalactivities routes test: ' + err.message)
-                }
-            })
-
-            it('should return status code 200 and the updated physical activity (and show an error log about unable to send ' +
-                'UpdatePhysicalActivity event)', () => {
-                // physical activity to update
-                const body = {
-                    name: defaultActivity.name,
-                    calories: defaultActivity.calories,
-                    steps: defaultActivity.steps ? defaultActivity.steps : undefined,
-                    distance: defaultActivity.distance ? defaultActivity.distance : undefined,
-                    levels: [],
-                    heart_rate: defaultActivity.heart_rate ? defaultActivity.heart_rate : undefined
-                }
-
-                return request
-                    .patch(`/v1/children/${result.child_id}/physicalactivities/${result.id}`)
-                    .send(body)
-                    .set('Content-Type', 'application/json')
-                    .expect(200)
-                    .then(res => {
-                        expect(res.body).to.have.property('id')
-                        expect(res.body.start_time).to.eql(result.start_time!.toISOString())
-                        expect(res.body.end_time).to.eql(result.end_time!.toISOString())
-                        expect(res.body.duration).to.eql(result.duration)
-                        expect(res.body.name).to.eql(defaultActivity.name)
-                        expect(res.body.calories).to.eql(defaultActivity.calories)
-                        if (defaultActivity.steps) {
-                            expect(res.body.steps).to.eql(defaultActivity.steps)
-                        }
-                        expect(res.body.distance).to.eql(defaultActivity.distance)
-                        expect(res.body).to.not.have.property('levels')
-                        if (defaultActivity.heart_rate) {
-                            expect(res.body.heart_rate).to.eql(defaultActivity.heart_rate.toJSON())
-                        }
-                        expect(res.body.child_id).to.eql(defaultActivity.child_id)
-                    })
-            })
-        })
-
-        context('when physical activity does not exist in the database', () => {
-            before(async () => {
-                try {
-                    await deleteAllActivities()
-                } catch (err) {
-                    throw new Error('Failure on children.physicalactivities routes test: ' + err.message)
-                }
-            })
-
-            it('should return status code 404 and an info message about the error on the search', () => {
-                // physical activity to update
-                const body = {
-                    name: defaultActivity.name,
-                    calories: defaultActivity.calories,
-                    steps: defaultActivity.steps ? defaultActivity.steps : undefined,
-                    distance: defaultActivity.distance ? defaultActivity.distance : undefined,
-                    levels: [],
-                    heart_rate: defaultActivity.heart_rate ? defaultActivity.heart_rate : undefined
-                }
-
-                return request
-                    .patch(`/v1/children/${defaultActivity.child_id}/physicalactivities/${defaultActivity.id}`)
-                    .send(body)
-                    .set('Content-Type', 'application/json')
-                    .expect(404)
-                    .then(err => {
-                        expect(err.body.code).to.eql(404)
-                        expect(err.body.message).to.eql('Physical Activity not found!')
-                        expect(err.body.description).to.eql('Physical Activity not found or already removed. ' +
-                            'A new operation for the same resource is not required!')
-                    })
-            })
-        })
-
-        context('when the child_id is invalid', () => {
-            before(async () => {
-                try {
-                    await deleteAllActivities()
-                } catch (err) {
-                    throw new Error('Failure on children.physicalactivities routes test: ' + err.message)
-                }
-            })
-            it('should return status code 400 and an info message about the invalid child_id', () => {
-                // physical activity to update
-                const body = {
-                    name: defaultActivity.name,
-                    start_time: defaultActivity.start_time,
-                    end_time: defaultActivity.end_time,
-                    duration: defaultActivity.duration,
-                    calories: defaultActivity.calories,
-                    steps: defaultActivity.steps ? defaultActivity.steps : undefined,
-                    distance: defaultActivity.distance ? defaultActivity.distance : undefined,
-                    levels: defaultActivity.levels ? defaultActivity.levels : undefined,
-                    heart_rate: defaultActivity.heart_rate ? defaultActivity.heart_rate : undefined
-                }
-
-                return request
-                    .patch(`/v1/children/123/physicalactivities/${defaultActivity.id}`)
-                    .send(body)
-                    .set('Content-Type', 'application/json')
-                    .expect(400)
-                    .then(err => {
-                        expect(err.body.code).to.eql(400)
-                        expect(err.body.message).to.eql(Strings.CHILD.PARAM_ID_NOT_VALID_FORMAT)
-                        expect(err.body.description).to.eql(Strings.ERROR_MESSAGE.UUID_NOT_VALID_FORMAT_DESC)
-                    })
-            })
-        })
-
-        context('when the physical activity id is invalid', () => {
-            before(async () => {
-                try {
-                    await deleteAllActivities()
-                } catch (err) {
-                    throw new Error('Failure on children.physicalactivities routes test: ' + err.message)
-                }
-            })
-            it('should return status code 400 and an info message about the invalid physical activity id', () => {
-                // physical activity to update
-                const body = {
-                    name: defaultActivity.name,
-                    start_time: defaultActivity.start_time,
-                    end_time: defaultActivity.end_time,
-                    duration: defaultActivity.duration,
-                    calories: defaultActivity.calories,
-                    steps: defaultActivity.steps ? defaultActivity.steps : undefined,
-                    distance: defaultActivity.distance ? defaultActivity.distance : undefined,
-                    levels: defaultActivity.levels ? defaultActivity.levels : undefined,
-                    heart_rate: defaultActivity.heart_rate ? defaultActivity.heart_rate : undefined
-                }
-
-                return request
-                    .patch(`/v1/children/${defaultActivity.child_id}/physicalactivities/123`)
-                    .send(body)
-                    .set('Content-Type', 'application/json')
-                    .expect(400)
-                    .then(err => {
-                        expect(err.body.code).to.eql(400)
-                        expect(err.body.message).to.eql(Strings.PHYSICAL_ACTIVITY.PARAM_ID_NOT_VALID_FORMAT)
-                        expect(err.body.description).to.eql(Strings.ERROR_MESSAGE.UUID_NOT_VALID_FORMAT_DESC)
-                    })
-            })
-        })
-
-        context('when a validation error occurs (attempt to update start_time)', () => {
-            before(async () => {
-                try {
-                    await deleteAllActivities()
-                } catch (err) {
-                    throw new Error('Failure on children.physicalactivities routes test: ' + err.message)
-                }
-            })
-            it('should return status code 400 and info message about the impossibility of updating', () => {
-                // physical activity to update
-                const body = {
-                    start_time: defaultActivity.start_time
-                }
-
-                return request
-                    .patch(`/v1/children/${defaultActivity.child_id}/physicalactivities/${defaultActivity.id}`)
-                    .send(body)
-                    .set('Content-Type', 'application/json')
-                    .expect(400)
-                    .then(err => {
-                        expect(err.body.code).to.eql(400)
-                        expect(err.body.message).to.eql(Strings.ERROR_MESSAGE.UNABLE_UPDATE)
-                        expect(err.body.description).to.eql('Physical Activity validation failed: '
-                            .concat(Strings.ERROR_MESSAGE.UNABLE_UPDATE_DESC))
-                    })
-            })
-        })
-
-        context('when a validation error occurs (attempt to update end_time)', () => {
-            before(async () => {
-                try {
-                    await deleteAllActivities()
-                } catch (err) {
-                    throw new Error('Failure on children.physicalactivities routes test: ' + err.message)
-                }
-            })
-            it('should return status code 400 and info message about the impossibility of updating', () => {
-                // physical activity to update
-                const body = {
-                    end_time: defaultActivity.end_time
-                }
-
-                return request
-                    .patch(`/v1/children/${defaultActivity.child_id}/physicalactivities/${defaultActivity.id}`)
-                    .send(body)
-                    .set('Content-Type', 'application/json')
-                    .expect(400)
-                    .then(err => {
-                        expect(err.body.code).to.eql(400)
-                        expect(err.body.message).to.eql(Strings.ERROR_MESSAGE.UNABLE_UPDATE)
-                        expect(err.body.description).to.eql('Physical Activity validation failed: '
-                            .concat(Strings.ERROR_MESSAGE.UNABLE_UPDATE_DESC))
-                    })
-            })
-        })
-
-        context('when a validation error occurs (attempt to update duration)', () => {
-            before(async () => {
-                try {
-                    await deleteAllActivities()
-                } catch (err) {
-                    throw new Error('Failure on children.physicalactivities routes test: ' + err.message)
-                }
-            })
-            it('should return status code 400 and info message about the impossibility of updating', () => {
-                // physical activity to update
-                const body = {
-                    duration: defaultActivity.duration
-                }
-
-                return request
-                    .patch(`/v1/children/${defaultActivity.child_id}/physicalactivities/${defaultActivity.id}`)
-                    .send(body)
-                    .set('Content-Type', 'application/json')
-                    .expect(400)
-                    .then(err => {
-                        expect(err.body.code).to.eql(400)
-                        expect(err.body.message).to.eql(Strings.ERROR_MESSAGE.UNABLE_UPDATE)
-                        expect(err.body.description).to.eql('Physical Activity validation failed: '
-                            .concat(Strings.ERROR_MESSAGE.UNABLE_UPDATE_DESC))
-                    })
-            })
-        })
-
-        context('when a validation error occurs (the name parameter does not have a valid value)', () => {
-            before(async () => {
-                try {
-                    await deleteAllActivities()
-                } catch (err) {
-                    throw new Error('Failure on children.physicalactivities routes test: ' + err.message)
-                }
-            })
-            it('should return status code 400 and info message about the invalid name parameter', () => {
-                // physical activity to update
-                const body = {
-                    name: ''
-                }
-
-                return request
-                    .patch(`/v1/children/${defaultActivity.child_id}/physicalactivities/${defaultActivity.id}`)
-                    .send(body)
-                    .set('Content-Type', 'application/json')
-                    .expect(400)
-                    .then(err => {
-                        expect(err.body.code).to.eql(400)
-                        expect(err.body.message).to.eql('Name field is invalid...')
-                        expect(err.body.description).to.eql('Physical Activity validation failed: ' +
-                            'Name must have at least one character.')
-                    })
-            })
-        })
-
-        context('when a validation error occurs (the calories parameter does not have a valid number)', () => {
-            before(async () => {
-                try {
-                    await deleteAllActivities()
-                } catch (err) {
-                    throw new Error('Failure on children.physicalactivities routes test: ' + err.message)
-                }
-            })
-            it('should return status code 400 and info message about the invalid calories parameter', () => {
-                // physical activity to update
-                const body = {
-                    calories: `${defaultActivity.calories}a`
-                }
-
-                return request
-                    .patch(`/v1/children/${defaultActivity.child_id}/physicalactivities/${defaultActivity.id}`)
-                    .send(body)
-                    .set('Content-Type', 'application/json')
-                    .expect(400)
-                    .then(err => {
-                        expect(err.body.code).to.eql(400)
-                        expect(err.body.message).to.eql('Calories field is invalid...')
-                        expect(err.body.description).to.eql('Physical Activity validation failed: '
-                            .concat(Strings.ERROR_MESSAGE.INVALID_NUMBER))
-                    })
-            })
-        })
-
-        context('when a validation error occurs (the calories parameter is negative)', () => {
-            before(async () => {
-                try {
-                    await deleteAllActivities()
-                } catch (err) {
-                    throw new Error('Failure on children.physicalactivities routes test: ' + err.message)
-                }
-            })
-            it('should return status code 400 and info message about the invalid calories parameter', () => {
-                // physical activity to update
-                const body = {
-                    calories: -(defaultActivity.calories!)
-                }
-
-                return request
-                    .patch(`/v1/children/${defaultActivity.child_id}/physicalactivities/${defaultActivity.id}`)
-                    .send(body)
-                    .set('Content-Type', 'application/json')
-                    .expect(400)
-                    .then(err => {
-                        expect(err.body.code).to.eql(400)
-                        expect(err.body.message).to.eql('Calories field is invalid...')
-                        expect(err.body.description).to.eql('Physical Activity validation failed: The value provided ' +
-                            'has a negative value!')
-                    })
-            })
-        })
-
-        context('when a validation error occurs (the steps parameter does not have a valid number)', () => {
-            before(async () => {
-                try {
-                    await deleteAllActivities()
-                } catch (err) {
-                    throw new Error('Failure on children.physicalactivities routes test: ' + err.message)
-                }
-            })
-            it('should return status code 400 and info message about the invalid steps parameter', () => {
-                // physical activity to update
-                const body = {
-                    steps: `100a`
-                }
-
-                return request
-                    .patch(`/v1/children/${defaultActivity.child_id}/physicalactivities/${defaultActivity.id}`)
-                    .send(body)
-                    .set('Content-Type', 'application/json')
-                    .expect(400)
-                    .then(err => {
-                        expect(err.body.code).to.eql(400)
-                        expect(err.body.message).to.eql('Steps field is invalid...')
-                        expect(err.body.description).to.eql('Physical Activity validation failed: '
-                            .concat(Strings.ERROR_MESSAGE.INVALID_NUMBER))
-                    })
-            })
-        })
-
-        context('when a validation error occurs (the steps parameter is negative)', () => {
-            before(async () => {
-                try {
-                    await deleteAllActivities()
-                } catch (err) {
-                    throw new Error('Failure on children.physicalactivities routes test: ' + err.message)
-                }
-            })
-            it('should return status code 400 and info message about the invalid steps parameter', () => {
-                // physical activity to update
-                const body = {
-                    steps: -200
-                }
-
-                return request
-                    .patch(`/v1/children/${defaultActivity.child_id}/physicalactivities/${defaultActivity.id}`)
-                    .send(body)
-                    .set('Content-Type', 'application/json')
-                    .expect(400)
-                    .then(err => {
-                        expect(err.body.code).to.eql(400)
-                        expect(err.body.message).to.eql('Steps field is invalid...')
-                        expect(err.body.description).to.eql('Physical Activity validation failed: The value provided ' +
-                            'has a negative value!')
-                    })
-            })
-        })
-
-        context('when a validation error occurs (the distance parameter does not have a valid number)', () => {
-            before(async () => {
-                try {
-                    await deleteAllActivities()
-                } catch (err) {
-                    throw new Error('Failure on children.physicalactivities routes test: ' + err.message)
-                }
-            })
-            it('should return status code 400 and info message about the invalid distance parameter', () => {
-                // physical activity to update
-                const body = {
-                    distance: `100a`
-                }
-
-                return request
-                    .patch(`/v1/children/${defaultActivity.child_id}/physicalactivities/${defaultActivity.id}`)
-                    .send(body)
-                    .set('Content-Type', 'application/json')
-                    .expect(400)
-                    .then(err => {
-                        expect(err.body.code).to.eql(400)
-                        expect(err.body.message).to.eql('Distance field is invalid...')
-                        expect(err.body.description).to.eql('Physical Activity validation failed: '
-                            .concat(Strings.ERROR_MESSAGE.INVALID_NUMBER))
-                    })
-            })
-        })
-
-        context('when a validation error occurs (the distance parameter is negative)', () => {
-            before(async () => {
-                try {
-                    await deleteAllActivities()
-                } catch (err) {
-                    throw new Error('Failure on children.physicalactivities routes test: ' + err.message)
-                }
-            })
-            it('should return status code 400 and info message about the invalid distance parameter', () => {
-                // physical activity to update
-                const body = {
-                    distance: -200
-                }
-
-                return request
-                    .patch(`/v1/children/${defaultActivity.child_id}/physicalactivities/${defaultActivity.id}`)
-                    .send(body)
-                    .set('Content-Type', 'application/json')
-                    .expect(400)
-                    .then(err => {
-                        expect(err.body.code).to.eql(400)
-                        expect(err.body.message).to.eql('Distance field is invalid...')
-                        expect(err.body.description).to.eql('Physical Activity validation failed: The value provided ' +
-                            'has a negative value!')
-                    })
-            })
-        })
-
-        context('when a validation error occurs (attempt to update levels with an array containing at least 1 item)',
-            () => {
-                before(async () => {
-                    try {
-                        await deleteAllActivities()
-                    } catch (err) {
-                        throw new Error('Failure on children.physicalactivities routes test: ' + err.message)
-                    }
-                })
-
-                it('should return status code 400 and info message about the invalid levels array', () => {
-                    // physical activity to update
-                    const body = {
-                        levels: defaultActivity.levels
-                    }
-
-                    return request
-                        .patch(`/v1/children/${defaultActivity.child_id}/physicalactivities/${defaultActivity.id}`)
-                        .send(body)
-                        .set('Content-Type', 'application/json')
-                        .expect(400)
-                        .then(err => {
-                            expect(err.body.code).to.eql(400)
-                            expect(err.body.message).to.eql(Strings.ERROR_MESSAGE.UNABLE_UPDATE)
-                            expect(err.body.description).to.eql('Physical Activity validation failed: '
-                                .concat(Strings.ERROR_MESSAGE.UNABLE_UPDATE_DESC))
-                        })
-                })
-            })
-
-        context('when a validation error occurs (the PhysicalActivityHeartRate is empty)', () => {
-            before(async () => {
-                try {
-                    await deleteAllActivities()
-                } catch (err) {
-                    throw new Error('Failure on children.physicalactivities routes test: ' + err.message)
-                }
-            })
-            it('should return status code 400 and info message about the invalid levels array', () => {
-                const body = {
-                    heart_rate: incorrectActivity11.heart_rate ? incorrectActivity11.heart_rate : undefined
-                }
-
-                return request
-                    .patch(`/v1/children/${defaultActivity.child_id}/physicalactivities/${defaultActivity.id}`)
-                    .send(body)
-                    .set('Content-Type', 'application/json')
-                    .expect(400)
-                    .then(err => {
-                        expect(err.body.code).to.eql(400)
-                        expect(err.body.message).to.eql('Required fields were not provided...')
-                        expect(err.body.description).to.eql('PhysicalActivityHeartRate validation failed: ' +
-                            'average, out_of_range_zone, fat_burn_zone, cardio_zone, peak_zone is required!')
-                    })
-            })
-        })
-
-        context('when a validation error occurs (the PhysicalActivityHeartRate has a negative average parameter)', () => {
-            before(async () => {
-                try {
-                    await deleteAllActivities()
-                } catch (err) {
-                    throw new Error('Failure on children.physicalactivities routes test: ' + err.message)
-                }
-            })
-            it('should return status code 400 and info message about the invalid levels array', () => {
-                const body = {
-                    heart_rate: incorrectActivity12.heart_rate ? incorrectActivity12.heart_rate : undefined
-                }
-
-                return request
-                    .patch(`/v1/children/${defaultActivity.child_id}/physicalactivities/${defaultActivity.id}`)
-                    .send(body)
-                    .set('Content-Type', 'application/json')
-                    .expect(400)
-                    .then(err => {
-                        expect(err.body.code).to.eql(400)
-                        expect(err.body.message).to.eql('Average field is invalid...')
-                        expect(err.body.description).to.eql('PhysicalActivityHeartRate validation failed: ' +
-                            'The value provided has a negative value!')
-                    })
-            })
-        })
-
-        context('when a validation error occurs (the "Fat Burn Zone" parameter of PhysicalActivityHeartRate is empty)', () => {
-            before(async () => {
-                try {
-                    await deleteAllActivities()
-                } catch (err) {
-                    throw new Error('Failure on children.physicalactivities routes test: ' + err.message)
-                }
-            })
-            it('should return status code 400 and info message about the invalid levels array', () => {
-                const body = {
-                    heart_rate: incorrectActivity13.heart_rate ? incorrectActivity13.heart_rate : undefined
-                }
-
-                return request
-                    .patch(`/v1/children/${defaultActivity.child_id}/physicalactivities/${defaultActivity.id}`)
-                    .send(body)
-                    .set('Content-Type', 'application/json')
-                    .expect(400)
-                    .then(err => {
-                        expect(err.body.code).to.eql(400)
-                        expect(err.body.message).to.eql('Required fields were not provided...')
-                        expect(err.body.description).to.eql('HeartRateZone validation failed: ' +
-                            'min, max, duration is required!')
-                    })
-            })
-        })
-
-        context('when a validation error occurs (the "Fat Burn Zone" parameter of PhysicalActivityHeartRate ' +
-            'has a negative duration)', () => {
-            before(async () => {
-                try {
-                    await deleteAllActivities()
-                } catch (err) {
-                    throw new Error('Failure on children.physicalactivities routes test: ' + err.message)
-                }
-            })
-            it('should return status code 400 and info message about the invalid levels array', () => {
-                const body = {
-                    heart_rate: incorrectActivity14.heart_rate ? incorrectActivity14.heart_rate : undefined
-                }
-
-                return request
-                    .patch(`/v1/children/${defaultActivity.child_id}/physicalactivities/${defaultActivity.id}`)
-                    .send(body)
-                    .set('Content-Type', 'application/json')
-                    .expect(400)
-                    .then(err => {
-                        expect(err.body.code).to.eql(400)
-                        expect(err.body.message).to.eql('Duration field is invalid...')
-                        expect(err.body.description).to.eql('HeartRateZone validation failed: ' +
-                            'The value provided has a negative value!')
-                    })
-            })
-        })
-    })
+    // describe('RABBITMQ PUBLISHER -> PATCH /v1/children/:child_id/physicalactivities/:physicalactivity_id', () => {
+    //     context('when this physical activity is updated successfully and published to the bus', () => {
+    //         // physical activity to update
+    //         const body = {
+    //             name: defaultActivity.name,
+    //             calories: defaultActivity.calories,
+    //             steps: defaultActivity.steps ? defaultActivity.steps : undefined,
+    //             distance: defaultActivity.distance ? defaultActivity.distance : undefined,
+    //             levels: [],
+    //             heart_rate: defaultActivity.heart_rate ? defaultActivity.heart_rate : undefined
+    //         }
+    //
+    //         let result
+    //
+    //         before(async () => {
+    //             try {
+    //                 await deleteAllActivities()
+    //
+    //                 // physical activity to be updated
+    //                 result = await createActivityToBeUpdated(defaultActivity)
+    //
+    //                 await rabbitmq.initialize(process.env.RABBITMQ_URI || Default.RABBITMQ_URI,
+    //                     { interval: 100, receiveFromYourself: true, sslOptions: { ca: [] } })
+    //             } catch (err) {
+    //                 throw new Error('Failure on children.physicalactivities routes test: ' + err.message)
+    //             }
+    //         })
+    //
+    //         after(async () => {
+    //             try {
+    //                 await rabbitmq.dispose()
+    //                 await rabbitmq.initialize('amqp://invalidUser:guest@localhost', { retries: 1, interval: 100 })
+    //             } catch (err) {
+    //                 throw new Error('Failure on children.physicalactivities test: ' + err.message)
+    //             }
+    //         })
+    //
+    //         it('The subscriber should receive a message in the correct format and with the same values as the activity ' +
+    //             'published on the bus', (done) => {
+    //             rabbitmq.bus
+    //                 .subUpdatePhysicalActivity(message => {
+    //                     try {
+    //                         expect(message.event_name).to.eql('PhysicalActivityUpdateEvent')
+    //                         expect(message).to.have.property('timestamp')
+    //                         expect(message).to.have.property('physicalactivity')
+    //                         expect(message.physicalactivity).to.have.property('id')
+    //                         expect(message.physicalactivity.name).to.eql(defaultActivity.name)
+    //                         expect(message.physicalactivity.start_time).to.eql(result.start_time!.toISOString())
+    //                         expect(message.physicalactivity.end_time).to.eql(result.end_time!.toISOString())
+    //                         expect(message.physicalactivity.duration).to.eql(result.duration)
+    //                         expect(message.physicalactivity.calories).to.eql(defaultActivity.calories)
+    //                         if (message.physicalactivity.steps) {
+    //                             expect(message.physicalactivity.steps).to.eql(defaultActivity.steps)
+    //                         }
+    //                         expect(message.physicalactivity.distance).to.eql(defaultActivity.distance)
+    //                         expect(message.physicalactivity).to.not.have.property('levels')
+    //                         expect(message.physicalactivity.heart_rate).to.eql(defaultActivity.heart_rate!.toJSON())
+    //                         expect(message.physicalactivity.child_id).to.eql(defaultActivity.child_id)
+    //                         done()
+    //                     } catch (err) {
+    //                         done(err)
+    //                     }
+    //                 })
+    //                 .then(() => {
+    //                     request
+    //                         .patch(`/v1/children/${result.child_id}/physicalactivities/${result.id}`)
+    //                         .send(body)
+    //                         .set('Content-Type', 'application/json')
+    //                         .expect(200)
+    //                         .then()
+    //                         .catch(done)
+    //                 })
+    //                 .catch(done)
+    //         })
+    //     })
+    // })
+    //
+    // describe('PATCH /v1/children/:child_id/physicalactivities/:physicalactivity_id', () => {
+    //     context('when this physical activity is updated successfully (there is no connection to RabbitMQ)', () => {
+    //         let result
+    //
+    //         before(async () => {
+    //             try {
+    //                 await deleteAllActivities()
+    //
+    //                 // physical activity to be updated
+    //                 result = await createActivityToBeUpdated(defaultActivity)
+    //             } catch (err) {
+    //                 throw new Error('Failure on children.physicalactivities routes test: ' + err.message)
+    //             }
+    //         })
+    //
+    //         it('should return status code 200 and the updated physical activity (and show an error log about unable to send ' +
+    //             'UpdatePhysicalActivity event)', () => {
+    //             // physical activity to update
+    //             const body = {
+    //                 name: defaultActivity.name,
+    //                 calories: defaultActivity.calories,
+    //                 steps: defaultActivity.steps ? defaultActivity.steps : undefined,
+    //                 distance: defaultActivity.distance ? defaultActivity.distance : undefined,
+    //                 levels: [],
+    //                 heart_rate: defaultActivity.heart_rate ? defaultActivity.heart_rate : undefined
+    //             }
+    //
+    //             return request
+    //                 .patch(`/v1/children/${result.child_id}/physicalactivities/${result.id}`)
+    //                 .send(body)
+    //                 .set('Content-Type', 'application/json')
+    //                 .expect(200)
+    //                 .then(res => {
+    //                     expect(res.body).to.have.property('id')
+    //                     expect(res.body.start_time).to.eql(result.start_time!.toISOString())
+    //                     expect(res.body.end_time).to.eql(result.end_time!.toISOString())
+    //                     expect(res.body.duration).to.eql(result.duration)
+    //                     expect(res.body.name).to.eql(defaultActivity.name)
+    //                     expect(res.body.calories).to.eql(defaultActivity.calories)
+    //                     if (defaultActivity.steps) {
+    //                         expect(res.body.steps).to.eql(defaultActivity.steps)
+    //                     }
+    //                     expect(res.body.distance).to.eql(defaultActivity.distance)
+    //                     expect(res.body).to.not.have.property('levels')
+    //                     if (defaultActivity.heart_rate) {
+    //                         expect(res.body.heart_rate).to.eql(defaultActivity.heart_rate.toJSON())
+    //                     }
+    //                     expect(res.body.child_id).to.eql(defaultActivity.child_id)
+    //                 })
+    //         })
+    //     })
+    //
+    //     context('when physical activity does not exist in the database', () => {
+    //         before(async () => {
+    //             try {
+    //                 await deleteAllActivities()
+    //             } catch (err) {
+    //                 throw new Error('Failure on children.physicalactivities routes test: ' + err.message)
+    //             }
+    //         })
+    //
+    //         it('should return status code 404 and an info message about the error on the search', () => {
+    //             // physical activity to update
+    //             const body = {
+    //                 name: defaultActivity.name,
+    //                 calories: defaultActivity.calories,
+    //                 steps: defaultActivity.steps ? defaultActivity.steps : undefined,
+    //                 distance: defaultActivity.distance ? defaultActivity.distance : undefined,
+    //                 levels: [],
+    //                 heart_rate: defaultActivity.heart_rate ? defaultActivity.heart_rate : undefined
+    //             }
+    //
+    //             return request
+    //                 .patch(`/v1/children/${defaultActivity.child_id}/physicalactivities/${defaultActivity.id}`)
+    //                 .send(body)
+    //                 .set('Content-Type', 'application/json')
+    //                 .expect(404)
+    //                 .then(err => {
+    //                     expect(err.body.code).to.eql(404)
+    //                     expect(err.body.message).to.eql('Physical Activity not found!')
+    //                     expect(err.body.description).to.eql('Physical Activity not found or already removed. ' +
+    //                         'A new operation for the same resource is not required!')
+    //                 })
+    //         })
+    //     })
+    //
+    //     context('when the child_id is invalid', () => {
+    //         before(async () => {
+    //             try {
+    //                 await deleteAllActivities()
+    //             } catch (err) {
+    //                 throw new Error('Failure on children.physicalactivities routes test: ' + err.message)
+    //             }
+    //         })
+    //         it('should return status code 400 and an info message about the invalid child_id', () => {
+    //             // physical activity to update
+    //             const body = {
+    //                 name: defaultActivity.name,
+    //                 start_time: defaultActivity.start_time,
+    //                 end_time: defaultActivity.end_time,
+    //                 duration: defaultActivity.duration,
+    //                 calories: defaultActivity.calories,
+    //                 steps: defaultActivity.steps ? defaultActivity.steps : undefined,
+    //                 distance: defaultActivity.distance ? defaultActivity.distance : undefined,
+    //                 levels: defaultActivity.levels ? defaultActivity.levels : undefined,
+    //                 heart_rate: defaultActivity.heart_rate ? defaultActivity.heart_rate : undefined
+    //             }
+    //
+    //             return request
+    //                 .patch(`/v1/children/123/physicalactivities/${defaultActivity.id}`)
+    //                 .send(body)
+    //                 .set('Content-Type', 'application/json')
+    //                 .expect(400)
+    //                 .then(err => {
+    //                     expect(err.body.code).to.eql(400)
+    //                     expect(err.body.message).to.eql(Strings.CHILD.PARAM_ID_NOT_VALID_FORMAT)
+    //                     expect(err.body.description).to.eql(Strings.ERROR_MESSAGE.UUID_NOT_VALID_FORMAT_DESC)
+    //                 })
+    //         })
+    //     })
+    //
+    //     context('when the physical activity id is invalid', () => {
+    //         before(async () => {
+    //             try {
+    //                 await deleteAllActivities()
+    //             } catch (err) {
+    //                 throw new Error('Failure on children.physicalactivities routes test: ' + err.message)
+    //             }
+    //         })
+    //         it('should return status code 400 and an info message about the invalid physical activity id', () => {
+    //             // physical activity to update
+    //             const body = {
+    //                 name: defaultActivity.name,
+    //                 start_time: defaultActivity.start_time,
+    //                 end_time: defaultActivity.end_time,
+    //                 duration: defaultActivity.duration,
+    //                 calories: defaultActivity.calories,
+    //                 steps: defaultActivity.steps ? defaultActivity.steps : undefined,
+    //                 distance: defaultActivity.distance ? defaultActivity.distance : undefined,
+    //                 levels: defaultActivity.levels ? defaultActivity.levels : undefined,
+    //                 heart_rate: defaultActivity.heart_rate ? defaultActivity.heart_rate : undefined
+    //             }
+    //
+    //             return request
+    //                 .patch(`/v1/children/${defaultActivity.child_id}/physicalactivities/123`)
+    //                 .send(body)
+    //                 .set('Content-Type', 'application/json')
+    //                 .expect(400)
+    //                 .then(err => {
+    //                     expect(err.body.code).to.eql(400)
+    //                     expect(err.body.message).to.eql(Strings.PHYSICAL_ACTIVITY.PARAM_ID_NOT_VALID_FORMAT)
+    //                     expect(err.body.description).to.eql(Strings.ERROR_MESSAGE.UUID_NOT_VALID_FORMAT_DESC)
+    //                 })
+    //         })
+    //     })
+    //
+    //     context('when a validation error occurs (attempt to update start_time)', () => {
+    //         before(async () => {
+    //             try {
+    //                 await deleteAllActivities()
+    //             } catch (err) {
+    //                 throw new Error('Failure on children.physicalactivities routes test: ' + err.message)
+    //             }
+    //         })
+    //         it('should return status code 400 and info message about the impossibility of updating', () => {
+    //             // physical activity to update
+    //             const body = {
+    //                 start_time: defaultActivity.start_time
+    //             }
+    //
+    //             return request
+    //                 .patch(`/v1/children/${defaultActivity.child_id}/physicalactivities/${defaultActivity.id}`)
+    //                 .send(body)
+    //                 .set('Content-Type', 'application/json')
+    //                 .expect(400)
+    //                 .then(err => {
+    //                     expect(err.body.code).to.eql(400)
+    //                     expect(err.body.message).to.eql(Strings.ERROR_MESSAGE.UNABLE_UPDATE)
+    //                     expect(err.body.description).to.eql('Physical Activity validation failed: '
+    //                         .concat(Strings.ERROR_MESSAGE.UNABLE_UPDATE_DESC))
+    //                 })
+    //         })
+    //     })
+    //
+    //     context('when a validation error occurs (attempt to update end_time)', () => {
+    //         before(async () => {
+    //             try {
+    //                 await deleteAllActivities()
+    //             } catch (err) {
+    //                 throw new Error('Failure on children.physicalactivities routes test: ' + err.message)
+    //             }
+    //         })
+    //         it('should return status code 400 and info message about the impossibility of updating', () => {
+    //             // physical activity to update
+    //             const body = {
+    //                 end_time: defaultActivity.end_time
+    //             }
+    //
+    //             return request
+    //                 .patch(`/v1/children/${defaultActivity.child_id}/physicalactivities/${defaultActivity.id}`)
+    //                 .send(body)
+    //                 .set('Content-Type', 'application/json')
+    //                 .expect(400)
+    //                 .then(err => {
+    //                     expect(err.body.code).to.eql(400)
+    //                     expect(err.body.message).to.eql(Strings.ERROR_MESSAGE.UNABLE_UPDATE)
+    //                     expect(err.body.description).to.eql('Physical Activity validation failed: '
+    //                         .concat(Strings.ERROR_MESSAGE.UNABLE_UPDATE_DESC))
+    //                 })
+    //         })
+    //     })
+    //
+    //     context('when a validation error occurs (attempt to update duration)', () => {
+    //         before(async () => {
+    //             try {
+    //                 await deleteAllActivities()
+    //             } catch (err) {
+    //                 throw new Error('Failure on children.physicalactivities routes test: ' + err.message)
+    //             }
+    //         })
+    //         it('should return status code 400 and info message about the impossibility of updating', () => {
+    //             // physical activity to update
+    //             const body = {
+    //                 duration: defaultActivity.duration
+    //             }
+    //
+    //             return request
+    //                 .patch(`/v1/children/${defaultActivity.child_id}/physicalactivities/${defaultActivity.id}`)
+    //                 .send(body)
+    //                 .set('Content-Type', 'application/json')
+    //                 .expect(400)
+    //                 .then(err => {
+    //                     expect(err.body.code).to.eql(400)
+    //                     expect(err.body.message).to.eql(Strings.ERROR_MESSAGE.UNABLE_UPDATE)
+    //                     expect(err.body.description).to.eql('Physical Activity validation failed: '
+    //                         .concat(Strings.ERROR_MESSAGE.UNABLE_UPDATE_DESC))
+    //                 })
+    //         })
+    //     })
+    //
+    //     context('when a validation error occurs (the name parameter does not have a valid value)', () => {
+    //         before(async () => {
+    //             try {
+    //                 await deleteAllActivities()
+    //             } catch (err) {
+    //                 throw new Error('Failure on children.physicalactivities routes test: ' + err.message)
+    //             }
+    //         })
+    //         it('should return status code 400 and info message about the invalid name parameter', () => {
+    //             // physical activity to update
+    //             const body = {
+    //                 name: ''
+    //             }
+    //
+    //             return request
+    //                 .patch(`/v1/children/${defaultActivity.child_id}/physicalactivities/${defaultActivity.id}`)
+    //                 .send(body)
+    //                 .set('Content-Type', 'application/json')
+    //                 .expect(400)
+    //                 .then(err => {
+    //                     expect(err.body.code).to.eql(400)
+    //                     expect(err.body.message).to.eql('Name field is invalid...')
+    //                     expect(err.body.description).to.eql('Physical Activity validation failed: ' +
+    //                         'Name must have at least one character.')
+    //                 })
+    //         })
+    //     })
+    //
+    //     context('when a validation error occurs (the calories parameter does not have a valid number)', () => {
+    //         before(async () => {
+    //             try {
+    //                 await deleteAllActivities()
+    //             } catch (err) {
+    //                 throw new Error('Failure on children.physicalactivities routes test: ' + err.message)
+    //             }
+    //         })
+    //         it('should return status code 400 and info message about the invalid calories parameter', () => {
+    //             // physical activity to update
+    //             const body = {
+    //                 calories: `${defaultActivity.calories}a`
+    //             }
+    //
+    //             return request
+    //                 .patch(`/v1/children/${defaultActivity.child_id}/physicalactivities/${defaultActivity.id}`)
+    //                 .send(body)
+    //                 .set('Content-Type', 'application/json')
+    //                 .expect(400)
+    //                 .then(err => {
+    //                     expect(err.body.code).to.eql(400)
+    //                     expect(err.body.message).to.eql('Calories field is invalid...')
+    //                     expect(err.body.description).to.eql('Physical Activity validation failed: '
+    //                         .concat(Strings.ERROR_MESSAGE.INVALID_NUMBER))
+    //                 })
+    //         })
+    //     })
+    //
+    //     context('when a validation error occurs (the calories parameter is negative)', () => {
+    //         before(async () => {
+    //             try {
+    //                 await deleteAllActivities()
+    //             } catch (err) {
+    //                 throw new Error('Failure on children.physicalactivities routes test: ' + err.message)
+    //             }
+    //         })
+    //         it('should return status code 400 and info message about the invalid calories parameter', () => {
+    //             // physical activity to update
+    //             const body = {
+    //                 calories: -(defaultActivity.calories!)
+    //             }
+    //
+    //             return request
+    //                 .patch(`/v1/children/${defaultActivity.child_id}/physicalactivities/${defaultActivity.id}`)
+    //                 .send(body)
+    //                 .set('Content-Type', 'application/json')
+    //                 .expect(400)
+    //                 .then(err => {
+    //                     expect(err.body.code).to.eql(400)
+    //                     expect(err.body.message).to.eql('Calories field is invalid...')
+    //                     expect(err.body.description).to.eql('Physical Activity validation failed: The value provided ' +
+    //                         'has a negative value!')
+    //                 })
+    //         })
+    //     })
+    //
+    //     context('when a validation error occurs (the steps parameter does not have a valid number)', () => {
+    //         before(async () => {
+    //             try {
+    //                 await deleteAllActivities()
+    //             } catch (err) {
+    //                 throw new Error('Failure on children.physicalactivities routes test: ' + err.message)
+    //             }
+    //         })
+    //         it('should return status code 400 and info message about the invalid steps parameter', () => {
+    //             // physical activity to update
+    //             const body = {
+    //                 steps: `100a`
+    //             }
+    //
+    //             return request
+    //                 .patch(`/v1/children/${defaultActivity.child_id}/physicalactivities/${defaultActivity.id}`)
+    //                 .send(body)
+    //                 .set('Content-Type', 'application/json')
+    //                 .expect(400)
+    //                 .then(err => {
+    //                     expect(err.body.code).to.eql(400)
+    //                     expect(err.body.message).to.eql('Steps field is invalid...')
+    //                     expect(err.body.description).to.eql('Physical Activity validation failed: '
+    //                         .concat(Strings.ERROR_MESSAGE.INVALID_NUMBER))
+    //                 })
+    //         })
+    //     })
+    //
+    //     context('when a validation error occurs (the steps parameter is negative)', () => {
+    //         before(async () => {
+    //             try {
+    //                 await deleteAllActivities()
+    //             } catch (err) {
+    //                 throw new Error('Failure on children.physicalactivities routes test: ' + err.message)
+    //             }
+    //         })
+    //         it('should return status code 400 and info message about the invalid steps parameter', () => {
+    //             // physical activity to update
+    //             const body = {
+    //                 steps: -200
+    //             }
+    //
+    //             return request
+    //                 .patch(`/v1/children/${defaultActivity.child_id}/physicalactivities/${defaultActivity.id}`)
+    //                 .send(body)
+    //                 .set('Content-Type', 'application/json')
+    //                 .expect(400)
+    //                 .then(err => {
+    //                     expect(err.body.code).to.eql(400)
+    //                     expect(err.body.message).to.eql('Steps field is invalid...')
+    //                     expect(err.body.description).to.eql('Physical Activity validation failed: The value provided ' +
+    //                         'has a negative value!')
+    //                 })
+    //         })
+    //     })
+    //
+    //     context('when a validation error occurs (the distance parameter does not have a valid number)', () => {
+    //         before(async () => {
+    //             try {
+    //                 await deleteAllActivities()
+    //             } catch (err) {
+    //                 throw new Error('Failure on children.physicalactivities routes test: ' + err.message)
+    //             }
+    //         })
+    //         it('should return status code 400 and info message about the invalid distance parameter', () => {
+    //             // physical activity to update
+    //             const body = {
+    //                 distance: `100a`
+    //             }
+    //
+    //             return request
+    //                 .patch(`/v1/children/${defaultActivity.child_id}/physicalactivities/${defaultActivity.id}`)
+    //                 .send(body)
+    //                 .set('Content-Type', 'application/json')
+    //                 .expect(400)
+    //                 .then(err => {
+    //                     expect(err.body.code).to.eql(400)
+    //                     expect(err.body.message).to.eql('Distance field is invalid...')
+    //                     expect(err.body.description).to.eql('Physical Activity validation failed: '
+    //                         .concat(Strings.ERROR_MESSAGE.INVALID_NUMBER))
+    //                 })
+    //         })
+    //     })
+    //
+    //     context('when a validation error occurs (the distance parameter is negative)', () => {
+    //         before(async () => {
+    //             try {
+    //                 await deleteAllActivities()
+    //             } catch (err) {
+    //                 throw new Error('Failure on children.physicalactivities routes test: ' + err.message)
+    //             }
+    //         })
+    //         it('should return status code 400 and info message about the invalid distance parameter', () => {
+    //             // physical activity to update
+    //             const body = {
+    //                 distance: -200
+    //             }
+    //
+    //             return request
+    //                 .patch(`/v1/children/${defaultActivity.child_id}/physicalactivities/${defaultActivity.id}`)
+    //                 .send(body)
+    //                 .set('Content-Type', 'application/json')
+    //                 .expect(400)
+    //                 .then(err => {
+    //                     expect(err.body.code).to.eql(400)
+    //                     expect(err.body.message).to.eql('Distance field is invalid...')
+    //                     expect(err.body.description).to.eql('Physical Activity validation failed: The value provided ' +
+    //                         'has a negative value!')
+    //                 })
+    //         })
+    //     })
+    //
+    //     context('when a validation error occurs (attempt to update levels with an array containing at least 1 item)',
+    //         () => {
+    //             before(async () => {
+    //                 try {
+    //                     await deleteAllActivities()
+    //                 } catch (err) {
+    //                     throw new Error('Failure on children.physicalactivities routes test: ' + err.message)
+    //                 }
+    //             })
+    //
+    //             it('should return status code 400 and info message about the invalid levels array', () => {
+    //                 // physical activity to update
+    //                 const body = {
+    //                     levels: defaultActivity.levels
+    //                 }
+    //
+    //                 return request
+    //                     .patch(`/v1/children/${defaultActivity.child_id}/physicalactivities/${defaultActivity.id}`)
+    //                     .send(body)
+    //                     .set('Content-Type', 'application/json')
+    //                     .expect(400)
+    //                     .then(err => {
+    //                         expect(err.body.code).to.eql(400)
+    //                         expect(err.body.message).to.eql(Strings.ERROR_MESSAGE.UNABLE_UPDATE)
+    //                         expect(err.body.description).to.eql('Physical Activity validation failed: '
+    //                             .concat(Strings.ERROR_MESSAGE.UNABLE_UPDATE_DESC))
+    //                     })
+    //             })
+    //         })
+    //
+    //     context('when a validation error occurs (the PhysicalActivityHeartRate is empty)', () => {
+    //         before(async () => {
+    //             try {
+    //                 await deleteAllActivities()
+    //             } catch (err) {
+    //                 throw new Error('Failure on children.physicalactivities routes test: ' + err.message)
+    //             }
+    //         })
+    //         it('should return status code 400 and info message about the invalid levels array', () => {
+    //             const body = {
+    //                 heart_rate: incorrectActivity11.heart_rate ? incorrectActivity11.heart_rate : undefined
+    //             }
+    //
+    //             return request
+    //                 .patch(`/v1/children/${defaultActivity.child_id}/physicalactivities/${defaultActivity.id}`)
+    //                 .send(body)
+    //                 .set('Content-Type', 'application/json')
+    //                 .expect(400)
+    //                 .then(err => {
+    //                     expect(err.body.code).to.eql(400)
+    //                     expect(err.body.message).to.eql('Required fields were not provided...')
+    //                     expect(err.body.description).to.eql('PhysicalActivityHeartRate validation failed: ' +
+    //                         'average, out_of_range_zone, fat_burn_zone, cardio_zone, peak_zone is required!')
+    //                 })
+    //         })
+    //     })
+    //
+    //     context('when a validation error occurs (the PhysicalActivityHeartRate has a negative average parameter)', () => {
+    //         before(async () => {
+    //             try {
+    //                 await deleteAllActivities()
+    //             } catch (err) {
+    //                 throw new Error('Failure on children.physicalactivities routes test: ' + err.message)
+    //             }
+    //         })
+    //         it('should return status code 400 and info message about the invalid levels array', () => {
+    //             const body = {
+    //                 heart_rate: incorrectActivity12.heart_rate ? incorrectActivity12.heart_rate : undefined
+    //             }
+    //
+    //             return request
+    //                 .patch(`/v1/children/${defaultActivity.child_id}/physicalactivities/${defaultActivity.id}`)
+    //                 .send(body)
+    //                 .set('Content-Type', 'application/json')
+    //                 .expect(400)
+    //                 .then(err => {
+    //                     expect(err.body.code).to.eql(400)
+    //                     expect(err.body.message).to.eql('Average field is invalid...')
+    //                     expect(err.body.description).to.eql('PhysicalActivityHeartRate validation failed: ' +
+    //                         'The value provided has a negative value!')
+    //                 })
+    //         })
+    //     })
+    //
+    //     context('when a validation error occurs (the "Fat Burn Zone" parameter of PhysicalActivityHeartRate is empty)', () => {
+    //         before(async () => {
+    //             try {
+    //                 await deleteAllActivities()
+    //             } catch (err) {
+    //                 throw new Error('Failure on children.physicalactivities routes test: ' + err.message)
+    //             }
+    //         })
+    //         it('should return status code 400 and info message about the invalid levels array', () => {
+    //             const body = {
+    //                 heart_rate: incorrectActivity13.heart_rate ? incorrectActivity13.heart_rate : undefined
+    //             }
+    //
+    //             return request
+    //                 .patch(`/v1/children/${defaultActivity.child_id}/physicalactivities/${defaultActivity.id}`)
+    //                 .send(body)
+    //                 .set('Content-Type', 'application/json')
+    //                 .expect(400)
+    //                 .then(err => {
+    //                     expect(err.body.code).to.eql(400)
+    //                     expect(err.body.message).to.eql('Required fields were not provided...')
+    //                     expect(err.body.description).to.eql('HeartRateZone validation failed: ' +
+    //                         'min, max, duration is required!')
+    //                 })
+    //         })
+    //     })
+    //
+    //     context('when a validation error occurs (the "Fat Burn Zone" parameter of PhysicalActivityHeartRate ' +
+    //         'has a negative duration)', () => {
+    //         before(async () => {
+    //             try {
+    //                 await deleteAllActivities()
+    //             } catch (err) {
+    //                 throw new Error('Failure on children.physicalactivities routes test: ' + err.message)
+    //             }
+    //         })
+    //         it('should return status code 400 and info message about the invalid levels array', () => {
+    //             const body = {
+    //                 heart_rate: incorrectActivity14.heart_rate ? incorrectActivity14.heart_rate : undefined
+    //             }
+    //
+    //             return request
+    //                 .patch(`/v1/children/${defaultActivity.child_id}/physicalactivities/${defaultActivity.id}`)
+    //                 .send(body)
+    //                 .set('Content-Type', 'application/json')
+    //                 .expect(400)
+    //                 .then(err => {
+    //                     expect(err.body.code).to.eql(400)
+    //                     expect(err.body.message).to.eql('Duration field is invalid...')
+    //                     expect(err.body.description).to.eql('HeartRateZone validation failed: ' +
+    //                         'The value provided has a negative value!')
+    //                 })
+    //         })
+    //     })
+    // })
     /**
      * DELETE route for PhysicalActivity
      */
@@ -2754,22 +2754,22 @@ async function createActivity(item): Promise<any> {
     return await Promise.resolve(ActivityRepoModel.create(resultModelEntity))
 }
 
-async function createActivityToBeUpdated(activity: PhysicalActivity): Promise<any> {
-    // physical activity to be updated
-    const result = createActivity({
-        name: activity.name,
-        start_time: activity.start_time,
-        end_time: activity.end_time,
-        duration: activity.duration,
-        calories: activity.calories,
-        steps: activity.steps ? activity.steps : undefined,
-        levels: activity.levels ? activity.levels : undefined,
-        heart_rate: activity.heart_rate ? activity.heart_rate : undefined,
-        child_id: activity.child_id
-    })
-
-    return await Promise.resolve(result)
-}
+// async function createActivityToBeUpdated(activity: PhysicalActivity): Promise<any> {
+//     // physical activity to be updated
+//     const result = createActivity({
+//         name: activity.name,
+//         start_time: activity.start_time,
+//         end_time: activity.end_time,
+//         duration: activity.duration,
+//         calories: activity.calories,
+//         steps: activity.steps ? activity.steps : undefined,
+//         levels: activity.levels ? activity.levels : undefined,
+//         heart_rate: activity.heart_rate ? activity.heart_rate : undefined,
+//         child_id: activity.child_id
+//     })
+//
+//     return await Promise.resolve(result)
+// }
 
 async function deleteAllActivities() {
     return ActivityRepoModel.deleteMany({})
