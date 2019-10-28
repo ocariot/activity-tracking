@@ -141,8 +141,8 @@ export class BodyFatController {
     private getMessageBodyFatNotFound(): object {
         return new ApiException(
             HttpStatus.NOT_FOUND,
-            'BodyFat not found!',
-            'BodyFat not found or already removed. A new operation for the same resource is not required!'
+            'Body Fat not found!',
+            'Body Fat not found or already removed. A new operation for the same resource is not required.'
         ).toJson()
     }
 }

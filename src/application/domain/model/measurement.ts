@@ -100,11 +100,6 @@ export class Measurement extends Entity implements IJSONSerializable, IJSONDeser
  * Name of traceable measurements.
  */
 export enum MeasurementType {
-    TEMPERATURE = 'temperature',
-    HUMIDITY = 'humidity',
-    PM1 = 'pm1',
-    PM2_5 = 'pm2.5',
-    PM10 = 'pm10',
     BODY_FAT = 'body_fat',
     WEIGHT = 'weight'
 }

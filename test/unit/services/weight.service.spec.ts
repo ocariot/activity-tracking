@@ -48,24 +48,16 @@ describe('Services: WeightService', () => {
     const incorrectWeight2: Weight = new WeightMock()    // child_id is invalid
     incorrectWeight2.child_id = '5a62be07de34500146d9c5442'
 
-    const incorrectWeight3: Weight = new WeightMock()    // type is invalid
-    incorrectWeight3.type = 'invalidType'
-
-    const incorrectWeight4: Weight = new WeightMock()    // body_fat of the Weight without all required fields
+    const incorrectWeight3: Weight = new WeightMock()    // body_fat of the Weight without all required fields
     const incorrectBodyFat: BodyFat = new BodyFat()
     incorrectBodyFat.type = ''
     incorrectBodyFat.unit = undefined
-    incorrectWeight4.body_fat = incorrectBodyFat
+    incorrectWeight3.body_fat = incorrectBodyFat
 
-    const incorrectWeight5: Weight = new WeightMock()    // body_fat of the Weight with an invalid child_id
+    const incorrectWeight4: Weight = new WeightMock()    // body_fat of the Weight with an invalid child_id
     const incorrectBodyFat2: BodyFat = new BodyFatMock()
     incorrectBodyFat2.child_id = '5a62be07de34500146d9c5442'
-    incorrectWeight5.body_fat = incorrectBodyFat2
-
-    const incorrectWeight6: Weight = new WeightMock()    // body_fat of the Weight with an invalid type
-    const incorrectBodyFat3: BodyFat = new BodyFatMock()
-    incorrectBodyFat3.type = 'invalidType'
-    incorrectWeight6.body_fat = incorrectBodyFat3
+    incorrectWeight4.body_fat = incorrectBodyFat2
 
     // Array with correct and incorrect Weight objects
     const mixedWeightArr: Array<Weight> = new Array<WeightMock>()
@@ -78,8 +70,6 @@ describe('Services: WeightService', () => {
     incorrectWeightArr.push(incorrectWeight2)
     incorrectWeightArr.push(incorrectWeight3)
     incorrectWeightArr.push(incorrectWeight4)
-    incorrectWeightArr.push(incorrectWeight5)
-    incorrectWeightArr.push(incorrectWeight6)
 
     const weightRepo: IWeightRepository = new WeightRepositoryMock()
     const bodyFatRepo: IBodyFatRepository = new BodyFatRepositoryMock()
@@ -233,21 +223,9 @@ describe('Services: WeightService', () => {
             })
         })
 
-        context('when the Weight is incorrect (type is invalid)', () => {
-            it('should throw a ValidationException', () => {
-                return weightService.add(incorrectWeight3)
-                    .catch(err => {
-                        assert.propertyVal(err, 'message',
-                            'The type of measurement provided "invalidtype" is not supported...')
-                        assert.propertyVal(err, 'description',
-                            'The allowed types are: temperature, humidity, pm1, pm2.5, pm10, body_fat, weight.')
-                    })
-            })
-        })
-
         context('when the Weight is incorrect (body_fat of the Weight without all required fields)', () => {
             it('should throw a ValidationException', () => {
-                return weightService.add(incorrectWeight4)
+                return weightService.add(incorrectWeight3)
                     .catch(err => {
                         assert.propertyVal(err, 'message', 'Required fields were not provided...')
                         assert.propertyVal(err, 'description', 'Measurement validation failed: type, timestamp, value, unit, ' +
@@ -258,22 +236,10 @@ describe('Services: WeightService', () => {
 
         context('when the Weight is incorrect (body_fat of the Weight with an invalid child_id)', () => {
             it('should throw a ValidationException', () => {
-                return weightService.add(incorrectWeight5)
+                return weightService.add(incorrectWeight4)
                     .catch(err => {
                         assert.propertyVal(err, 'message', Strings.CHILD.PARAM_ID_NOT_VALID_FORMAT)
                         assert.propertyVal(err, 'description', Strings.ERROR_MESSAGE.UUID_NOT_VALID_FORMAT_DESC)
-                    })
-            })
-        })
-
-        context('when the Weight is incorrect (body_fat of the Weight with an invalid type)', () => {
-            it('should throw a ValidationException', () => {
-                return weightService.add(incorrectWeight6)
-                    .catch(err => {
-                        assert.propertyVal(err, 'message',
-                            'The type of measurement provided "invalidtype" is not supported...')
-                        assert.propertyVal(err, 'description',
-                            'The allowed types are: temperature, humidity, pm1, pm2.5, pm10, body_fat, weight.')
                     })
             })
         })
@@ -399,21 +365,13 @@ describe('Services: WeightService', () => {
                         assert.propertyVal(result.error[1], 'description',
                             Strings.ERROR_MESSAGE.UUID_NOT_VALID_FORMAT_DESC)
                         assert.propertyVal(result.error[2], 'message',
-                            'The type of measurement provided "invalidtype" is not supported...')
-                        assert.propertyVal(result.error[2], 'description',
-                            'The allowed types are: temperature, humidity, pm1, pm2.5, pm10, body_fat, weight.')
-                        assert.propertyVal(result.error[3], 'message',
                             'Required fields were not provided...')
-                        assert.propertyVal(result.error[3], 'description',
+                        assert.propertyVal(result.error[2], 'description',
                             'Measurement validation failed: type, timestamp, value, unit, child_id is required!')
-                        assert.propertyVal(result.error[4], 'message',
+                        assert.propertyVal(result.error[3], 'message',
                             Strings.CHILD.PARAM_ID_NOT_VALID_FORMAT)
-                        assert.propertyVal(result.error[4], 'description',
+                        assert.propertyVal(result.error[3], 'description',
                             Strings.ERROR_MESSAGE.UUID_NOT_VALID_FORMAT_DESC)
-                        assert.propertyVal(result.error[5], 'message',
-                            'The type of measurement provided "invalidtype" is not supported...')
-                        assert.propertyVal(result.error[5], 'description',
-                            'The allowed types are: temperature, humidity, pm1, pm2.5, pm10, body_fat, weight.')
 
                         for (let i = 0; i < result.error.length; i++) {
                             assert.propertyVal(result.error[i], 'code', HttpStatus.BAD_REQUEST)

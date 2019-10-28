@@ -5,7 +5,6 @@ import { Measurement } from '../../../src/application/domain/model/measurement'
 import { CreateMeasurementValidator } from '../../../src/application/domain/validator/create.measurement.validator'
 
 const measurement: Measurement = new MeasurementMock()
-const type_aux: string = measurement.type!
 
 describe('Validators: CreateMeasurementValidator', () => {
     describe('validate(measurement: Measurement)', () => {
@@ -52,21 +51,6 @@ describe('Validators: CreateMeasurementValidator', () => {
                     assert.equal(err.message, Strings.CHILD.PARAM_ID_NOT_VALID_FORMAT)
                     assert.equal(err.description, Strings.ERROR_MESSAGE.UUID_NOT_VALID_FORMAT_DESC)
                 }
-            })
-        })
-
-        context('when the measurement has an invalid type', () => {
-            it('should throw a ValidationException', () => {
-                measurement.type = 'invalid_type'
-                try {
-                    CreateMeasurementValidator.validate(measurement)
-                } catch (err) {
-                    assert.equal(err.message,
-                        'The type of measurement provided "invalid_type" is not supported...')
-                    assert.equal(err.description,
-                        'The allowed types are: temperature, humidity, pm1, pm2.5, pm10, body_fat, weight.')
-                }
-                measurement.type = type_aux
             })
         })
     })

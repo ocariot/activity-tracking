@@ -706,7 +706,7 @@ describe('Routes: children.weights', () => {
                         expect(err.body.code).to.eql(404)
                         expect(err.body.message).to.eql('Weight not found!')
                         expect(err.body.description).to.eql('Weight not found or already removed. A new operation for ' +
-                            'the same resource is not required!')
+                            'the same resource is not required.')
                     })
             })
         })

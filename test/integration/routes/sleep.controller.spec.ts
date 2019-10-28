@@ -1199,7 +1199,7 @@ describe('Routes: children.sleep', () => {
                         expect(err.body.code).to.eql(404)
                         expect(err.body.message).to.eql('Sleep not found!')
                         expect(err.body.description).to.eql('Sleep not found or already removed. A new operation for ' +
-                            'the same resource is not required!')
+                            'the same resource is not required.')
                     })
             })
         })

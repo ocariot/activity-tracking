@@ -1,19 +1,14 @@
 import { ValidationException } from '../exception/validation.exception'
 import { Strings } from '../../../utils/strings'
 import { ObjectIdValidator } from './object.id.validator'
-import { Measurement, MeasurementType } from '../model/measurement'
+import { Measurement } from '../model/measurement'
 
 export class CreateMeasurementValidator {
     public static validate(measurement: Measurement): void | ValidationException {
         const fields: Array<string> = []
-        const measurementTypes: Array<string> = Object.values(MeasurementType)
 
         // validate null.
         if (!measurement.type) fields.push('type')
-        else if (!measurementTypes.includes(measurement.type)) {
-            throw new ValidationException(`The type of measurement provided "${measurement.type}" is not supported...`,
-                `The allowed types are: ${measurementTypes.join(', ')}.`)
-        }
         if (!measurement.timestamp) fields.push('timestamp')
         if (measurement.value === undefined) fields.push('value')
         else if (isNaN(measurement.value)) {

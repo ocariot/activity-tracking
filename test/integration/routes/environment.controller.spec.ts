@@ -9,7 +9,7 @@ import { expect } from 'chai'
 import { EnvironmentRepoModel } from '../../../src/infrastructure/database/schema/environment.schema'
 import { Strings } from '../../../src/utils/strings'
 import { EnvironmentEntityMapper } from '../../../src/infrastructure/entity/mapper/environment.entity.mapper'
-import { Measurement, MeasurementType } from '../../../src/application/domain/model/measurement'
+import { Measurement } from '../../../src/application/domain/model/measurement'
 import { IDatabase } from '../../../src/infrastructure/port/database.interface'
 import { IEventBus } from '../../../src/infrastructure/port/eventbus.interface'
 import { Default } from '../../../src/utils/default'
@@ -389,12 +389,12 @@ describe('Routes: environments', () => {
                     location: defaultEnvironment.location,
                     measurements: [
                         {
-                            type: MeasurementType.HUMIDITY,
+                            type: 'humidity',
                             value: '32a',
                             unit: '%'
                         },
                         {
-                            type: MeasurementType.TEMPERATURE,
+                            type: 'temperature',
                             value: 38,
                             unit: '°C'
                         }
@@ -714,12 +714,12 @@ describe('Routes: environments', () => {
                         location: defaultEnvironment.location,
                         measurements: [
                             {
-                                type: MeasurementType.TEMPERATURE,
+                                type: 'temperature',
                                 value: 25,
                                 unit: '°C'
                             },
                             {
-                                type: MeasurementType.HUMIDITY,
+                                type: 'humidity',
                                 value: 33,
                                 unit: '%'
                             }
@@ -744,10 +744,10 @@ describe('Routes: environments', () => {
                         expect(res.body[0].location.room).to.eql(defaultEnvironment.location!.room)
                         expect(res.body[0].location.latitude).to.eql(defaultEnvironment.location!.latitude)
                         expect(res.body[0].location.longitude).to.eql(defaultEnvironment.location!.longitude)
-                        expect(res.body[0].measurements[0].type).to.eql(MeasurementType.TEMPERATURE)
+                        expect(res.body[0].measurements[0].type).to.eql('temperature')
                         expect(res.body[0].measurements[0].value).to.eql(25)
                         expect(res.body[0].measurements[0].unit).to.eql('°C')
-                        expect(res.body[0].measurements[1].type).to.eql(MeasurementType.HUMIDITY)
+                        expect(res.body[0].measurements[1].type).to.eql('humidity')
                         expect(res.body[0].measurements[1].value).to.eql(33)
                         expect(res.body[0].measurements[1].unit).to.eql('%')
                         expect(res.body[0].climatized).to.eql(defaultEnvironment.climatized)
@@ -795,12 +795,12 @@ describe('Routes: environments', () => {
                         },
                         measurements: [
                             {
-                                type: MeasurementType.HUMIDITY,
+                                type: 'humidity',
                                 value: 32,
                                 unit: '%'
                             },
                             {
-                                type: MeasurementType.TEMPERATURE,
+                                type: 'temperature',
                                 value: 38,
                                 unit: '°C'
                             }
@@ -819,12 +819,12 @@ describe('Routes: environments', () => {
                         },
                         measurements: [
                             {
-                                type: MeasurementType.HUMIDITY,
+                                type: 'humidity',
                                 value: 32,
                                 unit: '%'
                             },
                             {
-                                type: MeasurementType.TEMPERATURE,
+                                type: 'temperature',
                                 value: 38,
                                 unit: '°C'
                             }
@@ -880,10 +880,10 @@ describe('Routes: environments', () => {
                         expect(res.body[0].location.room).to.eql('Room 40')
                         expect(res.body[0].location.latitude).to.eql(34.54323217)
                         expect(res.body[0].location.longitude).to.eql(7.54534798)
-                        expect(res.body[0].measurements[0].type).to.eql(MeasurementType.HUMIDITY)
+                        expect(res.body[0].measurements[0].type).to.eql('humidity')
                         expect(res.body[0].measurements[0].value).to.eql(32)
                         expect(res.body[0].measurements[0].unit).to.eql('%')
-                        expect(res.body[0].measurements[1].type).to.eql(MeasurementType.TEMPERATURE)
+                        expect(res.body[0].measurements[1].type).to.eql('temperature')
                         expect(res.body[0].measurements[1].value).to.eql(38)
                         expect(res.body[0].measurements[1].unit).to.eql('°C')
                         expect(res.body[0].climatized).to.eql(false)
@@ -923,12 +923,12 @@ describe('Routes: environments', () => {
                         location: defaultEnvironment.location,
                         measurements: [
                             {
-                                type: MeasurementType.HUMIDITY,
+                                type: 'humidity',
                                 value: 34,
                                 unit: '%'
                             },
                             {
-                                type: MeasurementType.TEMPERATURE,
+                                type: 'temperature',
                                 value: 40,
                                 unit: '°C'
                             }
@@ -993,12 +993,12 @@ describe('Routes: environments', () => {
                         location: defaultEnvironment.location,
                         measurements: [
                             {
-                                type: MeasurementType.HUMIDITY,
+                                type: 'humidity',
                                 value: 34,
                                 unit: '%'
                             },
                             {
-                                type: MeasurementType.TEMPERATURE,
+                                type: 'temperature',
                                 value: 40,
                                 unit: '°C'
                             }

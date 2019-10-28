@@ -167,7 +167,7 @@ export class SleepController {
         return new ApiException(
             HttpStatus.NOT_FOUND,
             'Sleep not found!',
-            'Sleep not found or already removed. A new operation for the same resource is not required!'
+            'Sleep not found or already removed. A new operation for the same resource is not required.'
         ).toJson()
     }
 }

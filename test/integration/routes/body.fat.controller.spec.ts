@@ -518,9 +518,9 @@ describe('Routes: children.bodyfats', () => {
                     .expect(404)
                     .then(err => {
                         expect(err.body.code).to.eql(404)
-                        expect(err.body.message).to.eql('BodyFat not found!')
-                        expect(err.body.description).to.eql('BodyFat not found or already removed. A new operation for ' +
-                            'the same resource is not required!')
+                        expect(err.body.message).to.eql('Body Fat not found!')
+                        expect(err.body.description).to.eql('Body Fat not found or already removed. A new operation for ' +
+                            'the same resource is not required.')
                     })
             })
         })

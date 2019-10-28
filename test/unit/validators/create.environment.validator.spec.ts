@@ -4,7 +4,7 @@ import { Environment } from '../../../src/application/domain/model/environment'
 import { EnvironmentMock } from '../../mocks/environment.mock'
 import { Strings } from '../../../src/utils/strings'
 import { Location } from '../../../src/application/domain/model/location'
-import { Measurement, MeasurementType } from '../../../src/application/domain/model/measurement'
+import { Measurement } from '../../../src/application/domain/model/measurement'
 
 const environment: Environment = new EnvironmentMock()
 const institution_id_aux: string = environment.institution_id!
@@ -113,7 +113,7 @@ describe('Validators: CreateEnvironmentValidator', () => {
         context('when the environment has an invalid measurement (missing one of the fields, the unit)', () => {
             it('should throw a ValidationException', () => {
                 const measurement: Measurement = new Measurement()
-                measurement.type = MeasurementType.TEMPERATURE
+                measurement.type = 'temperature'
                 measurement.value = 40
                 environment.measurements![1] = measurement
                 try {

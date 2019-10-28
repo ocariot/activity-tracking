@@ -1874,7 +1874,7 @@ describe('Routes: children.physicalactivities', () => {
                         expect(err.body.code).to.eql(404)
                         expect(err.body.message).to.eql('Physical Activity not found!')
                         expect(err.body.description).to.eql('Physical Activity not found or already removed. A new ' +
-                            'operation for the same resource is not required!')
+                            'operation for the same resource is not required.')
                     })
             })
         })

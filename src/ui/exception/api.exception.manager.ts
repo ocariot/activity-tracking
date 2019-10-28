@@ -3,7 +3,7 @@ import { Exception } from '../../application/domain/exception/exception'
 import { ValidationException } from '../../application/domain/exception/validation.exception'
 import { ApiException } from './api.exception'
 import { ConflictException } from '../../application/domain/exception/conflict.exception'
-import { RepositoryException } from '../../application/domain/exception/repository.exception'
+import { Strings } from '../../utils/strings'
 
 /**
  * Treats the exception types of the application and converts
@@ -23,10 +23,8 @@ export abstract class ApiExceptionManager {
             return new ApiException(HttpStatus.BAD_REQUEST, err.message, err.description)
         } else if (err instanceof ConflictException) {
             return new ApiException(HttpStatus.CONFLICT, err.message, err.description)
-        } else if (err instanceof RepositoryException) {
-            return new ApiException(HttpStatus.INTERNAL_SERVER_ERROR, err.message, err.description)
         }
 
-        return new ApiException(HttpStatus.INTERNAL_SERVER_ERROR, err.message, err.description)
+        return new ApiException(HttpStatus.INTERNAL_SERVER_ERROR, Strings.ERROR_MESSAGE.INTERNAL_SERVER_ERROR, err.message)
     }
 }

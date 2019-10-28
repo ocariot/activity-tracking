@@ -17,6 +17,9 @@ describe('Validators: CreateBodyFatValidator', () => {
         })
 
         context('when the bodyFat does not have all the required parameters (in this case missing type)', () => {
+            after(() => {
+                bodyFat.type = type_aux
+            })
             it('should throw a ValidationException', () => {
                 bodyFat.type = ''
                 try {
@@ -30,6 +33,7 @@ describe('Validators: CreateBodyFatValidator', () => {
 
         context('when the bodyFat does not have any of the required parameters', () => {
             it('should throw a ValidationException', () => {
+                bodyFat.type = undefined
                 bodyFat.timestamp = undefined
                 bodyFat.value = undefined
                 bodyFat.unit = undefined
@@ -52,21 +56,6 @@ describe('Validators: CreateBodyFatValidator', () => {
                     assert.equal(err.message, Strings.CHILD.PARAM_ID_NOT_VALID_FORMAT)
                     assert.equal(err.description, Strings.ERROR_MESSAGE.UUID_NOT_VALID_FORMAT_DESC)
                 }
-            })
-        })
-
-        context('when the bodyFat has an invalid type', () => {
-            it('should throw a ValidationException', () => {
-                bodyFat.type = 'invalid_type'
-                try {
-                    CreateBodyFatValidator.validate(bodyFat)
-                } catch (err) {
-                    assert.equal(err.message,
-                        'The type of measurement provided "invalid_type" is not supported...')
-                    assert.equal(err.description,
-                        'The allowed types are: temperature, humidity, pm1, pm2.5, pm10, body_fat, weight.')
-                }
-                bodyFat.type = type_aux
             })
         })
     })

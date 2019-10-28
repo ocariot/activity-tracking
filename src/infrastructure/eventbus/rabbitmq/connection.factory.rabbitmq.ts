@@ -20,7 +20,7 @@ export class ConnectionFactoryRabbitMQ implements IConnectionFactory {
      */
     public async createConnection(uri: string, options?: IEventBusOptions): Promise<IOcariotRabbitMQClient> {
         return Promise.resolve(
-            new OcariotRabbitMQClient('activity.tracking.app', uri, { ...this.options, ...options })
+            new OcariotRabbitMQClient('iot.tracking.app', uri, { ...this.options, ...options })
         )
     }
 }

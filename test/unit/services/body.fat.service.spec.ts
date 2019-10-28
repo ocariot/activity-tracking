@@ -40,9 +40,6 @@ describe('Services: BodyFatService', () => {
     const incorrectBodyFat2: BodyFat = new BodyFatMock()    // child_id is invalid
     incorrectBodyFat2.child_id = '5a62be07de34500146d9c5442'
 
-    const incorrectBodyFat3: BodyFat = new BodyFatMock()    // type is invalid
-    incorrectBodyFat3.type = 'invalidType'
-
     // Array with correct and incorrect BodyFat objects
     const mixedBodyFatArr: Array<BodyFat> = new Array<BodyFatMock>()
     mixedBodyFatArr.push(new BodyFatMock())
@@ -52,7 +49,6 @@ describe('Services: BodyFatService', () => {
     const incorrectBodyFatArr: Array<BodyFat> = new Array<BodyFatMock>()
     incorrectBodyFatArr.push(incorrectBodyFat)
     incorrectBodyFatArr.push(incorrectBodyFat2)
-    incorrectBodyFatArr.push(incorrectBodyFat3)
 
     const bodyFatRepo: IBodyFatRepository = new BodyFatRepositoryMock()
     const weightRepo: IWeightRepository = new WeightRepositoryMock()
@@ -231,10 +227,6 @@ describe('Services: BodyFatService', () => {
                             Strings.CHILD.PARAM_ID_NOT_VALID_FORMAT)
                         assert.propertyVal(result.error[1], 'description',
                             Strings.ERROR_MESSAGE.UUID_NOT_VALID_FORMAT_DESC)
-                        assert.propertyVal(result.error[2], 'message',
-                            'The type of measurement provided "invalidtype" is not supported...')
-                        assert.propertyVal(result.error[2], 'description',
-                            'The allowed types are: temperature, humidity, pm1, pm2.5, pm10, body_fat, weight.')
 
                         for (let i = 0; i < result.error.length; i++) {
                             assert.propertyVal(result.error[i], 'code', HttpStatus.BAD_REQUEST)

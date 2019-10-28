@@ -143,7 +143,7 @@ export class WeightController {
         return new ApiException(
             HttpStatus.NOT_FOUND,
             'Weight not found!',
-            'Weight not found or already removed. A new operation for the same resource is not required!'
+            'Weight not found or already removed. A new operation for the same resource is not required.'
         ).toJson()
     }
 }

@@ -125,7 +125,7 @@ export abstract class BaseRepository<T extends Entity, TModel> implements IRepos
                 return new ValidationException('Invalid query parameters!')
             }
         }
-        return new RepositoryException('An internal error has occurred in the database!',
-            'Please try again later...')
+        return new RepositoryException(err && err.message ? err.message : '',
+            err && err.description ? err.description : '')
     }
 }

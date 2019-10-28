@@ -167,7 +167,7 @@ export class ActivityController {
         return new ApiException(
             HttpStatus.NOT_FOUND,
             'Physical Activity not found!',
-            'Physical Activity not found or already removed. A new operation for the same resource is not required!'
+            'Physical Activity not found or already removed. A new operation for the same resource is not required.'
         ).toJson()
     }
 }
