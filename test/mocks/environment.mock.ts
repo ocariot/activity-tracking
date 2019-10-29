@@ -18,8 +18,8 @@ export class EnvironmentMock extends Environment {
         super.location = new Location().fromJSON({
             local: 'Indoor',
             room: 'room 01',
-            latitude: Math.random() * 90,
-            longitude:  Math.random() * 180
+            latitude: `${Math.random() * 90}`,
+            longitude: `${Math.random() * 180}`
         })
     }
 

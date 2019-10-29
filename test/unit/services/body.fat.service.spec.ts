@@ -34,7 +34,7 @@ describe('Services: BodyFatService', () => {
 
     // Incorrect BodyFat objects
     let incorrectBodyFat: BodyFat = new BodyFat()           // Without all required fields
-    incorrectBodyFat.type = ''
+    incorrectBodyFat.type = undefined
     incorrectBodyFat.unit = undefined
 
     const incorrectBodyFat2: BodyFat = new BodyFatMock()    // child_id is invalid
@@ -100,9 +100,9 @@ describe('Services: BodyFatService', () => {
             it('should throw a ValidationException', () => {
                 return bodyFatService.add(incorrectBodyFat)
                     .catch(err => {
-                        assert.propertyVal(err, 'message', 'Required fields were not provided...')
-                        assert.propertyVal(err, 'description', 'Measurement validation failed: type, timestamp, value, unit, ' +
-                            'child_id is required!')
+                        assert.propertyVal(err, 'message', Strings.ERROR_MESSAGE.REQUIRED_FIELDS)
+                        assert.propertyVal(err, 'description', 'type, timestamp, value, unit, child_id'
+                            .concat(Strings.ERROR_MESSAGE.REQUIRED_FIELDS_DESC))
                     })
             })
         })
@@ -206,9 +206,9 @@ describe('Services: BodyFatService', () => {
                         assert.propertyVal(result.success[0].item, 'child_id', mixedBodyFatArr[0].child_id)
 
                         assert.propertyVal(result.error[0], 'code', HttpStatus.BAD_REQUEST)
-                        assert.propertyVal(result.error[0], 'message', 'Required fields were not provided...')
-                        assert.propertyVal(result.error[0], 'description', 'Measurement validation failed: type, ' +
-                            'timestamp, value, unit, child_id is required!')
+                        assert.propertyVal(result.error[0], 'message', Strings.ERROR_MESSAGE.REQUIRED_FIELDS)
+                        assert.propertyVal(result.error[0], 'description', 'type, timestamp, value, unit, ' +
+                            'child_id'.concat(Strings.ERROR_MESSAGE.REQUIRED_FIELDS_DESC))
                     })
             })
         })
@@ -220,9 +220,9 @@ describe('Services: BodyFatService', () => {
                         result = result as MultiStatus<BodyFat>
 
                         assert.propertyVal(result.error[0], 'message',
-                            'Required fields were not provided...')
+                            Strings.ERROR_MESSAGE.REQUIRED_FIELDS)
                         assert.propertyVal(result.error[0], 'description',
-                            'Measurement validation failed: type, timestamp, value, unit, child_id is required!')
+                            'type, timestamp, value, unit, child_id'.concat(Strings.ERROR_MESSAGE.REQUIRED_FIELDS_DESC))
                         assert.propertyVal(result.error[1], 'message',
                             Strings.CHILD.PARAM_ID_NOT_VALID_FORMAT)
                         assert.propertyVal(result.error[1], 'description',

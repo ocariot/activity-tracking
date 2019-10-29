@@ -3,6 +3,7 @@ import { PhasesPatternType, SleepPatternDataSet } from '../../../src/application
 import { SleepPattern } from '../../../src/application/domain/model/sleep.pattern'
 import { SleepPatternValidator } from '../../../src/application/domain/validator/sleep.pattern.validator'
 import { SleepType } from '../../../src/application/domain/model/sleep'
+import { Strings } from '../../../src/utils/strings'
 
 let sleepPattern: SleepPattern = new SleepPattern()
 let dataSet: Array<SleepPatternDataSet> = []
@@ -43,8 +44,8 @@ describe('Validators: SleepPatternValidator', () => {
                 try {
                     SleepPatternValidator.validate(sleepPattern, SleepType.CLASSIC)
                 } catch (err) {
-                    assert.equal(err.message, 'Pattern are not in a format that is supported...')
-                    assert.equal(err.description, 'Validation of the standard of sleep failed: data_set is required!')
+                    assert.equal(err.message, Strings.ERROR_MESSAGE.REQUIRED_FIELDS)
+                    assert.equal(err.description, 'pattern.data_set is required!')
                 }
                 sleepPattern.data_set = dataSet
             })
@@ -57,8 +58,8 @@ describe('Validators: SleepPatternValidator', () => {
                 try {
                     SleepPatternValidator.validate(sleepPattern, SleepType.CLASSIC)
                 } catch (err) {
-                    assert.equal(err.message, 'Dataset are not in a format that is supported!')
-                    assert.equal(err.description, 'The data_set collection must not be empty!')
+                    assert.equal(err.message, Strings.ERROR_MESSAGE.INVALID_FIELDS)
+                    assert.equal(err.description, 'pattern.data_set must not be empty!')
                 }
                 dataSet.push(dataSetItem)
                 dataSet.push(dataSetItem2)
@@ -78,8 +79,9 @@ describe('Validators: SleepPatternValidator', () => {
                 try {
                     SleepPatternValidator.validate(sleepPattern, SleepType.CLASSIC)
                 } catch (err) {
-                    assert.equal(err.message, 'The sleep pattern name provided "restlesss" is not supported...')
-                    assert.equal(err.description, 'The names of the allowed patterns are: asleep, restless, awake.')
+                    assert.equal(err.message, Strings.ERROR_MESSAGE.INVALID_FIELDS)
+                    assert.equal(err.description, 'The names of the allowed data_set patterns are: ' +
+                        'asleep, restless, awake.')
                 }
                 sleepPattern.data_set[0] = dataSetItem
             })
@@ -96,8 +98,9 @@ describe('Validators: SleepPatternValidator', () => {
                 try {
                     SleepPatternValidator.validate(sleepPattern, SleepType.STAGES)
                 } catch (err) {
-                    assert.equal(err.message, 'The sleep pattern name provided "deeps" is not supported...')
-                    assert.equal(err.description, 'The names of the allowed patterns are: deep, light, rem, awake.')
+                    assert.equal(err.message, Strings.ERROR_MESSAGE.INVALID_FIELDS)
+                    assert.equal(err.description, 'The names of the allowed data_set patterns are: ' +
+                        'deep, light, rem, awake.')
                 }
                 sleepPattern.data_set[0] = dataSetItem
             })
@@ -109,8 +112,8 @@ describe('Validators: SleepPatternValidator', () => {
                 try {
                     SleepPatternValidator.validate(sleepPattern, SleepType.CLASSIC)
                 } catch (err) {
-                    assert.equal(err.message, 'Dataset are not in a format that is supported!')
-                    assert.equal(err.description, 'Validation of the sleep pattern dataset failed: data_set start_time is required!')
+                    assert.equal(err.message, Strings.ERROR_MESSAGE.REQUIRED_FIELDS)
+                    assert.equal(err.description, 'pattern.data_set.start_time'.concat(Strings.ERROR_MESSAGE.REQUIRED_FIELDS_DESC))
                 }
                 dataSetItem.start_time = new Date('2018-08-18T01:30:30Z')
             })
@@ -127,9 +130,9 @@ describe('Validators: SleepPatternValidator', () => {
                 try {
                     SleepPatternValidator.validate(sleepPattern, SleepType.CLASSIC)
                 } catch (err) {
-                    assert.equal(err.message, 'Dataset are not in a format that is supported!')
-                    assert.equal(err.description, 'Validation of the sleep pattern dataset failed: data_set start_time, ' +
-                        'data_set name, data_set duration is required!')
+                    assert.equal(err.message, Strings.ERROR_MESSAGE.REQUIRED_FIELDS)
+                    assert.equal(err.description, 'pattern.data_set.start_time, pattern.data_set.name, ' +
+                        'pattern.data_set.duration'.concat(Strings.ERROR_MESSAGE.REQUIRED_FIELDS_DESC))
                 }
                 sleepPattern.data_set[0] = dataSetItem
             })
@@ -141,8 +144,8 @@ describe('Validators: SleepPatternValidator', () => {
                 try {
                     SleepPatternValidator.validate(sleepPattern, SleepType.CLASSIC)
                 } catch (err) {
-                    assert.equal(err.message, 'Some (or several) duration field of sleep pattern is invalid...')
-                    assert.equal(err.description, 'Sleep Pattern dataset validation failed: The value provided has a negative value!')
+                    assert.equal(err.message, Strings.ERROR_MESSAGE.INVALID_FIELDS)
+                    assert.equal(err.description, 'pattern.data_set.duration'.concat(Strings.ERROR_MESSAGE.NEGATIVE_NUMBER))
                 }
                 dataSetItem.duration = Math.floor(Math.random() * 5 + 1) * 60000 // 1-5min milliseconds
             })

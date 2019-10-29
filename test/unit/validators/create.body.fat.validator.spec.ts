@@ -21,12 +21,12 @@ describe('Validators: CreateBodyFatValidator', () => {
                 bodyFat.type = type_aux
             })
             it('should throw a ValidationException', () => {
-                bodyFat.type = ''
+                bodyFat.type = undefined
                 try {
                     CreateBodyFatValidator.validate(bodyFat)
                 } catch (err) {
-                    assert.equal(err.message, 'Required fields were not provided...')
-                    assert.equal(err.description, 'Measurement validation failed: type is required!')
+                    assert.equal(err.message, Strings.ERROR_MESSAGE.REQUIRED_FIELDS)
+                    assert.equal(err.description, 'type'.concat(Strings.ERROR_MESSAGE.REQUIRED_FIELDS_DESC))
                 }
             })
         })
@@ -41,8 +41,9 @@ describe('Validators: CreateBodyFatValidator', () => {
                 try {
                     CreateBodyFatValidator.validate(bodyFat)
                 } catch (err) {
-                    assert.equal(err.message, 'Required fields were not provided...')
-                    assert.equal(err.description, 'Measurement validation failed: type, timestamp, value, unit, child_id is required!')
+                    assert.equal(err.message, Strings.ERROR_MESSAGE.REQUIRED_FIELDS)
+                    assert.equal(err.description, 'type, timestamp, value, unit, child_id'
+                        .concat(Strings.ERROR_MESSAGE.REQUIRED_FIELDS_DESC))
                 }
             })
         })

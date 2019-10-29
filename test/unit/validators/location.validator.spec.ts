@@ -1,6 +1,7 @@
 import { assert } from 'chai'
 import { Location } from '../../../src/application/domain/model/location'
 import { LocationValidator } from '../../../src/application/domain/validator/location.validator'
+import { Strings } from '../../../src/utils/strings'
 
 const location: Location = new Location()
 location.local = 'indoor'
@@ -21,8 +22,8 @@ describe('Validators: LocationValidator', () => {
                 try {
                     LocationValidator.validate(location)
                 } catch (err) {
-                    assert.equal(err.message, 'Location are not in a format that is supported...')
-                    assert.equal(err.description, 'Validation of location failed: location local is required!')
+                    assert.equal(err.message, Strings.ERROR_MESSAGE.REQUIRED_FIELDS)
+                    assert.equal(err.description, 'location.local'.concat(Strings.ERROR_MESSAGE.REQUIRED_FIELDS_DESC))
                 }
             })
         })
@@ -33,8 +34,9 @@ describe('Validators: LocationValidator', () => {
                 try {
                     LocationValidator.validate(location)
                 } catch (err) {
-                    assert.equal(err.message, 'Location are not in a format that is supported...')
-                    assert.equal(err.description, 'Validation of location failed: location local, location room is required!')
+                    assert.equal(err.message, Strings.ERROR_MESSAGE.REQUIRED_FIELDS)
+                    assert.equal(err.description, 'location.local, location.room'
+                        .concat(Strings.ERROR_MESSAGE.REQUIRED_FIELDS_DESC))
                 }
             })
         })

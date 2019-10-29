@@ -29,8 +29,8 @@ describe('Validators: CreateEnvironmentValidator', () => {
                 try {
                     CreateEnvironmentValidator.validate(environment)
                 } catch (err) {
-                    assert.equal(err.message, 'Required fields were not provided...')
-                    assert.equal(err.description, 'Validation of environment failed: institution_id required!')
+                    assert.equal(err.message, Strings.ERROR_MESSAGE.REQUIRED_FIELDS)
+                    assert.equal(err.description, 'institution_id'.concat(Strings.ERROR_MESSAGE.REQUIRED_FIELDS_DESC))
                 }
             })
         })
@@ -43,9 +43,9 @@ describe('Validators: CreateEnvironmentValidator', () => {
                 try {
                     CreateEnvironmentValidator.validate(environment)
                 } catch (err) {
-                    assert.equal(err.message, 'Required fields were not provided...')
-                    assert.equal(err.description, 'Validation of environment failed: timestamp, ' +
-                        'institution_id, location, measurements required!')
+                    assert.equal(err.message, Strings.ERROR_MESSAGE.REQUIRED_FIELDS)
+                    assert.equal(err.description, 'timestamp, institution_id, location, measurements'
+                        .concat(Strings.ERROR_MESSAGE.REQUIRED_FIELDS_DESC))
                 }
             })
         })
@@ -75,8 +75,9 @@ describe('Validators: CreateEnvironmentValidator', () => {
                 try {
                     CreateEnvironmentValidator.validate(environment)
                 } catch (err) {
-                    assert.equal(err.message, 'Location are not in a format that is supported...')
-                    assert.equal(err.description, 'Validation of location failed: location local, location room is required!')
+                    assert.equal(err.message, Strings.ERROR_MESSAGE.REQUIRED_FIELDS)
+                    assert.equal(err.description, 'location.local, location.room'
+                        .concat(Strings.ERROR_MESSAGE.REQUIRED_FIELDS_DESC))
                 }
                 environment.location.local = local_aux
                 environment.location.room = room_aux
@@ -89,8 +90,8 @@ describe('Validators: CreateEnvironmentValidator', () => {
                 try {
                     CreateEnvironmentValidator.validate(environment)
                 } catch (err) {
-                    assert.equal(err.message, 'Measurement are not in a format that is supported!')
-                    assert.equal(err.description, 'The measurements collection must not be empty!')
+                    assert.equal(err.message, Strings.ERROR_MESSAGE.INVALID_FIELDS)
+                    assert.equal(err.description, 'measurements collection must not be empty!')
                 }
                 environment.measurements = measurements_aux
             })
@@ -119,8 +120,8 @@ describe('Validators: CreateEnvironmentValidator', () => {
                 try {
                     CreateEnvironmentValidator.validate(environment)
                 } catch (err) {
-                    assert.equal(err.message, 'Required fields were not provided...')
-                    assert.equal(err.description, 'Validation of environment failed: measurement unit required!')
+                    assert.equal(err.message, Strings.ERROR_MESSAGE.REQUIRED_FIELDS)
+                    assert.equal(err.description, 'measurements.unit'.concat(Strings.ERROR_MESSAGE.REQUIRED_FIELDS_DESC))
                 }
                 environment.measurements = measurements_aux
             })
@@ -132,9 +133,9 @@ describe('Validators: CreateEnvironmentValidator', () => {
                 try {
                     CreateEnvironmentValidator.validate(environment)
                 } catch (err) {
-                    assert.equal(err.message, 'Required fields were not provided...')
-                    assert.equal(err.description, 'Validation of environment failed: measurement type,' +
-                        ' measurement value, measurement unit required!')
+                    assert.equal(err.message, Strings.ERROR_MESSAGE.REQUIRED_FIELDS)
+                    assert.equal(err.description, 'measurements.type, measurements.value, measurements.unit'
+                        .concat(Strings.ERROR_MESSAGE.REQUIRED_FIELDS_DESC))
                 }
                 environment.measurements = measurements_aux
             })

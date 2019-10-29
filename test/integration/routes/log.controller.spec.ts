@@ -354,12 +354,10 @@ describe('Routes: children.logs', () => {
 
                             expect(res.body.error[0].message).to.eql('Date parameter: 20199-03-08, is not in valid ISO 8601 format.')
                             expect(res.body.error[0].description).to.eql('Date must be in the format: yyyy-MM-dd')
-                            expect(res.body.error[1].message).to.eql('Value field is invalid...')
-                            expect(res.body.error[1].description).to.eql('Child log validation failed: The value ' +
-                                'provided has a negative value!')
-                            expect(res.body.error[2].message).to.eql('Value field is invalid...')
-                            expect(res.body.error[2].description).to.eql('Child log validation failed: ' +
-                                Strings.ERROR_MESSAGE.INVALID_NUMBER)
+                            expect(res.body.error[1].message).to.eql(Strings.ERROR_MESSAGE.INVALID_FIELDS)
+                            expect(res.body.error[1].description).to.eql('value'.concat(Strings.ERROR_MESSAGE.NEGATIVE_NUMBER))
+                            expect(res.body.error[2].message).to.eql(Strings.ERROR_MESSAGE.INVALID_FIELDS)
+                            expect(res.body.error[2].description).to.eql('value'.concat(Strings.ERROR_MESSAGE.INVALID_NUMBER))
 
                             for (let i = 0; i < res.body.error.length; i++) {
                                 expect(res.body.error[i].code).to.eql(HttpStatus.BAD_REQUEST)
@@ -440,7 +438,7 @@ describe('Routes: children.logs', () => {
                             for (let i = 0; i < res.body.error.length; i++) {
                                 expect(res.body.error[i].code).to.eql(HttpStatus.BAD_REQUEST)
                                 expect(res.body.error[i].message)
-                                    .to.eql('The name of type provided "step" is not supported...')
+                                    .to.eql(Strings.ERROR_MESSAGE.INVALID_FIELDS)
                                 expect(res.body.error[i].description)
                                     .to.eql('The names of the allowed types are: ' +
                                     'steps, calories, active_minutes, lightly_active_minutes, sedentary_minutes.')
@@ -487,8 +485,9 @@ describe('Routes: children.logs', () => {
                                 expect(res.body.success[i].item.value).to.eql(correctLogsArr[i].value)
                             }
                             expect(res.body.error[0].code).to.eql(HttpStatus.BAD_REQUEST)
-                            expect(res.body.error[0].message).to.eql('Required fields were not provided...')
-                            expect(res.body.error[0].description).to.eql('Child log validation failed: date, value is required!')
+                            expect(res.body.error[0].message).to.eql(Strings.ERROR_MESSAGE.REQUIRED_FIELDS)
+                            expect(res.body.error[0].description).to.eql('date, value'
+                                .concat(Strings.ERROR_MESSAGE.REQUIRED_FIELDS_DESC))
                         })
                 })
         })
@@ -668,8 +667,8 @@ describe('Routes: children.logs', () => {
                     .then(err => {
                         expect(err.body.code).to.eql(400)
                         expect(err.body.message).to.eql('Date range is invalid...')
-                        expect(err.body.description).to.eql('Log dates range validation failed: ' +
-                            'The period between the received dates is longer than one year')
+                        expect(err.body.description).to.eql('The period between the received dates can not ' +
+                            'exceed one year!')
                     })
             })
         })
@@ -694,8 +693,8 @@ describe('Routes: children.logs', () => {
                     .then(err => {
                         expect(err.body.code).to.eql(400)
                         expect(err.body.message).to.eql('Date range is invalid...')
-                        expect(err.body.description).to.eql('Log dates range validation failed: ' +
-                            'The date_end parameter can not contain an older date than that the date_start parameter!')
+                        expect(err.body.description).to.eql('The date_end parameter can not contain an older date ' +
+                            'than that the date_start parameter!')
                     })
             })
         })
@@ -864,7 +863,7 @@ describe('Routes: children.logs', () => {
                     .expect(400)
                     .then(err => {
                         expect(err.body.code).to.eql(400)
-                        expect(err.body.message).to.eql('The name of type provided "step" is not supported...')
+                        expect(err.body.message).to.eql(Strings.ERROR_MESSAGE.INVALID_FIELDS)
                         expect(err.body.description)
                             .to.eql('The names of the allowed types are: ' +
                             'steps, calories, active_minutes, lightly_active_minutes, sedentary_minutes.')
@@ -942,8 +941,7 @@ describe('Routes: children.logs', () => {
                     .then(err => {
                         expect(err.body.code).to.eql(400)
                         expect(err.body.message).to.eql('Date range is invalid...')
-                        expect(err.body.description).to.eql('Log dates range validation failed: ' +
-                            'The period between the received dates is longer than one year')
+                        expect(err.body.description).to.eql('The period between the received dates can not exceed one year!')
                     })
             })
         })

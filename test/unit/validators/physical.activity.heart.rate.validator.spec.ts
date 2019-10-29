@@ -3,6 +3,7 @@ import { PhysicalActivityHeartRate } from '../../../src/application/domain/model
 import { PhysicalActivityHeartRateMock } from '../../mocks/physical.activity.heart.rate.mock'
 import { PhysicalActivityHeartRateValidator } from '../../../src/application/domain/validator/physical.activity.heart.rate.validator'
 import { HeartRateZone } from '../../../src/application/domain/model/heart.rate.zone'
+import { Strings } from '../../../src/utils/strings'
 
 let activityHeartRate: PhysicalActivityHeartRate = new PhysicalActivityHeartRateMock()
 const out_of_range_zone_aux = activityHeartRate.out_of_range_zone
@@ -25,8 +26,8 @@ describe('Validators: PhysicalActivityHeartRateValidator', () => {
                 try {
                     PhysicalActivityHeartRateValidator.validate(activityHeartRate)
                 } catch (err) {
-                    assert.equal(err.message, 'Required fields were not provided...')
-                    assert.equal(err.description, 'PhysicalActivityHeartRate validation failed: average is required!')
+                    assert.equal(err.message, Strings.ERROR_MESSAGE.REQUIRED_FIELDS)
+                    assert.equal(err.description, 'heart_rate.average'.concat(Strings.ERROR_MESSAGE.REQUIRED_FIELDS_DESC))
                 }
             })
         })
@@ -37,9 +38,10 @@ describe('Validators: PhysicalActivityHeartRateValidator', () => {
                 try {
                     PhysicalActivityHeartRateValidator.validate(activityHeartRate)
                 } catch (err) {
-                    assert.equal(err.message, 'Required fields were not provided...')
-                    assert.equal(err.description, 'PhysicalActivityHeartRate validation failed: ' +
-                        'average, out_of_range_zone, fat_burn_zone, cardio_zone, peak_zone is required!')
+                    assert.equal(err.message, Strings.ERROR_MESSAGE.REQUIRED_FIELDS)
+                    assert.equal(err.description, 'heart_rate.average, heart_rate.out_of_range_zone, ' +
+                        'heart_rate.fat_burn_zone, heart_rate.cardio_zone, heart_rate.peak_zone'
+                            .concat(Strings.ERROR_MESSAGE.REQUIRED_FIELDS_DESC))
                 }
             })
         })
@@ -51,8 +53,8 @@ describe('Validators: PhysicalActivityHeartRateValidator', () => {
                 try {
                     PhysicalActivityHeartRateValidator.validate(activityHeartRate)
                 } catch (err) {
-                    assert.equal(err.message, 'Average field is invalid...')
-                    assert.equal(err.description, 'PhysicalActivityHeartRate validation failed: The value provided has a negative value!')
+                    assert.equal(err.message, Strings.ERROR_MESSAGE.INVALID_FIELDS)
+                    assert.equal(err.description, 'heart_rate.average'.concat(Strings.ERROR_MESSAGE.NEGATIVE_NUMBER))
                 }
                 activityHeartRate.average = 120
             })
@@ -64,8 +66,10 @@ describe('Validators: PhysicalActivityHeartRateValidator', () => {
                 try {
                     PhysicalActivityHeartRateValidator.validate(activityHeartRate)
                 } catch (err) {
-                    assert.equal(err.message, 'Required fields were not provided...')
-                    assert.equal(err.description, 'HeartRateZone validation failed: min, max, duration is required!')
+                    assert.equal(err.message, Strings.ERROR_MESSAGE.REQUIRED_FIELDS)
+                    assert.equal(err.description, 'heart_rate.out_of_range_zone.min, ' +
+                        'heart_rate.out_of_range_zone.max, heart_rate.out_of_range_zone.duration'
+                            .concat(Strings.ERROR_MESSAGE.REQUIRED_FIELDS_DESC))
                 }
             })
         })
@@ -77,8 +81,9 @@ describe('Validators: PhysicalActivityHeartRateValidator', () => {
                 try {
                     PhysicalActivityHeartRateValidator.validate(activityHeartRate)
                 } catch (err) {
-                    assert.equal(err.message, 'Required fields were not provided...')
-                    assert.equal(err.description, 'HeartRateZone validation failed: min, max, duration is required!')
+                    assert.equal(err.message, Strings.ERROR_MESSAGE.REQUIRED_FIELDS)
+                    assert.equal(err.description, 'heart_rate.fat_burn_zone.min, heart_rate.fat_burn_zone.max, ' +
+                        'heart_rate.fat_burn_zone.duration'.concat(Strings.ERROR_MESSAGE.REQUIRED_FIELDS_DESC))
                 }
             })
         })
@@ -90,8 +95,9 @@ describe('Validators: PhysicalActivityHeartRateValidator', () => {
                 try {
                     PhysicalActivityHeartRateValidator.validate(activityHeartRate)
                 } catch (err) {
-                    assert.equal(err.message, 'Required fields were not provided...')
-                    assert.equal(err.description, 'HeartRateZone validation failed: min, max, duration is required!')
+                    assert.equal(err.message, Strings.ERROR_MESSAGE.REQUIRED_FIELDS)
+                    assert.equal(err.description, 'heart_rate.cardio_zone.min, heart_rate.cardio_zone.max, ' +
+                        'heart_rate.cardio_zone.duration'.concat(Strings.ERROR_MESSAGE.REQUIRED_FIELDS_DESC))
                 }
             })
         })
@@ -103,8 +109,9 @@ describe('Validators: PhysicalActivityHeartRateValidator', () => {
                 try {
                     PhysicalActivityHeartRateValidator.validate(activityHeartRate)
                 } catch (err) {
-                    assert.equal(err.message, 'Required fields were not provided...')
-                    assert.equal(err.description, 'HeartRateZone validation failed: min, max, duration is required!')
+                    assert.equal(err.message, Strings.ERROR_MESSAGE.REQUIRED_FIELDS)
+                    assert.equal(err.description, 'heart_rate.peak_zone.min, heart_rate.peak_zone.max, ' +
+                        'heart_rate.peak_zone.duration'.concat(Strings.ERROR_MESSAGE.REQUIRED_FIELDS_DESC))
                 }
                 activityHeartRate.peak_zone = peak_zone_aux
             })
@@ -116,8 +123,8 @@ describe('Validators: PhysicalActivityHeartRateValidator', () => {
                 try {
                     PhysicalActivityHeartRateValidator.validate(activityHeartRate)
                 } catch (err) {
-                    assert.equal(err.message, 'Min field is invalid...')
-                    assert.equal(err.description, 'HeartRateZone validation failed: The value provided has a negative value!')
+                    assert.equal(err.message, Strings.ERROR_MESSAGE.INVALID_FIELDS)
+                    assert.equal(err.description, 'heart_rate.out_of_range_zone.min'.concat(Strings.ERROR_MESSAGE.NEGATIVE_NUMBER))
                 }
                 activityHeartRate.out_of_range_zone!.min = 30
 
@@ -130,8 +137,8 @@ describe('Validators: PhysicalActivityHeartRateValidator', () => {
                 try {
                     PhysicalActivityHeartRateValidator.validate(activityHeartRate)
                 } catch (err) {
-                    assert.equal(err.message, 'Max field is invalid...')
-                    assert.equal(err.description, 'HeartRateZone validation failed: The value provided has a negative value!')
+                    assert.equal(err.message, Strings.ERROR_MESSAGE.INVALID_FIELDS)
+                    assert.equal(err.description, 'heart_rate.out_of_range_zone.max'.concat(Strings.ERROR_MESSAGE.NEGATIVE_NUMBER))
                 }
                 activityHeartRate.out_of_range_zone!.max = 91
 
@@ -145,8 +152,8 @@ describe('Validators: PhysicalActivityHeartRateValidator', () => {
                 try {
                     PhysicalActivityHeartRateValidator.validate(activityHeartRate)
                 } catch (err) {
-                    assert.equal(err.message, 'Duration field is invalid...')
-                    assert.equal(err.description, 'HeartRateZone validation failed: The value provided has a negative value!')
+                    assert.equal(err.message, Strings.ERROR_MESSAGE.INVALID_FIELDS)
+                    assert.equal(err.description, 'heart_rate.out_of_range_zone.duration'.concat(Strings.ERROR_MESSAGE.NEGATIVE_NUMBER))
                 }
                 activityHeartRate.out_of_range_zone!.duration = 60000
 
@@ -159,8 +166,8 @@ describe('Validators: PhysicalActivityHeartRateValidator', () => {
                 try {
                     PhysicalActivityHeartRateValidator.validate(activityHeartRate)
                 } catch (err) {
-                    assert.equal(err.message, 'Min field is invalid...')
-                    assert.equal(err.description, 'HeartRateZone validation failed: The value provided has a negative value!')
+                    assert.equal(err.message, Strings.ERROR_MESSAGE.INVALID_FIELDS)
+                    assert.equal(err.description, 'heart_rate.fat_burn_zone.min'.concat(Strings.ERROR_MESSAGE.NEGATIVE_NUMBER))
                 }
                 activityHeartRate.fat_burn_zone!.min = 91
             })
@@ -172,8 +179,8 @@ describe('Validators: PhysicalActivityHeartRateValidator', () => {
                 try {
                     PhysicalActivityHeartRateValidator.validate(activityHeartRate)
                 } catch (err) {
-                    assert.equal(err.message, 'Max field is invalid...')
-                    assert.equal(err.description, 'HeartRateZone validation failed: The value provided has a negative value!')
+                    assert.equal(err.message, Strings.ERROR_MESSAGE.INVALID_FIELDS)
+                    assert.equal(err.description, 'heart_rate.fat_burn_zone.max'.concat(Strings.ERROR_MESSAGE.NEGATIVE_NUMBER))
                 }
                 activityHeartRate.fat_burn_zone!.max = 127
             })
@@ -185,8 +192,8 @@ describe('Validators: PhysicalActivityHeartRateValidator', () => {
                 try {
                     PhysicalActivityHeartRateValidator.validate(activityHeartRate)
                 } catch (err) {
-                    assert.equal(err.message, 'Duration field is invalid...')
-                    assert.equal(err.description, 'HeartRateZone validation failed: The value provided has a negative value!')
+                    assert.equal(err.message, Strings.ERROR_MESSAGE.INVALID_FIELDS)
+                    assert.equal(err.description, 'heart_rate.fat_burn_zone.duration'.concat(Strings.ERROR_MESSAGE.NEGATIVE_NUMBER))
                 }
                 activityHeartRate.fat_burn_zone!.duration = 600000
             })
@@ -198,8 +205,8 @@ describe('Validators: PhysicalActivityHeartRateValidator', () => {
                 try {
                     PhysicalActivityHeartRateValidator.validate(activityHeartRate)
                 } catch (err) {
-                    assert.equal(err.message, 'Min field is invalid...')
-                    assert.equal(err.description, 'HeartRateZone validation failed: The value provided has a negative value!')
+                    assert.equal(err.message, Strings.ERROR_MESSAGE.INVALID_FIELDS)
+                    assert.equal(err.description, 'heart_rate.cardio_zone.min'.concat(Strings.ERROR_MESSAGE.NEGATIVE_NUMBER))
                 }
                 activityHeartRate.cardio_zone!.min = 127
             })
@@ -211,8 +218,8 @@ describe('Validators: PhysicalActivityHeartRateValidator', () => {
                 try {
                     PhysicalActivityHeartRateValidator.validate(activityHeartRate)
                 } catch (err) {
-                    assert.equal(err.message, 'Max field is invalid...')
-                    assert.equal(err.description, 'HeartRateZone validation failed: The value provided has a negative value!')
+                    assert.equal(err.message, Strings.ERROR_MESSAGE.INVALID_FIELDS)
+                    assert.equal(err.description, 'heart_rate.cardio_zone.max'.concat(Strings.ERROR_MESSAGE.NEGATIVE_NUMBER))
                 }
                 activityHeartRate.cardio_zone!.max = 154
             })
@@ -224,8 +231,8 @@ describe('Validators: PhysicalActivityHeartRateValidator', () => {
                 try {
                     PhysicalActivityHeartRateValidator.validate(activityHeartRate)
                 } catch (err) {
-                    assert.equal(err.message, 'Duration field is invalid...')
-                    assert.equal(err.description, 'HeartRateZone validation failed: The value provided has a negative value!')
+                    assert.equal(err.message, Strings.ERROR_MESSAGE.INVALID_FIELDS)
+                    assert.equal(err.description, 'heart_rate.cardio_zone.duration'.concat(Strings.ERROR_MESSAGE.NEGATIVE_NUMBER))
                 }
                 activityHeartRate.cardio_zone!.duration = 60000
             })
@@ -237,8 +244,8 @@ describe('Validators: PhysicalActivityHeartRateValidator', () => {
                 try {
                     PhysicalActivityHeartRateValidator.validate(activityHeartRate)
                 } catch (err) {
-                    assert.equal(err.message, 'Min field is invalid...')
-                    assert.equal(err.description, 'HeartRateZone validation failed: The value provided has a negative value!')
+                    assert.equal(err.message, Strings.ERROR_MESSAGE.INVALID_FIELDS)
+                    assert.equal(err.description, 'heart_rate.peak_zone.min'.concat(Strings.ERROR_MESSAGE.NEGATIVE_NUMBER))
                 }
                 activityHeartRate.peak_zone!.min = 154
             })
@@ -250,8 +257,8 @@ describe('Validators: PhysicalActivityHeartRateValidator', () => {
                 try {
                     PhysicalActivityHeartRateValidator.validate(activityHeartRate)
                 } catch (err) {
-                    assert.equal(err.message, 'Max field is invalid...')
-                    assert.equal(err.description, 'HeartRateZone validation failed: The value provided has a negative value!')
+                    assert.equal(err.message, Strings.ERROR_MESSAGE.INVALID_FIELDS)
+                    assert.equal(err.description, 'heart_rate.peak_zone.max'.concat(Strings.ERROR_MESSAGE.NEGATIVE_NUMBER))
                 }
                 activityHeartRate.peak_zone!.max = 220
             })
@@ -263,8 +270,8 @@ describe('Validators: PhysicalActivityHeartRateValidator', () => {
                 try {
                     PhysicalActivityHeartRateValidator.validate(activityHeartRate)
                 } catch (err) {
-                    assert.equal(err.message, 'Duration field is invalid...')
-                    assert.equal(err.description, 'HeartRateZone validation failed: The value provided has a negative value!')
+                    assert.equal(err.message, Strings.ERROR_MESSAGE.INVALID_FIELDS)
+                    assert.equal(err.description, 'heart_rate.peak_zone.duration'.concat(Strings.ERROR_MESSAGE.NEGATIVE_NUMBER))
                 }
                 activityHeartRate.peak_zone!.duration = 60000
             })

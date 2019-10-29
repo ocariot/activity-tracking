@@ -253,8 +253,8 @@ describe('Routes: children.weights', () => {
                     .expect(400)
                     .then(err => {
                         expect(err.body.code).to.eql(400)
-                        expect(err.body.message).to.eql('Required fields were not provided...')
-                        expect(err.body.description).to.eql('Measurement validation failed: timestamp, value, unit is required!')
+                        expect(err.body.message).to.eql(Strings.ERROR_MESSAGE.REQUIRED_FIELDS)
+                        expect(err.body.description).to.eql('timestamp, value, unit'.concat(Strings.ERROR_MESSAGE.REQUIRED_FIELDS_DESC))
                     })
             })
         })
@@ -275,9 +275,52 @@ describe('Routes: children.weights', () => {
                     .expect(400)
                     .then(err => {
                         expect(err.body.code).to.eql(400)
-                        expect(err.body.message).to.eql('Measurement value field is invalid...')
-                        expect(err.body.description).to.eql('Measurement validation failed: '
-                            .concat(Strings.ERROR_MESSAGE.INVALID_NUMBER))
+                        expect(err.body.message).to.eql(Strings.ERROR_MESSAGE.INVALID_FIELDS)
+                        expect(err.body.description).to.eql('value'.concat(Strings.ERROR_MESSAGE.INVALID_NUMBER))
+                    })
+            })
+        })
+
+        context('when a validation error occurs (unit is empty)', () => {
+            it('should return status code 400 and info message about the invalid value', () => {
+                const body = {
+                    timestamp: defaultWeight.timestamp,
+                    value: defaultWeight.value,
+                    unit: '',
+                    body_fat: defaultWeight.body_fat!.value
+                }
+
+                return request
+                    .post(`/v1/children/${defaultWeight.child_id}/weights`)
+                    .send(body)
+                    .set('Content-Type', 'application/json')
+                    .expect(400)
+                    .then(err => {
+                        expect(err.body.code).to.eql(400)
+                        expect(err.body.message).to.eql(Strings.ERROR_MESSAGE.INVALID_FIELDS)
+                        expect(err.body.description).to.eql('unit'.concat(Strings.ERROR_MESSAGE.EMPTY_STRING))
+                    })
+            })
+        })
+
+        context('when a validation error occurs (unit is invalid)', () => {
+            it('should return status code 400 and info message about the invalid value', () => {
+                const body = {
+                    timestamp: defaultWeight.timestamp,
+                    value: defaultWeight.value,
+                    unit: 123,
+                    body_fat: defaultWeight.body_fat!.value
+                }
+
+                return request
+                    .post(`/v1/children/${defaultWeight.child_id}/weights`)
+                    .send(body)
+                    .set('Content-Type', 'application/json')
+                    .expect(400)
+                    .then(err => {
+                        expect(err.body.code).to.eql(400)
+                        expect(err.body.message).to.eql(Strings.ERROR_MESSAGE.INVALID_FIELDS)
+                        expect(err.body.description).to.eql('unit'.concat(Strings.ERROR_MESSAGE.INVALID_STRING))
                     })
             })
         })
@@ -454,8 +497,9 @@ describe('Routes: children.weights', () => {
 
                         // Error item
                         expect(res.body.error[0].code).to.eql(HttpStatus.BAD_REQUEST)
-                        expect(res.body.error[0].message).to.eql('Required fields were not provided...')
-                        expect(res.body.error[0].description).to.eql('Measurement validation failed: timestamp, value, unit is required!')
+                        expect(res.body.error[0].message).to.eql(Strings.ERROR_MESSAGE.REQUIRED_FIELDS)
+                        expect(res.body.error[0].description).to.eql('timestamp, value, unit'
+                            .concat(Strings.ERROR_MESSAGE.REQUIRED_FIELDS_DESC))
                     })
             })
         })

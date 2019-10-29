@@ -122,7 +122,7 @@ describe('Services: Log', () => {
                         assert.propertyVal(result.error[0], 'description',
                             'Date must be in the format: yyyy-MM-dd')
                         assert.propertyVal(result.error[1], 'message',
-                            'The name of type provided "step" is not supported...')
+                            Strings.ERROR_MESSAGE.INVALID_FIELDS)
                         assert.propertyVal(result.error[1], 'description',
                             'The names of the allowed types are: ' +
                             'steps, calories, active_minutes, lightly_active_minutes, sedentary_minutes.')
@@ -160,7 +160,7 @@ describe('Services: Log', () => {
                         assert.propertyVal(result.error[0], 'description',
                             'Date must be in the format: yyyy-MM-dd')
                         assert.propertyVal(result.error[1], 'message',
-                            'The name of type provided "step" is not supported...')
+                            Strings.ERROR_MESSAGE.INVALID_FIELDS)
                         assert.propertyVal(result.error[1], 'description',
                             'The names of the allowed types are: ' +
                             'steps, calories, active_minutes, lightly_active_minutes, sedentary_minutes.')
@@ -195,11 +195,11 @@ describe('Services: Log', () => {
                         }
 
                         assert.propertyVal(result.error[0], 'message',
-                            'Value field is invalid...')
-                        assert.propertyVal(result.error[0], 'description',
-                            'Child log validation failed: The value provided has a negative value!')
+                            Strings.ERROR_MESSAGE.INVALID_FIELDS)
+                        assert.propertyVal(result.error[0], 'description', 'value'
+                            .concat(Strings.ERROR_MESSAGE.NEGATIVE_NUMBER))
                         assert.propertyVal(result.error[1], 'message',
-                            'The name of type provided "step" is not supported...')
+                            Strings.ERROR_MESSAGE.INVALID_FIELDS)
                         assert.propertyVal(result.error[1], 'description',
                             'The names of the allowed types are: ' +
                             'steps, calories, active_minutes, lightly_active_minutes, sedentary_minutes.')
@@ -237,7 +237,7 @@ describe('Services: Log', () => {
                         assert.propertyVal(result.error[0], 'description',
                             Strings.ERROR_MESSAGE.UUID_NOT_VALID_FORMAT_DESC)
                         assert.propertyVal(result.error[1], 'message',
-                            'The name of type provided "step" is not supported...')
+                            Strings.ERROR_MESSAGE.INVALID_FIELDS)
                         assert.propertyVal(result.error[1], 'description',
                             'The names of the allowed types are: ' +
                             'steps, calories, active_minutes, lightly_active_minutes, sedentary_minutes.')
@@ -274,11 +274,11 @@ describe('Services: Log', () => {
                         }
 
                         assert.propertyVal(result.error[0], 'message',
-                            'Required fields were not provided...')
+                            Strings.ERROR_MESSAGE.REQUIRED_FIELDS)
                         assert.propertyVal(result.error[0], 'description',
-                            'Child log validation failed: type, date, value, child_id is required!')
+                            'type, date, value, child_id'.concat(Strings.ERROR_MESSAGE.REQUIRED_FIELDS_DESC))
                         assert.propertyVal(result.error[1], 'message',
-                            'The name of type provided "step" is not supported...')
+                            Strings.ERROR_MESSAGE.INVALID_FIELDS)
                         assert.propertyVal(result.error[1], 'description',
                             'The names of the allowed types are: ' +
                             'steps, calories, active_minutes, lightly_active_minutes, sedentary_minutes.')
@@ -373,8 +373,8 @@ describe('Services: Log', () => {
                 return logService.getByChildAndDate(correctLogsArr[0].child_id, '2018-03-18', '2019-03-27')
                     .catch(err => {
                         assert.propertyVal(err, 'message', 'Date range is invalid...')
-                        assert.propertyVal(err, 'description', 'Log dates range validation failed: ' +
-                            'The period between the received dates is longer than one year')
+                        assert.propertyVal(err, 'description', 'The period between the received dates ' +
+                            'can not exceed one year!')
                     })
             })
         })
@@ -433,7 +433,7 @@ describe('Services: Log', () => {
                     correctLogsArr[0].date, correctLogsArr[1].date)
                     .catch(err => {
                         assert.propertyVal(err, 'message',
-                            'The name of type provided "step" is not supported...')
+                            Strings.ERROR_MESSAGE.INVALID_FIELDS)
                         assert.propertyVal(err, 'description',
                             'The names of the allowed types are: ' +
                             'steps, calories, active_minutes, lightly_active_minutes, sedentary_minutes.')
@@ -475,8 +475,8 @@ describe('Services: Log', () => {
                     '2018-03-18', '2019-03-27')
                     .catch(err => {
                         assert.propertyVal(err, 'message', 'Date range is invalid...')
-                        assert.propertyVal(err, 'description', 'Log dates range validation failed: ' +
-                            'The period between the received dates is longer than one year')
+                        assert.propertyVal(err, 'description', 'The period between the received dates can ' +
+                            'not exceed one year!')
                     })
             })
         })

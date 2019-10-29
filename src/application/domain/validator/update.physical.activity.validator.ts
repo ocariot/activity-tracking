@@ -3,6 +3,8 @@ import { PhysicalActivity } from '../model/physical.activity'
 import { ObjectIdValidator } from './object.id.validator'
 import { Strings } from '../../../utils/strings'
 import { PhysicalActivityHeartRateValidator } from './physical.activity.heart.rate.validator'
+import { StringValidator } from './string.validator'
+import { NumberValidator } from './number.validator'
 
 export class UpdatePhysicalActivityValidator {
     public static validate(physicalActivity: PhysicalActivity): void | ValidationException {
@@ -15,58 +17,27 @@ export class UpdatePhysicalActivityValidator {
         }
 
         if (physicalActivity.start_time) {
-            throw new ValidationException(Strings.ERROR_MESSAGE.UNABLE_UPDATE,
-                'Physical Activity validation failed: '.concat(Strings.ERROR_MESSAGE.UNABLE_UPDATE_DESC))
+            throw new ValidationException(Strings.ERROR_MESSAGE.UNABLE_UPDATE, Strings.ERROR_MESSAGE.UNABLE_UPDATE_DESC)
         }
 
         if (physicalActivity.end_time) {
-            throw new ValidationException(Strings.ERROR_MESSAGE.UNABLE_UPDATE,
-                'Physical Activity validation failed: '.concat(Strings.ERROR_MESSAGE.UNABLE_UPDATE_DESC))
+            throw new ValidationException(Strings.ERROR_MESSAGE.UNABLE_UPDATE, Strings.ERROR_MESSAGE.UNABLE_UPDATE_DESC)
         }
 
         if (physicalActivity.duration) {
-            throw new ValidationException(Strings.ERROR_MESSAGE.UNABLE_UPDATE,
-                'Physical Activity validation failed: '.concat(Strings.ERROR_MESSAGE.UNABLE_UPDATE_DESC))
+            throw new ValidationException(Strings.ERROR_MESSAGE.UNABLE_UPDATE, Strings.ERROR_MESSAGE.UNABLE_UPDATE_DESC)
         }
 
-        if (physicalActivity.name !== undefined && physicalActivity.name.length === 0) {
-            throw new ValidationException('Name field is invalid...',
-                'Physical Activity validation failed: Name must have at least one character.')
-        }
+        if (physicalActivity.name !== undefined) StringValidator.validate(physicalActivity.name, 'name')
 
-        if (physicalActivity.calories) {
-            if (isNaN(physicalActivity.calories)) {
-                throw new ValidationException('Calories field is invalid...',
-                    'Physical Activity validation failed: '.concat(Strings.ERROR_MESSAGE.INVALID_NUMBER))
-            } else if (physicalActivity.calories < 0) {
-                throw new ValidationException('Calories field is invalid...',
-                    'Physical Activity validation failed: '.concat(Strings.ERROR_MESSAGE.NEGATIVE_PARAMETER))
-            }
-        }
+        if (physicalActivity.calories) NumberValidator.validate(physicalActivity.calories, 'calories')
 
-        if (physicalActivity.steps) {
-            if (isNaN(physicalActivity.steps)) {
-                throw new ValidationException('Steps field is invalid...',
-                    'Physical Activity validation failed: '.concat(Strings.ERROR_MESSAGE.INVALID_NUMBER))
-            } else if (physicalActivity.steps < 0) {
-                throw new ValidationException('Steps field is invalid...',
-                    'Physical Activity validation failed: '.concat(Strings.ERROR_MESSAGE.NEGATIVE_PARAMETER))
-            }
-        }
+        if (physicalActivity.steps) NumberValidator.validate(physicalActivity.steps, 'steps')
 
-        if (physicalActivity.distance) {
-            if (isNaN(physicalActivity.distance)) {
-                throw new ValidationException('Distance field is invalid...',
-                    'Physical Activity validation failed: '.concat(Strings.ERROR_MESSAGE.INVALID_NUMBER))
-            } else if (physicalActivity.distance < 0) {
-                throw new ValidationException('Distance field is invalid...',
-                    'Physical Activity validation failed: '.concat(Strings.ERROR_MESSAGE.NEGATIVE_PARAMETER))
-            }
-        }
+        if (physicalActivity.distance) NumberValidator.validate(physicalActivity.distance, 'distance')
 
         if (physicalActivity.levels && physicalActivity.levels.length) {
-            throw new ValidationException(Strings.ERROR_MESSAGE.UNABLE_UPDATE,
-                'Physical Activity validation failed: '.concat(Strings.ERROR_MESSAGE.UNABLE_UPDATE_DESC))
+            throw new ValidationException(Strings.ERROR_MESSAGE.UNABLE_UPDATE, Strings.ERROR_MESSAGE.UNABLE_UPDATE_DESC)
         }
 
         if (physicalActivity.heart_rate) PhysicalActivityHeartRateValidator.validate(physicalActivity.heart_rate)

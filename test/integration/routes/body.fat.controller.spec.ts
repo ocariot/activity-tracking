@@ -138,8 +138,29 @@ describe('Routes: children.bodyfats', () => {
                     .expect(400)
                     .then(err => {
                         expect(err.body.code).to.eql(400)
-                        expect(err.body.message).to.eql('Required fields were not provided...')
-                        expect(err.body.description).to.eql('Measurement validation failed: timestamp, value is required!')
+                        expect(err.body.message).to.eql(Strings.ERROR_MESSAGE.REQUIRED_FIELDS)
+                        expect(err.body.description).to.eql('timestamp, value'.concat(Strings.ERROR_MESSAGE.REQUIRED_FIELDS_DESC))
+                    })
+            })
+        })
+
+        context('when a validation error occurs (value is invalid)', () => {
+            it('should return status code 400 and info message about the missing fields', () => {
+                const body = {
+                    timestamp: defaultBodyFat.timestamp,
+                    value: `${defaultBodyFat.value}a`,
+                    unit: defaultBodyFat.unit
+                }
+
+                return request
+                    .post(`/v1/children/${defaultBodyFat.child_id}/bodyfats`)
+                    .send(body)
+                    .set('Content-Type', 'application/json')
+                    .expect(400)
+                    .then(err => {
+                        expect(err.body.code).to.eql(400)
+                        expect(err.body.message).to.eql(Strings.ERROR_MESSAGE.INVALID_FIELDS)
+                        expect(err.body.description).to.eql('value'.concat(Strings.ERROR_MESSAGE.INVALID_NUMBER))
                     })
             })
         })
@@ -300,8 +321,9 @@ describe('Routes: children.bodyfats', () => {
 
                         // Error item
                         expect(res.body.error[0].code).to.eql(HttpStatus.BAD_REQUEST)
-                        expect(res.body.error[0].message).to.eql('Required fields were not provided...')
-                        expect(res.body.error[0].description).to.eql('Measurement validation failed: timestamp, value is required!')
+                        expect(res.body.error[0].message).to.eql(Strings.ERROR_MESSAGE.REQUIRED_FIELDS)
+                        expect(res.body.error[0].description).to.eql('timestamp, value'
+                            .concat(Strings.ERROR_MESSAGE.REQUIRED_FIELDS_DESC))
                     })
             })
         })

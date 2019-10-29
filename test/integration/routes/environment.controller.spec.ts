@@ -252,9 +252,9 @@ describe('Routes: environments', () => {
                     .expect(400)
                     .then(err => {
                         expect(err.body.code).to.eql(400)
-                        expect(err.body.message).to.eql('Required fields were not provided...')
-                        expect(err.body.description).to.eql('Validation of environment failed: timestamp, institution_id, ' +
-                            'location, measurements required!')
+                        expect(err.body.message).to.eql(Strings.ERROR_MESSAGE.REQUIRED_FIELDS)
+                        expect(err.body.description).to.eql('timestamp, institution_id, location, measurements'
+                            .concat(Strings.ERROR_MESSAGE.REQUIRED_FIELDS_DESC))
                     })
             })
         })
@@ -299,13 +299,14 @@ describe('Routes: environments', () => {
                     .expect(400)
                     .then(err => {
                         expect(err.body.code).to.eql(400)
-                        expect(err.body.message).to.eql('Location are not in a format that is supported...')
-                        expect(err.body.description).to.eql('Validation of location failed: location local, location room is required!')
+                        expect(err.body.message).to.eql(Strings.ERROR_MESSAGE.REQUIRED_FIELDS)
+                        expect(err.body.description).to.eql('location.local, location.room'
+                            .concat(Strings.ERROR_MESSAGE.REQUIRED_FIELDS_DESC))
                     })
             })
         })
 
-        context('when a validation error occurs (location local is invalid)', () => {
+        context('when a validation error occurs (location local is empty)', () => {
             it('should return status code 400 and info message about the invalid location', () => {
                 const body = {
                     institution_id: defaultEnvironment.institution_id,
@@ -325,14 +326,39 @@ describe('Routes: environments', () => {
                     .expect(400)
                     .then(err => {
                         expect(err.body.code).to.eql(400)
-                        expect(err.body.message).to.eql('Location local field is invalid...')
-                        expect(err.body.description).to.eql('Validation of location failed: ' +
-                            'Location local must have at least one character.')
+                        expect(err.body.message).to.eql(Strings.ERROR_MESSAGE.INVALID_FIELDS)
+                        expect(err.body.description).to.eql('location.local'.concat(Strings.ERROR_MESSAGE.EMPTY_STRING))
                     })
             })
         })
 
-        context('when a validation error occurs (location room is invalid)', () => {
+        context('when a validation error occurs (location local is invalid)', () => {
+            it('should return status code 400 and info message about the invalid location', () => {
+                const body = {
+                    institution_id: defaultEnvironment.institution_id,
+                    location: {
+                        local: 123,
+                        room: defaultEnvironment.location!.room
+                    },
+                    measurements: defaultEnvironment.measurements,
+                    climatized: defaultEnvironment.climatized,
+                    timestamp: defaultEnvironment.timestamp
+                }
+
+                return request
+                    .post('/v1/environments')
+                    .send(body)
+                    .set('Content-Type', 'application/json')
+                    .expect(400)
+                    .then(err => {
+                        expect(err.body.code).to.eql(400)
+                        expect(err.body.message).to.eql(Strings.ERROR_MESSAGE.INVALID_FIELDS)
+                        expect(err.body.description).to.eql('location.local'.concat(Strings.ERROR_MESSAGE.INVALID_STRING))
+                    })
+            })
+        })
+
+        context('when a validation error occurs (location room is empty)', () => {
             it('should return status code 400 and info message about the invalid location', () => {
                 const body = {
                     institution_id: defaultEnvironment.institution_id,
@@ -352,9 +378,142 @@ describe('Routes: environments', () => {
                     .expect(400)
                     .then(err => {
                         expect(err.body.code).to.eql(400)
-                        expect(err.body.message).to.eql('Location room field is invalid...')
-                        expect(err.body.description).to.eql('Validation of location failed: ' +
-                            'Location room must have at least one character.')
+                        expect(err.body.message).to.eql(Strings.ERROR_MESSAGE.INVALID_FIELDS)
+                        expect(err.body.description).to.eql('location.room'.concat(Strings.ERROR_MESSAGE.EMPTY_STRING))
+                    })
+            })
+        })
+
+        context('when a validation error occurs (location room is invalid)', () => {
+            it('should return status code 400 and info message about the invalid location', () => {
+                const body = {
+                    institution_id: defaultEnvironment.institution_id,
+                    location: {
+                        local: defaultEnvironment.location!.local,
+                        room: 123
+                    },
+                    measurements: defaultEnvironment.measurements,
+                    climatized: defaultEnvironment.climatized,
+                    timestamp: defaultEnvironment.timestamp
+                }
+
+                return request
+                    .post('/v1/environments')
+                    .send(body)
+                    .set('Content-Type', 'application/json')
+                    .expect(400)
+                    .then(err => {
+                        expect(err.body.code).to.eql(400)
+                        expect(err.body.message).to.eql(Strings.ERROR_MESSAGE.INVALID_FIELDS)
+                        expect(err.body.description).to.eql('location.room'.concat(Strings.ERROR_MESSAGE.INVALID_STRING))
+                    })
+            })
+        })
+
+        context('when a validation error occurs (location latitude is empty)', () => {
+            it('should return status code 400 and info message about the invalid location', () => {
+                const body = {
+                    institution_id: defaultEnvironment.institution_id,
+                    location: {
+                        local: defaultEnvironment.location!.local,
+                        room: defaultEnvironment.location!.room,
+                        latitude: ''
+                    },
+                    measurements: defaultEnvironment.measurements,
+                    climatized: defaultEnvironment.climatized,
+                    timestamp: defaultEnvironment.timestamp
+                }
+
+                return request
+                    .post('/v1/environments')
+                    .send(body)
+                    .set('Content-Type', 'application/json')
+                    .expect(400)
+                    .then(err => {
+                        expect(err.body.code).to.eql(400)
+                        expect(err.body.message).to.eql(Strings.ERROR_MESSAGE.INVALID_FIELDS)
+                        expect(err.body.description).to.eql('location.latitude'.concat(Strings.ERROR_MESSAGE.EMPTY_STRING))
+                    })
+            })
+        })
+
+        context('when a validation error occurs (location latitude is invalid)', () => {
+            it('should return status code 400 and info message about the invalid location', () => {
+                const body = {
+                    institution_id: defaultEnvironment.institution_id,
+                    location: {
+                        local: defaultEnvironment.location!.local,
+                        room: defaultEnvironment.location!.room,
+                        latitude: 123
+                    },
+                    measurements: defaultEnvironment.measurements,
+                    climatized: defaultEnvironment.climatized,
+                    timestamp: defaultEnvironment.timestamp
+                }
+
+                return request
+                    .post('/v1/environments')
+                    .send(body)
+                    .set('Content-Type', 'application/json')
+                    .expect(400)
+                    .then(err => {
+                        expect(err.body.code).to.eql(400)
+                        expect(err.body.message).to.eql(Strings.ERROR_MESSAGE.INVALID_FIELDS)
+                        expect(err.body.description).to.eql('location.latitude'.concat(Strings.ERROR_MESSAGE.INVALID_STRING))
+                    })
+            })
+        })
+
+        context('when a validation error occurs (location longitude is empty)', () => {
+            it('should return status code 400 and info message about the invalid location', () => {
+                const body = {
+                    institution_id: defaultEnvironment.institution_id,
+                    location: {
+                        local: defaultEnvironment.location!.local,
+                        room: defaultEnvironment.location!.room,
+                        longitude: ''
+                    },
+                    measurements: defaultEnvironment.measurements,
+                    climatized: defaultEnvironment.climatized,
+                    timestamp: defaultEnvironment.timestamp
+                }
+
+                return request
+                    .post('/v1/environments')
+                    .send(body)
+                    .set('Content-Type', 'application/json')
+                    .expect(400)
+                    .then(err => {
+                        expect(err.body.code).to.eql(400)
+                        expect(err.body.message).to.eql(Strings.ERROR_MESSAGE.INVALID_FIELDS)
+                        expect(err.body.description).to.eql('location.longitude'.concat(Strings.ERROR_MESSAGE.EMPTY_STRING))
+                    })
+            })
+        })
+
+        context('when a validation error occurs (location longitude is invalid)', () => {
+            it('should return status code 400 and info message about the invalid location', () => {
+                const body = {
+                    institution_id: defaultEnvironment.institution_id,
+                    location: {
+                        local: defaultEnvironment.location!.local,
+                        room: defaultEnvironment.location!.room,
+                        longitude: 123
+                    },
+                    measurements: defaultEnvironment.measurements,
+                    climatized: defaultEnvironment.climatized,
+                    timestamp: defaultEnvironment.timestamp
+                }
+
+                return request
+                    .post('/v1/environments')
+                    .send(body)
+                    .set('Content-Type', 'application/json')
+                    .expect(400)
+                    .then(err => {
+                        expect(err.body.code).to.eql(400)
+                        expect(err.body.message).to.eql(Strings.ERROR_MESSAGE.INVALID_FIELDS)
+                        expect(err.body.description).to.eql('location.longitude'.concat(Strings.ERROR_MESSAGE.INVALID_STRING))
                     })
             })
         })
@@ -376,8 +535,76 @@ describe('Routes: environments', () => {
                     .expect(400)
                     .then(err => {
                         expect(err.body.code).to.eql(400)
-                        expect(err.body.message).to.eql('Measurement are not in a format that is supported!')
-                        expect(err.body.description).to.eql('The measurements collection must not be empty!')
+                        expect(err.body.message).to.eql(Strings.ERROR_MESSAGE.INVALID_FIELDS)
+                        expect(err.body.description).to.eql('measurements collection must not be empty!')
+                    })
+            })
+        })
+
+        context('when a validation error occurs (measurements array has an item that has an empty type)', () => {
+            it('should return status code 400 and info message about the invalid measurements array', () => {
+                const body = {
+                    institution_id: defaultEnvironment.institution_id,
+                    location: defaultEnvironment.location,
+                    measurements: [
+                        {
+                            type: '',
+                            value: 32,
+                            unit: '%'
+                        },
+                        {
+                            type: 'temperature',
+                            value: 38,
+                            unit: '°C'
+                        }
+                    ],
+                    climatized: defaultEnvironment.climatized,
+                    timestamp: defaultEnvironment.timestamp
+                }
+
+                return request
+                    .post('/v1/environments')
+                    .send(body)
+                    .set('Content-Type', 'application/json')
+                    .expect(400)
+                    .then(err => {
+                        expect(err.body.code).to.eql(400)
+                        expect(err.body.message).to.eql(Strings.ERROR_MESSAGE.INVALID_FIELDS)
+                        expect(err.body.description).to.eql('measurements.type'.concat(Strings.ERROR_MESSAGE.EMPTY_STRING))
+                    })
+            })
+        })
+
+        context('when a validation error occurs (measurements array has an item that has an invalid type)', () => {
+            it('should return status code 400 and info message about the invalid measurements array', () => {
+                const body = {
+                    institution_id: defaultEnvironment.institution_id,
+                    location: defaultEnvironment.location,
+                    measurements: [
+                        {
+                            type: 123,
+                            value: 32,
+                            unit: '%'
+                        },
+                        {
+                            type: 'temperature',
+                            value: 38,
+                            unit: '°C'
+                        }
+                    ],
+                    climatized: defaultEnvironment.climatized,
+                    timestamp: defaultEnvironment.timestamp
+                }
+
+                return request
+                    .post('/v1/environments')
+                    .send(body)
+                    .set('Content-Type', 'application/json')
+                    .expect(400)
+                    .then(err => {
+                        expect(err.body.code).to.eql(400)
+                        expect(err.body.message).to.eql(Strings.ERROR_MESSAGE.INVALID_FIELDS)
+                        expect(err.body.description).to.eql('measurements.type'.concat(Strings.ERROR_MESSAGE.INVALID_STRING))
                     })
             })
         })
@@ -410,9 +637,76 @@ describe('Routes: environments', () => {
                     .expect(400)
                     .then(err => {
                         expect(err.body.code).to.eql(400)
-                        expect(err.body.message).to.eql('Measurement value field is invalid...')
-                        expect(err.body.description).to.eql('Validation of environment failed: '
-                            .concat(Strings.ERROR_MESSAGE.INVALID_NUMBER))
+                        expect(err.body.message).to.eql(Strings.ERROR_MESSAGE.INVALID_FIELDS)
+                        expect(err.body.description).to.eql('measurements.value'.concat(Strings.ERROR_MESSAGE.INVALID_NUMBER))
+                    })
+            })
+        })
+
+        context('when a validation error occurs (measurements array has an item that has an empty unit)', () => {
+            it('should return status code 400 and info message about the invalid measurements array', () => {
+                const body = {
+                    institution_id: defaultEnvironment.institution_id,
+                    location: defaultEnvironment.location,
+                    measurements: [
+                        {
+                            type: 'humidity',
+                            value: 32,
+                            unit: ''
+                        },
+                        {
+                            type: 'temperature',
+                            value: 38,
+                            unit: '°C'
+                        }
+                    ],
+                    climatized: defaultEnvironment.climatized,
+                    timestamp: defaultEnvironment.timestamp
+                }
+
+                return request
+                    .post('/v1/environments')
+                    .send(body)
+                    .set('Content-Type', 'application/json')
+                    .expect(400)
+                    .then(err => {
+                        expect(err.body.code).to.eql(400)
+                        expect(err.body.message).to.eql(Strings.ERROR_MESSAGE.INVALID_FIELDS)
+                        expect(err.body.description).to.eql('measurements.unit'.concat(Strings.ERROR_MESSAGE.EMPTY_STRING))
+                    })
+            })
+        })
+
+        context('when a validation error occurs (measurements array has an item that has an invalid unit)', () => {
+            it('should return status code 400 and info message about the invalid measurements array', () => {
+                const body = {
+                    institution_id: defaultEnvironment.institution_id,
+                    location: defaultEnvironment.location,
+                    measurements: [
+                        {
+                            type: 'humidity',
+                            value: 32,
+                            unit: '%'
+                        },
+                        {
+                            type: 'temperature',
+                            value: 38,
+                            unit: 123
+                        }
+                    ],
+                    climatized: defaultEnvironment.climatized,
+                    timestamp: defaultEnvironment.timestamp
+                }
+
+                return request
+                    .post('/v1/environments')
+                    .send(body)
+                    .set('Content-Type', 'application/json')
+                    .expect(400)
+                    .then(err => {
+                        expect(err.body.code).to.eql(400)
+                        expect(err.body.message).to.eql(Strings.ERROR_MESSAGE.INVALID_FIELDS)
+                        expect(err.body.description).to.eql('measurements.unit'.concat(Strings.ERROR_MESSAGE.INVALID_STRING))
                     })
             })
         })
@@ -435,13 +729,38 @@ describe('Routes: environments', () => {
                     .expect(400)
                     .then(err => {
                         expect(err.body.code).to.eql(400)
-                        expect(err.body.message).to.eql('Required fields were not provided...')
-                        expect(err.body.description).to.eql('Validation of environment failed: measurement type, ' +
-                            'measurement value, measurement unit required!')
+                        expect(err.body.message).to.eql(Strings.ERROR_MESSAGE.REQUIRED_FIELDS)
+                        expect(err.body.description).to.eql('measurements.type, measurements.value, ' +
+                            'measurements.unit'.concat(Strings.ERROR_MESSAGE.REQUIRED_FIELDS_DESC))
                     })
             })
         })
 
+        context('when a validation error occurs (climatized is invalid)', () => {
+            it('should return status code 400 and info message about the invalid climatized', () => {
+                const body = {
+                    institution_id: defaultEnvironment.institution_id,
+                    location: {
+                        local: defaultEnvironment.location!.local,
+                        room: defaultEnvironment.location!.room,
+                    },
+                    measurements: defaultEnvironment.measurements,
+                    climatized: 'invalid_climatized',
+                    timestamp: defaultEnvironment.timestamp
+                }
+
+                return request
+                    .post('/v1/environments')
+                    .send(body)
+                    .set('Content-Type', 'application/json')
+                    .expect(400)
+                    .then(err => {
+                        expect(err.body.code).to.eql(400)
+                        expect(err.body.message).to.eql(Strings.ERROR_MESSAGE.INVALID_FIELDS)
+                        expect(err.body.description).to.eql('climatized must be a boolean!')
+                    })
+            })
+        })
     })
     /**
      * POST route with an environment array in the body
@@ -608,9 +927,9 @@ describe('Routes: environments', () => {
 
                         // Error item
                         expect(res.body.error[0].code).to.eql(HttpStatus.BAD_REQUEST)
-                        expect(res.body.error[0].message).to.eql('Required fields were not provided...')
-                        expect(res.body.error[0].description).to.eql('Validation of environment failed: timestamp, ' +
-                            'institution_id, location, measurements required!')
+                        expect(res.body.error[0].message).to.eql(Strings.ERROR_MESSAGE.REQUIRED_FIELDS)
+                        expect(res.body.error[0].description).to.eql('timestamp, institution_id, location, ' +
+                            'measurements'.concat(Strings.ERROR_MESSAGE.REQUIRED_FIELDS_DESC))
                     })
             })
         })
@@ -646,27 +965,27 @@ describe('Routes: environments', () => {
                     .expect(207)
                     .then(res => {
                         expect(res.body.error[0].message)
-                            .to.eql('Required fields were not provided...')
+                            .to.eql(Strings.ERROR_MESSAGE.REQUIRED_FIELDS)
                         expect(res.body.error[0].description)
-                            .to.eql('Validation of environment failed: ' +
-                            'timestamp, institution_id, location, measurements required!')
+                            .to.eql('timestamp, institution_id, location, measurements'
+                            .concat(Strings.ERROR_MESSAGE.REQUIRED_FIELDS_DESC))
                         expect(res.body.error[1].message)
                             .to.eql(Strings.INSTITUTION.PARAM_ID_NOT_VALID_FORMAT)
                         expect(res.body.error[1].description)
                             .to.eql(Strings.ERROR_MESSAGE.UUID_NOT_VALID_FORMAT_DESC)
                         expect(res.body.error[2].message)
-                            .to.eql('Location are not in a format that is supported...')
+                            .to.eql(Strings.ERROR_MESSAGE.REQUIRED_FIELDS)
                         expect(res.body.error[2].description)
-                            .to.eql('Validation of location failed: location local, location room is required!')
+                            .to.eql('location.local, location.room'.concat(Strings.ERROR_MESSAGE.REQUIRED_FIELDS_DESC))
                         expect(res.body.error[3].message)
-                            .to.eql('Measurement are not in a format that is supported!')
+                            .to.eql(Strings.ERROR_MESSAGE.INVALID_FIELDS)
                         expect(res.body.error[3].description)
-                            .to.eql('The measurements collection must not be empty!')
+                            .to.eql('measurements collection must not be empty!')
                         expect(res.body.error[4].message)
-                            .to.eql('Required fields were not provided...')
+                            .to.eql(Strings.ERROR_MESSAGE.REQUIRED_FIELDS)
                         expect(res.body.error[4].description)
-                            .to.eql('Validation of environment failed: ' +
-                            'measurement type, measurement value, measurement unit required!')
+                            .to.eql('measurements.type, measurements.value, measurements.unit'
+                            .concat(Strings.ERROR_MESSAGE.REQUIRED_FIELDS_DESC))
 
                         for (let i = 0; i < res.body.error.length; i++) {
                             expect(res.body.error[i].code).to.eql(HttpStatus.BAD_REQUEST)
@@ -878,8 +1197,8 @@ describe('Routes: environments', () => {
                         expect(res.body[0].institution_id).to.eql(defaultEnvironment.institution_id)
                         expect(res.body[0].location.local).to.eql('Indoor')
                         expect(res.body[0].location.room).to.eql('Room 40')
-                        expect(res.body[0].location.latitude).to.eql(34.54323217)
-                        expect(res.body[0].location.longitude).to.eql(7.54534798)
+                        expect(res.body[0].location.latitude).to.eql('34.54323217')
+                        expect(res.body[0].location.longitude).to.eql('7.54534798')
                         expect(res.body[0].measurements[0].type).to.eql('humidity')
                         expect(res.body[0].measurements[0].value).to.eql(32)
                         expect(res.body[0].measurements[0].unit).to.eql('%')

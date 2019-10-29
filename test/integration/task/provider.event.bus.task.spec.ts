@@ -1379,40 +1379,6 @@ describe('PROVIDER EVENT BUS TASK', () => {
                     })
             })
 
-            it('should return a ValidationException (query with an invalid number (location latitude)', (done) => {
-                rabbitmq.bus.getEnvironments('?location.latitude=invalidLatitude')
-                    .then(result => {
-                        expect(result.length).to.eql(0)
-                        done(new Error('The find method of the repository should not function normally'))
-                    })
-                    .catch((err) => {
-                        try {
-                            expect(err.message).to.eql('Error: '
-                                .concat('The value \'invalidLatitude\' of location.latitude field is not a number.'))
-                            done()
-                        } catch (err) {
-                            done(err)
-                        }
-                    })
-            })
-
-            it('should return a ValidationException (query with an invalid number (location longitude)', (done) => {
-                rabbitmq.bus.getEnvironments('?location.longitude=invalidLongitude')
-                    .then(result => {
-                        expect(result.length).to.eql(0)
-                        done(new Error('The find method of the repository should not function normally'))
-                    })
-                    .catch((err) => {
-                        try {
-                            expect(err.message).to.eql('Error: '
-                                .concat('The value \'invalidLongitude\' of location.longitude field is not a number.'))
-                            done()
-                        } catch (err) {
-                            done(err)
-                        }
-                    })
-            })
-
             it('should return a ValidationException (query with an invalid climatized parameter)', (done) => {
                 rabbitmq.bus.getEnvironments('?climatized=invalidClimatized')
                     .then(result => {

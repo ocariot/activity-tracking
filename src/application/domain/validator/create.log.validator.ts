@@ -4,6 +4,7 @@ import { Log } from '../model/log'
 import { LogTypeValidator } from './log.type.validator'
 import { ObjectIdValidator } from './object.id.validator'
 import { DateValidator } from './date.validator'
+import { NumberValidator } from './number.validator'
 
 export class CreateLogValidator {
     public static validate(childLog: Log): void | ValidationException {
@@ -17,20 +18,14 @@ export class CreateLogValidator {
         else DateValidator.validate(childLog.date)
 
         if (childLog.value === undefined) fields.push('value')
-        else if (isNaN(childLog.value)) {
-            throw new ValidationException('Value field is invalid...',
-                'Child log validation failed: '.concat(Strings.ERROR_MESSAGE.INVALID_NUMBER))
-        } else if (childLog.value < 0) {
-            throw new ValidationException('Value field is invalid...',
-                'Child log validation failed: '.concat(Strings.ERROR_MESSAGE.NEGATIVE_PARAMETER))
-        }
+        else NumberValidator.validate(childLog.value, 'value')
 
         if (!childLog.child_id) fields.push('child_id')
         else ObjectIdValidator.validate(childLog.child_id, Strings.CHILD.PARAM_ID_NOT_VALID_FORMAT)
 
         if (fields.length > 0) {
-            throw new ValidationException('Required fields were not provided...',
-                'Child log validation failed: '.concat(fields.join(', ')).concat(' is required!'))
+            throw new ValidationException(Strings.ERROR_MESSAGE.REQUIRED_FIELDS,
+                fields.join(', ').concat(Strings.ERROR_MESSAGE.REQUIRED_FIELDS_DESC))
         }
     }
 }

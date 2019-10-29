@@ -68,8 +68,8 @@ describe('Validators: UpdatePhysicalActivityValidator', () => {
                 try {
                     UpdatePhysicalActivityValidator.validate(activity)
                 } catch (err) {
-                    assert.equal(err.message, 'Calories field is invalid...')
-                    assert.equal(err.description, 'Physical Activity validation failed: The value provided has a negative value!')
+                    assert.equal(err.message, Strings.ERROR_MESSAGE.INVALID_FIELDS)
+                    assert.equal(err.description, 'calories'.concat(Strings.ERROR_MESSAGE.NEGATIVE_NUMBER))
                 }
                 activity.calories = 200
             })
@@ -81,8 +81,8 @@ describe('Validators: UpdatePhysicalActivityValidator', () => {
                 try {
                     UpdatePhysicalActivityValidator.validate(activity)
                 } catch (err) {
-                    assert.equal(err.message, 'Steps field is invalid...')
-                    assert.equal(err.description, 'Physical Activity validation failed: The value provided has a negative value!')
+                    assert.equal(err.message, Strings.ERROR_MESSAGE.INVALID_FIELDS)
+                    assert.equal(err.description, 'steps'.concat(Strings.ERROR_MESSAGE.NEGATIVE_NUMBER))
                 }
                 activity.steps = 1000
             })
@@ -94,8 +94,8 @@ describe('Validators: UpdatePhysicalActivityValidator', () => {
                 try {
                     UpdatePhysicalActivityValidator.validate(activity)
                 } catch (err) {
-                    assert.equal(err.message, 'Distance field is invalid...')
-                    assert.equal(err.description, 'Physical Activity validation failed: The value provided has a negative value!')
+                    assert.equal(err.message, Strings.ERROR_MESSAGE.INVALID_FIELDS)
+                    assert.equal(err.description, 'distance'.concat(Strings.ERROR_MESSAGE.NEGATIVE_NUMBER))
                 }
                 activity.distance = 1000
             })
@@ -107,9 +107,10 @@ describe('Validators: UpdatePhysicalActivityValidator', () => {
                 try {
                     UpdatePhysicalActivityValidator.validate(activity)
                 } catch (err) {
-                    assert.equal(err.message, 'Required fields were not provided...')
-                    assert.equal(err.description, 'PhysicalActivityHeartRate validation failed: ' +
-                        'average, out_of_range_zone, fat_burn_zone, cardio_zone, peak_zone is required!')
+                    assert.equal(err.message, Strings.ERROR_MESSAGE.REQUIRED_FIELDS)
+                    assert.equal(err.description, 'heart_rate.average, heart_rate.out_of_range_zone, ' +
+                        'heart_rate.fat_burn_zone, heart_rate.cardio_zone, heart_rate.peak_zone'
+                            .concat(Strings.ERROR_MESSAGE.REQUIRED_FIELDS_DESC))
                 }
             })
         })
@@ -121,8 +122,8 @@ describe('Validators: UpdatePhysicalActivityValidator', () => {
                 try {
                     UpdatePhysicalActivityValidator.validate(activity)
                 } catch (err) {
-                    assert.equal(err.message, 'Average field is invalid...')
-                    assert.equal(err.description, 'PhysicalActivityHeartRate validation failed: The value provided has a negative value!')
+                    assert.equal(err.message, Strings.ERROR_MESSAGE.INVALID_FIELDS)
+                    assert.equal(err.description, 'heart_rate.average'.concat(Strings.ERROR_MESSAGE.NEGATIVE_NUMBER))
                 }
                 activity.heart_rate.average = 120
             })
@@ -135,8 +136,8 @@ describe('Validators: UpdatePhysicalActivityValidator', () => {
                 try {
                     UpdatePhysicalActivityValidator.validate(activity)
                 } catch (err) {
-                    assert.equal(err.message, 'Required fields were not provided...')
-                    assert.equal(err.description, 'PhysicalActivityHeartRate validation failed: out_of_range_zone is required!')
+                    assert.equal(err.message, Strings.ERROR_MESSAGE.REQUIRED_FIELDS)
+                    assert.equal(err.description, 'heart_rate.out_of_range_zone'.concat(Strings.ERROR_MESSAGE.REQUIRED_FIELDS_DESC))
                 }
                 activity.heart_rate!.out_of_range_zone = out_of_range_zone_aux
             })
@@ -149,8 +150,8 @@ describe('Validators: UpdatePhysicalActivityValidator', () => {
                 try {
                     UpdatePhysicalActivityValidator.validate(activity)
                 } catch (err) {
-                    assert.equal(err.message, 'Required fields were not provided...')
-                    assert.equal(err.description, 'PhysicalActivityHeartRate validation failed: fat_burn_zone is required!')
+                    assert.equal(err.message, Strings.ERROR_MESSAGE.REQUIRED_FIELDS)
+                    assert.equal(err.description, 'heart_rate.fat_burn_zone'.concat(Strings.ERROR_MESSAGE.REQUIRED_FIELDS_DESC))
                 }
                 activity.heart_rate!.fat_burn_zone = fat_burn_zone_aux
             })
@@ -163,8 +164,8 @@ describe('Validators: UpdatePhysicalActivityValidator', () => {
                 try {
                     UpdatePhysicalActivityValidator.validate(activity)
                 } catch (err) {
-                    assert.equal(err.message, 'Required fields were not provided...')
-                    assert.equal(err.description, 'PhysicalActivityHeartRate validation failed: cardio_zone is required!')
+                    assert.equal(err.message, Strings.ERROR_MESSAGE.REQUIRED_FIELDS)
+                    assert.equal(err.description, 'heart_rate.cardio_zone'.concat(Strings.ERROR_MESSAGE.REQUIRED_FIELDS_DESC))
                 }
                 activity.heart_rate!.cardio_zone = cardio_zone_aux
             })
@@ -177,8 +178,8 @@ describe('Validators: UpdatePhysicalActivityValidator', () => {
                 try {
                     UpdatePhysicalActivityValidator.validate(activity)
                 } catch (err) {
-                    assert.equal(err.message, 'Required fields were not provided...')
-                    assert.equal(err.description, 'PhysicalActivityHeartRate validation failed: peak_zone is required!')
+                    assert.equal(err.message, Strings.ERROR_MESSAGE.REQUIRED_FIELDS)
+                    assert.equal(err.description, 'heart_rate.peak_zone'.concat(Strings.ERROR_MESSAGE.REQUIRED_FIELDS_DESC))
                 }
                 activity.heart_rate!.peak_zone = peak_zone_aux
             })
@@ -191,8 +192,9 @@ describe('Validators: UpdatePhysicalActivityValidator', () => {
                 try {
                     UpdatePhysicalActivityValidator.validate(activity)
                 } catch (err) {
-                    assert.equal(err.message, 'Required fields were not provided...')
-                    assert.equal(err.description, 'HeartRateZone validation failed: min, max, duration is required!')
+                    assert.equal(err.message, Strings.ERROR_MESSAGE.REQUIRED_FIELDS)
+                    assert.equal(err.description, 'heart_rate.fat_burn_zone.min, heart_rate.fat_burn_zone.max, ' +
+                        'heart_rate.fat_burn_zone.duration'.concat(Strings.ERROR_MESSAGE.REQUIRED_FIELDS_DESC))
                 }
                 activity.heart_rate!.fat_burn_zone = fat_burn_zone_aux
             })
@@ -205,8 +207,9 @@ describe('Validators: UpdatePhysicalActivityValidator', () => {
                 try {
                     UpdatePhysicalActivityValidator.validate(activity)
                 } catch (err) {
-                    assert.equal(err.message, 'Duration field is invalid...')
-                    assert.equal(err.description, 'HeartRateZone validation failed: The value provided has a negative value!')
+                    assert.equal(err.message, Strings.ERROR_MESSAGE.INVALID_FIELDS)
+                    assert.equal(err.description, 'heart_rate.fat_burn_zone.duration'
+                        .concat(Strings.ERROR_MESSAGE.NEGATIVE_NUMBER))
                 }
                 activity.heart_rate!.fat_burn_zone!.duration = 600000
             })

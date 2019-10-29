@@ -389,9 +389,9 @@ describe('Routes: children.physicalactivities', () => {
                     .expect(400)
                     .then(err => {
                         expect(err.body.code).to.eql(400)
-                        expect(err.body.message).to.eql('Required fields were not provided...')
-                        expect(err.body.description).to.eql('Physical Activity validation failed: ' +
-                            'start_time, end_time, duration, name, calories is required!')
+                        expect(err.body.message).to.eql(Strings.ERROR_MESSAGE.REQUIRED_FIELDS)
+                        expect(err.body.description).to.eql('start_time, end_time, duration, name, calories'
+                            .concat(Strings.ERROR_MESSAGE.REQUIRED_FIELDS_DESC))
                     })
             })
         })
@@ -415,8 +415,8 @@ describe('Routes: children.physicalactivities', () => {
                     .expect(400)
                     .then(err => {
                         expect(err.body.code).to.eql(400)
-                        expect(err.body.message).to.eql('Required fields were not provided...')
-                        expect(err.body.description).to.eql('Physical Activity validation failed: name, calories is required!')
+                        expect(err.body.message).to.eql(Strings.ERROR_MESSAGE.REQUIRED_FIELDS)
+                        expect(err.body.description).to.eql('name, calories'.concat(Strings.ERROR_MESSAGE.REQUIRED_FIELDS_DESC))
                     })
             })
         })
@@ -442,9 +442,8 @@ describe('Routes: children.physicalactivities', () => {
                     .expect(400)
                     .then(err => {
                         expect(err.body.code).to.eql(400)
-                        expect(err.body.message).to.eql('Duration field is invalid...')
-                        expect(err.body.description).to.eql('Activity validation failed: '
-                            .concat(Strings.ERROR_MESSAGE.INVALID_NUMBER))
+                        expect(err.body.message).to.eql(Strings.ERROR_MESSAGE.INVALID_FIELDS)
+                        expect(err.body.description).to.eql('duration'.concat(Strings.ERROR_MESSAGE.INVALID_NUMBER))
                     })
             })
         })
@@ -470,9 +469,9 @@ describe('Routes: children.physicalactivities', () => {
                     .expect(400)
                     .then(err => {
                         expect(err.body.code).to.eql(400)
-                        expect(err.body.message).to.eql('Date field is invalid...')
-                        expect(err.body.description).to.eql('Date validation failed: The end_time parameter can not ' +
-                            'contain an older date than that the start_time parameter!')
+                        expect(err.body.message).to.eql(Strings.ERROR_MESSAGE.INVALID_FIELDS)
+                        expect(err.body.description).to.eql('The end_time parameter can not contain an older date ' +
+                            'than that the start_time parameter!')
                     })
             })
         })
@@ -498,9 +497,9 @@ describe('Routes: children.physicalactivities', () => {
                     .expect(400)
                     .then(err => {
                         expect(err.body.code).to.eql(400)
-                        expect(err.body.message).to.eql('Duration field is invalid...')
-                        expect(err.body.description).to.eql('Duration validation failed: Activity duration value does ' +
-                            'not match values passed in start_time and end_time parameters!')
+                        expect(err.body.message).to.eql(Strings.ERROR_MESSAGE.INVALID_FIELDS)
+                        expect(err.body.description).to.eql('duration value does not match values passed in ' +
+                            'start_time and end_time parameters!')
                     })
             })
         })
@@ -526,8 +525,8 @@ describe('Routes: children.physicalactivities', () => {
                     .expect(400)
                     .then(err => {
                         expect(err.body.code).to.eql(400)
-                        expect(err.body.message).to.eql('Duration field is invalid...')
-                        expect(err.body.description).to.eql('Activity validation failed: The value provided has a negative value!')
+                        expect(err.body.message).to.eql(Strings.ERROR_MESSAGE.INVALID_FIELDS)
+                        expect(err.body.description).to.eql('duration'.concat(Strings.ERROR_MESSAGE.NEGATIVE_NUMBER))
                     })
             })
         })
@@ -558,7 +557,7 @@ describe('Routes: children.physicalactivities', () => {
             })
         })
 
-        context('when a validation error occurs (the name parameter does not have a valid value)', () => {
+        context('when a validation error occurs (the name parameter is empty)', () => {
             it('should return status code 400 and info message about the invalid parameter of name', () => {
                 const body = {
                     name: '',
@@ -579,14 +578,40 @@ describe('Routes: children.physicalactivities', () => {
                     .expect(400)
                     .then(err => {
                         expect(err.body.code).to.eql(400)
-                        expect(err.body.message).to.eql('Name field is invalid...')
-                        expect(err.body.description).to.eql('Physical Activity validation failed: ' +
-                            'Name must have at least one character.')
+                        expect(err.body.message).to.eql(Strings.ERROR_MESSAGE.INVALID_FIELDS)
+                        expect(err.body.description).to.eql('name'.concat(Strings.ERROR_MESSAGE.EMPTY_STRING))
                     })
             })
         })
 
-        context('when a validation error occurs (the calories parameter does not have a valid number)', () => {
+        context('when a validation error occurs (the name parameter is invalid)', () => {
+            it('should return status code 400 and info message about the invalid parameter of name', () => {
+                const body = {
+                    name: 123,
+                    start_time: defaultActivity.start_time,
+                    end_time: defaultActivity.end_time,
+                    duration: defaultActivity.duration,
+                    calories: defaultActivity.calories,
+                    steps: defaultActivity.steps ? defaultActivity.steps : undefined,
+                    distance: defaultActivity.distance ? defaultActivity.distance : undefined,
+                    levels: defaultActivity.levels ? defaultActivity.levels : undefined,
+                    heart_rate: defaultActivity.heart_rate ? defaultActivity.heart_rate : undefined
+                }
+
+                return request
+                    .post(`/v1/children/${defaultActivity.child_id}/physicalactivities`)
+                    .send(body)
+                    .set('Content-Type', 'application/json')
+                    .expect(400)
+                    .then(err => {
+                        expect(err.body.code).to.eql(400)
+                        expect(err.body.message).to.eql(Strings.ERROR_MESSAGE.INVALID_FIELDS)
+                        expect(err.body.description).to.eql('name'.concat(Strings.ERROR_MESSAGE.INVALID_STRING))
+                    })
+            })
+        })
+
+        context('when a validation error occurs (the calories parameter is invalid)', () => {
             it('should return status code 400 and info message about the invalid parameter of calories', () => {
                 const body = {
                     name: defaultActivity.name,
@@ -607,9 +632,8 @@ describe('Routes: children.physicalactivities', () => {
                     .expect(400)
                     .then(err => {
                         expect(err.body.code).to.eql(400)
-                        expect(err.body.message).to.eql('Calories field is invalid...')
-                        expect(err.body.description).to.eql('Physical Activity validation failed: '
-                            .concat(Strings.ERROR_MESSAGE.INVALID_NUMBER))
+                        expect(err.body.message).to.eql(Strings.ERROR_MESSAGE.INVALID_FIELDS)
+                        expect(err.body.description).to.eql('calories'.concat(Strings.ERROR_MESSAGE.INVALID_NUMBER))
                     })
             })
         })
@@ -635,13 +659,13 @@ describe('Routes: children.physicalactivities', () => {
                     .expect(400)
                     .then(err => {
                         expect(err.body.code).to.eql(400)
-                        expect(err.body.message).to.eql('Calories field is invalid...')
-                        expect(err.body.description).to.eql('Physical Activity validation failed: The value provided has a negative value!')
+                        expect(err.body.message).to.eql(Strings.ERROR_MESSAGE.INVALID_FIELDS)
+                        expect(err.body.description).to.eql('calories'.concat(Strings.ERROR_MESSAGE.NEGATIVE_NUMBER))
                     })
             })
         })
 
-        context('when a validation error occurs (the steps parameter does not have a valid number)', () => {
+        context('when a validation error occurs (the steps parameter is invalid)', () => {
             it('should return status code 400 and info message about the invalid parameter of steps', () => {
                 const body = {
                     name: defaultActivity.name,
@@ -662,9 +686,8 @@ describe('Routes: children.physicalactivities', () => {
                     .expect(400)
                     .then(err => {
                         expect(err.body.code).to.eql(400)
-                        expect(err.body.message).to.eql('Steps field is invalid...')
-                        expect(err.body.description).to.eql('Physical Activity validation failed: '
-                            .concat(Strings.ERROR_MESSAGE.INVALID_NUMBER))
+                        expect(err.body.message).to.eql(Strings.ERROR_MESSAGE.INVALID_FIELDS)
+                        expect(err.body.description).to.eql('steps'.concat(Strings.ERROR_MESSAGE.INVALID_NUMBER))
                     })
             })
         })
@@ -690,14 +713,13 @@ describe('Routes: children.physicalactivities', () => {
                     .expect(400)
                     .then(err => {
                         expect(err.body.code).to.eql(400)
-                        expect(err.body.message).to.eql('Steps field is invalid...')
-                        expect(err.body.description).to.eql('Physical Activity validation failed: The value provided ' +
-                            'has a negative value!')
+                        expect(err.body.message).to.eql(Strings.ERROR_MESSAGE.INVALID_FIELDS)
+                        expect(err.body.description).to.eql('steps'.concat(Strings.ERROR_MESSAGE.NEGATIVE_NUMBER))
                     })
             })
         })
 
-        context('when a validation error occurs (the distance parameter does not have a valid number)', () => {
+        context('when a validation error occurs (the distance parameter is invalid)', () => {
             it('should return status code 400 and info message about the invalid parameter of distance', () => {
                 const body = {
                     name: defaultActivity.name,
@@ -718,9 +740,8 @@ describe('Routes: children.physicalactivities', () => {
                     .expect(400)
                     .then(err => {
                         expect(err.body.code).to.eql(400)
-                        expect(err.body.message).to.eql('Distance field is invalid...')
-                        expect(err.body.description).to.eql('Physical Activity validation failed: '
-                            .concat(Strings.ERROR_MESSAGE.INVALID_NUMBER))
+                        expect(err.body.message).to.eql(Strings.ERROR_MESSAGE.INVALID_FIELDS)
+                        expect(err.body.description).to.eql('distance'.concat(Strings.ERROR_MESSAGE.INVALID_NUMBER))
                     })
             })
         })
@@ -746,9 +767,8 @@ describe('Routes: children.physicalactivities', () => {
                     .expect(400)
                     .then(err => {
                         expect(err.body.code).to.eql(400)
-                        expect(err.body.message).to.eql('Distance field is invalid...')
-                        expect(err.body.description).to.eql('Physical Activity validation failed: The value provided ' +
-                            'has a negative value!')
+                        expect(err.body.message).to.eql(Strings.ERROR_MESSAGE.INVALID_FIELDS)
+                        expect(err.body.description).to.eql('distance'.concat(Strings.ERROR_MESSAGE.NEGATIVE_NUMBER))
                     })
             })
         })
@@ -791,8 +811,9 @@ describe('Routes: children.physicalactivities', () => {
                     .expect(400)
                     .then(err => {
                         expect(err.body.code).to.eql(400)
-                        expect(err.body.message).to.eql('The name of level provided "sedentaries" is not supported...')
-                        expect(err.body.description).to.eql('The names of the allowed levels are: sedentary, lightly, fairly, very.')
+                        expect(err.body.message).to.eql(Strings.ERROR_MESSAGE.INVALID_FIELDS)
+                        expect(err.body.description).to.eql('The names of the allowed levels are: ' +
+                            'sedentary, lightly, fairly, very.')
                     })
             })
         })
@@ -835,9 +856,8 @@ describe('Routes: children.physicalactivities', () => {
                     .expect(400)
                     .then(err => {
                         expect(err.body.code).to.eql(400)
-                        expect(err.body.message).to.eql('Some (or several) duration field of levels array is invalid...')
-                        expect(err.body.description).to.eql('Physical Activity Level validation failed: '
-                            .concat(Strings.ERROR_MESSAGE.INVALID_NUMBER))
+                        expect(err.body.message).to.eql(Strings.ERROR_MESSAGE.INVALID_FIELDS)
+                        expect(err.body.description).to.eql('levels.duration'.concat(Strings.ERROR_MESSAGE.INVALID_NUMBER))
                     })
             })
         })
@@ -880,9 +900,9 @@ describe('Routes: children.physicalactivities', () => {
                     .expect(400)
                     .then(err => {
                         expect(err.body.code).to.eql(400)
-                        expect(err.body.message).to.eql('Level are not in a format that is supported!')
-                        expect(err.body.description).to.eql('Must have values ​​for the following levels: sedentary, ' +
-                            'lightly, fairly, very.')
+                        expect(err.body.message).to.eql(Strings.ERROR_MESSAGE.INVALID_FIELDS)
+                        expect(err.body.description).to.eql('The levels array must have values for the following ' +
+                            'levels: sedentary, lightly, fairly, very.')
                     })
             })
         })
@@ -925,9 +945,8 @@ describe('Routes: children.physicalactivities', () => {
                     .expect(400)
                     .then(err => {
                         expect(err.body.code).to.eql(400)
-                        expect(err.body.message).to.eql('Some (or several) duration field of levels array is invalid...')
-                        expect(err.body.description).to.eql('Physical Activity Level validation failed: The value ' +
-                            'provided has a negative value!')
+                        expect(err.body.message).to.eql(Strings.ERROR_MESSAGE.INVALID_FIELDS)
+                        expect(err.body.description).to.eql('levels.duration'.concat(Strings.ERROR_MESSAGE.NEGATIVE_NUMBER))
                     })
             })
         })
@@ -954,9 +973,10 @@ describe('Routes: children.physicalactivities', () => {
                     .expect(400)
                     .then(err => {
                         expect(err.body.code).to.eql(400)
-                        expect(err.body.message).to.eql('Required fields were not provided...')
-                        expect(err.body.description).to.eql('PhysicalActivityHeartRate validation failed: ' +
-                            'average, out_of_range_zone, fat_burn_zone, cardio_zone, peak_zone is required!')
+                        expect(err.body.message).to.eql(Strings.ERROR_MESSAGE.REQUIRED_FIELDS)
+                        expect(err.body.description).to.eql('heart_rate.average, heart_rate.out_of_range_zone, ' +
+                            'heart_rate.fat_burn_zone, heart_rate.cardio_zone, heart_rate.peak_zone'
+                                .concat(Strings.ERROR_MESSAGE.REQUIRED_FIELDS_DESC))
                     })
             })
         })
@@ -989,9 +1009,8 @@ describe('Routes: children.physicalactivities', () => {
                     .expect(400)
                     .then(err => {
                         expect(err.body.code).to.eql(400)
-                        expect(err.body.message).to.eql('Average field is invalid...')
-                        expect(err.body.description).to.eql('PhysicalActivityHeartRate validation failed: ' +
-                            Strings.ERROR_MESSAGE.INVALID_NUMBER)
+                        expect(err.body.message).to.eql(Strings.ERROR_MESSAGE.INVALID_FIELDS)
+                        expect(err.body.description).to.eql('heart_rate.average'.concat(Strings.ERROR_MESSAGE.INVALID_NUMBER))
                     })
             })
         })
@@ -1018,9 +1037,8 @@ describe('Routes: children.physicalactivities', () => {
                     .expect(400)
                     .then(err => {
                         expect(err.body.code).to.eql(400)
-                        expect(err.body.message).to.eql('Average field is invalid...')
-                        expect(err.body.description).to.eql('PhysicalActivityHeartRate validation failed: ' +
-                            'The value provided has a negative value!')
+                        expect(err.body.message).to.eql(Strings.ERROR_MESSAGE.INVALID_FIELDS)
+                        expect(err.body.description).to.eql('heart_rate.average'.concat(Strings.ERROR_MESSAGE.NEGATIVE_NUMBER))
                     })
             })
         })
@@ -1047,9 +1065,10 @@ describe('Routes: children.physicalactivities', () => {
                     .expect(400)
                     .then(err => {
                         expect(err.body.code).to.eql(400)
-                        expect(err.body.message).to.eql('Required fields were not provided...')
-                        expect(err.body.description).to.eql('HeartRateZone validation failed: ' +
-                            'min, max, duration is required!')
+                        expect(err.body.message).to.eql(Strings.ERROR_MESSAGE.REQUIRED_FIELDS)
+                        expect(err.body.description).to.eql('heart_rate.fat_burn_zone.min, ' +
+                            'heart_rate.fat_burn_zone.max, heart_rate.fat_burn_zone.duration'
+                                .concat(Strings.ERROR_MESSAGE.REQUIRED_FIELDS_DESC))
                     })
             })
         })
@@ -1083,8 +1102,8 @@ describe('Routes: children.physicalactivities', () => {
                     .expect(400)
                     .then(err => {
                         expect(err.body.code).to.eql(400)
-                        expect(err.body.message).to.eql('Min field is invalid...')
-                        expect(err.body.description).to.eql('HeartRateZone validation failed: ' +
+                        expect(err.body.message).to.eql(Strings.ERROR_MESSAGE.INVALID_FIELDS)
+                        expect(err.body.description).to.eql('heart_rate.fat_burn_zone.min' +
                             Strings.ERROR_MESSAGE.INVALID_NUMBER)
                     })
             })
@@ -1119,9 +1138,9 @@ describe('Routes: children.physicalactivities', () => {
                         .expect(400)
                         .then(err => {
                             expect(err.body.code).to.eql(400)
-                            expect(err.body.message).to.eql('Min field is invalid...')
-                            expect(err.body.description).to.eql('HeartRateZone validation failed: ' +
-                                Strings.ERROR_MESSAGE.NEGATIVE_PARAMETER)
+                            expect(err.body.message).to.eql(Strings.ERROR_MESSAGE.INVALID_FIELDS)
+                            expect(err.body.description).to.eql('heart_rate.fat_burn_zone.min' +
+                                Strings.ERROR_MESSAGE.NEGATIVE_NUMBER)
                         })
                 })
         })
@@ -1155,8 +1174,8 @@ describe('Routes: children.physicalactivities', () => {
                         .expect(400)
                         .then(err => {
                             expect(err.body.code).to.eql(400)
-                            expect(err.body.message).to.eql('Max field is invalid...')
-                            expect(err.body.description).to.eql('HeartRateZone validation failed: ' +
+                            expect(err.body.message).to.eql(Strings.ERROR_MESSAGE.INVALID_FIELDS)
+                            expect(err.body.description).to.eql('heart_rate.fat_burn_zone.max' +
                                 Strings.ERROR_MESSAGE.INVALID_NUMBER)
                         })
                 })
@@ -1191,9 +1210,9 @@ describe('Routes: children.physicalactivities', () => {
                         .expect(400)
                         .then(err => {
                             expect(err.body.code).to.eql(400)
-                            expect(err.body.message).to.eql('Max field is invalid...')
-                            expect(err.body.description).to.eql('HeartRateZone validation failed: ' +
-                                Strings.ERROR_MESSAGE.NEGATIVE_PARAMETER)
+                            expect(err.body.message).to.eql(Strings.ERROR_MESSAGE.INVALID_FIELDS)
+                            expect(err.body.description).to.eql('heart_rate.fat_burn_zone.max' +
+                                Strings.ERROR_MESSAGE.NEGATIVE_NUMBER)
                         })
                 })
         })
@@ -1227,8 +1246,8 @@ describe('Routes: children.physicalactivities', () => {
                         .expect(400)
                         .then(err => {
                             expect(err.body.code).to.eql(400)
-                            expect(err.body.message).to.eql('Duration field is invalid...')
-                            expect(err.body.description).to.eql('HeartRateZone validation failed: ' +
+                            expect(err.body.message).to.eql(Strings.ERROR_MESSAGE.INVALID_FIELDS)
+                            expect(err.body.description).to.eql('heart_rate.fat_burn_zone.duration' +
                                 Strings.ERROR_MESSAGE.INVALID_NUMBER)
                         })
                 })
@@ -1257,9 +1276,9 @@ describe('Routes: children.physicalactivities', () => {
                     .expect(400)
                     .then(err => {
                         expect(err.body.code).to.eql(400)
-                        expect(err.body.message).to.eql('Duration field is invalid...')
-                        expect(err.body.description).to.eql('HeartRateZone validation failed: ' +
-                            Strings.ERROR_MESSAGE.NEGATIVE_PARAMETER)
+                        expect(err.body.message).to.eql(Strings.ERROR_MESSAGE.INVALID_FIELDS)
+                        expect(err.body.description).to.eql('heart_rate.fat_burn_zone.duration' +
+                            Strings.ERROR_MESSAGE.NEGATIVE_NUMBER)
                     })
             })
         })
@@ -1461,9 +1480,9 @@ describe('Routes: children.physicalactivities', () => {
 
                         // Error item
                         expect(res.body.error[0].code).to.eql(HttpStatus.BAD_REQUEST)
-                        expect(res.body.error[0].message).to.eql('Required fields were not provided...')
-                        expect(res.body.error[0].description).to.eql('Physical Activity validation failed: ' +
-                            'start_time, end_time, duration, name, calories is required!')
+                        expect(res.body.error[0].message).to.eql(Strings.ERROR_MESSAGE.REQUIRED_FIELDS)
+                        expect(res.body.error[0].description).to.eql('start_time, end_time, duration, name, ' +
+                            'calories'.concat(Strings.ERROR_MESSAGE.REQUIRED_FIELDS_DESC))
                     })
             })
         })
@@ -1502,47 +1521,46 @@ describe('Routes: children.physicalactivities', () => {
                     .set('Content-Type', 'application/json')
                     .expect(207)
                     .then(res => {
-                        expect(res.body.error[0].message).to.eql('Required fields were not provided...')
-                        expect(res.body.error[0].description).to.eql('Physical Activity validation failed: ' +
-                            'start_time, end_time, duration, name, calories is required!')
-                        expect(res.body.error[1].message).to.eql('Required fields were not provided...')
-                        expect(res.body.error[1].description).to.eql('Physical Activity validation failed: name, calories is required!')
-                        expect(res.body.error[2].message).to.eql('Date field is invalid...')
-                        expect(res.body.error[2].description).to.eql('Date validation failed: ' +
-                            'The end_time parameter can not contain an older date than that the start_time parameter!')
-                        expect(res.body.error[3].message).to.eql('Duration field is invalid...')
-                        expect(res.body.error[3].description).to.eql('Duration validation failed: ' +
-                            'Activity duration value does not match values passed in start_time and end_time parameters!')
-                        expect(res.body.error[4].message).to.eql('Duration field is invalid...')
-                        expect(res.body.error[4].description).to.eql('Activity validation failed: ' +
-                            'The value provided has a negative value!')
-                        expect(res.body.error[5].message).to.eql('Calories field is invalid...')
-                        expect(res.body.error[5].description).to.eql('Physical Activity validation failed: ' +
-                            'The value provided has a negative value!')
-                        expect(res.body.error[6].message).to.eql('Steps field is invalid...')
-                        expect(res.body.error[6].description).to.eql('Physical Activity validation failed: ' +
-                            'The value provided has a negative value!')
-                        expect(res.body.error[7].message).to.eql('The name of level provided "sedentaries" is not supported...')
+                        expect(res.body.error[0].message).to.eql(Strings.ERROR_MESSAGE.REQUIRED_FIELDS)
+                        expect(res.body.error[0].description).to.eql('start_time, end_time, duration, name, ' +
+                            'calories'.concat(Strings.ERROR_MESSAGE.REQUIRED_FIELDS_DESC))
+                        expect(res.body.error[1].message).to.eql(Strings.ERROR_MESSAGE.REQUIRED_FIELDS)
+                        expect(res.body.error[1].description).to.eql('name, calories'
+                            .concat(Strings.ERROR_MESSAGE.REQUIRED_FIELDS_DESC))
+                        expect(res.body.error[2].message).to.eql(Strings.ERROR_MESSAGE.INVALID_FIELDS)
+                        expect(res.body.error[2].description).to.eql('The end_time parameter can not contain an ' +
+                            'older date than that the start_time parameter!')
+                        expect(res.body.error[3].message).to.eql(Strings.ERROR_MESSAGE.INVALID_FIELDS)
+                        expect(res.body.error[3].description).to.eql('duration value does not match values passed ' +
+                            'in start_time and end_time parameters!')
+                        expect(res.body.error[4].message).to.eql(Strings.ERROR_MESSAGE.INVALID_FIELDS)
+                        expect(res.body.error[4].description).to.eql('duration'.concat(Strings.ERROR_MESSAGE.NEGATIVE_NUMBER))
+                        expect(res.body.error[5].message).to.eql(Strings.ERROR_MESSAGE.INVALID_FIELDS)
+                        expect(res.body.error[5].description).to.eql('calories'.concat(Strings.ERROR_MESSAGE.NEGATIVE_NUMBER))
+                        expect(res.body.error[6].message).to.eql(Strings.ERROR_MESSAGE.INVALID_FIELDS)
+                        expect(res.body.error[6].description).to.eql('steps'.concat(Strings.ERROR_MESSAGE.NEGATIVE_NUMBER))
+                        expect(res.body.error[7].message).to.eql(Strings.ERROR_MESSAGE.INVALID_FIELDS)
                         expect(res.body.error[7].description).to.eql('The names of the allowed levels are: ' +
                             'sedentary, lightly, fairly, very.')
-                        expect(res.body.error[8].message).to.eql('Level are not in a format that is supported!')
-                        expect(res.body.error[8].description).to.eql('Must have values ​​for the following levels:' +
-                            ' sedentary, lightly, fairly, very.')
-                        expect(res.body.error[9].message).to.eql('Some (or several) duration field of levels array is invalid...')
-                        expect(res.body.error[9].description).to.eql('Physical Activity Level validation failed: ' +
-                            'The value provided has a negative value!')
-                        expect(res.body.error[10].message).to.eql('Required fields were not provided...')
-                        expect(res.body.error[10].description).to.eql('PhysicalActivityHeartRate validation failed: ' +
-                            'average, out_of_range_zone, fat_burn_zone, cardio_zone, peak_zone is required!')
-                        expect(res.body.error[11].message).to.eql('Average field is invalid...')
-                        expect(res.body.error[11].description).to.eql('PhysicalActivityHeartRate validation failed: ' +
-                            'The value provided has a negative value!')
-                        expect(res.body.error[12].message).to.eql('Required fields were not provided...')
-                        expect(res.body.error[12].description).to.eql('HeartRateZone validation failed: ' +
-                            'min, max, duration is required!')
-                        expect(res.body.error[13].message).to.eql('Duration field is invalid...')
-                        expect(res.body.error[13].description).to.eql('HeartRateZone validation failed: ' +
-                            'The value provided has a negative value!')
+                        expect(res.body.error[8].message).to.eql(Strings.ERROR_MESSAGE.INVALID_FIELDS)
+                        expect(res.body.error[8].description).to.eql('The levels array must have values for ' +
+                            'the following levels: sedentary, lightly, fairly, very.')
+                        expect(res.body.error[9].message).to.eql(Strings.ERROR_MESSAGE.INVALID_FIELDS)
+                        expect(res.body.error[9].description).to.eql('levels.duration'.concat(Strings.ERROR_MESSAGE.NEGATIVE_NUMBER))
+                        expect(res.body.error[10].message).to.eql(Strings.ERROR_MESSAGE.REQUIRED_FIELDS)
+                        expect(res.body.error[10].description).to.eql('heart_rate.average, heart_rate.out_of_range_zone, ' +
+                            'heart_rate.fat_burn_zone, heart_rate.cardio_zone, heart_rate.peak_zone'
+                                .concat(Strings.ERROR_MESSAGE.REQUIRED_FIELDS_DESC))
+                        expect(res.body.error[11].message).to.eql(Strings.ERROR_MESSAGE.INVALID_FIELDS)
+                        expect(res.body.error[11].description).to.eql('heart_rate.average'
+                            .concat(Strings.ERROR_MESSAGE.NEGATIVE_NUMBER))
+                        expect(res.body.error[12].message).to.eql(Strings.ERROR_MESSAGE.REQUIRED_FIELDS)
+                        expect(res.body.error[12].description).to.eql('heart_rate.fat_burn_zone.min, ' +
+                            'heart_rate.fat_burn_zone.max, heart_rate.fat_burn_zone.duration'
+                                .concat(Strings.ERROR_MESSAGE.REQUIRED_FIELDS_DESC))
+                        expect(res.body.error[13].message).to.eql(Strings.ERROR_MESSAGE.INVALID_FIELDS)
+                        expect(res.body.error[13].description).to.eql('heart_rate.fat_burn_zone.duration'
+                            .concat(Strings.ERROR_MESSAGE.NEGATIVE_NUMBER))
 
                         for (let i = 0; i < res.body.error.length; i++) {
                             expect(res.body.error[i].code).to.eql(HttpStatus.BAD_REQUEST)
@@ -2489,7 +2507,7 @@ describe('Routes: children.physicalactivities', () => {
     //                 .expect(400)
     //                 .then(err => {
     //                     expect(err.body.code).to.eql(400)
-    //                     expect(err.body.message).to.eql('Required fields were not provided...')
+    //                     expect(err.body.message).to.eql(Strings.ERROR_MESSAGE.REQUIRED_FIELDS)
     //                     expect(err.body.description).to.eql('PhysicalActivityHeartRate validation failed: ' +
     //                         'average, out_of_range_zone, fat_burn_zone, cardio_zone, peak_zone is required!')
     //                 })
@@ -2543,7 +2561,7 @@ describe('Routes: children.physicalactivities', () => {
     //                 .expect(400)
     //                 .then(err => {
     //                     expect(err.body.code).to.eql(400)
-    //                     expect(err.body.message).to.eql('Required fields were not provided...')
+    //                     expect(err.body.message).to.eql(Strings.ERROR_MESSAGE.REQUIRED_FIELDS)
     //                     expect(err.body.description).to.eql('HeartRateZone validation failed: ' +
     //                         'min, max, duration is required!')
     //                 })

@@ -326,9 +326,9 @@ describe('Routes: children.sleep', () => {
                     .expect(400)
                     .then(err => {
                         expect(err.body.code).to.eql(400)
-                        expect(err.body.message).to.eql('Required fields were not provided...')
-                        expect(err.body.description).to.eql('Sleep validation failed: ' +
-                            'start_time, end_time, duration, type, pattern is required!')
+                        expect(err.body.message).to.eql(Strings.ERROR_MESSAGE.REQUIRED_FIELDS)
+                        expect(err.body.description).to.eql('start_time, end_time, duration, type, pattern'
+                            .concat(Strings.ERROR_MESSAGE.REQUIRED_FIELDS_DESC))
                     })
             })
         })
@@ -348,8 +348,8 @@ describe('Routes: children.sleep', () => {
                     .expect(400)
                     .then(err => {
                         expect(err.body.code).to.eql(400)
-                        expect(err.body.message).to.eql('Required fields were not provided...')
-                        expect(err.body.description).to.eql('Sleep validation failed: type, pattern is required!')
+                        expect(err.body.message).to.eql(Strings.ERROR_MESSAGE.REQUIRED_FIELDS)
+                        expect(err.body.description).to.eql('type, pattern'.concat(Strings.ERROR_MESSAGE.REQUIRED_FIELDS_DESC))
                     })
             })
         })
@@ -371,9 +371,9 @@ describe('Routes: children.sleep', () => {
                     .expect(400)
                     .then(err => {
                         expect(err.body.code).to.eql(400)
-                        expect(err.body.message).to.eql('Date field is invalid...')
-                        expect(err.body.description).to.eql('Date validation failed: The end_time parameter can not ' +
-                            'contain an older date than that the start_time parameter!')
+                        expect(err.body.message).to.eql(Strings.ERROR_MESSAGE.INVALID_FIELDS)
+                        expect(err.body.description).to.eql('The end_time parameter can not contain an older date ' +
+                            'than that the start_time parameter!')
                     })
             })
         })
@@ -395,9 +395,9 @@ describe('Routes: children.sleep', () => {
                     .expect(400)
                     .then(err => {
                         expect(err.body.code).to.eql(400)
-                        expect(err.body.message).to.eql('Duration field is invalid...')
-                        expect(err.body.description).to.eql('Duration validation failed: Activity duration value does ' +
-                            'not match values passed in start_time and end_time parameters!')
+                        expect(err.body.message).to.eql(Strings.ERROR_MESSAGE.INVALID_FIELDS)
+                        expect(err.body.description).to.eql('duration value does not match values passed in ' +
+                            'start_time and end_time parameters!')
                     })
             })
         })
@@ -419,8 +419,8 @@ describe('Routes: children.sleep', () => {
                     .expect(400)
                     .then(err => {
                         expect(err.body.code).to.eql(400)
-                        expect(err.body.message).to.eql('Duration field is invalid...')
-                        expect(err.body.description).to.eql('Activity validation failed: The value provided has a negative value!')
+                        expect(err.body.message).to.eql(Strings.ERROR_MESSAGE.INVALID_FIELDS)
+                        expect(err.body.description).to.eql('duration'.concat(Strings.ERROR_MESSAGE.NEGATIVE_NUMBER))
                     })
             })
         })
@@ -465,8 +465,8 @@ describe('Routes: children.sleep', () => {
                     .expect(400)
                     .then(err => {
                         expect(err.body.code).to.eql(400)
-                        expect(err.body.message).to.eql('The type provided "classics" is not supported...')
-                        expect(err.body.description).to.eql('The allowed Sleep Pattern types are: classic, stages.')
+                        expect(err.body.message).to.eql(Strings.ERROR_MESSAGE.INVALID_FIELDS)
+                        expect(err.body.description).to.eql('The names of the allowed Sleep Pattern types are: classic, stages.')
                     })
             })
         })
@@ -488,8 +488,8 @@ describe('Routes: children.sleep', () => {
                     .expect(400)
                     .then(err => {
                         expect(err.body.code).to.eql(400)
-                        expect(err.body.message).to.eql('Pattern are not in a format that is supported...')
-                        expect(err.body.description).to.eql('Validation of the standard of sleep failed: data_set is required!')
+                        expect(err.body.message).to.eql(Strings.ERROR_MESSAGE.REQUIRED_FIELDS)
+                        expect(err.body.description).to.eql('pattern.data_set is required!')
                     })
             })
         })
@@ -513,8 +513,8 @@ describe('Routes: children.sleep', () => {
                     .expect(400)
                     .then(err => {
                         expect(err.body.code).to.eql(400)
-                        expect(err.body.message).to.eql('Dataset are not in a format that is supported!')
-                        expect(err.body.description).to.eql('The data_set collection must not be empty!')
+                        expect(err.body.message).to.eql(Strings.ERROR_MESSAGE.INVALID_FIELDS)
+                        expect(err.body.description).to.eql('pattern.data_set must not be empty!')
                     })
             })
         })
@@ -540,9 +540,9 @@ describe('Routes: children.sleep', () => {
                     .expect(400)
                     .then(err => {
                         expect(err.body.code).to.eql(400)
-                        expect(err.body.message).to.eql('Dataset are not in a format that is supported!')
-                        expect(err.body.description).to.eql('Validation of the sleep pattern dataset failed: data_set ' +
-                            'start_time, data_set name, data_set duration is required!')
+                        expect(err.body.message).to.eql(Strings.ERROR_MESSAGE.REQUIRED_FIELDS)
+                        expect(err.body.description).to.eql('pattern.data_set.start_time, pattern.data_set.name, ' +
+                            'pattern.data_set.duration'.concat(Strings.ERROR_MESSAGE.REQUIRED_FIELDS_DESC))
                     })
             })
         })
@@ -573,9 +573,8 @@ describe('Routes: children.sleep', () => {
                         .expect(400)
                         .then(err => {
                             expect(err.body.code).to.eql(400)
-                            expect(err.body.message).to.eql('Some (or several) duration field of sleep pattern ' +
-                                'is invalid...')
-                            expect(err.body.description).to.eql('Sleep Pattern dataset validation failed: '
+                            expect(err.body.message).to.eql(Strings.ERROR_MESSAGE.INVALID_FIELDS)
+                            expect(err.body.description).to.eql('pattern.data_set.duration'
                                 .concat(Strings.ERROR_MESSAGE.INVALID_NUMBER))
                         })
                 })
@@ -606,9 +605,9 @@ describe('Routes: children.sleep', () => {
                     .expect(400)
                     .then(err => {
                         expect(err.body.code).to.eql(400)
-                        expect(err.body.message).to.eql('Some (or several) duration field of sleep pattern is invalid...')
-                        expect(err.body.description).to.eql('Sleep Pattern dataset validation failed: The value provided ' +
-                            'has a negative value!')
+                        expect(err.body.message).to.eql(Strings.ERROR_MESSAGE.INVALID_FIELDS)
+                        expect(err.body.description).to.eql('pattern.data_set.duration'
+                            .concat(Strings.ERROR_MESSAGE.NEGATIVE_NUMBER))
                     })
             })
         })
@@ -630,10 +629,12 @@ describe('Routes: children.sleep', () => {
                     .expect(400)
                     .then(err => {
                         expect(err.body.code).to.eql(400)
-                        expect(err.body.message).to.eql('The sleep pattern name provided "restlesss" is not supported...')
+                        expect(err.body.message).to.eql(Strings.ERROR_MESSAGE.INVALID_FIELDS)
                         if (incorrectSleep11.type === SleepType.CLASSIC)
-                            expect(err.body.description).to.eql('The names of the allowed patterns are: asleep, restless, awake.')
-                        else expect(err.body.description).to.eql('The names of the allowed patterns are: deep, light, rem, awake.')
+                            expect(err.body.description).to.eql('The names of the allowed data_set patterns are: ' +
+                                'asleep, restless, awake.')
+                        else expect(err.body.description).to.eql('The names of the allowed data_set patterns are: ' +
+                            'deep, light, rem, awake.')
                     })
             })
         })
@@ -656,8 +657,9 @@ describe('Routes: children.sleep', () => {
                     .expect(400)
                     .then(err => {
                         expect(err.body.code).to.eql(400)
-                        expect(err.body.message).to.eql('The sleep pattern name provided "deeps" is not supported...')
-                        expect(err.body.description).to.eql('The names of the allowed patterns are: deep, light, rem, awake.')
+                        expect(err.body.message).to.eql(Strings.ERROR_MESSAGE.INVALID_FIELDS)
+                        expect(err.body.description).to.eql('The names of the allowed data_set patterns are: ' +
+                            'deep, light, rem, awake.')
                     })
             })
         })
@@ -848,9 +850,9 @@ describe('Routes: children.sleep', () => {
 
                         // Error item
                         expect(res.body.error[0].code).to.eql(HttpStatus.BAD_REQUEST)
-                        expect(res.body.error[0].message).to.eql('Required fields were not provided...')
-                        expect(res.body.error[0].description).to.eql('Sleep validation failed: ' +
-                            'start_time, end_time, duration, type, pattern is required!')
+                        expect(res.body.error[0].message).to.eql(Strings.ERROR_MESSAGE.REQUIRED_FIELDS)
+                        expect(res.body.error[0].description).to.eql('start_time, end_time, duration, type, ' +
+                            'pattern'.concat(Strings.ERROR_MESSAGE.REQUIRED_FIELDS_DESC))
                     })
             })
         })
@@ -885,38 +887,43 @@ describe('Routes: children.sleep', () => {
                     .set('Content-Type', 'application/json')
                     .expect(207)
                     .then(res => {
-                        expect(res.body.error[0].message).to.eql('Required fields were not provided...')
-                        expect(res.body.error[0].description).to.eql('Sleep validation failed: ' +
-                            'start_time, end_time, duration, type, pattern is required!')
-                        expect(res.body.error[1].message).to.eql('Required fields were not provided...')
-                        expect(res.body.error[1].description).to.eql('Sleep validation failed: type, pattern is required!')
-                        expect(res.body.error[2].message).to.eql('Date field is invalid...')
-                        expect(res.body.error[2].description).to.eql('Date validation failed: The end_time parameter can not contain ' +
+                        expect(res.body.error[0].message).to.eql(Strings.ERROR_MESSAGE.REQUIRED_FIELDS)
+                        expect(res.body.error[0].description).to.eql('start_time, end_time, duration, type, pattern'
+                            .concat(Strings.ERROR_MESSAGE.REQUIRED_FIELDS_DESC))
+                        expect(res.body.error[1].message).to.eql(Strings.ERROR_MESSAGE.REQUIRED_FIELDS)
+                        expect(res.body.error[1].description).to.eql('type, pattern'
+                            .concat(Strings.ERROR_MESSAGE.REQUIRED_FIELDS_DESC))
+                        expect(res.body.error[2].message).to.eql(Strings.ERROR_MESSAGE.INVALID_FIELDS)
+                        expect(res.body.error[2].description).to.eql('The end_time parameter can not contain ' +
                             'an older date than that the start_time parameter!')
-                        expect(res.body.error[3].message).to.eql('Duration field is invalid...')
-                        expect(res.body.error[3].description).to.eql('Duration validation failed: Activity duration value does not ' +
-                            'match values passed in start_time and end_time parameters!')
-                        expect(res.body.error[4].message).to.eql('Duration field is invalid...')
-                        expect(res.body.error[4].description).to.eql('Activity validation failed: The value provided has a negative value!')
-                        expect(res.body.error[5].message).to.eql('The type provided "classics" is not supported...')
-                        expect(res.body.error[5].description).to.eql('The allowed Sleep Pattern types are: classic, stages.')
-                        expect(res.body.error[6].message).to.eql('Pattern are not in a format that is supported...')
-                        expect(res.body.error[6].description).to.eql('Validation of the standard of sleep failed: data_set is required!')
-                        expect(res.body.error[7].message).to.eql('Dataset are not in a format that is supported!')
-                        expect(res.body.error[7].description).to.eql('The data_set collection must not be empty!')
-                        expect(res.body.error[8].message).to.eql('Dataset are not in a format that is supported!')
-                        expect(res.body.error[8].description).to.eql('Validation of the sleep pattern dataset failed: ' +
-                            'data_set start_time, data_set name, data_set duration is required!')
-                        expect(res.body.error[9].message).to.eql('Some (or several) duration field of sleep pattern is invalid...')
-                        expect(res.body.error[9].description).to.eql('Sleep Pattern dataset validation failed: The value provided ' +
-                            'has a negative value!')
-                        expect(res.body.error[10].message).to.eql('The sleep pattern name provided "restlesss" is not supported...')
+                        expect(res.body.error[3].message).to.eql(Strings.ERROR_MESSAGE.INVALID_FIELDS)
+                        expect(res.body.error[3].description).to.eql('duration value does not match values ' +
+                            'passed in start_time and end_time parameters!')
+                        expect(res.body.error[4].message).to.eql(Strings.ERROR_MESSAGE.INVALID_FIELDS)
+                        expect(res.body.error[4].description).to.eql('duration'.concat(Strings.ERROR_MESSAGE.NEGATIVE_NUMBER))
+                        expect(res.body.error[5].message).to.eql(Strings.ERROR_MESSAGE.INVALID_FIELDS)
+                        expect(res.body.error[5].description).to.eql('The names of the allowed Sleep Pattern types are: ' +
+                            'classic, stages.')
+                        expect(res.body.error[6].message).to.eql(Strings.ERROR_MESSAGE.REQUIRED_FIELDS)
+                        expect(res.body.error[6].description).to.eql('pattern.data_set is required!')
+                        expect(res.body.error[7].message).to.eql(Strings.ERROR_MESSAGE.INVALID_FIELDS)
+                        expect(res.body.error[7].description).to.eql('pattern.data_set must not be empty!')
+                        expect(res.body.error[8].message).to.eql(Strings.ERROR_MESSAGE.REQUIRED_FIELDS)
+                        expect(res.body.error[8].description).to.eql('pattern.data_set.start_time, pattern.data_set.name, ' +
+                            'pattern.data_set.duration'.concat(Strings.ERROR_MESSAGE.REQUIRED_FIELDS_DESC))
+                        expect(res.body.error[9].message).to.eql(Strings.ERROR_MESSAGE.INVALID_FIELDS)
+                        expect(res.body.error[9].description).to.eql('pattern.data_set.duration'
+                            .concat(Strings.ERROR_MESSAGE.NEGATIVE_NUMBER))
+                        expect(res.body.error[10].message).to.eql(Strings.ERROR_MESSAGE.INVALID_FIELDS)
                         if (incorrectSleep11.type === SleepType.CLASSIC)
-                            expect(res.body.error[10].description).to.eql('The names of the allowed patterns are: asleep, restless, awake.')
+                            expect(res.body.error[10].description).to.eql('The names of the allowed data_set patterns are: ' +
+                                'asleep, restless, awake.')
                         else
-                            expect(res.body.error[10].description).to.eql('The names of the allowed patterns are: deep, light, rem, awake.')
-                        expect(res.body.error[11].message).to.eql('The sleep pattern name provided "deeps" is not supported...')
-                        expect(res.body.error[11].description).to.eql('The names of the allowed patterns are: deep, light, rem, awake.')
+                            expect(res.body.error[10].description).to.eql('The names of the allowed data_set patterns are: ' +
+                                'deep, light, rem, awake.')
+                        expect(res.body.error[11].message).to.eql(Strings.ERROR_MESSAGE.INVALID_FIELDS)
+                        expect(res.body.error[11].description).to.eql('The names of the allowed data_set patterns are: ' +
+                            'deep, light, rem, awake.')
 
                         for (let i = 0; i < res.body.error.length; i++) {
                             expect(res.body.error[i].code).to.eql(HttpStatus.BAD_REQUEST)
