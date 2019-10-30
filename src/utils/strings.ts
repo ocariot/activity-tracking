@@ -61,6 +61,8 @@ export abstract class Strings {
         REQUIRED_FIELDS_DESC: ' are required!',
         INVALID_FIELDS: 'One or more request fields are invalid...',
         INVALID_STRING: ' must be a string!',
-        EMPTY_STRING: ' must have at least one character!'
+        EMPTY_STRING: ' must have at least one character!',
+        INVALID_DATE: ', is not in valid ISO 8601 format.',
+        INVALID_DATE_DESC: 'Date must be in the format: yyyy-MM-dd\'T\'HH:mm:ssZ'
     }
 }

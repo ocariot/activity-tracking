@@ -103,7 +103,7 @@ describe('Validators: CreateLogValidator', () => {
                 try {
                     CreateLogValidator.validate(logTest)
                 } catch (err) {
-                    assert.equal(err.message, 'Date parameter: 20199-03-11, is not in valid ISO 8601 format.')
+                    assert.equal(err.message, 'Datetime: 20199-03-11'.concat(Strings.ERROR_MESSAGE.INVALID_DATE))
                     assert.equal(err.description, 'Date must be in the format: yyyy-MM-dd')
                 }
             })

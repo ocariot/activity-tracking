@@ -118,7 +118,7 @@ describe('Services: Log', () => {
                 return logService.addLogs(incorrectLogsArr)
                     .then(result => {
                         assert.propertyVal(result.error[0], 'message',
-                            'Date parameter: 20199-03-08, is not in valid ISO 8601 format.')
+                            'Datetime: 20199-03-08'.concat(Strings.ERROR_MESSAGE.INVALID_DATE))
                         assert.propertyVal(result.error[0], 'description',
                             'Date must be in the format: yyyy-MM-dd')
                         assert.propertyVal(result.error[1], 'message',
@@ -156,7 +156,7 @@ describe('Services: Log', () => {
                         }
 
                         assert.propertyVal(result.error[0], 'message',
-                            'Date parameter: 20199-03-08, is not in valid ISO 8601 format.')
+                            'Datetime: 20199-03-08'.concat(Strings.ERROR_MESSAGE.INVALID_DATE))
                         assert.propertyVal(result.error[0], 'description',
                             'Date must be in the format: yyyy-MM-dd')
                         assert.propertyVal(result.error[1], 'message',
@@ -348,7 +348,7 @@ describe('Services: Log', () => {
 
                 return logService.getByChildAndDate(correctLogsArr[0].child_id, correctLogsArr[0].date, correctLogsArr[1].date)
                     .catch(err => {
-                        assert.propertyVal(err, 'message', 'Date parameter: 20199-03-18, is not in valid ISO 8601 format.')
+                        assert.propertyVal(err, 'message', 'Datetime: 20199-03-18'.concat(Strings.ERROR_MESSAGE.INVALID_DATE))
                         assert.propertyVal(err, 'description', 'Date must be in the format: yyyy-MM-dd')
                     })
             })
@@ -362,7 +362,7 @@ describe('Services: Log', () => {
 
                 return logService.getByChildAndDate(correctLogsArr[0].child_id, correctLogsArr[0].date, correctLogsArr[1].date)
                     .catch(err => {
-                        assert.propertyVal(err, 'message', 'Date parameter: 20199-03-18, is not in valid ISO 8601 format.')
+                        assert.propertyVal(err, 'message', 'Datetime: 20199-03-18'.concat(Strings.ERROR_MESSAGE.INVALID_DATE))
                         assert.propertyVal(err, 'description', 'Date must be in the format: yyyy-MM-dd')
                     })
             })
@@ -448,7 +448,7 @@ describe('Services: Log', () => {
                 return logService.getByChildResourceAndDate(correctLogsArr[0].child_id, correctLogsArr[0].type,
                     correctLogsArr[0].date, correctLogsArr[1].date)
                     .catch(err => {
-                        assert.propertyVal(err, 'message', 'Date parameter: 20199-03-18, is not in valid ISO 8601 format.')
+                        assert.propertyVal(err, 'message', 'Datetime: 20199-03-18'.concat(Strings.ERROR_MESSAGE.INVALID_DATE))
                         assert.propertyVal(err, 'description', 'Date must be in the format: yyyy-MM-dd')
                     })
             })
@@ -462,7 +462,7 @@ describe('Services: Log', () => {
                 return logService.getByChildResourceAndDate(correctLogsArr[0].child_id, correctLogsArr[0].type,
                     correctLogsArr[0].date, correctLogsArr[1].date)
                     .catch(err => {
-                        assert.propertyVal(err, 'message', 'Date parameter: 20199-03-18, is not in valid ISO 8601 format.')
+                        assert.propertyVal(err, 'message', 'Datetime: 20199-03-18'.concat(Strings.ERROR_MESSAGE.INVALID_DATE))
                         assert.propertyVal(err, 'description', 'Date must be in the format: yyyy-MM-dd')
                     })
             })

@@ -352,7 +352,7 @@ describe('Routes: children.logs', () => {
                                 expect(res.body.success[i].item.value).to.eql(mixedLogsArr[i].value)
                             }
 
-                            expect(res.body.error[0].message).to.eql('Date parameter: 20199-03-08, is not in valid ISO 8601 format.')
+                            expect(res.body.error[0].message).to.eql('Datetime: 20199-03-08'.concat(Strings.ERROR_MESSAGE.INVALID_DATE))
                             expect(res.body.error[0].description).to.eql('Date must be in the format: yyyy-MM-dd')
                             expect(res.body.error[1].message).to.eql(Strings.ERROR_MESSAGE.INVALID_FIELDS)
                             expect(res.body.error[1].description).to.eql('value'.concat(Strings.ERROR_MESSAGE.NEGATIVE_NUMBER))
@@ -616,7 +616,7 @@ describe('Routes: children.logs', () => {
                     .expect(400)
                     .then(err => {
                         expect(err.body.code).to.eql(400)
-                        expect(err.body.message).to.eql('Date parameter: 20199-10-01, is not in valid ISO 8601 format.')
+                        expect(err.body.message).to.eql('Datetime: 20199-10-01'.concat(Strings.ERROR_MESSAGE.INVALID_DATE))
                         expect(err.body.description).to.eql('Date must be in the format: yyyy-MM-dd')
                     })
             })
@@ -641,7 +641,7 @@ describe('Routes: children.logs', () => {
                     .expect(400)
                     .then(err => {
                         expect(err.body.code).to.eql(400)
-                        expect(err.body.message).to.eql('Date parameter: 20199-10-01, is not in valid ISO 8601 format.')
+                        expect(err.body.message).to.eql('Datetime: 20199-10-01'.concat(Strings.ERROR_MESSAGE.INVALID_DATE))
                         expect(err.body.description).to.eql('Date must be in the format: yyyy-MM-dd')
                     })
             })
@@ -890,7 +890,7 @@ describe('Routes: children.logs', () => {
                     .expect(400)
                     .then(err => {
                         expect(err.body.code).to.eql(400)
-                        expect(err.body.message).to.eql('Date parameter: 20199-10-01, is not in valid ISO 8601 format.')
+                        expect(err.body.message).to.eql('Datetime: 20199-10-01'.concat(Strings.ERROR_MESSAGE.INVALID_DATE))
                         expect(err.body.description).to.eql('Date must be in the format: yyyy-MM-dd')
                     })
             })
@@ -915,7 +915,7 @@ describe('Routes: children.logs', () => {
                     .expect(400)
                     .then(err => {
                         expect(err.body.code).to.eql(400)
-                        expect(err.body.message).to.eql('Date parameter: 20199-10-01, is not in valid ISO 8601 format.')
+                        expect(err.body.message).to.eql('Datetime: 20199-10-01'.concat(Strings.ERROR_MESSAGE.INVALID_DATE))
                         expect(err.body.description).to.eql('Date must be in the format: yyyy-MM-dd')
                     })
             })

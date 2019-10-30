@@ -417,7 +417,7 @@ describe('PROVIDER EVENT BUS TASK', () => {
                     .catch((err) => {
                         try {
                             expect(err.message).to.eql('Error: '
-                                .concat('Datetime: invalidStartTime is not in valid ISO 8601 format.'))
+                                .concat('Datetime: invalidStartTime'.concat(Strings.ERROR_MESSAGE.INVALID_DATE)))
                             done()
                         } catch (err) {
                             done(err)
@@ -434,7 +434,7 @@ describe('PROVIDER EVENT BUS TASK', () => {
                     .catch((err) => {
                         try {
                             expect(err.message).to.eql('Error: '
-                                .concat('Datetime: invalidEndTime is not in valid ISO 8601 format.'))
+                                .concat('Datetime: invalidEndTime'.concat(Strings.ERROR_MESSAGE.INVALID_DATE)))
                             done()
                         } catch (err) {
                             done(err)
@@ -781,7 +781,7 @@ describe('PROVIDER EVENT BUS TASK', () => {
                     .catch((err) => {
                         try {
                             expect(err.message).to.eql('Error: '
-                                .concat('Datetime: invalidStartTime is not in valid ISO 8601 format.'))
+                                .concat('Datetime: invalidStartTime'.concat(Strings.ERROR_MESSAGE.INVALID_DATE)))
                             done()
                         } catch (err) {
                             done(err)
@@ -798,7 +798,7 @@ describe('PROVIDER EVENT BUS TASK', () => {
                     .catch((err) => {
                         try {
                             expect(err.message).to.eql('Error: '
-                                .concat('Datetime: invalidEndTime is not in valid ISO 8601 format.'))
+                                .concat('Datetime: invalidEndTime'.concat(Strings.ERROR_MESSAGE.INVALID_DATE)))
                             done()
                         } catch (err) {
                             done(err)
@@ -1071,7 +1071,7 @@ describe('PROVIDER EVENT BUS TASK', () => {
                     .catch((err) => {
                         try {
                             expect(err.message).to.eql('Error: '
-                                .concat('Datetime: invalidTimestamp is not in valid ISO 8601 format.'))
+                                .concat('Datetime: invalidTimestamp'.concat(Strings.ERROR_MESSAGE.INVALID_DATE)))
                             done()
                         } catch (err) {
                             done(err)
@@ -1405,7 +1405,7 @@ describe('PROVIDER EVENT BUS TASK', () => {
                     .catch((err) => {
                         try {
                             expect(err.message).to.eql('Error: '
-                                .concat('Datetime: invalidTimestamp is not in valid ISO 8601 format.'))
+                                .concat('Datetime: invalidTimestamp'.concat(Strings.ERROR_MESSAGE.INVALID_DATE)))
                             done()
                         } catch (err) {
                             done(err)
@@ -1656,7 +1656,7 @@ describe('PROVIDER EVENT BUS TASK', () => {
                     .catch((err) => {
                         try {
                             expect(err.message).to.eql('Error: '
-                                .concat('Date parameter: invalidDateStart, is not in valid ISO 8601 format.'))
+                                .concat('Datetime: invalidDateStart'.concat(Strings.ERROR_MESSAGE.INVALID_DATE)))
                             done()
                         } catch (err) {
                             done(err)
