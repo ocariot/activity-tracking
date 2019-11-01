@@ -3,8 +3,6 @@ import { IJSONDeserializable } from '../utils/json.deserializable.interface'
 import { JsonUtils } from '../utils/json.utils'
 import { Entity } from './entity'
 import { DatetimeValidator } from '../validator/datetime.validator'
-import { ValidationException } from '../exception/validation.exception'
-import { Strings } from '../../../utils/strings'
 
 /**
  * Implementation of the measurement entity.
@@ -64,12 +62,7 @@ export class Measurement extends Entity implements IJSONSerializable, IJSONDeser
 
     public convertDatetimeString(value: string): Date {
         DatetimeValidator.validate(value)
-        const date: Date = new Date(value)
-        if (isNaN(date.getTime())) {
-            throw new ValidationException(`Datetime: ${value}`.concat(Strings.ERROR_MESSAGE.INVALID_DATE),
-                Strings.ERROR_MESSAGE.INVALID_DATE_DESC)
-        }
-        return date
+        return new Date(value)
     }
 
     public fromJSON(json: any): Measurement {

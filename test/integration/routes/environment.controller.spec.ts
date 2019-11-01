@@ -761,6 +761,32 @@ describe('Routes: environments', () => {
                     })
             })
         })
+
+        context('when a validation error occurs (timestamp is invalid)', () => {
+            it('should return status code 400 and info message about the invalid timestamp', () => {
+                const body = {
+                    institution_id: defaultEnvironment.institution_id,
+                    location: {
+                        local: defaultEnvironment.location!.local,
+                        room: defaultEnvironment.location!.room,
+                    },
+                    measurements: defaultEnvironment.measurements,
+                    climatized: defaultEnvironment.climatized,
+                    timestamp: '2019-11-35T14:40:00Z'
+                }
+
+                return request
+                    .post('/v1/environments')
+                    .send(body)
+                    .set('Content-Type', 'application/json')
+                    .expect(400)
+                    .then(err => {
+                        expect(err.body.code).to.eql(400)
+                        expect(err.body.message).to.eql('Datetime: 2019-11-35T14:40:00Z'.concat(Strings.ERROR_MESSAGE.INVALID_DATE))
+                        expect(err.body.description).to.eql(Strings.ERROR_MESSAGE.INVALID_DATE_DESC)
+                    })
+            })
+        })
     })
     /**
      * POST route with an environment array in the body

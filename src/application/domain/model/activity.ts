@@ -3,8 +3,6 @@ import { IJSONSerializable } from '../utils/json.serializable.interface'
 import { IJSONDeserializable } from '../utils/json.deserializable.interface'
 import { JsonUtils } from '../utils/json.utils'
 import { DatetimeValidator } from '../validator/datetime.validator'
-import { ValidationException } from '../exception/validation.exception'
-import { Strings } from '../../../utils/strings'
 
 /**
  * Implementation of the physicalactivity entity.
@@ -56,12 +54,7 @@ export class Activity extends Entity implements IJSONSerializable, IJSONDeserial
 
     public convertDatetimeString(value: string): Date {
         DatetimeValidator.validate(value)
-        const date: Date = new Date(value)
-        if (isNaN(date.getTime())) {
-            throw new ValidationException(`Datetime: ${value}`.concat(Strings.ERROR_MESSAGE.INVALID_DATE),
-                Strings.ERROR_MESSAGE.INVALID_DATE_DESC)
-        }
-        return date
+        return new Date(value)
     }
 
     public fromJSON(json: any): Activity {

@@ -8,5 +8,11 @@ export class DatetimeValidator {
             throw new ValidationException(`Datetime: ${datetime}`.concat(Strings.ERROR_MESSAGE.INVALID_DATE),
                 Strings.ERROR_MESSAGE.INVALID_DATE_DESC)
         }
+        // Validate day
+        const date: Date = new Date(datetime)
+        if (isNaN(date.getTime())) {
+            throw new ValidationException(`Datetime: ${datetime}`.concat(Strings.ERROR_MESSAGE.INVALID_DATE),
+                Strings.ERROR_MESSAGE.INVALID_DATE_DESC)
+        }
     }
 }

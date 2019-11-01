@@ -3,7 +3,7 @@ import { Strings } from '../../../utils/strings'
 import { Log } from '../model/log'
 import { LogTypeValidator } from './log.type.validator'
 import { ObjectIdValidator } from './object.id.validator'
-import { DateValidator } from './date.validator'
+import { LogDateValidator } from './log.date.validator'
 import { NumberValidator } from './number.validator'
 
 export class CreateLogValidator {
@@ -15,7 +15,7 @@ export class CreateLogValidator {
         else LogTypeValidator.validate((childLog.type))
 
         if (!childLog.date) fields.push('date')
-        else DateValidator.validate(childLog.date)
+        else LogDateValidator.validate(childLog.date)
 
         if (childLog.value === undefined) fields.push('value')
         else NumberValidator.validate(childLog.value, 'value')

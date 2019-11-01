@@ -402,6 +402,29 @@ describe('Routes: children.sleep', () => {
             })
         })
 
+        context('when a validation error occurs (start_time with an invalid day)', () => {
+            it('should return status code 400 and info message about the invalid date', () => {
+                const body = {
+                    start_time: '2018-08-35T01:40:30Z',
+                    end_time: defaultSleep.end_time,
+                    duration: defaultSleep.duration,
+                    pattern: defaultSleep.pattern,
+                    type: defaultSleep.type
+                }
+
+                return request
+                    .post(`/v1/children/${defaultSleep.child_id}/sleep`)
+                    .send(body)
+                    .set('Content-Type', 'application/json')
+                    .expect(400)
+                    .then(err => {
+                        expect(err.body.code).to.eql(400)
+                        expect(err.body.message).to.eql('Datetime: 2018-08-35T01:40:30Z'.concat(Strings.ERROR_MESSAGE.INVALID_DATE))
+                        expect(err.body.description).to.eql(Strings.ERROR_MESSAGE.INVALID_DATE_DESC)
+                    })
+            })
+        })
+
         context('when a validation error occurs (the duration is negative)', () => {
             it('should return status code 400 and info message about the invalid duration', () => {
                 const body = {

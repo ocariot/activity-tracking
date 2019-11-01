@@ -504,6 +504,33 @@ describe('Routes: children.physicalactivities', () => {
             })
         })
 
+        context('when a validation error occurs (start_time with an invalid day)', () => {
+            it('should return status code 400 and info message about the invalid date', () => {
+                const body = {
+                    name: defaultActivity.name,
+                    start_time: '2019-12-35T12:52:59Z',
+                    end_time: defaultActivity.end_time,
+                    duration: defaultActivity.duration,
+                    calories: defaultActivity.calories,
+                    steps: defaultActivity.steps ? defaultActivity.steps : undefined,
+                    distance: defaultActivity.distance ? defaultActivity.distance : undefined,
+                    levels: defaultActivity.levels ? defaultActivity.levels : undefined,
+                    heart_rate: defaultActivity.heart_rate ? defaultActivity.heart_rate : undefined
+                }
+
+                return request
+                    .post(`/v1/children/${defaultActivity.child_id}/physicalactivities`)
+                    .send(body)
+                    .set('Content-Type', 'application/json')
+                    .expect(400)
+                    .then(err => {
+                        expect(err.body.code).to.eql(400)
+                        expect(err.body.message).to.eql('Datetime: 2019-12-35T12:52:59Z'.concat(Strings.ERROR_MESSAGE.INVALID_DATE))
+                        expect(err.body.description).to.eql(Strings.ERROR_MESSAGE.INVALID_DATE_DESC)
+                    })
+            })
+        })
+
         context('when a validation error occurs (the duration is negative)', () => {
             it('should return status code 400 and info message about the invalid duration', () => {
                 const body = {
