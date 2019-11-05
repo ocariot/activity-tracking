@@ -17,7 +17,6 @@ import { WeightService } from '../../../src/application/service/weight.service'
 import { Weight } from '../../../src/application/domain/model/weight'
 import { WeightMock } from '../../mocks/weight.mock'
 import { BodyFat } from '../../../src/application/domain/model/body.fat'
-import { BodyFatMock } from '../../mocks/body.fat.mock'
 import { IBodyFatRepository } from '../../../src/application/port/body.fat.repository.interface'
 import { BodyFatRepositoryMock } from '../../mocks/body.fat.repository.mock'
 import { MeasurementType } from '../../../src/application/domain/model/measurement'
@@ -49,15 +48,18 @@ describe('Services: WeightService', () => {
     incorrectWeight2.child_id = '5a62be07de34500146d9c5442'
 
     const incorrectWeight3: Weight = new WeightMock()    // body_fat of the Weight without all required fields
-    const incorrectBodyFat: BodyFat = new BodyFat()
-    incorrectBodyFat.type = undefined
-    incorrectBodyFat.unit = undefined
-    incorrectWeight3.body_fat = incorrectBodyFat
+    const incorrectBodyFatJSON: any = {
+        type: MeasurementType.BODY_FAT,
+        timestamp: new Date(1560826800000 + Math.floor((Math.random() * 1000))),
+        value: -20,
+        unit: '%',
+        child_id: '5a62be07de34500146d9c544'
+    }
+    incorrectWeight3.body_fat = new BodyFat().fromJSON(incorrectBodyFatJSON)
 
     const incorrectWeight4: Weight = new WeightMock()    // body_fat of the Weight with an invalid child_id
-    const incorrectBodyFat2: BodyFat = new BodyFatMock()
-    incorrectBodyFat2.child_id = '5a62be07de34500146d9c5442'
-    incorrectWeight4.body_fat = incorrectBodyFat2
+    incorrectBodyFatJSON.value = 'invalidValue'
+    incorrectWeight4.body_fat = new BodyFat().fromJSON(incorrectBodyFatJSON)
 
     // Array with correct and incorrect Weight objects
     const mixedWeightArr: Array<Weight> = new Array<WeightMock>()
@@ -227,9 +229,8 @@ describe('Services: WeightService', () => {
             it('should throw a ValidationException', () => {
                 return weightService.add(incorrectWeight3)
                     .catch(err => {
-                        assert.propertyVal(err, 'message', Strings.ERROR_MESSAGE.REQUIRED_FIELDS)
-                        assert.propertyVal(err, 'description', 'type, timestamp, value, unit, child_id'
-                            .concat(Strings.ERROR_MESSAGE.REQUIRED_FIELDS_DESC))
+                        assert.propertyVal(err, 'message', Strings.ERROR_MESSAGE.INVALID_FIELDS)
+                        assert.propertyVal(err, 'description', 'body_fat'.concat(Strings.ERROR_MESSAGE.NEGATIVE_NUMBER))
                     })
             })
         })
@@ -238,8 +239,8 @@ describe('Services: WeightService', () => {
             it('should throw a ValidationException', () => {
                 return weightService.add(incorrectWeight4)
                     .catch(err => {
-                        assert.propertyVal(err, 'message', Strings.CHILD.PARAM_ID_NOT_VALID_FORMAT)
-                        assert.propertyVal(err, 'description', Strings.ERROR_MESSAGE.UUID_NOT_VALID_FORMAT_DESC)
+                        assert.propertyVal(err, 'message', Strings.ERROR_MESSAGE.INVALID_FIELDS)
+                        assert.propertyVal(err, 'description', 'body_fat'.concat(Strings.ERROR_MESSAGE.INVALID_NUMBER))
                     })
             })
         })
@@ -365,13 +366,13 @@ describe('Services: WeightService', () => {
                         assert.propertyVal(result.error[1], 'description',
                             Strings.ERROR_MESSAGE.UUID_NOT_VALID_FORMAT_DESC)
                         assert.propertyVal(result.error[2], 'message',
-                            Strings.ERROR_MESSAGE.REQUIRED_FIELDS)
-                        assert.propertyVal(result.error[2], 'description',
-                            'type, timestamp, value, unit, child_id'.concat(Strings.ERROR_MESSAGE.REQUIRED_FIELDS_DESC))
+                            Strings.ERROR_MESSAGE.INVALID_FIELDS)
+                        assert.propertyVal(result.error[2], 'description', 'body_fat'
+                            .concat(Strings.ERROR_MESSAGE.NEGATIVE_NUMBER))
                         assert.propertyVal(result.error[3], 'message',
-                            Strings.CHILD.PARAM_ID_NOT_VALID_FORMAT)
-                        assert.propertyVal(result.error[3], 'description',
-                            Strings.ERROR_MESSAGE.UUID_NOT_VALID_FORMAT_DESC)
+                            Strings.ERROR_MESSAGE.INVALID_FIELDS)
+                        assert.propertyVal(result.error[3], 'description', 'body_fat'
+                            .concat(Strings.ERROR_MESSAGE.INVALID_NUMBER))
 
                         for (let i = 0; i < result.error.length; i++) {
                             assert.propertyVal(result.error[i], 'code', HttpStatus.BAD_REQUEST)

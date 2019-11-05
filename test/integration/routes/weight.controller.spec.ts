@@ -390,6 +390,50 @@ describe('Routes: children.weights', () => {
                     })
             })
         })
+
+        context('when a validation error occurs (body_fat is invalid)', () => {
+            it('should return status code 400 and info message about the invalid body_fat', () => {
+                const body = {
+                    timestamp: defaultWeight.timestamp,
+                    value: defaultWeight.value,
+                    unit: defaultWeight.unit,
+                    body_fat: `${defaultWeight.body_fat!.value}a`
+                }
+
+                return request
+                    .post(`/v1/children/${defaultWeight.child_id}/weights`)
+                    .send(body)
+                    .set('Content-Type', 'application/json')
+                    .expect(400)
+                    .then(err => {
+                        expect(err.body.code).to.eql(400)
+                        expect(err.body.message).to.eql(Strings.ERROR_MESSAGE.INVALID_FIELDS)
+                        expect(err.body.description).to.eql('body_fat'.concat(Strings.ERROR_MESSAGE.INVALID_NUMBER))
+                    })
+            })
+        })
+
+        context('when a validation error occurs (body_fat is negative)', () => {
+            it('should return status code 400 and info message about the negative body_fat', () => {
+                const body = {
+                    timestamp: defaultWeight.timestamp,
+                    value: defaultWeight.value,
+                    unit: defaultWeight.unit,
+                    body_fat: -(defaultWeight.body_fat!.value!)
+                }
+
+                return request
+                    .post(`/v1/children/${defaultWeight.child_id}/weights`)
+                    .send(body)
+                    .set('Content-Type', 'application/json')
+                    .expect(400)
+                    .then(err => {
+                        expect(err.body.code).to.eql(400)
+                        expect(err.body.message).to.eql(Strings.ERROR_MESSAGE.INVALID_FIELDS)
+                        expect(err.body.description).to.eql('body_fat'.concat(Strings.ERROR_MESSAGE.NEGATIVE_NUMBER))
+                    })
+            })
+        })
     })
     /**
      * POST route with a Weight array in the body
