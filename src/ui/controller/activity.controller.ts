@@ -12,6 +12,8 @@ import { ILogger } from '../../utils/custom.logger'
 import { MultiStatus } from '../../application/domain/model/multi.status'
 import { IQuery } from '../../application/port/query.interface'
 import { Strings } from '../../utils/strings'
+import { StatusError } from '../../application/domain/model/status.error'
+import { ValidationException } from '../../application/domain/exception/validation.exception'
 
 /**
  * Controller that implements PhysicalActivity feature operations.
@@ -45,13 +47,31 @@ export class ActivityController {
         try {
             // Multiple items of PhysicalActivity
             if (req.body instanceof Array) {
-                const activitiesArr: Array<PhysicalActivity> = req.body.map(item => {
-                    const activityItem: PhysicalActivity = new PhysicalActivity().fromJSON(item)
-                    activityItem.child_id = req.params.child_id
-                    return activityItem
+                const invalidItems: Array<StatusError<PhysicalActivity>> = new Array<StatusError<PhysicalActivity>>()
+                const activitiesArr: Array<PhysicalActivity> = new Array<PhysicalActivity>()
+                req.body.forEach(item => {
+                    try {
+                        const activityItem: PhysicalActivity = new PhysicalActivity().fromJSON(item)
+                        activityItem.child_id = req.params.child_id
+                        activitiesArr.push(activityItem)
+                    } catch (err) {
+                        // when unable to successfully form the object through fromJSON()
+                        let statusCode: number = HttpStatus.INTERNAL_SERVER_ERROR
+                        if (err instanceof ValidationException) statusCode = HttpStatus.BAD_REQUEST
+
+                        // Create a StatusError object for the construction of the MultiStatus response.
+                        const statusError: StatusError<PhysicalActivity> = new StatusError<PhysicalActivity>(statusCode, err.message,
+                            err.description, item)
+                        invalidItems.push(statusError)
+                    }
                 })
 
                 const resultMultiStatus: MultiStatus<PhysicalActivity> = await this._activityService.add(activitiesArr)
+                if (invalidItems.length > 0) {
+                    invalidItems.forEach(invalidItem => {
+                        resultMultiStatus.error.push(invalidItem)
+                    })
+                }
                 return res.status(HttpStatus.MULTI_STATUS).send(resultMultiStatus)
             }
 

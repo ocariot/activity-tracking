@@ -145,6 +145,9 @@ describe('Routes: children.physicalactivities', () => {
     const incorrectActivity14: PhysicalActivity = new PhysicalActivityMock()
     incorrectActivity14.heart_rate!.fat_burn_zone!.duration = -600000
 
+    const incorrectActivity15: PhysicalActivity = new PhysicalActivityMock()     // The start_time is invalid
+    incorrectActivity15.start_time = new Date('2019-12-32T12:52:59Z')
+
     // Array with correct and incorrect activities
     const mixedActivitiesArr: Array<PhysicalActivity> = new Array<PhysicalActivityMock>()
     mixedActivitiesArr.push(new PhysicalActivityMock())
@@ -166,6 +169,7 @@ describe('Routes: children.physicalactivities', () => {
     incorrectActivitiesArr.push(incorrectActivity12)
     incorrectActivitiesArr.push(incorrectActivity13)
     incorrectActivitiesArr.push(incorrectActivity14)
+    incorrectActivitiesArr.push(incorrectActivity15)
 
     // Start services
     before(async () => {
@@ -1588,6 +1592,8 @@ describe('Routes: children.physicalactivities', () => {
                         expect(res.body.error[13].message).to.eql(Strings.ERROR_MESSAGE.INVALID_FIELDS)
                         expect(res.body.error[13].description).to.eql('heart_rate.fat_burn_zone.duration'
                             .concat(Strings.ERROR_MESSAGE.NEGATIVE_NUMBER))
+                        expect(res.body.error[14].message).to.eql('Datetime: null'.concat(Strings.ERROR_MESSAGE.INVALID_DATE))
+                        expect(res.body.error[14].description).to.eql(Strings.ERROR_MESSAGE.INVALID_DATE_DESC)
 
                         for (let i = 0; i < res.body.error.length; i++) {
                             expect(res.body.error[i].code).to.eql(HttpStatus.BAD_REQUEST)
@@ -1623,7 +1629,7 @@ describe('Routes: children.physicalactivities', () => {
                                 expect(res.body.error[i].item.heart_rate.peak_zone)
                                     .to.eql(incorrectActivitiesArr[i].heart_rate!.peak_zone!.toJSON())
                             }
-                            if (i !== 0)
+                            if (i !== 0 && i !== 14)
                                 expect(res.body.error[i].item.child_id).to.eql(incorrectActivitiesArr[i].child_id)
                         }
 

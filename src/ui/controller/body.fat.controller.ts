@@ -12,6 +12,8 @@ import { IBodyFatService } from '../../application/port/body.fat.service.interfa
 import { BodyFat } from '../../application/domain/model/body.fat'
 import { IQuery } from '../../application/port/query.interface'
 import { MeasurementType } from '../../application/domain/model/measurement'
+import { StatusError } from '../../application/domain/model/status.error'
+import { ValidationException } from '../../application/domain/exception/validation.exception'
 
 /**
  * Controller that implements BodyFat feature operations.
@@ -45,13 +47,31 @@ export class BodyFatController {
         try {
             // Multiple items of BodyFat
             if (req.body instanceof Array) {
-                const bodyFatArr: Array<BodyFat> = req.body.map(item => {
-                    const bodyFatItem: BodyFat = new BodyFat().fromJSON(item)
-                    bodyFatItem.child_id = req.params.child_id
-                    return bodyFatItem
+                const invalidItems: Array<StatusError<BodyFat>> = new Array<StatusError<BodyFat>>()
+                const bodyFatArr: Array<BodyFat> = new Array<BodyFat>()
+                req.body.forEach(item => {
+                    try {
+                        const bodyFatItem: BodyFat = new BodyFat().fromJSON(item)
+                        bodyFatItem.child_id = req.params.child_id
+                        bodyFatArr.push(bodyFatItem)
+                    } catch (err) {
+                        // when unable to successfully form the object through fromJSON()
+                        let statusCode: number = HttpStatus.INTERNAL_SERVER_ERROR
+                        if (err instanceof ValidationException) statusCode = HttpStatus.BAD_REQUEST
+
+                        // Create a StatusError object for the construction of the MultiStatus response.
+                        const statusError: StatusError<BodyFat> = new StatusError<BodyFat>(statusCode, err.message,
+                            err.description, item)
+                        invalidItems.push(statusError)
+                    }
                 })
 
                 const resultMultiStatus: MultiStatus<BodyFat> = await this._bodyFatService.add(bodyFatArr)
+                if (invalidItems.length > 0) {
+                    invalidItems.forEach(invalidItem => {
+                        resultMultiStatus.error.push(invalidItem)
+                    })
+                }
                 return res.status(HttpStatus.MULTI_STATUS).send(resultMultiStatus)
             }
 

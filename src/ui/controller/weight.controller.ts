@@ -11,6 +11,8 @@ import { MultiStatus } from '../../application/domain/model/multi.status'
 import { IWeightService } from '../../application/port/weight.service.interface'
 import { Weight } from '../../application/domain/model/weight'
 import { IQuery } from '../../application/port/query.interface'
+import { ValidationException } from '../../application/domain/exception/validation.exception'
+import { StatusError } from '../../application/domain/model/status.error'
 
 /**
  * Controller that implements Weight feature operations.
@@ -44,14 +46,32 @@ export class WeightController {
         try {
             // Multiple items of Weight
             if (req.body instanceof Array) {
-                const weightArr: Array<Weight> = req.body.map(item => {
-                    const weightItem: Weight = new Weight().fromJSON(item)
-                    weightItem.child_id = req.params.child_id
-                    if (weightItem.body_fat) weightItem.body_fat.child_id = req.params.child_id
-                    return weightItem
+                const invalidItems: Array<StatusError<Weight>> = new Array<StatusError<Weight>>()
+                const weightArr: Array<Weight> = new Array<Weight>()
+                req.body.forEach(item => {
+                    try {
+                        const weightItem: Weight = new Weight().fromJSON(item)
+                        weightItem.child_id = req.params.child_id
+                        if (weightItem.body_fat) weightItem.body_fat.child_id = req.params.child_id
+                        weightArr.push(weightItem)
+                    } catch (err) {
+                        // when unable to successfully form the object through fromJSON()
+                        let statusCode: number = HttpStatus.INTERNAL_SERVER_ERROR
+                        if (err instanceof ValidationException) statusCode = HttpStatus.BAD_REQUEST
+
+                        // Create a StatusError object for the construction of the MultiStatus response.
+                        const statusError: StatusError<Weight> = new StatusError<Weight>(statusCode, err.message,
+                            err.description, item)
+                        invalidItems.push(statusError)
+                    }
                 })
 
                 const resultMultiStatus: MultiStatus<Weight> = await this._weightService.add(weightArr)
+                if (invalidItems.length > 0) {
+                    invalidItems.forEach(invalidItem => {
+                        resultMultiStatus.error.push(invalidItem)
+                    })
+                }
                 return res.status(HttpStatus.MULTI_STATUS).send(resultMultiStatus)
             }
 

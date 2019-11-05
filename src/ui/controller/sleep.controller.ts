@@ -12,6 +12,8 @@ import { Sleep } from '../../application/domain/model/sleep'
 import { MultiStatus } from '../../application/domain/model/multi.status'
 import { IQuery } from '../../application/port/query.interface'
 import { Strings } from '../../utils/strings'
+import { StatusError } from '../../application/domain/model/status.error'
+import { ValidationException } from '../../application/domain/exception/validation.exception'
 
 /**
  * Controller that implements Sleep feature operations.
@@ -45,13 +47,31 @@ export class SleepController {
         try {
             // Multiple items of Sleep
             if (req.body instanceof Array) {
-                const sleepArr: Array<Sleep> = req.body.map(item => {
-                    const sleepItem: Sleep = new Sleep().fromJSON(item)
-                    sleepItem.child_id = req.params.child_id
-                    return sleepItem
+                const invalidItems: Array<StatusError<Sleep>> = new Array<StatusError<Sleep>>()
+                const sleepArr: Array<Sleep> = new Array<Sleep>()
+                req.body.forEach(item => {
+                    try {
+                        const sleepItem: Sleep = new Sleep().fromJSON(item)
+                        sleepItem.child_id = req.params.child_id
+                        sleepArr.push(sleepItem)
+                    } catch (err) {
+                        // when unable to successfully form the object through fromJSON()
+                        let statusCode: number = HttpStatus.INTERNAL_SERVER_ERROR
+                        if (err instanceof ValidationException) statusCode = HttpStatus.BAD_REQUEST
+
+                        // Create a StatusError object for the construction of the MultiStatus response.
+                        const statusError: StatusError<Sleep> = new StatusError<Sleep>(statusCode, err.message,
+                            err.description, item)
+                        invalidItems.push(statusError)
+                    }
                 })
 
                 const resultMultiStatus: MultiStatus<Sleep> = await this._sleepService.add(sleepArr)
+                if (invalidItems.length > 0) {
+                    invalidItems.forEach(invalidItem => {
+                        resultMultiStatus.error.push(invalidItem)
+                    })
+                }
                 return res.status(HttpStatus.MULTI_STATUS).send(resultMultiStatus)
             }
 

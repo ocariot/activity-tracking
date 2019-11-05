@@ -34,13 +34,19 @@ describe('Routes: children.weights', () => {
     }
 
     // Incorrect Weight objects
-    const incorrectWeight: Weight = new Weight()         // Without all required fields
-    incorrectWeight.type = ''
+    const incorrectWeight1: Weight = new Weight()         // Without all required fields
+    const incorrectWeight2: Weight = new WeightMock()         // The timestamp is invalid
+    incorrectWeight2.timestamp = new Date('2019-12-35T12:52:59Z')
 
     // Array with correct and incorrect Weight objects
     const mixedWeightArr: Array<Weight> = new Array<WeightMock>()
     mixedWeightArr.push(new WeightMock())
-    mixedWeightArr.push(incorrectWeight)
+    mixedWeightArr.push(incorrectWeight1)
+
+    // Array with only incorrect Weight objects
+    const incorrectWeightArr: Array<Weight> = new Array<WeightMock>()
+    incorrectWeightArr.push(incorrectWeight1)
+    incorrectWeightArr.push(incorrectWeight2)
 
     // Start services
     before(async () => {
@@ -588,6 +594,59 @@ describe('Routes: children.weights', () => {
                         expect(res.body.error[0].message).to.eql(Strings.ERROR_MESSAGE.REQUIRED_FIELDS)
                         expect(res.body.error[0].description).to.eql('timestamp, value, unit'
                             .concat(Strings.ERROR_MESSAGE.REQUIRED_FIELDS_DESC))
+                    })
+            })
+        })
+
+        context('when there are only incorrect Weight objects in the body', () => {
+            before(async () => {
+                try {
+                    await deleteAllWeights()
+                } catch (err) {
+                    throw new Error('Failure on children.weights routes test: ' + err.message)
+                }
+            })
+
+            it('should return status code 201 and return a response of type MultiStatus<Weight> with the ' +
+                'description of error in each one of them', () => {
+                const body: any = []
+
+                incorrectWeightArr.forEach(bodyFat => {
+                    const bodyElem = {
+                        timestamp: bodyFat.timestamp,
+                        value: bodyFat.value,
+                        unit: bodyFat.unit,
+                        body_fat: (bodyFat.body_fat) ? bodyFat.body_fat.value : undefined
+                    }
+                    body.push(bodyElem)
+                })
+
+                return request
+                    .post(`/v1/children/${defaultWeight.child_id}/weights`)
+                    .send(body)
+                    .set('Content-Type', 'application/json')
+                    .expect(207)
+                    .then(res => {
+                        expect(res.body.error[0].message).to.eql(Strings.ERROR_MESSAGE.REQUIRED_FIELDS)
+                        expect(res.body.error[0].description).to.eql('timestamp, value, unit'
+                            .concat(Strings.ERROR_MESSAGE.REQUIRED_FIELDS_DESC))
+                        expect(res.body.error[1].message).to.eql('Datetime: null'.concat(Strings.ERROR_MESSAGE.INVALID_DATE))
+                        expect(res.body.error[1].description).to.eql(Strings.ERROR_MESSAGE.INVALID_DATE_DESC)
+
+                        for (let i = 0; i < res.body.error.length; i++) {
+                            expect(res.body.error[i].code).to.eql(HttpStatus.BAD_REQUEST)
+                            if (i !== 0) {
+                                expect(res.body.error[i].item.timestamp).to.eql(null)
+                                expect(res.body.error[i].item.value).to.eql(incorrectWeightArr[i].value)
+                                expect(res.body.error[i].item.unit).to.eql(incorrectWeightArr[i].unit)
+                                expect(res.body.error[i].item.body_fat).eql(incorrectWeightArr[i].body_fat!.value)
+                            }
+                            if (i === 0) {
+                                expect(res.body.error[i].item.child_id).eql(defaultWeight.child_id)
+                            }
+                        }
+
+                        expect(res.body.success.length).to.eql(0)
                     })
             })
         })

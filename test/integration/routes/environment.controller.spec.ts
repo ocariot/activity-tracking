@@ -49,6 +49,9 @@ describe('Routes: environments', () => {
     const incorrectEnv5: Environment = new EnvironmentMock()   // Measurement invalid (missing fields)
     incorrectEnv5.measurements![2] = new Measurement()
 
+    const incorrectEnv6: Environment = new EnvironmentMock()   // The timestamp is invalid
+    incorrectEnv6.timestamp = new Date('2019-12-35T12:52:59Z')
+
     // Array with correct and incorrect environments
     const mixedEnvironmentsArr: Array<Environment> = new Array<EnvironmentMock>()
     mixedEnvironmentsArr.push(new EnvironmentMock())
@@ -61,6 +64,7 @@ describe('Routes: environments', () => {
     incorrectEnvironmentsArr.push(incorrectEnv3)
     incorrectEnvironmentsArr.push(incorrectEnv4)
     incorrectEnvironmentsArr.push(incorrectEnv5)
+    incorrectEnvironmentsArr.push(incorrectEnv6)
 
     // Start services
     before(async () => {
@@ -1012,6 +1016,8 @@ describe('Routes: environments', () => {
                         expect(res.body.error[4].description)
                             .to.eql('measurements.type, measurements.value, measurements.unit'
                             .concat(Strings.ERROR_MESSAGE.REQUIRED_FIELDS_DESC))
+                        expect(res.body.error[5].message).to.eql('Datetime: null'.concat(Strings.ERROR_MESSAGE.INVALID_DATE))
+                        expect(res.body.error[5].description).to.eql(Strings.ERROR_MESSAGE.INVALID_DATE_DESC)
 
                         for (let i = 0; i < res.body.error.length; i++) {
                             expect(res.body.error[i].code).to.eql(HttpStatus.BAD_REQUEST)
@@ -1027,7 +1033,7 @@ describe('Routes: environments', () => {
                             }
                             if (res.body.error[i].item.climatized)
                                 expect(res.body.error[i].item.climatized).to.eql(incorrectEnvironmentsArr[i].climatized)
-                            if (i !== 0) expect(res.body.error[i].item.timestamp)
+                            if (i !== 0 && i !== 5) expect(res.body.error[i].item.timestamp)
                                 .to.eql(incorrectEnvironmentsArr[i].timestamp.toISOString())
                             if (i !== 0 && i !== 3) {
                                 let index = 0

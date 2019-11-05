@@ -108,6 +108,9 @@ describe('Routes: children.sleep', () => {
     incorrectSleep12.pattern!.data_set = new Array<SleepPatternDataSet>()
     incorrectSleep12.pattern!.data_set[0] = new SleepPatternDataSet().fromJSON(wrongDataSetItem12JSON)
 
+    const incorrectSleep13: Sleep = new SleepMock()         // The end_time is invalid
+    incorrectSleep13.end_time = new Date('2019-12-35T12:52:59Z')
+
     // Array with correct and incorrect sleep objects
     const mixedSleepArr: Array<Sleep> = new Array<SleepMock>()
     mixedSleepArr.push(new SleepMock())
@@ -127,6 +130,7 @@ describe('Routes: children.sleep', () => {
     incorrectSleepArr.push(incorrectSleep10)
     incorrectSleepArr.push(incorrectSleep11)
     incorrectSleepArr.push(incorrectSleep12)
+    incorrectSleepArr.push(incorrectSleep13)
 
     // Start services
     before(async () => {
@@ -947,6 +951,8 @@ describe('Routes: children.sleep', () => {
                         expect(res.body.error[11].message).to.eql(Strings.ERROR_MESSAGE.INVALID_FIELDS)
                         expect(res.body.error[11].description).to.eql('The names of the allowed data_set patterns are: ' +
                             'deep, light, rem, awake.')
+                        expect(res.body.error[12].message).to.eql('Datetime: null'.concat(Strings.ERROR_MESSAGE.INVALID_DATE))
+                        expect(res.body.error[12].description).to.eql(Strings.ERROR_MESSAGE.INVALID_DATE_DESC)
 
                         for (let i = 0; i < res.body.error.length; i++) {
                             expect(res.body.error[i].code).to.eql(HttpStatus.BAD_REQUEST)
@@ -966,7 +972,7 @@ describe('Routes: children.sleep', () => {
                             }
                             if (res.body.error[i].item.type)
                                 expect(res.body.error[i].item.type).to.eql(incorrectSleepArr[i].type)
-                            if (i !== 0)
+                            if (i !== 0 && i !== 12)
                                 expect(res.body.error[i].item.child_id).to.eql(incorrectSleepArr[i].child_id)
                         }
 
