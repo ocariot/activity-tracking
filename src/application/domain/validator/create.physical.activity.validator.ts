@@ -24,13 +24,9 @@ export class CreatePhysicalActivityValidator {
         if (activity.calories === undefined) fields.push('calories')
         else NumberValidator.validate(activity.calories, 'calories')
 
-        if (activity.steps) {
-            NumberValidator.validate(activity.steps, 'steps')
-        }
+        if (activity.steps !== undefined) NumberValidator.validate(activity.steps, 'steps')
 
-        if (activity.distance) {
-            NumberValidator.validate(activity.distance, 'distance')
-        }
+        if (activity.distance !== undefined) NumberValidator.validate(activity.distance, 'distance')
 
         if (activity.levels && activity.levels.length > 0) PhysicalActivityLevelsValidator.validate(activity.levels)
         if (activity.heart_rate) PhysicalActivityHeartRateValidator.validate(activity.heart_rate)

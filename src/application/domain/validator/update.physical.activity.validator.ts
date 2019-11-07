@@ -30,11 +30,11 @@ export class UpdatePhysicalActivityValidator {
 
         if (physicalActivity.name !== undefined) StringValidator.validate(physicalActivity.name, 'name')
 
-        if (physicalActivity.calories) NumberValidator.validate(physicalActivity.calories, 'calories')
+        if (physicalActivity.calories !== undefined) NumberValidator.validate(physicalActivity.calories, 'calories')
 
-        if (physicalActivity.steps) NumberValidator.validate(physicalActivity.steps, 'steps')
+        if (physicalActivity.steps !== undefined) NumberValidator.validate(physicalActivity.steps, 'steps')
 
-        if (physicalActivity.distance) NumberValidator.validate(physicalActivity.distance, 'distance')
+        if (physicalActivity.distance !== undefined) NumberValidator.validate(physicalActivity.distance, 'distance')
 
         if (physicalActivity.levels && physicalActivity.levels.length) {
             throw new ValidationException(Strings.ERROR_MESSAGE.UNABLE_UPDATE, Strings.ERROR_MESSAGE.UNABLE_UPDATE_DESC)

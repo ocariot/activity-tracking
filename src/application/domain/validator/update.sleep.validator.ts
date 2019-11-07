@@ -12,7 +12,7 @@ export class UpdateSleepValidator {
         if (sleep.child_id) ObjectIdValidator.validate(sleep.child_id, Strings.CHILD.PARAM_ID_NOT_VALID_FORMAT)
         if (sleep.id) ObjectIdValidator.validate(sleep.id, Strings.SLEEP.PARAM_ID_NOT_VALID_FORMAT)
 
-        if (sleep.duration) NumberValidator.validate(sleep.duration, 'duration')
+        if (sleep.duration !== undefined) NumberValidator.validate(sleep.duration, 'duration')
         if (sleep.start_time && sleep.end_time && sleep.duration) {
             const durationValidate: number = sleep.end_time.getTime() - sleep.start_time.getTime()
             if (durationValidate < 0) {
