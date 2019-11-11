@@ -60,8 +60,14 @@ export class Location implements IJSONSerializable, IJSONDeserializable<Location
 
         if (json.local !== undefined) this.local = json.local
         if (json.room !== undefined) this.room = json.room
-        if (json.latitude !== undefined) this.latitude = json.latitude
-        if (json.longitude !== undefined) this.longitude = json.longitude
+        if (json.latitude !== undefined) {
+            if (typeof json.latitude === 'number') json.latitude = json.latitude.toString()
+            this.latitude = json.latitude
+        }
+        if (json.longitude !== undefined) {
+            if (typeof json.longitude === 'number') json.longitude = json.longitude.toString()
+            this.longitude = json.longitude
+        }
 
         return this
     }
