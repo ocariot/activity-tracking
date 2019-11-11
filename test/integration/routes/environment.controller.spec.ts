@@ -441,33 +441,6 @@ describe('Routes: environments', () => {
             })
         })
 
-        context('when a validation error occurs (location latitude is invalid)', () => {
-            it('should return status code 400 and info message about the invalid location', () => {
-                const body = {
-                    institution_id: defaultEnvironment.institution_id,
-                    location: {
-                        local: defaultEnvironment.location!.local,
-                        room: defaultEnvironment.location!.room,
-                        latitude: 123
-                    },
-                    measurements: defaultEnvironment.measurements,
-                    climatized: defaultEnvironment.climatized,
-                    timestamp: defaultEnvironment.timestamp
-                }
-
-                return request
-                    .post('/v1/environments')
-                    .send(body)
-                    .set('Content-Type', 'application/json')
-                    .expect(400)
-                    .then(err => {
-                        expect(err.body.code).to.eql(400)
-                        expect(err.body.message).to.eql(Strings.ERROR_MESSAGE.INVALID_FIELDS)
-                        expect(err.body.description).to.eql('location.latitude'.concat(Strings.ERROR_MESSAGE.INVALID_STRING))
-                    })
-            })
-        })
-
         context('when a validation error occurs (location longitude is empty)', () => {
             it('should return status code 400 and info message about the invalid location', () => {
                 const body = {
@@ -491,33 +464,6 @@ describe('Routes: environments', () => {
                         expect(err.body.code).to.eql(400)
                         expect(err.body.message).to.eql(Strings.ERROR_MESSAGE.INVALID_FIELDS)
                         expect(err.body.description).to.eql('location.longitude'.concat(Strings.ERROR_MESSAGE.EMPTY_STRING))
-                    })
-            })
-        })
-
-        context('when a validation error occurs (location longitude is invalid)', () => {
-            it('should return status code 400 and info message about the invalid location', () => {
-                const body = {
-                    institution_id: defaultEnvironment.institution_id,
-                    location: {
-                        local: defaultEnvironment.location!.local,
-                        room: defaultEnvironment.location!.room,
-                        longitude: 123
-                    },
-                    measurements: defaultEnvironment.measurements,
-                    climatized: defaultEnvironment.climatized,
-                    timestamp: defaultEnvironment.timestamp
-                }
-
-                return request
-                    .post('/v1/environments')
-                    .send(body)
-                    .set('Content-Type', 'application/json')
-                    .expect(400)
-                    .then(err => {
-                        expect(err.body.code).to.eql(400)
-                        expect(err.body.message).to.eql(Strings.ERROR_MESSAGE.INVALID_FIELDS)
-                        expect(err.body.description).to.eql('location.longitude'.concat(Strings.ERROR_MESSAGE.INVALID_STRING))
                     })
             })
         })
