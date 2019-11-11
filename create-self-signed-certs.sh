@@ -26,7 +26,7 @@ C  = UE
 ST = Bruxelas
 L  = Bruxelas
 O  = OCARIoT CA
-CN = api.ocariot.com
+CN = localhost
 # Allow client and server auth. You may want to only allow server auth.
 # Link to SAN names.
 [v3_req]
@@ -53,10 +53,10 @@ EOF
 openssl req \
   -new \
   -newkey rsa:2048 \
-  -days 120 \
+  -days 365 \
   -nodes \
   -x509 \
-  -subj "//C=UE\ST=Bruxelas\L=Bruxelas\O=OCARIoT CA\CN=api.ocariot.com" \
+  -subj "/C=US/ST=Bruxelas/L=Bruxelas/O=OCARIoT CA/CN=localhost" \
   -keyout "${DIR}/ca.key" \
   -out "${DIR}/ca.crt"
 # For each server/service you want to secure with your CA, repeat the
@@ -77,7 +77,7 @@ openssl req \
 # by our CA.
 openssl x509 \
   -req \
-  -days 120 \
+  -days 365 \
   -in "${DIR}/server.csr" \
   -CA "${DIR}/ca.crt" \
   -CAkey "${DIR}/ca.key" \

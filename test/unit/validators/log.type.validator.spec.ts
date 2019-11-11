@@ -1,6 +1,7 @@
 import { assert } from 'chai'
 import { Log, LogType } from '../../../src/application/domain/model/log'
 import { LogTypeValidator } from '../../../src/application/domain/validator/log.type.validator'
+import { Strings } from '../../../src/utils/strings'
 
 let log: Log = new Log('2019-03-11', 1000, LogType.STEPS, '5a62be07de34500146d9c544')
 
@@ -28,7 +29,7 @@ describe('Validators: LogTypeValidator', () => {
                 try {
                     LogTypeValidator.validate(log.type)
                 } catch (err) {
-                    assert.equal(err.message, 'The name of type provided "step" is not supported...')
+                    assert.equal(err.message, Strings.ERROR_MESSAGE.INVALID_FIELDS)
                     assert.equal(err.description,
                         'The names of the allowed types are: ' +
                         'steps, calories, active_minutes, lightly_active_minutes, sedentary_minutes.')

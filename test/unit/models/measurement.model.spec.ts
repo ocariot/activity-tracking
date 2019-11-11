@@ -1,10 +1,10 @@
 import { assert } from 'chai'
-import { Measurement, MeasurementType } from '../../../src/application/domain/model/measurement'
+import { Measurement } from '../../../src/application/domain/model/measurement'
 import { ValidationException } from '../../../src/application/domain/exception/validation.exception'
 
 describe('Models: Measurement', () => {
     const measurementJSON: any = {
-        type: MeasurementType.HUMIDITY,
+        type: 'humidity',
         timestamp: new Date(),
         value: 30.05,
         unit: '%',

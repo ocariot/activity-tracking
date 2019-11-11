@@ -1,33 +1,32 @@
 import { ValidationException } from '../exception/validation.exception'
 import { Strings } from '../../../utils/strings'
 import { ObjectIdValidator } from './object.id.validator'
-import { Measurement, MeasurementType } from '../model/measurement'
+import { Measurement } from '../model/measurement'
+import { NumberValidator } from './number.validator'
+import { StringValidator } from './string.validator'
 
 export class CreateMeasurementValidator {
     public static validate(measurement: Measurement): void | ValidationException {
         const fields: Array<string> = []
-        const measurementTypes: Array<string> = Object.values(MeasurementType)
 
         // validate null.
-        if (!measurement.type) fields.push('type')
-        else if (!measurementTypes.includes(measurement.type)) {
-            throw new ValidationException(`The type of measurement provided "${measurement.type}" is not supported...`,
-                `The allowed types are: ${measurementTypes.join(', ')}.`)
-        }
+        if (measurement.type === undefined) fields.push('type')
+        else StringValidator.validate(measurement.type, 'type')
+
         if (!measurement.timestamp) fields.push('timestamp')
+
         if (measurement.value === undefined) fields.push('value')
-        else if (isNaN(measurement.value)) {
-            throw new ValidationException('Measurement value field is invalid...',
-                'Measurement validation failed: '.concat(Strings.ERROR_MESSAGE.INVALID_NUMBER))
-        }
-        if (!measurement.unit) fields.push('unit')
+        else NumberValidator.validate(measurement.value, 'value')
+
+        if (measurement.unit === undefined) fields.push('unit')
+        else StringValidator.validate(measurement.unit, 'unit')
 
         if (!measurement.child_id) fields.push('child_id')
         else ObjectIdValidator.validate(measurement.child_id, Strings.CHILD.PARAM_ID_NOT_VALID_FORMAT)
 
         if (fields.length > 0) {
-            throw new ValidationException('Required fields were not provided...',
-                'Measurement validation failed: '.concat(fields.join(', ')).concat(' is required!'))
+            throw new ValidationException(Strings.ERROR_MESSAGE.REQUIRED_FIELDS,
+                fields.join(', ').concat(Strings.ERROR_MESSAGE.REQUIRED_FIELDS_DESC))
         }
     }
 }

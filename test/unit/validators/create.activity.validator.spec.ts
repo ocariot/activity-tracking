@@ -53,9 +53,9 @@ describe('Validators: CreateActivityValidator', () => {
                 try {
                     CreateActivityValidator.validate(activity)
                 } catch (err) {
-                    assert.equal(err.message, 'Date field is invalid...')
-                    assert.equal(err.description, 'Date validation failed: The end_time parameter can not contain an older date ' +
-                        'than that the start_time parameter!')
+                    assert.equal(err.message, Strings.ERROR_MESSAGE.INVALID_FIELDS)
+                    assert.equal(err.description, 'The end_time parameter can not contain an older date than ' +
+                        'that the start_time parameter!')
                 }
             })
         })
@@ -67,9 +67,9 @@ describe('Validators: CreateActivityValidator', () => {
                 try {
                     CreateActivityValidator.validate(activity)
                 } catch (err) {
-                    assert.equal(err.message, 'Duration field is invalid...')
-                    assert.equal(err.description, 'Duration validation failed: Activity duration value does not match values ' +
-                        'passed in start_time and end_time parameters!')
+                    assert.equal(err.message, Strings.ERROR_MESSAGE.INVALID_FIELDS)
+                    assert.equal(err.description, 'duration value does not match values passed in start_time ' +
+                        'and end_time parameters!')
                 }
             })
         })
@@ -80,8 +80,8 @@ describe('Validators: CreateActivityValidator', () => {
                 try {
                     CreateActivityValidator.validate(activity)
                 } catch (err) {
-                    assert.equal(err.message, 'Duration field is invalid...')
-                    assert.equal(err.description, 'Activity validation failed: '.concat(Strings.ERROR_MESSAGE.NEGATIVE_PARAMETER))
+                    assert.equal(err.message, Strings.ERROR_MESSAGE.INVALID_FIELDS)
+                    assert.equal(err.description, 'duration'.concat(Strings.ERROR_MESSAGE.NEGATIVE_NUMBER))
                 }
                 activity.duration = 1178000
             })

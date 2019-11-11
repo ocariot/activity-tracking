@@ -31,13 +31,19 @@ describe('Routes: children.bodyfats', () => {
     }
 
     // Incorrect BodyFat object
-    const incorrectBodyFat: BodyFat = new BodyFat()           // Without all required fields
-    incorrectBodyFat.unit = undefined
+    const incorrectBodyFat1: BodyFat = new BodyFat()           // Without all required fields
+    const incorrectBodyFat2: BodyFat = new BodyFatMock()         // The timestamp is invalid
+    incorrectBodyFat2.timestamp = new Date('2019-12-35T12:52:59Z')
 
     // Array with correct and incorrect BodyFat objects
     const mixedBodyFatArr: Array<BodyFat> = new Array<BodyFatMock>()
     mixedBodyFatArr.push(new BodyFatMock())
-    mixedBodyFatArr.push(incorrectBodyFat)
+    mixedBodyFatArr.push(incorrectBodyFat1)
+
+    // Array with only incorrect BodyFat objects
+    const incorrectBodyFatArr: Array<BodyFat> = new Array<BodyFatMock>()
+    incorrectBodyFatArr.push(incorrectBodyFat1)
+    incorrectBodyFatArr.push(incorrectBodyFat2)
 
     // Start services
     before(async () => {
@@ -138,14 +144,77 @@ describe('Routes: children.bodyfats', () => {
                     .expect(400)
                     .then(err => {
                         expect(err.body.code).to.eql(400)
-                        expect(err.body.message).to.eql('Required fields were not provided...')
-                        expect(err.body.description).to.eql('Measurement validation failed: timestamp, value is required!')
+                        expect(err.body.message).to.eql(Strings.ERROR_MESSAGE.REQUIRED_FIELDS)
+                        expect(err.body.description).to.eql('timestamp, value'.concat(Strings.ERROR_MESSAGE.REQUIRED_FIELDS_DESC))
+                    })
+            })
+        })
+
+        context('when a validation error occurs (timestamp is invalid)', () => {
+            it('should return status code 400 and info message about the missing fields', () => {
+                const body = {
+                    timestamp: '2019-06-35T14:40:00Z',
+                    value: defaultBodyFat.value,
+                    unit: defaultBodyFat.unit
+                }
+
+                return request
+                    .post(`/v1/children/${defaultBodyFat.child_id}/bodyfats`)
+                    .send(body)
+                    .set('Content-Type', 'application/json')
+                    .expect(400)
+                    .then(err => {
+                        expect(err.body.code).to.eql(400)
+                        expect(err.body.message).to.eql('Datetime: 2019-06-35T14:40:00Z'.concat(Strings.ERROR_MESSAGE.INVALID_DATE))
+                        expect(err.body.description).to.eql(Strings.ERROR_MESSAGE.INVALID_DATE_DESC)
+                    })
+            })
+        })
+
+        context('when a validation error occurs (value is invalid)', () => {
+            it('should return status code 400 and info message about the invalid value', () => {
+                const body = {
+                    timestamp: defaultBodyFat.timestamp,
+                    value: `${defaultBodyFat.value}a`,
+                    unit: defaultBodyFat.unit
+                }
+
+                return request
+                    .post(`/v1/children/${defaultBodyFat.child_id}/bodyfats`)
+                    .send(body)
+                    .set('Content-Type', 'application/json')
+                    .expect(400)
+                    .then(err => {
+                        expect(err.body.code).to.eql(400)
+                        expect(err.body.message).to.eql(Strings.ERROR_MESSAGE.INVALID_FIELDS)
+                        expect(err.body.description).to.eql('value'.concat(Strings.ERROR_MESSAGE.INVALID_NUMBER))
+                    })
+            })
+        })
+
+        context('when a validation error occurs (value is negative)', () => {
+            it('should return status code 400 and info message about the negative value', () => {
+                const body = {
+                    timestamp: defaultBodyFat.timestamp,
+                    value: -(defaultBodyFat.value!),
+                    unit: defaultBodyFat.unit
+                }
+
+                return request
+                    .post(`/v1/children/${defaultBodyFat.child_id}/bodyfats`)
+                    .send(body)
+                    .set('Content-Type', 'application/json')
+                    .expect(400)
+                    .then(err => {
+                        expect(err.body.code).to.eql(400)
+                        expect(err.body.message).to.eql(Strings.ERROR_MESSAGE.INVALID_FIELDS)
+                        expect(err.body.description).to.eql('value'.concat(Strings.ERROR_MESSAGE.NEGATIVE_NUMBER))
                     })
             })
         })
 
         context('when a validation error occurs (child_id is invalid)', () => {
-            it('should return status code 400 and info message about the missing fields', () => {
+            it('should return status code 400 and info message about the invalid child_id', () => {
                 const body = {
                     timestamp: defaultBodyFat.timestamp,
                     value: defaultBodyFat.value,
@@ -300,8 +369,60 @@ describe('Routes: children.bodyfats', () => {
 
                         // Error item
                         expect(res.body.error[0].code).to.eql(HttpStatus.BAD_REQUEST)
-                        expect(res.body.error[0].message).to.eql('Required fields were not provided...')
-                        expect(res.body.error[0].description).to.eql('Measurement validation failed: timestamp, value is required!')
+                        expect(res.body.error[0].message).to.eql(Strings.ERROR_MESSAGE.REQUIRED_FIELDS)
+                        expect(res.body.error[0].description).to.eql('timestamp, value'
+                            .concat(Strings.ERROR_MESSAGE.REQUIRED_FIELDS_DESC))
+                    })
+            })
+        })
+
+        context('when there are only incorrect BodyFat objects in the body', () => {
+            before(async () => {
+                try {
+                    await deleteAllBodyFats()
+                } catch (err) {
+                    throw new Error('Failure on children.bodyfats routes test: ' + err.message)
+                }
+            })
+
+            it('should return status code 201 and return a response of type MultiStatus<BodyFat> with the ' +
+                'description of error in each one of them', () => {
+                const body: any = []
+
+                incorrectBodyFatArr.forEach(bodyFat => {
+                    const bodyElem = {
+                        timestamp: bodyFat.timestamp,
+                        value: bodyFat.value,
+                        unit: bodyFat.unit
+                    }
+                    body.push(bodyElem)
+                })
+
+                return request
+                    .post(`/v1/children/${defaultBodyFat.child_id}/bodyfats`)
+                    .send(body)
+                    .set('Content-Type', 'application/json')
+                    .expect(207)
+                    .then(res => {
+                        expect(res.body.error[0].message).to.eql(Strings.ERROR_MESSAGE.REQUIRED_FIELDS)
+                        expect(res.body.error[0].description).to.eql('timestamp, value'
+                            .concat(Strings.ERROR_MESSAGE.REQUIRED_FIELDS_DESC))
+                        expect(res.body.error[1].message).to.eql('Datetime: null'.concat(Strings.ERROR_MESSAGE.INVALID_DATE))
+                        expect(res.body.error[1].description).to.eql(Strings.ERROR_MESSAGE.INVALID_DATE_DESC)
+
+                        for (let i = 0; i < res.body.error.length; i++) {
+                            expect(res.body.error[i].code).to.eql(HttpStatus.BAD_REQUEST)
+                            if (i !== 0) {
+                                expect(res.body.error[i].item.timestamp).to.eql(null)
+                                expect(res.body.error[i].item.value).to.eql(incorrectBodyFatArr[i].value)
+                                expect(res.body.error[i].item.unit).to.eql(incorrectBodyFatArr[i].unit)
+                            }
+                            if (i === 0) {
+                                expect(res.body.error[i].item.child_id).eql(defaultBodyFat.child_id)
+                            }
+                        }
+
+                        expect(res.body.success.length).to.eql(0)
                     })
             })
         })
@@ -518,9 +639,9 @@ describe('Routes: children.bodyfats', () => {
                     .expect(404)
                     .then(err => {
                         expect(err.body.code).to.eql(404)
-                        expect(err.body.message).to.eql('BodyFat not found!')
-                        expect(err.body.description).to.eql('BodyFat not found or already removed. A new operation for ' +
-                            'the same resource is not required!')
+                        expect(err.body.message).to.eql('Body Fat not found!')
+                        expect(err.body.description).to.eql('Body Fat not found or already removed. A new operation for ' +
+                            'the same resource is not required.')
                     })
             })
         })

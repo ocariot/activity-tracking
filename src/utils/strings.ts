@@ -48,12 +48,21 @@ export abstract class Strings {
 
     public static readonly ERROR_MESSAGE: any = {
         UNEXPECTED: 'An unexpected error has occurred. Please try again later...',
-        NEGATIVE_PARAMETER: 'The value provided has a negative value!',
-        INVALID_NUMBER: 'The value provided is not a valid number!',
         UNABLE_UPDATE: 'Unable to update this attribute.',
         UNABLE_UPDATE_DESC: 'Updateable attributes are: name, calories, steps, distance, levels ' +
             '(only if the update is from an empty array) and heart_rate.',
         UUID_NOT_VALID_FORMAT: 'Some ID provided does not have a valid format!',
-        UUID_NOT_VALID_FORMAT_DESC: 'A 24-byte hex ID similar to this: 507f191e810c19729de860ea is expected.'
+        UUID_NOT_VALID_FORMAT_DESC: 'A 24-byte hex ID similar to this: 507f191e810c19729de860ea is expected.',
+        DISCONTINUED_METHOD: 'Support for this method has been discontinued.',
+        INTERNAL_SERVER_ERROR: 'An internal server error has occurred.',
+        INVALID_NUMBER: ' must be a valid number!',
+        NEGATIVE_NUMBER: ' can\'t be negative!',
+        REQUIRED_FIELDS: 'Required fields were not provided...',
+        REQUIRED_FIELDS_DESC: ' are required!',
+        INVALID_FIELDS: 'One or more request fields are invalid...',
+        INVALID_STRING: ' must be a string!',
+        EMPTY_STRING: ' must have at least one character!',
+        INVALID_DATE: ', is not in valid ISO 8601 format.',
+        INVALID_DATE_DESC: 'Date must be in the format: yyyy-MM-dd\'T\'HH:mm:ssZ'
     }
 }

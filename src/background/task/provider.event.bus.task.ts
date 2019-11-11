@@ -16,7 +16,7 @@ import { Weight } from '../../application/domain/model/weight'
 import { Environment } from '../../application/domain/model/environment'
 import { ILogRepository } from '../../application/port/log.repository.interface'
 import { ObjectIdValidator } from '../../application/domain/validator/object.id.validator'
-import { DateValidator } from '../../application/domain/validator/date.validator'
+import { LogDateValidator } from '../../application/domain/validator/log.date.validator'
 import { LogDateRangeValidator } from '../../application/domain/validator/log.date.range.validator'
 import { ChildLog } from '../../application/domain/model/child.log'
 
@@ -127,8 +127,8 @@ export class ProviderEventBusTask implements IBackgroundTask {
             .provideLogs(async (childId, dateStart, dateEnd) => {
                 try {
                     ObjectIdValidator.validate(childId)
-                    DateValidator.validate(dateStart)
-                    DateValidator.validate(dateEnd)
+                    LogDateValidator.validate(dateStart)
+                    LogDateValidator.validate(dateEnd)
                     LogDateRangeValidator.validate(dateStart, dateEnd)
                     const result: ChildLog = await this._logRepository.findByChild(childId, dateStart, dateEnd) as ChildLog
                     return result.toJSON()

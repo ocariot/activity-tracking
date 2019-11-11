@@ -32,27 +32,38 @@ describe('Routes: children.logs', () => {
         mixedLogsArr.push(new LogMock())
     }
 
-    // Incorrect log (invalid date)
-    const incorrectLog = new Log('20199-03-08', 250, LogType.CALORIES, '5a62be07de34500146d9c544')
-    incorrectLog.id = '507f1f77bcf86cd799439011'
-    mixedLogsArr.push(incorrectLog)
+    // Mock other incorrect log with invalid date (invalid day)
+    const incorrectLogJSON: any = {
+        date: '2019-03-35',
+        value: 1000
+    }
+
+    // Mock other incorrect log with invalid date
+    const incorrectLogJSON2: any = {
+        date: '20199-03-18',
+        value: 1000
+    }
 
     // Mock other incorrect log with negative value
-    const logJSON: any = {
+    const incorrectLogJSON3: any = {
         date: '2019-03-18',
         value: -1000
     }
 
     // Mock other incorrect log with invalid value
-    const otherLogJSON: any = {
+    const incorrectLogJSON4: any = {
         date: '2019-03-18',
         value: 'invalid_value'
     }
 
-    const incorrectLog2: Log = new Log().fromJSON(logJSON)
-    const incorrectLog3: Log = new Log().fromJSON(otherLogJSON)
+    const incorrectLog: Log = new Log().fromJSON(incorrectLogJSON)
+    const incorrectLog2: Log = new Log().fromJSON(incorrectLogJSON2)
+    const incorrectLog3: Log = new Log().fromJSON(incorrectLogJSON3)
+    const incorrectLog4: Log = new Log().fromJSON(incorrectLogJSON4)
+    mixedLogsArr.push(incorrectLog)
     mixedLogsArr.push(incorrectLog2)
     mixedLogsArr.push(incorrectLog3)
+    mixedLogsArr.push(incorrectLog4)
 
     // Start services
     before(async () => {
@@ -352,14 +363,14 @@ describe('Routes: children.logs', () => {
                                 expect(res.body.success[i].item.value).to.eql(mixedLogsArr[i].value)
                             }
 
-                            expect(res.body.error[0].message).to.eql('Date parameter: 20199-03-08, is not in valid ISO 8601 format.')
+                            expect(res.body.error[0].message).to.eql('Datetime: 2019-03-35'.concat(Strings.ERROR_MESSAGE.INVALID_DATE))
                             expect(res.body.error[0].description).to.eql('Date must be in the format: yyyy-MM-dd')
-                            expect(res.body.error[1].message).to.eql('Value field is invalid...')
-                            expect(res.body.error[1].description).to.eql('Child log validation failed: The value ' +
-                                'provided has a negative value!')
-                            expect(res.body.error[2].message).to.eql('Value field is invalid...')
-                            expect(res.body.error[2].description).to.eql('Child log validation failed: ' +
-                                Strings.ERROR_MESSAGE.INVALID_NUMBER)
+                            expect(res.body.error[1].message).to.eql('Datetime: 20199-03-18'.concat(Strings.ERROR_MESSAGE.INVALID_DATE))
+                            expect(res.body.error[1].description).to.eql('Date must be in the format: yyyy-MM-dd')
+                            expect(res.body.error[2].message).to.eql(Strings.ERROR_MESSAGE.INVALID_FIELDS)
+                            expect(res.body.error[2].description).to.eql('value'.concat(Strings.ERROR_MESSAGE.NEGATIVE_NUMBER))
+                            expect(res.body.error[3].message).to.eql(Strings.ERROR_MESSAGE.INVALID_FIELDS)
+                            expect(res.body.error[3].description).to.eql('value'.concat(Strings.ERROR_MESSAGE.INVALID_NUMBER))
 
                             for (let i = 0; i < res.body.error.length; i++) {
                                 expect(res.body.error[i].code).to.eql(HttpStatus.BAD_REQUEST)
@@ -440,7 +451,7 @@ describe('Routes: children.logs', () => {
                             for (let i = 0; i < res.body.error.length; i++) {
                                 expect(res.body.error[i].code).to.eql(HttpStatus.BAD_REQUEST)
                                 expect(res.body.error[i].message)
-                                    .to.eql('The name of type provided "step" is not supported...')
+                                    .to.eql(Strings.ERROR_MESSAGE.INVALID_FIELDS)
                                 expect(res.body.error[i].description)
                                     .to.eql('The names of the allowed types are: ' +
                                     'steps, calories, active_minutes, lightly_active_minutes, sedentary_minutes.')
@@ -487,8 +498,9 @@ describe('Routes: children.logs', () => {
                                 expect(res.body.success[i].item.value).to.eql(correctLogsArr[i].value)
                             }
                             expect(res.body.error[0].code).to.eql(HttpStatus.BAD_REQUEST)
-                            expect(res.body.error[0].message).to.eql('Required fields were not provided...')
-                            expect(res.body.error[0].description).to.eql('Child log validation failed: date, value is required!')
+                            expect(res.body.error[0].message).to.eql(Strings.ERROR_MESSAGE.REQUIRED_FIELDS)
+                            expect(res.body.error[0].description).to.eql('date, value'
+                                .concat(Strings.ERROR_MESSAGE.REQUIRED_FIELDS_DESC))
                         })
                 })
         })
@@ -617,7 +629,7 @@ describe('Routes: children.logs', () => {
                     .expect(400)
                     .then(err => {
                         expect(err.body.code).to.eql(400)
-                        expect(err.body.message).to.eql('Date parameter: 20199-10-01, is not in valid ISO 8601 format.')
+                        expect(err.body.message).to.eql('Datetime: 20199-10-01'.concat(Strings.ERROR_MESSAGE.INVALID_DATE))
                         expect(err.body.description).to.eql('Date must be in the format: yyyy-MM-dd')
                     })
             })
@@ -642,7 +654,32 @@ describe('Routes: children.logs', () => {
                     .expect(400)
                     .then(err => {
                         expect(err.body.code).to.eql(400)
-                        expect(err.body.message).to.eql('Date parameter: 20199-10-01, is not in valid ISO 8601 format.')
+                        expect(err.body.message).to.eql('Datetime: 20199-10-01'.concat(Strings.ERROR_MESSAGE.INVALID_DATE))
+                        expect(err.body.description).to.eql('Date must be in the format: yyyy-MM-dd')
+                    })
+            })
+        })
+
+        context('when the parameters are incorrect (date_end with an invalid day)', () => {
+            before(async () => {
+                try {
+                    await deleteAllLogs()
+                } catch (err) {
+                    throw new Error('Failure on children.logs routes test: ' + err.message)
+                }
+            })
+            it('should return status code 400 and an info message about the invalid date_end', () => {
+                const basePath = `/v1/children/${correctLogsArr[0].child_id}/logs`
+                const specificPath = `/date/${correctLogsArr[0].date}/2019-10-35`
+                const url = `${basePath}${specificPath}`
+
+                return request
+                    .get(url)
+                    .set('Content-Type', 'application/json')
+                    .expect(400)
+                    .then(err => {
+                        expect(err.body.code).to.eql(400)
+                        expect(err.body.message).to.eql('Datetime: 2019-10-35'.concat(Strings.ERROR_MESSAGE.INVALID_DATE))
                         expect(err.body.description).to.eql('Date must be in the format: yyyy-MM-dd')
                     })
             })
@@ -668,8 +705,8 @@ describe('Routes: children.logs', () => {
                     .then(err => {
                         expect(err.body.code).to.eql(400)
                         expect(err.body.message).to.eql('Date range is invalid...')
-                        expect(err.body.description).to.eql('Log dates range validation failed: ' +
-                            'The period between the received dates is longer than one year')
+                        expect(err.body.description).to.eql('The period between the received dates can not ' +
+                            'exceed one year!')
                     })
             })
         })
@@ -694,8 +731,8 @@ describe('Routes: children.logs', () => {
                     .then(err => {
                         expect(err.body.code).to.eql(400)
                         expect(err.body.message).to.eql('Date range is invalid...')
-                        expect(err.body.description).to.eql('Log dates range validation failed: ' +
-                            'The date_end parameter can not contain an older date than that the date_start parameter!')
+                        expect(err.body.description).to.eql('The date_end parameter can not contain an older date ' +
+                            'than that the date_start parameter!')
                     })
             })
         })
@@ -864,7 +901,7 @@ describe('Routes: children.logs', () => {
                     .expect(400)
                     .then(err => {
                         expect(err.body.code).to.eql(400)
-                        expect(err.body.message).to.eql('The name of type provided "step" is not supported...')
+                        expect(err.body.message).to.eql(Strings.ERROR_MESSAGE.INVALID_FIELDS)
                         expect(err.body.description)
                             .to.eql('The names of the allowed types are: ' +
                             'steps, calories, active_minutes, lightly_active_minutes, sedentary_minutes.')
@@ -891,7 +928,32 @@ describe('Routes: children.logs', () => {
                     .expect(400)
                     .then(err => {
                         expect(err.body.code).to.eql(400)
-                        expect(err.body.message).to.eql('Date parameter: 20199-10-01, is not in valid ISO 8601 format.')
+                        expect(err.body.message).to.eql('Datetime: 20199-10-01'.concat(Strings.ERROR_MESSAGE.INVALID_DATE))
+                        expect(err.body.description).to.eql('Date must be in the format: yyyy-MM-dd')
+                    })
+            })
+        })
+
+        context('when the parameters are incorrect (date_start with an invalid day)', () => {
+            before(async () => {
+                try {
+                    await deleteAllLogs()
+                } catch (err) {
+                    throw new Error('Failure on children.logs routes test: ' + err.message)
+                }
+            })
+            it('should return status code 400 and an info message about the invalid date_start', () => {
+                const basePath = `/v1/children/${correctLogsArr[0].child_id}/logs/${correctLogsArr[0].type}`
+                const specificPath = `/date/2019-10-35/${correctLogsArr[0].date}`
+                const url = `${basePath}${specificPath}`
+
+                return request
+                    .get(url)
+                    .set('Content-Type', 'application/json')
+                    .expect(400)
+                    .then(err => {
+                        expect(err.body.code).to.eql(400)
+                        expect(err.body.message).to.eql('Datetime: 2019-10-35'.concat(Strings.ERROR_MESSAGE.INVALID_DATE))
                         expect(err.body.description).to.eql('Date must be in the format: yyyy-MM-dd')
                     })
             })
@@ -916,7 +978,7 @@ describe('Routes: children.logs', () => {
                     .expect(400)
                     .then(err => {
                         expect(err.body.code).to.eql(400)
-                        expect(err.body.message).to.eql('Date parameter: 20199-10-01, is not in valid ISO 8601 format.')
+                        expect(err.body.message).to.eql('Datetime: 20199-10-01'.concat(Strings.ERROR_MESSAGE.INVALID_DATE))
                         expect(err.body.description).to.eql('Date must be in the format: yyyy-MM-dd')
                     })
             })
@@ -942,8 +1004,7 @@ describe('Routes: children.logs', () => {
                     .then(err => {
                         expect(err.body.code).to.eql(400)
                         expect(err.body.message).to.eql('Date range is invalid...')
-                        expect(err.body.description).to.eql('Log dates range validation failed: ' +
-                            'The period between the received dates is longer than one year')
+                        expect(err.body.description).to.eql('The period between the received dates can not exceed one year!')
                     })
             })
         })

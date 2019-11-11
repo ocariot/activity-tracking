@@ -1,6 +1,7 @@
 import { assert } from 'chai'
 import { ActivityLevelType, PhysicalActivityLevel } from '../../../src/application/domain/model/physical.activity.level'
 import { PhysicalActivityLevelsValidator } from '../../../src/application/domain/validator/physical.activity.levels.validator'
+import { Strings } from '../../../src/utils/strings'
 
 let levels: Array<PhysicalActivityLevel> =
         [new PhysicalActivityLevel(ActivityLevelType.SEDENTARY, Math.floor((Math.random() * 10) * 60000)),
@@ -23,8 +24,9 @@ describe('Validators: PhysicalActivityLevelsValidator', () => {
                 try {
                     PhysicalActivityLevelsValidator.validate(levels)
                 } catch (err) {
-                    assert.equal(err.message, 'Level are not in a format that is supported!')
-                    assert.equal(err.description, 'Must have values ​​for the following levels: sedentary, lightly, fairly, very.')
+                    assert.equal(err.message, Strings.ERROR_MESSAGE.INVALID_FIELDS)
+                    assert.equal(err.description, 'The levels array must have values for the following levels: ' +
+                        'sedentary, lightly, fairly, very.')
                 }
                 levels = [new PhysicalActivityLevel(ActivityLevelType.SEDENTARY, Math.floor((Math.random() * 10) * 60000)),
                     new PhysicalActivityLevel(ActivityLevelType.LIGHTLY, Math.floor((Math.random() * 10) * 60000)),
@@ -47,7 +49,7 @@ describe('Validators: PhysicalActivityLevelsValidator', () => {
                 try {
                     PhysicalActivityLevelsValidator.validate(levels)
                 } catch (err) {
-                    assert.equal(err.message, 'The name of level provided "lightlys" is not supported...')
+                    assert.equal(err.message, Strings.ERROR_MESSAGE.INVALID_FIELDS)
                     assert.equal(err.description, 'The names of the allowed levels are: sedentary, lightly, fairly, very.')
                 }
                 levels[1] = new PhysicalActivityLevel(ActivityLevelType.LIGHTLY, Math.floor((Math.random() * 10) * 60000))
@@ -68,8 +70,9 @@ describe('Validators: PhysicalActivityLevelsValidator', () => {
                 try {
                     PhysicalActivityLevelsValidator.validate(levels)
                 } catch (err) {
-                    assert.equal(err.message, 'Level are not in a format that is supported!')
-                    assert.equal(err.description, 'Must have values ​​for the following levels: sedentary, lightly, fairly, very.')
+                    assert.equal(err.message, Strings.ERROR_MESSAGE.INVALID_FIELDS)
+                    assert.equal(err.description, 'The levels array must have values for the following levels: ' +
+                        'sedentary, lightly, fairly, very.')
                 }
                 levels[1] = new PhysicalActivityLevel(ActivityLevelType.LIGHTLY, Math.floor((Math.random() * 10) * 60000))
             })
@@ -81,8 +84,8 @@ describe('Validators: PhysicalActivityLevelsValidator', () => {
                 try {
                     PhysicalActivityLevelsValidator.validate(levels)
                 } catch (err) {
-                    assert.equal(err.message, 'Level are not in a format that is supported...')
-                    assert.equal(err.description, 'Validation of physical activity levels failed:  level duration is required!')
+                    assert.equal(err.message, Strings.ERROR_MESSAGE.REQUIRED_FIELDS)
+                    assert.equal(err.description, 'levels.duration'.concat(Strings.ERROR_MESSAGE.REQUIRED_FIELDS_DESC))
                 }
                 levels[1].duration = Math.floor((Math.random() * 10) * 60000)
             })
@@ -102,8 +105,9 @@ describe('Validators: PhysicalActivityLevelsValidator', () => {
                 try {
                     PhysicalActivityLevelsValidator.validate(levels)
                 } catch (err) {
-                    assert.equal(err.message, 'Level are not in a format that is supported!')
-                    assert.equal(err.description, 'Must have values ​​for the following levels: sedentary, lightly, fairly, very.')
+                    assert.equal(err.message, Strings.ERROR_MESSAGE.INVALID_FIELDS)
+                    assert.equal(err.description, 'The levels array must have values for the following levels: ' +
+                        'sedentary, lightly, fairly, very.')
                 }
                 levels[1] = new PhysicalActivityLevel(ActivityLevelType.LIGHTLY, Math.floor((Math.random() * 10) * 60000))
             })
@@ -115,8 +119,8 @@ describe('Validators: PhysicalActivityLevelsValidator', () => {
                 try {
                     PhysicalActivityLevelsValidator.validate(levels)
                 } catch (err) {
-                    assert.equal(err.message, 'Some (or several) duration field of levels array is invalid...')
-                    assert.equal(err.description, 'Physical Activity Level validation failed: The value provided has a negative value!')
+                    assert.equal(err.message, Strings.ERROR_MESSAGE.INVALID_FIELDS)
+                    assert.equal(err.description, 'levels.duration'.concat(Strings.ERROR_MESSAGE.NEGATIVE_NUMBER))
                 }
                 levels[1].duration = Math.floor((Math.random() * 10 + 1) * 60000)
             })

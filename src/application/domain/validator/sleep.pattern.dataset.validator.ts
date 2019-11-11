@@ -2,43 +2,37 @@ import { ValidationException } from '../exception/validation.exception'
 import { PhasesPatternType, SleepPatternDataSet, StagesPatternType } from '../model/sleep.pattern.data.set'
 import { Strings } from '../../../utils/strings'
 import { SleepType } from '../model/sleep'
+import { NumberValidator } from './number.validator'
 
 export class SleepPatternDataSetValidator {
     public static validate(dataset: Array<SleepPatternDataSet>, sleepType: SleepType): void | ValidationException {
         const fields: Array<string> = []
-        const message: string = 'Dataset are not in a format that is supported!'
         const phasesPatternTypes: Array<string> = Object.values(PhasesPatternType)
         const stagesPatternTypes: Array<string> = Object.values(StagesPatternType)
 
         if (!dataset.length) {
-            throw new ValidationException(message, 'The data_set collection must not be empty!')
+            throw new ValidationException(Strings.ERROR_MESSAGE.INVALID_FIELDS, 'pattern.data_set must not be empty!')
         }
 
         dataset.forEach((data: SleepPatternDataSet) => {
             // validate null
-            if (!data.start_time) fields.push('data_set start_time')
-            if (!data.name) fields.push('data_set name')
+            if (!data.start_time) fields.push('pattern.data_set.start_time')
+            if (!data.name) fields.push('pattern.data_set.name')
             else if (sleepType === SleepType.CLASSIC && !phasesPatternTypes.includes(data.name)) {
-                    throw new ValidationException(`The sleep pattern name provided "${data.name}" is not supported...`,
-                        'The names of the allowed patterns are: '.concat(phasesPatternTypes.join(', ').concat('.')))
+                    throw new ValidationException(Strings.ERROR_MESSAGE.INVALID_FIELDS,
+                        'The names of the allowed data_set patterns are: '.concat(phasesPatternTypes.join(', ').concat('.')))
             }
             else if (sleepType === SleepType.STAGES && !stagesPatternTypes.includes(data.name)) {
-                    throw new ValidationException(`The sleep pattern name provided "${data.name}" is not supported...`,
-                        'The names of the allowed patterns are: '.concat(stagesPatternTypes.join(', ').concat('.')))
+                    throw new ValidationException(Strings.ERROR_MESSAGE.INVALID_FIELDS,
+                        'The names of the allowed data_set patterns are: '.concat(stagesPatternTypes.join(', ').concat('.')))
             }
-            if (data.duration === undefined) fields.push('data_set duration')
-            else if (isNaN(data.duration)) {
-                throw new ValidationException('Some (or several) duration field of sleep pattern is invalid...',
-                    'Sleep Pattern dataset validation failed: '.concat(Strings.ERROR_MESSAGE.INVALID_NUMBER))
-            } else if (data.duration < 0) {
-                throw new ValidationException('Some (or several) duration field of sleep pattern is invalid...',
-                    'Sleep Pattern dataset validation failed: '.concat(Strings.ERROR_MESSAGE.NEGATIVE_PARAMETER))
-            }
+            if (data.duration === undefined) fields.push('pattern.data_set.duration')
+            else NumberValidator.validate(data.duration, 'pattern.data_set.duration')
         })
 
         if (fields.length > 0) {
-            throw new ValidationException(message,
-                'Validation of the sleep pattern dataset failed: '.concat(fields.join(', ')).concat(' is required!'))
+            throw new ValidationException(Strings.ERROR_MESSAGE.REQUIRED_FIELDS,
+                fields.join(', ').concat(Strings.ERROR_MESSAGE.REQUIRED_FIELDS_DESC))
         }
     }
 }

@@ -2,6 +2,7 @@ import { ValidationException } from '../exception/validation.exception'
 import { Sleep, SleepType } from '../model/sleep'
 import { SleepPatternValidator } from './sleep.pattern.validator'
 import { CreateActivityValidator } from './create.activity.validator'
+import { Strings } from '../../../utils/strings'
 
 export class CreateSleepValidator {
     public static validate(sleep: Sleep): void | ValidationException {
@@ -19,16 +20,16 @@ export class CreateSleepValidator {
         // Validate Sleep attributes
         if (!sleep.type) fields.push('type')
         else if (!sleepPatternTypes.includes(sleep.type)) {
-            throw new ValidationException(`The type provided "${sleep.type}" is not supported...`,
-                `The allowed Sleep Pattern types are: ${sleepPatternTypes.join(', ')}.`)
+            throw new ValidationException(Strings.ERROR_MESSAGE.INVALID_FIELDS,
+                `The names of the allowed Sleep Pattern types are: ${sleepPatternTypes.join(', ')}.`)
         }
 
         if (!sleep.pattern) fields.push('pattern')
         else SleepPatternValidator.validate(sleep.pattern, sleep.type!)
 
         if (fields.length > 0) {
-            throw new ValidationException('Required fields were not provided...',
-                'Sleep validation failed: '.concat(fields.join(', ')).concat(' is required!'))
+            throw new ValidationException(Strings.ERROR_MESSAGE.REQUIRED_FIELDS,
+                fields.join(', ').concat(Strings.ERROR_MESSAGE.REQUIRED_FIELDS_DESC))
         }
     }
 }

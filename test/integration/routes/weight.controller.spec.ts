@@ -34,13 +34,19 @@ describe('Routes: children.weights', () => {
     }
 
     // Incorrect Weight objects
-    const incorrectWeight: Weight = new Weight()         // Without all required fields
-    incorrectWeight.type = ''
+    const incorrectWeight1: Weight = new Weight()         // Without all required fields
+    const incorrectWeight2: Weight = new WeightMock()         // The timestamp is invalid
+    incorrectWeight2.timestamp = new Date('2019-12-35T12:52:59Z')
 
     // Array with correct and incorrect Weight objects
     const mixedWeightArr: Array<Weight> = new Array<WeightMock>()
     mixedWeightArr.push(new WeightMock())
-    mixedWeightArr.push(incorrectWeight)
+    mixedWeightArr.push(incorrectWeight1)
+
+    // Array with only incorrect Weight objects
+    const incorrectWeightArr: Array<Weight> = new Array<WeightMock>()
+    incorrectWeightArr.push(incorrectWeight1)
+    incorrectWeightArr.push(incorrectWeight2)
 
     // Start services
     before(async () => {
@@ -253,8 +259,30 @@ describe('Routes: children.weights', () => {
                     .expect(400)
                     .then(err => {
                         expect(err.body.code).to.eql(400)
-                        expect(err.body.message).to.eql('Required fields were not provided...')
-                        expect(err.body.description).to.eql('Measurement validation failed: timestamp, value, unit is required!')
+                        expect(err.body.message).to.eql(Strings.ERROR_MESSAGE.REQUIRED_FIELDS)
+                        expect(err.body.description).to.eql('timestamp, value, unit'.concat(Strings.ERROR_MESSAGE.REQUIRED_FIELDS_DESC))
+                    })
+            })
+        })
+
+        context('when a validation error occurs (timestamp is invalid)', () => {
+            it('should return status code 400 and info message about the invalid timestamp', () => {
+                const body = {
+                    timestamp: '2019-06-35T14:40:00Z',
+                    value: defaultWeight.value,
+                    unit: defaultWeight.unit,
+                    body_fat: defaultWeight.body_fat!.value
+                }
+
+                return request
+                    .post(`/v1/children/${defaultWeight.child_id}/weights`)
+                    .send(body)
+                    .set('Content-Type', 'application/json')
+                    .expect(400)
+                    .then(err => {
+                        expect(err.body.code).to.eql(400)
+                        expect(err.body.message).to.eql('Datetime: 2019-06-35T14:40:00Z'.concat(Strings.ERROR_MESSAGE.INVALID_DATE))
+                        expect(err.body.description).to.eql(Strings.ERROR_MESSAGE.INVALID_DATE_DESC)
                     })
             })
         })
@@ -275,15 +303,80 @@ describe('Routes: children.weights', () => {
                     .expect(400)
                     .then(err => {
                         expect(err.body.code).to.eql(400)
-                        expect(err.body.message).to.eql('Measurement value field is invalid...')
-                        expect(err.body.description).to.eql('Measurement validation failed: '
-                            .concat(Strings.ERROR_MESSAGE.INVALID_NUMBER))
+                        expect(err.body.message).to.eql(Strings.ERROR_MESSAGE.INVALID_FIELDS)
+                        expect(err.body.description).to.eql('value'.concat(Strings.ERROR_MESSAGE.INVALID_NUMBER))
+                    })
+            })
+        })
+
+        context('when a validation error occurs (value is negative)', () => {
+            it('should return status code 400 and info message about the negative value', () => {
+                const body = {
+                    timestamp: defaultWeight.timestamp,
+                    value: -(defaultWeight.value!),
+                    unit: defaultWeight.unit,
+                    body_fat: defaultWeight.body_fat!.value
+                }
+
+                return request
+                    .post(`/v1/children/${defaultWeight.child_id}/weights`)
+                    .send(body)
+                    .set('Content-Type', 'application/json')
+                    .expect(400)
+                    .then(err => {
+                        expect(err.body.code).to.eql(400)
+                        expect(err.body.message).to.eql(Strings.ERROR_MESSAGE.INVALID_FIELDS)
+                        expect(err.body.description).to.eql('value'.concat(Strings.ERROR_MESSAGE.NEGATIVE_NUMBER))
+                    })
+            })
+        })
+
+        context('when a validation error occurs (unit is empty)', () => {
+            it('should return status code 400 and info message about the empty unit', () => {
+                const body = {
+                    timestamp: defaultWeight.timestamp,
+                    value: defaultWeight.value,
+                    unit: '',
+                    body_fat: defaultWeight.body_fat!.value
+                }
+
+                return request
+                    .post(`/v1/children/${defaultWeight.child_id}/weights`)
+                    .send(body)
+                    .set('Content-Type', 'application/json')
+                    .expect(400)
+                    .then(err => {
+                        expect(err.body.code).to.eql(400)
+                        expect(err.body.message).to.eql(Strings.ERROR_MESSAGE.INVALID_FIELDS)
+                        expect(err.body.description).to.eql('unit'.concat(Strings.ERROR_MESSAGE.EMPTY_STRING))
+                    })
+            })
+        })
+
+        context('when a validation error occurs (unit is invalid)', () => {
+            it('should return status code 400 and info message about the invalid unit', () => {
+                const body = {
+                    timestamp: defaultWeight.timestamp,
+                    value: defaultWeight.value,
+                    unit: 123,
+                    body_fat: defaultWeight.body_fat!.value
+                }
+
+                return request
+                    .post(`/v1/children/${defaultWeight.child_id}/weights`)
+                    .send(body)
+                    .set('Content-Type', 'application/json')
+                    .expect(400)
+                    .then(err => {
+                        expect(err.body.code).to.eql(400)
+                        expect(err.body.message).to.eql(Strings.ERROR_MESSAGE.INVALID_FIELDS)
+                        expect(err.body.description).to.eql('unit'.concat(Strings.ERROR_MESSAGE.INVALID_STRING))
                     })
             })
         })
 
         context('when a validation error occurs (child_id is invalid)', () => {
-            it('should return status code 400 and info message about the missing fields', () => {
+            it('should return status code 400 and info message about the invalid child_id', () => {
                 const body = {
                     timestamp: defaultWeight.timestamp,
                     value: defaultWeight.value,
@@ -300,6 +393,50 @@ describe('Routes: children.weights', () => {
                         expect(err.body.code).to.eql(400)
                         expect(err.body.message).to.eql(Strings.CHILD.PARAM_ID_NOT_VALID_FORMAT)
                         expect(err.body.description).to.eql(Strings.ERROR_MESSAGE.UUID_NOT_VALID_FORMAT_DESC)
+                    })
+            })
+        })
+
+        context('when a validation error occurs (body_fat is invalid)', () => {
+            it('should return status code 400 and info message about the invalid body_fat', () => {
+                const body = {
+                    timestamp: defaultWeight.timestamp,
+                    value: defaultWeight.value,
+                    unit: defaultWeight.unit,
+                    body_fat: `${defaultWeight.body_fat!.value}a`
+                }
+
+                return request
+                    .post(`/v1/children/${defaultWeight.child_id}/weights`)
+                    .send(body)
+                    .set('Content-Type', 'application/json')
+                    .expect(400)
+                    .then(err => {
+                        expect(err.body.code).to.eql(400)
+                        expect(err.body.message).to.eql(Strings.ERROR_MESSAGE.INVALID_FIELDS)
+                        expect(err.body.description).to.eql('body_fat'.concat(Strings.ERROR_MESSAGE.INVALID_NUMBER))
+                    })
+            })
+        })
+
+        context('when a validation error occurs (body_fat is negative)', () => {
+            it('should return status code 400 and info message about the negative body_fat', () => {
+                const body = {
+                    timestamp: defaultWeight.timestamp,
+                    value: defaultWeight.value,
+                    unit: defaultWeight.unit,
+                    body_fat: -(defaultWeight.body_fat!.value!)
+                }
+
+                return request
+                    .post(`/v1/children/${defaultWeight.child_id}/weights`)
+                    .send(body)
+                    .set('Content-Type', 'application/json')
+                    .expect(400)
+                    .then(err => {
+                        expect(err.body.code).to.eql(400)
+                        expect(err.body.message).to.eql(Strings.ERROR_MESSAGE.INVALID_FIELDS)
+                        expect(err.body.description).to.eql('body_fat'.concat(Strings.ERROR_MESSAGE.NEGATIVE_NUMBER))
                     })
             })
         })
@@ -454,8 +591,62 @@ describe('Routes: children.weights', () => {
 
                         // Error item
                         expect(res.body.error[0].code).to.eql(HttpStatus.BAD_REQUEST)
-                        expect(res.body.error[0].message).to.eql('Required fields were not provided...')
-                        expect(res.body.error[0].description).to.eql('Measurement validation failed: timestamp, value, unit is required!')
+                        expect(res.body.error[0].message).to.eql(Strings.ERROR_MESSAGE.REQUIRED_FIELDS)
+                        expect(res.body.error[0].description).to.eql('timestamp, value, unit'
+                            .concat(Strings.ERROR_MESSAGE.REQUIRED_FIELDS_DESC))
+                    })
+            })
+        })
+
+        context('when there are only incorrect Weight objects in the body', () => {
+            before(async () => {
+                try {
+                    await deleteAllWeights()
+                } catch (err) {
+                    throw new Error('Failure on children.weights routes test: ' + err.message)
+                }
+            })
+
+            it('should return status code 201 and return a response of type MultiStatus<Weight> with the ' +
+                'description of error in each one of them', () => {
+                const body: any = []
+
+                incorrectWeightArr.forEach(bodyFat => {
+                    const bodyElem = {
+                        timestamp: bodyFat.timestamp,
+                        value: bodyFat.value,
+                        unit: bodyFat.unit,
+                        body_fat: (bodyFat.body_fat) ? bodyFat.body_fat.value : undefined
+                    }
+                    body.push(bodyElem)
+                })
+
+                return request
+                    .post(`/v1/children/${defaultWeight.child_id}/weights`)
+                    .send(body)
+                    .set('Content-Type', 'application/json')
+                    .expect(207)
+                    .then(res => {
+                        expect(res.body.error[0].message).to.eql(Strings.ERROR_MESSAGE.REQUIRED_FIELDS)
+                        expect(res.body.error[0].description).to.eql('timestamp, value, unit'
+                            .concat(Strings.ERROR_MESSAGE.REQUIRED_FIELDS_DESC))
+                        expect(res.body.error[1].message).to.eql('Datetime: null'.concat(Strings.ERROR_MESSAGE.INVALID_DATE))
+                        expect(res.body.error[1].description).to.eql(Strings.ERROR_MESSAGE.INVALID_DATE_DESC)
+
+                        for (let i = 0; i < res.body.error.length; i++) {
+                            expect(res.body.error[i].code).to.eql(HttpStatus.BAD_REQUEST)
+                            if (i !== 0) {
+                                expect(res.body.error[i].item.timestamp).to.eql(null)
+                                expect(res.body.error[i].item.value).to.eql(incorrectWeightArr[i].value)
+                                expect(res.body.error[i].item.unit).to.eql(incorrectWeightArr[i].unit)
+                                expect(res.body.error[i].item.body_fat).eql(incorrectWeightArr[i].body_fat!.value)
+                            }
+                            if (i === 0) {
+                                expect(res.body.error[i].item.child_id).eql(defaultWeight.child_id)
+                            }
+                        }
+
+                        expect(res.body.success.length).to.eql(0)
                     })
             })
         })
@@ -706,7 +897,7 @@ describe('Routes: children.weights', () => {
                         expect(err.body.code).to.eql(404)
                         expect(err.body.message).to.eql('Weight not found!')
                         expect(err.body.description).to.eql('Weight not found or already removed. A new operation for ' +
-                            'the same resource is not required!')
+                            'the same resource is not required.')
                     })
             })
         })

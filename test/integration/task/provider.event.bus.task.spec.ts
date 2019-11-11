@@ -417,7 +417,7 @@ describe('PROVIDER EVENT BUS TASK', () => {
                     .catch((err) => {
                         try {
                             expect(err.message).to.eql('Error: '
-                                .concat('Datetime: invalidStartTime is not in valid ISO 8601 format.'))
+                                .concat('Datetime: invalidStartTime'.concat(Strings.ERROR_MESSAGE.INVALID_DATE)))
                             done()
                         } catch (err) {
                             done(err)
@@ -434,7 +434,7 @@ describe('PROVIDER EVENT BUS TASK', () => {
                     .catch((err) => {
                         try {
                             expect(err.message).to.eql('Error: '
-                                .concat('Datetime: invalidEndTime is not in valid ISO 8601 format.'))
+                                .concat('Datetime: invalidEndTime'.concat(Strings.ERROR_MESSAGE.INVALID_DATE)))
                             done()
                         } catch (err) {
                             done(err)
@@ -781,7 +781,7 @@ describe('PROVIDER EVENT BUS TASK', () => {
                     .catch((err) => {
                         try {
                             expect(err.message).to.eql('Error: '
-                                .concat('Datetime: invalidStartTime is not in valid ISO 8601 format.'))
+                                .concat('Datetime: invalidStartTime'.concat(Strings.ERROR_MESSAGE.INVALID_DATE)))
                             done()
                         } catch (err) {
                             done(err)
@@ -798,7 +798,7 @@ describe('PROVIDER EVENT BUS TASK', () => {
                     .catch((err) => {
                         try {
                             expect(err.message).to.eql('Error: '
-                                .concat('Datetime: invalidEndTime is not in valid ISO 8601 format.'))
+                                .concat('Datetime: invalidEndTime'.concat(Strings.ERROR_MESSAGE.INVALID_DATE)))
                             done()
                         } catch (err) {
                             done(err)
@@ -1071,7 +1071,7 @@ describe('PROVIDER EVENT BUS TASK', () => {
                     .catch((err) => {
                         try {
                             expect(err.message).to.eql('Error: '
-                                .concat('Datetime: invalidTimestamp is not in valid ISO 8601 format.'))
+                                .concat('Datetime: invalidTimestamp'.concat(Strings.ERROR_MESSAGE.INVALID_DATE)))
                             done()
                         } catch (err) {
                             done(err)
@@ -1379,40 +1379,6 @@ describe('PROVIDER EVENT BUS TASK', () => {
                     })
             })
 
-            it('should return a ValidationException (query with an invalid number (location latitude)', (done) => {
-                rabbitmq.bus.getEnvironments('?location.latitude=invalidLatitude')
-                    .then(result => {
-                        expect(result.length).to.eql(0)
-                        done(new Error('The find method of the repository should not function normally'))
-                    })
-                    .catch((err) => {
-                        try {
-                            expect(err.message).to.eql('Error: '
-                                .concat('The value \'invalidLatitude\' of location.latitude field is not a number.'))
-                            done()
-                        } catch (err) {
-                            done(err)
-                        }
-                    })
-            })
-
-            it('should return a ValidationException (query with an invalid number (location longitude)', (done) => {
-                rabbitmq.bus.getEnvironments('?location.longitude=invalidLongitude')
-                    .then(result => {
-                        expect(result.length).to.eql(0)
-                        done(new Error('The find method of the repository should not function normally'))
-                    })
-                    .catch((err) => {
-                        try {
-                            expect(err.message).to.eql('Error: '
-                                .concat('The value \'invalidLongitude\' of location.longitude field is not a number.'))
-                            done()
-                        } catch (err) {
-                            done(err)
-                        }
-                    })
-            })
-
             it('should return a ValidationException (query with an invalid climatized parameter)', (done) => {
                 rabbitmq.bus.getEnvironments('?climatized=invalidClimatized')
                     .then(result => {
@@ -1439,7 +1405,7 @@ describe('PROVIDER EVENT BUS TASK', () => {
                     .catch((err) => {
                         try {
                             expect(err.message).to.eql('Error: '
-                                .concat('Datetime: invalidTimestamp is not in valid ISO 8601 format.'))
+                                .concat('Datetime: invalidTimestamp'.concat(Strings.ERROR_MESSAGE.INVALID_DATE)))
                             done()
                         } catch (err) {
                             done(err)
@@ -1690,7 +1656,7 @@ describe('PROVIDER EVENT BUS TASK', () => {
                     .catch((err) => {
                         try {
                             expect(err.message).to.eql('Error: '
-                                .concat('Date parameter: invalidDateStart, is not in valid ISO 8601 format.'))
+                                .concat('Datetime: invalidDateStart'.concat(Strings.ERROR_MESSAGE.INVALID_DATE)))
                             done()
                         } catch (err) {
                             done(err)

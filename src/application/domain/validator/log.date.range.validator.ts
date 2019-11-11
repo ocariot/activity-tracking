@@ -7,11 +7,10 @@ export class LogDateRangeValidator {
 
         if (rangeDates < 0) {
             throw new ValidationException('Date range is invalid...',
-                'Log dates range validation failed: The date_end parameter can not contain an older date ' +
-                'than that the date_start parameter!')
+                'The date_end parameter can not contain an older date than that the date_start parameter!')
         } else if (period > 1) {
             throw new ValidationException('Date range is invalid...',
-                'Log dates range validation failed: The period between the received dates is longer than one year')
+                'The period between the received dates can not exceed one year!')
         }
     }
 }

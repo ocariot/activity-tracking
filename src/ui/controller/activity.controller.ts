@@ -11,6 +11,9 @@ import { IPhysicalActivityService } from '../../application/port/physical.activi
 import { ILogger } from '../../utils/custom.logger'
 import { MultiStatus } from '../../application/domain/model/multi.status'
 import { IQuery } from '../../application/port/query.interface'
+import { Strings } from '../../utils/strings'
+import { StatusError } from '../../application/domain/model/status.error'
+import { ValidationException } from '../../application/domain/exception/validation.exception'
 
 /**
  * Controller that implements PhysicalActivity feature operations.
@@ -44,13 +47,31 @@ export class ActivityController {
         try {
             // Multiple items of PhysicalActivity
             if (req.body instanceof Array) {
-                const activitiesArr: Array<PhysicalActivity> = req.body.map(item => {
-                    const activityItem: PhysicalActivity = new PhysicalActivity().fromJSON(item)
-                    activityItem.child_id = req.params.child_id
-                    return activityItem
+                const invalidItems: Array<StatusError<PhysicalActivity>> = new Array<StatusError<PhysicalActivity>>()
+                const activitiesArr: Array<PhysicalActivity> = new Array<PhysicalActivity>()
+                req.body.forEach(item => {
+                    try {
+                        const activityItem: PhysicalActivity = new PhysicalActivity().fromJSON(item)
+                        activityItem.child_id = req.params.child_id
+                        activitiesArr.push(activityItem)
+                    } catch (err) {
+                        // when unable to successfully form the object through fromJSON()
+                        let statusCode: number = HttpStatus.INTERNAL_SERVER_ERROR
+                        if (err instanceof ValidationException) statusCode = HttpStatus.BAD_REQUEST
+
+                        // Create a StatusError object for the construction of the MultiStatus response.
+                        const statusError: StatusError<PhysicalActivity> = new StatusError<PhysicalActivity>(statusCode, err.message,
+                            err.description, item)
+                        invalidItems.push(statusError)
+                    }
                 })
 
                 const resultMultiStatus: MultiStatus<PhysicalActivity> = await this._activityService.add(activitiesArr)
+                if (invalidItems.length > 0) {
+                    invalidItems.forEach(invalidItem => {
+                        resultMultiStatus.error.push(invalidItem)
+                    })
+                }
                 return res.status(HttpStatus.MULTI_STATUS).send(resultMultiStatus)
             }
 
@@ -124,19 +145,21 @@ export class ActivityController {
      */
     @httpPatch('/:child_id/physicalactivities/:physicalactivity_id')
     public async updatePhysicalActivityOfChild(@request() req: Request, @response() res: Response): Promise<Response> {
-        try {
-            const physicalActivity: PhysicalActivity = new PhysicalActivity().fromJSON(req.body)
-            physicalActivity.id = req.params.physicalactivity_id
-            physicalActivity.child_id = req.params.child_id
-
-            const result = await this._activityService.updateByChild(physicalActivity)
-            if (!result) return res.status(HttpStatus.NOT_FOUND).send(this.getMessageNotActivityFound())
-            return res.status(HttpStatus.OK).send(result)
-        } catch (err) {
-            const handlerError = ApiExceptionManager.build(err)
-            return res.status(handlerError.code)
-                .send(handlerError.toJson())
-        }
+        // try {
+        //     const physicalActivity: PhysicalActivity = new PhysicalActivity().fromJSON(req.body)
+        //     physicalActivity.id = req.params.physicalactivity_id
+        //     physicalActivity.child_id = req.params.child_id
+        //
+        //     const result = await this._activityService.updateByChild(physicalActivity)
+        //     if (!result) return res.status(HttpStatus.NOT_FOUND).send(this.getMessageNotActivityFound())
+        //     return res.status(HttpStatus.OK).send(result)
+        // } catch (err) {
+        //     const handlerError = ApiExceptionManager.build(err)
+        //     return res.status(handlerError.code)
+        //         .send(handlerError.toJson())
+        // }
+        return res.status(HttpStatus.METHOD_NOT_ALLOWED)
+            .send(new ApiException(HttpStatus.METHOD_NOT_ALLOWED, Strings.ERROR_MESSAGE.DISCONTINUED_METHOD).toJson())
     }
 
     /**
@@ -164,7 +187,7 @@ export class ActivityController {
         return new ApiException(
             HttpStatus.NOT_FOUND,
             'Physical Activity not found!',
-            'Physical Activity not found or already removed. A new operation for the same resource is not required!'
+            'Physical Activity not found or already removed. A new operation for the same resource is not required.'
         ).toJson()
     }
 }

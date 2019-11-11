@@ -205,7 +205,7 @@ describe('SUBSCRIBE EVENT BUS TASK', () => {
             it('should return an array with three physical activities', (done) => {
                 rabbitmq.bus.pubSyncPhysicalActivity([activity1, activity2, activity3])
                     .then(async () => {
-                        await timeout(6000)
+                        await timeout(3000)
                         const result = await activityRepository.find(new Query())
                         expect(result.length).to.eql(3)
                         done()
@@ -229,7 +229,7 @@ describe('SUBSCRIBE EVENT BUS TASK', () => {
             it('should return an array with two physical activities', (done) => {
                 rabbitmq.bus.pubSyncPhysicalActivity([activity1, activity2, activity3])
                     .then(async () => {
-                        await timeout(6000)
+                        await timeout(3000)
                         const result = await activityRepository.find(new Query())
                         expect(result.length).to.eql(2)
                         done()
@@ -350,7 +350,7 @@ describe('SUBSCRIBE EVENT BUS TASK', () => {
             it('should return an array with three sleep objects', (done) => {
                 rabbitmq.bus.pubSyncSleep([sleep1, sleep2, sleep3])
                     .then(async () => {
-                        await timeout(6000)
+                        await timeout(3000)
                         const result = await sleepRepository.find(new Query())
                         expect(result.length).to.eql(3)
                         done()
@@ -374,7 +374,7 @@ describe('SUBSCRIBE EVENT BUS TASK', () => {
             it('should return an array with two sleep objects', (done) => {
                 rabbitmq.bus.pubSyncSleep([sleep1, sleep2, sleep3])
                     .then(async () => {
-                        await timeout(6000)
+                        await timeout(3000)
                         const result = await sleepRepository.find(new Query())
                         expect(result.length).to.eql(2)
                         done()
@@ -485,7 +485,7 @@ describe('SUBSCRIBE EVENT BUS TASK', () => {
             it('should return an array with three weight objects', (done) => {
                 rabbitmq.bus.pubSyncWeight([weight1, weight2, weight3])
                     .then(async () => {
-                        await timeout(6000)
+                        await timeout(3000)
                         const result = await weightRepository.find(new Query())
                         expect(result.length).to.eql(3)
                         done()
@@ -503,7 +503,7 @@ describe('SUBSCRIBE EVENT BUS TASK', () => {
             it('should return an array with two weight objects', (done) => {
                 rabbitmq.bus.pubSyncWeight([weight1, weight2, weight3])
                     .then(async () => {
-                        await timeout(6000)
+                        await timeout(3000)
                         const result = await weightRepository.find(new Query())
                         expect(result.length).to.eql(2)
                         done()
@@ -618,7 +618,7 @@ describe('SUBSCRIBE EVENT BUS TASK', () => {
             it('should return an array with three logs', (done) => {
                 rabbitmq.bus.pubSyncLog([log1, log2, log3])
                     .then(async () => {
-                        await timeout(6000)
+                        await timeout(3000)
                         const result = await logRepository.find(new Query())
                         expect(result.length).to.eql(3)
                         done()
@@ -640,7 +640,7 @@ describe('SUBSCRIBE EVENT BUS TASK', () => {
             it('should return an array with two logs', (done) => {
                 rabbitmq.bus.pubSyncLog([log1, log2, log3])
                     .then(async () => {
-                        await timeout(6000)
+                        await timeout(3000)
                         const result = await logRepository.find(new Query())
                         expect(result.length).to.eql(2)
                         done()

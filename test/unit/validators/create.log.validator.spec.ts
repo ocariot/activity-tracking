@@ -20,8 +20,8 @@ describe('Validators: CreateLogValidator', () => {
                 try {
                     CreateLogValidator.validate(log)
                 } catch (err) {
-                    assert.equal(err.message, 'Required fields were not provided...')
-                    assert.equal(err.description, 'Child log validation failed: type is required!')
+                    assert.equal(err.message, Strings.ERROR_MESSAGE.REQUIRED_FIELDS)
+                    assert.equal(err.description, 'type'.concat(Strings.ERROR_MESSAGE.REQUIRED_FIELDS_DESC))
                 }
             })
         })
@@ -34,9 +34,9 @@ describe('Validators: CreateLogValidator', () => {
                 try {
                     CreateLogValidator.validate(log)
                 } catch (err) {
-                    assert.equal(err.message, 'Required fields were not provided...')
-                    assert.equal(err.description,
-                        'Child log validation failed: type, date, value, child_id is required!')
+                    assert.equal(err.message, Strings.ERROR_MESSAGE.REQUIRED_FIELDS)
+                    assert.equal(err.description, 'type, date, value, child_id'
+                        .concat(Strings.ERROR_MESSAGE.REQUIRED_FIELDS_DESC))
                 }
             })
         })
@@ -57,7 +57,7 @@ describe('Validators: CreateLogValidator', () => {
                 try {
                     CreateLogValidator.validate(logTest)
                 } catch (err) {
-                    assert.equal(err.message, 'The name of type provided "step" is not supported...')
+                    assert.equal(err.message, Strings.ERROR_MESSAGE.INVALID_FIELDS)
                     assert.equal(err.description,
                         'The names of the allowed types are: ' +
                         'steps, calories, active_minutes, lightly_active_minutes, sedentary_minutes.')
@@ -81,8 +81,8 @@ describe('Validators: CreateLogValidator', () => {
                 try {
                     CreateLogValidator.validate(logTest)
                 } catch (err) {
-                    assert.equal(err.message, 'Value field is invalid...')
-                    assert.equal(err.description, 'Child log validation failed: '.concat(Strings.ERROR_MESSAGE.INVALID_NUMBER))
+                    assert.equal(err.message, Strings.ERROR_MESSAGE.INVALID_FIELDS)
+                    assert.equal(err.description, 'value'.concat(Strings.ERROR_MESSAGE.INVALID_NUMBER))
                 }
             })
         })
@@ -103,7 +103,7 @@ describe('Validators: CreateLogValidator', () => {
                 try {
                     CreateLogValidator.validate(logTest)
                 } catch (err) {
-                    assert.equal(err.message, 'Date parameter: 20199-03-11, is not in valid ISO 8601 format.')
+                    assert.equal(err.message, 'Datetime: 20199-03-11'.concat(Strings.ERROR_MESSAGE.INVALID_DATE))
                     assert.equal(err.description, 'Date must be in the format: yyyy-MM-dd')
                 }
             })
@@ -118,9 +118,8 @@ describe('Validators: CreateLogValidator', () => {
                 try {
                     CreateLogValidator.validate(log)
                 } catch (err) {
-                    assert.equal(err.message, 'Value field is invalid...')
-                    assert.equal(err.description,
-                        'Child log validation failed: The value provided has a negative value!')
+                    assert.equal(err.message, Strings.ERROR_MESSAGE.INVALID_FIELDS)
+                    assert.equal(err.description, 'value'.concat(Strings.ERROR_MESSAGE.NEGATIVE_NUMBER))
                 }
                 log.value = 1000
             })

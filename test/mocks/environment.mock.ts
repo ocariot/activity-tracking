@@ -1,6 +1,6 @@
 import { Environment } from '../../src/application/domain/model/environment'
 import { Location } from '../../src/application/domain/model/location'
-import { Measurement, MeasurementType } from '../../src/application/domain/model/measurement'
+import { Measurement } from '../../src/application/domain/model/measurement'
 
 export class EnvironmentMock extends Environment {
 
@@ -18,8 +18,8 @@ export class EnvironmentMock extends Environment {
         super.location = new Location().fromJSON({
             local: 'Indoor',
             room: 'room 01',
-            latitude: Math.random() * 90,
-            longitude:  Math.random() * 180
+            latitude: `${Math.random() * 90}`,
+            longitude: `${Math.random() * 180}`
         })
     }
 
@@ -51,7 +51,7 @@ export class EnvironmentMock extends Environment {
 
     private generateTemp(): Measurement {
         const measurement: Measurement = new Measurement()
-        measurement.type = MeasurementType.TEMPERATURE
+        measurement.type = 'temperature'
         measurement.value = Math.random() * 13 + 19 // 19-31
         measurement.unit = '°C'
 
@@ -60,7 +60,7 @@ export class EnvironmentMock extends Environment {
 
     private generateHumi(): Measurement {
         const measurement: Measurement = new Measurement()
-        measurement.type = MeasurementType.HUMIDITY
+        measurement.type = 'humidity'
         measurement.value = Math.random() * 16 + 30 // 30-45
         measurement.unit = '%'
 
@@ -69,7 +69,7 @@ export class EnvironmentMock extends Environment {
 
     private generatePm1(): Measurement {
         const measurement: Measurement = new Measurement()
-        measurement.type = MeasurementType.PM1
+        measurement.type = 'pm1'
         measurement.value = Math.random() // 0-1
         measurement.unit = 'µm'
 
@@ -78,7 +78,7 @@ export class EnvironmentMock extends Environment {
 
     private generatePm2_5(): Measurement {
         const measurement: Measurement = new Measurement()
-        measurement.type = MeasurementType.PM2_5
+        measurement.type = 'pm2.5'
         measurement.value = Math.random() * 2.6 // 0-2.5
         measurement.unit = 'µm'
 
@@ -87,7 +87,7 @@ export class EnvironmentMock extends Environment {
 
     private generatePm10(): Measurement {
         const measurement: Measurement = new Measurement()
-        measurement.type = MeasurementType.PM10
+        measurement.type = 'pm10'
         measurement.value = Math.random() * 11 // 0-10
         measurement.unit = 'µm'
 

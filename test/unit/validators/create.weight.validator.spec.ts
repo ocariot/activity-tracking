@@ -33,19 +33,30 @@ describe('Validators: CreateWeightValidator', () => {
         })
 
         context('when the weight does not have all the required parameters (in this case missing type)', () => {
+            after(() => {
+                weight.type = type_aux
+            })
             it('should throw a ValidationException', () => {
-                weight.type = ''
+                weight.type = undefined
                 try {
                     CreateWeightValidator.validate(weight)
                 } catch (err) {
-                    assert.equal(err.message, 'Required fields were not provided...')
-                    assert.equal(err.description, 'Measurement validation failed: type is required!')
+                    assert.equal(err.message, Strings.ERROR_MESSAGE.REQUIRED_FIELDS)
+                    assert.equal(err.description, 'type'.concat(Strings.ERROR_MESSAGE.REQUIRED_FIELDS_DESC))
                 }
             })
         })
 
         context('when the weight does not have any of the required parameters', () => {
+            after(() => {
+                weight.type = type_aux
+                weight.timestamp = timestamp_aux
+                weight.value = value_aux
+                weight.unit = unit_aux
+                weight.child_id = child_id_aux
+            })
             it('should throw a ValidationException', () => {
+                weight.type = undefined
                 weight.timestamp = undefined
                 weight.value = undefined
                 weight.unit = undefined
@@ -53,13 +64,17 @@ describe('Validators: CreateWeightValidator', () => {
                 try {
                     CreateWeightValidator.validate(weight)
                 } catch (err) {
-                    assert.equal(err.message, 'Required fields were not provided...')
-                    assert.equal(err.description, 'Measurement validation failed: type, timestamp, value, unit, child_id is required!')
+                    assert.equal(err.message, Strings.ERROR_MESSAGE.REQUIRED_FIELDS)
+                    assert.equal(err.description, 'type, timestamp, value, unit, child_id'
+                        .concat(Strings.ERROR_MESSAGE.REQUIRED_FIELDS_DESC))
                 }
             })
         })
 
         context('when the weight has an invalid child_id', () => {
+            after(() => {
+                weight.child_id = child_id_aux
+            })
             it('should throw a ValidationException', () => {
                 weight.child_id = '5a62be07de34500146d9c5442'
                 try {
@@ -71,35 +86,17 @@ describe('Validators: CreateWeightValidator', () => {
             })
         })
 
-        context('when the weight has an invalid type', () => {
-            it('should throw a ValidationException', () => {
-                weight.type = 'invalid_type'
-                try {
-                    CreateWeightValidator.validate(weight)
-                } catch (err) {
-                    assert.equal(err.message,
-                        'The type of measurement provided "invalid_type" is not supported...')
-                    assert.equal(err.description,
-                        'The allowed types are: temperature, humidity, pm1, pm2.5, pm10, body_fat, weight.')
-                }
-                weight.type = type_aux
-                weight.timestamp = timestamp_aux
-                weight.value = value_aux
-                weight.unit = unit_aux
-                weight.child_id = child_id_aux
-            })
-        })
-
         context('when the bodyFat measurement of weight object is invalid (missing parameters)', () => {
             it('should throw a ValidationException', () => {
                 weight.body_fat = new BodyFat()
-                weight.body_fat.type = ''
-                weight.body_fat.unit = ''
+                weight.body_fat.type = undefined
+                weight.body_fat.unit = undefined
                 try {
                     CreateWeightValidator.validate(weight)
                 } catch (err) {
-                    assert.equal(err.message, 'Required fields were not provided...')
-                    assert.equal(err.description, 'Measurement validation failed: type, timestamp, value, unit, child_id is required!')
+                    assert.equal(err.message, Strings.ERROR_MESSAGE.REQUIRED_FIELDS)
+                    assert.equal(err.description, 'type, timestamp, value, unit, child_id'
+                        .concat(Strings.ERROR_MESSAGE.REQUIRED_FIELDS_DESC))
                 }
                 weight.body_fat = body_fat_aux
             })

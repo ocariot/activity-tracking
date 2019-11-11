@@ -34,14 +34,11 @@ describe('Services: BodyFatService', () => {
 
     // Incorrect BodyFat objects
     let incorrectBodyFat: BodyFat = new BodyFat()           // Without all required fields
-    incorrectBodyFat.type = ''
+    incorrectBodyFat.type = undefined
     incorrectBodyFat.unit = undefined
 
     const incorrectBodyFat2: BodyFat = new BodyFatMock()    // child_id is invalid
     incorrectBodyFat2.child_id = '5a62be07de34500146d9c5442'
-
-    const incorrectBodyFat3: BodyFat = new BodyFatMock()    // type is invalid
-    incorrectBodyFat3.type = 'invalidType'
 
     // Array with correct and incorrect BodyFat objects
     const mixedBodyFatArr: Array<BodyFat> = new Array<BodyFatMock>()
@@ -52,7 +49,6 @@ describe('Services: BodyFatService', () => {
     const incorrectBodyFatArr: Array<BodyFat> = new Array<BodyFatMock>()
     incorrectBodyFatArr.push(incorrectBodyFat)
     incorrectBodyFatArr.push(incorrectBodyFat2)
-    incorrectBodyFatArr.push(incorrectBodyFat3)
 
     const bodyFatRepo: IBodyFatRepository = new BodyFatRepositoryMock()
     const weightRepo: IWeightRepository = new WeightRepositoryMock()
@@ -104,9 +100,9 @@ describe('Services: BodyFatService', () => {
             it('should throw a ValidationException', () => {
                 return bodyFatService.add(incorrectBodyFat)
                     .catch(err => {
-                        assert.propertyVal(err, 'message', 'Required fields were not provided...')
-                        assert.propertyVal(err, 'description', 'Measurement validation failed: type, timestamp, value, unit, ' +
-                            'child_id is required!')
+                        assert.propertyVal(err, 'message', Strings.ERROR_MESSAGE.REQUIRED_FIELDS)
+                        assert.propertyVal(err, 'description', 'type, timestamp, value, unit, child_id'
+                            .concat(Strings.ERROR_MESSAGE.REQUIRED_FIELDS_DESC))
                     })
             })
         })
@@ -210,9 +206,9 @@ describe('Services: BodyFatService', () => {
                         assert.propertyVal(result.success[0].item, 'child_id', mixedBodyFatArr[0].child_id)
 
                         assert.propertyVal(result.error[0], 'code', HttpStatus.BAD_REQUEST)
-                        assert.propertyVal(result.error[0], 'message', 'Required fields were not provided...')
-                        assert.propertyVal(result.error[0], 'description', 'Measurement validation failed: type, ' +
-                            'timestamp, value, unit, child_id is required!')
+                        assert.propertyVal(result.error[0], 'message', Strings.ERROR_MESSAGE.REQUIRED_FIELDS)
+                        assert.propertyVal(result.error[0], 'description', 'type, timestamp, value, unit, ' +
+                            'child_id'.concat(Strings.ERROR_MESSAGE.REQUIRED_FIELDS_DESC))
                     })
             })
         })
@@ -224,17 +220,13 @@ describe('Services: BodyFatService', () => {
                         result = result as MultiStatus<BodyFat>
 
                         assert.propertyVal(result.error[0], 'message',
-                            'Required fields were not provided...')
+                            Strings.ERROR_MESSAGE.REQUIRED_FIELDS)
                         assert.propertyVal(result.error[0], 'description',
-                            'Measurement validation failed: type, timestamp, value, unit, child_id is required!')
+                            'type, timestamp, value, unit, child_id'.concat(Strings.ERROR_MESSAGE.REQUIRED_FIELDS_DESC))
                         assert.propertyVal(result.error[1], 'message',
                             Strings.CHILD.PARAM_ID_NOT_VALID_FORMAT)
                         assert.propertyVal(result.error[1], 'description',
                             Strings.ERROR_MESSAGE.UUID_NOT_VALID_FORMAT_DESC)
-                        assert.propertyVal(result.error[2], 'message',
-                            'The type of measurement provided "invalidtype" is not supported...')
-                        assert.propertyVal(result.error[2], 'description',
-                            'The allowed types are: temperature, humidity, pm1, pm2.5, pm10, body_fat, weight.')
 
                         for (let i = 0; i < result.error.length; i++) {
                             assert.propertyVal(result.error[i], 'code', HttpStatus.BAD_REQUEST)

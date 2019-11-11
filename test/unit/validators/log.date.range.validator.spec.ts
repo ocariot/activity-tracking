@@ -20,8 +20,7 @@ describe('Validators: LogDateRangeValidator', () => {
                     LogDateRangeValidator.validate(dateStart, dateEnd)
                 } catch (err) {
                     assert.equal(err.message, 'Date range is invalid...')
-                    assert.equal(err.description, 'Log dates range validation failed: ' +
-                        'The period between the received dates is longer than one year')
+                    assert.equal(err.description, 'The period between the received dates can not exceed one year!')
                 }
             })
         })

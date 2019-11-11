@@ -7,7 +7,7 @@ import { IQuery } from '../port/query.interface'
 import { Log } from '../domain/model/log'
 import { ILogRepository } from '../port/log.repository.interface'
 import { CreateLogValidator } from '../domain/validator/create.log.validator'
-import { DateValidator } from '../domain/validator/date.validator'
+import { LogDateValidator } from '../domain/validator/log.date.validator'
 import { ChildLog } from '../domain/model/child.log'
 import { MultiStatus } from '../domain/model/multi.status'
 import { StatusSuccess } from '../domain/model/status.success'
@@ -120,8 +120,8 @@ export class LogService implements ILogService {
     public async getByChildAndDate(childId: string, dateStart: string, dateEnd: string): Promise<ChildLog> {
         try {
             ObjectIdValidator.validate(childId, Strings.CHILD.PARAM_ID_NOT_VALID_FORMAT)
-            DateValidator.validate(dateStart)
-            DateValidator.validate(dateEnd)
+            LogDateValidator.validate(dateStart)
+            LogDateValidator.validate(dateEnd)
             LogDateRangeValidator.validate(dateStart, dateEnd)
 
             const result: ChildLog = await this._logRepository.findByChild(childId, dateStart, dateEnd) as ChildLog
@@ -149,8 +149,8 @@ export class LogService implements ILogService {
         try {
             ObjectIdValidator.validate(childId, Strings.CHILD.PARAM_ID_NOT_VALID_FORMAT)
             LogTypeValidator.validate(desiredResource)
-            DateValidator.validate(dateStart)
-            DateValidator.validate(dateEnd)
+            LogDateValidator.validate(dateStart)
+            LogDateValidator.validate(dateEnd)
             LogDateRangeValidator.validate(dateStart, dateEnd)
 
             const result: Array<Log> = await this._logRepository.findByChild(

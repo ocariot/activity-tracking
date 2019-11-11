@@ -129,9 +129,9 @@ describe('Services: Environment', () => {
             it('should throw a ValidationException', () => {
                 return environmentService.add(incorrectEnvironment)
                     .catch(err => {
-                        assert.propertyVal(err, 'message', 'Required fields were not provided...')
-                        assert.propertyVal(err, 'description', 'Validation of environment failed: timestamp, ' +
-                            'institution_id, location, measurements required!')
+                        assert.propertyVal(err, 'message', Strings.ERROR_MESSAGE.REQUIRED_FIELDS)
+                        assert.propertyVal(err, 'description', 'timestamp, institution_id, location, ' +
+                            'measurements'.concat(Strings.ERROR_MESSAGE.REQUIRED_FIELDS_DESC))
                     })
             })
         })
@@ -157,8 +157,9 @@ describe('Services: Environment', () => {
 
                 return environmentService.add(incorrectEnvironment)
                     .catch(err => {
-                        assert.propertyVal(err, 'message', 'Location are not in a format that is supported...')
-                        assert.propertyVal(err, 'description', 'Validation of location failed: location local, location room is required!')
+                        assert.propertyVal(err, 'message', Strings.ERROR_MESSAGE.REQUIRED_FIELDS)
+                        assert.propertyVal(err, 'description', 'location.local, location.room'
+                            .concat(Strings.ERROR_MESSAGE.REQUIRED_FIELDS_DESC))
                     })
             })
         })
@@ -171,8 +172,8 @@ describe('Services: Environment', () => {
 
                 return environmentService.add(incorrectEnvironment)
                     .catch(err => {
-                        assert.propertyVal(err, 'message', 'Measurement are not in a format that is supported!')
-                        assert.propertyVal(err, 'description', 'The measurements collection must not be empty!')
+                        assert.propertyVal(err, 'message', Strings.ERROR_MESSAGE.INVALID_FIELDS)
+                        assert.propertyVal(err, 'description', 'measurements collection must not be empty!')
                     })
             })
         })
@@ -198,9 +199,9 @@ describe('Services: Environment', () => {
 
                 return environmentService.add(incorrectEnvironment)
                     .catch(err => {
-                        assert.propertyVal(err, 'message', 'Required fields were not provided...')
-                        assert.propertyVal(err, 'description', 'Validation of environment failed: measurement type, ' +
-                            'measurement value, measurement unit required!')
+                        assert.propertyVal(err, 'message', Strings.ERROR_MESSAGE.REQUIRED_FIELDS)
+                        assert.propertyVal(err, 'description', 'measurements.type, measurements.value, ' +
+                            'measurements.unit'.concat(Strings.ERROR_MESSAGE.REQUIRED_FIELDS_DESC))
                     })
             })
         })
@@ -278,9 +279,9 @@ describe('Services: Environment', () => {
                         assert.propertyVal(result.success[0].item, 'timestamp', mixedEnvironmentsArr[0].timestamp)
 
                         assert.propertyVal(result.error[0], 'code', HttpStatus.BAD_REQUEST)
-                        assert.propertyVal(result.error[0], 'message', 'Required fields were not provided...')
-                        assert.propertyVal(result.error[0], 'description', 'Validation of environment failed: timestamp, ' +
-                            'institution_id, location, measurements required!')
+                        assert.propertyVal(result.error[0], 'message', Strings.ERROR_MESSAGE.REQUIRED_FIELDS)
+                        assert.propertyVal(result.error[0], 'description', 'timestamp, institution_id, ' +
+                            'location, measurements'.concat(Strings.ERROR_MESSAGE.REQUIRED_FIELDS_DESC))
                     })
             })
         })
@@ -292,25 +293,21 @@ describe('Services: Environment', () => {
                         result = result as MultiStatus<Environment>
 
                         assert.propertyVal(result.error[0], 'message',
-                            'Required fields were not provided...')
+                            Strings.ERROR_MESSAGE.REQUIRED_FIELDS)
                         assert.propertyVal(result.error[0], 'description',
-                            'Validation of environment failed: timestamp, institution_id, location, measurements required!')
-                        assert.propertyVal(result.error[1], 'message',
-                            Strings.INSTITUTION.PARAM_ID_NOT_VALID_FORMAT)
-                        assert.propertyVal(result.error[1], 'description',
-                            Strings.ERROR_MESSAGE.UUID_NOT_VALID_FORMAT_DESC)
-                        assert.propertyVal(result.error[2], 'message',
-                            'Location are not in a format that is supported...')
+                            'timestamp, institution_id, location, measurements'.concat(Strings.ERROR_MESSAGE.REQUIRED_FIELDS_DESC))
+                        assert.propertyVal(result.error[1], 'message', Strings.INSTITUTION.PARAM_ID_NOT_VALID_FORMAT)
+                        assert.propertyVal(result.error[1], 'description', Strings.ERROR_MESSAGE.UUID_NOT_VALID_FORMAT_DESC)
+                        assert.propertyVal(result.error[2], 'message', Strings.ERROR_MESSAGE.REQUIRED_FIELDS)
                         assert.propertyVal(result.error[2], 'description',
-                            'Validation of location failed: location local, location room is required!')
-                        assert.propertyVal(result.error[3], 'message',
-                            'Measurement are not in a format that is supported!')
+                            'location.local, location.room'.concat(Strings.ERROR_MESSAGE.REQUIRED_FIELDS_DESC))
+                        assert.propertyVal(result.error[3], 'message', Strings.ERROR_MESSAGE.INVALID_FIELDS)
                         assert.propertyVal(result.error[3], 'description',
-                            'The measurements collection must not be empty!')
+                            'measurements collection must not be empty!')
                         assert.propertyVal(result.error[4], 'message',
-                            'Required fields were not provided...')
+                            Strings.ERROR_MESSAGE.REQUIRED_FIELDS)
                         assert.propertyVal(result.error[4], 'description',
-                            'Validation of environment failed: measurement type, measurement value, measurement unit required!')
+                            'measurements.type, measurements.value, measurements.unit'.concat(Strings.ERROR_MESSAGE.REQUIRED_FIELDS_DESC))
 
                         for (let i = 0; i < result.error.length; i++) {
                             assert.propertyVal(result.error[i], 'code', HttpStatus.BAD_REQUEST)

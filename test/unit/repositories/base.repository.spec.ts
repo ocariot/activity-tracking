@@ -10,7 +10,6 @@ import { Entity } from '../../../src/application/domain/model/entity'
 import { Sleep } from '../../../src/application/domain/model/sleep'
 import { SleepMock } from '../../mocks/sleep.mock'
 import { SleepRepoModel } from '../../../src/infrastructure/database/schema/sleep.schema'
-import { Strings } from '../../../src/utils/strings'
 
 require('sinon-mongoose')
 
@@ -273,12 +272,11 @@ describe('Repositories: BaseRepository', () => {
                     .expects('findOneAndUpdate')
                     .withArgs({ _id: defaultSleep.id }, defaultSleep, { new: true })
                     .chain('exec')
-                    .rejects({ name: 'CastError' })
+                    .rejects({ name: 'CastError', value: defaultSleep.id, path: 'id' })
 
                 return repo.update(defaultSleep)
                     .catch((err: any) => {
-                        assert.equal(err.message, Strings.ERROR_MESSAGE.UUID_NOT_VALID_FORMAT)
-                        assert.equal(err.description, Strings.ERROR_MESSAGE.UUID_NOT_VALID_FORMAT_DESC)
+                        assert.equal(err.message, `The value '${defaultSleep.id}' of id field is invalid.`)
                     })
             })
         })
@@ -352,12 +350,11 @@ describe('Repositories: BaseRepository', () => {
                     .expects('findOneAndDelete')
                     .withArgs({ _id: invalidId })
                     .chain('exec')
-                    .rejects({ name: 'CastError' })
+                    .rejects({ name: 'CastError', value: invalidId, path: 'id' })
 
                 return repo.delete(invalidId)
                     .catch((err: any) => {
-                        assert.equal(err.message, Strings.ERROR_MESSAGE.UUID_NOT_VALID_FORMAT)
-                        assert.equal(err.description, Strings.ERROR_MESSAGE.UUID_NOT_VALID_FORMAT_DESC)
+                        assert.equal(err.message, `The value '${invalidId}' of id field is invalid.`)
                     })
             })
         })

@@ -17,8 +17,8 @@ const environmentSchema = new Mongoose.Schema({
                 type: String,
                 required: true
             },
-            latitude: { type: Number },
-            longitude: { type: Number }
+            latitude: { type: String },
+            longitude: { type: String }
         },
         measurements: [{
             type: {

@@ -200,9 +200,9 @@ describe('Services: SleepService', () => {
             it('should throw a ValidationException', () => {
                 return sleepService.add(incorrectSleep)
                     .catch(err => {
-                        assert.propertyVal(err, 'message', 'Required fields were not provided...')
-                        assert.propertyVal(err, 'description', 'Sleep validation failed: ' +
-                            'start_time, end_time, duration, child_id, type, pattern is required!')
+                        assert.propertyVal(err, 'message', Strings.ERROR_MESSAGE.REQUIRED_FIELDS)
+                        assert.propertyVal(err, 'description', 'start_time, end_time, duration, child_id, type, ' +
+                            'pattern'.concat(Strings.ERROR_MESSAGE.REQUIRED_FIELDS_DESC))
                     })
             })
         })
@@ -222,8 +222,9 @@ describe('Services: SleepService', () => {
 
                 return sleepService.add(incorrectSleep)
                     .catch(err => {
-                        assert.propertyVal(err, 'message', 'Required fields were not provided...')
-                        assert.propertyVal(err, 'description', 'Sleep validation failed: type, pattern is required!')
+                        assert.propertyVal(err, 'message', Strings.ERROR_MESSAGE.REQUIRED_FIELDS)
+                        assert.propertyVal(err, 'description', 'type, pattern'
+                            .concat(Strings.ERROR_MESSAGE.REQUIRED_FIELDS_DESC))
                     })
             })
         })
@@ -236,8 +237,8 @@ describe('Services: SleepService', () => {
 
                 return sleepService.add(incorrectSleep)
                     .catch(err => {
-                        assert.propertyVal(err, 'message', 'Date field is invalid...')
-                        assert.propertyVal(err, 'description', 'Date validation failed: The end_time parameter can not contain ' +
+                        assert.propertyVal(err, 'message', Strings.ERROR_MESSAGE.INVALID_FIELDS)
+                        assert.propertyVal(err, 'description', 'The end_time parameter can not contain ' +
                             'an older date than that the start_time parameter!')
                     })
             })
@@ -250,9 +251,9 @@ describe('Services: SleepService', () => {
 
                 return sleepService.add(incorrectSleep)
                     .catch(err => {
-                        assert.propertyVal(err, 'message', 'Duration field is invalid...')
-                        assert.propertyVal(err, 'description', 'Duration validation failed: Activity duration value does not ' +
-                            'match values passed in start_time and end_time parameters!')
+                        assert.propertyVal(err, 'message', Strings.ERROR_MESSAGE.INVALID_FIELDS)
+                        assert.propertyVal(err, 'description', 'duration value does not match values ' +
+                            'passed in start_time and end_time parameters!')
                     })
             })
         })
@@ -264,8 +265,8 @@ describe('Services: SleepService', () => {
 
                 return sleepService.add(incorrectSleep)
                     .catch(err => {
-                        assert.propertyVal(err, 'message', 'Duration field is invalid...')
-                        assert.propertyVal(err, 'description', 'Activity validation failed: The value provided has a negative value!')
+                        assert.propertyVal(err, 'message', Strings.ERROR_MESSAGE.INVALID_FIELDS)
+                        assert.propertyVal(err, 'description', 'duration'.concat(Strings.ERROR_MESSAGE.NEGATIVE_NUMBER))
                     })
             })
         })
@@ -298,8 +299,9 @@ describe('Services: SleepService', () => {
 
                 return sleepService.add(incorrectSleep)
                     .catch(err => {
-                        assert.propertyVal(err, 'message', 'The type provided "classics" is not supported...')
-                        assert.propertyVal(err, 'description', 'The allowed Sleep Pattern types are: classic, stages.')
+                        assert.propertyVal(err, 'message', Strings.ERROR_MESSAGE.INVALID_FIELDS)
+                        assert.propertyVal(err, 'description', 'The names of the allowed Sleep Pattern ' +
+                            'types are: classic, stages.')
                     })
             })
         })
@@ -312,8 +314,8 @@ describe('Services: SleepService', () => {
 
                 return sleepService.add(incorrectSleep)
                     .catch(err => {
-                        assert.propertyVal(err, 'message', 'Pattern are not in a format that is supported...')
-                        assert.propertyVal(err, 'description', 'Validation of the standard of sleep failed: data_set is required!')
+                        assert.propertyVal(err, 'message', Strings.ERROR_MESSAGE.REQUIRED_FIELDS)
+                        assert.propertyVal(err, 'description', 'pattern.data_set is required!')
                     })
             })
         })
@@ -324,8 +326,8 @@ describe('Services: SleepService', () => {
 
                 return sleepService.add(incorrectSleep)
                     .catch(err => {
-                        assert.propertyVal(err, 'message', 'Dataset are not in a format that is supported!')
-                        assert.propertyVal(err, 'description', 'The data_set collection must not be empty!')
+                        assert.propertyVal(err, 'message', Strings.ERROR_MESSAGE.INVALID_FIELDS)
+                        assert.propertyVal(err, 'description', 'pattern.data_set must not be empty!')
                     })
             })
         })
@@ -338,9 +340,10 @@ describe('Services: SleepService', () => {
 
                 return sleepService.add(incorrectSleep)
                     .catch(err => {
-                        assert.propertyVal(err, 'message', 'Dataset are not in a format that is supported!')
-                        assert.propertyVal(err, 'description', 'Validation of the sleep pattern dataset failed: ' +
-                            'data_set start_time, data_set name, data_set duration is required!')
+                        assert.propertyVal(err, 'message', Strings.ERROR_MESSAGE.REQUIRED_FIELDS)
+                        assert.propertyVal(err, 'description', 'pattern.data_set.start_time, ' +
+                            'pattern.data_set.name, pattern.data_set.duration'
+                                .concat(Strings.ERROR_MESSAGE.REQUIRED_FIELDS_DESC))
                     })
             })
         })
@@ -355,9 +358,9 @@ describe('Services: SleepService', () => {
 
                 return sleepService.add(incorrectSleep)
                     .catch(err => {
-                        assert.propertyVal(err, 'message', 'Some (or several) duration field of sleep pattern is invalid...')
-                        assert.propertyVal(err, 'description', 'Sleep Pattern dataset validation failed: The value provided ' +
-                            'has a negative value!')
+                        assert.propertyVal(err, 'message', Strings.ERROR_MESSAGE.INVALID_FIELDS)
+                        assert.propertyVal(err, 'description', 'pattern.data_set.duration'
+                            .concat(Strings.ERROR_MESSAGE.NEGATIVE_NUMBER))
                     })
             })
         })
@@ -373,11 +376,13 @@ describe('Services: SleepService', () => {
 
                 return sleepService.add(incorrectSleep)
                     .catch(err => {
-                        assert.propertyVal(err, 'message', 'The sleep pattern name provided "restlesss" is not supported...')
+                        assert.propertyVal(err, 'message', Strings.ERROR_MESSAGE.INVALID_FIELDS)
                         if (incorrectSleep.type === SleepType.CLASSIC)
-                            assert.propertyVal(err, 'description', 'The names of the allowed patterns are: asleep, restless, awake.')
+                            assert.propertyVal(err, 'description', 'The names of the allowed ' +
+                                'data_set patterns are: asleep, restless, awake.')
                         else
-                            assert.propertyVal(err, 'description', 'The names of the allowed patterns are: deep, light, rem, awake.')
+                            assert.propertyVal(err, 'description', 'The names of the allowed ' +
+                                'data_set patterns are: deep, light, rem, awake.')
                     })
             })
         })
@@ -405,8 +410,9 @@ describe('Services: SleepService', () => {
 
                 return sleepService.add(incorrectSleep)
                     .catch(err => {
-                        assert.propertyVal(err, 'message', 'The sleep pattern name provided "deeps" is not supported...')
-                        assert.propertyVal(err, 'description', 'The names of the allowed patterns are: deep, light, rem, awake.')
+                        assert.propertyVal(err, 'message', Strings.ERROR_MESSAGE.INVALID_FIELDS)
+                        assert.propertyVal(err, 'description', 'The names of the allowed ' +
+                            'data_set patterns are: deep, light, rem, awake.')
                     })
             })
         })
@@ -484,9 +490,9 @@ describe('Services: SleepService', () => {
                         assert.propertyVal(result.success[0].item, 'type', mixedSleepArr[0].type)
 
                         assert.propertyVal(result.error[0], 'code', HttpStatus.BAD_REQUEST)
-                        assert.propertyVal(result.error[0], 'message', 'Required fields were not provided...')
-                        assert.propertyVal(result.error[0], 'description', 'Sleep validation failed: ' +
-                            'start_time, end_time, duration, child_id, type, pattern is required!')
+                        assert.propertyVal(result.error[0], 'message', Strings.ERROR_MESSAGE.REQUIRED_FIELDS)
+                        assert.propertyVal(result.error[0], 'description', 'start_time, end_time, ' +
+                            'duration, child_id, type, pattern'.concat(Strings.ERROR_MESSAGE.REQUIRED_FIELDS_DESC))
                     })
             })
         })
@@ -497,46 +503,48 @@ describe('Services: SleepService', () => {
                     .then((result: Sleep | MultiStatus<Sleep>) => {
                         result = result as MultiStatus<Sleep>
 
-                        assert.propertyVal(result.error[0], 'message', 'Required fields were not provided...')
-                        assert.propertyVal(result.error[0], 'description', 'Sleep validation failed: ' +
-                            'start_time, end_time, duration, child_id, type, pattern is required!')
-                        assert.propertyVal(result.error[1], 'message', 'Required fields were not provided...')
-                        assert.propertyVal(result.error[1], 'description', 'Sleep validation failed: type, pattern is required!')
-                        assert.propertyVal(result.error[2], 'message', 'Date field is invalid...')
-                        assert.propertyVal(result.error[2], 'description', 'Date validation failed: The end_time parameter can not ' +
-                            'contain an older date than that the start_time parameter!')
-                        assert.propertyVal(result.error[3], 'message', 'Duration field is invalid...')
-                        assert.propertyVal(result.error[3], 'description', 'Duration validation failed: Activity duration value does ' +
+                        assert.propertyVal(result.error[0], 'message', Strings.ERROR_MESSAGE.REQUIRED_FIELDS)
+                        assert.propertyVal(result.error[0], 'description', 'start_time, end_time, ' +
+                            'duration, child_id, type, pattern'.concat(Strings.ERROR_MESSAGE.REQUIRED_FIELDS_DESC))
+                        assert.propertyVal(result.error[1], 'message', Strings.ERROR_MESSAGE.REQUIRED_FIELDS)
+                        assert.propertyVal(result.error[1], 'description', 'type, pattern'
+                            .concat(Strings.ERROR_MESSAGE.REQUIRED_FIELDS_DESC))
+                        assert.propertyVal(result.error[2], 'message', Strings.ERROR_MESSAGE.INVALID_FIELDS)
+                        assert.propertyVal(result.error[2], 'description', 'The end_time parameter ' +
+                            'can not contain an older date than that the start_time parameter!')
+                        assert.propertyVal(result.error[3], 'message', Strings.ERROR_MESSAGE.INVALID_FIELDS)
+                        assert.propertyVal(result.error[3], 'description', 'duration value does ' +
                             'not match values passed in start_time and end_time parameters!')
-                        assert.propertyVal(result.error[4], 'message', 'Duration field is invalid...')
-                        assert.propertyVal(result.error[4], 'description', 'Activity validation failed: The value provided has a ' +
-                            'negative value!')
+                        assert.propertyVal(result.error[4], 'message', Strings.ERROR_MESSAGE.INVALID_FIELDS)
+                        assert.propertyVal(result.error[4], 'description', 'duration'
+                            .concat(Strings.ERROR_MESSAGE.NEGATIVE_NUMBER))
                         assert.propertyVal(result.error[5], 'message', Strings.CHILD.PARAM_ID_NOT_VALID_FORMAT)
                         assert.propertyVal(result.error[5], 'description', Strings.ERROR_MESSAGE.UUID_NOT_VALID_FORMAT_DESC)
-                        assert.propertyVal(result.error[6], 'message', 'The type provided "classics" is not supported...')
-                        assert.propertyVal(result.error[6], 'description', 'The allowed Sleep Pattern types are: classic, stages.')
-                        assert.propertyVal(result.error[7], 'message', 'Pattern are not in a format that is supported...')
-                        assert.propertyVal(result.error[7], 'description', 'Validation of the standard of sleep failed: data_set is ' +
-                            'required!')
-                        assert.propertyVal(result.error[8], 'message', 'Dataset are not in a format that is supported!')
-                        assert.propertyVal(result.error[8], 'description', 'The data_set collection must not be empty!')
-                        assert.propertyVal(result.error[9], 'message', 'Dataset are not in a format that is supported!')
-                        assert.propertyVal(result.error[9], 'description', 'Validation of the sleep pattern dataset failed: ' +
-                            'data_set start_time, data_set name, data_set duration is required!')
-                        assert.propertyVal(result.error[10], 'message', 'Some (or several) duration field of sleep pattern is invalid...')
-                        assert.propertyVal(result.error[10], 'description', 'Sleep Pattern dataset validation failed: The value provided ' +
-                            'has a negative value!')
-                        assert.propertyVal(result.error[11], 'message', 'The sleep pattern name provided "restlesss" is not supported...')
+                        assert.propertyVal(result.error[6], 'message', Strings.ERROR_MESSAGE.INVALID_FIELDS)
+                        assert.propertyVal(result.error[6], 'description', 'The names of the allowed ' +
+                            'Sleep Pattern types are: classic, stages.')
+                        assert.propertyVal(result.error[7], 'message', Strings.ERROR_MESSAGE.REQUIRED_FIELDS)
+                        assert.propertyVal(result.error[7], 'description', 'pattern.data_set is required!')
+                        assert.propertyVal(result.error[8], 'message', Strings.ERROR_MESSAGE.INVALID_FIELDS)
+                        assert.propertyVal(result.error[8], 'description', 'pattern.data_set must not be empty!')
+                        assert.propertyVal(result.error[9], 'message', Strings.ERROR_MESSAGE.REQUIRED_FIELDS)
+                        assert.propertyVal(result.error[9], 'description', 'pattern.data_set.start_time, ' +
+                            'pattern.data_set.name, pattern.data_set.duration'
+                                .concat(Strings.ERROR_MESSAGE.REQUIRED_FIELDS_DESC))
+                        assert.propertyVal(result.error[10], 'message', Strings.ERROR_MESSAGE.INVALID_FIELDS)
+                        assert.propertyVal(result.error[10], 'description', 'pattern.data_set.duration'
+                            .concat(Strings.ERROR_MESSAGE.NEGATIVE_NUMBER))
+                        assert.propertyVal(result.error[11], 'message', Strings.ERROR_MESSAGE.INVALID_FIELDS)
                         if (result.error[11].item.type === SleepType.CLASSIC) {
-                            assert.propertyVal(result.error[11], 'description', 'The names of the allowed patterns are: ' +
-                                'asleep, restless, awake.')
+                            assert.propertyVal(result.error[11], 'description', 'The names of the allowed ' +
+                                'data_set patterns are: asleep, restless, awake.')
                         } else {
-                            assert.propertyVal(result.error[11], 'description', 'The names of the allowed patterns are: ' +
-                                'deep, light, rem, awake.')
+                            assert.propertyVal(result.error[11], 'description', 'The names of the allowed ' +
+                                'data_set patterns are: deep, light, rem, awake.')
                         }
-                        assert.propertyVal(result.error[12], 'message', 'The sleep pattern name provided "deeps" is not supported...')
-                        assert.propertyVal(result.error[12], 'description', 'The names of the allowed patterns are: ' +
-                            'deep, light, rem, awake.')
+                        assert.propertyVal(result.error[12], 'message', Strings.ERROR_MESSAGE.INVALID_FIELDS)
+                        assert.propertyVal(result.error[12], 'description', 'The names of the allowed ' +
+                            'data_set patterns are: deep, light, rem, awake.')
 
                         for (let i = 0; i < result.error.length; i++) {
                             assert.propertyVal(result.error[i], 'code', HttpStatus.BAD_REQUEST)
@@ -758,8 +766,8 @@ describe('Services: SleepService', () => {
 
                 return sleepService.updateByChild(incorrectSleep)
                     .catch(err => {
-                        assert.propertyVal(err, 'message', 'Duration field is invalid...')
-                        assert.propertyVal(err, 'description', 'Sleep validation failed: The value provided has a negative value!')
+                        assert.propertyVal(err, 'message', Strings.ERROR_MESSAGE.INVALID_FIELDS)
+                        assert.propertyVal(err, 'description', 'duration'.concat(Strings.ERROR_MESSAGE.NEGATIVE_NUMBER))
                     })
             })
         })
@@ -779,8 +787,9 @@ describe('Services: SleepService', () => {
 
                 return sleepService.updateByChild(incorrectSleep)
                     .catch(err => {
-                        assert.propertyVal(err, 'message', 'The type provided "classics" is not supported...')
-                        assert.propertyVal(err, 'description', 'The allowed Sleep Pattern types are: classic, stages.')
+                        assert.propertyVal(err, 'message', Strings.ERROR_MESSAGE.INVALID_FIELDS)
+                        assert.propertyVal(err, 'description', 'The names of the allowed ' +
+                            'Sleep Pattern types are: classic, stages.')
                     })
             })
         })
@@ -792,8 +801,8 @@ describe('Services: SleepService', () => {
 
                 return sleepService.updateByChild(incorrectSleep)
                     .catch(err => {
-                        assert.propertyVal(err, 'message', 'Pattern are not in a format that is supported...')
-                        assert.propertyVal(err, 'description', 'Validation of the standard of sleep failed: data_set is required!')
+                        assert.propertyVal(err, 'message', Strings.ERROR_MESSAGE.REQUIRED_FIELDS)
+                        assert.propertyVal(err, 'description', 'pattern.data_set is required!')
                     })
             })
         })
@@ -804,8 +813,8 @@ describe('Services: SleepService', () => {
 
                 return sleepService.updateByChild(incorrectSleep)
                     .catch(err => {
-                        assert.propertyVal(err, 'message', 'Dataset are not in a format that is supported!')
-                        assert.propertyVal(err, 'description', 'The data_set collection must not be empty!')
+                        assert.propertyVal(err, 'message', Strings.ERROR_MESSAGE.INVALID_FIELDS)
+                        assert.propertyVal(err, 'description', 'pattern.data_set must not be empty!')
                     })
             })
         })
@@ -818,9 +827,10 @@ describe('Services: SleepService', () => {
 
                 return sleepService.updateByChild(incorrectSleep)
                     .catch(err => {
-                        assert.propertyVal(err, 'message', 'Dataset are not in a format that is supported!')
-                        assert.propertyVal(err, 'description', 'Validation of the sleep pattern dataset failed: ' +
-                            'data_set start_time, data_set name, data_set duration is required!')
+                        assert.propertyVal(err, 'message', Strings.ERROR_MESSAGE.REQUIRED_FIELDS)
+                        assert.propertyVal(err, 'description', 'pattern.data_set.start_time, ' +
+                            'pattern.data_set.name, pattern.data_set.duration'
+                                .concat(Strings.ERROR_MESSAGE.REQUIRED_FIELDS_DESC))
                     })
             })
         })
@@ -835,9 +845,9 @@ describe('Services: SleepService', () => {
 
                 return sleepService.updateByChild(incorrectSleep)
                     .catch(err => {
-                        assert.propertyVal(err, 'message', 'Some (or several) duration field of sleep pattern is invalid...')
-                        assert.propertyVal(err, 'description', 'Sleep Pattern dataset validation failed: The value provided ' +
-                            'has a negative value!')
+                        assert.propertyVal(err, 'message', Strings.ERROR_MESSAGE.INVALID_FIELDS)
+                        assert.propertyVal(err, 'description', 'pattern.data_set.duration'
+                            .concat(Strings.ERROR_MESSAGE.NEGATIVE_NUMBER))
                     })
             })
         })
@@ -853,11 +863,13 @@ describe('Services: SleepService', () => {
 
                 return sleepService.updateByChild(incorrectSleep)
                     .catch(err => {
-                        assert.propertyVal(err, 'message', 'The sleep pattern name provided "restlesss" is not supported...')
+                        assert.propertyVal(err, 'message', Strings.ERROR_MESSAGE.INVALID_FIELDS)
                         if (incorrectSleep.type === SleepType.CLASSIC)
-                            assert.propertyVal(err, 'description', 'The names of the allowed patterns are: asleep, restless, awake.')
+                            assert.propertyVal(err, 'description', 'The names of the allowed ' +
+                                'data_set patterns are: asleep, restless, awake.')
                         else
-                            assert.propertyVal(err, 'description', 'The names of the allowed patterns are: deep, light, rem, awake.')
+                            assert.propertyVal(err, 'description', 'The names of the allowed ' +
+                                'data_set patterns are: deep, light, rem, awake.')
                     })
             })
         })
@@ -885,8 +897,9 @@ describe('Services: SleepService', () => {
 
                 return sleepService.updateByChild(incorrectSleep)
                     .catch(err => {
-                        assert.propertyVal(err, 'message', 'The sleep pattern name provided "deeps" is not supported...')
-                        assert.propertyVal(err, 'description', 'The names of the allowed patterns are: deep, light, rem, awake.')
+                        assert.propertyVal(err, 'message', Strings.ERROR_MESSAGE.INVALID_FIELDS)
+                        assert.propertyVal(err, 'description', 'The names of the allowed ' +
+                            'data_set patterns are: deep, light, rem, awake.')
                     })
             })
         })
