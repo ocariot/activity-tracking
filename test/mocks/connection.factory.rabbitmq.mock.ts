@@ -3,6 +3,19 @@ import { IOcariotRabbitMQClient } from '@ocariot/rabbitmq-client-node/lib'
 
 export class ConnectionFactoryRabbitMQMock implements IConnectionFactory {
     private eventBus: IOcariotRabbitMQClient = {
+        getFoods(childId: string, dateStart: string, dateEnd: string): Promise<any> {
+            return Promise.resolve({})
+        }, provideFoods(listener: (childId: string, dateStart: string, dateEnd: string) => any): Promise<void> {
+            return Promise.resolve()
+        }, pubSaveFood(food: any): Promise<void> {
+            return Promise.resolve()
+        }, pubUpdateFood(food: any): Promise<void> {
+            return Promise.resolve()
+        }, subSaveFood(callback: (message: any) => void): Promise<void> {
+            return Promise.resolve()
+        }, subUpdateFood(callback: (message: any) => void): Promise<void> {
+            return Promise.resolve()
+        },
         close(): Promise<void> {
             return Promise.resolve()
         },
