@@ -249,7 +249,7 @@ describe('Validators: CreatePhysicalActivityValidator', () => {
                             duration: Math.floor((Math.random() * 10) * 60000)
                         },
                         {
-                            name: '',
+                            name: undefined,
                             duration: Math.floor((Math.random() * 10) * 60000)
                         },
                         {

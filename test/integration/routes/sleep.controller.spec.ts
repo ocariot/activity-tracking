@@ -41,7 +41,7 @@ describe('Routes: children.sleep', () => {
         end_time: defaultSleep.end_time,
         duration: defaultSleep.duration,
         pattern: undefined,
-        type: '',
+        type: undefined,
         child_id: defaultSleep.child_id
     }
 

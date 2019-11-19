@@ -119,7 +119,7 @@ describe('Routes: children.physicalactivities', () => {
     incorrectActivity8 = incorrectActivity8.fromJSON(incorrectActivityJSON)
 
     let incorrectActivity9: PhysicalActivity = new PhysicalActivityMock()    // The levels array has an item that contains empty fields
-    incorrectActivityJSON.levels[0].name = ''
+    incorrectActivityJSON.levels[0].name = undefined
     incorrectActivityJSON.levels[0].duration = undefined
     incorrectActivity9 = incorrectActivity9.fromJSON(incorrectActivityJSON)
 

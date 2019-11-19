@@ -17,7 +17,7 @@ export class SleepPatternDataSetValidator {
         dataset.forEach((data: SleepPatternDataSet) => {
             // validate null
             if (!data.start_time) fields.push('pattern.data_set.start_time')
-            if (!data.name) fields.push('pattern.data_set.name')
+            if (data.name === undefined) fields.push('pattern.data_set.name')
             else if (sleepType === SleepType.CLASSIC && !phasesPatternTypes.includes(data.name)) {
                     throw new ValidationException(Strings.ERROR_MESSAGE.INVALID_FIELDS,
                         'The names of the allowed data_set patterns are: '.concat(phasesPatternTypes.join(', ').concat('.')))

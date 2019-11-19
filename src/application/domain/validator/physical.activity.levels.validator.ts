@@ -15,7 +15,7 @@ export class PhysicalActivityLevelsValidator {
 
         levels.forEach((level: PhysicalActivityLevel) => {
             // validate null
-            if (!level.name) fields.push('levels.name')
+            if (level.name === undefined) fields.push('levels.name')
             else if (!levelsTypes.includes(level.name)) {
                 throw new ValidationException(Strings.ERROR_MESSAGE.INVALID_FIELDS,
                     `The names of the allowed levels are: ${levelsTypes.join(', ')}.`)
