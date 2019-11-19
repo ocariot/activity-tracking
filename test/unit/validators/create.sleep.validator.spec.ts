@@ -128,7 +128,7 @@ describe('Validators: CreateSleepValidator', () => {
                     end_time: sleep.end_time,
                     duration: sleep.duration,
                     pattern: undefined,
-                    type: '',
+                    type: undefined,
                     child_id: new ObjectID()
                 }
                 const invalidSleep = new Sleep().fromJSON(sleepJSON)

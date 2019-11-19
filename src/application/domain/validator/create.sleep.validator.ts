@@ -18,7 +18,7 @@ export class CreateSleepValidator {
         }
 
         // Validate Sleep attributes
-        if (!sleep.type) fields.push('type')
+        if (sleep.type === undefined) fields.push('type')
         else if (!sleepPatternTypes.includes(sleep.type)) {
             throw new ValidationException(Strings.ERROR_MESSAGE.INVALID_FIELDS,
                 `The names of the allowed Sleep Pattern types are: ${sleepPatternTypes.join(', ')}.`)

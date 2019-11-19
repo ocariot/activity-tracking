@@ -257,7 +257,7 @@ describe('Services: Log', () => {
         context('when some of the logs in the array are incorrect (missing fields)', () => {
             it('should perform the operations of creating and updating normally for the correct logs and returning a response ' +
                 'of type MultiStatus<Log> with the description of success and error cases of each log', () => {
-                incorrectLog.date = ''
+                incorrectLog.date = undefined!
                 incorrectLog.value = undefined!
                 incorrectLog.type = undefined!
                 incorrectLog.child_id = ''

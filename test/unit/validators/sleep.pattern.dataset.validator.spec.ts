@@ -105,7 +105,7 @@ describe('Validators: SleepPatternDataSetValidator', () => {
             it('should throw a ValidationException', () => {
                 const dataSetItemJSON: any = {
                     start_time : undefined,
-                    name : '',
+                    name : undefined,
                     duration : undefined
                 }
                 dataSetItem = new SleepPatternDataSet().fromJSON(dataSetItemJSON)
