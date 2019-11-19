@@ -961,7 +961,7 @@ describe('Services: SleepService', () => {
     describe('countSleep(childId: string)', () => {
         context('when there is at least one sleep object associated with the child received', () => {
             it('should return how many sleep objects are associated with such child in the database', () => {
-                return sleepService.countSleep(sleep.child_id!)
+                return sleepService.countByChild(sleep.child_id!)
                     .then(res => {
                         assert.equal(res, 1)
                     })

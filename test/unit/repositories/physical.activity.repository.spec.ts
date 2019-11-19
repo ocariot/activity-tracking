@@ -253,7 +253,7 @@ describe('Repositories: PhysicalActivityRepository', () => {
                     .withArgs({ child_id: defaultActivity.child_id })
                     .resolves(true)
 
-                return activityRepo.removeAllActivitiesFromChild(defaultActivity.child_id)
+                return activityRepo.removeAllByChild(defaultActivity.child_id)
                     .then((result: boolean) => {
                         assert.isTrue(result)
                     })
@@ -270,7 +270,7 @@ describe('Repositories: PhysicalActivityRepository', () => {
                     .withArgs({ child_id: randomChildId })
                     .resolves(false)
 
-                return activityRepo.removeAllActivitiesFromChild(randomChildId)
+                return activityRepo.removeAllByChild(randomChildId)
                     .then((result: boolean) => {
                         assert.isFalse(result)
                     })
@@ -286,7 +286,7 @@ describe('Repositories: PhysicalActivityRepository', () => {
                     .rejects({ message: 'An internal error has occurred in the database!',
                                description: 'Please try again later...' })
 
-                return activityRepo.removeAllActivitiesFromChild(defaultActivity.child_id)
+                return activityRepo.removeAllByChild(defaultActivity.child_id)
                     .catch (err => {
                         assert.propertyVal(err, 'message', 'An internal error has occurred in the database!')
                         assert.propertyVal(err, 'description', 'Please try again later...')
@@ -305,7 +305,7 @@ describe('Repositories: PhysicalActivityRepository', () => {
                     .chain('exec')
                     .resolves(2)
 
-                return activityRepo.countActivities(defaultActivity.child_id)
+                return activityRepo.countByChild(defaultActivity.child_id)
                     .then((countActivities: number) => {
                         assert.equal(countActivities, 2)
                     })
@@ -321,7 +321,7 @@ describe('Repositories: PhysicalActivityRepository', () => {
                     .chain('exec')
                     .resolves(0)
 
-                return activityRepo.countActivities(defaultActivity.child_id)
+                return activityRepo.countByChild(defaultActivity.child_id)
                     .then((countActivities: number) => {
                         assert.equal(countActivities, 0)
                     })
@@ -338,7 +338,7 @@ describe('Repositories: PhysicalActivityRepository', () => {
                     .rejects({ message: 'An internal error has occurred in the database!',
                                description: 'Please try again later...' })
 
-                return activityRepo.countActivities(defaultActivity.child_id)
+                return activityRepo.countByChild(defaultActivity.child_id)
                     .catch (err => {
                         assert.propertyVal(err, 'message', 'An internal error has occurred in the database!')
                         assert.propertyVal(err, 'description', 'Please try again later...')

@@ -13,6 +13,10 @@ export class EnvironmentRepositoryMock implements IEnvironmentRepository {
         return Promise.resolve(1)
     }
 
+    public countByInstitution(institutionId: string): Promise<number> {
+        return Promise.resolve(1)
+    }
+
     public create(item: Environment): Promise<Environment> {
         if (item.id === '507f1f77bcf86cd799439013')
             return Promise.resolve(undefined!)
@@ -42,11 +46,17 @@ export class EnvironmentRepositoryMock implements IEnvironmentRepository {
         return Promise.resolve(environment)
     }
 
+    public removeByInstitution(environmentId: string, institutionId: string): Promise<boolean> {
+        if (environmentId === '507f1f77bcf86cd799439011')
+            return Promise.resolve(true)
+        return Promise.resolve(false)
+    }
+
     public update(item: Environment): Promise<Environment> {
         return Promise.resolve(item)
     }
 
-    public removeAllEnvironmentsFromInstitution(institutionID: string): Promise<boolean> {
+    public removeAllByInstitution(institutionID: string): Promise<boolean> {
         return Promise.resolve(true)
     }
 

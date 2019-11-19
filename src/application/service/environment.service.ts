@@ -128,38 +128,96 @@ export class EnvironmentService implements IEnvironmentService {
             // 5. Returns the created object.
             return Promise.resolve(environmentSaved)
         } catch (err) {
+            if (err.message === Strings.ERROR_MESSAGE.REPO_CREATE_CONFLICT) {
+                return Promise.reject(new ConflictException(Strings.ENVIRONMENT.ALREADY_REGISTERED))
+            }
             return Promise.reject(err)
         }
     }
 
     /**
-     * Get the data of all environment in the infrastructure.
+     * Get the data of all environments in the infrastructure.
      *
      * @param query Defines object to be used for queries.
      * @return {Promise<Array<Environment>>}
      * @throws {RepositoryException}
      */
-    public getAll(query: IQuery): Promise<Array<Environment>> {
+    public async getAll(query: IQuery): Promise<Array<Environment>> {
+        throw new Error('Unsupported feature!')
+    }
+
+    /**
+     * Get the data of all environment in the infrastructure.
+     *
+     * @param institutionId Institution ID.
+     * @param query Defines object to be used for queries.
+     * @return {Promise<Array<Environment>>}
+     * @throws {RepositoryException}
+     */
+    public getAllByInstitution(institutionId: string, query: IQuery): Promise<Array<Environment>> {
+        ObjectIdValidator.validate(institutionId, Strings.INSTITUTION.PARAM_ID_NOT_VALID_FORMAT)
+
         return this._environmentRepository.find(query)
     }
 
     /**
-     * Remove Measurement from the environment according to its unique identifier.
+     * Removes all environments related with an Institution.
      *
-     * @param id Unique identifier.
+     * @param institutionId Institution unique identifier.
+     * @param query Defines object to be used for queries.
      * @return {Promise<boolean>}
      * @throws {ValidationException | RepositoryException}
      */
-    public async remove(id: string): Promise<boolean> {
+    public async removeAllByInstitution(institutionId: string, query: IQuery): Promise<boolean> {
         try {
             // 1. Validate id parameter.
-            ObjectIdValidator.validate(id, Strings.ENVIRONMENT.PARAM_ID_NOT_VALID_FORMAT)
+            ObjectIdValidator.validate(institutionId, Strings.INSTITUTION.PARAM_ID_NOT_VALID_FORMAT)
+
+            const environmentsDeleted: Array<Environment> = await this._environmentRepository.find(query)
+
+            const wasDeleted: boolean = await this._environmentRepository.removeAllByInstitution(institutionId)
+
+            // 3. If deleted successfully, the object is published on the message bus.
+            if (wasDeleted) {
+                environmentsDeleted.forEach(environmentDeleted => {
+                    this._eventBus.bus
+                        .pubDeleteEnvironment(environmentDeleted)
+                        .then(() => {
+                            this._logger.info(`Measurement of environment with ID: ${environmentDeleted.id} was deleted...`)
+                        })
+                        .catch((err) => {
+                            this._logger.error(`Error trying to publish event DeleteEnvironment. ${err.message}`)
+                        })
+                })
+                // 4a. Returns true.
+                return Promise.resolve(true)
+            }
+            // 4b. Returns false.
+            return Promise.resolve(false)
+        } catch (err) {
+            return Promise.reject(err)
+        }
+    }
+
+    /**
+     * Removes environment according to its unique identifier and related institution.
+     *
+     * @param environmentId Environment unique identifier.
+     * @param institutionId Institution unique identifier.
+     * @return {Promise<boolean>}
+     * @throws {ValidationException | RepositoryException}
+     */
+    public async removeByInstitution(environmentId: string, institutionId: string): Promise<boolean> {
+        try {
+            // 1. Validate id parameters.
+            ObjectIdValidator.validate(institutionId, Strings.INSTITUTION.PARAM_ID_NOT_VALID_FORMAT)
+            ObjectIdValidator.validate(environmentId, Strings.ENVIRONMENT.PARAM_ID_NOT_VALID_FORMAT)
 
             // 2. Create an environment with a single attribute, its id, to be used in publishing on event bus.
             const environmentToBeDeleted: Environment = new Environment()
-            environmentToBeDeleted.id = id
+            environmentToBeDeleted.id = environmentId
 
-            const wasDeleted: boolean = await this._environmentRepository.delete(id)
+            const wasDeleted: boolean = await this._environmentRepository.removeByInstitution(environmentId, institutionId)
 
             // 3. If deleted successfully, the object is published on the message bus.
             if (wasDeleted) {
@@ -189,7 +247,18 @@ export class EnvironmentService implements IEnvironmentService {
         throw new Error('Unsupported feature!')
     }
 
-    public count(): Promise<number> {
-        return this._environmentRepository.count()
+    public async remove(id: string): Promise<boolean> {
+        throw new Error('Unsupported feature!')
+    }
+
+    /**
+     * Returns the total of environments of an Institution.
+     *
+     * @param institutionId Institution id associated with environments.
+     * @return {Promise<number>}
+     * @throws {RepositoryException}
+     */
+    public countByInstitution(institutionId: string): Promise<number> {
+        return this._environmentRepository.countByInstitution(institutionId)
     }
 }

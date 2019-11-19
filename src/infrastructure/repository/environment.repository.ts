@@ -35,8 +35,9 @@ export class EnvironmentRepository extends BaseRepository<Environment, Environme
     public async checkExist(environment: Environment): Promise<boolean> {
         const query: Query = new Query()
         return new Promise<boolean>((resolve, reject) => {
-            if (environment.timestamp && environment.location) {
+            if (environment.institution_id && environment.timestamp && environment.location) {
                 query.filters = {
+                    'institution_id': environment.institution_id,
                     'timestamp': environment.timestamp,
                     'location.local': environment.location.local,
                     'location.room': environment.location.room,
@@ -54,16 +55,36 @@ export class EnvironmentRepository extends BaseRepository<Environment, Environme
     }
 
     /**
-     * Removes all environments associated with the institutionID received.
+     * Removes environment according to its unique identifier and related institution.
      *
-     * @param institutionID Institution id associated with environments.
+     * @param environmentId Environment unique identifier.
+     * @param institutionId Institution unique identifier.
      * @return {Promise<boolean>}
      * @throws {ValidationException | RepositoryException}
      */
-    public async removeAllEnvironmentsFromInstitution(institutionID: string): Promise<boolean> {
+    public removeByInstitution(environmentId: string, institutionId: string): Promise<boolean> {
+        return new Promise<boolean>((resolve, reject) => {
+            this.environmentModel.findOneAndDelete({ institution_id: institutionId, _id: environmentId })
+                .exec()
+                .then(result => {
+                    if (!result) return resolve(false)
+                    resolve(true)
+                })
+                .catch(err => reject(super.mongoDBErrorListener(err)))
+        })
+    }
+
+    /**
+     * Removes all environments associated with an Institution.
+     *
+     * @param institutionId Institution id associated with environments.
+     * @return {Promise<boolean>}
+     * @throws {ValidationException | RepositoryException}
+     */
+    public async removeAllByInstitution(institutionId: string): Promise<boolean> {
         // Creates the query with the received parameter
         const query: IQuery = new Query()
-        query.filters = { institution_id: institutionID }
+        query.filters = { institution_id: institutionId }
 
         return new Promise<boolean>((resolve, reject) => {
             this.environmentModel.deleteMany(query.filters)
@@ -75,7 +96,14 @@ export class EnvironmentRepository extends BaseRepository<Environment, Environme
         })
     }
 
-    public count(): Promise<number> {
-        return super.count(new Query())
+    /**
+     * Returns the total of environments of an Institution.
+     *
+     * @param institutionId Institution id associated with environments.
+     * @return {Promise<number>}
+     * @throws {RepositoryException}
+     */
+    public countByInstitution(institutionId: string): Promise<number> {
+        return super.count(new Query().fromJSON({ filters: { institution_id: institutionId } }))
     }
 }

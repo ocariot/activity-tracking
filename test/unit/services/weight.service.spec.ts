@@ -575,7 +575,7 @@ describe('Services: WeightService', () => {
     describe('countWeights(childId: string)', () => {
         context('when there is at least one weight associated with the child received', () => {
             it('should return how many weights are associated with such child in the database', () => {
-                return weightService.countWeights(weight.child_id!)
+                return weightService.countByChild(weight.child_id!)
                     .then(res => {
                         assert.equal(res, 1)
                     })

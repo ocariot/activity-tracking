@@ -266,7 +266,14 @@ export class PhysicalActivityService implements IPhysicalActivityService {
         throw new Error('Unsupported feature!')
     }
 
-    public countActivities(childId: string): Promise<number> {
-        return this._activityRepository.countActivities(childId)
+    /**
+     * Returns the total of activities of a child.
+     *
+     * @param childId Child id associated with physical activities.
+     * @return {Promise<number>}
+     * @throws {RepositoryException}
+     */
+    public countByChild(childId: string): Promise<number> {
+        return this._activityRepository.countByChild(childId)
     }
 }

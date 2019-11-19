@@ -255,7 +255,14 @@ export class WeightService implements IWeightService {
         throw new Error('Unsupported feature!')
     }
 
-    public countWeights(childId: string): Promise<number> {
-        return this._weightRepository.countWeights(childId)
+    /**
+     * Returns the total of weights of a child.
+     *
+     * @param childId Child id associated with Weight objects.
+     * @return {Promise<number>}
+     * @throws {RepositoryException}
+     */
+    public countByChild(childId: string): Promise<number> {
+        return this._weightRepository.countByChild(childId)
     }
 }

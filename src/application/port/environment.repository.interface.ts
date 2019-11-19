@@ -20,19 +20,30 @@ export interface IEnvironmentRepository extends IRepository<Environment> {
     checkExist(environment: Environment): Promise<boolean>
 
     /**
-     * Removes all environments associated with the institutionID received.
+     * Removes environment according to its unique identifier and related institution.
      *
-     * @param institutionID Institution id associated with environments.
+     * @param environmentId Environment unique identifier.
+     * @param institutionId Institution unique identifier.
      * @return {Promise<boolean>}
      * @throws {ValidationException | RepositoryException}
      */
-    removeAllEnvironmentsFromInstitution(institutionID: string): Promise<boolean>
+    removeByInstitution(environmentId: string | number, institutionId: string): Promise<boolean>
 
     /**
-     * Returns the total of environments.
+     * Removes all environments associated with an Institution.
      *
+     * @param institutionId Institution id associated with environments.
+     * @return {Promise<boolean>}
+     * @throws {ValidationException | RepositoryException}
+     */
+    removeAllByInstitution(institutionId: string): Promise<boolean>
+
+    /**
+     * Returns the total of environments of an Institution.
+     *
+     * @param institutionId Institution id associated with environments.
      * @return {Promise<number>}
      * @throws {RepositoryException}
      */
-    count(): Promise<number>
+    countByInstitution(institutionId: string): Promise<number>
 }

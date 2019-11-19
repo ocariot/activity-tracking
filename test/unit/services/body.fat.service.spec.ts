@@ -435,7 +435,7 @@ describe('Services: BodyFatService', () => {
     describe('countBodyFats(childId: string)', () => {
         context('when there is at least one body fat associated with the child received', () => {
             it('should return how many body fats are associated with such child in the database', () => {
-                return bodyFatService.countBodyFats(bodyFat.child_id!)
+                return bodyFatService.countByChild(bodyFat.child_id!)
                     .then(res => {
                         assert.equal(res, 1)
                     })

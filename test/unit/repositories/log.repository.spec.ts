@@ -102,7 +102,7 @@ describe('Repositories: LogRepository', () => {
                     .withArgs({ child_id: defaultLog.child_id })
                     .resolves(true)
 
-                return logRepo.removeAllLogsFromChild(defaultLog.child_id)
+                return logRepo.removeAllByChild(defaultLog.child_id)
                     .then((result: boolean) => {
                         assert.isTrue(result)
                     })
@@ -119,7 +119,7 @@ describe('Repositories: LogRepository', () => {
                     .withArgs({ child_id: randomChildId })
                     .resolves(false)
 
-                return logRepo.removeAllLogsFromChild(randomChildId)
+                return logRepo.removeAllByChild(randomChildId)
                     .then((result: boolean) => {
                         assert.isFalse(result)
                     })
@@ -135,7 +135,7 @@ describe('Repositories: LogRepository', () => {
                     .rejects({ message: 'An internal error has occurred in the database!',
                                description: 'Please try again later...' })
 
-                return logRepo.removeAllLogsFromChild(defaultLog.child_id)
+                return logRepo.removeAllByChild(defaultLog.child_id)
                     .catch (err => {
                         assert.propertyVal(err, 'message', 'An internal error has occurred in the database!')
                         assert.propertyVal(err, 'description', 'Please try again later...')

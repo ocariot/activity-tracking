@@ -922,7 +922,7 @@ describe('Services: PhysicalActivityService', () => {
     describe('countActivities(childId: string)', () => {
         context('when there is at least one physical activity associated with the child received', () => {
             it('should return how many physical activities are associated with such child in the database', () => {
-                return activityService.countActivities(activity.child_id!)
+                return activityService.countByChild(activity.child_id!)
                     .then(res => {
                         assert.equal(res, 1)
                     })

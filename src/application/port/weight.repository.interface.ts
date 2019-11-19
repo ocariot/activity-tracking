@@ -37,7 +37,7 @@ export interface IWeightRepository extends IRepository<Weight> {
      * @return {Promise<boolean>}
      * @throws {ValidationException | RepositoryException}
      */
-    removeAllWeightFromChild(childId: string): Promise<boolean>
+    removeAllByChild(childId: string): Promise<boolean>
 
     /**
      * Disassociates a Weight object from a BodyFat.
@@ -55,5 +55,5 @@ export interface IWeightRepository extends IRepository<Weight> {
      * @return {Promise<number>}
      * @throws {RepositoryException}
      */
-    countWeights(childId: string): Promise<number>
+    countByChild(childId: string): Promise<number>
 }

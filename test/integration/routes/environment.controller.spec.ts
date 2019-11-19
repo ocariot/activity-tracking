@@ -30,31 +30,33 @@ describe('Routes: environments', () => {
         // Array with correct environments
     const correctEnvironmentsArr: Array<Environment> = new Array<EnvironmentMock>()
     for (let i = 0; i < 3; i++) {
-        correctEnvironmentsArr.push(new EnvironmentMock())
+        const env: Environment = new EnvironmentMock()
+        env.institution_id = defaultEnvironment.institution_id
+        correctEnvironmentsArr.push(env)
     }
 
     // Incorrect environments
     const incorrectEnv1: Environment = new Environment()        // Without required fields
+    incorrectEnv1.institution_id = defaultEnvironment.institution_id
 
-    const incorrectEnv2: Environment = new EnvironmentMock()   // Institution id invalid
-    incorrectEnv2.institution_id = '5c6dd16ea1a67d0034e6108bc'
+    const incorrectEnv2: Environment = new EnvironmentMock()   // location invalid
+    incorrectEnv2.location!.local = undefined!
+    incorrectEnv2.location!.room = undefined!
 
-    const incorrectEnv3: Environment = new EnvironmentMock()   // location invalid
-    incorrectEnv3.location!.local = undefined!
-    incorrectEnv3.location!.room = undefined!
+    const incorrectEnv3: Environment = new EnvironmentMock()   // Measurement invalid (empty array)
+    incorrectEnv3.measurements = new Array<Measurement>()
 
-    const incorrectEnv4: Environment = new EnvironmentMock()   // Measurement invalid (empty array)
-    incorrectEnv4.measurements = new Array<Measurement>()
+    const incorrectEnv4: Environment = new EnvironmentMock()   // Measurement invalid (missing fields)
+    incorrectEnv4.measurements![2] = new Measurement()
 
-    const incorrectEnv5: Environment = new EnvironmentMock()   // Measurement invalid (missing fields)
-    incorrectEnv5.measurements![2] = new Measurement()
-
-    const incorrectEnv6: Environment = new EnvironmentMock()   // The timestamp is invalid
-    incorrectEnv6.timestamp = new Date('2019-12-35T12:52:59Z')
+    const incorrectEnv5: Environment = new EnvironmentMock()   // The timestamp is invalid
+    incorrectEnv5.timestamp = new Date('2019-12-35T12:52:59Z')
 
     // Array with correct and incorrect environments
     const mixedEnvironmentsArr: Array<Environment> = new Array<EnvironmentMock>()
-    mixedEnvironmentsArr.push(new EnvironmentMock())
+    const correctEnv: Environment = new EnvironmentMock()
+    correctEnv.institution_id = defaultEnvironment.institution_id
+    mixedEnvironmentsArr.push(correctEnv)
     mixedEnvironmentsArr.push(incorrectEnv1)
 
     // Array with only incorrect environments
@@ -64,7 +66,6 @@ describe('Routes: environments', () => {
     incorrectEnvironmentsArr.push(incorrectEnv3)
     incorrectEnvironmentsArr.push(incorrectEnv4)
     incorrectEnvironmentsArr.push(incorrectEnv5)
-    incorrectEnvironmentsArr.push(incorrectEnv6)
 
     // Start services
     before(async () => {
@@ -95,7 +96,6 @@ describe('Routes: environments', () => {
     describe('RABBITMQ PUBLISHER -> POST /v1/environments with only one Environment in the body', () => {
         context('when posting a new Environment with success and publishing it to the bus', () => {
             const body = {
-                institution_id: defaultEnvironment.institution_id,
                 location: defaultEnvironment.location,
                 measurements: defaultEnvironment.measurements,
                 climatized: defaultEnvironment.climatized,
@@ -152,7 +152,7 @@ describe('Routes: environments', () => {
                     })
                     .then(() => {
                         request
-                            .post('/v1/environments')
+                            .post(`/v1/institutions/${defaultEnvironment.institution_id}/environments`)
                             .send(body)
                             .set('Content-Type', 'application/json')
                             .expect(201)
@@ -176,7 +176,6 @@ describe('Routes: environments', () => {
             it('should return status code 201 and the saved Environment (and show an error log about unable to send ' +
                 'SaveEnvironment event)', () => {
                 const body = {
-                    institution_id: defaultEnvironment.institution_id,
                     location: defaultEnvironment.location,
                     measurements: defaultEnvironment.measurements,
                     climatized: defaultEnvironment.climatized,
@@ -184,7 +183,7 @@ describe('Routes: environments', () => {
                 }
 
                 return request
-                    .post('/v1/environments')
+                    .post(`/v1/institutions/${defaultEnvironment.institution_id}/environments`)
                     .send(body)
                     .set('Content-Type', 'application/json')
                     .expect(201)
@@ -226,7 +225,6 @@ describe('Routes: environments', () => {
             })
             it('should return status code 409 and an info message about duplicate items', () => {
                 const body = {
-                    institution_id: defaultEnvironment.institution_id,
                     location: defaultEnvironment.location,
                     measurements: defaultEnvironment.measurements,
                     climatized: defaultEnvironment.climatized,
@@ -234,7 +232,7 @@ describe('Routes: environments', () => {
                 }
 
                 return request
-                    .post('/v1/environments')
+                    .post(`/v1/institutions/${defaultEnvironment.institution_id}/environments`)
                     .send(body)
                     .set('Content-Type', 'application/json')
                     .expect(409)
@@ -250,14 +248,14 @@ describe('Routes: environments', () => {
                 const body = {}
 
                 return request
-                    .post('/v1/environments')
+                    .post(`/v1/institutions/${defaultEnvironment.institution_id}/environments`)
                     .send(body)
                     .set('Content-Type', 'application/json')
                     .expect(400)
                     .then(err => {
                         expect(err.body.code).to.eql(400)
                         expect(err.body.message).to.eql(Strings.ERROR_MESSAGE.REQUIRED_FIELDS)
-                        expect(err.body.description).to.eql('timestamp, institution_id, location, measurements'
+                        expect(err.body.description).to.eql('timestamp, location, measurements'
                             .concat(Strings.ERROR_MESSAGE.REQUIRED_FIELDS_DESC))
                     })
             })
@@ -266,7 +264,6 @@ describe('Routes: environments', () => {
         context('when a validation error occurs (institution_id is invalid)', () => {
             it('should return status code 400 and info message about the invalid institution_id', () => {
                 const body = {
-                    institution_id: '5a62be07de34500146d9c5442',
                     location: defaultEnvironment.location,
                     measurements: defaultEnvironment.measurements,
                     climatized: defaultEnvironment.climatized,
@@ -274,7 +271,7 @@ describe('Routes: environments', () => {
                 }
 
                 return request
-                    .post('/v1/environments')
+                    .post('/v1/institutions/123/environments')
                     .send(body)
                     .set('Content-Type', 'application/json')
                     .expect(400)
@@ -289,7 +286,6 @@ describe('Routes: environments', () => {
         context('when a validation error occurs (location is invalid, missing required fields)', () => {
             it('should return status code 400 and info message about the invalid location', () => {
                 const body = {
-                    institution_id: defaultEnvironment.institution_id,
                     location: new Location(),
                     measurements: defaultEnvironment.measurements,
                     climatized: defaultEnvironment.climatized,
@@ -297,7 +293,7 @@ describe('Routes: environments', () => {
                 }
 
                 return request
-                    .post('/v1/environments')
+                    .post(`/v1/institutions/${defaultEnvironment.institution_id}/environments`)
                     .send(body)
                     .set('Content-Type', 'application/json')
                     .expect(400)
@@ -313,7 +309,6 @@ describe('Routes: environments', () => {
         context('when a validation error occurs (location local is empty)', () => {
             it('should return status code 400 and info message about the invalid location', () => {
                 const body = {
-                    institution_id: defaultEnvironment.institution_id,
                     location: {
                         local: '',
                         room: defaultEnvironment.location!.room
@@ -324,7 +319,7 @@ describe('Routes: environments', () => {
                 }
 
                 return request
-                    .post('/v1/environments')
+                    .post(`/v1/institutions/${defaultEnvironment.institution_id}/environments`)
                     .send(body)
                     .set('Content-Type', 'application/json')
                     .expect(400)
@@ -339,7 +334,6 @@ describe('Routes: environments', () => {
         context('when a validation error occurs (location local is invalid)', () => {
             it('should return status code 400 and info message about the invalid location', () => {
                 const body = {
-                    institution_id: defaultEnvironment.institution_id,
                     location: {
                         local: 123,
                         room: defaultEnvironment.location!.room
@@ -350,7 +344,7 @@ describe('Routes: environments', () => {
                 }
 
                 return request
-                    .post('/v1/environments')
+                    .post(`/v1/institutions/${defaultEnvironment.institution_id}/environments`)
                     .send(body)
                     .set('Content-Type', 'application/json')
                     .expect(400)
@@ -365,7 +359,6 @@ describe('Routes: environments', () => {
         context('when a validation error occurs (location room is empty)', () => {
             it('should return status code 400 and info message about the invalid location', () => {
                 const body = {
-                    institution_id: defaultEnvironment.institution_id,
                     location: {
                         local: defaultEnvironment.location!.local,
                         room: ''
@@ -376,7 +369,7 @@ describe('Routes: environments', () => {
                 }
 
                 return request
-                    .post('/v1/environments')
+                    .post(`/v1/institutions/${defaultEnvironment.institution_id}/environments`)
                     .send(body)
                     .set('Content-Type', 'application/json')
                     .expect(400)
@@ -391,7 +384,6 @@ describe('Routes: environments', () => {
         context('when a validation error occurs (location room is invalid)', () => {
             it('should return status code 400 and info message about the invalid location', () => {
                 const body = {
-                    institution_id: defaultEnvironment.institution_id,
                     location: {
                         local: defaultEnvironment.location!.local,
                         room: 123
@@ -402,7 +394,7 @@ describe('Routes: environments', () => {
                 }
 
                 return request
-                    .post('/v1/environments')
+                    .post(`/v1/institutions/${defaultEnvironment.institution_id}/environments`)
                     .send(body)
                     .set('Content-Type', 'application/json')
                     .expect(400)
@@ -417,7 +409,6 @@ describe('Routes: environments', () => {
         context('when a validation error occurs (location latitude is empty)', () => {
             it('should return status code 400 and info message about the invalid location', () => {
                 const body = {
-                    institution_id: defaultEnvironment.institution_id,
                     location: {
                         local: defaultEnvironment.location!.local,
                         room: defaultEnvironment.location!.room,
@@ -429,7 +420,7 @@ describe('Routes: environments', () => {
                 }
 
                 return request
-                    .post('/v1/environments')
+                    .post(`/v1/institutions/${defaultEnvironment.institution_id}/environments`)
                     .send(body)
                     .set('Content-Type', 'application/json')
                     .expect(400)
@@ -444,7 +435,6 @@ describe('Routes: environments', () => {
         context('when a validation error occurs (location longitude is empty)', () => {
             it('should return status code 400 and info message about the invalid location', () => {
                 const body = {
-                    institution_id: defaultEnvironment.institution_id,
                     location: {
                         local: defaultEnvironment.location!.local,
                         room: defaultEnvironment.location!.room,
@@ -456,7 +446,7 @@ describe('Routes: environments', () => {
                 }
 
                 return request
-                    .post('/v1/environments')
+                    .post(`/v1/institutions/${defaultEnvironment.institution_id}/environments`)
                     .send(body)
                     .set('Content-Type', 'application/json')
                     .expect(400)
@@ -471,7 +461,6 @@ describe('Routes: environments', () => {
         context('when a validation error occurs (measurements array is empty)', () => {
             it('should return status code 400 and info message about the invalid measurements array', () => {
                 const body = {
-                    institution_id: defaultEnvironment.institution_id,
                     location: defaultEnvironment.location,
                     measurements: new Array<Measurement>(),
                     climatized: defaultEnvironment.climatized,
@@ -479,7 +468,7 @@ describe('Routes: environments', () => {
                 }
 
                 return request
-                    .post('/v1/environments')
+                    .post(`/v1/institutions/${defaultEnvironment.institution_id}/environments`)
                     .send(body)
                     .set('Content-Type', 'application/json')
                     .expect(400)
@@ -494,7 +483,6 @@ describe('Routes: environments', () => {
         context('when a validation error occurs (measurements array has an item that has an empty type)', () => {
             it('should return status code 400 and info message about the invalid measurements array', () => {
                 const body = {
-                    institution_id: defaultEnvironment.institution_id,
                     location: defaultEnvironment.location,
                     measurements: [
                         {
@@ -513,7 +501,7 @@ describe('Routes: environments', () => {
                 }
 
                 return request
-                    .post('/v1/environments')
+                    .post(`/v1/institutions/${defaultEnvironment.institution_id}/environments`)
                     .send(body)
                     .set('Content-Type', 'application/json')
                     .expect(400)
@@ -528,7 +516,6 @@ describe('Routes: environments', () => {
         context('when a validation error occurs (measurements array has an item that has an invalid type)', () => {
             it('should return status code 400 and info message about the invalid measurements array', () => {
                 const body = {
-                    institution_id: defaultEnvironment.institution_id,
                     location: defaultEnvironment.location,
                     measurements: [
                         {
@@ -547,7 +534,7 @@ describe('Routes: environments', () => {
                 }
 
                 return request
-                    .post('/v1/environments')
+                    .post(`/v1/institutions/${defaultEnvironment.institution_id}/environments`)
                     .send(body)
                     .set('Content-Type', 'application/json')
                     .expect(400)
@@ -562,7 +549,6 @@ describe('Routes: environments', () => {
         context('when a validation error occurs (measurements array has an item that has an invalid value)', () => {
             it('should return status code 400 and info message about the invalid measurements array', () => {
                 const body = {
-                    institution_id: defaultEnvironment.institution_id,
                     location: defaultEnvironment.location,
                     measurements: [
                         {
@@ -581,7 +567,7 @@ describe('Routes: environments', () => {
                 }
 
                 return request
-                    .post('/v1/environments')
+                    .post(`/v1/institutions/${defaultEnvironment.institution_id}/environments`)
                     .send(body)
                     .set('Content-Type', 'application/json')
                     .expect(400)
@@ -596,7 +582,6 @@ describe('Routes: environments', () => {
         context('when a validation error occurs (measurements array has an item that has an empty unit)', () => {
             it('should return status code 400 and info message about the invalid measurements array', () => {
                 const body = {
-                    institution_id: defaultEnvironment.institution_id,
                     location: defaultEnvironment.location,
                     measurements: [
                         {
@@ -615,7 +600,7 @@ describe('Routes: environments', () => {
                 }
 
                 return request
-                    .post('/v1/environments')
+                    .post(`/v1/institutions/${defaultEnvironment.institution_id}/environments`)
                     .send(body)
                     .set('Content-Type', 'application/json')
                     .expect(400)
@@ -630,7 +615,6 @@ describe('Routes: environments', () => {
         context('when a validation error occurs (measurements array has an item that has an invalid unit)', () => {
             it('should return status code 400 and info message about the invalid measurements array', () => {
                 const body = {
-                    institution_id: defaultEnvironment.institution_id,
                     location: defaultEnvironment.location,
                     measurements: [
                         {
@@ -649,7 +633,7 @@ describe('Routes: environments', () => {
                 }
 
                 return request
-                    .post('/v1/environments')
+                    .post(`/v1/institutions/${defaultEnvironment.institution_id}/environments`)
                     .send(body)
                     .set('Content-Type', 'application/json')
                     .expect(400)
@@ -665,7 +649,6 @@ describe('Routes: environments', () => {
             it('should return status code 400 and info message about the invalid measurements array', () => {
                 defaultMeasurements[1] = new Measurement()
                 const body = {
-                    institution_id: defaultEnvironment.institution_id,
                     location: defaultEnvironment.location,
                     measurements: defaultMeasurements,
                     climatized: defaultEnvironment.climatized,
@@ -673,7 +656,7 @@ describe('Routes: environments', () => {
                 }
 
                 return request
-                    .post('/v1/environments')
+                    .post(`/v1/institutions/${defaultEnvironment.institution_id}/environments`)
                     .send(body)
                     .set('Content-Type', 'application/json')
                     .expect(400)
@@ -689,7 +672,6 @@ describe('Routes: environments', () => {
         context('when a validation error occurs (climatized is invalid)', () => {
             it('should return status code 400 and info message about the invalid climatized', () => {
                 const body = {
-                    institution_id: defaultEnvironment.institution_id,
                     location: {
                         local: defaultEnvironment.location!.local,
                         room: defaultEnvironment.location!.room,
@@ -700,7 +682,7 @@ describe('Routes: environments', () => {
                 }
 
                 return request
-                    .post('/v1/environments')
+                    .post(`/v1/institutions/${defaultEnvironment.institution_id}/environments`)
                     .send(body)
                     .set('Content-Type', 'application/json')
                     .expect(400)
@@ -715,7 +697,6 @@ describe('Routes: environments', () => {
         context('when a validation error occurs (timestamp is invalid)', () => {
             it('should return status code 400 and info message about the invalid timestamp', () => {
                 const body = {
-                    institution_id: defaultEnvironment.institution_id,
                     location: {
                         local: defaultEnvironment.location!.local,
                         room: defaultEnvironment.location!.room,
@@ -726,7 +707,7 @@ describe('Routes: environments', () => {
                 }
 
                 return request
-                    .post('/v1/environments')
+                    .post(`/v1/institutions/${defaultEnvironment.institution_id}/environments`)
                     .send(body)
                     .set('Content-Type', 'application/json')
                     .expect(400)
@@ -734,6 +715,31 @@ describe('Routes: environments', () => {
                         expect(err.body.code).to.eql(400)
                         expect(err.body.message).to.eql('Datetime: 2019-11-35T14:40:00Z'.concat(Strings.ERROR_MESSAGE.INVALID_DATE))
                         expect(err.body.description).to.eql(Strings.ERROR_MESSAGE.INVALID_DATE_DESC)
+                    })
+            })
+        })
+
+        context('when a validation error occurs (institution id is invalid)', () => {
+            it('should return status code 400 and info message about the invalid institution id', () => {
+                const body = {
+                    location: {
+                        local: defaultEnvironment.location!.local,
+                        room: defaultEnvironment.location!.room,
+                    },
+                    measurements: defaultEnvironment.measurements,
+                    climatized: defaultEnvironment.climatized,
+                    timestamp: defaultEnvironment.timestamp
+                }
+
+                return request
+                    .post(`/v1/institutions/123/environments`)
+                    .send(body)
+                    .set('Content-Type', 'application/json')
+                    .expect(400)
+                    .then(err => {
+                        expect(err.body.code).to.eql(400)
+                        expect(err.body.message).to.eql(Strings.INSTITUTION.PARAM_ID_NOT_VALID_FORMAT)
+                        expect(err.body.description).to.eql(Strings.ERROR_MESSAGE.UUID_NOT_VALID_FORMAT_DESC)
                     })
             })
         })
@@ -757,7 +763,6 @@ describe('Routes: environments', () => {
 
                 correctEnvironmentsArr.forEach(environment => {
                     const bodyElem = {
-                        institution_id: environment.institution_id,
                         location: environment.location,
                         measurements: environment.measurements,
                         climatized: environment.climatized,
@@ -767,7 +772,7 @@ describe('Routes: environments', () => {
                 })
 
                 return request
-                    .post('/v1/environments')
+                    .post(`/v1/institutions/${defaultEnvironment.institution_id}/environments`)
                     .send(body)
                     .set('Content-Type', 'application/json')
                     .expect(207)
@@ -818,7 +823,6 @@ describe('Routes: environments', () => {
 
                 correctEnvironmentsArr.forEach(environment => {
                     const bodyElem = {
-                        institution_id: environment.institution_id,
                         location: environment.location,
                         measurements: environment.measurements,
                         climatized: environment.climatized,
@@ -828,7 +832,7 @@ describe('Routes: environments', () => {
                 })
 
                 return request
-                    .post('/v1/environments')
+                    .post(`/v1/institutions/${defaultEnvironment.institution_id}/environments`)
                     .send(body)
                     .set('Content-Type', 'application/json')
                     .expect(207)
@@ -870,7 +874,6 @@ describe('Routes: environments', () => {
 
                 mixedEnvironmentsArr.forEach(environment => {
                     const bodyElem = {
-                        institution_id: environment.institution_id,
                         location: environment.location,
                         measurements: environment.measurements,
                         climatized: environment.climatized,
@@ -880,7 +883,7 @@ describe('Routes: environments', () => {
                 })
 
                 return request
-                    .post('/v1/environments')
+                    .post(`/v1/institutions/${defaultEnvironment.institution_id}/environments`)
                     .send(body)
                     .set('Content-Type', 'application/json')
                     .expect(207)
@@ -904,7 +907,7 @@ describe('Routes: environments', () => {
                         // Error item
                         expect(res.body.error[0].code).to.eql(HttpStatus.BAD_REQUEST)
                         expect(res.body.error[0].message).to.eql(Strings.ERROR_MESSAGE.REQUIRED_FIELDS)
-                        expect(res.body.error[0].description).to.eql('timestamp, institution_id, location, ' +
+                        expect(res.body.error[0].description).to.eql('timestamp, location, ' +
                             'measurements'.concat(Strings.ERROR_MESSAGE.REQUIRED_FIELDS_DESC))
                     })
             })
@@ -925,7 +928,6 @@ describe('Routes: environments', () => {
 
                 incorrectEnvironmentsArr.forEach(environment => {
                     const bodyElem = {
-                        institution_id: environment.institution_id,
                         location: environment.location,
                         measurements: environment.measurements,
                         climatized: environment.climatized,
@@ -935,7 +937,7 @@ describe('Routes: environments', () => {
                 })
 
                 return request
-                    .post('/v1/environments')
+                    .post(`/v1/institutions/${defaultEnvironment.institution_id}/environments`)
                     .send(body)
                     .set('Content-Type', 'application/json')
                     .expect(207)
@@ -943,32 +945,28 @@ describe('Routes: environments', () => {
                         expect(res.body.error[0].message)
                             .to.eql(Strings.ERROR_MESSAGE.REQUIRED_FIELDS)
                         expect(res.body.error[0].description)
-                            .to.eql('timestamp, institution_id, location, measurements'
+                            .to.eql('timestamp, location, measurements'
                             .concat(Strings.ERROR_MESSAGE.REQUIRED_FIELDS_DESC))
                         expect(res.body.error[1].message)
-                            .to.eql(Strings.INSTITUTION.PARAM_ID_NOT_VALID_FORMAT)
+                            .to.eql(Strings.ERROR_MESSAGE.REQUIRED_FIELDS)
                         expect(res.body.error[1].description)
-                            .to.eql(Strings.ERROR_MESSAGE.UUID_NOT_VALID_FORMAT_DESC)
-                        expect(res.body.error[2].message)
-                            .to.eql(Strings.ERROR_MESSAGE.REQUIRED_FIELDS)
-                        expect(res.body.error[2].description)
                             .to.eql('location.local, location.room'.concat(Strings.ERROR_MESSAGE.REQUIRED_FIELDS_DESC))
-                        expect(res.body.error[3].message)
+                        expect(res.body.error[2].message)
                             .to.eql(Strings.ERROR_MESSAGE.INVALID_FIELDS)
-                        expect(res.body.error[3].description)
+                        expect(res.body.error[2].description)
                             .to.eql('measurements collection must not be empty!')
-                        expect(res.body.error[4].message)
+                        expect(res.body.error[3].message)
                             .to.eql(Strings.ERROR_MESSAGE.REQUIRED_FIELDS)
-                        expect(res.body.error[4].description)
+                        expect(res.body.error[3].description)
                             .to.eql('measurements.type, measurements.value, measurements.unit'
                             .concat(Strings.ERROR_MESSAGE.REQUIRED_FIELDS_DESC))
-                        expect(res.body.error[5].message).to.eql('Datetime: null'.concat(Strings.ERROR_MESSAGE.INVALID_DATE))
-                        expect(res.body.error[5].description).to.eql(Strings.ERROR_MESSAGE.INVALID_DATE_DESC)
+                        expect(res.body.error[4].message).to.eql('Datetime: null'.concat(Strings.ERROR_MESSAGE.INVALID_DATE))
+                        expect(res.body.error[4].description).to.eql(Strings.ERROR_MESSAGE.INVALID_DATE_DESC)
 
                         for (let i = 0; i < res.body.error.length; i++) {
                             expect(res.body.error[i].code).to.eql(HttpStatus.BAD_REQUEST)
-                            expect(res.body.error[i].item.institution_id).to.eql(incorrectEnvironmentsArr[i].institution_id)
-                            if (i === 2) {
+                            if (i !== 4) expect(res.body.error[i].item.institution_id).to.eql(defaultEnvironment.institution_id)
+                            if (i === 1) {
                                 expect(res.body.error[i].item.location.latitude)
                                     .to.eql(incorrectEnvironmentsArr[i].location!.latitude)
                                 expect(res.body.error[i].item.location.longitude)
@@ -979,9 +977,9 @@ describe('Routes: environments', () => {
                             }
                             if (res.body.error[i].item.climatized)
                                 expect(res.body.error[i].item.climatized).to.eql(incorrectEnvironmentsArr[i].climatized)
-                            if (i !== 0 && i !== 5) expect(res.body.error[i].item.timestamp)
+                            if (i !== 0 && i !== 4) expect(res.body.error[i].item.timestamp)
                                 .to.eql(incorrectEnvironmentsArr[i].timestamp.toISOString())
-                            if (i !== 0 && i !== 3) {
+                            if (i !== 0 && i !== 2) {
                                 let index = 0
                                 for (const measurement of res.body.error[i].item.measurements) {
                                     expect(measurement.type).to.eql(incorrectEnvironmentsArr[i].measurements![index].type)
@@ -1030,7 +1028,7 @@ describe('Routes: environments', () => {
             })
             it('should return status code 200 and a list of environments found', () => {
                 return request
-                    .get('/v1/environments')
+                    .get(`/v1/institutions/${defaultEnvironment.institution_id}/environments`)
                     .set('Content-Type', 'application/json')
                     .expect(200)
                     .then(res => {
@@ -1064,11 +1062,33 @@ describe('Routes: environments', () => {
 
             it('should return status code 200 and an empty list', () => {
                 return request
-                    .get('/v1/environments')
+                    .get(`/v1/institutions/${defaultEnvironment.institution_id}/environments`)
                     .set('Content-Type', 'application/json')
                     .expect(200)
                     .then(res => {
                         expect(res.body.length).to.eql(0)
+                    })
+            })
+        })
+
+        context('when the institution id is invalid', () => {
+            before(async () => {
+                try {
+                    await deleteAllEnvironments()
+                } catch (err) {
+                    throw new Error('Failure on environments routes test: ' + err.message)
+                }
+            })
+
+            it('should return status code 400 and info message about the invalid institution id', () => {
+                return request
+                    .get(`/v1/institutions/123/environments`)
+                    .set('Content-Type', 'application/json')
+                    .expect(400)
+                    .then(err => {
+                        expect(err.body.code).to.eql(400)
+                        expect(err.body.message).to.eql(Strings.INSTITUTION.PARAM_ID_NOT_VALID_FORMAT)
+                        expect(err.body.description).to.eql(Strings.ERROR_MESSAGE.UUID_NOT_VALID_FORMAT_DESC)
                     })
             })
         })
@@ -1135,9 +1155,8 @@ describe('Routes: environments', () => {
             })
             it('should return status code 200 and the result as needed in the query ' +
                 '(all the environment records of an institution in one day)', () => {
-                const url = '/v1/environments'
-                    .concat(`?institution_id=${defaultEnvironment.institution_id}`)
-                    .concat('&timestamp=gte:2019-01-20T00:00:00.000Z&timestamp=lt:2019-01-20T23:59:59.999Z')
+                const url = (`/v1/institutions/${defaultEnvironment.institution_id}/environments`)
+                    .concat('?timestamp=gte:2019-01-20T00:00:00.000Z&timestamp=lt:2019-01-20T23:59:59.999Z')
                     .concat('&sort=institution_id&page=1&limit=3')
 
                 return request
@@ -1159,9 +1178,8 @@ describe('Routes: environments', () => {
 
             it('should return status code 200 and the result as needed in the query ' +
                 '(all the environment records of a room in one day)', () => {
-                const url = '/v1/environments'
-                    .concat(`?institution_id=${defaultEnvironment.institution_id}`)
-                    .concat('&location.local=Indoor&location.room=Room 40')
+                const url = (`/v1/institutions/${defaultEnvironment.institution_id}/environments`)
+                    .concat('?location.local=Indoor&location.room=Room 40')
                     .concat('&timestamp=gte:2019-01-20T00:00:00.000Z&timestamp=lt:2019-01-20T23:59:59.999Z')
                     .concat('&sort=institution_id&page=1&limit=3')
 
@@ -1189,9 +1207,8 @@ describe('Routes: environments', () => {
             })
 
             it('should return status code 200 and an empty list (when no environment record is found)', () => {
-                const url = '/v1/environments?'
+                const url = `/v1/institutions/${defaultEnvironment.institution_id}/environments?`
                     .concat('?timestamp=gte:2017-01-20T00:00:00.000Z&timestamp=lt:2017-01-20T23:59:59.999Z')
-                    .concat(`&institution_id=${defaultEnvironment.institution_id}`)
                     .concat('&sort=institution_id&page=1&limit=3')
 
                 return request
@@ -1200,6 +1217,199 @@ describe('Routes: environments', () => {
                     .expect(200)
                     .then(res => {
                         expect(res.body.length).to.eql(0)
+                    })
+            })
+        })
+    })
+    /**
+     * DELETE ALL route
+     */
+    describe('RABBITMQ PUBLISHER -> DELETE /v1/environments/:environment_id', () => {
+        context('when the environments were deleted successfully and their IDs are published on the bus', () => {
+            before(async () => {
+                try {
+                    const otherEnvironment: Environment = new EnvironmentMock()
+                    await deleteAllEnvironments()
+
+                    await createEnvironment({
+                        institution_id: defaultEnvironment.institution_id,
+                        location: defaultEnvironment.location,
+                        measurements: [
+                            {
+                                type: 'humidity',
+                                value: 34,
+                                unit: '%'
+                            },
+                            {
+                                type: 'temperature',
+                                value: 40,
+                                unit: '°C'
+                            }
+                        ],
+                        climatized: defaultEnvironment.climatized,
+                        timestamp: defaultEnvironment.timestamp
+                    })
+
+                    await createEnvironment({
+                        institution_id: defaultEnvironment.institution_id,
+                        location: otherEnvironment.location,
+                        measurements: [
+                            {
+                                type: 'humidity',
+                                value: 34,
+                                unit: '%'
+                            },
+                            {
+                                type: 'temperature',
+                                value: 40,
+                                unit: '°C'
+                            }
+                        ],
+                        climatized: otherEnvironment.climatized,
+                        timestamp: otherEnvironment.timestamp
+                    })
+
+                    await rabbitmq.initialize(process.env.RABBITMQ_URI || Default.RABBITMQ_URI,
+                        { interval: 100, receiveFromYourself: true, sslOptions: { ca: [] } })
+                } catch (err) {
+                    throw new Error('Failure on environments routes test: ' + err.message)
+                }
+            })
+
+            after(async () => {
+                try {
+                    await rabbitmq.dispose()
+                    await rabbitmq.initialize('amqp://invalidUser:guest@localhost', { retries: 1, interval: 100 })
+                } catch (err) {
+                    throw new Error('Failure on environments test: ' + err.message)
+                }
+            })
+
+            it('The subscriber should receive a message in the correct format and that has the same ID ' +
+                'published on the bus', (done) => {
+                rabbitmq.bus
+                    .subDeleteEnvironment(message => {
+                        try {
+                            expect(message.event_name).to.eql('EnvironmentDeleteEvent')
+                            expect(message).to.have.property('timestamp')
+                            expect(message).to.have.property('environment')
+                            expect(message.environment).to.have.property('id')
+                            done()
+                        } catch (err) {
+                            done(err)
+                        }
+                    })
+                    .then(() => {
+                        request
+                            .delete(`/v1/institutions/${defaultEnvironment.institution_id}/environments/`)
+                            .set('Content-Type', 'application/json')
+                            .expect(204)
+                            .then()
+                            .catch(done)
+                    })
+                    .catch(done)
+            })
+        })
+    })
+
+    describe('DELETE /v1/environments/:environment_id', () => {
+        context('when the environments were deleted successfully (there is no connection to RabbitMQ)', () => {
+            before(async () => {
+                try {
+                    const otherEnvironment: Environment = new EnvironmentMock()
+                    await deleteAllEnvironments()
+
+                    await createEnvironment({
+                        institution_id: defaultEnvironment.institution_id,
+                        location: defaultEnvironment.location,
+                        measurements: [
+                            {
+                                type: 'humidity',
+                                value: 34,
+                                unit: '%'
+                            },
+                            {
+                                type: 'temperature',
+                                value: 40,
+                                unit: '°C'
+                            }
+                        ],
+                        climatized: defaultEnvironment.climatized,
+                        timestamp: defaultEnvironment.timestamp
+                    })
+
+                    await createEnvironment({
+                        institution_id: defaultEnvironment.institution_id,
+                        location: otherEnvironment.location,
+                        measurements: [
+                            {
+                                type: 'humidity',
+                                value: 34,
+                                unit: '%'
+                            },
+                            {
+                                type: 'temperature',
+                                value: 40,
+                                unit: '°C'
+                            }
+                        ],
+                        climatized: otherEnvironment.climatized,
+                        timestamp: otherEnvironment.timestamp
+                    })
+                } catch (err) {
+                    throw new Error('Failure on environments routes test: ' + err.message)
+                }
+            })
+            it('should return status code 204 and no content for environments (and show an error log about unable to send ' +
+                'DeleteEnvironment events)', () => {
+                return request
+                    .delete(`/v1/institutions/${defaultEnvironment.institution_id}/environments/`)
+                    .set('Content-Type', 'application/json')
+                    .expect(204)
+                    .then(res => {
+                        expect(res.body).to.eql({})
+                    })
+            })
+        })
+
+        context('when the institution has no environments associated with it', () => {
+            before(async () => {
+                try {
+                    await deleteAllEnvironments()
+                } catch (err) {
+                    throw new Error('Failure on environments routes test: ' + err.message)
+                }
+            })
+
+            it('should return status code 204 and no content for environment', () => {
+                return request
+                    .delete(`/v1/institutions/${defaultEnvironment.institution_id}/environments/`)
+                    .set('Content-Type', 'application/json')
+                    .expect(204)
+                    .then(err => {
+                        expect(err.body).to.eql({})
+                    })
+            })
+        })
+
+        context('when the institution id is invalid', () => {
+            before(async () => {
+                try {
+                    await deleteAllEnvironments()
+                } catch (err) {
+                    throw new Error('Failure on environments routes test: ' + err.message)
+                }
+            })
+
+            it('should return status code 400 and info message about the invalid institution id', () => {
+                return request
+                    .delete('/v1/institutions/123/environments/')
+                    .set('Content-Type', 'application/json')
+                    .expect(400)
+                    .then(err => {
+                        expect(err.body.code).to.eql(400)
+                        expect(err.body.message).to.eql(Strings.INSTITUTION.PARAM_ID_NOT_VALID_FORMAT)
+                        expect(err.body.description).to.eql(Strings.ERROR_MESSAGE.UUID_NOT_VALID_FORMAT_DESC)
                     })
             })
         })
@@ -1266,7 +1476,7 @@ describe('Routes: environments', () => {
                     })
                     .then(() => {
                         request
-                            .delete(`/v1/environments/${result.id}`)
+                            .delete(`/v1/institutions/${result.institution_id}/environments/${result.id}`)
                             .set('Content-Type', 'application/json')
                             .expect(204)
                             .then()
@@ -1310,7 +1520,7 @@ describe('Routes: environments', () => {
             it('should return status code 204 and no content for environment (and show an error log about unable to send ' +
                 'DeleteEnvironment event)', () => {
                 return request
-                    .delete(`/v1/environments/${result.id}`)
+                    .delete(`/v1/institutions/${result.institution_id}/environments/${result.id}`)
                     .set('Content-Type', 'application/json')
                     .expect(204)
                     .then(res => {
@@ -1330,11 +1540,33 @@ describe('Routes: environments', () => {
 
             it('should return status code 204 and no content for environment', () => {
                 return request
-                    .delete(`/v1/environments/${defaultEnvironment.id}`)
+                    .delete(`/v1/institutions/${defaultEnvironment.institution_id}/environments/${defaultEnvironment.id}`)
                     .set('Content-Type', 'application/json')
                     .expect(204)
                     .then(err => {
                         expect(err.body).to.eql({})
+                    })
+            })
+        })
+
+        context('when the institution id is invalid', () => {
+            before(async () => {
+                try {
+                    await deleteAllEnvironments()
+                } catch (err) {
+                    throw new Error('Failure on environments routes test: ' + err.message)
+                }
+            })
+
+            it('should return status code 400 and info message about the invalid institution id', () => {
+                return request
+                    .delete(`/v1/institutions/123/environments/${defaultEnvironment.id}`)
+                    .set('Content-Type', 'application/json')
+                    .expect(400)
+                    .then(err => {
+                        expect(err.body.code).to.eql(400)
+                        expect(err.body.message).to.eql(Strings.INSTITUTION.PARAM_ID_NOT_VALID_FORMAT)
+                        expect(err.body.description).to.eql(Strings.ERROR_MESSAGE.UUID_NOT_VALID_FORMAT_DESC)
                     })
             })
         })
@@ -1350,7 +1582,7 @@ describe('Routes: environments', () => {
 
             it('should return status code 400 and info message about the invalid environment id', () => {
                 return request
-                    .delete(`/v1/environments/123`)
+                    .delete(`/v1/institutions/${defaultEnvironment.institution_id}/environments/123`)
                     .set('Content-Type', 'application/json')
                     .expect(400)
                     .then(err => {

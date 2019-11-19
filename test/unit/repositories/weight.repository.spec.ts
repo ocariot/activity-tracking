@@ -375,7 +375,7 @@ describe('Repositories: WeightRepository', () => {
                     .withArgs({ child_id: defaultWeight.child_id })
                     .resolves(true)
 
-                return weightRepo.removeAllWeightFromChild(defaultWeight.child_id!)
+                return weightRepo.removeAllByChild(defaultWeight.child_id!)
                     .then((result: boolean) => {
                         assert.isTrue(result)
                     })
@@ -392,7 +392,7 @@ describe('Repositories: WeightRepository', () => {
                     .withArgs({ child_id: randomChildId })
                     .resolves(false)
 
-                return weightRepo.removeAllWeightFromChild(randomChildId)
+                return weightRepo.removeAllByChild(randomChildId)
                     .then((result: boolean) => {
                         assert.isFalse(result)
                     })
@@ -408,7 +408,7 @@ describe('Repositories: WeightRepository', () => {
                     .rejects({ message: 'An internal error has occurred in the database!',
                                description: 'Please try again later...' })
 
-                return weightRepo.removeAllWeightFromChild(defaultWeight.child_id!)
+                return weightRepo.removeAllByChild(defaultWeight.child_id!)
                     .catch (err => {
                         assert.propertyVal(err, 'message', 'An internal error has occurred in the database!')
                         assert.propertyVal(err, 'description', 'Please try again later...')
@@ -481,7 +481,7 @@ describe('Repositories: WeightRepository', () => {
                     .chain('exec')
                     .resolves(2)
 
-                return weightRepo.countWeights(defaultWeight.child_id!)
+                return weightRepo.countByChild(defaultWeight.child_id!)
                     .then((countWeights: number) => {
                         assert.equal(countWeights, 2)
                     })
@@ -497,7 +497,7 @@ describe('Repositories: WeightRepository', () => {
                     .chain('exec')
                     .resolves(0)
 
-                return weightRepo.countWeights(defaultWeight.child_id!)
+                return weightRepo.countByChild(defaultWeight.child_id!)
                     .then((countWeights: number) => {
                         assert.equal(countWeights, 0)
                     })
@@ -514,7 +514,7 @@ describe('Repositories: WeightRepository', () => {
                     .rejects({ message: 'An internal error has occurred in the database!',
                                description: 'Please try again later...' })
 
-                return weightRepo.countWeights(defaultWeight.child_id!)
+                return weightRepo.countByChild(defaultWeight.child_id!)
                     .catch (err => {
                         assert.propertyVal(err, 'message', 'An internal error has occurred in the database!')
                         assert.propertyVal(err, 'description', 'Please try again later...')

@@ -61,7 +61,7 @@ export class LogRepositoryMock implements ILogRepository {
         return Promise.resolve(new ChildLogMock())
     }
 
-    public removeAllLogsFromChild(childId: string): Promise<boolean> {
+    public removeAllByChild(childId: string): Promise<boolean> {
         return Promise.resolve(true)
     }
 }

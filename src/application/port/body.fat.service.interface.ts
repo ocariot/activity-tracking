@@ -55,5 +55,5 @@ export interface IBodyFatService extends IService<BodyFat> {
      * @return {Promise<number>}
      * @throws {RepositoryException}
      */
-    countBodyFats(childId: string): Promise<number>
+    countByChild(childId: string): Promise<number>
 }
