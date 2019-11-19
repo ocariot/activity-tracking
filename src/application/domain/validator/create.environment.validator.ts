@@ -31,7 +31,7 @@ export class CreateEnvironmentValidator {
                 else StringValidator.validate(measurement.type, 'measurements.type')
 
                 if (measurement.value === undefined) fields.push('measurements.value')
-                else if (isNaN(measurement.value)) {
+                else if (measurement.value === null || isNaN(measurement.value)) {
                     throw new ValidationException(Strings.ERROR_MESSAGE.INVALID_FIELDS,
                         'measurements.value'.concat(Strings.ERROR_MESSAGE.INVALID_NUMBER))
                 }
@@ -41,7 +41,7 @@ export class CreateEnvironmentValidator {
             })
         }
 
-        if (environment.climatized && typeof environment.climatized !== 'boolean') {
+        if (environment.climatized !== undefined && typeof environment.climatized !== 'boolean') {
             throw new ValidationException(Strings.ERROR_MESSAGE.INVALID_FIELDS, 'climatized must be a boolean!')
         }
 

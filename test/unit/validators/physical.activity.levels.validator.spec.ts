@@ -59,7 +59,7 @@ describe('Validators: PhysicalActivityLevelsValidator', () => {
         context('when the physical activity levels array has an invalid level (missing one of the fields, the name)', () => {
             it('should throw a ValidationException', () => {
                 const levelsJSON = {
-                    name: '',
+                    name: undefined,
                     duration: Math.floor((Math.random() * 10) * 60000)
                 }
 
@@ -94,7 +94,7 @@ describe('Validators: PhysicalActivityLevelsValidator', () => {
         context('when the physical activity levels array has an invalid level (missing all fields)', () => {
             it('should throw a ValidationException', () => {
                 const levelsJSON = {
-                    name: '',
+                    name: undefined,
                     duration: undefined
                 }
 

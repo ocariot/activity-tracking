@@ -14,7 +14,7 @@ export class CreateLogValidator {
         if (!childLog.type) fields.push('type')
         else LogTypeValidator.validate((childLog.type))
 
-        if (!childLog.date) fields.push('date')
+        if (childLog.date === undefined) fields.push('date')
         else LogDateValidator.validate(childLog.date)
 
         if (childLog.value === undefined) fields.push('value')

@@ -108,7 +108,7 @@ describe('Services: PhysicalActivityService', () => {
     incorrectActivity9 = incorrectActivity9.fromJSON(incorrectActivityJSON)
 
     let incorrectActivity10: PhysicalActivity = new PhysicalActivityMock()    // The levels array has an item that contains empty fields
-    incorrectActivityJSON.levels[0].name = ''
+    incorrectActivityJSON.levels[0].name = undefined
     incorrectActivityJSON.levels[0].duration = undefined
     incorrectActivity10 = incorrectActivity10.fromJSON(incorrectActivityJSON)
 
@@ -360,7 +360,7 @@ describe('Services: PhysicalActivityService', () => {
 
         context('when the physical activity is incorrect (the levels array has an item that contains empty fields)', () => {
             it('should throw a ValidationException', () => {
-                incorrectActivityJSON.levels[0].name = ''
+                incorrectActivityJSON.levels[0].name = undefined
                 incorrectActivityJSON.levels[0].duration = undefined
                 incorrectActivity = incorrectActivity.fromJSON(incorrectActivityJSON)
 
