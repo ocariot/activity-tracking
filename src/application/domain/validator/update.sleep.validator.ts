@@ -25,7 +25,7 @@ export class UpdateSleepValidator {
             }
         }
 
-        if (sleep.type && !sleepPatternTypes.includes(sleep.type)) {
+        if (sleep.type !== undefined && !sleepPatternTypes.includes(sleep.type)) {
             throw new ValidationException(Strings.ERROR_MESSAGE.INVALID_FIELDS,
                 `The names of the allowed Sleep Pattern types are: ${sleepPatternTypes.join(', ')}.`)
         }

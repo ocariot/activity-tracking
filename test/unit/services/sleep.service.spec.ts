@@ -48,7 +48,7 @@ describe('Services: SleepService', () => {
         end_time: sleep.end_time,
         duration: sleep.duration,
         pattern: undefined,
-        type: '',
+        type: undefined,
         child_id: new ObjectID()
     }
 
@@ -215,7 +215,7 @@ describe('Services: SleepService', () => {
                     end_time: sleep.end_time,
                     duration: sleep.duration,
                     pattern: undefined,
-                    type: '',
+                    type: undefined,
                     child_id: new ObjectID()
                 }
                 incorrectSleep = new Sleep().fromJSON(sleepJSON)
