@@ -23,7 +23,7 @@ describe('Repositories: EnvironmentRepository', () => {
                 ordination: {},
                 pagination: { page: 1, limit: 100, skip: 0 },
                 filters: {
-                    'institution': defaultEnvironment.institution_id,
+                    'institution_id': defaultEnvironment.institution_id,
                     'timestamp': defaultEnvironment.timestamp,
                     'location.local': defaultEnvironment.location!.local,
                     'location.room': defaultEnvironment.location!.room,
