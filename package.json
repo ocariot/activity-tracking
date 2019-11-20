@@ -1,6 +1,6 @@
 {
   "name": "iot-tracking",
-  "version": "2.0.6",
+  "version": "2.1.0",
   "description": "Microservice responsible for tracking activities, sleep, environments and measurements on the OCARIoT platform",
   "main": "dist/server.js",
   "scripts": {
@@ -63,7 +63,7 @@
     "inversify": "^5.0.1",
     "inversify-express-utils": "^6.3.2",
     "ip-allowed": "^1.1.1",
-    "mongoose": "^5.7.11",
+    "mongoose": "^5.7.12",
     "morgan": "^1.9.1",
     "query-strings-parser": "^2.1.3",
     "reflect-metadata": "^0.1.13",
