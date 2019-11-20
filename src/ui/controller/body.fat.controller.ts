@@ -103,7 +103,7 @@ export class BodyFatController {
             query.addFilter({ child_id: req.params.child_id, type: MeasurementType.BODY_FAT })
             const result = await this._bodyFatService
                 .getAllByChild(req.params.child_id, query)
-            const count: number = await this._bodyFatService.countBodyFats(req.params.child_id)
+            const count: number = await this._bodyFatService.countByChild(req.params.child_id)
             res.setHeader('X-Total-Count', count)
             return res.status(HttpStatus.OK).send(result)
         } catch (err) {

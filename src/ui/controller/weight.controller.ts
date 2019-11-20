@@ -104,7 +104,7 @@ export class WeightController {
             query.addFilter({ child_id: req.params.child_id })
             const result = await this._weightService
                 .getAllByChild(req.params.child_id, query)
-            const count: number = await this._weightService.countWeights(req.params.child_id)
+            const count: number = await this._weightService.countByChild(req.params.child_id)
             res.setHeader('X-Total-Count', count)
             return res.status(HttpStatus.OK).send(result)
         } catch (err) {

@@ -103,7 +103,7 @@ export class SleepController {
             query.addFilter({ child_id: req.params.child_id })
             const result = await this._sleepService
                 .getAllByChild(req.params.child_id, query)
-            const count: number = await this._sleepService.countSleep(req.params.child_id)
+            const count: number = await this._sleepService.countByChild(req.params.child_id)
             res.setHeader('X-Total-Count', count)
             return res.status(HttpStatus.OK).send(result)
         } catch (err) {

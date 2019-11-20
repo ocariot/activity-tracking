@@ -103,7 +103,7 @@ export class ActivityController {
             query.addFilter({ child_id: req.params.child_id })
             const result = await this._activityService
                 .getAllByChild(req.params.child_id, query)
-            const count: number = await this._activityService.countActivities(req.params.child_id)
+            const count: number = await this._activityService.countByChild(req.params.child_id)
             res.setHeader('X-Total-Count', count)
             return res.status(HttpStatus.OK).send(result)
         } catch (err) {

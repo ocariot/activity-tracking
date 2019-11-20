@@ -216,7 +216,14 @@ export class BodyFatService implements IBodyFatService {
         throw new Error('Unsupported feature!')
     }
 
-    public countBodyFats(childId: string): Promise<number> {
-        return this._bodyFatRepository.countBodyFats(childId)
+    /**
+     * Returns the total of body fats of a child.
+     *
+     * @param childId Child id associated with BodyFat objects.
+     * @return {Promise<number>}
+     * @throws {RepositoryException}
+     */
+    public countByChild(childId: string): Promise<number> {
+        return this._bodyFatRepository.countByChild(childId)
     }
 }

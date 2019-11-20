@@ -341,7 +341,7 @@ describe('Services: Environment', () => {
                     'location.longitude': environment.location ? environment.location.longitude : undefined
                 }
 
-                return environmentService.getAll(query)
+                return environmentService.getAllByInstitution(environment.institution_id!, query)
                     .then(result => {
                         assert.isArray(result)
                         assert.isNotEmpty(result)
@@ -361,7 +361,7 @@ describe('Services: Environment', () => {
                     'location.longitude': environment.location ? environment.location.longitude : undefined
                 }
 
-                return environmentService.getAll(query)
+                return environmentService.getAllByInstitution(environment.institution_id!, query)
                     .then(result => {
                         assert.isArray(result)
                         assert.isEmpty(result)
@@ -378,7 +378,7 @@ describe('Services: Environment', () => {
             it('should return true', () => {
                 environment.id = '507f1f77bcf86cd799439011'
 
-                return environmentService.remove(environment.id!)
+                return environmentService.removeByInstitution(environment.id!, environment.institution_id!)
                     .then(result => {
                         assert.equal(result, true)
                     })
@@ -389,7 +389,7 @@ describe('Services: Environment', () => {
             it('should return false', () => {
                 environment.id = '5c6dd16ea1a67d0034e6108b'
 
-                return environmentService.remove(environment.id!)
+                return environmentService.removeByInstitution(environment.id!, environment.institution_id!)
                     .then(result => {
                         assert.equal(result, false)
                     })
@@ -400,7 +400,7 @@ describe('Services: Environment', () => {
             it('should throw a ValidationException', () => {
                 environment.id = '5c6dd16ea1a67d0034e6108b2'
 
-                return environmentService.remove(environment.id!)
+                return environmentService.removeByInstitution(environment.id!, environment.institution_id!)
                     .catch (err => {
                         assert.propertyVal(err, 'message', Strings.ENVIRONMENT.PARAM_ID_NOT_VALID_FORMAT)
                         assert.propertyVal(err, 'description', Strings.ERROR_MESSAGE.UUID_NOT_VALID_FORMAT_DESC)
@@ -412,7 +412,7 @@ describe('Services: Environment', () => {
     describe('count()', () => {
         context('when want count environments', () => {
             it('should return the number of environments', () => {
-                return environmentService.count()
+                return environmentService.countByInstitution(environment.institution_id!)
                     .then(res => {
                         assert.equal(res, 1)
                     })

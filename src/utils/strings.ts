@@ -63,6 +63,7 @@ export abstract class Strings {
         INVALID_STRING: ' must be a string!',
         EMPTY_STRING: ' must have at least one character!',
         INVALID_DATE: ', is not in valid ISO 8601 format.',
-        INVALID_DATE_DESC: 'Date must be in the format: yyyy-MM-dd\'T\'HH:mm:ssZ'
+        INVALID_DATE_DESC: 'Date must be in the format: yyyy-MM-dd\'T\'HH:mm:ssZ',
+        REPO_CREATE_CONFLICT: 'A registration with the same unique data already exists!'
     }
 }

@@ -118,12 +118,12 @@ export abstract class BaseRepository<T extends Entity, TModel> implements IRepos
                 }
                 return new ValidationException(`The value \'${err.value}\' of ${err.path} field is invalid.`)
             } else if (err.name === 'MongoError' && err.code === 11000) {
-                return new ConflictException('A registration with the same unique data already exists!')
+                return new ConflictException(Strings.ERROR_MESSAGE.REPO_CREATE_CONFLICT)
             } else if (err.name === 'ObjectParameterError') {
                 return new ValidationException('Invalid query parameters!')
             }
         }
-        return new RepositoryException(err && err.message ? err.message : '',
-            err && err.description ? err.description : '')
+        return new RepositoryException(err && err.message ? err.message : Strings.ERROR_MESSAGE.INTERNAL_SERVER_ERROR,
+            err && err.description ? err.description : undefined)
     }
 }

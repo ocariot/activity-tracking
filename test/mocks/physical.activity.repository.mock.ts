@@ -13,7 +13,7 @@ export class PhysicalActivityRepositoryMock implements IPhysicalActivityReposito
         return Promise.resolve(1)
     }
 
-    public countActivities(childId: string): Promise<number> {
+    public countByChild(childId: string): Promise<number> {
         return Promise.resolve(1)
     }
 
@@ -63,7 +63,7 @@ export class PhysicalActivityRepositoryMock implements IPhysicalActivityReposito
         return Promise.resolve(undefined!)
     }
 
-    public removeAllActivitiesFromChild(childId: string): Promise<boolean> {
+    public removeAllByChild(childId: string): Promise<boolean> {
         return Promise.resolve(true)
     }
 }

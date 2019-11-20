@@ -63,5 +63,5 @@ export interface ISleepService extends IService<Sleep> {
      * @return {Promise<number>}
      * @throws {RepositoryException}
      */
-    countSleep(childId: string): Promise<number>
+    countByChild(childId: string): Promise<number>
 }

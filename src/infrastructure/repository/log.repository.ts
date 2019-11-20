@@ -124,7 +124,7 @@ export class LogRepository extends BaseRepository<Log, LogEntity>
      * @return {Promise<boolean>}
      * @throws {ValidationException | RepositoryException}
      */
-    public async removeAllLogsFromChild(childId: string): Promise<boolean> {
+    public async removeAllByChild(childId: string): Promise<boolean> {
         // Creates the query with the received parameter
         const query: IQuery = new Query()
         query.filters = { child_id: childId }

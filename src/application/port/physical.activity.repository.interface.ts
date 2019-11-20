@@ -45,7 +45,7 @@ export interface IPhysicalActivityRepository extends IRepository<PhysicalActivit
      * @return {Promise<boolean>}
      * @throws {ValidationException | RepositoryException}
      */
-    removeAllActivitiesFromChild(childId: string): Promise<boolean>
+    removeAllByChild(childId: string): Promise<boolean>
 
     /**
      * Returns the total of activities of a child.
@@ -54,5 +54,5 @@ export interface IPhysicalActivityRepository extends IRepository<PhysicalActivit
      * @return {Promise<number>}
      * @throws {RepositoryException}
      */
-    countActivities(childId: string): Promise<number>
+    countByChild(childId: string): Promise<number>
 }

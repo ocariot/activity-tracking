@@ -246,7 +246,7 @@ describe('Repositories: SleepRepository', () => {
                     .withArgs({ child_id: defaultSleep.child_id })
                     .resolves(true)
 
-                return sleepRepo.removeAllSleepFromChild(defaultSleep.child_id)
+                return sleepRepo.removeAllByChild(defaultSleep.child_id)
                     .then((result: boolean) => {
                         assert.isTrue(result)
                     })
@@ -263,7 +263,7 @@ describe('Repositories: SleepRepository', () => {
                     .withArgs({ child_id: randomChildId })
                     .resolves(false)
 
-                return sleepRepo.removeAllSleepFromChild(randomChildId)
+                return sleepRepo.removeAllByChild(randomChildId)
                     .then((result: boolean) => {
                         assert.isFalse(result)
                     })
@@ -279,7 +279,7 @@ describe('Repositories: SleepRepository', () => {
                     .rejects({ message: 'An internal error has occurred in the database!',
                                description: 'Please try again later...' })
 
-                return sleepRepo.removeAllSleepFromChild(defaultSleep.child_id)
+                return sleepRepo.removeAllByChild(defaultSleep.child_id)
                     .catch (err => {
                         assert.propertyVal(err, 'message', 'An internal error has occurred in the database!')
                         assert.propertyVal(err, 'description', 'Please try again later...')
@@ -298,7 +298,7 @@ describe('Repositories: SleepRepository', () => {
                     .chain('exec')
                     .resolves(2)
 
-                return sleepRepo.countSleep(defaultSleep.child_id)
+                return sleepRepo.countByChild(defaultSleep.child_id)
                     .then((countSleep: number) => {
                         assert.equal(countSleep, 2)
                     })
@@ -314,7 +314,7 @@ describe('Repositories: SleepRepository', () => {
                     .chain('exec')
                     .resolves(0)
 
-                return sleepRepo.countSleep(defaultSleep.child_id)
+                return sleepRepo.countByChild(defaultSleep.child_id)
                     .then((countSleep: number) => {
                         assert.equal(countSleep, 0)
                     })
@@ -331,7 +331,7 @@ describe('Repositories: SleepRepository', () => {
                     .rejects({ message: 'An internal error has occurred in the database!',
                                description: 'Please try again later...' })
 
-                return sleepRepo.countSleep(defaultSleep.child_id)
+                return sleepRepo.countByChild(defaultSleep.child_id)
                     .catch (err => {
                         assert.propertyVal(err, 'message', 'An internal error has occurred in the database!')
                         assert.propertyVal(err, 'description', 'Please try again later...')

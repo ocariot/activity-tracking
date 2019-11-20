@@ -267,7 +267,14 @@ export class SleepService implements ISleepService {
         throw new Error('Unsupported feature!')
     }
 
-    public countSleep(childId: string): Promise<number> {
-        return this._sleepRepository.countSleep(childId)
+    /**
+     * Returns the total of sleep objects of a child.
+     *
+     * @param childId Child id associated with Sleep objects.
+     * @return {Promise<number>}
+     * @throws {RepositoryException}
+     */
+    public countByChild(childId: string): Promise<number> {
+        return this._sleepRepository.countByChild(childId)
     }
 }

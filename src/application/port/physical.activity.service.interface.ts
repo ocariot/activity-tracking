@@ -63,5 +63,5 @@ export interface IPhysicalActivityService extends IService<PhysicalActivity> {
      * @return {Promise<number>}
      * @throws {RepositoryException}
      */
-    countActivities(childId: string): Promise<number>
+    countByChild(childId: string): Promise<number>
 }

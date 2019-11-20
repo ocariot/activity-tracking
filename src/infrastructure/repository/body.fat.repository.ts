@@ -106,7 +106,7 @@ export class BodyFatRepository extends BaseRepository<BodyFat, BodyFatEntity> im
      * @return {Promise<boolean>}
      * @throws {ValidationException | RepositoryException}
      */
-    public async removeAllBodyFatFromChild(childId: string): Promise<boolean> {
+    public async removeAllByChild(childId: string): Promise<boolean> {
         // Creates the query with the received parameter
         const query: IQuery = new Query()
         query.filters = { child_id: childId }
@@ -128,7 +128,7 @@ export class BodyFatRepository extends BaseRepository<BodyFat, BodyFatEntity> im
      * @return {Promise<number>}
      * @throws {RepositoryException}
      */
-    public countBodyFats(childId: string): Promise<number> {
+    public countByChild(childId: string): Promise<number> {
         return super.count(new Query().fromJSON({ filters: { child_id: childId, type: MeasurementType.BODY_FAT } }))
     }
 }

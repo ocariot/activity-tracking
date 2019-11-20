@@ -94,7 +94,7 @@ export class SleepRepository extends BaseRepository<Sleep, SleepEntity> implemen
      * @return {Promise<boolean>}
      * @throws {ValidationException | RepositoryException}
      */
-    public async removeAllSleepFromChild(childId: string): Promise<boolean> {
+    public async removeAllByChild(childId: string): Promise<boolean> {
         // Creates the query with the received parameter
         const query: IQuery = new Query()
         query.filters = { child_id: childId }
@@ -109,7 +109,14 @@ export class SleepRepository extends BaseRepository<Sleep, SleepEntity> implemen
         })
     }
 
-    public countSleep(childId: string): Promise<number> {
+    /**
+     * Returns the total of sleep objects of a child.
+     *
+     * @param childId Child id associated with Sleep objects.
+     * @return {Promise<number>}
+     * @throws {RepositoryException}
+     */
+    public countByChild(childId: string): Promise<number> {
         return super.count(new Query().fromJSON({ filters: { child_id: childId } }))
     }
 }

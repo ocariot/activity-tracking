@@ -34,7 +34,7 @@ export const userDeleteEventHandler = async (event: any) => {
         ObjectIdValidator.validate(childId)
 
         // 2a. Try to delete all activities associated with this user.
-        activityRepository.removeAllActivitiesFromChild(childId)
+        activityRepository.removeAllByChild(childId)
             .then(() => {
                 logger.info(`All activities associated with the child with ID: ${childId} have been successfully`
                     .concat(` removed from the database.`))
@@ -44,7 +44,7 @@ export const userDeleteEventHandler = async (event: any) => {
             })
 
         // 2b. Try to delete all sleep objects associated with this user.
-        sleepRepository.removeAllSleepFromChild(childId)
+        sleepRepository.removeAllByChild(childId)
             .then(() => {
                 logger.info(`All sleep objects associated with the child with ID: ${childId} have been successfully`
                     .concat(` removed from the database.`))
@@ -54,7 +54,7 @@ export const userDeleteEventHandler = async (event: any) => {
             })
 
         // 2c. Try to delete all bodyfat objects associated with this user.
-        bodyFatRepository.removeAllBodyFatFromChild(childId)
+        bodyFatRepository.removeAllByChild(childId)
             .then(() => {
                 logger.info(`All body fat objects associated with the child with ID: ${childId} have been successfully`
                     .concat(` removed from the database.`))
@@ -64,7 +64,7 @@ export const userDeleteEventHandler = async (event: any) => {
             })
 
         // 2d. Try to delete all weight objects associated with this user.
-        weightRepository.removeAllWeightFromChild(childId)
+        weightRepository.removeAllByChild(childId)
             .then(() => {
                 logger.info(`All weight objects associated with the child with ID: ${childId} have been successfully`
                     .concat(` removed from the database.`))
@@ -74,7 +74,7 @@ export const userDeleteEventHandler = async (event: any) => {
             })
 
         // 2e. Try to delete all logs associated with this user.
-        logRepository.removeAllLogsFromChild(childId)
+        logRepository.removeAllByChild(childId)
             .then(() => {
                 logger.info(`All logs associated with the child with ID: ${childId} have been successfully`
                     .concat(` removed from the database.`))

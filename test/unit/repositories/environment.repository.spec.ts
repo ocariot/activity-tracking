@@ -23,6 +23,7 @@ describe('Repositories: EnvironmentRepository', () => {
                 ordination: {},
                 pagination: { page: 1, limit: 100, skip: 0 },
                 filters: {
+                    'institution_id': defaultEnvironment.institution_id,
                     'timestamp': defaultEnvironment.timestamp,
                     'location.local': defaultEnvironment.location!.local,
                     'location.room': defaultEnvironment.location!.room,
@@ -101,7 +102,7 @@ describe('Repositories: EnvironmentRepository', () => {
                     .withArgs({ institution_id: defaultEnvironment.institution_id })
                     .resolves(true)
 
-                return environmentRepo.removeAllEnvironmentsFromInstitution(defaultEnvironment.institution_id!)
+                return environmentRepo.removeAllByInstitution(defaultEnvironment.institution_id!)
                     .then((result: boolean) => {
                         assert.isTrue(result)
                     })
@@ -118,7 +119,7 @@ describe('Repositories: EnvironmentRepository', () => {
                     .withArgs({ institution_id: randomInstitutionId })
                     .resolves(false)
 
-                return environmentRepo.removeAllEnvironmentsFromInstitution(randomInstitutionId)
+                return environmentRepo.removeAllByInstitution(randomInstitutionId)
                     .then((result: boolean) => {
                         assert.isFalse(result)
                     })
@@ -136,7 +137,7 @@ describe('Repositories: EnvironmentRepository', () => {
                         description: 'Please try again later...'
                     })
 
-                return environmentRepo.removeAllEnvironmentsFromInstitution(defaultEnvironment.institution_id!)
+                return environmentRepo.removeAllByInstitution(defaultEnvironment.institution_id!)
                     .catch(err => {
                         assert.propertyVal(err, 'message', 'An internal error has occurred in the database!')
                         assert.propertyVal(err, 'description', 'Please try again later...')
@@ -155,7 +156,7 @@ describe('Repositories: EnvironmentRepository', () => {
                     .chain('exec')
                     .resolves(2)
 
-                return environmentRepo.count()
+                return environmentRepo.countByInstitution(defaultEnvironment.institution_id!)
                     .then((countEnvironments: number) => {
                         assert.equal(countEnvironments, 2)
                     })
@@ -171,7 +172,7 @@ describe('Repositories: EnvironmentRepository', () => {
                     .chain('exec')
                     .resolves(0)
 
-                return environmentRepo.count()
+                return environmentRepo.countByInstitution(defaultEnvironment.institution_id!)
                     .then((countEnvironments: number) => {
                         assert.equal(countEnvironments, 0)
                     })
@@ -190,7 +191,7 @@ describe('Repositories: EnvironmentRepository', () => {
                         description: 'Please try again later...'
                     })
 
-                return environmentRepo.count()
+                return environmentRepo.countByInstitution(defaultEnvironment.institution_id!)
                     .catch(err => {
                         assert.propertyVal(err, 'message', 'An internal error has occurred in the database!')
                         assert.propertyVal(err, 'description', 'Please try again later...')

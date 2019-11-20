@@ -13,7 +13,7 @@ export class BodyFatRepositoryMock implements IBodyFatRepository {
         return Promise.resolve(1)
     }
 
-    public countBodyFats(childId: string): Promise<number> {
+    public countByChild(childId: string): Promise<number> {
         return Promise.resolve(1)
     }
 
@@ -47,7 +47,7 @@ export class BodyFatRepositoryMock implements IBodyFatRepository {
         return Promise.resolve(undefined!)
     }
 
-    public removeAllBodyFatFromChild(childId: string): Promise<boolean> {
+    public removeAllByChild(childId: string): Promise<boolean> {
         return Promise.resolve(true)
     }
 

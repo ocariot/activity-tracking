@@ -13,7 +13,7 @@ export class WeightRepositoryMock implements IWeightRepository {
         return Promise.resolve(1)
     }
 
-    public countWeights(childId: string): Promise<number> {
+    public countByChild(childId: string): Promise<number> {
         return Promise.resolve(1)
     }
 
@@ -53,7 +53,7 @@ export class WeightRepositoryMock implements IWeightRepository {
         return Promise.resolve(undefined!)
     }
 
-    public removeAllWeightFromChild(childId: string): Promise<boolean> {
+    public removeAllByChild(childId: string): Promise<boolean> {
         return Promise.resolve(true)
     }
 

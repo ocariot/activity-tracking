@@ -13,7 +13,7 @@ export class SleepRepositoryMock implements ISleepRepository {
         return Promise.resolve(1)
     }
 
-    public countSleep(childId: string): Promise<number> {
+    public countByChild(childId: string): Promise<number> {
         return Promise.resolve(1)
     }
 
@@ -63,7 +63,7 @@ export class SleepRepositoryMock implements ISleepRepository {
         return Promise.resolve(undefined!)
     }
 
-    public removeAllSleepFromChild(childId: string): Promise<boolean> {
+    public removeAllByChild(childId: string): Promise<boolean> {
         return Promise.resolve(true)
     }
 }

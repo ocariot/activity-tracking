@@ -25,7 +25,7 @@ export const institutionDeleteEventHandler = async (event: any) => {
         ObjectIdValidator.validate(institutionId)
 
         // 2. Try to delete all the environments associated with this institution.
-        environmentRepository.removeAllEnvironmentsFromInstitution(institutionId)
+        environmentRepository.removeAllByInstitution(institutionId)
             .then(() => {
                 logger.info(`All environments associated with the institution with ID: ${institutionId} have been`
                     .concat(` successfully removed from the database.`))

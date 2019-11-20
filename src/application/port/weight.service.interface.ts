@@ -55,5 +55,5 @@ export interface IWeightService extends IService<Weight> {
      * @return {Promise<number>}
      * @throws {RepositoryException}
      */
-    countWeights(childId: string): Promise<number>
+    countByChild(childId: string): Promise<number>
 }

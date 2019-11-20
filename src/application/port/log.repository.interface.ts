@@ -41,5 +41,5 @@ export interface ILogRepository extends IRepository<Log> {
      * @return {Promise<boolean>}
      * @throws {ValidationException | RepositoryException}
      */
-    removeAllLogsFromChild(childId: string): Promise<boolean>
+    removeAllByChild(childId: string): Promise<boolean>
 }

@@ -53,5 +53,5 @@ const environmentSchema = new Mongoose.Schema({
     }
 )
 
-environmentSchema.index({ location: 1, timestamp: 1 }, { unique: true }) // define index at schema level
+environmentSchema.index({ institution_id: 1, location: 1, timestamp: 1 }, { unique: true }) // define index at schema level
 export const EnvironmentRepoModel = Mongoose.model<IEnvironmentModel>('Environment', environmentSchema)
