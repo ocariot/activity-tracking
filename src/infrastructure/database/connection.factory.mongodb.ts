@@ -8,10 +8,7 @@ export class ConnectionFactoryMongoDB implements IConnectionFactory {
         useNewUrlParser: true,
         useCreateIndex: true,
         useFindAndModify: false,
-        useUnifiedTopology: true,
-        bufferMaxEntries: 0,
-        reconnectTries: Number.MAX_SAFE_INTEGER,
-        reconnectInterval: 2000
+        useUnifiedTopology: true
     }
 
     /**
@@ -23,9 +20,8 @@ export class ConnectionFactoryMongoDB implements IConnectionFactory {
      * @return Promise<Connection>
      */
     public createConnection(uri: string, options?: IDBOptions): Promise<Connection> {
-        if (options && options.retries && options.retries > 0) this.options.reconnectTries = options.retries
-        if (options && options.interval) this.options.reconnectInterval = options.interval
-
+        // if (options && options.retries && options.retries > 0) this.options.reconnectTries = options.retries
+        // if (options && options.interval) this.options.reconnectInterval = options.interval
         return new Promise<Connection>((resolve, reject) => {
             mongoose.connect(uri, this.options)
                 .then((result: Mongoose) => resolve(result.connection))

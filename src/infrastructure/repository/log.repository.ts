@@ -77,9 +77,6 @@ export class LogRepository extends BaseRepository<Log, LogEntity>
         const q: any = query.toJSON()
         return new Promise<Array<Log> | ChildLog>((resolve, reject) => {
             this.Model.find(q.filters)
-                .sort(q.ordination)
-                .skip(Number((q.pagination.limit * q.pagination.page) - q.pagination.limit))
-                .limit(Number(q.pagination.limit))
                 .exec() // execute query
                 .then((result: Array<LogEntity>) => {
                     const logsFind: Array<Log> = result.map(item => this.mapper.transform(item))

@@ -193,6 +193,9 @@ export class ConnectionFactoryRabbitMQMock implements IConnectionFactory {
         pubSyncWeight(weight: any): Promise<void> {
             return Promise.resolve()
         },
+        pubFitbitRevoke(fitbit: any): Promise<void> {
+            return Promise.resolve()
+        },
         sub(routingKey: string, callback: (message: any) => void): Promise<void> {
             return Promise.resolve()
         },
@@ -270,7 +273,10 @@ export class ConnectionFactoryRabbitMQMock implements IConnectionFactory {
         },
         subSyncWeight(callback: (message: any) => void): Promise<void> {
             return Promise.resolve()
-        }
+        },
+        subFitbitRevoke(callback: (message: any) => void): Promise<void> {
+            return Promise.resolve()
+        },
     }
 
     public createConnection(uri: string, options?: IEventBusOptions): Promise<any> {

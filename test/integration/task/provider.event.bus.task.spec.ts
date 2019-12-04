@@ -46,8 +46,7 @@ describe('PROVIDER EVENT BUS TASK', () => {
     // Start DB connection, RabbitMQ connection and ProviderEventBusTask
     before(async () => {
         try {
-            await dbConnection.connect(process.env.MONGODB_URI_TEST || Default.MONGODB_URI_TEST,
-                { interval: 100 })
+            await dbConnection.connect(process.env.MONGODB_URI_TEST || Default.MONGODB_URI_TEST)
 
             await deleteAllActivities()
             await deleteAllSleep()
@@ -521,8 +520,7 @@ describe('PROVIDER EVENT BUS TASK', () => {
                 })
                 after(async () => {
                     try {
-                        await dbConnection.connect(process.env.MONGODB_URI_TEST || Default.MONGODB_URI_TEST,
-                            { interval: 100 })
+                        await dbConnection.connect(process.env.MONGODB_URI_TEST || Default.MONGODB_URI_TEST)
                     } catch (err) {
                         throw new Error('Failure on Provider PhysicalActivity test: ' + err.message)
                     }
@@ -851,8 +849,7 @@ describe('PROVIDER EVENT BUS TASK', () => {
                 })
                 after(async () => {
                     try {
-                        await dbConnection.connect(process.env.MONGODB_URI_TEST || Default.MONGODB_URI_TEST,
-                            { interval: 100 })
+                        await dbConnection.connect(process.env.MONGODB_URI_TEST || Default.MONGODB_URI_TEST)
                     } catch (err) {
                         throw new Error('Failure on Provider Sleep test: ' + err.message)
                     }
@@ -1124,8 +1121,7 @@ describe('PROVIDER EVENT BUS TASK', () => {
                 })
                 after(async () => {
                     try {
-                        await dbConnection.connect(process.env.MONGODB_URI_TEST || Default.MONGODB_URI_TEST,
-                            { interval: 100 })
+                        await dbConnection.connect(process.env.MONGODB_URI_TEST || Default.MONGODB_URI_TEST)
                     } catch (err) {
                         throw new Error('Failure on Provider Weight test: ' + err.message)
                     }
@@ -1425,8 +1421,7 @@ describe('PROVIDER EVENT BUS TASK', () => {
                 })
                 after(async () => {
                     try {
-                        await dbConnection.connect(process.env.MONGODB_URI_TEST || Default.MONGODB_URI_TEST,
-                            { interval: 100 })
+                        await dbConnection.connect(process.env.MONGODB_URI_TEST || Default.MONGODB_URI_TEST)
                     } catch (err) {
                         throw new Error('Failure on Provider Environment test: ' + err.message)
                     }
@@ -1696,8 +1691,7 @@ describe('PROVIDER EVENT BUS TASK', () => {
                 })
                 after(async () => {
                     try {
-                        await dbConnection.connect(process.env.MONGODB_URI_TEST || Default.MONGODB_URI_TEST,
-                            { interval: 100 })
+                        await dbConnection.connect(process.env.MONGODB_URI_TEST || Default.MONGODB_URI_TEST)
                     } catch (err) {
                         throw new Error('Failure on Provider Log test: ' + err.message)
                     }

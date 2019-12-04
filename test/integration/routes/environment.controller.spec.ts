@@ -70,8 +70,7 @@ describe('Routes: environments', () => {
     // Start services
     before(async () => {
         try {
-            await dbConnection.connect(process.env.MONGODB_URI_TEST || Default.MONGODB_URI_TEST,
-                { interval: 100 })
+            await dbConnection.connect(process.env.MONGODB_URI_TEST || Default.MONGODB_URI_TEST)
 
             await rabbitmq.initialize('amqp://invalidUser:guest@localhost', { retries: 1, interval: 100 })
 
@@ -674,7 +673,7 @@ describe('Routes: environments', () => {
                 const body = {
                     location: {
                         local: defaultEnvironment.location!.local,
-                        room: defaultEnvironment.location!.room,
+                        room: defaultEnvironment.location!.room
                     },
                     measurements: defaultEnvironment.measurements,
                     climatized: 'invalid_climatized',
@@ -699,7 +698,7 @@ describe('Routes: environments', () => {
                 const body = {
                     location: {
                         local: defaultEnvironment.location!.local,
-                        room: defaultEnvironment.location!.room,
+                        room: defaultEnvironment.location!.room
                     },
                     measurements: defaultEnvironment.measurements,
                     climatized: defaultEnvironment.climatized,
@@ -724,7 +723,7 @@ describe('Routes: environments', () => {
                 const body = {
                     location: {
                         local: defaultEnvironment.location!.local,
-                        room: defaultEnvironment.location!.room,
+                        room: defaultEnvironment.location!.room
                     },
                     measurements: defaultEnvironment.measurements,
                     climatized: defaultEnvironment.climatized,
@@ -1256,12 +1255,12 @@ describe('Routes: environments', () => {
                         measurements: [
                             {
                                 type: 'humidity',
-                                value: 34,
+                                value: 33.7,
                                 unit: '%'
                             },
                             {
                                 type: 'temperature',
-                                value: 40,
+                                value: 39.8,
                                 unit: '°C'
                             }
                         ],
@@ -1287,14 +1286,16 @@ describe('Routes: environments', () => {
 
             it('The subscriber should receive a message in the correct format and that has the same ID ' +
                 'published on the bus', (done) => {
+                let count = 1
                 rabbitmq.bus
                     .subDeleteEnvironment(message => {
                         try {
                             expect(message.event_name).to.eql('EnvironmentDeleteEvent')
                             expect(message).to.have.property('timestamp')
                             expect(message).to.have.property('environment')
-                            expect(message.environment).to.have.property('id')
-                            done()
+                            expect(message.environment[0]).to.have.property('id')
+                            expect(message.environment[1]).to.have.property('id')
+                            if (++count === 2) done()
                         } catch (err) {
                             done(err)
                         }
