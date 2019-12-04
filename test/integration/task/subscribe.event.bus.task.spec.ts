@@ -48,8 +48,7 @@ describe('SUBSCRIBE EVENT BUS TASK', () => {
     // Start DB connection, RabbitMQ connection and SubscribeEventBusTask
     before(async () => {
         try {
-            await dbConnection.connect(process.env.MONGODB_URI_TEST || Default.MONGODB_URI_TEST,
-                { interval: 100 })
+            await dbConnection.connect(process.env.MONGODB_URI_TEST || Default.MONGODB_URI_TEST)
 
             await deleteAllActivities()
             await deleteAllSleep()
@@ -163,8 +162,7 @@ describe('SUBSCRIBE EVENT BUS TASK', () => {
                 rabbitmq.bus.pubSyncPhysicalActivity(activity)
                     .then(async () => {
                         await timeout(1000)
-                        await dbConnection.connect(process.env.MONGODB_URI_TEST || Default.MONGODB_URI_TEST,
-                            { interval: 100 })
+                        await dbConnection.connect(process.env.MONGODB_URI_TEST || Default.MONGODB_URI_TEST)
 
                         await timeout(2000)
                         const result = await activityRepository.find(new Query())
@@ -310,8 +308,7 @@ describe('SUBSCRIBE EVENT BUS TASK', () => {
                 rabbitmq.bus.pubSyncSleep(sleep)
                     .then(async () => {
                         await timeout(1000)
-                        await dbConnection.connect(process.env.MONGODB_URI_TEST || Default.MONGODB_URI_TEST,
-                            { interval: 100 })
+                        await dbConnection.connect(process.env.MONGODB_URI_TEST || Default.MONGODB_URI_TEST)
 
                         await timeout(2000)
                         const result = await sleepRepository.find(new Query())
@@ -455,8 +452,7 @@ describe('SUBSCRIBE EVENT BUS TASK', () => {
                 rabbitmq.bus.pubSyncWeight(weight)
                     .then(async () => {
                         await timeout(1000)
-                        await dbConnection.connect(process.env.MONGODB_URI_TEST || Default.MONGODB_URI_TEST,
-                            { interval: 100 })
+                        await dbConnection.connect(process.env.MONGODB_URI_TEST || Default.MONGODB_URI_TEST)
 
                         await timeout(2000)
                         const result = await weightRepository.find(new Query())
@@ -530,12 +526,14 @@ describe('SUBSCRIBE EVENT BUS TASK', () => {
             }
         })
         context('when receiving a LogSaveEvent with one log successfully', () => {
-            const log: any = {  type: 'steps',
-                                value: 20,
-                                date: '2019-09-16',
-                                child_id: '5d7fb75ae48591c21a793f70' }
+            const log: any = {
+                type: 'steps',
+                value: 20,
+                date: '2019-09-16',
+                child_id: '5d7fb75ae48591c21a793f70'
+            }
             it('should return an array with one log', (done) => {
-                rabbitmq.bus.pubSyncLog([ log ])
+                rabbitmq.bus.pubSyncLog([log])
                     .then(async () => {
                         // Wait for 2000 milliseconds for the task to be executed
                         await timeout(2000)
@@ -557,7 +555,7 @@ describe('SUBSCRIBE EVENT BUS TASK', () => {
         context('when receiving a LogSaveEvent with one invalid log', () => {
             const log: Log = new Log()       // Invalid log
             it('should return an empty array', (done) => {
-                rabbitmq.bus.pubSyncLog([ log ])
+                rabbitmq.bus.pubSyncLog([log])
                     .then(async () => {
                         await timeout(2000)
                         const result = await logRepository.find(new Query())
@@ -577,16 +575,17 @@ describe('SUBSCRIBE EVENT BUS TASK', () => {
                     throw new Error('Failure on Subscribe LogSaveEvent test: ' + err.message)
                 }
             })
-            const log: any = {  type: 'steps',
-                                value: 20,
-                                date: '2019-09-16',
-                                child_id: '5d7fb75ae48591c21a793f70' }
+            const log: any = {
+                type: 'steps',
+                value: 20,
+                date: '2019-09-16',
+                child_id: '5d7fb75ae48591c21a793f70'
+            }
             it('should return an array with one log', (done) => {
-                rabbitmq.bus.pubSyncLog([ log ])
+                rabbitmq.bus.pubSyncLog([log])
                     .then(async () => {
                         await timeout(1000)
-                        await dbConnection.connect(process.env.MONGODB_URI_TEST || Default.MONGODB_URI_TEST,
-                            { interval: 100 })
+                        await dbConnection.connect(process.env.MONGODB_URI_TEST || Default.MONGODB_URI_TEST)
 
                         await timeout(2000)
                         const result = await logRepository.find(new Query())
@@ -603,18 +602,24 @@ describe('SUBSCRIBE EVENT BUS TASK', () => {
         })
 
         context('when receiving a LogSaveEvent with some correct logs successfully', () => {
-            const log1: any = {  type: 'active_minutes',
-                                 value: 4,
-                                 date: '2019-09-16',
-                                 child_id: '5d7fb75ae48591c21a793f70' }
-            const log2: any = {  type: 'calories',
-                                 value: 20,
-                                 date: '2019-09-16',
-                                 child_id: '5d7fb75ae48591c21a793f70' }
-            const log3: any = {  type: 'steps',
-                                 value: 15,
-                                 date: '2019-09-16',
-                                 child_id: '5d7fb75ae48591c21a793f70' }
+            const log1: any = {
+                type: 'active_minutes',
+                value: 4,
+                date: '2019-09-16',
+                child_id: '5d7fb75ae48591c21a793f70'
+            }
+            const log2: any = {
+                type: 'calories',
+                value: 20,
+                date: '2019-09-16',
+                child_id: '5d7fb75ae48591c21a793f70'
+            }
+            const log3: any = {
+                type: 'steps',
+                value: 15,
+                date: '2019-09-16',
+                child_id: '5d7fb75ae48591c21a793f70'
+            }
             it('should return an array with three logs', (done) => {
                 rabbitmq.bus.pubSyncLog([log1, log2, log3])
                     .then(async () => {
@@ -628,15 +633,19 @@ describe('SUBSCRIBE EVENT BUS TASK', () => {
         })
 
         context('when receiving a LogSaveEvent with some incorrect logs successfully', () => {
-            const log1: any = {  type: 'active_minutes',
-                                 value: 4,
-                                 date: '2019-09-16',
-                                 child_id: '5d7fb75ae48591c21a793f70' }
+            const log1: any = {
+                type: 'active_minutes',
+                value: 4,
+                date: '2019-09-16',
+                child_id: '5d7fb75ae48591c21a793f70'
+            }
             const log2: Log = new Log()
-            const log3: any = {  type: 'steps',
-                                 value: 15,
-                                 date: '2019-09-16',
-                                 child_id: '5d7fb75ae48591c21a793f70' }
+            const log3: any = {
+                type: 'steps',
+                value: 15,
+                date: '2019-09-16',
+                child_id: '5d7fb75ae48591c21a793f70'
+            }
             it('should return an array with two logs', (done) => {
                 rabbitmq.bus.pubSyncLog([log1, log2, log3])
                     .then(async () => {
@@ -682,12 +691,14 @@ describe('SUBSCRIBE EVENT BUS TASK', () => {
                     throw new Error('Failure on Subscribe InstitutionDeleteEvent test: ' + err.message)
                 }
             })
-            const institution: any = { id: '5d7fb75ae48591c21a793f70',
-                                       type: 'Institute of Scientific Research',
-                                       name: 'NUTES/UEPB',
-                                       address: 'Av. Juvêncio Arruda, S/N - Universitário, Campina Grande - PB, 58429-600',
-                                       latitude: -7.2100766,
-                                       longitude: -35.9175756 }
+            const institution: any = {
+                id: '5d7fb75ae48591c21a793f70',
+                type: 'Institute of Scientific Research',
+                name: 'NUTES/UEPB',
+                address: 'Av. Juvêncio Arruda, S/N - Universitário, Campina Grande - PB, 58429-600',
+                latitude: -7.2100766,
+                longitude: -35.9175756
+            }
             it('should return an empty array', (done) => {
                 rabbitmq.bus.pubDeleteInstitution(institution)
                     .then(async () => {
@@ -718,12 +729,14 @@ describe('SUBSCRIBE EVENT BUS TASK', () => {
                     throw new Error('Failure on Subscribe InstitutionDeleteEvent test: ' + err.message)
                 }
             })
-            const institution: any = { id: '5d7fb75ae48591c21a793f70',
+            const institution: any = {
+                id: '5d7fb75ae48591c21a793f70',
                 type: 'Institute of Scientific Research',
                 name: 'NUTES/UEPB',
                 address: 'Av. Juvêncio Arruda, S/N - Universitário, Campina Grande - PB, 58429-600',
                 latitude: -7.2100766,
-                longitude: -35.9175756 }
+                longitude: -35.9175756
+            }
             it('should return an array with one environment (which was not associated with the deleted institution)', (done) => {
                 rabbitmq.bus.pubDeleteInstitution(institution)
                     .then(async () => {
@@ -738,12 +751,14 @@ describe('SUBSCRIBE EVENT BUS TASK', () => {
         })
 
         context('when receiving an InstitutionDeleteEvent with an invalid institution (invalid id)', () => {
-            const institution: any = { id: '5d7fb75ae48591c21a793f701',      // Invalid institution
+            const institution: any = {
+                id: '5d7fb75ae48591c21a793f701',      // Invalid institution
                 type: 'Institute of Scientific Research',
                 name: 'NUTES/UEPB',
                 address: 'Av. Juvêncio Arruda, S/N - Universitário, Campina Grande - PB, 58429-600',
                 latitude: -7.2100766,
-                longitude: -35.9175756 }
+                longitude: -35.9175756
+            }
             it('should return an empty array and print a log referring to the wrong institution format, ' +
                 'in this case the id that is not in the correct format', (done) => {
                 rabbitmq.bus.pubDeleteInstitution(institution)
@@ -777,18 +792,19 @@ describe('SUBSCRIBE EVENT BUS TASK', () => {
                     throw new Error('Failure on Subscribe InstitutionDeleteEvent test: ' + err.message)
                 }
             })
-            const institution: any = { id: '5d7fb75ae48591c21a793f70',
+            const institution: any = {
+                id: '5d7fb75ae48591c21a793f70',
                 type: 'Institute of Scientific Research',
                 name: 'NUTES/UEPB',
                 address: 'Av. Juvêncio Arruda, S/N - Universitário, Campina Grande - PB, 58429-600',
                 latitude: -7.2100766,
-                longitude: -35.9175756 }
+                longitude: -35.9175756
+            }
             it('should return an empty array', (done) => {
                 rabbitmq.bus.pubDeleteInstitution(institution)
                     .then(async () => {
                         await timeout(1000)
-                        await dbConnection.connect(process.env.MONGODB_URI_TEST || Default.MONGODB_URI_TEST,
-                            { interval: 100 })
+                        await dbConnection.connect(process.env.MONGODB_URI_TEST || Default.MONGODB_URI_TEST)
 
                         await timeout(2000)
                         const result = await environmentRepository.find(new Query())
@@ -858,14 +874,16 @@ describe('SUBSCRIBE EVENT BUS TASK', () => {
                     throw new Error('Failure on Subscribe UserDeleteEvent test: ' + err.message)
                 }
             })
-            const user: any = { id: '5d7fb75ae48591c21a793f70',
-                                type: 'child',
-                                username: 'BR9999',
-                                gender: 'male',
-                                age: 11,
-                                institution_id: '5a62be07de34500146d9c624',
-                                last_login: '2018-11-19T14:40:00',
-                                last_sync: '2018-11-19T14:40:00' }
+            const user: any = {
+                id: '5d7fb75ae48591c21a793f70',
+                type: 'child',
+                username: 'BR9999',
+                gender: 'male',
+                age: 11,
+                institution_id: '5a62be07de34500146d9c624',
+                last_login: '2018-11-19T14:40:00',
+                last_sync: '2018-11-19T14:40:00'
+            }
             it('should return an empty array for each repository queried', (done) => {
                 rabbitmq.bus.pubDeleteUser(user)
                     .then(async () => {
@@ -928,14 +946,16 @@ describe('SUBSCRIBE EVENT BUS TASK', () => {
                     throw new Error('Failure on Subscribe UserDeleteEvent test: ' + err.message)
                 }
             })
-            const user: any = { id: '5d7fb75ae48591c21a793f70',
+            const user: any = {
+                id: '5d7fb75ae48591c21a793f70',
                 type: 'child',
                 username: 'BR9999',
                 gender: 'male',
                 age: 11,
                 institution_id: '5a62be07de34500146d9c624',
                 last_login: '2018-11-19T14:40:00',
-                last_sync: '2018-11-19T14:40:00' }
+                last_sync: '2018-11-19T14:40:00'
+            }
             it('should return an empty array for the BodyFat, Weight and Log repositories', (done) => {
                 rabbitmq.bus.pubDeleteUser(user)
                     .then(async () => {
@@ -965,14 +985,16 @@ describe('SUBSCRIBE EVENT BUS TASK', () => {
         })
 
         context('when receiving an UserDeleteEvent with an invalid user (invalid id)', () => {
-            const user: any = { id: '5d7fb75ae48591c21a793f701',        // Invalid user
+            const user: any = {
+                id: '5d7fb75ae48591c21a793f701',        // Invalid user
                 type: 'child',
                 username: 'BR9999',
                 gender: 'male',
                 age: 11,
                 institution_id: '5a62be07de34500146d9c624',
                 last_login: '2018-11-19T14:40:00',
-                last_sync: '2018-11-19T14:40:00' }
+                last_sync: '2018-11-19T14:40:00'
+            }
             it('should print a log referring to the wrong user format, in this case the id that is not in the ' +
                 'correct format', (done) => {
                 rabbitmq.bus.pubDeleteUser(user)
@@ -1020,20 +1042,21 @@ describe('SUBSCRIBE EVENT BUS TASK', () => {
                     throw new Error('Failure on Subscribe UserDeleteEvent test: ' + err.message)
                 }
             })
-            const user: any = { id: '5d7fb75ae48591c21a793f70',
+            const user: any = {
+                id: '5d7fb75ae48591c21a793f70',
                 type: 'child',
                 username: 'BR9999',
                 gender: 'male',
                 age: 11,
                 institution_id: '5a62be07de34500146d9c624',
                 last_login: '2018-11-19T14:40:00',
-                last_sync: '2018-11-19T14:40:00' }
+                last_sync: '2018-11-19T14:40:00'
+            }
             it('should return an empty array for each repository queried', (done) => {
                 rabbitmq.bus.pubDeleteUser(user)
                     .then(async () => {
                         await timeout(1000)
-                        await dbConnection.connect(process.env.MONGODB_URI_TEST || Default.MONGODB_URI_TEST,
-                            { interval: 100 })
+                        await dbConnection.connect(process.env.MONGODB_URI_TEST || Default.MONGODB_URI_TEST)
 
                         await timeout(2000)
                         const query: IQuery = new Query()

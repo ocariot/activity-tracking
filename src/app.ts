@@ -4,7 +4,6 @@ import helmet from 'helmet'
 import bodyParser from 'body-parser'
 import HttpStatus from 'http-status-codes'
 import swaggerUi from 'swagger-ui-express'
-import whitelist from 'ip-allowed'
 import qs from 'query-strings-parser'
 import express, { Application, NextFunction, Request, Response } from 'express'
 import { inject, injectable } from 'inversify'
@@ -60,30 +59,12 @@ export class App {
      */
     private async initMiddleware(): Promise<void> {
         try {
-            await this.setupHostWhitelist()
             await this.setupInversifyExpress()
             this.setupSwaggerUI()
             this.setupErrorsHandler()
         } catch (err) {
             this._logger.error(`Fatal error in middleware configuration: ${(err && err.message) ? err.message : ''}`)
         }
-    }
-
-    /**
-     * Access control based on host addresses.
-     * Only allow requests from the hosts that are on the permissions list.
-     *
-     * @private
-     * @return Promise<void>
-     */
-    private async setupHostWhitelist(): Promise<void> {
-        this.express.use(whitelist(process.env.HOST_WHITELIST || Default.IP_WHITELIST,
-            {
-                log: (clientIp, accessDenied) => {
-                    if (accessDenied) this._logger.warn(`Access denied for IP ${clientIp}`)
-                }
-            })
-        )
     }
 
     /**

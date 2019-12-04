@@ -3,8 +3,6 @@ export interface IConnectionFactory {
 }
 
 export interface IDBOptions {
-    retries?: number
-    interval?: number
 }
 
 export interface IEventBusOptions {

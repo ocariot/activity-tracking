@@ -22,6 +22,7 @@ import { ChildLog } from '../../application/domain/model/child.log'
 
 @injectable()
 export class ProviderEventBusTask implements IBackgroundTask {
+
     constructor(
         @inject(Identifier.RABBITMQ_EVENT_BUS) private readonly _eventBus: IEventBus,
         @inject(Identifier.ACTIVITY_REPOSITORY) private readonly _activityRepository: IPhysicalActivityRepository,
@@ -50,12 +51,7 @@ export class ProviderEventBusTask implements IBackgroundTask {
         this._eventBus.bus
             .providePhysicalActivities(async (query) => {
                 try {
-                    const _query: IQuery = new Query().fromJSON(
-                        query ?
-                            {
-                                ...qs.parser(query, {},
-                                    { date_fields: { start_at: 'start_time', end_at: 'start_time' } })
-                            } : { limit: Number.MAX_SAFE_INTEGER })
+                    const _query: IQuery = this.buildQS(query, 'start_time')
                     const result: Array<PhysicalActivity> = await this._activityRepository.find(_query)
                     return result.map(item => item.toJSON())
                 } catch (err) {
@@ -69,12 +65,7 @@ export class ProviderEventBusTask implements IBackgroundTask {
         this._eventBus.bus
             .provideSleep(async (query) => {
                 try {
-                    const _query: IQuery = new Query().fromJSON(
-                        query ?
-                            {
-                                ...qs.parser(query, {},
-                                    { date_fields: { start_at: 'start_time', end_at: 'start_time' } })
-                            } : { limit: Number.MAX_SAFE_INTEGER })
+                    const _query: IQuery = this.buildQS(query, 'start_time')
                     const result: Array<Sleep> = await this._sleepRepository.find(_query)
                     return result.map(item => item.toJSON())
                 } catch (err) {
@@ -88,12 +79,7 @@ export class ProviderEventBusTask implements IBackgroundTask {
         this._eventBus.bus
             .provideWeights(async (query) => {
                 try {
-                    const _query: IQuery = new Query().fromJSON(
-                        query ?
-                            {
-                                ...qs.parser(query, {},
-                                    { date_fields: { start_at: 'timestamp', end_at: 'timestamp' } })
-                            } : { limit: Number.MAX_SAFE_INTEGER })
+                    const _query: IQuery = this.buildQS(query, 'timestamp')
                     const result: Array<Weight> = await this._weightRepository.find(_query)
                     return result.map(item => item.toJSON())
                 } catch (err) {
@@ -107,12 +93,7 @@ export class ProviderEventBusTask implements IBackgroundTask {
         this._eventBus.bus
             .provideEnvironments(async (query) => {
                 try {
-                    const _query: IQuery = new Query().fromJSON(
-                        query ?
-                            {
-                                ...qs.parser(query, {},
-                                    { date_fields: { start_at: 'timestamp', end_at: 'timestamp' } })
-                            } : { limit: Number.MAX_SAFE_INTEGER })
+                    const _query: IQuery = this.buildQS(query, 'timestamp')
                     const result: Array<Environment> = await this._environmentRepository.find(_query)
                     return result.map(item => item.toJSON())
                 } catch (err) {
@@ -138,5 +119,18 @@ export class ProviderEventBusTask implements IBackgroundTask {
             })
             .then(() => this._logger.info('Log resource provided successfully!'))
             .catch((err) => this._logger.error(`Error trying to provide Log resource: ${err.message}`))
+    }
+
+    /**
+     * Prepare query string based on defaults parameters and values.
+     * 
+     * @param query
+     * @param dateField 
+     */
+    private buildQS(query: any, dateField: string): IQuery {
+        return new Query().fromJSON(
+            qs.parser(query ? query : {}, { pagination: { limit: Number.MAX_SAFE_INTEGER } },
+                { use_page: true, date_fields: { start_at: dateField, end_at: dateField } })
+        )
     }
 }

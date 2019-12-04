@@ -179,16 +179,14 @@ export class EnvironmentService implements IEnvironmentService {
 
             // 3. If deleted successfully, the object is published on the message bus.
             if (wasDeleted) {
-                environmentsDeleted.forEach(environmentDeleted => {
-                    this._eventBus.bus
-                        .pubDeleteEnvironment(environmentDeleted)
-                        .then(() => {
-                            this._logger.info(`Measurement of environment with ID: ${environmentDeleted.id} was deleted...`)
-                        })
-                        .catch((err) => {
-                            this._logger.error(`Error trying to publish event DeleteEnvironment. ${err.message}`)
-                        })
-                })
+                this._eventBus.bus
+                    .pubDeleteEnvironment(environmentsDeleted)
+                    .then(() => {
+                        this._logger.info(`Institution-related environments measures with ID: ${institutionId} have been removed...`)
+                    })
+                    .catch((err) => {
+                        this._logger.error(`Error trying to publish event DeleteEnvironment. ${err.message}`)
+                    })
                 // 4a. Returns true.
                 return Promise.resolve(true)
             }
