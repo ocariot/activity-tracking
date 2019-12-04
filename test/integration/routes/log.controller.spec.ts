@@ -68,7 +68,7 @@ describe('Routes: children.logs', () => {
     // Start services
     before(async () => {
         try {
-            await dbConnection.connect(process.env.MONGODB_URI_TEST || Default.MONGODB_URI_TEST, { interval: 100 })
+            await dbConnection.connect(process.env.MONGODB_URI_TEST || Default.MONGODB_URI_TEST)
             await deleteAllLogs()
         } catch (err) {
             throw new Error('Failure on children.logs routes test: ' + err.message)

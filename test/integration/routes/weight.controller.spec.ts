@@ -51,8 +51,7 @@ describe('Routes: children.weights', () => {
     // Start services
     before(async () => {
         try {
-            await dbConnection.connect(process.env.MONGODB_URI_TEST || Default.MONGODB_URI_TEST,
-                { interval: 100 })
+            await dbConnection.connect(process.env.MONGODB_URI_TEST || Default.MONGODB_URI_TEST)
 
             await rabbitmq.initialize('amqp://invalidUser:guest@localhost', { retries: 1, interval: 100 })
 
@@ -782,24 +781,24 @@ describe('Routes: children.weights', () => {
 
             it('should return status code 200 and the result as needed in the query (all weight registers in one day)',
                 () => {
-                const url = `/v1/children/${defaultWeight.child_id}/weights`
-                    .concat('?timestamp=gte:2019-01-20T00:00:00.000Z&timestamp=lt:2019-01-20T23:59:59.999Z')
-                    .concat('&sort=child_id&page=1&limit=3')
+                    const url = `/v1/children/${defaultWeight.child_id}/weights`
+                        .concat('?timestamp=gte:2019-01-20T00:00:00.000Z&timestamp=lt:2019-01-20T23:59:59.999Z')
+                        .concat('&sort=child_id&page=1&limit=3')
 
-                return request
-                    .get(url)
-                    .set('Content-Type', 'application/json')
-                    .expect(200)
-                    .then(res => {
-                        expect(res.body.length).to.eql(1)
-                        expect(res.body[0]).to.have.property('id')
-                        expect(res.body[0].timestamp).to.eql(resultWeight.timestamp!.toISOString())
-                        expect(res.body[0].value).to.eql(defaultWeight.value)
-                        expect(res.body[0].unit).to.eql(defaultWeight.unit)
-                        expect(res.body[0].child_id).to.eql(defaultWeight.child_id)
-                        expect(res.body[0].body_fat).to.eql(defaultWeight.body_fat!.value)
-                    })
-            })
+                    return request
+                        .get(url)
+                        .set('Content-Type', 'application/json')
+                        .expect(200)
+                        .then(res => {
+                            expect(res.body.length).to.eql(1)
+                            expect(res.body[0]).to.have.property('id')
+                            expect(res.body[0].timestamp).to.eql(resultWeight.timestamp!.toISOString())
+                            expect(res.body[0].value).to.eql(defaultWeight.value)
+                            expect(res.body[0].unit).to.eql(defaultWeight.unit)
+                            expect(res.body[0].child_id).to.eql(defaultWeight.child_id)
+                            expect(res.body[0].body_fat).to.eql(defaultWeight.body_fat!.value)
+                        })
+                })
 
             it('should return status code 200 and an empty list (when no weight register is found)', () => {
                 const url = `/v1/children/${defaultWeight.child_id}/weights`
