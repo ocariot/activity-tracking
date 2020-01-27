@@ -52,7 +52,7 @@ export class Weight extends Measurement implements IJSONSerializable, IJSONDeser
     public toJSON(): any {
         return {
             id: super.id,
-            timestamp: this.timestamp,
+            timestamp: this.timestamp?.toISOString().substr(0, 19),
             value: this.value,
             unit: this.unit,
             child_id: this.child_id,

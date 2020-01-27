@@ -1,32 +1,34 @@
 import { assert } from 'chai'
 import { SleepPatternSummaryData } from '../../../src/application/domain/model/sleep.pattern.summary.data'
 import { SleepPattern } from '../../../src/application/domain/model/sleep.pattern'
-import { SleepPatternDataSet, StagesPatternType } from '../../../src/application/domain/model/sleep.pattern.data.set'
+import { StagesPatternType } from '../../../src/application/domain/model/sleep.pattern.data.set'
 import { SleepPatternStagesSummary } from '../../../src/application/domain/model/sleep.pattern.stages.summary'
 
 describe('Models: SleepPattern', () => {
-    const dataSetItem: SleepPatternDataSet = new SleepPatternDataSet()
-    dataSetItem.start_time = new Date('2018-08-18T01:30:30Z')
-    dataSetItem.name = StagesPatternType.DEEP
-    dataSetItem.duration = Math.floor(Math.random() * 5 + 1) * 60000 // 1-5min milliseconds
-
-    const dataSetItem2: SleepPatternDataSet = new SleepPatternDataSet()
-    dataSetItem2.start_time = new Date('2018-08-18T01:45:30Z')
-    dataSetItem2.name = StagesPatternType.LIGHT
-    dataSetItem2.duration = Math.floor(Math.random() * 3 + 1) * 60000 // 1-3min in milliseconds
-
-    const dataSetItem3: SleepPatternDataSet = new SleepPatternDataSet()
-    dataSetItem3.start_time = new Date('2018-08-18T02:45:30Z')
-    dataSetItem3.name = StagesPatternType.REM
-    dataSetItem3.duration = Math.floor(Math.random() * 120 + 1) * 60000 // 1-180min in milliseconds
-
-    const dataSetItem4: SleepPatternDataSet = new SleepPatternDataSet()
-    dataSetItem4.start_time = new Date('2018-08-18T02:45:30Z')
-    dataSetItem4.name = StagesPatternType.AWAKE
-    dataSetItem4.duration = Math.floor(Math.random() * 120 + 1) * 60000 // 1-180min in milliseconds
 
     const summaryDataJSON: any = {
-        data_set: [dataSetItem, dataSetItem2, dataSetItem3, dataSetItem4],
+        data_set: [
+            {
+                start_time: '2018-08-18T01:30:30Z',
+                name: StagesPatternType.DEEP,
+                duration: Math.floor(Math.random() * 5 + 1) * 60000 // 1-5min milliseconds
+            },
+            {
+                start_time: '2018-08-18T01:45:30Z',
+                name: StagesPatternType.LIGHT,
+                duration: Math.floor(Math.random() * 3 + 1) * 60000 // 1-3min in milliseconds
+            },
+            {
+                start_time: '2018-08-18T02:45:30Z',
+                name: StagesPatternType.REM,
+                duration: Math.floor(Math.random() * 120 + 1) * 60000 // 1-180min in milliseconds
+            },
+            {
+                start_time: '2018-08-18T03:45:30Z',
+                name: StagesPatternType.AWAKE,
+                duration: Math.floor(Math.random() * 120 + 1) * 60000 // 1-180min in milliseconds
+            }
+        ],
         summary: new SleepPatternStagesSummary(new SleepPatternSummaryData(2, 10000),
             new SleepPatternSummaryData(3, 20000),
             new SleepPatternSummaryData(4, 30000),
@@ -38,7 +40,13 @@ describe('Models: SleepPattern', () => {
             it('should return an SleepPattern model', () => {
                 const result = new SleepPattern().fromJSON(summaryDataJSON)
 
-                assert.deepPropertyVal(result, 'data_set', summaryDataJSON.data_set)
+                let i = 0
+                for (const dataSetItem of result.data_set) {
+                    assert.deepPropertyVal(dataSetItem, 'start_time', new Date(summaryDataJSON.data_set[i].start_time))
+                    assert.deepPropertyVal(dataSetItem, 'name', summaryDataJSON.data_set[i].name)
+                    assert.deepPropertyVal(dataSetItem, 'duration', summaryDataJSON.data_set[i].duration)
+                    i++
+                }
             })
         })
 
@@ -54,7 +62,13 @@ describe('Models: SleepPattern', () => {
             it('should transform the string in json and return SleepPattern model', () => {
                 const result = new SleepPattern().fromJSON(JSON.stringify(summaryDataJSON))
 
-                assert.deepPropertyVal(result, 'data_set', summaryDataJSON.data_set)
+                let i = 0
+                for (const dataSetItem of result.data_set) {
+                    assert.deepPropertyVal(dataSetItem, 'start_time', new Date(summaryDataJSON.data_set[i].start_time))
+                    assert.deepPropertyVal(dataSetItem, 'name', summaryDataJSON.data_set[i].name)
+                    assert.deepPropertyVal(dataSetItem, 'duration', summaryDataJSON.data_set[i].duration)
+                    i++
+                }
             })
         })
     })
@@ -65,13 +79,13 @@ describe('Models: SleepPattern', () => {
                 let result = new SleepPattern().fromJSON(summaryDataJSON)
                 result = result.toJSON()
                 // Pattern data_set
-                assert.propertyVal(result.data_set[0], 'start_time', summaryDataJSON.data_set[0].start_time)
+                assert.propertyVal(result.data_set[0], 'start_time', summaryDataJSON.data_set[0].start_time.substr(0, 19))
                 assert.propertyVal(result.data_set[0], 'name', summaryDataJSON.data_set[0].name)
                 assert.propertyVal(result.data_set[0], 'duration', summaryDataJSON.data_set[0].duration)
-                assert.propertyVal(result.data_set[1], 'start_time', summaryDataJSON.data_set[1].start_time)
+                assert.propertyVal(result.data_set[1], 'start_time', summaryDataJSON.data_set[1].start_time.substr(0, 19))
                 assert.propertyVal(result.data_set[1], 'name', summaryDataJSON.data_set[1].name)
                 assert.propertyVal(result.data_set[1], 'duration', summaryDataJSON.data_set[1].duration)
-                assert.propertyVal(result.data_set[2], 'start_time', summaryDataJSON.data_set[2].start_time)
+                assert.propertyVal(result.data_set[2], 'start_time', summaryDataJSON.data_set[2].start_time.substr(0, 19))
                 assert.propertyVal(result.data_set[2], 'name', summaryDataJSON.data_set[2].name)
                 assert.propertyVal(result.data_set[2], 'duration', summaryDataJSON.data_set[2].duration)
             })

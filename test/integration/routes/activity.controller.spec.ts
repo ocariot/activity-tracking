@@ -147,6 +147,7 @@ describe('Routes: children.physicalactivities', () => {
 
     const incorrectActivity15: PhysicalActivity = new PhysicalActivityMock()     // The start_time is invalid
     incorrectActivity15.start_time = new Date('2019-12-32T12:52:59Z')
+    incorrectActivity15.end_time = new Date('2020-01-01T12:52:59Z')
 
     // Array with correct and incorrect activities
     const mixedActivitiesArr: Array<PhysicalActivity> = new Array<PhysicalActivityMock>()
@@ -241,8 +242,8 @@ describe('Routes: children.physicalactivities', () => {
                             expect(message).to.have.property('physicalactivity')
                             expect(message.physicalactivity).to.have.property('id')
                             expect(message.physicalactivity.name).to.eql(defaultActivity.name)
-                            expect(message.physicalactivity.start_time).to.eql(defaultActivity.start_time!.toISOString())
-                            expect(message.physicalactivity.end_time).to.eql(defaultActivity.end_time!.toISOString())
+                            expect(message.physicalactivity.start_time).to.eql(defaultActivity.start_time!.toISOString().substr(0, 19))
+                            expect(message.physicalactivity.end_time).to.eql(defaultActivity.end_time!.toISOString().substr(0, 19))
                             expect(message.physicalactivity.duration).to.eql(defaultActivity.duration)
                             expect(message.physicalactivity.calories).to.eql(defaultActivity.calories)
                             if (message.physicalactivity.steps) {
@@ -320,8 +321,8 @@ describe('Routes: children.physicalactivities', () => {
                     .then(res => {
                         expect(res.body).to.have.property('id')
                         expect(res.body.name).to.eql(defaultActivity.name)
-                        expect(res.body.start_time).to.eql(defaultActivity.start_time!.toISOString())
-                        expect(res.body.end_time).to.eql(defaultActivity.end_time!.toISOString())
+                        expect(res.body.start_time).to.eql(defaultActivity.start_time!.toISOString().substr(0, 19))
+                        expect(res.body.end_time).to.eql(defaultActivity.end_time!.toISOString().substr(0, 19))
                         expect(res.body.duration).to.eql(defaultActivity.duration)
                         expect(res.body.calories).to.eql(defaultActivity.calories)
                         if (res.body.steps) {
@@ -1355,8 +1356,8 @@ describe('Routes: children.physicalactivities', () => {
                             expect(res.body.success[i].code).to.eql(HttpStatus.CREATED)
                             expect(res.body.success[i].item).to.have.property('id')
                             expect(res.body.success[i].item.name).to.eql(correctActivitiesArr[i].name)
-                            expect(res.body.success[i].item.start_time).to.eql(correctActivitiesArr[i].start_time!.toISOString())
-                            expect(res.body.success[i].item.end_time).to.eql(correctActivitiesArr[i].end_time!.toISOString())
+                            expect(res.body.success[i].item.start_time).to.eql(correctActivitiesArr[i].start_time!.toISOString().substr(0, 19))
+                            expect(res.body.success[i].item.end_time).to.eql(correctActivitiesArr[i].end_time!.toISOString().substr(0, 19))
                             expect(res.body.success[i].item.duration).to.eql(correctActivitiesArr[i].duration)
                             expect(res.body.success[i].item.calories).to.eql(correctActivitiesArr[i].calories)
                             if (correctActivitiesArr[i].steps) {
@@ -1430,8 +1431,8 @@ describe('Routes: children.physicalactivities', () => {
                             expect(res.body.error[i].code).to.eql(HttpStatus.CONFLICT)
                             expect(res.body.error[i].message).to.eql(Strings.PHYSICAL_ACTIVITY.ALREADY_REGISTERED)
                             expect(res.body.error[i].item.name).to.eql(correctActivitiesArr[i].name)
-                            expect(res.body.error[i].item.start_time).to.eql(correctActivitiesArr[i].start_time!.toISOString())
-                            expect(res.body.error[i].item.end_time).to.eql(correctActivitiesArr[i].end_time!.toISOString())
+                            expect(res.body.error[i].item.start_time).to.eql(correctActivitiesArr[i].start_time!.toISOString().substr(0, 19))
+                            expect(res.body.error[i].item.end_time).to.eql(correctActivitiesArr[i].end_time!.toISOString().substr(0, 19))
                             expect(res.body.error[i].item.duration).to.eql(correctActivitiesArr[i].duration)
                             expect(res.body.error[i].item.calories).to.eql(correctActivitiesArr[i].calories)
                             if (correctActivitiesArr[i].steps) {
@@ -1491,8 +1492,8 @@ describe('Routes: children.physicalactivities', () => {
                         expect(res.body.success[0].code).to.eql(HttpStatus.CREATED)
                         expect(res.body.success[0].item).to.have.property('id')
                         expect(res.body.success[0].item.name).to.eql(mixedActivitiesArr[0].name)
-                        expect(res.body.success[0].item.start_time).to.eql(mixedActivitiesArr[0].start_time!.toISOString())
-                        expect(res.body.success[0].item.end_time).to.eql(mixedActivitiesArr[0].end_time!.toISOString())
+                        expect(res.body.success[0].item.start_time).to.eql(mixedActivitiesArr[0].start_time!.toISOString().substr(0, 19))
+                        expect(res.body.success[0].item.end_time).to.eql(mixedActivitiesArr[0].end_time!.toISOString().substr(0, 19))
                         expect(res.body.success[0].item.duration).to.eql(mixedActivitiesArr[0].duration)
                         expect(res.body.success[0].item.calories).to.eql(mixedActivitiesArr[0].calories)
                         if (mixedActivitiesArr[0].steps) {
@@ -1597,10 +1598,17 @@ describe('Routes: children.physicalactivities', () => {
                         for (let i = 0; i < res.body.error.length; i++) {
                             expect(res.body.error[i].code).to.eql(HttpStatus.BAD_REQUEST)
                             expect(res.body.error[i].item.name).to.eql(incorrectActivitiesArr[i].name)
-                            if (res.body.error[i].item.start_time)
-                                expect(res.body.error[i].item.start_time).to.eql(incorrectActivitiesArr[i].start_time!.toISOString())
-                            if (res.body.error[i].item.end_time)
-                                expect(res.body.error[i].item.end_time).to.eql(incorrectActivitiesArr[i].end_time!.toISOString())
+                            if (res.body.error[i].item.start_time) {
+                                expect(res.body.error[i].item.start_time)
+                                    .to.eql(incorrectActivitiesArr[i].start_time!.toISOString().substr(0, 19))
+                            }
+                            if (res.body.error[i].item.end_time) {
+                                const dateToBeCompared = i !== 14
+                                    ? incorrectActivitiesArr[i].end_time!.toISOString().substr(0, 19)
+                                    : incorrectActivitiesArr[i].end_time!.toISOString()
+                                expect(res.body.error[i].item.end_time)
+                                    .to.eql(dateToBeCompared)
+                            }
                             expect(res.body.error[i].item.duration).to.eql(incorrectActivitiesArr[i].duration)
                             expect(res.body.error[i].item.calories).to.eql(incorrectActivitiesArr[i].calories)
                             if (incorrectActivitiesArr[i].steps) {
@@ -1672,8 +1680,8 @@ describe('Routes: children.physicalactivities', () => {
                         expect(res.body.length).to.eql(1)
                         expect(res.body[0]).to.have.property('id')
                         expect(res.body[0].name).to.eql(defaultActivity.name)
-                        expect(res.body[0].start_time).to.eql(defaultActivity.start_time!.toISOString())
-                        expect(res.body[0].end_time).to.eql(defaultActivity.end_time!.toISOString())
+                        expect(res.body[0].start_time).to.eql(defaultActivity.start_time!.toISOString().substr(0, 19))
+                        expect(res.body[0].end_time).to.eql(defaultActivity.end_time!.toISOString().substr(0, 19))
                         expect(res.body[0].duration).to.eql(defaultActivity.duration)
                         expect(res.body[0].calories).to.eql(defaultActivity.calories)
                         if (defaultActivity.steps) {
@@ -1801,8 +1809,8 @@ describe('Routes: children.physicalactivities', () => {
                         expect(res.body.length).to.eql(1)
                         expect(res.body[0]).to.have.property('id')
                         expect(res.body[0].name).to.eql(defaultActivity.name)
-                        expect(res.body[0].start_time).to.eql(result1.start_time.toISOString())
-                        expect(res.body[0].end_time).to.eql(result1.end_time.toISOString())
+                        expect(res.body[0].start_time).to.eql(result1.start_time.toISOString().substr(0, 19))
+                        expect(res.body[0].end_time).to.eql(result1.end_time.toISOString().substr(0, 19))
                         expect(res.body[0].duration).to.eql(defaultActivity.duration)
                         expect(res.body[0].calories).to.eql(defaultActivity.calories)
                         if (defaultActivity.steps) {
@@ -1886,8 +1894,8 @@ describe('Routes: children.physicalactivities', () => {
                     .then(res => {
                         expect(res.body).to.have.property('id')
                         expect(res.body.name).to.eql(defaultActivity.name)
-                        expect(res.body.start_time).to.eql(defaultActivity.start_time!.toISOString())
-                        expect(res.body.end_time).to.eql(defaultActivity.end_time!.toISOString())
+                        expect(res.body.start_time).to.eql(defaultActivity.start_time!.toISOString().substr(0, 19))
+                        expect(res.body.end_time).to.eql(defaultActivity.end_time!.toISOString().substr(0, 19))
                         expect(res.body.duration).to.eql(defaultActivity.duration)
                         expect(res.body.calories).to.eql(defaultActivity.calories)
                         if (defaultActivity.steps) {
