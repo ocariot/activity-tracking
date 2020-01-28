@@ -23,7 +23,8 @@ describe('Validators: LocationValidator', () => {
                     LocationValidator.validate(location)
                 } catch (err) {
                     assert.equal(err.message, Strings.ERROR_MESSAGE.REQUIRED_FIELDS)
-                    assert.equal(err.description, 'location.local'.concat(Strings.ERROR_MESSAGE.REQUIRED_FIELDS_DESC))
+                    assert.equal(err.description, Strings.ERROR_MESSAGE.REQUIRED_FIELDS_DESC
+                        .replace('{0}', 'location.local'))
                 }
             })
         })
@@ -35,8 +36,8 @@ describe('Validators: LocationValidator', () => {
                     LocationValidator.validate(location)
                 } catch (err) {
                     assert.equal(err.message, Strings.ERROR_MESSAGE.REQUIRED_FIELDS)
-                    assert.equal(err.description, 'location.local, location.room'
-                        .concat(Strings.ERROR_MESSAGE.REQUIRED_FIELDS_DESC))
+                    assert.equal(err.description, Strings.ERROR_MESSAGE.REQUIRED_FIELDS_DESC
+                        .replace('{0}', 'location.local, location.room'))
                 }
             })
         })

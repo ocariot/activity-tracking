@@ -2,7 +2,7 @@ import { ValidationException } from '../exception/validation.exception'
 import { Strings } from '../../../utils/strings'
 import { ObjectIdValidator } from './object.id.validator'
 import { Measurement } from '../model/measurement'
-import { NumberValidator } from './number.validator'
+import { NumberPositiveValidator } from './number.positive.validator'
 import { StringValidator } from './string.validator'
 
 export class CreateMeasurementValidator {
@@ -16,7 +16,7 @@ export class CreateMeasurementValidator {
         if (!measurement.timestamp) fields.push('timestamp')
 
         if (measurement.value === undefined) fields.push('value')
-        else NumberValidator.validate(measurement.value, 'value')
+        else NumberPositiveValidator.validate(measurement.value, 'value')
 
         if (measurement.unit === undefined) fields.push('unit')
         else StringValidator.validate(measurement.unit, 'unit')
@@ -26,7 +26,7 @@ export class CreateMeasurementValidator {
 
         if (fields.length > 0) {
             throw new ValidationException(Strings.ERROR_MESSAGE.REQUIRED_FIELDS,
-                fields.join(', ').concat(Strings.ERROR_MESSAGE.REQUIRED_FIELDS_DESC))
+                Strings.ERROR_MESSAGE.REQUIRED_FIELDS_DESC.replace('{0}', fields.join(', ')))
         }
     }
 }

@@ -224,8 +224,8 @@ describe('Services: PhysicalActivityService', () => {
                 return activityService.add(incorrectActivity)
                     .catch(err => {
                         assert.propertyVal(err, 'message', Strings.ERROR_MESSAGE.REQUIRED_FIELDS)
-                        assert.propertyVal(err, 'description', 'start_time, end_time, duration, child_id, ' +
-                            'name, calories'.concat(Strings.ERROR_MESSAGE.REQUIRED_FIELDS_DESC))
+                        assert.propertyVal(err, 'description', Strings.ERROR_MESSAGE.REQUIRED_FIELDS_DESC
+                            .replace('{0}', 'start_time, end_time, duration, child_id, name, calories'))
                     })
             })
         })
@@ -239,8 +239,8 @@ describe('Services: PhysicalActivityService', () => {
                 return activityService.add(incorrectActivity)
                     .catch(err => {
                         assert.propertyVal(err, 'message', Strings.ERROR_MESSAGE.REQUIRED_FIELDS)
-                        assert.propertyVal(err, 'description', 'name, calories'
-                            .concat(Strings.ERROR_MESSAGE.REQUIRED_FIELDS_DESC))
+                        assert.propertyVal(err, 'description', Strings.ERROR_MESSAGE.REQUIRED_FIELDS_DESC
+                            .replace('{0}', 'name, calories'))
                     })
             })
         })
@@ -282,8 +282,8 @@ describe('Services: PhysicalActivityService', () => {
                 return activityService.add(incorrectActivity)
                     .catch(err => {
                         assert.propertyVal(err, 'message', Strings.ERROR_MESSAGE.INVALID_FIELDS)
-                        assert.propertyVal(err, 'description', 'duration'
-                            .concat(Strings.ERROR_MESSAGE.NEGATIVE_NUMBER))
+                        assert.propertyVal(err, 'description', Strings.ERROR_MESSAGE.NEGATIVE_INTEGER
+                            .replace('{0}', 'duration'))
                     })
             })
         })
@@ -309,8 +309,8 @@ describe('Services: PhysicalActivityService', () => {
                 return activityService.add(incorrectActivity)
                     .catch(err => {
                         assert.propertyVal(err, 'message', Strings.ERROR_MESSAGE.INVALID_FIELDS)
-                        assert.propertyVal(err, 'description', 'calories'
-                            .concat(Strings.ERROR_MESSAGE.NEGATIVE_NUMBER))
+                        assert.propertyVal(err, 'description', Strings.ERROR_MESSAGE.NEGATIVE_NUMBER
+                            .replace('{0}', 'calories'))
                     })
             })
         })
@@ -323,8 +323,8 @@ describe('Services: PhysicalActivityService', () => {
                 return activityService.add(incorrectActivity)
                     .catch(err => {
                         assert.propertyVal(err, 'message', Strings.ERROR_MESSAGE.INVALID_FIELDS)
-                        assert.propertyVal(err, 'description', 'steps'
-                            .concat(Strings.ERROR_MESSAGE.NEGATIVE_NUMBER))
+                        assert.propertyVal(err, 'description', Strings.ERROR_MESSAGE.NEGATIVE_INTEGER
+                            .replace('{0}', 'steps'))
                     })
             })
         })
@@ -337,8 +337,8 @@ describe('Services: PhysicalActivityService', () => {
                 return activityService.add(incorrectActivity)
                     .catch(err => {
                         assert.propertyVal(err, 'message', Strings.ERROR_MESSAGE.INVALID_FIELDS)
-                        assert.propertyVal(err, 'description', 'distance'
-                            .concat(Strings.ERROR_MESSAGE.NEGATIVE_NUMBER))
+                        assert.propertyVal(err, 'description', Strings.ERROR_MESSAGE.NEGATIVE_NUMBER
+                            .replace('{0}', 'distance'))
                     })
             })
         })
@@ -381,8 +381,8 @@ describe('Services: PhysicalActivityService', () => {
                 return activityService.add(incorrectActivity)
                     .catch(err => {
                         assert.propertyVal(err, 'message', Strings.ERROR_MESSAGE.INVALID_FIELDS)
-                        assert.propertyVal(err, 'description', 'levels.duration'
-                            .concat(Strings.ERROR_MESSAGE.NEGATIVE_NUMBER))
+                        assert.propertyVal(err, 'description', Strings.ERROR_MESSAGE.NEGATIVE_INTEGER
+                            .replace('{0}', 'levels.duration'))
                     })
             })
         })
@@ -392,9 +392,9 @@ describe('Services: PhysicalActivityService', () => {
                 return activityService.add(incorrectActivity12)
                     .catch(err => {
                         assert.propertyVal(err, 'message', Strings.ERROR_MESSAGE.REQUIRED_FIELDS)
-                        assert.propertyVal(err, 'description', 'heart_rate.average, ' +
-                            'heart_rate.out_of_range_zone, heart_rate.fat_burn_zone, heart_rate.cardio_zone, ' +
-                            'heart_rate.peak_zone'.concat(Strings.ERROR_MESSAGE.REQUIRED_FIELDS_DESC))
+                        assert.propertyVal(err, 'description', Strings.ERROR_MESSAGE.REQUIRED_FIELDS_DESC
+                            .replace('{0}', 'heart_rate.average, heart_rate.out_of_range_zone, ' +
+                                'heart_rate.fat_burn_zone, heart_rate.cardio_zone, heart_rate.peak_zone'))
                     })
             })
         })
@@ -404,8 +404,8 @@ describe('Services: PhysicalActivityService', () => {
                 return activityService.add(incorrectActivity13)
                     .catch(err => {
                         assert.propertyVal(err, 'message', Strings.ERROR_MESSAGE.INVALID_FIELDS)
-                        assert.propertyVal(err, 'description', 'heart_rate.average'
-                            .concat(Strings.ERROR_MESSAGE.NEGATIVE_NUMBER))
+                        assert.propertyVal(err, 'description', Strings.ERROR_MESSAGE.INTEGER_GREATER_ZERO
+                            .replace('{0}', 'heart_rate.average'))
                     })
             })
         })
@@ -415,9 +415,9 @@ describe('Services: PhysicalActivityService', () => {
                 return activityService.add(incorrectActivity14)
                     .catch(err => {
                         assert.propertyVal(err, 'message', Strings.ERROR_MESSAGE.REQUIRED_FIELDS)
-                        assert.propertyVal(err, 'description', 'heart_rate.fat_burn_zone.min, ' +
-                            'heart_rate.fat_burn_zone.max, heart_rate.fat_burn_zone.duration'
-                                .concat(Strings.ERROR_MESSAGE.REQUIRED_FIELDS_DESC))
+                        assert.propertyVal(err, 'description', Strings.ERROR_MESSAGE.REQUIRED_FIELDS_DESC
+                            .replace('{0}', 'heart_rate.fat_burn_zone.min, ' +
+                                'heart_rate.fat_burn_zone.max, heart_rate.fat_burn_zone.duration'))
                     })
             })
         })
@@ -428,8 +428,8 @@ describe('Services: PhysicalActivityService', () => {
                 return activityService.add(incorrectActivity15)
                     .catch(err => {
                         assert.propertyVal(err, 'message', Strings.ERROR_MESSAGE.INVALID_FIELDS)
-                        assert.propertyVal(err, 'description', 'heart_rate.fat_burn_zone.duration'
-                            .concat(Strings.ERROR_MESSAGE.NEGATIVE_NUMBER))
+                        assert.propertyVal(err, 'description', Strings.ERROR_MESSAGE.NEGATIVE_INTEGER
+                            .replace('{0}', 'heart_rate.fat_burn_zone.duration'))
                     })
             })
         })
@@ -520,8 +520,8 @@ describe('Services: PhysicalActivityService', () => {
 
                         assert.propertyVal(result.error[0], 'code', HttpStatus.BAD_REQUEST)
                         assert.propertyVal(result.error[0], 'message', Strings.ERROR_MESSAGE.REQUIRED_FIELDS)
-                        assert.propertyVal(result.error[0], 'description', 'start_time, end_time, ' +
-                            'duration, child_id, name, calories'.concat(Strings.ERROR_MESSAGE.REQUIRED_FIELDS_DESC))
+                        assert.propertyVal(result.error[0], 'description', Strings.ERROR_MESSAGE.REQUIRED_FIELDS_DESC
+                            .replace('{0}', 'start_time, end_time, duration, child_id, name, calories'))
                     })
             })
         })
@@ -534,27 +534,27 @@ describe('Services: PhysicalActivityService', () => {
                         result = result as MultiStatus<PhysicalActivity>
 
                         assert.propertyVal(result.error[0], 'message', Strings.ERROR_MESSAGE.REQUIRED_FIELDS)
-                        assert.propertyVal(result.error[0], 'description', 'start_time, end_time, ' +
-                            'duration, child_id, name, calories'.concat(Strings.ERROR_MESSAGE.REQUIRED_FIELDS_DESC))
+                        assert.propertyVal(result.error[0], 'description', Strings.ERROR_MESSAGE.REQUIRED_FIELDS_DESC
+                            .replace('{0}', 'start_time, end_time, duration, child_id, name, calories'))
                         assert.propertyVal(result.error[1], 'message', Strings.ERROR_MESSAGE.REQUIRED_FIELDS)
-                        assert.propertyVal(result.error[1], 'description', 'name, calories'
-                            .concat(Strings.ERROR_MESSAGE.REQUIRED_FIELDS_DESC))
+                        assert.propertyVal(result.error[1], 'description', Strings.ERROR_MESSAGE.REQUIRED_FIELDS_DESC
+                            .replace('{0}', 'name, calories'))
                         assert.propertyVal(result.error[2], 'message', Strings.ERROR_MESSAGE.INVALID_FIELDS)
                         assert.propertyVal(result.error[2], 'description', Strings.ERROR_MESSAGE.INVALID_START_TIME)
                         assert.propertyVal(result.error[3], 'message', Strings.ERROR_MESSAGE.INVALID_FIELDS)
                         assert.propertyVal(result.error[3], 'description', 'duration value does not match ' +
                             'values passed in start_time and end_time parameters!')
                         assert.propertyVal(result.error[4], 'message', Strings.ERROR_MESSAGE.INVALID_FIELDS)
-                        assert.propertyVal(result.error[4], 'description', 'duration'
-                            .concat(Strings.ERROR_MESSAGE.NEGATIVE_NUMBER))
+                        assert.propertyVal(result.error[4], 'description', Strings.ERROR_MESSAGE.NEGATIVE_INTEGER
+                            .replace('{0}', 'duration'))
                         assert.propertyVal(result.error[5], 'message', Strings.CHILD.PARAM_ID_NOT_VALID_FORMAT)
                         assert.propertyVal(result.error[5], 'description', Strings.ERROR_MESSAGE.UUID_NOT_VALID_FORMAT_DESC)
                         assert.propertyVal(result.error[6], 'message', Strings.ERROR_MESSAGE.INVALID_FIELDS)
-                        assert.propertyVal(result.error[6], 'description', 'calories'
-                            .concat(Strings.ERROR_MESSAGE.NEGATIVE_NUMBER))
+                        assert.propertyVal(result.error[6], 'description', Strings.ERROR_MESSAGE.NEGATIVE_NUMBER
+                            .replace('{0}', 'calories'))
                         assert.propertyVal(result.error[7], 'message', Strings.ERROR_MESSAGE.INVALID_FIELDS)
-                        assert.propertyVal(result.error[7], 'description', 'steps'
-                            .concat(Strings.ERROR_MESSAGE.NEGATIVE_NUMBER))
+                        assert.propertyVal(result.error[7], 'description', Strings.ERROR_MESSAGE.NEGATIVE_INTEGER
+                            .replace('{0}', 'steps'))
                         assert.propertyVal(result.error[8], 'message', Strings.ERROR_MESSAGE.INVALID_FIELDS)
                         assert.propertyVal(result.error[8], 'description', 'The names of the allowed levels are: ' +
                             'sedentary, lightly, fairly, very.')
@@ -562,22 +562,23 @@ describe('Services: PhysicalActivityService', () => {
                         assert.propertyVal(result.error[9], 'description', 'The levels array must have ' +
                             'values for the following levels: sedentary, lightly, fairly, very.')
                         assert.propertyVal(result.error[10], 'message', Strings.ERROR_MESSAGE.INVALID_FIELDS)
-                        assert.propertyVal(result.error[10], 'description', 'levels.duration'
-                            .concat(Strings.ERROR_MESSAGE.NEGATIVE_NUMBER))
+                        assert.propertyVal(result.error[10], 'description', Strings.ERROR_MESSAGE.NEGATIVE_INTEGER
+                            .replace('{0}', 'levels.duration'))
                         assert.propertyVal(result.error[11], 'message', Strings.ERROR_MESSAGE.REQUIRED_FIELDS)
-                        assert.propertyVal(result.error[11], 'description', 'heart_rate.average, ' +
-                            'heart_rate.out_of_range_zone, heart_rate.fat_burn_zone, heart_rate.cardio_zone, ' +
-                            'heart_rate.peak_zone'.concat(Strings.ERROR_MESSAGE.REQUIRED_FIELDS_DESC))
+                        assert.propertyVal(result.error[11], 'description', Strings.ERROR_MESSAGE.REQUIRED_FIELDS_DESC
+                            .replace('{0}', 'heart_rate.average, heart_rate.out_of_range_zone, ' +
+                                'heart_rate.fat_burn_zone, heart_rate.cardio_zone, ' +
+                                'heart_rate.peak_zone'))
                         assert.propertyVal(result.error[12], 'message', Strings.ERROR_MESSAGE.INVALID_FIELDS)
-                        assert.propertyVal(result.error[12], 'description', 'heart_rate.average'
-                            .concat(Strings.ERROR_MESSAGE.NEGATIVE_NUMBER))
+                        assert.propertyVal(result.error[12], 'description', Strings.ERROR_MESSAGE.INTEGER_GREATER_ZERO
+                            .replace('{0}', 'heart_rate.average'))
                         assert.propertyVal(result.error[13], 'message', Strings.ERROR_MESSAGE.REQUIRED_FIELDS)
-                        assert.propertyVal(result.error[13], 'description', 'heart_rate.fat_burn_zone.min, ' +
-                            'heart_rate.fat_burn_zone.max, heart_rate.fat_burn_zone.duration'
-                                .concat(Strings.ERROR_MESSAGE.REQUIRED_FIELDS_DESC))
+                        assert.propertyVal(result.error[13], 'description', Strings.ERROR_MESSAGE.REQUIRED_FIELDS_DESC
+                            .replace('{0}', 'heart_rate.fat_burn_zone.min, ' +
+                                'heart_rate.fat_burn_zone.max, heart_rate.fat_burn_zone.duration'))
                         assert.propertyVal(result.error[14], 'message', Strings.ERROR_MESSAGE.INVALID_FIELDS)
-                        assert.propertyVal(result.error[14], 'description', 'heart_rate.fat_burn_zone.duration'
-                            .concat(Strings.ERROR_MESSAGE.NEGATIVE_NUMBER))
+                        assert.propertyVal(result.error[14], 'description', Strings.ERROR_MESSAGE.NEGATIVE_INTEGER
+                            .replace('{0}', 'heart_rate.fat_burn_zone.duration'))
 
                         for (let i = 0; i < result.error.length; i++) {
                             assert.propertyVal(result.error[i], 'code', HttpStatus.BAD_REQUEST)
@@ -809,9 +810,9 @@ describe('Services: PhysicalActivityService', () => {
                 return activityService.updateByChild(incorrectActivity12)
                     .catch(err => {
                         assert.propertyVal(err, 'message', Strings.ERROR_MESSAGE.REQUIRED_FIELDS)
-                        assert.propertyVal(err, 'description', 'heart_rate.average, ' +
-                            'heart_rate.out_of_range_zone, heart_rate.fat_burn_zone, heart_rate.cardio_zone, ' +
-                            'heart_rate.peak_zone'.concat(Strings.ERROR_MESSAGE.REQUIRED_FIELDS_DESC))
+                        assert.propertyVal(err, 'description', Strings.ERROR_MESSAGE.REQUIRED_FIELDS_DESC
+                            .replace('{0}', 'heart_rate.average, heart_rate.out_of_range_zone, ' +
+                                'heart_rate.fat_burn_zone, heart_rate.cardio_zone, heart_rate.peak_zone'))
                     })
             })
         })
@@ -825,8 +826,8 @@ describe('Services: PhysicalActivityService', () => {
                 return activityService.updateByChild(incorrectActivity13)
                     .catch(err => {
                         assert.propertyVal(err, 'message', Strings.ERROR_MESSAGE.INVALID_FIELDS)
-                        assert.propertyVal(err, 'description', 'heart_rate.average'
-                            .concat(Strings.ERROR_MESSAGE.NEGATIVE_NUMBER))
+                        assert.propertyVal(err, 'description', Strings.ERROR_MESSAGE.INTEGER_GREATER_ZERO
+                            .replace('{0}', 'heart_rate.average'))
                     })
             })
         })
@@ -840,9 +841,9 @@ describe('Services: PhysicalActivityService', () => {
                 return activityService.updateByChild(incorrectActivity14)
                     .catch(err => {
                         assert.propertyVal(err, 'message', Strings.ERROR_MESSAGE.REQUIRED_FIELDS)
-                        assert.propertyVal(err, 'description', 'heart_rate.fat_burn_zone.min, ' +
-                            'heart_rate.fat_burn_zone.max, heart_rate.fat_burn_zone.duration'
-                                .concat(Strings.ERROR_MESSAGE.REQUIRED_FIELDS_DESC))
+                        assert.propertyVal(err, 'description', Strings.ERROR_MESSAGE.REQUIRED_FIELDS_DESC
+                            .replace('{0}', 'heart_rate.fat_burn_zone.min, ' +
+                                'heart_rate.fat_burn_zone.max, heart_rate.fat_burn_zone.duration'))
                     })
             })
         })
@@ -857,8 +858,8 @@ describe('Services: PhysicalActivityService', () => {
                 return activityService.updateByChild(incorrectActivity15)
                     .catch(err => {
                         assert.propertyVal(err, 'message', Strings.ERROR_MESSAGE.INVALID_FIELDS)
-                        assert.propertyVal(err, 'description', 'heart_rate.fat_burn_zone.duration'
-                            .concat(Strings.ERROR_MESSAGE.NEGATIVE_NUMBER))
+                        assert.propertyVal(err, 'description', Strings.ERROR_MESSAGE.NEGATIVE_INTEGER
+                            .replace('{0}', 'heart_rate.fat_burn_zone.duration'))
                     })
             })
         })

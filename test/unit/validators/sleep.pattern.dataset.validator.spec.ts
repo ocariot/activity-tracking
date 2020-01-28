@@ -95,7 +95,8 @@ describe('Validators: SleepPatternDataSetValidator', () => {
                     SleepPatternDataSetValidator.validate(dataSet, SleepType.CLASSIC)
                 } catch (err) {
                     assert.equal(err.message, Strings.ERROR_MESSAGE.REQUIRED_FIELDS)
-                    assert.equal(err.description, 'pattern.data_set.start_time'.concat(Strings.ERROR_MESSAGE.REQUIRED_FIELDS_DESC))
+                    assert.equal(err.description, Strings.ERROR_MESSAGE.REQUIRED_FIELDS_DESC
+                        .replace('{0}', 'pattern.data_set.start_time'))
                 }
                 dataSetItem.start_time = new Date('2018-08-18T01:30:30Z')
             })
@@ -114,8 +115,9 @@ describe('Validators: SleepPatternDataSetValidator', () => {
                     SleepPatternDataSetValidator.validate(dataSet, SleepType.CLASSIC)
                 } catch (err) {
                     assert.equal(err.message, Strings.ERROR_MESSAGE.REQUIRED_FIELDS)
-                    assert.equal(err.description, 'pattern.data_set.start_time, pattern.data_set.name, ' +
-                        'pattern.data_set.duration'.concat(Strings.ERROR_MESSAGE.REQUIRED_FIELDS_DESC))
+                    assert.equal(err.description, Strings.ERROR_MESSAGE.REQUIRED_FIELDS_DESC
+                        .replace('{0}', 'pattern.data_set.start_time, pattern.data_set.name, ' +
+                            'pattern.data_set.duration'))
                 }
                 dataSetItem.start_time = new Date('2018-08-18T01:30:30Z')
                 dataSetItem.name = PhasesPatternType.RESTLESS
@@ -130,7 +132,8 @@ describe('Validators: SleepPatternDataSetValidator', () => {
                     SleepPatternDataSetValidator.validate(dataSet, SleepType.CLASSIC)
                 } catch (err) {
                     assert.equal(err.message, Strings.ERROR_MESSAGE.INVALID_FIELDS)
-                    assert.equal(err.description, 'pattern.data_set.duration'.concat(Strings.ERROR_MESSAGE.NEGATIVE_NUMBER))
+                    assert.equal(err.description, Strings.ERROR_MESSAGE.NEGATIVE_INTEGER
+                        .replace('{0}', 'pattern.data_set.duration'))
                 }
                 dataSetItem.duration = Math.floor(Math.random() * 5 + 1) * 60000 // 1-5min milliseconds
             })

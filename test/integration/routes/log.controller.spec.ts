@@ -369,9 +369,11 @@ describe('Routes: children.logs', () => {
                             replace('{0}', '20199-03-18'))
                             expect(res.body.error[1].description).to.eql(Strings.ERROR_MESSAGE.INVALID_DATE_FORMAT_DESC)
                             expect(res.body.error[2].message).to.eql(Strings.ERROR_MESSAGE.INVALID_FIELDS)
-                            expect(res.body.error[2].description).to.eql('value'.concat(Strings.ERROR_MESSAGE.NEGATIVE_NUMBER))
+                            expect(res.body.error[2].description).to.eql(Strings.ERROR_MESSAGE.NEGATIVE_NUMBER
+                                .replace('{0}', 'value'))
                             expect(res.body.error[3].message).to.eql(Strings.ERROR_MESSAGE.INVALID_FIELDS)
-                            expect(res.body.error[3].description).to.eql('value'.concat(Strings.ERROR_MESSAGE.INVALID_NUMBER))
+                            expect(res.body.error[3].description).to.eql(Strings.ERROR_MESSAGE.NEGATIVE_NUMBER
+                                .replace('{0}', 'value'))
 
                             for (let i = 0; i < res.body.error.length; i++) {
                                 expect(res.body.error[i].code).to.eql(HttpStatus.BAD_REQUEST)
@@ -500,8 +502,8 @@ describe('Routes: children.logs', () => {
                             }
                             expect(res.body.error[0].code).to.eql(HttpStatus.BAD_REQUEST)
                             expect(res.body.error[0].message).to.eql(Strings.ERROR_MESSAGE.REQUIRED_FIELDS)
-                            expect(res.body.error[0].description).to.eql('date, value'
-                                .concat(Strings.ERROR_MESSAGE.REQUIRED_FIELDS_DESC))
+                            expect(res.body.error[0].description).to.eql(Strings.ERROR_MESSAGE.REQUIRED_FIELDS_DESC
+                                .replace('{0}', 'date, value'))
                         })
                 })
         })

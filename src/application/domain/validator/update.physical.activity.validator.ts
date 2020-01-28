@@ -4,7 +4,8 @@ import { ObjectIdValidator } from './object.id.validator'
 import { Strings } from '../../../utils/strings'
 import { PhysicalActivityHeartRateValidator } from './physical.activity.heart.rate.validator'
 import { StringValidator } from './string.validator'
-import { NumberValidator } from './number.validator'
+import { NumberPositiveValidator } from './number.positive.validator'
+import { IntegerPositiveValidator } from './integer.positive.validator'
 
 export class UpdatePhysicalActivityValidator {
     public static validate(physicalActivity: PhysicalActivity): void | ValidationException {
@@ -30,11 +31,11 @@ export class UpdatePhysicalActivityValidator {
 
         if (physicalActivity.name !== undefined) StringValidator.validate(physicalActivity.name, 'name')
 
-        if (physicalActivity.calories !== undefined) NumberValidator.validate(physicalActivity.calories, 'calories')
+        if (physicalActivity.calories !== undefined) NumberPositiveValidator.validate(physicalActivity.calories, 'calories')
 
-        if (physicalActivity.steps !== undefined) NumberValidator.validate(physicalActivity.steps, 'steps')
+        if (physicalActivity.steps !== undefined) IntegerPositiveValidator.validate(physicalActivity.steps, 'steps')
 
-        if (physicalActivity.distance !== undefined) NumberValidator.validate(physicalActivity.distance, 'distance')
+        if (physicalActivity.distance !== undefined) NumberPositiveValidator.validate(physicalActivity.distance, 'distance')
 
         if (physicalActivity.levels && physicalActivity.levels.length) {
             throw new ValidationException(Strings.ERROR_MESSAGE.UNABLE_UPDATE, Strings.ERROR_MESSAGE.UNABLE_UPDATE_DESC)

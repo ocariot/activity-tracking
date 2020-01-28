@@ -30,7 +30,8 @@ describe('Validators: CreateEnvironmentValidator', () => {
                     CreateEnvironmentValidator.validate(environment)
                 } catch (err) {
                     assert.equal(err.message, Strings.ERROR_MESSAGE.REQUIRED_FIELDS)
-                    assert.equal(err.description, 'institution_id'.concat(Strings.ERROR_MESSAGE.REQUIRED_FIELDS_DESC))
+                    assert.equal(err.description, Strings.ERROR_MESSAGE.REQUIRED_FIELDS_DESC
+                        .replace('{0}', 'institution_id'))
                 }
             })
         })
@@ -44,8 +45,8 @@ describe('Validators: CreateEnvironmentValidator', () => {
                     CreateEnvironmentValidator.validate(environment)
                 } catch (err) {
                     assert.equal(err.message, Strings.ERROR_MESSAGE.REQUIRED_FIELDS)
-                    assert.equal(err.description, 'timestamp, institution_id, location, measurements'
-                        .concat(Strings.ERROR_MESSAGE.REQUIRED_FIELDS_DESC))
+                    assert.equal(err.description, Strings.ERROR_MESSAGE.REQUIRED_FIELDS_DESC
+                        .replace('{0}', 'timestamp, institution_id, location, measurements'))
                 }
             })
         })
@@ -76,8 +77,8 @@ describe('Validators: CreateEnvironmentValidator', () => {
                     CreateEnvironmentValidator.validate(environment)
                 } catch (err) {
                     assert.equal(err.message, Strings.ERROR_MESSAGE.REQUIRED_FIELDS)
-                    assert.equal(err.description, 'location.local, location.room'
-                        .concat(Strings.ERROR_MESSAGE.REQUIRED_FIELDS_DESC))
+                    assert.equal(err.description, Strings.ERROR_MESSAGE.REQUIRED_FIELDS_DESC
+                        .replace('{0}', 'location.local, location.room'))
                 }
                 environment.location.local = local_aux
                 environment.location.room = room_aux
@@ -121,7 +122,8 @@ describe('Validators: CreateEnvironmentValidator', () => {
                     CreateEnvironmentValidator.validate(environment)
                 } catch (err) {
                     assert.equal(err.message, Strings.ERROR_MESSAGE.REQUIRED_FIELDS)
-                    assert.equal(err.description, 'measurements.unit'.concat(Strings.ERROR_MESSAGE.REQUIRED_FIELDS_DESC))
+                    assert.equal(err.description, Strings.ERROR_MESSAGE.REQUIRED_FIELDS_DESC
+                        .replace('{0}', 'measurements.unit'))
                 }
                 environment.measurements = measurements_aux
             })
@@ -134,8 +136,8 @@ describe('Validators: CreateEnvironmentValidator', () => {
                     CreateEnvironmentValidator.validate(environment)
                 } catch (err) {
                     assert.equal(err.message, Strings.ERROR_MESSAGE.REQUIRED_FIELDS)
-                    assert.equal(err.description, 'measurements.type, measurements.value, measurements.unit'
-                        .concat(Strings.ERROR_MESSAGE.REQUIRED_FIELDS_DESC))
+                    assert.equal(err.description, Strings.ERROR_MESSAGE.REQUIRED_FIELDS_DESC
+                        .replace('{0}', 'measurements.type, measurements.value, measurements.unit'))
                 }
                 environment.measurements = measurements_aux
             })

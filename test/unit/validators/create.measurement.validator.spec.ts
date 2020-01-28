@@ -22,7 +22,8 @@ describe('Validators: CreateMeasurementValidator', () => {
                     CreateMeasurementValidator.validate(measurement)
                 } catch (err) {
                     assert.equal(err.message, Strings.ERROR_MESSAGE.REQUIRED_FIELDS)
-                    assert.equal(err.description, 'type'.concat(Strings.ERROR_MESSAGE.REQUIRED_FIELDS_DESC))
+                    assert.equal(err.description, Strings.ERROR_MESSAGE.REQUIRED_FIELDS_DESC
+                        .replace('{0}', 'type'))
                 }
             })
         })
@@ -37,8 +38,8 @@ describe('Validators: CreateMeasurementValidator', () => {
                     CreateMeasurementValidator.validate(measurement)
                 } catch (err) {
                     assert.equal(err.message, Strings.ERROR_MESSAGE.REQUIRED_FIELDS)
-                    assert.equal(err.description, 'type, timestamp, value, unit, child_id'
-                        .concat(Strings.ERROR_MESSAGE.REQUIRED_FIELDS_DESC))
+                    assert.equal(err.description, Strings.ERROR_MESSAGE.REQUIRED_FIELDS_DESC
+                        .replace('{0}', 'type, timestamp, value, unit, child_id'))
                 }
             })
         })

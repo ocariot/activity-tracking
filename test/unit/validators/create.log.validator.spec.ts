@@ -21,7 +21,8 @@ describe('Validators: CreateLogValidator', () => {
                     CreateLogValidator.validate(log)
                 } catch (err) {
                     assert.equal(err.message, Strings.ERROR_MESSAGE.REQUIRED_FIELDS)
-                    assert.equal(err.description, 'type'.concat(Strings.ERROR_MESSAGE.REQUIRED_FIELDS_DESC))
+                    assert.equal(err.description, Strings.ERROR_MESSAGE.REQUIRED_FIELDS_DESC
+                        .replace('{0}', 'type'))
                 }
             })
         })
@@ -35,8 +36,8 @@ describe('Validators: CreateLogValidator', () => {
                     CreateLogValidator.validate(log)
                 } catch (err) {
                     assert.equal(err.message, Strings.ERROR_MESSAGE.REQUIRED_FIELDS)
-                    assert.equal(err.description, 'type, date, value, child_id'
-                        .concat(Strings.ERROR_MESSAGE.REQUIRED_FIELDS_DESC))
+                    assert.equal(err.description, Strings.ERROR_MESSAGE.REQUIRED_FIELDS_DESC
+                        .replace('{0}', 'type, date, value, child_id'))
                 }
             })
         })
@@ -82,7 +83,8 @@ describe('Validators: CreateLogValidator', () => {
                     CreateLogValidator.validate(logTest)
                 } catch (err) {
                     assert.equal(err.message, Strings.ERROR_MESSAGE.INVALID_FIELDS)
-                    assert.equal(err.description, 'value'.concat(Strings.ERROR_MESSAGE.INVALID_NUMBER))
+                    assert.equal(err.description, Strings.ERROR_MESSAGE.NEGATIVE_NUMBER
+                        .replace('{0}', 'value'))
                 }
             })
         })
@@ -120,7 +122,8 @@ describe('Validators: CreateLogValidator', () => {
                     CreateLogValidator.validate(log)
                 } catch (err) {
                     assert.equal(err.message, Strings.ERROR_MESSAGE.INVALID_FIELDS)
-                    assert.equal(err.description, 'value'.concat(Strings.ERROR_MESSAGE.NEGATIVE_NUMBER))
+                    assert.equal(err.description, Strings.ERROR_MESSAGE.NEGATIVE_NUMBER
+                        .replace('{0}', 'value'))
                 }
                 log.value = 1000
             })

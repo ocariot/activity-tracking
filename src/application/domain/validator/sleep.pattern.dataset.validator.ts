@@ -2,7 +2,7 @@ import { ValidationException } from '../exception/validation.exception'
 import { PhasesPatternType, SleepPatternDataSet, StagesPatternType } from '../model/sleep.pattern.data.set'
 import { Strings } from '../../../utils/strings'
 import { SleepType } from '../model/sleep'
-import { NumberValidator } from './number.validator'
+import { IntegerPositiveValidator } from './integer.positive.validator'
 
 export class SleepPatternDataSetValidator {
     public static validate(dataset: Array<SleepPatternDataSet>, sleepType: SleepType): void | ValidationException {
@@ -27,12 +27,12 @@ export class SleepPatternDataSetValidator {
                         'The names of the allowed data_set patterns are: '.concat(stagesPatternTypes.join(', ').concat('.')))
             }
             if (data.duration === undefined) fields.push('pattern.data_set.duration')
-            else NumberValidator.validate(data.duration, 'pattern.data_set.duration')
+            else IntegerPositiveValidator.validate(data.duration, 'pattern.data_set.duration')
         })
 
         if (fields.length > 0) {
             throw new ValidationException(Strings.ERROR_MESSAGE.REQUIRED_FIELDS,
-                fields.join(', ').concat(Strings.ERROR_MESSAGE.REQUIRED_FIELDS_DESC))
+                Strings.ERROR_MESSAGE.REQUIRED_FIELDS_DESC.replace('{0}', fields.join(', ')))
         }
     }
 }

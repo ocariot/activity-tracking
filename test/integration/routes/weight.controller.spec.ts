@@ -259,7 +259,8 @@ describe('Routes: children.weights', () => {
                     .then(err => {
                         expect(err.body.code).to.eql(400)
                         expect(err.body.message).to.eql(Strings.ERROR_MESSAGE.REQUIRED_FIELDS)
-                        expect(err.body.description).to.eql('timestamp, value, unit'.concat(Strings.ERROR_MESSAGE.REQUIRED_FIELDS_DESC))
+                        expect(err.body.description).to.eql(Strings.ERROR_MESSAGE.REQUIRED_FIELDS_DESC
+                            .replace('{0}', 'timestamp, value, unit'))
                     })
             })
         })
@@ -303,7 +304,8 @@ describe('Routes: children.weights', () => {
                     .then(err => {
                         expect(err.body.code).to.eql(400)
                         expect(err.body.message).to.eql(Strings.ERROR_MESSAGE.INVALID_FIELDS)
-                        expect(err.body.description).to.eql('value'.concat(Strings.ERROR_MESSAGE.INVALID_NUMBER))
+                        expect(err.body.description).to.eql(Strings.ERROR_MESSAGE.NEGATIVE_NUMBER
+                            .replace('{0}', 'value'))
                     })
             })
         })
@@ -325,7 +327,8 @@ describe('Routes: children.weights', () => {
                     .then(err => {
                         expect(err.body.code).to.eql(400)
                         expect(err.body.message).to.eql(Strings.ERROR_MESSAGE.INVALID_FIELDS)
-                        expect(err.body.description).to.eql('value'.concat(Strings.ERROR_MESSAGE.NEGATIVE_NUMBER))
+                        expect(err.body.description).to.eql(Strings.ERROR_MESSAGE.NEGATIVE_NUMBER
+                            .replace('{0}', 'value'))
                     })
             })
         })
@@ -347,7 +350,8 @@ describe('Routes: children.weights', () => {
                     .then(err => {
                         expect(err.body.code).to.eql(400)
                         expect(err.body.message).to.eql(Strings.ERROR_MESSAGE.INVALID_FIELDS)
-                        expect(err.body.description).to.eql('unit'.concat(Strings.ERROR_MESSAGE.EMPTY_STRING))
+                        expect(err.body.description).to.eql(Strings.ERROR_MESSAGE.EMPTY_STRING
+                            .replace('{0}', 'unit'))
                     })
             })
         })
@@ -369,7 +373,8 @@ describe('Routes: children.weights', () => {
                     .then(err => {
                         expect(err.body.code).to.eql(400)
                         expect(err.body.message).to.eql(Strings.ERROR_MESSAGE.INVALID_FIELDS)
-                        expect(err.body.description).to.eql('unit'.concat(Strings.ERROR_MESSAGE.INVALID_STRING))
+                        expect(err.body.description).to.eql(Strings.ERROR_MESSAGE.INVALID_STRING
+                            .replace('{0}', 'unit'))
                     })
             })
         })
@@ -413,7 +418,8 @@ describe('Routes: children.weights', () => {
                     .then(err => {
                         expect(err.body.code).to.eql(400)
                         expect(err.body.message).to.eql(Strings.ERROR_MESSAGE.INVALID_FIELDS)
-                        expect(err.body.description).to.eql('body_fat'.concat(Strings.ERROR_MESSAGE.INVALID_NUMBER))
+                        expect(err.body.description).to.eql(Strings.ERROR_MESSAGE.NEGATIVE_NUMBER
+                            .replace('{0}', 'body_fat'))
                     })
             })
         })
@@ -435,7 +441,8 @@ describe('Routes: children.weights', () => {
                     .then(err => {
                         expect(err.body.code).to.eql(400)
                         expect(err.body.message).to.eql(Strings.ERROR_MESSAGE.INVALID_FIELDS)
-                        expect(err.body.description).to.eql('body_fat'.concat(Strings.ERROR_MESSAGE.NEGATIVE_NUMBER))
+                        expect(err.body.description).to.eql(Strings.ERROR_MESSAGE.NEGATIVE_NUMBER
+                            .replace('{0}', 'body_fat'))
                     })
             })
         })
@@ -591,8 +598,8 @@ describe('Routes: children.weights', () => {
                         // Error item
                         expect(res.body.error[0].code).to.eql(HttpStatus.BAD_REQUEST)
                         expect(res.body.error[0].message).to.eql(Strings.ERROR_MESSAGE.REQUIRED_FIELDS)
-                        expect(res.body.error[0].description).to.eql('timestamp, value, unit'
-                            .concat(Strings.ERROR_MESSAGE.REQUIRED_FIELDS_DESC))
+                        expect(res.body.error[0].description).to.eql(Strings.ERROR_MESSAGE.REQUIRED_FIELDS_DESC
+                            .replace('{0}', 'timestamp, value, unit'))
                     })
             })
         })
@@ -627,8 +634,8 @@ describe('Routes: children.weights', () => {
                     .expect(207)
                     .then(res => {
                         expect(res.body.error[0].message).to.eql(Strings.ERROR_MESSAGE.REQUIRED_FIELDS)
-                        expect(res.body.error[0].description).to.eql('timestamp, value, unit'
-                            .concat(Strings.ERROR_MESSAGE.REQUIRED_FIELDS_DESC))
+                        expect(res.body.error[0].description).to.eql(Strings.ERROR_MESSAGE.REQUIRED_FIELDS_DESC
+                            .replace('{0}', 'timestamp, value, unit'))
                         expect(res.body.error[1].message).to.eql(Strings.ERROR_MESSAGE.INVALID_DATETIME_FORMAT.
                         replace('{0}', 'null'))
                         expect(res.body.error[1].description).to.eql(Strings.ERROR_MESSAGE.INVALID_DATETIME_FORMAT_DESC)

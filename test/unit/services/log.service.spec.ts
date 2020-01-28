@@ -196,8 +196,8 @@ describe('Services: Log', () => {
 
                         assert.propertyVal(result.error[0], 'message',
                             Strings.ERROR_MESSAGE.INVALID_FIELDS)
-                        assert.propertyVal(result.error[0], 'description', 'value'
-                            .concat(Strings.ERROR_MESSAGE.NEGATIVE_NUMBER))
+                        assert.propertyVal(result.error[0], 'description', Strings.ERROR_MESSAGE.NEGATIVE_NUMBER
+                            .replace('{0}', 'value'))
                         assert.propertyVal(result.error[1], 'message',
                             Strings.ERROR_MESSAGE.INVALID_FIELDS)
                         assert.propertyVal(result.error[1], 'description',
@@ -276,7 +276,8 @@ describe('Services: Log', () => {
                         assert.propertyVal(result.error[0], 'message',
                             Strings.ERROR_MESSAGE.REQUIRED_FIELDS)
                         assert.propertyVal(result.error[0], 'description',
-                            'type, date, value, child_id'.concat(Strings.ERROR_MESSAGE.REQUIRED_FIELDS_DESC))
+                            Strings.ERROR_MESSAGE.REQUIRED_FIELDS_DESC
+                                .replace('{0}', 'type, date, value, child_id'))
                         assert.propertyVal(result.error[1], 'message',
                             Strings.ERROR_MESSAGE.INVALID_FIELDS)
                         assert.propertyVal(result.error[1], 'description',
