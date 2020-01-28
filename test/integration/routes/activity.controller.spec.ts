@@ -474,8 +474,7 @@ describe('Routes: children.physicalactivities', () => {
                     .then(err => {
                         expect(err.body.code).to.eql(400)
                         expect(err.body.message).to.eql(Strings.ERROR_MESSAGE.INVALID_FIELDS)
-                        expect(err.body.description).to.eql('The end_time parameter can not contain an older date ' +
-                            'than that the start_time parameter!')
+                        expect(err.body.description).to.eql(Strings.ERROR_MESSAGE.INVALID_START_TIME)
                     })
             })
         })
@@ -529,8 +528,8 @@ describe('Routes: children.physicalactivities', () => {
                     .expect(400)
                     .then(err => {
                         expect(err.body.code).to.eql(400)
-                        expect(err.body.message).to.eql('Datetime: 2019-12-35T12:52:59Z'.concat(Strings.ERROR_MESSAGE.INVALID_DATE))
-                        expect(err.body.description).to.eql(Strings.ERROR_MESSAGE.INVALID_DATE_DESC)
+                        expect(err.body.message).to.eql(Strings.ERROR_MESSAGE.INVALID_DATETIME_FORMAT.
+                        replace('{0}', '2019-12-35T12:52:59Z'))
                     })
             })
         })
@@ -1559,8 +1558,7 @@ describe('Routes: children.physicalactivities', () => {
                         expect(res.body.error[1].description).to.eql('name, calories'
                             .concat(Strings.ERROR_MESSAGE.REQUIRED_FIELDS_DESC))
                         expect(res.body.error[2].message).to.eql(Strings.ERROR_MESSAGE.INVALID_FIELDS)
-                        expect(res.body.error[2].description).to.eql('The end_time parameter can not contain an ' +
-                            'older date than that the start_time parameter!')
+                        expect(res.body.error[2].description).to.eql(Strings.ERROR_MESSAGE.INVALID_START_TIME)
                         expect(res.body.error[3].message).to.eql(Strings.ERROR_MESSAGE.INVALID_FIELDS)
                         expect(res.body.error[3].description).to.eql('duration value does not match values passed ' +
                             'in start_time and end_time parameters!')
@@ -1592,8 +1590,9 @@ describe('Routes: children.physicalactivities', () => {
                         expect(res.body.error[13].message).to.eql(Strings.ERROR_MESSAGE.INVALID_FIELDS)
                         expect(res.body.error[13].description).to.eql('heart_rate.fat_burn_zone.duration'
                             .concat(Strings.ERROR_MESSAGE.NEGATIVE_NUMBER))
-                        expect(res.body.error[14].message).to.eql('Datetime: null'.concat(Strings.ERROR_MESSAGE.INVALID_DATE))
-                        expect(res.body.error[14].description).to.eql(Strings.ERROR_MESSAGE.INVALID_DATE_DESC)
+                        expect(res.body.error[14].message).to.eql(Strings.ERROR_MESSAGE.INVALID_DATETIME_FORMAT.
+                        replace('{0}', 'null'))
+                        expect(res.body.error[14].description).to.eql(Strings.ERROR_MESSAGE.INVALID_DATETIME_FORMAT_DESC)
 
                         for (let i = 0; i < res.body.error.length; i++) {
                             expect(res.body.error[i].code).to.eql(HttpStatus.BAD_REQUEST)

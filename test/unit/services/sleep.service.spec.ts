@@ -238,8 +238,7 @@ describe('Services: SleepService', () => {
                 return sleepService.add(incorrectSleep)
                     .catch(err => {
                         assert.propertyVal(err, 'message', Strings.ERROR_MESSAGE.INVALID_FIELDS)
-                        assert.propertyVal(err, 'description', 'The end_time parameter can not contain ' +
-                            'an older date than that the start_time parameter!')
+                        assert.propertyVal(err, 'description', Strings.ERROR_MESSAGE.INVALID_START_TIME)
                     })
             })
         })
@@ -510,8 +509,7 @@ describe('Services: SleepService', () => {
                         assert.propertyVal(result.error[1], 'description', 'type, pattern'
                             .concat(Strings.ERROR_MESSAGE.REQUIRED_FIELDS_DESC))
                         assert.propertyVal(result.error[2], 'message', Strings.ERROR_MESSAGE.INVALID_FIELDS)
-                        assert.propertyVal(result.error[2], 'description', 'The end_time parameter ' +
-                            'can not contain an older date than that the start_time parameter!')
+                        assert.propertyVal(result.error[2], 'description', Strings.ERROR_MESSAGE.INVALID_START_TIME)
                         assert.propertyVal(result.error[3], 'message', Strings.ERROR_MESSAGE.INVALID_FIELDS)
                         assert.propertyVal(result.error[3], 'description', 'duration value does ' +
                             'not match values passed in start_time and end_time parameters!')

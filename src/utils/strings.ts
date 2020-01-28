@@ -62,8 +62,15 @@ export abstract class Strings {
         INVALID_FIELDS: 'One or more request fields are invalid...',
         INVALID_STRING: ' must be a string!',
         EMPTY_STRING: ' must have at least one character!',
-        INVALID_DATE: ', is not in valid ISO 8601 format.',
-        INVALID_DATE_DESC: 'Date must be in the format: yyyy-MM-dd\'T\'HH:mm:ssZ',
+        INVALID_START_TIME: 'The end_time parameter can not contain an older date than that the start_time parameter!',
+        YEAR_NOT_ALLOWED: 'Date {0} has year not allowed. The year must be greater than 1678 and less than 2261.',
+        INVALID_DATE_FORMAT: 'Date: {0}, is not in valid ISO 8601 format.',
+        INVALID_DATE_FORMAT_DESC: 'Date must be in the format: yyyy-MM-dd',
+        INVALID_DATETIME_FORMAT: 'Datetime: {0}, is not in valid ISO 8601 format.',
+        INVALID_DATETIME_FORMAT_DESC: 'Datetime must be in the format: yyyy-MM-ddTHH:mm:ssZ',
+        DATE_RANGE_INVALID: 'The interval between dates {0} and {1} is invalid!',
+        DATE_RANGE_INVALID_DESC: 'The date_end parameter can not contain an older date than that the date_start parameter!',
+        DATE_RANGE_EXCEED_YEAR_DESC: 'The period between the received dates can not exceed one year!',
         REPO_CREATE_CONFLICT: 'A registration with the same unique data already exists!'
     }
 }

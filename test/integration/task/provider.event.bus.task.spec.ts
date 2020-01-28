@@ -576,7 +576,8 @@ describe('PROVIDER EVENT BUS TASK', () => {
                         expect(result[0].child_id).to.eql(sleep.child_id)
                         let index = 0
                         for (const elem of sleep.pattern!.data_set) {
-                            expect(result[0].pattern.data_set[index].start_time).to.eql(elem.start_time.toISOString())
+                            expect(result[0].pattern.data_set[index].start_time)
+                                .to.eql(elem.start_time.toISOString().substr(0, 19))
                             expect(result[0].pattern.data_set[index].name).to.eql(elem.name)
                             expect(result[0].pattern.data_set[index].duration).to.eql(elem.duration)
                             index++
@@ -1651,7 +1652,7 @@ describe('PROVIDER EVENT BUS TASK', () => {
                     .catch((err) => {
                         try {
                             expect(err.message).to.eql('Error: '
-                                .concat('Datetime: invalidDateStart'.concat(Strings.ERROR_MESSAGE.INVALID_DATE)))
+                                .concat(Strings.ERROR_MESSAGE.INVALID_DATE_FORMAT.replace('{0}', 'invalidDateStart')))
                             done()
                         } catch (err) {
                             done(err)

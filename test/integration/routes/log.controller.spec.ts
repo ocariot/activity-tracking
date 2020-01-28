@@ -363,10 +363,11 @@ describe('Routes: children.logs', () => {
                                 expect(res.body.success[i].item.value).to.eql(mixedLogsArr[i].value)
                             }
 
-                            expect(res.body.error[0].message).to.eql('Datetime: 2019-03-35'.concat(Strings.ERROR_MESSAGE.INVALID_DATE))
-                            expect(res.body.error[0].description).to.eql('Date must be in the format: yyyy-MM-dd')
-                            expect(res.body.error[1].message).to.eql('Datetime: 20199-03-18'.concat(Strings.ERROR_MESSAGE.INVALID_DATE))
-                            expect(res.body.error[1].description).to.eql('Date must be in the format: yyyy-MM-dd')
+                            expect(res.body.error[0].message).to.eql(Strings.ERROR_MESSAGE.INVALID_DATE_FORMAT.
+                            replace('{0}', '2019-03-35'))
+                            expect(res.body.error[1].message).to.eql(Strings.ERROR_MESSAGE.INVALID_DATE_FORMAT.
+                            replace('{0}', '20199-03-18'))
+                            expect(res.body.error[1].description).to.eql(Strings.ERROR_MESSAGE.INVALID_DATE_FORMAT_DESC)
                             expect(res.body.error[2].message).to.eql(Strings.ERROR_MESSAGE.INVALID_FIELDS)
                             expect(res.body.error[2].description).to.eql('value'.concat(Strings.ERROR_MESSAGE.NEGATIVE_NUMBER))
                             expect(res.body.error[3].message).to.eql(Strings.ERROR_MESSAGE.INVALID_FIELDS)
@@ -629,8 +630,9 @@ describe('Routes: children.logs', () => {
                     .expect(400)
                     .then(err => {
                         expect(err.body.code).to.eql(400)
-                        expect(err.body.message).to.eql('Datetime: 20199-10-01'.concat(Strings.ERROR_MESSAGE.INVALID_DATE))
-                        expect(err.body.description).to.eql('Date must be in the format: yyyy-MM-dd')
+                        expect(err.body.message).to.eql(Strings.ERROR_MESSAGE.INVALID_DATE_FORMAT.
+                        replace('{0}', '20199-10-01'))
+                        expect(err.body.description).to.eql(Strings.ERROR_MESSAGE.INVALID_DATE_FORMAT_DESC)
                     })
             })
         })
@@ -654,8 +656,9 @@ describe('Routes: children.logs', () => {
                     .expect(400)
                     .then(err => {
                         expect(err.body.code).to.eql(400)
-                        expect(err.body.message).to.eql('Datetime: 20199-10-01'.concat(Strings.ERROR_MESSAGE.INVALID_DATE))
-                        expect(err.body.description).to.eql('Date must be in the format: yyyy-MM-dd')
+                        expect(err.body.message).to.eql(Strings.ERROR_MESSAGE.INVALID_DATE_FORMAT.
+                        replace('{0}', '20199-10-01'))
+                        expect(err.body.description).to.eql(Strings.ERROR_MESSAGE.INVALID_DATE_FORMAT_DESC)
                     })
             })
         })
@@ -679,8 +682,8 @@ describe('Routes: children.logs', () => {
                     .expect(400)
                     .then(err => {
                         expect(err.body.code).to.eql(400)
-                        expect(err.body.message).to.eql('Datetime: 2019-10-35'.concat(Strings.ERROR_MESSAGE.INVALID_DATE))
-                        expect(err.body.description).to.eql('Date must be in the format: yyyy-MM-dd')
+                        expect(err.body.message).to.eql(Strings.ERROR_MESSAGE.INVALID_DATE_FORMAT.
+                        replace('{0}', '2019-10-35'))
                     })
             })
         })
@@ -704,9 +707,9 @@ describe('Routes: children.logs', () => {
                     .expect(400)
                     .then(err => {
                         expect(err.body.code).to.eql(400)
-                        expect(err.body.message).to.eql('Date range is invalid...')
-                        expect(err.body.description).to.eql('The period between the received dates can not ' +
-                            'exceed one year!')
+                        expect(err.body.message).to.eql(Strings.ERROR_MESSAGE.DATE_RANGE_INVALID
+                            .replace('{0}', '2018-03-18').replace('{1}', '2019-03-27'))
+                        expect(err.body.description).to.eql(Strings.ERROR_MESSAGE.DATE_RANGE_EXCEED_YEAR_DESC)
                     })
             })
         })
@@ -730,9 +733,9 @@ describe('Routes: children.logs', () => {
                     .expect(400)
                     .then(err => {
                         expect(err.body.code).to.eql(400)
-                        expect(err.body.message).to.eql('Date range is invalid...')
-                        expect(err.body.description).to.eql('The date_end parameter can not contain an older date ' +
-                            'than that the date_start parameter!')
+                        expect(err.body.message).to.eql(Strings.ERROR_MESSAGE.DATE_RANGE_INVALID
+                            .replace('{0}', '2018-03-18').replace('{1}', '2017-03-27'))
+                        expect(err.body.description).to.eql(Strings.ERROR_MESSAGE.DATE_RANGE_INVALID_DESC)
                     })
             })
         })
@@ -928,8 +931,9 @@ describe('Routes: children.logs', () => {
                     .expect(400)
                     .then(err => {
                         expect(err.body.code).to.eql(400)
-                        expect(err.body.message).to.eql('Datetime: 20199-10-01'.concat(Strings.ERROR_MESSAGE.INVALID_DATE))
-                        expect(err.body.description).to.eql('Date must be in the format: yyyy-MM-dd')
+                        expect(err.body.message).to.eql(Strings.ERROR_MESSAGE.INVALID_DATE_FORMAT.
+                        replace('{0}', '20199-10-01'))
+                        expect(err.body.description).to.eql(Strings.ERROR_MESSAGE.INVALID_DATE_FORMAT_DESC)
                     })
             })
         })
@@ -953,8 +957,8 @@ describe('Routes: children.logs', () => {
                     .expect(400)
                     .then(err => {
                         expect(err.body.code).to.eql(400)
-                        expect(err.body.message).to.eql('Datetime: 2019-10-35'.concat(Strings.ERROR_MESSAGE.INVALID_DATE))
-                        expect(err.body.description).to.eql('Date must be in the format: yyyy-MM-dd')
+                        expect(err.body.message).to.eql(Strings.ERROR_MESSAGE.INVALID_DATE_FORMAT.
+                        replace('{0}', '2019-10-35'))
                     })
             })
         })
@@ -978,8 +982,9 @@ describe('Routes: children.logs', () => {
                     .expect(400)
                     .then(err => {
                         expect(err.body.code).to.eql(400)
-                        expect(err.body.message).to.eql('Datetime: 20199-10-01'.concat(Strings.ERROR_MESSAGE.INVALID_DATE))
-                        expect(err.body.description).to.eql('Date must be in the format: yyyy-MM-dd')
+                        expect(err.body.message).to.eql(Strings.ERROR_MESSAGE.INVALID_DATE_FORMAT.
+                        replace('{0}', '20199-10-01'))
+                        expect(err.body.description).to.eql(Strings.ERROR_MESSAGE.INVALID_DATE_FORMAT_DESC)
                     })
             })
         })
@@ -1003,8 +1008,9 @@ describe('Routes: children.logs', () => {
                     .expect(400)
                     .then(err => {
                         expect(err.body.code).to.eql(400)
-                        expect(err.body.message).to.eql('Date range is invalid...')
-                        expect(err.body.description).to.eql('The period between the received dates can not exceed one year!')
+                        expect(err.body.message).to.eql(Strings.ERROR_MESSAGE.DATE_RANGE_INVALID
+                            .replace('{0}', '2018-03-18').replace('{1}', '2019-03-27'))
+                        expect(err.body.description).to.eql(Strings.ERROR_MESSAGE.DATE_RANGE_EXCEED_YEAR_DESC)
                     })
             })
         })

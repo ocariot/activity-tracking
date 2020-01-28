@@ -165,8 +165,8 @@ describe('Routes: children.bodyfats', () => {
                     .expect(400)
                     .then(err => {
                         expect(err.body.code).to.eql(400)
-                        expect(err.body.message).to.eql('Datetime: 2019-06-35T14:40:00Z'.concat(Strings.ERROR_MESSAGE.INVALID_DATE))
-                        expect(err.body.description).to.eql(Strings.ERROR_MESSAGE.INVALID_DATE_DESC)
+                        expect(err.body.message).to.eql(Strings.ERROR_MESSAGE.INVALID_DATETIME_FORMAT.
+                        replace('{0}', '2019-06-35T14:40:00Z'))
                     })
             })
         })
@@ -407,8 +407,9 @@ describe('Routes: children.bodyfats', () => {
                         expect(res.body.error[0].message).to.eql(Strings.ERROR_MESSAGE.REQUIRED_FIELDS)
                         expect(res.body.error[0].description).to.eql('timestamp, value'
                             .concat(Strings.ERROR_MESSAGE.REQUIRED_FIELDS_DESC))
-                        expect(res.body.error[1].message).to.eql('Datetime: null'.concat(Strings.ERROR_MESSAGE.INVALID_DATE))
-                        expect(res.body.error[1].description).to.eql(Strings.ERROR_MESSAGE.INVALID_DATE_DESC)
+                        expect(res.body.error[1].message).to.eql(Strings.ERROR_MESSAGE.INVALID_DATETIME_FORMAT.
+                        replace('{0}', 'null'))
+                        expect(res.body.error[1].description).to.eql(Strings.ERROR_MESSAGE.INVALID_DATETIME_FORMAT_DESC)
 
                         for (let i = 0; i < res.body.error.length; i++) {
                             expect(res.body.error[i].code).to.eql(HttpStatus.BAD_REQUEST)

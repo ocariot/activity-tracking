@@ -59,8 +59,7 @@ describe('Validators: CreateSleepValidator', () => {
                     CreateSleepValidator.validate(sleep)
                 } catch (err) {
                     assert.equal(err.message, Strings.ERROR_MESSAGE.INVALID_FIELDS)
-                    assert.equal(err.description, 'The end_time parameter can not contain an older date ' +
-                        'than that the start_time parameter!')
+                    assert.equal(err.description, Strings.ERROR_MESSAGE.INVALID_START_TIME)
                 }
             })
         })

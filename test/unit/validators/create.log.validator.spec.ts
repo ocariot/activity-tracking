@@ -103,8 +103,9 @@ describe('Validators: CreateLogValidator', () => {
                 try {
                     CreateLogValidator.validate(logTest)
                 } catch (err) {
-                    assert.equal(err.message, 'Datetime: 20199-03-11'.concat(Strings.ERROR_MESSAGE.INVALID_DATE))
-                    assert.equal(err.description, 'Date must be in the format: yyyy-MM-dd')
+                    assert.equal(err.message, Strings.ERROR_MESSAGE.INVALID_DATE_FORMAT
+                        .replace('{0}', '20199-03-11'))
+                    assert.equal(err.description, Strings.ERROR_MESSAGE.INVALID_DATE_FORMAT_DESC)
                 }
             })
         })

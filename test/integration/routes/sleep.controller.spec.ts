@@ -218,7 +218,7 @@ describe('Routes: children.sleep', () => {
                     .then(() => {
                         request
                             .post(`/v1/children/${defaultSleep.child_id}/sleep`)
-                            .send(body)
+                            .send(sleepToJSON(body))
                             .set('Content-Type', 'application/json')
                             .expect(201)
                             .then()
@@ -250,7 +250,7 @@ describe('Routes: children.sleep', () => {
 
                 return request
                     .post(`/v1/children/${defaultSleep.child_id}/sleep`)
-                    .send(body)
+                    .send(sleepToJSON(body))
                     .set('Content-Type', 'application/json')
                     .expect(201)
                     .then(res => {
@@ -376,8 +376,7 @@ describe('Routes: children.sleep', () => {
                     .then(err => {
                         expect(err.body.code).to.eql(400)
                         expect(err.body.message).to.eql(Strings.ERROR_MESSAGE.INVALID_FIELDS)
-                        expect(err.body.description).to.eql('The end_time parameter can not contain an older date ' +
-                            'than that the start_time parameter!')
+                        expect(err.body.description).to.eql(Strings.ERROR_MESSAGE.INVALID_START_TIME)
                     })
             })
         })
@@ -423,8 +422,8 @@ describe('Routes: children.sleep', () => {
                     .expect(400)
                     .then(err => {
                         expect(err.body.code).to.eql(400)
-                        expect(err.body.message).to.eql('Datetime: 2018-08-35T01:40:30Z'.concat(Strings.ERROR_MESSAGE.INVALID_DATE))
-                        expect(err.body.description).to.eql(Strings.ERROR_MESSAGE.INVALID_DATE_DESC)
+                        expect(err.body.message).to.eql(Strings.ERROR_MESSAGE.INVALID_DATETIME_FORMAT.
+                        replace('{0}', '2018-08-35T01:40:30Z'))
                     })
             })
         })
@@ -716,7 +715,7 @@ describe('Routes: children.sleep', () => {
                         pattern: sleep.pattern,
                         type: sleep.type
                     }
-                    body.push(bodyElem)
+                    body.push(sleepToJSON(bodyElem))
                 })
 
                 return request
@@ -791,7 +790,7 @@ describe('Routes: children.sleep', () => {
                         pattern: sleep.pattern,
                         type: sleep.type
                     }
-                    body.push(bodyElem)
+                    body.push(sleepToJSON(bodyElem))
                 })
 
                 return request
@@ -846,7 +845,7 @@ describe('Routes: children.sleep', () => {
                         pattern: sleep.pattern,
                         type: sleep.type
                     }
-                    body.push(bodyElem)
+                    body.push(sleepToJSON(bodyElem))
                 })
 
                 return request
@@ -914,7 +913,7 @@ describe('Routes: children.sleep', () => {
                         pattern: sleep.pattern,
                         type: sleep.type
                     }
-                    body.push(bodyElem)
+                    body.push(sleepToJSON(bodyElem))
                 })
 
                 return request
@@ -930,8 +929,7 @@ describe('Routes: children.sleep', () => {
                         expect(res.body.error[1].description).to.eql('type, pattern'
                             .concat(Strings.ERROR_MESSAGE.REQUIRED_FIELDS_DESC))
                         expect(res.body.error[2].message).to.eql(Strings.ERROR_MESSAGE.INVALID_FIELDS)
-                        expect(res.body.error[2].description).to.eql('The end_time parameter can not contain ' +
-                            'an older date than that the start_time parameter!')
+                        expect(res.body.error[2].description).to.eql(Strings.ERROR_MESSAGE.INVALID_START_TIME)
                         expect(res.body.error[3].message).to.eql(Strings.ERROR_MESSAGE.INVALID_FIELDS)
                         expect(res.body.error[3].description).to.eql('duration value does not match values ' +
                             'passed in start_time and end_time parameters!')
@@ -960,23 +958,32 @@ describe('Routes: children.sleep', () => {
                         expect(res.body.error[11].message).to.eql(Strings.ERROR_MESSAGE.INVALID_FIELDS)
                         expect(res.body.error[11].description).to.eql('The names of the allowed data_set patterns are: ' +
                             'deep, light, rem, awake.')
-                        expect(res.body.error[12].message).to.eql('Datetime: null'.concat(Strings.ERROR_MESSAGE.INVALID_DATE))
-                        expect(res.body.error[12].description).to.eql(Strings.ERROR_MESSAGE.INVALID_DATE_DESC)
+                        expect(res.body.error[12].message).to.eql(Strings.ERROR_MESSAGE.INVALID_DATETIME_FORMAT.
+                        replace('{0}', 'null'))
+                        expect(res.body.error[12].description).to.eql(Strings.ERROR_MESSAGE.INVALID_DATETIME_FORMAT_DESC)
 
                         for (let i = 0; i < res.body.error.length; i++) {
                             expect(res.body.error[i].code).to.eql(HttpStatus.BAD_REQUEST)
-                            if (res.body.error[i].item.start_time)
+                            if (res.body.error[i].item.start_time) {
+                                const dateToBeCompared = i !== 12
+                                    ? incorrectSleepArr[i].start_time!.toISOString().substr(0, 19)
+                                    : incorrectSleepArr[i].start_time!.toISOString()
                                 expect(res.body.error[i].item.start_time)
-                                    .to.eql(incorrectSleepArr[i].start_time!.toISOString().substr(0, 19))
-                            if (res.body.error[i].item.end_time)
+                                    .to.eql(dateToBeCompared)
+                            }
+                            if (res.body.error[i].item.end_time) {
                                 expect(res.body.error[i].item.end_time)
                                     .to.eql(incorrectSleepArr[i].end_time!.toISOString().substr(0, 19))
+                            }
                             expect(res.body.error[i].item.duration).to.eql(incorrectSleepArr[i].duration)
                             if (i !== 0 && i !== 1 && i !== 5 && i !== 6 && i !== 8) {
                                 let index = 0
                                 for (const elem of incorrectSleepArr[i].pattern!.data_set) {
+                                    const dateToBeCompared = i !== 12
+                                        ? elem.start_time.toISOString().substr(0, 19)
+                                        : elem.start_time.toISOString()
                                     expect(res.body.error[i].item.pattern.data_set[index].start_time)
-                                        .to.eql(elem.start_time.toISOString().substr(0, 19))
+                                        .to.eql(dateToBeCompared)
                                     expect(res.body.error[i].item.pattern.data_set[index].name).to.eql(elem.name)
                                     expect(res.body.error[i].item.pattern.data_set[index].duration).to.eql(elem.duration)
                                     index++
@@ -2138,4 +2145,31 @@ async function createSleep(item): Promise<any> {
 
 async function deleteAllSleep() {
     return SleepRepoModel.deleteMany({})
+}
+
+function sleepToJSON(sleep: any): any {
+    return {
+        id: sleep.id,
+        start_time: sleep.start_time,
+        end_time: sleep.end_time,
+        duration: sleep.duration,
+        child_id: sleep.child_id,
+        type: sleep.type,
+        pattern: sleep.pattern ? patternToJSON(sleep.pattern) : sleep.pattern
+    }
+}
+
+function patternToJSON(pattern: SleepPattern): any {
+    return {
+        data_set: pattern.data_set ? pattern.data_set.map(item => dataSetItemToJSON(item)) : pattern.data_set,
+        summary: pattern.summary ? pattern.summary.toJSON() : pattern.summary
+    }
+}
+
+function dataSetItemToJSON(dataSetItem: SleepPatternDataSet): any {
+    return {
+        start_time: dataSetItem.start_time,
+        name: dataSetItem.name,
+        duration: dataSetItem.duration
+    }
 }
