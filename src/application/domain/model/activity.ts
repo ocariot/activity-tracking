@@ -83,8 +83,8 @@ export class Activity extends Entity implements IJSONSerializable, IJSONDeserial
     public toJSON(): any {
         return {
             id: super.id,
-            start_time: this.start_time,
-            end_time: this.end_time,
+            start_time: this.start_time?.toISOString().substr(0, 19),
+            end_time: this.end_time?.toISOString().substr(0, 19),
             duration: this.duration,
             child_id: this.child_id
         }

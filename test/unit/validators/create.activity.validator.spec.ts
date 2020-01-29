@@ -54,8 +54,7 @@ describe('Validators: CreateActivityValidator', () => {
                     CreateActivityValidator.validate(activity)
                 } catch (err) {
                     assert.equal(err.message, Strings.ERROR_MESSAGE.INVALID_FIELDS)
-                    assert.equal(err.description, 'The end_time parameter can not contain an older date than ' +
-                        'that the start_time parameter!')
+                    assert.equal(err.description, Strings.ERROR_MESSAGE.INVALID_START_TIME)
                 }
             })
         })
@@ -81,7 +80,8 @@ describe('Validators: CreateActivityValidator', () => {
                     CreateActivityValidator.validate(activity)
                 } catch (err) {
                     assert.equal(err.message, Strings.ERROR_MESSAGE.INVALID_FIELDS)
-                    assert.equal(err.description, 'duration'.concat(Strings.ERROR_MESSAGE.NEGATIVE_NUMBER))
+                    assert.equal(err.description, Strings.ERROR_MESSAGE.NEGATIVE_INTEGER
+                        .replace('{0}', 'duration'))
                 }
                 activity.duration = 1178000
             })

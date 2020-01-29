@@ -28,6 +28,8 @@ import { Environment } from '../../../src/application/domain/model/environment'
 import { IBodyFatRepository } from '../../../src/application/port/body.fat.repository.interface'
 import { MeasurementType } from '../../../src/application/domain/model/measurement'
 import { IQuery } from '../../../src/application/port/query.interface'
+import { SleepPattern } from '../../../src/application/domain/model/sleep.pattern'
+import { SleepPatternDataSet } from '../../../src/application/domain/model/sleep.pattern.data.set'
 
 const dbConnection: IDatabase = DIContainer.get(Identifier.MONGODB_CONNECTION)
 const rabbitmq: IEventBus = DIContainer.get(Identifier.RABBITMQ_EVENT_BUS)
@@ -109,7 +111,7 @@ describe('SUBSCRIBE EVENT BUS TASK', () => {
         context('when receiving a PhysicalActivitySaveEvent with one physical activity successfully', () => {
             const activity: PhysicalActivity = new PhysicalActivityMock()
             it('should return an array with one physical activity', (done) => {
-                rabbitmq.bus.pubSyncPhysicalActivity(activity)
+                rabbitmq.bus.pubSyncPhysicalActivity(activityToJSON(activity))
                     .then(async () => {
                         // Wait for 2000 milliseconds for the task to be executed
                         await timeout(2000)
@@ -159,7 +161,7 @@ describe('SUBSCRIBE EVENT BUS TASK', () => {
             })
             const activity: PhysicalActivity = new PhysicalActivityMock()
             it('should return an array with one physical activity', (done) => {
-                rabbitmq.bus.pubSyncPhysicalActivity(activity)
+                rabbitmq.bus.pubSyncPhysicalActivity(activityToJSON(activity))
                     .then(async () => {
                         await timeout(1000)
                         await dbConnection.connect(process.env.MONGODB_URI_TEST || Default.MONGODB_URI_TEST)
@@ -257,7 +259,7 @@ describe('SUBSCRIBE EVENT BUS TASK', () => {
         context('when receiving a SleepSaveEvent with one sleep object successfully', () => {
             const sleep: Sleep = new SleepMock()
             it('should return an array with one sleep object', (done) => {
-                rabbitmq.bus.pubSyncSleep(sleep)
+                rabbitmq.bus.pubSyncSleep(sleepToJSON(sleep))
                     .then(async () => {
                         // Wait for 2000 milliseconds for the task to be executed
                         await timeout(2000)
@@ -305,7 +307,7 @@ describe('SUBSCRIBE EVENT BUS TASK', () => {
             })
             const sleep: Sleep = new SleepMock()
             it('should return an array with one sleep object', (done) => {
-                rabbitmq.bus.pubSyncSleep(sleep)
+                rabbitmq.bus.pubSyncSleep(sleepToJSON(sleep))
                     .then(async () => {
                         await timeout(1000)
                         await dbConnection.connect(process.env.MONGODB_URI_TEST || Default.MONGODB_URI_TEST)
@@ -402,7 +404,7 @@ describe('SUBSCRIBE EVENT BUS TASK', () => {
         context('when receiving a WeightSaveEvent with one weight object successfully', () => {
             const weight: Weight = new WeightMock()
             it('should return an array with one weight object', (done) => {
-                rabbitmq.bus.pubSyncWeight(weight)
+                rabbitmq.bus.pubSyncWeight(weightToJSON(weight))
                     .then(async () => {
                         // Wait for 2000 milliseconds for the task to be executed
                         await timeout(2000)
@@ -449,7 +451,7 @@ describe('SUBSCRIBE EVENT BUS TASK', () => {
             })
             const weight: Weight = new WeightMock()
             it('should return an array with one weight object', (done) => {
-                rabbitmq.bus.pubSyncWeight(weight)
+                rabbitmq.bus.pubSyncWeight(weightToJSON(weight))
                     .then(async () => {
                         await timeout(1000)
                         await dbConnection.connect(process.env.MONGODB_URI_TEST || Default.MONGODB_URI_TEST)
@@ -1107,4 +1109,58 @@ async function deleteAllLogs() {
 
 async function deleteAllEnvironments() {
     return EnvironmentRepoModel.deleteMany({})
+}
+
+function activityToJSON(activity: any): any {
+    return {
+        id: activity.id,
+        start_time: activity.start_time,
+        end_time: activity.end_time,
+        duration: activity.duration,
+        child_id: activity.child_id,
+        name: activity.name,
+        calories: activity.calories,
+        steps: activity.steps,
+        distance: activity.distance,
+        levels: activity.levels ? activity.levels.map(item => item.toJSON()) : activity.levels,
+        heart_rate: activity.heart_rate ? activity.heart_rate.toJSON() : activity.heart_rate
+    }
+}
+
+function sleepToJSON(sleep: any): any {
+    return {
+        id: sleep.id,
+        start_time: sleep.start_time,
+        end_time: sleep.end_time,
+        duration: sleep.duration,
+        child_id: sleep.child_id,
+        type: sleep.type,
+        pattern: sleep.pattern ? patternToJSON(sleep.pattern) : sleep.pattern
+    }
+}
+
+function patternToJSON(pattern: SleepPattern): any {
+    return {
+        data_set: pattern.data_set ? pattern.data_set.map(item => dataSetItemToJSON(item)) : pattern.data_set,
+        summary: pattern.summary ? pattern.summary.toJSON() : pattern.summary
+    }
+}
+
+function dataSetItemToJSON(dataSetItem: SleepPatternDataSet): any {
+    return {
+        start_time: dataSetItem.start_time,
+        name: dataSetItem.name,
+        duration: dataSetItem.duration
+    }
+}
+
+function weightToJSON(weight: Weight): any {
+    return {
+        id: weight.id,
+        timestamp: weight.timestamp,
+        value: weight.value,
+        unit: weight.unit,
+        child_id: weight.child_id,
+        body_fat: weight.body_fat ? weight.body_fat.value : undefined
+    }
 }

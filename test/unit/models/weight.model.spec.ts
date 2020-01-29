@@ -83,7 +83,7 @@ describe('Models: Weight', () => {
                 let result = new Weight().fromJSON(weightJSON)
                 result = result.toJSON()
                 assert.propertyVal(result, 'id', weightJSON.id)
-                assert.propertyVal(result, 'timestamp', weightJSON.timestamp)
+                assert.propertyVal(result, 'timestamp', weightJSON.timestamp.toISOString().substr(0, 19))
                 assert.propertyVal(result, 'value', weightJSON.value)
                 assert.propertyVal(result, 'unit', weightJSON.unit)
                 assert.propertyVal(result, 'child_id', weightJSON.child_id)

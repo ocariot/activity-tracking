@@ -130,8 +130,8 @@ describe('Services: Environment', () => {
                 return environmentService.add(incorrectEnvironment)
                     .catch(err => {
                         assert.propertyVal(err, 'message', Strings.ERROR_MESSAGE.REQUIRED_FIELDS)
-                        assert.propertyVal(err, 'description', 'timestamp, institution_id, location, ' +
-                            'measurements'.concat(Strings.ERROR_MESSAGE.REQUIRED_FIELDS_DESC))
+                        assert.propertyVal(err, 'description', Strings.ERROR_MESSAGE.REQUIRED_FIELDS_DESC
+                            .replace('{0}', 'timestamp, institution_id, location, measurements'))
                     })
             })
         })
@@ -158,8 +158,8 @@ describe('Services: Environment', () => {
                 return environmentService.add(incorrectEnvironment)
                     .catch(err => {
                         assert.propertyVal(err, 'message', Strings.ERROR_MESSAGE.REQUIRED_FIELDS)
-                        assert.propertyVal(err, 'description', 'location.local, location.room'
-                            .concat(Strings.ERROR_MESSAGE.REQUIRED_FIELDS_DESC))
+                        assert.propertyVal(err, 'description', Strings.ERROR_MESSAGE.REQUIRED_FIELDS_DESC
+                            .replace('{0}', 'location.local, location.room'))
                     })
             })
         })
@@ -200,8 +200,8 @@ describe('Services: Environment', () => {
                 return environmentService.add(incorrectEnvironment)
                     .catch(err => {
                         assert.propertyVal(err, 'message', Strings.ERROR_MESSAGE.REQUIRED_FIELDS)
-                        assert.propertyVal(err, 'description', 'measurements.type, measurements.value, ' +
-                            'measurements.unit'.concat(Strings.ERROR_MESSAGE.REQUIRED_FIELDS_DESC))
+                        assert.propertyVal(err, 'description', Strings.ERROR_MESSAGE.REQUIRED_FIELDS_DESC
+                            .replace('{0}', 'measurements.type, measurements.value, measurements.unit'))
                     })
             })
         })
@@ -280,8 +280,8 @@ describe('Services: Environment', () => {
 
                         assert.propertyVal(result.error[0], 'code', HttpStatus.BAD_REQUEST)
                         assert.propertyVal(result.error[0], 'message', Strings.ERROR_MESSAGE.REQUIRED_FIELDS)
-                        assert.propertyVal(result.error[0], 'description', 'timestamp, institution_id, ' +
-                            'location, measurements'.concat(Strings.ERROR_MESSAGE.REQUIRED_FIELDS_DESC))
+                        assert.propertyVal(result.error[0], 'description', Strings.ERROR_MESSAGE.REQUIRED_FIELDS_DESC
+                            .replace('{0}', 'timestamp, institution_id, location, measurements'))
                     })
             })
         })
@@ -295,19 +295,21 @@ describe('Services: Environment', () => {
                         assert.propertyVal(result.error[0], 'message',
                             Strings.ERROR_MESSAGE.REQUIRED_FIELDS)
                         assert.propertyVal(result.error[0], 'description',
-                            'timestamp, institution_id, location, measurements'.concat(Strings.ERROR_MESSAGE.REQUIRED_FIELDS_DESC))
+                            Strings.ERROR_MESSAGE.REQUIRED_FIELDS_DESC
+                                .replace('{0}', 'timestamp, institution_id, location, measurements'))
                         assert.propertyVal(result.error[1], 'message', Strings.INSTITUTION.PARAM_ID_NOT_VALID_FORMAT)
                         assert.propertyVal(result.error[1], 'description', Strings.ERROR_MESSAGE.UUID_NOT_VALID_FORMAT_DESC)
                         assert.propertyVal(result.error[2], 'message', Strings.ERROR_MESSAGE.REQUIRED_FIELDS)
                         assert.propertyVal(result.error[2], 'description',
-                            'location.local, location.room'.concat(Strings.ERROR_MESSAGE.REQUIRED_FIELDS_DESC))
+                            Strings.ERROR_MESSAGE.REQUIRED_FIELDS_DESC
+                                .replace('{0}', 'location.local, location.room'))
                         assert.propertyVal(result.error[3], 'message', Strings.ERROR_MESSAGE.INVALID_FIELDS)
                         assert.propertyVal(result.error[3], 'description',
                             'measurements collection must not be empty!')
                         assert.propertyVal(result.error[4], 'message',
                             Strings.ERROR_MESSAGE.REQUIRED_FIELDS)
-                        assert.propertyVal(result.error[4], 'description',
-                            'measurements.type, measurements.value, measurements.unit'.concat(Strings.ERROR_MESSAGE.REQUIRED_FIELDS_DESC))
+                        assert.propertyVal(result.error[4], 'description', Strings.ERROR_MESSAGE.REQUIRED_FIELDS_DESC
+                            .replace('{0}', 'measurements.type, measurements.value, measurements.unit'))
 
                         for (let i = 0; i < result.error.length; i++) {
                             assert.propertyVal(result.error[i], 'code', HttpStatus.BAD_REQUEST)

@@ -201,8 +201,8 @@ describe('Services: SleepService', () => {
                 return sleepService.add(incorrectSleep)
                     .catch(err => {
                         assert.propertyVal(err, 'message', Strings.ERROR_MESSAGE.REQUIRED_FIELDS)
-                        assert.propertyVal(err, 'description', 'start_time, end_time, duration, child_id, type, ' +
-                            'pattern'.concat(Strings.ERROR_MESSAGE.REQUIRED_FIELDS_DESC))
+                        assert.propertyVal(err, 'description', Strings.ERROR_MESSAGE.REQUIRED_FIELDS_DESC
+                            .replace('{0}', 'start_time, end_time, duration, child_id, type, pattern'))
                     })
             })
         })
@@ -223,8 +223,8 @@ describe('Services: SleepService', () => {
                 return sleepService.add(incorrectSleep)
                     .catch(err => {
                         assert.propertyVal(err, 'message', Strings.ERROR_MESSAGE.REQUIRED_FIELDS)
-                        assert.propertyVal(err, 'description', 'type, pattern'
-                            .concat(Strings.ERROR_MESSAGE.REQUIRED_FIELDS_DESC))
+                        assert.propertyVal(err, 'description', Strings.ERROR_MESSAGE.REQUIRED_FIELDS_DESC
+                            .replace('{0}', 'type, pattern'))
                     })
             })
         })
@@ -238,8 +238,7 @@ describe('Services: SleepService', () => {
                 return sleepService.add(incorrectSleep)
                     .catch(err => {
                         assert.propertyVal(err, 'message', Strings.ERROR_MESSAGE.INVALID_FIELDS)
-                        assert.propertyVal(err, 'description', 'The end_time parameter can not contain ' +
-                            'an older date than that the start_time parameter!')
+                        assert.propertyVal(err, 'description', Strings.ERROR_MESSAGE.INVALID_START_TIME)
                     })
             })
         })
@@ -266,7 +265,8 @@ describe('Services: SleepService', () => {
                 return sleepService.add(incorrectSleep)
                     .catch(err => {
                         assert.propertyVal(err, 'message', Strings.ERROR_MESSAGE.INVALID_FIELDS)
-                        assert.propertyVal(err, 'description', 'duration'.concat(Strings.ERROR_MESSAGE.NEGATIVE_NUMBER))
+                        assert.propertyVal(err, 'description', Strings.ERROR_MESSAGE.NEGATIVE_INTEGER
+                            .replace('{0}', 'duration'))
                     })
             })
         })
@@ -341,9 +341,9 @@ describe('Services: SleepService', () => {
                 return sleepService.add(incorrectSleep)
                     .catch(err => {
                         assert.propertyVal(err, 'message', Strings.ERROR_MESSAGE.REQUIRED_FIELDS)
-                        assert.propertyVal(err, 'description', 'pattern.data_set.start_time, ' +
-                            'pattern.data_set.name, pattern.data_set.duration'
-                                .concat(Strings.ERROR_MESSAGE.REQUIRED_FIELDS_DESC))
+                        assert.propertyVal(err, 'description', Strings.ERROR_MESSAGE.REQUIRED_FIELDS_DESC
+                            .replace('{0}', 'pattern.data_set.start_time, ' +
+                                'pattern.data_set.name, pattern.data_set.duration'))
                     })
             })
         })
@@ -359,8 +359,8 @@ describe('Services: SleepService', () => {
                 return sleepService.add(incorrectSleep)
                     .catch(err => {
                         assert.propertyVal(err, 'message', Strings.ERROR_MESSAGE.INVALID_FIELDS)
-                        assert.propertyVal(err, 'description', 'pattern.data_set.duration'
-                            .concat(Strings.ERROR_MESSAGE.NEGATIVE_NUMBER))
+                        assert.propertyVal(err, 'description', Strings.ERROR_MESSAGE.NEGATIVE_INTEGER
+                            .replace('{0}', 'pattern.data_set.duration'))
                     })
             })
         })
@@ -491,8 +491,8 @@ describe('Services: SleepService', () => {
 
                         assert.propertyVal(result.error[0], 'code', HttpStatus.BAD_REQUEST)
                         assert.propertyVal(result.error[0], 'message', Strings.ERROR_MESSAGE.REQUIRED_FIELDS)
-                        assert.propertyVal(result.error[0], 'description', 'start_time, end_time, ' +
-                            'duration, child_id, type, pattern'.concat(Strings.ERROR_MESSAGE.REQUIRED_FIELDS_DESC))
+                        assert.propertyVal(result.error[0], 'description', Strings.ERROR_MESSAGE.REQUIRED_FIELDS_DESC
+                            .replace('{0}', 'start_time, end_time, duration, child_id, type, pattern'))
                     })
             })
         })
@@ -504,20 +504,19 @@ describe('Services: SleepService', () => {
                         result = result as MultiStatus<Sleep>
 
                         assert.propertyVal(result.error[0], 'message', Strings.ERROR_MESSAGE.REQUIRED_FIELDS)
-                        assert.propertyVal(result.error[0], 'description', 'start_time, end_time, ' +
-                            'duration, child_id, type, pattern'.concat(Strings.ERROR_MESSAGE.REQUIRED_FIELDS_DESC))
+                        assert.propertyVal(result.error[0], 'description', Strings.ERROR_MESSAGE.REQUIRED_FIELDS_DESC
+                            .replace('{0}', 'start_time, end_time, duration, child_id, type, pattern'))
                         assert.propertyVal(result.error[1], 'message', Strings.ERROR_MESSAGE.REQUIRED_FIELDS)
-                        assert.propertyVal(result.error[1], 'description', 'type, pattern'
-                            .concat(Strings.ERROR_MESSAGE.REQUIRED_FIELDS_DESC))
+                        assert.propertyVal(result.error[1], 'description', Strings.ERROR_MESSAGE.REQUIRED_FIELDS_DESC
+                            .replace('{0}', 'type, pattern'))
                         assert.propertyVal(result.error[2], 'message', Strings.ERROR_MESSAGE.INVALID_FIELDS)
-                        assert.propertyVal(result.error[2], 'description', 'The end_time parameter ' +
-                            'can not contain an older date than that the start_time parameter!')
+                        assert.propertyVal(result.error[2], 'description', Strings.ERROR_MESSAGE.INVALID_START_TIME)
                         assert.propertyVal(result.error[3], 'message', Strings.ERROR_MESSAGE.INVALID_FIELDS)
                         assert.propertyVal(result.error[3], 'description', 'duration value does ' +
                             'not match values passed in start_time and end_time parameters!')
                         assert.propertyVal(result.error[4], 'message', Strings.ERROR_MESSAGE.INVALID_FIELDS)
-                        assert.propertyVal(result.error[4], 'description', 'duration'
-                            .concat(Strings.ERROR_MESSAGE.NEGATIVE_NUMBER))
+                        assert.propertyVal(result.error[4], 'description', Strings.ERROR_MESSAGE.NEGATIVE_INTEGER
+                            .replace('{0}', 'duration'))
                         assert.propertyVal(result.error[5], 'message', Strings.CHILD.PARAM_ID_NOT_VALID_FORMAT)
                         assert.propertyVal(result.error[5], 'description', Strings.ERROR_MESSAGE.UUID_NOT_VALID_FORMAT_DESC)
                         assert.propertyVal(result.error[6], 'message', Strings.ERROR_MESSAGE.INVALID_FIELDS)
@@ -528,12 +527,12 @@ describe('Services: SleepService', () => {
                         assert.propertyVal(result.error[8], 'message', Strings.ERROR_MESSAGE.INVALID_FIELDS)
                         assert.propertyVal(result.error[8], 'description', 'pattern.data_set must not be empty!')
                         assert.propertyVal(result.error[9], 'message', Strings.ERROR_MESSAGE.REQUIRED_FIELDS)
-                        assert.propertyVal(result.error[9], 'description', 'pattern.data_set.start_time, ' +
-                            'pattern.data_set.name, pattern.data_set.duration'
-                                .concat(Strings.ERROR_MESSAGE.REQUIRED_FIELDS_DESC))
+                        assert.propertyVal(result.error[9], 'description', Strings.ERROR_MESSAGE.REQUIRED_FIELDS_DESC
+                            .replace('{0}', 'pattern.data_set.start_time, pattern.data_set.name, ' +
+                                'pattern.data_set.duration'))
                         assert.propertyVal(result.error[10], 'message', Strings.ERROR_MESSAGE.INVALID_FIELDS)
-                        assert.propertyVal(result.error[10], 'description', 'pattern.data_set.duration'
-                            .concat(Strings.ERROR_MESSAGE.NEGATIVE_NUMBER))
+                        assert.propertyVal(result.error[10], 'description', Strings.ERROR_MESSAGE.NEGATIVE_INTEGER
+                            .replace('{0}', 'pattern.data_set.duration'))
                         assert.propertyVal(result.error[11], 'message', Strings.ERROR_MESSAGE.INVALID_FIELDS)
                         if (result.error[11].item.type === SleepType.CLASSIC) {
                             assert.propertyVal(result.error[11], 'description', 'The names of the allowed ' +
@@ -767,7 +766,8 @@ describe('Services: SleepService', () => {
                 return sleepService.updateByChild(incorrectSleep)
                     .catch(err => {
                         assert.propertyVal(err, 'message', Strings.ERROR_MESSAGE.INVALID_FIELDS)
-                        assert.propertyVal(err, 'description', 'duration'.concat(Strings.ERROR_MESSAGE.NEGATIVE_NUMBER))
+                        assert.propertyVal(err, 'description', Strings.ERROR_MESSAGE.NEGATIVE_INTEGER
+                            .replace('{0}', 'duration'))
                     })
             })
         })
@@ -828,9 +828,9 @@ describe('Services: SleepService', () => {
                 return sleepService.updateByChild(incorrectSleep)
                     .catch(err => {
                         assert.propertyVal(err, 'message', Strings.ERROR_MESSAGE.REQUIRED_FIELDS)
-                        assert.propertyVal(err, 'description', 'pattern.data_set.start_time, ' +
-                            'pattern.data_set.name, pattern.data_set.duration'
-                                .concat(Strings.ERROR_MESSAGE.REQUIRED_FIELDS_DESC))
+                        assert.propertyVal(err, 'description', Strings.ERROR_MESSAGE.REQUIRED_FIELDS_DESC
+                            .replace('{0}', 'pattern.data_set.start_time, pattern.data_set.name, ' +
+                                'pattern.data_set.duration'))
                     })
             })
         })
@@ -846,8 +846,8 @@ describe('Services: SleepService', () => {
                 return sleepService.updateByChild(incorrectSleep)
                     .catch(err => {
                         assert.propertyVal(err, 'message', Strings.ERROR_MESSAGE.INVALID_FIELDS)
-                        assert.propertyVal(err, 'description', 'pattern.data_set.duration'
-                            .concat(Strings.ERROR_MESSAGE.NEGATIVE_NUMBER))
+                        assert.propertyVal(err, 'description', Strings.ERROR_MESSAGE.NEGATIVE_INTEGER
+                            .replace('{0}', 'pattern.data_set.duration'))
                     })
             })
         })

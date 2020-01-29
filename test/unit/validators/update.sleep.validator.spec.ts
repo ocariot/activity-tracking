@@ -68,7 +68,8 @@ describe('Validators: UpdateSleepValidator', () => {
                     UpdateSleepValidator.validate(sleep)
                 } catch (err) {
                     assert.equal(err.message, Strings.ERROR_MESSAGE.INVALID_FIELDS)
-                    assert.equal(err.description, 'duration'.concat(Strings.ERROR_MESSAGE.NEGATIVE_NUMBER))
+                    assert.equal(err.description, Strings.ERROR_MESSAGE.NEGATIVE_INTEGER
+                        .replace('{0}', 'duration'))
                 }
                 sleep.duration = duration_aux
             })
@@ -133,7 +134,8 @@ describe('Validators: UpdateSleepValidator', () => {
                         UpdateSleepValidator.validate(sleep)
                     } catch (err) {
                         assert.equal(err.message, Strings.ERROR_MESSAGE.REQUIRED_FIELDS)
-                        assert.equal(err.description, 'pattern.data_set.start_time'.concat(Strings.ERROR_MESSAGE.REQUIRED_FIELDS_DESC))
+                        assert.equal(err.description, Strings.ERROR_MESSAGE.REQUIRED_FIELDS_DESC
+                            .replace('{0}', 'pattern.data_set.start_time'))
                     }
                 })
         })
@@ -148,8 +150,9 @@ describe('Validators: UpdateSleepValidator', () => {
                         UpdateSleepValidator.validate(sleep)
                     } catch (err) {
                         assert.equal(err.message, Strings.ERROR_MESSAGE.REQUIRED_FIELDS)
-                        assert.equal(err.description, 'pattern.data_set.start_time, pattern.data_set.name, ' +
-                            'pattern.data_set.duration'.concat(Strings.ERROR_MESSAGE.REQUIRED_FIELDS_DESC))
+                        assert.equal(err.description, Strings.ERROR_MESSAGE.REQUIRED_FIELDS_DESC
+                            .replace('{0}', 'pattern.data_set.start_time, pattern.data_set.name, ' +
+                                'pattern.data_set.duration'))
                     }
                 })
         })
@@ -167,7 +170,8 @@ describe('Validators: UpdateSleepValidator', () => {
                         UpdateSleepValidator.validate(sleep)
                     } catch (err) {
                         assert.equal(err.message, Strings.ERROR_MESSAGE.INVALID_FIELDS)
-                        assert.equal(err.description, 'pattern.data_set.duration'.concat(Strings.ERROR_MESSAGE.NEGATIVE_NUMBER))
+                        assert.equal(err.description, Strings.ERROR_MESSAGE.NEGATIVE_INTEGER
+                            .replace('{0}', 'pattern.data_set.duration'))
                     }
                     dataSetItemTest.duration = 60000
                 })

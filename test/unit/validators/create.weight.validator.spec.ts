@@ -42,7 +42,8 @@ describe('Validators: CreateWeightValidator', () => {
                     CreateWeightValidator.validate(weight)
                 } catch (err) {
                     assert.equal(err.message, Strings.ERROR_MESSAGE.REQUIRED_FIELDS)
-                    assert.equal(err.description, 'type'.concat(Strings.ERROR_MESSAGE.REQUIRED_FIELDS_DESC))
+                    assert.equal(err.description, Strings.ERROR_MESSAGE.REQUIRED_FIELDS_DESC
+                        .replace('{0}', 'type'))
                 }
             })
         })
@@ -65,8 +66,8 @@ describe('Validators: CreateWeightValidator', () => {
                     CreateWeightValidator.validate(weight)
                 } catch (err) {
                     assert.equal(err.message, Strings.ERROR_MESSAGE.REQUIRED_FIELDS)
-                    assert.equal(err.description, 'type, timestamp, value, unit, child_id'
-                        .concat(Strings.ERROR_MESSAGE.REQUIRED_FIELDS_DESC))
+                    assert.equal(err.description, Strings.ERROR_MESSAGE.REQUIRED_FIELDS_DESC
+                        .replace('{0}', 'type, timestamp, value, unit, child_id'))
                 }
             })
         })
@@ -83,22 +84,6 @@ describe('Validators: CreateWeightValidator', () => {
                     assert.equal(err.message, Strings.CHILD.PARAM_ID_NOT_VALID_FORMAT)
                     assert.equal(err.description, Strings.ERROR_MESSAGE.UUID_NOT_VALID_FORMAT_DESC)
                 }
-            })
-        })
-
-        context('when the bodyFat measurement of weight object is invalid (missing parameters)', () => {
-            it('should throw a ValidationException', () => {
-                weight.body_fat = new BodyFat()
-                weight.body_fat.type = undefined
-                weight.body_fat.unit = undefined
-                try {
-                    CreateWeightValidator.validate(weight)
-                } catch (err) {
-                    assert.equal(err.message, Strings.ERROR_MESSAGE.REQUIRED_FIELDS)
-                    assert.equal(err.description, 'type, timestamp, value, unit, child_id'
-                        .concat(Strings.ERROR_MESSAGE.REQUIRED_FIELDS_DESC))
-                }
-                weight.body_fat = body_fat_aux
             })
         })
 

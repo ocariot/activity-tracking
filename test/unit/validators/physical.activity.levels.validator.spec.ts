@@ -85,7 +85,8 @@ describe('Validators: PhysicalActivityLevelsValidator', () => {
                     PhysicalActivityLevelsValidator.validate(levels)
                 } catch (err) {
                     assert.equal(err.message, Strings.ERROR_MESSAGE.REQUIRED_FIELDS)
-                    assert.equal(err.description, 'levels.duration'.concat(Strings.ERROR_MESSAGE.REQUIRED_FIELDS_DESC))
+                    assert.equal(err.description, Strings.ERROR_MESSAGE.REQUIRED_FIELDS_DESC
+                        .replace('{0}', 'levels.duration'))
                 }
                 levels[1].duration = Math.floor((Math.random() * 10) * 60000)
             })
@@ -120,7 +121,8 @@ describe('Validators: PhysicalActivityLevelsValidator', () => {
                     PhysicalActivityLevelsValidator.validate(levels)
                 } catch (err) {
                     assert.equal(err.message, Strings.ERROR_MESSAGE.INVALID_FIELDS)
-                    assert.equal(err.description, 'levels.duration'.concat(Strings.ERROR_MESSAGE.NEGATIVE_NUMBER))
+                    assert.equal(err.description, Strings.ERROR_MESSAGE.NEGATIVE_INTEGER
+                        .replace('{0}', 'levels.duration'))
                 }
                 levels[1].duration = Math.floor((Math.random() * 10 + 1) * 60000)
             })

@@ -10,6 +10,8 @@ export class CreateEnvironmentValidator {
     public static validate(environment: Environment): void | ValidationException {
         const fields: Array<string> = []
 
+        const regZone = new RegExp(/^-*[0-9]{1,}(\.\d{1,})?$/i) // 1-n (positive or negative)
+
         // validate null
         if (!environment.timestamp) fields.push('timestamp')
 
@@ -31,9 +33,9 @@ export class CreateEnvironmentValidator {
                 else StringValidator.validate(measurement.type, 'measurements.type')
 
                 if (measurement.value === undefined) fields.push('measurements.value')
-                else if (measurement.value === null || isNaN(measurement.value)) {
+                else if (!(regZone.test(String(measurement.value)))) {
                     throw new ValidationException(Strings.ERROR_MESSAGE.INVALID_FIELDS,
-                        'measurements.value'.concat(Strings.ERROR_MESSAGE.INVALID_NUMBER))
+                        Strings.ERROR_MESSAGE.INVALID_NUMBER.replace('{0}', 'measurements.value'))
                 }
 
                 if (measurement.unit === undefined) fields.push('measurements.unit')
@@ -47,7 +49,7 @@ export class CreateEnvironmentValidator {
 
         if (fields.length > 0) {
             throw new ValidationException(Strings.ERROR_MESSAGE.REQUIRED_FIELDS,
-                fields.join(', ').concat(Strings.ERROR_MESSAGE.REQUIRED_FIELDS_DESC))
+                Strings.ERROR_MESSAGE.REQUIRED_FIELDS_DESC.replace('{0}', fields.join(', ')))
         }
     }
 }

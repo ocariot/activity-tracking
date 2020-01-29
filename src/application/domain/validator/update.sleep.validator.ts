@@ -3,7 +3,7 @@ import { Sleep, SleepType } from '../model/sleep'
 import { SleepPatternValidator } from './sleep.pattern.validator'
 import { ObjectIdValidator } from './object.id.validator'
 import { Strings } from '../../../utils/strings'
-import { NumberValidator } from './number.validator'
+import { IntegerPositiveValidator } from './integer.positive.validator'
 
 export class UpdateSleepValidator {
     public static validate(sleep: Sleep): void | ValidationException {
@@ -12,12 +12,12 @@ export class UpdateSleepValidator {
         if (sleep.child_id) ObjectIdValidator.validate(sleep.child_id, Strings.CHILD.PARAM_ID_NOT_VALID_FORMAT)
         if (sleep.id) ObjectIdValidator.validate(sleep.id, Strings.SLEEP.PARAM_ID_NOT_VALID_FORMAT)
 
-        if (sleep.duration !== undefined) NumberValidator.validate(sleep.duration, 'duration')
+        if (sleep.duration !== undefined) IntegerPositiveValidator.validate(sleep.duration, 'duration')
         if (sleep.start_time && sleep.end_time && sleep.duration) {
             const durationValidate: number = sleep.end_time.getTime() - sleep.start_time.getTime()
             if (durationValidate < 0) {
                 throw new ValidationException(Strings.ERROR_MESSAGE.INVALID_FIELDS,
-                    'The end_time parameter can not contain an older date than that the start_time parameter!')
+                    Strings.ERROR_MESSAGE.INVALID_START_TIME)
             }
             if (Number(sleep.duration) !== durationValidate) {
                 throw new ValidationException(Strings.ERROR_MESSAGE.INVALID_FIELDS,
