@@ -27,7 +27,8 @@ describe('Validators: PhysicalActivityHeartRateValidator', () => {
                     PhysicalActivityHeartRateValidator.validate(activityHeartRate)
                 } catch (err) {
                     assert.equal(err.message, Strings.ERROR_MESSAGE.REQUIRED_FIELDS)
-                    assert.equal(err.description, 'heart_rate.average'.concat(Strings.ERROR_MESSAGE.REQUIRED_FIELDS_DESC))
+                    assert.equal(err.description, Strings.ERROR_MESSAGE.REQUIRED_FIELDS_DESC
+                        .replace('{0}', 'heart_rate.average'))
                 }
             })
         })
@@ -39,9 +40,9 @@ describe('Validators: PhysicalActivityHeartRateValidator', () => {
                     PhysicalActivityHeartRateValidator.validate(activityHeartRate)
                 } catch (err) {
                     assert.equal(err.message, Strings.ERROR_MESSAGE.REQUIRED_FIELDS)
-                    assert.equal(err.description, 'heart_rate.average, heart_rate.out_of_range_zone, ' +
-                        'heart_rate.fat_burn_zone, heart_rate.cardio_zone, heart_rate.peak_zone'
-                            .concat(Strings.ERROR_MESSAGE.REQUIRED_FIELDS_DESC))
+                    assert.equal(err.description, Strings.ERROR_MESSAGE.REQUIRED_FIELDS_DESC
+                        .replace('{0}', 'heart_rate.average, heart_rate.out_of_range_zone, ' +
+                            'heart_rate.fat_burn_zone, heart_rate.cardio_zone, heart_rate.peak_zone'))
                 }
             })
         })
@@ -54,7 +55,8 @@ describe('Validators: PhysicalActivityHeartRateValidator', () => {
                     PhysicalActivityHeartRateValidator.validate(activityHeartRate)
                 } catch (err) {
                     assert.equal(err.message, Strings.ERROR_MESSAGE.INVALID_FIELDS)
-                    assert.equal(err.description, 'heart_rate.average'.concat(Strings.ERROR_MESSAGE.NEGATIVE_NUMBER))
+                    assert.equal(err.description, Strings.ERROR_MESSAGE.INTEGER_GREATER_ZERO
+                        .replace('{0}', 'heart_rate.average'))
                 }
                 activityHeartRate.average = 120
             })
@@ -67,9 +69,9 @@ describe('Validators: PhysicalActivityHeartRateValidator', () => {
                     PhysicalActivityHeartRateValidator.validate(activityHeartRate)
                 } catch (err) {
                     assert.equal(err.message, Strings.ERROR_MESSAGE.REQUIRED_FIELDS)
-                    assert.equal(err.description, 'heart_rate.out_of_range_zone.min, ' +
-                        'heart_rate.out_of_range_zone.max, heart_rate.out_of_range_zone.duration'
-                            .concat(Strings.ERROR_MESSAGE.REQUIRED_FIELDS_DESC))
+                    assert.equal(err.description, Strings.ERROR_MESSAGE.REQUIRED_FIELDS_DESC
+                        .replace('{0}', 'heart_rate.out_of_range_zone.min, ' +
+                            'heart_rate.out_of_range_zone.max, heart_rate.out_of_range_zone.duration'))
                 }
             })
         })
@@ -82,8 +84,9 @@ describe('Validators: PhysicalActivityHeartRateValidator', () => {
                     PhysicalActivityHeartRateValidator.validate(activityHeartRate)
                 } catch (err) {
                     assert.equal(err.message, Strings.ERROR_MESSAGE.REQUIRED_FIELDS)
-                    assert.equal(err.description, 'heart_rate.fat_burn_zone.min, heart_rate.fat_burn_zone.max, ' +
-                        'heart_rate.fat_burn_zone.duration'.concat(Strings.ERROR_MESSAGE.REQUIRED_FIELDS_DESC))
+                    assert.equal(err.description, Strings.ERROR_MESSAGE.REQUIRED_FIELDS_DESC
+                        .replace('{0}', 'heart_rate.fat_burn_zone.min, heart_rate.fat_burn_zone.max, ' +
+                            'heart_rate.fat_burn_zone.duration'))
                 }
             })
         })
@@ -96,8 +99,9 @@ describe('Validators: PhysicalActivityHeartRateValidator', () => {
                     PhysicalActivityHeartRateValidator.validate(activityHeartRate)
                 } catch (err) {
                     assert.equal(err.message, Strings.ERROR_MESSAGE.REQUIRED_FIELDS)
-                    assert.equal(err.description, 'heart_rate.cardio_zone.min, heart_rate.cardio_zone.max, ' +
-                        'heart_rate.cardio_zone.duration'.concat(Strings.ERROR_MESSAGE.REQUIRED_FIELDS_DESC))
+                    assert.equal(err.description, Strings.ERROR_MESSAGE.REQUIRED_FIELDS_DESC
+                        .replace('{0}', 'heart_rate.cardio_zone.min, heart_rate.cardio_zone.max, ' +
+                            'heart_rate.cardio_zone.duration'))
                 }
             })
         })
@@ -110,8 +114,9 @@ describe('Validators: PhysicalActivityHeartRateValidator', () => {
                     PhysicalActivityHeartRateValidator.validate(activityHeartRate)
                 } catch (err) {
                     assert.equal(err.message, Strings.ERROR_MESSAGE.REQUIRED_FIELDS)
-                    assert.equal(err.description, 'heart_rate.peak_zone.min, heart_rate.peak_zone.max, ' +
-                        'heart_rate.peak_zone.duration'.concat(Strings.ERROR_MESSAGE.REQUIRED_FIELDS_DESC))
+                    assert.equal(err.description, Strings.ERROR_MESSAGE.REQUIRED_FIELDS_DESC
+                        .replace('{0}', 'heart_rate.peak_zone.min, heart_rate.peak_zone.max, ' +
+                            'heart_rate.peak_zone.duration'))
                 }
                 activityHeartRate.peak_zone = peak_zone_aux
             })
@@ -124,7 +129,8 @@ describe('Validators: PhysicalActivityHeartRateValidator', () => {
                     PhysicalActivityHeartRateValidator.validate(activityHeartRate)
                 } catch (err) {
                     assert.equal(err.message, Strings.ERROR_MESSAGE.INVALID_FIELDS)
-                    assert.equal(err.description, 'heart_rate.out_of_range_zone.min'.concat(Strings.ERROR_MESSAGE.NEGATIVE_NUMBER))
+                    assert.equal(err.description, Strings.ERROR_MESSAGE.INTEGER_GREATER_ZERO
+                        .replace('{0}', 'heart_rate.out_of_range_zone.min'))
                 }
                 activityHeartRate.out_of_range_zone!.min = 30
 
@@ -138,7 +144,8 @@ describe('Validators: PhysicalActivityHeartRateValidator', () => {
                     PhysicalActivityHeartRateValidator.validate(activityHeartRate)
                 } catch (err) {
                     assert.equal(err.message, Strings.ERROR_MESSAGE.INVALID_FIELDS)
-                    assert.equal(err.description, 'heart_rate.out_of_range_zone.max'.concat(Strings.ERROR_MESSAGE.NEGATIVE_NUMBER))
+                    assert.equal(err.description, Strings.ERROR_MESSAGE.INTEGER_GREATER_ZERO
+                        .replace('{0}', 'heart_rate.out_of_range_zone.max'))
                 }
                 activityHeartRate.out_of_range_zone!.max = 91
 
@@ -153,7 +160,8 @@ describe('Validators: PhysicalActivityHeartRateValidator', () => {
                     PhysicalActivityHeartRateValidator.validate(activityHeartRate)
                 } catch (err) {
                     assert.equal(err.message, Strings.ERROR_MESSAGE.INVALID_FIELDS)
-                    assert.equal(err.description, 'heart_rate.out_of_range_zone.duration'.concat(Strings.ERROR_MESSAGE.NEGATIVE_NUMBER))
+                    assert.equal(err.description, Strings.ERROR_MESSAGE.NEGATIVE_INTEGER
+                        .replace('{0}', 'heart_rate.out_of_range_zone.duration'))
                 }
                 activityHeartRate.out_of_range_zone!.duration = 60000
 
@@ -167,7 +175,8 @@ describe('Validators: PhysicalActivityHeartRateValidator', () => {
                     PhysicalActivityHeartRateValidator.validate(activityHeartRate)
                 } catch (err) {
                     assert.equal(err.message, Strings.ERROR_MESSAGE.INVALID_FIELDS)
-                    assert.equal(err.description, 'heart_rate.fat_burn_zone.min'.concat(Strings.ERROR_MESSAGE.NEGATIVE_NUMBER))
+                    assert.equal(err.description, Strings.ERROR_MESSAGE.INTEGER_GREATER_ZERO
+                        .replace('{0}', 'heart_rate.fat_burn_zone.min'))
                 }
                 activityHeartRate.fat_burn_zone!.min = 91
             })
@@ -180,7 +189,8 @@ describe('Validators: PhysicalActivityHeartRateValidator', () => {
                     PhysicalActivityHeartRateValidator.validate(activityHeartRate)
                 } catch (err) {
                     assert.equal(err.message, Strings.ERROR_MESSAGE.INVALID_FIELDS)
-                    assert.equal(err.description, 'heart_rate.fat_burn_zone.max'.concat(Strings.ERROR_MESSAGE.NEGATIVE_NUMBER))
+                    assert.equal(err.description, Strings.ERROR_MESSAGE.INTEGER_GREATER_ZERO
+                        .replace('{0}', 'heart_rate.fat_burn_zone.max'))
                 }
                 activityHeartRate.fat_burn_zone!.max = 127
             })
@@ -193,7 +203,8 @@ describe('Validators: PhysicalActivityHeartRateValidator', () => {
                     PhysicalActivityHeartRateValidator.validate(activityHeartRate)
                 } catch (err) {
                     assert.equal(err.message, Strings.ERROR_MESSAGE.INVALID_FIELDS)
-                    assert.equal(err.description, 'heart_rate.fat_burn_zone.duration'.concat(Strings.ERROR_MESSAGE.NEGATIVE_NUMBER))
+                    assert.equal(err.description, Strings.ERROR_MESSAGE.NEGATIVE_INTEGER
+                        .replace('{0}', 'heart_rate.fat_burn_zone.duration'))
                 }
                 activityHeartRate.fat_burn_zone!.duration = 600000
             })
@@ -206,7 +217,8 @@ describe('Validators: PhysicalActivityHeartRateValidator', () => {
                     PhysicalActivityHeartRateValidator.validate(activityHeartRate)
                 } catch (err) {
                     assert.equal(err.message, Strings.ERROR_MESSAGE.INVALID_FIELDS)
-                    assert.equal(err.description, 'heart_rate.cardio_zone.min'.concat(Strings.ERROR_MESSAGE.NEGATIVE_NUMBER))
+                    assert.equal(err.description, Strings.ERROR_MESSAGE.INTEGER_GREATER_ZERO
+                        .replace('{0}', 'heart_rate.cardio_zone.min'))
                 }
                 activityHeartRate.cardio_zone!.min = 127
             })
@@ -219,7 +231,8 @@ describe('Validators: PhysicalActivityHeartRateValidator', () => {
                     PhysicalActivityHeartRateValidator.validate(activityHeartRate)
                 } catch (err) {
                     assert.equal(err.message, Strings.ERROR_MESSAGE.INVALID_FIELDS)
-                    assert.equal(err.description, 'heart_rate.cardio_zone.max'.concat(Strings.ERROR_MESSAGE.NEGATIVE_NUMBER))
+                    assert.equal(err.description, Strings.ERROR_MESSAGE.INTEGER_GREATER_ZERO
+                        .replace('{0}', 'heart_rate.cardio_zone.max'))
                 }
                 activityHeartRate.cardio_zone!.max = 154
             })
@@ -232,7 +245,8 @@ describe('Validators: PhysicalActivityHeartRateValidator', () => {
                     PhysicalActivityHeartRateValidator.validate(activityHeartRate)
                 } catch (err) {
                     assert.equal(err.message, Strings.ERROR_MESSAGE.INVALID_FIELDS)
-                    assert.equal(err.description, 'heart_rate.cardio_zone.duration'.concat(Strings.ERROR_MESSAGE.NEGATIVE_NUMBER))
+                    assert.equal(err.description, Strings.ERROR_MESSAGE.NEGATIVE_INTEGER
+                        .replace('{0}', 'heart_rate.cardio_zone.duration'))
                 }
                 activityHeartRate.cardio_zone!.duration = 60000
             })
@@ -245,7 +259,8 @@ describe('Validators: PhysicalActivityHeartRateValidator', () => {
                     PhysicalActivityHeartRateValidator.validate(activityHeartRate)
                 } catch (err) {
                     assert.equal(err.message, Strings.ERROR_MESSAGE.INVALID_FIELDS)
-                    assert.equal(err.description, 'heart_rate.peak_zone.min'.concat(Strings.ERROR_MESSAGE.NEGATIVE_NUMBER))
+                    assert.equal(err.description, Strings.ERROR_MESSAGE.INTEGER_GREATER_ZERO
+                        .replace('{0}', 'heart_rate.peak_zone.min'))
                 }
                 activityHeartRate.peak_zone!.min = 154
             })
@@ -258,7 +273,8 @@ describe('Validators: PhysicalActivityHeartRateValidator', () => {
                     PhysicalActivityHeartRateValidator.validate(activityHeartRate)
                 } catch (err) {
                     assert.equal(err.message, Strings.ERROR_MESSAGE.INVALID_FIELDS)
-                    assert.equal(err.description, 'heart_rate.peak_zone.max'.concat(Strings.ERROR_MESSAGE.NEGATIVE_NUMBER))
+                    assert.equal(err.description, Strings.ERROR_MESSAGE.INTEGER_GREATER_ZERO
+                        .replace('{0}', 'heart_rate.peak_zone.max'))
                 }
                 activityHeartRate.peak_zone!.max = 220
             })
@@ -271,7 +287,8 @@ describe('Validators: PhysicalActivityHeartRateValidator', () => {
                     PhysicalActivityHeartRateValidator.validate(activityHeartRate)
                 } catch (err) {
                     assert.equal(err.message, Strings.ERROR_MESSAGE.INVALID_FIELDS)
-                    assert.equal(err.description, 'heart_rate.peak_zone.duration'.concat(Strings.ERROR_MESSAGE.NEGATIVE_NUMBER))
+                    assert.equal(err.description, Strings.ERROR_MESSAGE.NEGATIVE_INTEGER
+                        .replace('{0}', 'heart_rate.peak_zone.duration'))
                 }
                 activityHeartRate.peak_zone!.duration = 60000
             })

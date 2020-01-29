@@ -209,8 +209,8 @@ describe('Services: WeightService', () => {
                 return weightService.add(incorrectWeight1)
                     .catch(err => {
                         assert.propertyVal(err, 'message', Strings.ERROR_MESSAGE.REQUIRED_FIELDS)
-                        assert.propertyVal(err, 'description', 'type, timestamp, value, unit, child_id'
-                            .concat(Strings.ERROR_MESSAGE.REQUIRED_FIELDS_DESC))
+                        assert.propertyVal(err, 'description', Strings.ERROR_MESSAGE.REQUIRED_FIELDS_DESC
+                            .replace('{0}', 'type, timestamp, value, unit, child_id'))
                     })
             })
         })
@@ -230,7 +230,8 @@ describe('Services: WeightService', () => {
                 return weightService.add(incorrectWeight3)
                     .catch(err => {
                         assert.propertyVal(err, 'message', Strings.ERROR_MESSAGE.INVALID_FIELDS)
-                        assert.propertyVal(err, 'description', 'body_fat'.concat(Strings.ERROR_MESSAGE.NEGATIVE_NUMBER))
+                        assert.propertyVal(err, 'description', Strings.ERROR_MESSAGE.NEGATIVE_NUMBER
+                            .replace('{0}', 'body_fat'))
                     })
             })
         })
@@ -240,7 +241,8 @@ describe('Services: WeightService', () => {
                 return weightService.add(incorrectWeight4)
                     .catch(err => {
                         assert.propertyVal(err, 'message', Strings.ERROR_MESSAGE.INVALID_FIELDS)
-                        assert.propertyVal(err, 'description', 'body_fat'.concat(Strings.ERROR_MESSAGE.INVALID_NUMBER))
+                        assert.propertyVal(err, 'description', Strings.ERROR_MESSAGE.NEGATIVE_NUMBER
+                            .replace('{0}', 'body_fat'))
                     })
             })
         })
@@ -345,8 +347,8 @@ describe('Services: WeightService', () => {
 
                         assert.propertyVal(result.error[0], 'code', HttpStatus.BAD_REQUEST)
                         assert.propertyVal(result.error[0], 'message', Strings.ERROR_MESSAGE.REQUIRED_FIELDS)
-                        assert.propertyVal(result.error[0], 'description', 'type, timestamp, value, unit, ' +
-                            'child_id'.concat(Strings.ERROR_MESSAGE.REQUIRED_FIELDS_DESC))
+                        assert.propertyVal(result.error[0], 'description', Strings.ERROR_MESSAGE.REQUIRED_FIELDS_DESC
+                            .replace('{0}', 'type, timestamp, value, unit, child_id'))
                     })
             })
         })
@@ -359,20 +361,20 @@ describe('Services: WeightService', () => {
 
                         assert.propertyVal(result.error[0], 'message',
                             Strings.ERROR_MESSAGE.REQUIRED_FIELDS)
-                        assert.propertyVal(result.error[0], 'description',
-                            'type, timestamp, value, unit, child_id'.concat(Strings.ERROR_MESSAGE.REQUIRED_FIELDS_DESC))
+                        assert.propertyVal(result.error[0], 'description', Strings.ERROR_MESSAGE.REQUIRED_FIELDS_DESC
+                            .replace('{0}', 'type, timestamp, value, unit, child_id'))
                         assert.propertyVal(result.error[1], 'message',
                             Strings.CHILD.PARAM_ID_NOT_VALID_FORMAT)
                         assert.propertyVal(result.error[1], 'description',
                             Strings.ERROR_MESSAGE.UUID_NOT_VALID_FORMAT_DESC)
                         assert.propertyVal(result.error[2], 'message',
                             Strings.ERROR_MESSAGE.INVALID_FIELDS)
-                        assert.propertyVal(result.error[2], 'description', 'body_fat'
-                            .concat(Strings.ERROR_MESSAGE.NEGATIVE_NUMBER))
+                        assert.propertyVal(result.error[2], 'description', Strings.ERROR_MESSAGE.NEGATIVE_NUMBER
+                            .replace('{0}', 'body_fat'))
                         assert.propertyVal(result.error[3], 'message',
                             Strings.ERROR_MESSAGE.INVALID_FIELDS)
-                        assert.propertyVal(result.error[3], 'description', 'body_fat'
-                            .concat(Strings.ERROR_MESSAGE.INVALID_NUMBER))
+                        assert.propertyVal(result.error[3], 'description', Strings.ERROR_MESSAGE.NEGATIVE_NUMBER
+                            .replace('{0}', 'body_fat'))
 
                         for (let i = 0; i < result.error.length; i++) {
                             assert.propertyVal(result.error[i], 'code', HttpStatus.BAD_REQUEST)

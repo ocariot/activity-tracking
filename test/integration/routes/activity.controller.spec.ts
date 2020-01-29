@@ -147,6 +147,7 @@ describe('Routes: children.physicalactivities', () => {
 
     const incorrectActivity15: PhysicalActivity = new PhysicalActivityMock()     // The start_time is invalid
     incorrectActivity15.start_time = new Date('2019-12-32T12:52:59Z')
+    incorrectActivity15.end_time = new Date('2020-01-01T12:52:59Z')
 
     // Array with correct and incorrect activities
     const mixedActivitiesArr: Array<PhysicalActivity> = new Array<PhysicalActivityMock>()
@@ -241,8 +242,8 @@ describe('Routes: children.physicalactivities', () => {
                             expect(message).to.have.property('physicalactivity')
                             expect(message.physicalactivity).to.have.property('id')
                             expect(message.physicalactivity.name).to.eql(defaultActivity.name)
-                            expect(message.physicalactivity.start_time).to.eql(defaultActivity.start_time!.toISOString())
-                            expect(message.physicalactivity.end_time).to.eql(defaultActivity.end_time!.toISOString())
+                            expect(message.physicalactivity.start_time).to.eql(defaultActivity.start_time!.toISOString().substr(0, 19))
+                            expect(message.physicalactivity.end_time).to.eql(defaultActivity.end_time!.toISOString().substr(0, 19))
                             expect(message.physicalactivity.duration).to.eql(defaultActivity.duration)
                             expect(message.physicalactivity.calories).to.eql(defaultActivity.calories)
                             if (message.physicalactivity.steps) {
@@ -320,8 +321,8 @@ describe('Routes: children.physicalactivities', () => {
                     .then(res => {
                         expect(res.body).to.have.property('id')
                         expect(res.body.name).to.eql(defaultActivity.name)
-                        expect(res.body.start_time).to.eql(defaultActivity.start_time!.toISOString())
-                        expect(res.body.end_time).to.eql(defaultActivity.end_time!.toISOString())
+                        expect(res.body.start_time).to.eql(defaultActivity.start_time!.toISOString().substr(0, 19))
+                        expect(res.body.end_time).to.eql(defaultActivity.end_time!.toISOString().substr(0, 19))
                         expect(res.body.duration).to.eql(defaultActivity.duration)
                         expect(res.body.calories).to.eql(defaultActivity.calories)
                         if (res.body.steps) {
@@ -393,8 +394,8 @@ describe('Routes: children.physicalactivities', () => {
                     .then(err => {
                         expect(err.body.code).to.eql(400)
                         expect(err.body.message).to.eql(Strings.ERROR_MESSAGE.REQUIRED_FIELDS)
-                        expect(err.body.description).to.eql('start_time, end_time, duration, name, calories'
-                            .concat(Strings.ERROR_MESSAGE.REQUIRED_FIELDS_DESC))
+                        expect(err.body.description).to.eql(Strings.ERROR_MESSAGE.REQUIRED_FIELDS_DESC
+                            .replace('{0}', 'start_time, end_time, duration, name, calories'))
                     })
             })
         })
@@ -419,7 +420,8 @@ describe('Routes: children.physicalactivities', () => {
                     .then(err => {
                         expect(err.body.code).to.eql(400)
                         expect(err.body.message).to.eql(Strings.ERROR_MESSAGE.REQUIRED_FIELDS)
-                        expect(err.body.description).to.eql('name, calories'.concat(Strings.ERROR_MESSAGE.REQUIRED_FIELDS_DESC))
+                        expect(err.body.description).to.eql(Strings.ERROR_MESSAGE.REQUIRED_FIELDS_DESC
+                            .replace('{0}', 'name, calories'))
                     })
             })
         })
@@ -446,7 +448,8 @@ describe('Routes: children.physicalactivities', () => {
                     .then(err => {
                         expect(err.body.code).to.eql(400)
                         expect(err.body.message).to.eql(Strings.ERROR_MESSAGE.INVALID_FIELDS)
-                        expect(err.body.description).to.eql('duration'.concat(Strings.ERROR_MESSAGE.INVALID_NUMBER))
+                        expect(err.body.description).to.eql(Strings.ERROR_MESSAGE.NEGATIVE_INTEGER
+                            .replace('{0}', 'duration'))
                     })
             })
         })
@@ -473,8 +476,7 @@ describe('Routes: children.physicalactivities', () => {
                     .then(err => {
                         expect(err.body.code).to.eql(400)
                         expect(err.body.message).to.eql(Strings.ERROR_MESSAGE.INVALID_FIELDS)
-                        expect(err.body.description).to.eql('The end_time parameter can not contain an older date ' +
-                            'than that the start_time parameter!')
+                        expect(err.body.description).to.eql(Strings.ERROR_MESSAGE.INVALID_START_TIME)
                     })
             })
         })
@@ -528,8 +530,8 @@ describe('Routes: children.physicalactivities', () => {
                     .expect(400)
                     .then(err => {
                         expect(err.body.code).to.eql(400)
-                        expect(err.body.message).to.eql('Datetime: 2019-12-35T12:52:59Z'.concat(Strings.ERROR_MESSAGE.INVALID_DATE))
-                        expect(err.body.description).to.eql(Strings.ERROR_MESSAGE.INVALID_DATE_DESC)
+                        expect(err.body.message).to.eql(Strings.ERROR_MESSAGE.INVALID_DATETIME_FORMAT.
+                        replace('{0}', '2019-12-35T12:52:59Z'))
                     })
             })
         })
@@ -556,7 +558,8 @@ describe('Routes: children.physicalactivities', () => {
                     .then(err => {
                         expect(err.body.code).to.eql(400)
                         expect(err.body.message).to.eql(Strings.ERROR_MESSAGE.INVALID_FIELDS)
-                        expect(err.body.description).to.eql('duration'.concat(Strings.ERROR_MESSAGE.NEGATIVE_NUMBER))
+                        expect(err.body.description).to.eql(Strings.ERROR_MESSAGE.NEGATIVE_INTEGER
+                            .replace('{0}', 'duration'))
                     })
             })
         })
@@ -609,7 +612,7 @@ describe('Routes: children.physicalactivities', () => {
                     .then(err => {
                         expect(err.body.code).to.eql(400)
                         expect(err.body.message).to.eql(Strings.ERROR_MESSAGE.INVALID_FIELDS)
-                        expect(err.body.description).to.eql('name'.concat(Strings.ERROR_MESSAGE.EMPTY_STRING))
+                        expect(err.body.description).to.eql(Strings.ERROR_MESSAGE.EMPTY_STRING.replace('{0}', 'name'))
                     })
             })
         })
@@ -636,7 +639,7 @@ describe('Routes: children.physicalactivities', () => {
                     .then(err => {
                         expect(err.body.code).to.eql(400)
                         expect(err.body.message).to.eql(Strings.ERROR_MESSAGE.INVALID_FIELDS)
-                        expect(err.body.description).to.eql('name'.concat(Strings.ERROR_MESSAGE.INVALID_STRING))
+                        expect(err.body.description).to.eql(Strings.ERROR_MESSAGE.INVALID_STRING.replace('{0}', 'name'))
                     })
             })
         })
@@ -663,7 +666,8 @@ describe('Routes: children.physicalactivities', () => {
                     .then(err => {
                         expect(err.body.code).to.eql(400)
                         expect(err.body.message).to.eql(Strings.ERROR_MESSAGE.INVALID_FIELDS)
-                        expect(err.body.description).to.eql('calories'.concat(Strings.ERROR_MESSAGE.INVALID_NUMBER))
+                        expect(err.body.description).to.eql(Strings.ERROR_MESSAGE.NEGATIVE_NUMBER
+                            .replace('{0}', 'calories'))
                     })
             })
         })
@@ -690,7 +694,8 @@ describe('Routes: children.physicalactivities', () => {
                     .then(err => {
                         expect(err.body.code).to.eql(400)
                         expect(err.body.message).to.eql(Strings.ERROR_MESSAGE.INVALID_FIELDS)
-                        expect(err.body.description).to.eql('calories'.concat(Strings.ERROR_MESSAGE.NEGATIVE_NUMBER))
+                        expect(err.body.description).to.eql(Strings.ERROR_MESSAGE.NEGATIVE_NUMBER
+                            .replace('{0}', 'calories'))
                     })
             })
         })
@@ -717,7 +722,8 @@ describe('Routes: children.physicalactivities', () => {
                     .then(err => {
                         expect(err.body.code).to.eql(400)
                         expect(err.body.message).to.eql(Strings.ERROR_MESSAGE.INVALID_FIELDS)
-                        expect(err.body.description).to.eql('steps'.concat(Strings.ERROR_MESSAGE.INVALID_NUMBER))
+                        expect(err.body.description).to.eql(Strings.ERROR_MESSAGE.NEGATIVE_INTEGER
+                            .replace('{0}', 'steps'))
                     })
             })
         })
@@ -744,7 +750,8 @@ describe('Routes: children.physicalactivities', () => {
                     .then(err => {
                         expect(err.body.code).to.eql(400)
                         expect(err.body.message).to.eql(Strings.ERROR_MESSAGE.INVALID_FIELDS)
-                        expect(err.body.description).to.eql('steps'.concat(Strings.ERROR_MESSAGE.NEGATIVE_NUMBER))
+                        expect(err.body.description).to.eql(Strings.ERROR_MESSAGE.NEGATIVE_INTEGER
+                            .replace('{0}', 'steps'))
                     })
             })
         })
@@ -771,7 +778,8 @@ describe('Routes: children.physicalactivities', () => {
                     .then(err => {
                         expect(err.body.code).to.eql(400)
                         expect(err.body.message).to.eql(Strings.ERROR_MESSAGE.INVALID_FIELDS)
-                        expect(err.body.description).to.eql('distance'.concat(Strings.ERROR_MESSAGE.INVALID_NUMBER))
+                        expect(err.body.description).to.eql(Strings.ERROR_MESSAGE.NEGATIVE_NUMBER
+                            .replace('{0}', 'distance'))
                     })
             })
         })
@@ -798,7 +806,8 @@ describe('Routes: children.physicalactivities', () => {
                     .then(err => {
                         expect(err.body.code).to.eql(400)
                         expect(err.body.message).to.eql(Strings.ERROR_MESSAGE.INVALID_FIELDS)
-                        expect(err.body.description).to.eql('distance'.concat(Strings.ERROR_MESSAGE.NEGATIVE_NUMBER))
+                        expect(err.body.description).to.eql(Strings.ERROR_MESSAGE.NEGATIVE_NUMBER
+                            .replace('{0}', 'distance'))
                     })
             })
         })
@@ -887,7 +896,8 @@ describe('Routes: children.physicalactivities', () => {
                     .then(err => {
                         expect(err.body.code).to.eql(400)
                         expect(err.body.message).to.eql(Strings.ERROR_MESSAGE.INVALID_FIELDS)
-                        expect(err.body.description).to.eql('levels.duration'.concat(Strings.ERROR_MESSAGE.INVALID_NUMBER))
+                        expect(err.body.description).to.eql(Strings.ERROR_MESSAGE.NEGATIVE_INTEGER
+                            .replace('{0}', 'levels.duration'))
                     })
             })
         })
@@ -976,7 +986,8 @@ describe('Routes: children.physicalactivities', () => {
                     .then(err => {
                         expect(err.body.code).to.eql(400)
                         expect(err.body.message).to.eql(Strings.ERROR_MESSAGE.INVALID_FIELDS)
-                        expect(err.body.description).to.eql('levels.duration'.concat(Strings.ERROR_MESSAGE.NEGATIVE_NUMBER))
+                        expect(err.body.description).to.eql(Strings.ERROR_MESSAGE.NEGATIVE_INTEGER
+                            .replace('{0}', 'levels.duration'))
                     })
             })
         })
@@ -1004,9 +1015,9 @@ describe('Routes: children.physicalactivities', () => {
                     .then(err => {
                         expect(err.body.code).to.eql(400)
                         expect(err.body.message).to.eql(Strings.ERROR_MESSAGE.REQUIRED_FIELDS)
-                        expect(err.body.description).to.eql('heart_rate.average, heart_rate.out_of_range_zone, ' +
-                            'heart_rate.fat_burn_zone, heart_rate.cardio_zone, heart_rate.peak_zone'
-                                .concat(Strings.ERROR_MESSAGE.REQUIRED_FIELDS_DESC))
+                        expect(err.body.description).to.eql( Strings.ERROR_MESSAGE.REQUIRED_FIELDS_DESC
+                            .replace('{0}', 'heart_rate.average, heart_rate.out_of_range_zone, ' +
+                                'heart_rate.fat_burn_zone, heart_rate.cardio_zone, heart_rate.peak_zone'))
                     })
             })
         })
@@ -1040,7 +1051,8 @@ describe('Routes: children.physicalactivities', () => {
                     .then(err => {
                         expect(err.body.code).to.eql(400)
                         expect(err.body.message).to.eql(Strings.ERROR_MESSAGE.INVALID_FIELDS)
-                        expect(err.body.description).to.eql('heart_rate.average'.concat(Strings.ERROR_MESSAGE.INVALID_NUMBER))
+                        expect(err.body.description).to.eql(Strings.ERROR_MESSAGE.INTEGER_GREATER_ZERO
+                            .replace('{0}', 'heart_rate.average'))
                     })
             })
         })
@@ -1068,7 +1080,8 @@ describe('Routes: children.physicalactivities', () => {
                     .then(err => {
                         expect(err.body.code).to.eql(400)
                         expect(err.body.message).to.eql(Strings.ERROR_MESSAGE.INVALID_FIELDS)
-                        expect(err.body.description).to.eql('heart_rate.average'.concat(Strings.ERROR_MESSAGE.NEGATIVE_NUMBER))
+                        expect(err.body.description).to.eql(Strings.ERROR_MESSAGE.INTEGER_GREATER_ZERO
+                            .replace('{0}', 'heart_rate.average'))
                     })
             })
         })
@@ -1096,9 +1109,9 @@ describe('Routes: children.physicalactivities', () => {
                     .then(err => {
                         expect(err.body.code).to.eql(400)
                         expect(err.body.message).to.eql(Strings.ERROR_MESSAGE.REQUIRED_FIELDS)
-                        expect(err.body.description).to.eql('heart_rate.fat_burn_zone.min, ' +
-                            'heart_rate.fat_burn_zone.max, heart_rate.fat_burn_zone.duration'
-                                .concat(Strings.ERROR_MESSAGE.REQUIRED_FIELDS_DESC))
+                        expect(err.body.description).to.eql(Strings.ERROR_MESSAGE.REQUIRED_FIELDS_DESC
+                            .replace('{0}', 'heart_rate.fat_burn_zone.min, heart_rate.fat_burn_zone.max, ' +
+                                'heart_rate.fat_burn_zone.duration'))
                     })
             })
         })
@@ -1133,8 +1146,8 @@ describe('Routes: children.physicalactivities', () => {
                     .then(err => {
                         expect(err.body.code).to.eql(400)
                         expect(err.body.message).to.eql(Strings.ERROR_MESSAGE.INVALID_FIELDS)
-                        expect(err.body.description).to.eql('heart_rate.fat_burn_zone.min' +
-                            Strings.ERROR_MESSAGE.INVALID_NUMBER)
+                        expect(err.body.description).to.eql(Strings.ERROR_MESSAGE.INTEGER_GREATER_ZERO
+                            .replace('{0}', 'heart_rate.fat_burn_zone.min'))
                     })
             })
         })
@@ -1169,8 +1182,8 @@ describe('Routes: children.physicalactivities', () => {
                         .then(err => {
                             expect(err.body.code).to.eql(400)
                             expect(err.body.message).to.eql(Strings.ERROR_MESSAGE.INVALID_FIELDS)
-                            expect(err.body.description).to.eql('heart_rate.fat_burn_zone.min' +
-                                Strings.ERROR_MESSAGE.NEGATIVE_NUMBER)
+                            expect(err.body.description).to.eql(Strings.ERROR_MESSAGE.INTEGER_GREATER_ZERO
+                                .replace('{0}', 'heart_rate.fat_burn_zone.min'))
                         })
                 })
         })
@@ -1205,8 +1218,8 @@ describe('Routes: children.physicalactivities', () => {
                         .then(err => {
                             expect(err.body.code).to.eql(400)
                             expect(err.body.message).to.eql(Strings.ERROR_MESSAGE.INVALID_FIELDS)
-                            expect(err.body.description).to.eql('heart_rate.fat_burn_zone.max' +
-                                Strings.ERROR_MESSAGE.INVALID_NUMBER)
+                            expect(err.body.description).to.eql(Strings.ERROR_MESSAGE.INTEGER_GREATER_ZERO
+                                .replace('{0}', 'heart_rate.fat_burn_zone.max'))
                         })
                 })
         })
@@ -1241,8 +1254,8 @@ describe('Routes: children.physicalactivities', () => {
                         .then(err => {
                             expect(err.body.code).to.eql(400)
                             expect(err.body.message).to.eql(Strings.ERROR_MESSAGE.INVALID_FIELDS)
-                            expect(err.body.description).to.eql('heart_rate.fat_burn_zone.max' +
-                                Strings.ERROR_MESSAGE.NEGATIVE_NUMBER)
+                            expect(err.body.description).to.eql(Strings.ERROR_MESSAGE.INTEGER_GREATER_ZERO
+                                .replace('{0}', 'heart_rate.fat_burn_zone.max'))
                         })
                 })
         })
@@ -1277,8 +1290,8 @@ describe('Routes: children.physicalactivities', () => {
                         .then(err => {
                             expect(err.body.code).to.eql(400)
                             expect(err.body.message).to.eql(Strings.ERROR_MESSAGE.INVALID_FIELDS)
-                            expect(err.body.description).to.eql('heart_rate.fat_burn_zone.duration' +
-                                Strings.ERROR_MESSAGE.INVALID_NUMBER)
+                            expect(err.body.description).to.eql(Strings.ERROR_MESSAGE.NEGATIVE_INTEGER
+                                .replace('{0}', 'heart_rate.fat_burn_zone.duration'))
                         })
                 })
         })
@@ -1307,8 +1320,8 @@ describe('Routes: children.physicalactivities', () => {
                     .then(err => {
                         expect(err.body.code).to.eql(400)
                         expect(err.body.message).to.eql(Strings.ERROR_MESSAGE.INVALID_FIELDS)
-                        expect(err.body.description).to.eql('heart_rate.fat_burn_zone.duration' +
-                            Strings.ERROR_MESSAGE.NEGATIVE_NUMBER)
+                        expect(err.body.description).to.eql(Strings.ERROR_MESSAGE.NEGATIVE_INTEGER
+                            .replace('{0}', 'heart_rate.fat_burn_zone.duration'))
                     })
             })
         })
@@ -1355,8 +1368,8 @@ describe('Routes: children.physicalactivities', () => {
                             expect(res.body.success[i].code).to.eql(HttpStatus.CREATED)
                             expect(res.body.success[i].item).to.have.property('id')
                             expect(res.body.success[i].item.name).to.eql(correctActivitiesArr[i].name)
-                            expect(res.body.success[i].item.start_time).to.eql(correctActivitiesArr[i].start_time!.toISOString())
-                            expect(res.body.success[i].item.end_time).to.eql(correctActivitiesArr[i].end_time!.toISOString())
+                            expect(res.body.success[i].item.start_time).to.eql(correctActivitiesArr[i].start_time!.toISOString().substr(0, 19))
+                            expect(res.body.success[i].item.end_time).to.eql(correctActivitiesArr[i].end_time!.toISOString().substr(0, 19))
                             expect(res.body.success[i].item.duration).to.eql(correctActivitiesArr[i].duration)
                             expect(res.body.success[i].item.calories).to.eql(correctActivitiesArr[i].calories)
                             if (correctActivitiesArr[i].steps) {
@@ -1430,8 +1443,8 @@ describe('Routes: children.physicalactivities', () => {
                             expect(res.body.error[i].code).to.eql(HttpStatus.CONFLICT)
                             expect(res.body.error[i].message).to.eql(Strings.PHYSICAL_ACTIVITY.ALREADY_REGISTERED)
                             expect(res.body.error[i].item.name).to.eql(correctActivitiesArr[i].name)
-                            expect(res.body.error[i].item.start_time).to.eql(correctActivitiesArr[i].start_time!.toISOString())
-                            expect(res.body.error[i].item.end_time).to.eql(correctActivitiesArr[i].end_time!.toISOString())
+                            expect(res.body.error[i].item.start_time).to.eql(correctActivitiesArr[i].start_time!.toISOString().substr(0, 19))
+                            expect(res.body.error[i].item.end_time).to.eql(correctActivitiesArr[i].end_time!.toISOString().substr(0, 19))
                             expect(res.body.error[i].item.duration).to.eql(correctActivitiesArr[i].duration)
                             expect(res.body.error[i].item.calories).to.eql(correctActivitiesArr[i].calories)
                             if (correctActivitiesArr[i].steps) {
@@ -1491,8 +1504,8 @@ describe('Routes: children.physicalactivities', () => {
                         expect(res.body.success[0].code).to.eql(HttpStatus.CREATED)
                         expect(res.body.success[0].item).to.have.property('id')
                         expect(res.body.success[0].item.name).to.eql(mixedActivitiesArr[0].name)
-                        expect(res.body.success[0].item.start_time).to.eql(mixedActivitiesArr[0].start_time!.toISOString())
-                        expect(res.body.success[0].item.end_time).to.eql(mixedActivitiesArr[0].end_time!.toISOString())
+                        expect(res.body.success[0].item.start_time).to.eql(mixedActivitiesArr[0].start_time!.toISOString().substr(0, 19))
+                        expect(res.body.success[0].item.end_time).to.eql(mixedActivitiesArr[0].end_time!.toISOString().substr(0, 19))
                         expect(res.body.success[0].item.duration).to.eql(mixedActivitiesArr[0].duration)
                         expect(res.body.success[0].item.calories).to.eql(mixedActivitiesArr[0].calories)
                         if (mixedActivitiesArr[0].steps) {
@@ -1511,8 +1524,8 @@ describe('Routes: children.physicalactivities', () => {
                         // Error item
                         expect(res.body.error[0].code).to.eql(HttpStatus.BAD_REQUEST)
                         expect(res.body.error[0].message).to.eql(Strings.ERROR_MESSAGE.REQUIRED_FIELDS)
-                        expect(res.body.error[0].description).to.eql('start_time, end_time, duration, name, ' +
-                            'calories'.concat(Strings.ERROR_MESSAGE.REQUIRED_FIELDS_DESC))
+                        expect(res.body.error[0].description).to.eql(Strings.ERROR_MESSAGE.REQUIRED_FIELDS_DESC
+                            .replace('{0}', 'start_time, end_time, duration, name, calories'))
                     })
             })
         })
@@ -1552,23 +1565,25 @@ describe('Routes: children.physicalactivities', () => {
                     .expect(207)
                     .then(res => {
                         expect(res.body.error[0].message).to.eql(Strings.ERROR_MESSAGE.REQUIRED_FIELDS)
-                        expect(res.body.error[0].description).to.eql('start_time, end_time, duration, name, ' +
-                            'calories'.concat(Strings.ERROR_MESSAGE.REQUIRED_FIELDS_DESC))
+                        expect(res.body.error[0].description).to.eql( Strings.ERROR_MESSAGE.REQUIRED_FIELDS_DESC
+                            .replace('{0}', 'start_time, end_time, duration, name, calories'))
                         expect(res.body.error[1].message).to.eql(Strings.ERROR_MESSAGE.REQUIRED_FIELDS)
-                        expect(res.body.error[1].description).to.eql('name, calories'
-                            .concat(Strings.ERROR_MESSAGE.REQUIRED_FIELDS_DESC))
+                        expect(res.body.error[1].description).to.eql( Strings.ERROR_MESSAGE.REQUIRED_FIELDS_DESC
+                            .replace('{0}', 'name, calories'))
                         expect(res.body.error[2].message).to.eql(Strings.ERROR_MESSAGE.INVALID_FIELDS)
-                        expect(res.body.error[2].description).to.eql('The end_time parameter can not contain an ' +
-                            'older date than that the start_time parameter!')
+                        expect(res.body.error[2].description).to.eql(Strings.ERROR_MESSAGE.INVALID_START_TIME)
                         expect(res.body.error[3].message).to.eql(Strings.ERROR_MESSAGE.INVALID_FIELDS)
                         expect(res.body.error[3].description).to.eql('duration value does not match values passed ' +
                             'in start_time and end_time parameters!')
                         expect(res.body.error[4].message).to.eql(Strings.ERROR_MESSAGE.INVALID_FIELDS)
-                        expect(res.body.error[4].description).to.eql('duration'.concat(Strings.ERROR_MESSAGE.NEGATIVE_NUMBER))
+                        expect(res.body.error[4].description).to.eql(Strings.ERROR_MESSAGE.NEGATIVE_INTEGER
+                            .replace('{0}', 'duration'))
                         expect(res.body.error[5].message).to.eql(Strings.ERROR_MESSAGE.INVALID_FIELDS)
-                        expect(res.body.error[5].description).to.eql('calories'.concat(Strings.ERROR_MESSAGE.NEGATIVE_NUMBER))
+                        expect(res.body.error[5].description).to.eql(Strings.ERROR_MESSAGE.NEGATIVE_NUMBER
+                            .replace('{0}', 'calories'))
                         expect(res.body.error[6].message).to.eql(Strings.ERROR_MESSAGE.INVALID_FIELDS)
-                        expect(res.body.error[6].description).to.eql('steps'.concat(Strings.ERROR_MESSAGE.NEGATIVE_NUMBER))
+                        expect(res.body.error[6].description).to.eql(Strings.ERROR_MESSAGE.NEGATIVE_INTEGER
+                            .replace('{0}', 'steps'))
                         expect(res.body.error[7].message).to.eql(Strings.ERROR_MESSAGE.INVALID_FIELDS)
                         expect(res.body.error[7].description).to.eql('The names of the allowed levels are: ' +
                             'sedentary, lightly, fairly, very.')
@@ -1576,31 +1591,40 @@ describe('Routes: children.physicalactivities', () => {
                         expect(res.body.error[8].description).to.eql('The levels array must have values for ' +
                             'the following levels: sedentary, lightly, fairly, very.')
                         expect(res.body.error[9].message).to.eql(Strings.ERROR_MESSAGE.INVALID_FIELDS)
-                        expect(res.body.error[9].description).to.eql('levels.duration'.concat(Strings.ERROR_MESSAGE.NEGATIVE_NUMBER))
+                        expect(res.body.error[9].description).to.eql(Strings.ERROR_MESSAGE.NEGATIVE_INTEGER
+                            .replace('{0}', 'levels.duration'))
                         expect(res.body.error[10].message).to.eql(Strings.ERROR_MESSAGE.REQUIRED_FIELDS)
-                        expect(res.body.error[10].description).to.eql('heart_rate.average, heart_rate.out_of_range_zone, ' +
-                            'heart_rate.fat_burn_zone, heart_rate.cardio_zone, heart_rate.peak_zone'
-                                .concat(Strings.ERROR_MESSAGE.REQUIRED_FIELDS_DESC))
+                        expect(res.body.error[10].description).to.eql(Strings.ERROR_MESSAGE.REQUIRED_FIELDS_DESC
+                            .replace('{0}', 'heart_rate.average, heart_rate.out_of_range_zone, ' +
+                                'heart_rate.fat_burn_zone, heart_rate.cardio_zone, heart_rate.peak_zone'))
                         expect(res.body.error[11].message).to.eql(Strings.ERROR_MESSAGE.INVALID_FIELDS)
-                        expect(res.body.error[11].description).to.eql('heart_rate.average'
-                            .concat(Strings.ERROR_MESSAGE.NEGATIVE_NUMBER))
+                        expect(res.body.error[11].description).to.eql(Strings.ERROR_MESSAGE.INTEGER_GREATER_ZERO
+                            .replace('{0}', 'heart_rate.average'))
                         expect(res.body.error[12].message).to.eql(Strings.ERROR_MESSAGE.REQUIRED_FIELDS)
-                        expect(res.body.error[12].description).to.eql('heart_rate.fat_burn_zone.min, ' +
-                            'heart_rate.fat_burn_zone.max, heart_rate.fat_burn_zone.duration'
-                                .concat(Strings.ERROR_MESSAGE.REQUIRED_FIELDS_DESC))
+                        expect(res.body.error[12].description).to.eql(Strings.ERROR_MESSAGE.REQUIRED_FIELDS_DESC
+                            .replace('{0}', 'heart_rate.fat_burn_zone.min, heart_rate.fat_burn_zone.max, ' +
+                                'heart_rate.fat_burn_zone.duration'))
                         expect(res.body.error[13].message).to.eql(Strings.ERROR_MESSAGE.INVALID_FIELDS)
-                        expect(res.body.error[13].description).to.eql('heart_rate.fat_burn_zone.duration'
-                            .concat(Strings.ERROR_MESSAGE.NEGATIVE_NUMBER))
-                        expect(res.body.error[14].message).to.eql('Datetime: null'.concat(Strings.ERROR_MESSAGE.INVALID_DATE))
-                        expect(res.body.error[14].description).to.eql(Strings.ERROR_MESSAGE.INVALID_DATE_DESC)
+                        expect(res.body.error[13].description).to.eql(Strings.ERROR_MESSAGE.NEGATIVE_INTEGER
+                            .replace('{0}', 'heart_rate.fat_burn_zone.duration'))
+                        expect(res.body.error[14].message).to.eql(Strings.ERROR_MESSAGE.INVALID_DATETIME_FORMAT.
+                        replace('{0}', 'null'))
+                        expect(res.body.error[14].description).to.eql(Strings.ERROR_MESSAGE.INVALID_DATETIME_FORMAT_DESC)
 
                         for (let i = 0; i < res.body.error.length; i++) {
                             expect(res.body.error[i].code).to.eql(HttpStatus.BAD_REQUEST)
                             expect(res.body.error[i].item.name).to.eql(incorrectActivitiesArr[i].name)
-                            if (res.body.error[i].item.start_time)
-                                expect(res.body.error[i].item.start_time).to.eql(incorrectActivitiesArr[i].start_time!.toISOString())
-                            if (res.body.error[i].item.end_time)
-                                expect(res.body.error[i].item.end_time).to.eql(incorrectActivitiesArr[i].end_time!.toISOString())
+                            if (res.body.error[i].item.start_time) {
+                                expect(res.body.error[i].item.start_time)
+                                    .to.eql(incorrectActivitiesArr[i].start_time!.toISOString().substr(0, 19))
+                            }
+                            if (res.body.error[i].item.end_time) {
+                                const dateToBeCompared = i !== 14
+                                    ? incorrectActivitiesArr[i].end_time!.toISOString().substr(0, 19)
+                                    : incorrectActivitiesArr[i].end_time!.toISOString()
+                                expect(res.body.error[i].item.end_time)
+                                    .to.eql(dateToBeCompared)
+                            }
                             expect(res.body.error[i].item.duration).to.eql(incorrectActivitiesArr[i].duration)
                             expect(res.body.error[i].item.calories).to.eql(incorrectActivitiesArr[i].calories)
                             if (incorrectActivitiesArr[i].steps) {
@@ -1672,8 +1696,8 @@ describe('Routes: children.physicalactivities', () => {
                         expect(res.body.length).to.eql(1)
                         expect(res.body[0]).to.have.property('id')
                         expect(res.body[0].name).to.eql(defaultActivity.name)
-                        expect(res.body[0].start_time).to.eql(defaultActivity.start_time!.toISOString())
-                        expect(res.body[0].end_time).to.eql(defaultActivity.end_time!.toISOString())
+                        expect(res.body[0].start_time).to.eql(defaultActivity.start_time!.toISOString().substr(0, 19))
+                        expect(res.body[0].end_time).to.eql(defaultActivity.end_time!.toISOString().substr(0, 19))
                         expect(res.body[0].duration).to.eql(defaultActivity.duration)
                         expect(res.body[0].calories).to.eql(defaultActivity.calories)
                         if (defaultActivity.steps) {
@@ -1801,8 +1825,8 @@ describe('Routes: children.physicalactivities', () => {
                         expect(res.body.length).to.eql(1)
                         expect(res.body[0]).to.have.property('id')
                         expect(res.body[0].name).to.eql(defaultActivity.name)
-                        expect(res.body[0].start_time).to.eql(result1.start_time.toISOString())
-                        expect(res.body[0].end_time).to.eql(result1.end_time.toISOString())
+                        expect(res.body[0].start_time).to.eql(result1.start_time.toISOString().substr(0, 19))
+                        expect(res.body[0].end_time).to.eql(result1.end_time.toISOString().substr(0, 19))
                         expect(res.body[0].duration).to.eql(defaultActivity.duration)
                         expect(res.body[0].calories).to.eql(defaultActivity.calories)
                         if (defaultActivity.steps) {
@@ -1886,8 +1910,8 @@ describe('Routes: children.physicalactivities', () => {
                     .then(res => {
                         expect(res.body).to.have.property('id')
                         expect(res.body.name).to.eql(defaultActivity.name)
-                        expect(res.body.start_time).to.eql(defaultActivity.start_time!.toISOString())
-                        expect(res.body.end_time).to.eql(defaultActivity.end_time!.toISOString())
+                        expect(res.body.start_time).to.eql(defaultActivity.start_time!.toISOString().substr(0, 19))
+                        expect(res.body.end_time).to.eql(defaultActivity.end_time!.toISOString().substr(0, 19))
                         expect(res.body.duration).to.eql(defaultActivity.duration)
                         expect(res.body.calories).to.eql(defaultActivity.calories)
                         if (defaultActivity.steps) {
@@ -2344,7 +2368,7 @@ describe('Routes: children.physicalactivities', () => {
     //                     expect(err.body.code).to.eql(400)
     //                     expect(err.body.message).to.eql('Calories field is invalid...')
     //                     expect(err.body.description).to.eql('Physical Activity validation failed: '
-    //                         .concat(Strings.ERROR_MESSAGE.INVALID_NUMBER))
+    //                         .concat(Strings.ERROR_MESSAGE.NEGATIVE_NUMBER))
     //                 })
     //         })
     //     })
@@ -2400,7 +2424,7 @@ describe('Routes: children.physicalactivities', () => {
     //                     expect(err.body.code).to.eql(400)
     //                     expect(err.body.message).to.eql('Steps field is invalid...')
     //                     expect(err.body.description).to.eql('Physical Activity validation failed: '
-    //                         .concat(Strings.ERROR_MESSAGE.INVALID_NUMBER))
+    //                         .concat(Strings.ERROR_MESSAGE.NEGATIVE_NUMBER))
     //                 })
     //         })
     //     })
@@ -2456,7 +2480,7 @@ describe('Routes: children.physicalactivities', () => {
     //                     expect(err.body.code).to.eql(400)
     //                     expect(err.body.message).to.eql('Distance field is invalid...')
     //                     expect(err.body.description).to.eql('Physical Activity validation failed: '
-    //                         .concat(Strings.ERROR_MESSAGE.INVALID_NUMBER))
+    //                         .concat(Strings.ERROR_MESSAGE.NEGATIVE_NUMBER))
     //                 })
     //         })
     //     })

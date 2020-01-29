@@ -29,7 +29,8 @@ describe('Validators: CreateSleepValidator', () => {
                     CreateSleepValidator.validate(sleep)
                 } catch (err) {
                     assert.equal(err.message, Strings.ERROR_MESSAGE.REQUIRED_FIELDS)
-                    assert.equal(err.description, 'start_time'.concat(Strings.ERROR_MESSAGE.REQUIRED_FIELDS_DESC))
+                    assert.equal(err.description, Strings.ERROR_MESSAGE.REQUIRED_FIELDS_DESC
+                        .replace('{0}', 'start_time'))
                 }
             })
         })
@@ -43,8 +44,8 @@ describe('Validators: CreateSleepValidator', () => {
                     CreateSleepValidator.validate(sleep)
                 } catch (err) {
                     assert.equal(err.message, Strings.ERROR_MESSAGE.REQUIRED_FIELDS)
-                    assert.equal(err.description, 'start_time, end_time, duration, child_id'
-                        .concat(Strings.ERROR_MESSAGE.REQUIRED_FIELDS_DESC))
+                    assert.equal(err.description, Strings.ERROR_MESSAGE.REQUIRED_FIELDS_DESC
+                        .replace('{0}', 'start_time, end_time, duration, child_id'))
                 }
             })
         })
@@ -59,8 +60,7 @@ describe('Validators: CreateSleepValidator', () => {
                     CreateSleepValidator.validate(sleep)
                 } catch (err) {
                     assert.equal(err.message, Strings.ERROR_MESSAGE.INVALID_FIELDS)
-                    assert.equal(err.description, 'The end_time parameter can not contain an older date ' +
-                        'than that the start_time parameter!')
+                    assert.equal(err.description, Strings.ERROR_MESSAGE.INVALID_START_TIME)
                 }
             })
         })
@@ -86,7 +86,8 @@ describe('Validators: CreateSleepValidator', () => {
                     CreateSleepValidator.validate(sleep)
                 } catch (err) {
                     assert.equal(err.message, Strings.ERROR_MESSAGE.INVALID_FIELDS)
-                    assert.equal(err.description, 'duration'.concat(Strings.ERROR_MESSAGE.NEGATIVE_NUMBER))
+                    assert.equal(err.description, Strings.ERROR_MESSAGE.NEGATIVE_INTEGER
+                        .replace('{0}', 'duration'))
                 }
                 sleep.duration = 29520000
             })
@@ -115,7 +116,8 @@ describe('Validators: CreateSleepValidator', () => {
                     CreateSleepValidator.validate(sleep)
                 } catch (err) {
                     assert.equal(err.message, Strings.ERROR_MESSAGE.REQUIRED_FIELDS)
-                    assert.equal(err.description, 'pattern'.concat(Strings.ERROR_MESSAGE.REQUIRED_FIELDS_DESC))
+                    assert.equal(err.description, Strings.ERROR_MESSAGE.REQUIRED_FIELDS_DESC
+                        .replace('{0}', 'pattern'))
                 }
             })
         })
@@ -136,7 +138,8 @@ describe('Validators: CreateSleepValidator', () => {
                     CreateSleepValidator.validate(invalidSleep)
                 } catch (err) {
                     assert.equal(err.message, Strings.ERROR_MESSAGE.REQUIRED_FIELDS)
-                    assert.equal(err.description, 'type, pattern'.concat(Strings.ERROR_MESSAGE.REQUIRED_FIELDS_DESC))
+                    assert.equal(err.description, Strings.ERROR_MESSAGE.REQUIRED_FIELDS_DESC
+                        .replace('{0}', 'type, pattern'))
                 }
             })
         })
@@ -200,7 +203,8 @@ describe('Validators: CreateSleepValidator', () => {
                         CreateSleepValidator.validate(sleep)
                     } catch (err) {
                         assert.equal(err.message, Strings.ERROR_MESSAGE.REQUIRED_FIELDS)
-                        assert.equal(err.description, 'pattern.data_set.start_time'.concat(Strings.ERROR_MESSAGE.REQUIRED_FIELDS_DESC))
+                        assert.equal(err.description, Strings.ERROR_MESSAGE.REQUIRED_FIELDS_DESC
+                            .replace('{0}', 'pattern.data_set.start_time'))
                     }
                 })
         })
@@ -215,8 +219,9 @@ describe('Validators: CreateSleepValidator', () => {
                         CreateSleepValidator.validate(sleep)
                     } catch (err) {
                         assert.equal(err.message, Strings.ERROR_MESSAGE.REQUIRED_FIELDS)
-                        assert.equal(err.description, 'pattern.data_set.start_time, pattern.data_set.name, ' +
-                            'pattern.data_set.duration'.concat(Strings.ERROR_MESSAGE.REQUIRED_FIELDS_DESC))
+                        assert.equal(err.description, Strings.ERROR_MESSAGE.REQUIRED_FIELDS_DESC
+                            .replace('{0}', 'pattern.data_set.start_time, pattern.data_set.name, ' +
+                                'pattern.data_set.duration'))
                     }
                 })
         })
@@ -234,7 +239,8 @@ describe('Validators: CreateSleepValidator', () => {
                         CreateSleepValidator.validate(sleep)
                     } catch (err) {
                         assert.equal(err.message, Strings.ERROR_MESSAGE.INVALID_FIELDS)
-                        assert.equal(err.description, 'pattern.data_set.duration'.concat(Strings.ERROR_MESSAGE.NEGATIVE_NUMBER))
+                        assert.equal(err.description, Strings.ERROR_MESSAGE.NEGATIVE_INTEGER
+                            .replace('{0}', 'pattern.data_set.duration'))
                     }
                     dataSetItemTest.duration = 60000
                 })

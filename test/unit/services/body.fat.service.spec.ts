@@ -101,8 +101,8 @@ describe('Services: BodyFatService', () => {
                 return bodyFatService.add(incorrectBodyFat)
                     .catch(err => {
                         assert.propertyVal(err, 'message', Strings.ERROR_MESSAGE.REQUIRED_FIELDS)
-                        assert.propertyVal(err, 'description', 'type, timestamp, value, unit, child_id'
-                            .concat(Strings.ERROR_MESSAGE.REQUIRED_FIELDS_DESC))
+                        assert.propertyVal(err, 'description', Strings.ERROR_MESSAGE.REQUIRED_FIELDS_DESC
+                            .replace('{0}', 'type, timestamp, value, unit, child_id'))
                     })
             })
         })
@@ -207,8 +207,8 @@ describe('Services: BodyFatService', () => {
 
                         assert.propertyVal(result.error[0], 'code', HttpStatus.BAD_REQUEST)
                         assert.propertyVal(result.error[0], 'message', Strings.ERROR_MESSAGE.REQUIRED_FIELDS)
-                        assert.propertyVal(result.error[0], 'description', 'type, timestamp, value, unit, ' +
-                            'child_id'.concat(Strings.ERROR_MESSAGE.REQUIRED_FIELDS_DESC))
+                        assert.propertyVal(result.error[0], 'description', Strings.ERROR_MESSAGE.REQUIRED_FIELDS_DESC
+                            .replace('{0}', 'type, timestamp, value, unit, child_id'))
                     })
             })
         })
@@ -222,7 +222,8 @@ describe('Services: BodyFatService', () => {
                         assert.propertyVal(result.error[0], 'message',
                             Strings.ERROR_MESSAGE.REQUIRED_FIELDS)
                         assert.propertyVal(result.error[0], 'description',
-                            'type, timestamp, value, unit, child_id'.concat(Strings.ERROR_MESSAGE.REQUIRED_FIELDS_DESC))
+                            Strings.ERROR_MESSAGE.REQUIRED_FIELDS_DESC
+                                .replace('{0}', 'type, timestamp, value, unit, child_id'))
                         assert.propertyVal(result.error[1], 'message',
                             Strings.CHILD.PARAM_ID_NOT_VALID_FORMAT)
                         assert.propertyVal(result.error[1], 'description',

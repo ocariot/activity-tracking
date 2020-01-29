@@ -6,8 +6,8 @@ import { ValidationException } from '../../../src/application/domain/exception/v
 describe('Models: Activity', () => {
     const activityJSON: any = {
         id: new ObjectID(),
-        start_time: new Date(),
-        end_time: new Date(),
+        start_time: new Date('2018-08-18T01:30:30Z'),
+        end_time: new Date('2018-08-18T01:30:30Z'),
         duration: 900000,
         child_id: new ObjectID()
     }
@@ -72,8 +72,8 @@ describe('Models: Activity', () => {
                 let result = new Activity().fromJSON(activityJSON)
                 result = result.toJSON()
                 assert.propertyVal(result, 'id', activityJSON.id)
-                assert.propertyVal(result, 'start_time', activityJSON.start_time)
-                assert.propertyVal(result, 'end_time', activityJSON.end_time)
+                assert.propertyVal(result, 'start_time', activityJSON.start_time.toISOString().substr(0, 19))
+                assert.propertyVal(result, 'end_time', activityJSON.end_time.toISOString().substr(0, 19))
                 assert.propertyVal(result, 'duration', activityJSON.duration)
                 assert.propertyVal(result, 'child_id', activityJSON.child_id)
             })

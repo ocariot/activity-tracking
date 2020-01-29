@@ -61,7 +61,7 @@ export class SleepPatternDataSet implements IJSONSerializable, IJSONDeserializab
 
     public toJSON(): any {
         return {
-            start_time: this.start_time,
+            start_time: this.start_time?.toISOString().substr(0, 19),
             name: this.name,
             duration: this.duration
         }

@@ -19,8 +19,9 @@ describe('Validators: DatetimeValidator', () => {
                 try {
                     DatetimeValidator.validate(date)
                 } catch (err) {
-                    assert.equal(err.message, 'Datetime: 20199-03-11'.concat(Strings.ERROR_MESSAGE.INVALID_DATE))
-                    assert.equal(err.description, Strings.ERROR_MESSAGE.INVALID_DATE_DESC)
+                    assert.equal(err.message, Strings.ERROR_MESSAGE.INVALID_DATETIME_FORMAT
+                        .replace('{0}', '20199-03-11'))
+                    assert.equal(err.description, Strings.ERROR_MESSAGE.INVALID_DATETIME_FORMAT_DESC)
                 }
             })
         })

@@ -117,10 +117,10 @@ describe('Services: Log', () => {
 
                 return logService.addLogs(incorrectLogsArr)
                     .then(result => {
-                        assert.propertyVal(result.error[0], 'message',
-                            'Datetime: 20199-03-08'.concat(Strings.ERROR_MESSAGE.INVALID_DATE))
+                        assert.propertyVal(result.error[0], 'message', Strings.ERROR_MESSAGE.INVALID_DATE_FORMAT
+                            .replace('{0}', '20199-03-08'))
                         assert.propertyVal(result.error[0], 'description',
-                            'Date must be in the format: yyyy-MM-dd')
+                            Strings.ERROR_MESSAGE.INVALID_DATE_FORMAT_DESC)
                         assert.propertyVal(result.error[1], 'message',
                             Strings.ERROR_MESSAGE.INVALID_FIELDS)
                         assert.propertyVal(result.error[1], 'description',
@@ -155,10 +155,10 @@ describe('Services: Log', () => {
                             assert.property(result.success[i].item, 'child_id')
                         }
 
-                        assert.propertyVal(result.error[0], 'message',
-                            'Datetime: 20199-03-08'.concat(Strings.ERROR_MESSAGE.INVALID_DATE))
+                        assert.propertyVal(result.error[0], 'message', Strings.ERROR_MESSAGE.INVALID_DATE_FORMAT
+                            .replace('{0}', '20199-03-08'))
                         assert.propertyVal(result.error[0], 'description',
-                            'Date must be in the format: yyyy-MM-dd')
+                            Strings.ERROR_MESSAGE.INVALID_DATE_FORMAT_DESC)
                         assert.propertyVal(result.error[1], 'message',
                             Strings.ERROR_MESSAGE.INVALID_FIELDS)
                         assert.propertyVal(result.error[1], 'description',
@@ -196,8 +196,8 @@ describe('Services: Log', () => {
 
                         assert.propertyVal(result.error[0], 'message',
                             Strings.ERROR_MESSAGE.INVALID_FIELDS)
-                        assert.propertyVal(result.error[0], 'description', 'value'
-                            .concat(Strings.ERROR_MESSAGE.NEGATIVE_NUMBER))
+                        assert.propertyVal(result.error[0], 'description', Strings.ERROR_MESSAGE.NEGATIVE_NUMBER
+                            .replace('{0}', 'value'))
                         assert.propertyVal(result.error[1], 'message',
                             Strings.ERROR_MESSAGE.INVALID_FIELDS)
                         assert.propertyVal(result.error[1], 'description',
@@ -276,7 +276,8 @@ describe('Services: Log', () => {
                         assert.propertyVal(result.error[0], 'message',
                             Strings.ERROR_MESSAGE.REQUIRED_FIELDS)
                         assert.propertyVal(result.error[0], 'description',
-                            'type, date, value, child_id'.concat(Strings.ERROR_MESSAGE.REQUIRED_FIELDS_DESC))
+                            Strings.ERROR_MESSAGE.REQUIRED_FIELDS_DESC
+                                .replace('{0}', 'type, date, value, child_id'))
                         assert.propertyVal(result.error[1], 'message',
                             Strings.ERROR_MESSAGE.INVALID_FIELDS)
                         assert.propertyVal(result.error[1], 'description',
@@ -348,8 +349,9 @@ describe('Services: Log', () => {
 
                 return logService.getByChildAndDate(correctLogsArr[0].child_id, correctLogsArr[0].date, correctLogsArr[1].date)
                     .catch(err => {
-                        assert.propertyVal(err, 'message', 'Datetime: 20199-03-18'.concat(Strings.ERROR_MESSAGE.INVALID_DATE))
-                        assert.propertyVal(err, 'description', 'Date must be in the format: yyyy-MM-dd')
+                        assert.propertyVal(err, 'message', Strings.ERROR_MESSAGE.INVALID_DATE_FORMAT
+                            .replace('{0}', '20199-03-18'))
+                        assert.propertyVal(err, 'description', Strings.ERROR_MESSAGE.INVALID_DATE_FORMAT_DESC)
                     })
             })
         })
@@ -362,8 +364,9 @@ describe('Services: Log', () => {
 
                 return logService.getByChildAndDate(correctLogsArr[0].child_id, correctLogsArr[0].date, correctLogsArr[1].date)
                     .catch(err => {
-                        assert.propertyVal(err, 'message', 'Datetime: 20199-03-18'.concat(Strings.ERROR_MESSAGE.INVALID_DATE))
-                        assert.propertyVal(err, 'description', 'Date must be in the format: yyyy-MM-dd')
+                        assert.propertyVal(err, 'message', Strings.ERROR_MESSAGE.INVALID_DATE_FORMAT
+                            .replace('{0}', '20199-03-18'))
+                        assert.propertyVal(err, 'description', Strings.ERROR_MESSAGE.INVALID_DATE_FORMAT_DESC)
                     })
             })
         })
@@ -372,9 +375,9 @@ describe('Services: Log', () => {
             it('should throw a ValidationException', () => {
                 return logService.getByChildAndDate(correctLogsArr[0].child_id, '2018-03-18', '2019-03-27')
                     .catch(err => {
-                        assert.propertyVal(err, 'message', 'Date range is invalid...')
-                        assert.propertyVal(err, 'description', 'The period between the received dates ' +
-                            'can not exceed one year!')
+                        assert.propertyVal(err, 'message', Strings.ERROR_MESSAGE.DATE_RANGE_INVALID
+                            .replace('{0}', '2018-03-18').replace('{1}', '2019-03-27'))
+                        assert.propertyVal(err, 'description', Strings.ERROR_MESSAGE.DATE_RANGE_EXCEED_YEAR_DESC)
                     })
             })
         })
@@ -448,8 +451,9 @@ describe('Services: Log', () => {
                 return logService.getByChildResourceAndDate(correctLogsArr[0].child_id, correctLogsArr[0].type,
                     correctLogsArr[0].date, correctLogsArr[1].date)
                     .catch(err => {
-                        assert.propertyVal(err, 'message', 'Datetime: 20199-03-18'.concat(Strings.ERROR_MESSAGE.INVALID_DATE))
-                        assert.propertyVal(err, 'description', 'Date must be in the format: yyyy-MM-dd')
+                        assert.propertyVal(err, 'message', Strings.ERROR_MESSAGE.INVALID_DATE_FORMAT
+                            .replace('{0}', '20199-03-18'))
+                        assert.propertyVal(err, 'description', Strings.ERROR_MESSAGE.INVALID_DATE_FORMAT_DESC)
                     })
             })
         })
@@ -462,8 +466,9 @@ describe('Services: Log', () => {
                 return logService.getByChildResourceAndDate(correctLogsArr[0].child_id, correctLogsArr[0].type,
                     correctLogsArr[0].date, correctLogsArr[1].date)
                     .catch(err => {
-                        assert.propertyVal(err, 'message', 'Datetime: 20199-03-18'.concat(Strings.ERROR_MESSAGE.INVALID_DATE))
-                        assert.propertyVal(err, 'description', 'Date must be in the format: yyyy-MM-dd')
+                        assert.propertyVal(err, 'message', Strings.ERROR_MESSAGE.INVALID_DATE_FORMAT
+                            .replace('{0}', '20199-03-18'))
+                        assert.propertyVal(err, 'description', Strings.ERROR_MESSAGE.INVALID_DATE_FORMAT_DESC)
                     })
             })
         })
@@ -474,9 +479,9 @@ describe('Services: Log', () => {
                 return logService.getByChildResourceAndDate(correctLogsArr[0].child_id, correctLogsArr[0].type,
                     '2018-03-18', '2019-03-27')
                     .catch(err => {
-                        assert.propertyVal(err, 'message', 'Date range is invalid...')
-                        assert.propertyVal(err, 'description', 'The period between the received dates can ' +
-                            'not exceed one year!')
+                        assert.propertyVal(err, 'message', Strings.ERROR_MESSAGE.DATE_RANGE_INVALID
+                            .replace('{0}', '2018-03-18').replace('{1}', '2019-03-27'))
+                        assert.propertyVal(err, 'description', Strings.ERROR_MESSAGE.DATE_RANGE_EXCEED_YEAR_DESC)
                     })
             })
         })

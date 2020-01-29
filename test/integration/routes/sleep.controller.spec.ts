@@ -22,6 +22,7 @@ const request = require('supertest')(app.getExpress())
 
 describe('Routes: children.sleep', () => {
     const defaultSleep: Sleep = new SleepMock()
+
     const otherSleep: Sleep = new SleepMock()
     otherSleep.child_id = '5a62be07de34500146d9c542'
 
@@ -197,12 +198,12 @@ describe('Routes: children.sleep', () => {
                             expect(message).to.have.property('timestamp')
                             expect(message).to.have.property('sleep')
                             expect(message.sleep).to.have.property('id')
-                            expect(message.sleep.start_time).to.eql(defaultSleep.start_time!.toISOString())
-                            expect(message.sleep.end_time).to.eql(defaultSleep.end_time!.toISOString())
+                            expect(message.sleep.start_time).to.eql(defaultSleep.start_time!.toISOString().substr(0, 19))
+                            expect(message.sleep.end_time).to.eql(defaultSleep.end_time!.toISOString().substr(0, 19))
                             expect(message.sleep.duration).to.eql(defaultSleep.duration)
                             let index = 0
                             for (const elem of defaultSleep.pattern!.data_set) {
-                                expect(message.sleep.pattern.data_set[index].start_time).to.eql(elem.start_time.toISOString())
+                                expect(message.sleep.pattern.data_set[index].start_time).to.eql(elem.start_time.toISOString().substr(0, 19))
                                 expect(message.sleep.pattern.data_set[index].name).to.eql(elem.name)
                                 expect(message.sleep.pattern.data_set[index].duration).to.eql(elem.duration)
                                 index++
@@ -217,7 +218,7 @@ describe('Routes: children.sleep', () => {
                     .then(() => {
                         request
                             .post(`/v1/children/${defaultSleep.child_id}/sleep`)
-                            .send(body)
+                            .send(sleepToJSON(body))
                             .set('Content-Type', 'application/json')
                             .expect(201)
                             .then()
@@ -249,17 +250,17 @@ describe('Routes: children.sleep', () => {
 
                 return request
                     .post(`/v1/children/${defaultSleep.child_id}/sleep`)
-                    .send(body)
+                    .send(sleepToJSON(body))
                     .set('Content-Type', 'application/json')
                     .expect(201)
                     .then(res => {
                         expect(res.body).to.have.property('id')
-                        expect(res.body.start_time).to.eql(defaultSleep.start_time!.toISOString())
-                        expect(res.body.end_time).to.eql(defaultSleep.end_time!.toISOString())
+                        expect(res.body.start_time).to.eql(defaultSleep.start_time!.toISOString().substr(0, 19))
+                        expect(res.body.end_time).to.eql(defaultSleep.end_time!.toISOString().substr(0, 19))
                         expect(res.body.duration).to.eql(defaultSleep.duration)
                         let index = 0
                         for (const elem of defaultSleep.pattern!.data_set) {
-                            expect(res.body.pattern.data_set[index].start_time).to.eql(elem.start_time.toISOString())
+                            expect(res.body.pattern.data_set[index].start_time).to.eql(elem.start_time.toISOString().substr(0, 19))
                             expect(res.body.pattern.data_set[index].name).to.eql(elem.name)
                             expect(res.body.pattern.data_set[index].duration).to.eql(elem.duration)
                             index++
@@ -330,8 +331,8 @@ describe('Routes: children.sleep', () => {
                     .then(err => {
                         expect(err.body.code).to.eql(400)
                         expect(err.body.message).to.eql(Strings.ERROR_MESSAGE.REQUIRED_FIELDS)
-                        expect(err.body.description).to.eql('start_time, end_time, duration, type, pattern'
-                            .concat(Strings.ERROR_MESSAGE.REQUIRED_FIELDS_DESC))
+                        expect(err.body.description).to.eql(Strings.ERROR_MESSAGE.REQUIRED_FIELDS_DESC
+                            .replace('{0}', 'start_time, end_time, duration, type, pattern'))
                     })
             })
         })
@@ -352,7 +353,8 @@ describe('Routes: children.sleep', () => {
                     .then(err => {
                         expect(err.body.code).to.eql(400)
                         expect(err.body.message).to.eql(Strings.ERROR_MESSAGE.REQUIRED_FIELDS)
-                        expect(err.body.description).to.eql('type, pattern'.concat(Strings.ERROR_MESSAGE.REQUIRED_FIELDS_DESC))
+                        expect(err.body.description).to.eql(Strings.ERROR_MESSAGE.REQUIRED_FIELDS_DESC
+                            .replace('{0}', 'type, pattern'))
                     })
             })
         })
@@ -375,8 +377,7 @@ describe('Routes: children.sleep', () => {
                     .then(err => {
                         expect(err.body.code).to.eql(400)
                         expect(err.body.message).to.eql(Strings.ERROR_MESSAGE.INVALID_FIELDS)
-                        expect(err.body.description).to.eql('The end_time parameter can not contain an older date ' +
-                            'than that the start_time parameter!')
+                        expect(err.body.description).to.eql(Strings.ERROR_MESSAGE.INVALID_START_TIME)
                     })
             })
         })
@@ -422,8 +423,8 @@ describe('Routes: children.sleep', () => {
                     .expect(400)
                     .then(err => {
                         expect(err.body.code).to.eql(400)
-                        expect(err.body.message).to.eql('Datetime: 2018-08-35T01:40:30Z'.concat(Strings.ERROR_MESSAGE.INVALID_DATE))
-                        expect(err.body.description).to.eql(Strings.ERROR_MESSAGE.INVALID_DATE_DESC)
+                        expect(err.body.message).to.eql(Strings.ERROR_MESSAGE.INVALID_DATETIME_FORMAT.
+                        replace('{0}', '2018-08-35T01:40:30Z'))
                     })
             })
         })
@@ -446,7 +447,8 @@ describe('Routes: children.sleep', () => {
                     .then(err => {
                         expect(err.body.code).to.eql(400)
                         expect(err.body.message).to.eql(Strings.ERROR_MESSAGE.INVALID_FIELDS)
-                        expect(err.body.description).to.eql('duration'.concat(Strings.ERROR_MESSAGE.NEGATIVE_NUMBER))
+                        expect(err.body.description).to.eql(Strings.ERROR_MESSAGE.NEGATIVE_INTEGER
+                            .replace('{0}', 'duration'))
                     })
             })
         })
@@ -567,8 +569,9 @@ describe('Routes: children.sleep', () => {
                     .then(err => {
                         expect(err.body.code).to.eql(400)
                         expect(err.body.message).to.eql(Strings.ERROR_MESSAGE.REQUIRED_FIELDS)
-                        expect(err.body.description).to.eql('pattern.data_set.start_time, pattern.data_set.name, ' +
-                            'pattern.data_set.duration'.concat(Strings.ERROR_MESSAGE.REQUIRED_FIELDS_DESC))
+                        expect(err.body.description).to.eql(Strings.ERROR_MESSAGE.REQUIRED_FIELDS_DESC
+                            .replace('{0}', 'pattern.data_set.start_time, pattern.data_set.name, ' +
+                                'pattern.data_set.duration'))
                     })
             })
         })
@@ -600,8 +603,8 @@ describe('Routes: children.sleep', () => {
                         .then(err => {
                             expect(err.body.code).to.eql(400)
                             expect(err.body.message).to.eql(Strings.ERROR_MESSAGE.INVALID_FIELDS)
-                            expect(err.body.description).to.eql('pattern.data_set.duration'
-                                .concat(Strings.ERROR_MESSAGE.INVALID_NUMBER))
+                            expect(err.body.description).to.eql(Strings.ERROR_MESSAGE.NEGATIVE_INTEGER
+                                .replace('{0}', 'pattern.data_set.duration'))
                         })
                 })
             })
@@ -632,8 +635,8 @@ describe('Routes: children.sleep', () => {
                     .then(err => {
                         expect(err.body.code).to.eql(400)
                         expect(err.body.message).to.eql(Strings.ERROR_MESSAGE.INVALID_FIELDS)
-                        expect(err.body.description).to.eql('pattern.data_set.duration'
-                            .concat(Strings.ERROR_MESSAGE.NEGATIVE_NUMBER))
+                        expect(err.body.description).to.eql(Strings.ERROR_MESSAGE.NEGATIVE_INTEGER
+                            .replace('{0}', 'pattern.data_set.duration'))
                     })
             })
         })
@@ -715,7 +718,7 @@ describe('Routes: children.sleep', () => {
                         pattern: sleep.pattern,
                         type: sleep.type
                     }
-                    body.push(bodyElem)
+                    body.push(sleepToJSON(bodyElem))
                 })
 
                 return request
@@ -727,12 +730,15 @@ describe('Routes: children.sleep', () => {
                         for (let i = 0; i < res.body.success.length; i++) {
                             expect(res.body.success[i].code).to.eql(HttpStatus.CREATED)
                             expect(res.body.success[i].item).to.have.property('id')
-                            expect(res.body.success[i].item.start_time).to.eql(correctSleepArr[i].start_time!.toISOString())
-                            expect(res.body.success[i].item.end_time).to.eql(correctSleepArr[i].end_time!.toISOString())
+                            expect(res.body.success[i].item.start_time)
+                                .to.eql(correctSleepArr[i].start_time!.toISOString().substr(0, 19))
+                            expect(res.body.success[i].item.end_time)
+                                .to.eql(correctSleepArr[i].end_time!.toISOString().substr(0, 19))
                             expect(res.body.success[i].item.duration).to.eql(correctSleepArr[i].duration)
                             let index = 0
                             for (const elem of correctSleepArr[i].pattern!.data_set) {
-                                expect(res.body.success[i].item.pattern.data_set[index].start_time).to.eql(elem.start_time.toISOString())
+                                expect(res.body.success[i].item.pattern.data_set[index].start_time)
+                                    .to.eql(elem.start_time.toISOString().substr(0, 19))
                                 expect(res.body.success[i].item.pattern.data_set[index].name).to.eql(elem.name)
                                 expect(res.body.success[i].item.pattern.data_set[index].duration).to.eql(elem.duration)
                                 index++
@@ -787,7 +793,7 @@ describe('Routes: children.sleep', () => {
                         pattern: sleep.pattern,
                         type: sleep.type
                     }
-                    body.push(bodyElem)
+                    body.push(sleepToJSON(bodyElem))
                 })
 
                 return request
@@ -799,12 +805,15 @@ describe('Routes: children.sleep', () => {
                         for (let i = 0; i < res.body.error.length; i++) {
                             expect(res.body.error[i].code).to.eql(HttpStatus.CONFLICT)
                             expect(res.body.error[i].message).to.eql(Strings.SLEEP.ALREADY_REGISTERED)
-                            expect(res.body.error[i].item.start_time).to.eql(correctSleepArr[i].start_time!.toISOString())
-                            expect(res.body.error[i].item.end_time).to.eql(correctSleepArr[i].end_time!.toISOString())
+                            expect(res.body.error[i].item.start_time)
+                                .to.eql(correctSleepArr[i].start_time!.toISOString().substr(0, 19))
+                            expect(res.body.error[i].item.end_time)
+                                .to.eql(correctSleepArr[i].end_time!.toISOString().substr(0, 19))
                             expect(res.body.error[i].item.duration).to.eql(correctSleepArr[i].duration)
                             let index = 0
                             for (const elem of correctSleepArr[i].pattern!.data_set) {
-                                expect(res.body.error[i].item.pattern.data_set[index].start_time).to.eql(elem.start_time.toISOString())
+                                expect(res.body.error[i].item.pattern.data_set[index].start_time)
+                                    .to.eql(elem.start_time.toISOString().substr(0, 19))
                                 expect(res.body.error[i].item.pattern.data_set[index].name).to.eql(elem.name)
                                 expect(res.body.error[i].item.pattern.data_set[index].duration).to.eql(elem.duration)
                                 index++
@@ -839,7 +848,7 @@ describe('Routes: children.sleep', () => {
                         pattern: sleep.pattern,
                         type: sleep.type
                     }
-                    body.push(bodyElem)
+                    body.push(sleepToJSON(bodyElem))
                 })
 
                 return request
@@ -851,12 +860,15 @@ describe('Routes: children.sleep', () => {
                         // Success item
                         expect(res.body.success[0].code).to.eql(HttpStatus.CREATED)
                         expect(res.body.success[0].item).to.have.property('id')
-                        expect(res.body.success[0].item.start_time).to.eql(mixedSleepArr[0].start_time!.toISOString())
-                        expect(res.body.success[0].item.end_time).to.eql(mixedSleepArr[0].end_time!.toISOString())
+                        expect(res.body.success[0].item.start_time)
+                            .to.eql(mixedSleepArr[0].start_time!.toISOString().substr(0, 19))
+                        expect(res.body.success[0].item.end_time)
+                            .to.eql(mixedSleepArr[0].end_time!.toISOString().substr(0, 19))
                         expect(res.body.success[0].item.duration).to.eql(mixedSleepArr[0].duration)
                         let index = 0
                         for (const elem of mixedSleepArr[0].pattern!.data_set) {
-                            expect(res.body.success[0].item.pattern.data_set[index].start_time).to.eql(elem.start_time.toISOString())
+                            expect(res.body.success[0].item.pattern.data_set[index].start_time)
+                                .to.eql(elem.start_time.toISOString().substr(0, 19))
                             expect(res.body.success[0].item.pattern.data_set[index].name).to.eql(elem.name)
                             expect(res.body.success[0].item.pattern.data_set[index].duration).to.eql(elem.duration)
                             index++
@@ -877,8 +889,8 @@ describe('Routes: children.sleep', () => {
                         // Error item
                         expect(res.body.error[0].code).to.eql(HttpStatus.BAD_REQUEST)
                         expect(res.body.error[0].message).to.eql(Strings.ERROR_MESSAGE.REQUIRED_FIELDS)
-                        expect(res.body.error[0].description).to.eql('start_time, end_time, duration, type, ' +
-                            'pattern'.concat(Strings.ERROR_MESSAGE.REQUIRED_FIELDS_DESC))
+                        expect(res.body.error[0].description).to.eql(Strings.ERROR_MESSAGE.REQUIRED_FIELDS_DESC
+                            .replace('{0}', 'start_time, end_time, duration, type, pattern'))
                     })
             })
         })
@@ -904,7 +916,7 @@ describe('Routes: children.sleep', () => {
                         pattern: sleep.pattern,
                         type: sleep.type
                     }
-                    body.push(bodyElem)
+                    body.push(sleepToJSON(bodyElem))
                 })
 
                 return request
@@ -914,19 +926,19 @@ describe('Routes: children.sleep', () => {
                     .expect(207)
                     .then(res => {
                         expect(res.body.error[0].message).to.eql(Strings.ERROR_MESSAGE.REQUIRED_FIELDS)
-                        expect(res.body.error[0].description).to.eql('start_time, end_time, duration, type, pattern'
-                            .concat(Strings.ERROR_MESSAGE.REQUIRED_FIELDS_DESC))
+                        expect(res.body.error[0].description).to.eql(Strings.ERROR_MESSAGE.REQUIRED_FIELDS_DESC
+                            .replace('{0}', 'start_time, end_time, duration, type, pattern'))
                         expect(res.body.error[1].message).to.eql(Strings.ERROR_MESSAGE.REQUIRED_FIELDS)
-                        expect(res.body.error[1].description).to.eql('type, pattern'
-                            .concat(Strings.ERROR_MESSAGE.REQUIRED_FIELDS_DESC))
+                        expect(res.body.error[1].description).to.eql(Strings.ERROR_MESSAGE.REQUIRED_FIELDS_DESC
+                            .replace('{0}', 'type, pattern'))
                         expect(res.body.error[2].message).to.eql(Strings.ERROR_MESSAGE.INVALID_FIELDS)
-                        expect(res.body.error[2].description).to.eql('The end_time parameter can not contain ' +
-                            'an older date than that the start_time parameter!')
+                        expect(res.body.error[2].description).to.eql(Strings.ERROR_MESSAGE.INVALID_START_TIME)
                         expect(res.body.error[3].message).to.eql(Strings.ERROR_MESSAGE.INVALID_FIELDS)
                         expect(res.body.error[3].description).to.eql('duration value does not match values ' +
                             'passed in start_time and end_time parameters!')
                         expect(res.body.error[4].message).to.eql(Strings.ERROR_MESSAGE.INVALID_FIELDS)
-                        expect(res.body.error[4].description).to.eql('duration'.concat(Strings.ERROR_MESSAGE.NEGATIVE_NUMBER))
+                        expect(res.body.error[4].description).to.eql(Strings.ERROR_MESSAGE.NEGATIVE_INTEGER
+                            .replace('{0}', 'duration'))
                         expect(res.body.error[5].message).to.eql(Strings.ERROR_MESSAGE.INVALID_FIELDS)
                         expect(res.body.error[5].description).to.eql('The names of the allowed Sleep Pattern types are: ' +
                             'classic, stages.')
@@ -935,11 +947,12 @@ describe('Routes: children.sleep', () => {
                         expect(res.body.error[7].message).to.eql(Strings.ERROR_MESSAGE.INVALID_FIELDS)
                         expect(res.body.error[7].description).to.eql('pattern.data_set must not be empty!')
                         expect(res.body.error[8].message).to.eql(Strings.ERROR_MESSAGE.REQUIRED_FIELDS)
-                        expect(res.body.error[8].description).to.eql('pattern.data_set.start_time, pattern.data_set.name, ' +
-                            'pattern.data_set.duration'.concat(Strings.ERROR_MESSAGE.REQUIRED_FIELDS_DESC))
+                        expect(res.body.error[8].description).to.eql(Strings.ERROR_MESSAGE.REQUIRED_FIELDS_DESC
+                            .replace('{0}', 'pattern.data_set.start_time, pattern.data_set.name, ' +
+                                'pattern.data_set.duration'))
                         expect(res.body.error[9].message).to.eql(Strings.ERROR_MESSAGE.INVALID_FIELDS)
-                        expect(res.body.error[9].description).to.eql('pattern.data_set.duration'
-                            .concat(Strings.ERROR_MESSAGE.NEGATIVE_NUMBER))
+                        expect(res.body.error[9].description).to.eql(Strings.ERROR_MESSAGE.NEGATIVE_INTEGER
+                            .replace('{0}', 'pattern.data_set.duration'))
                         expect(res.body.error[10].message).to.eql(Strings.ERROR_MESSAGE.INVALID_FIELDS)
                         if (incorrectSleep11.type === SleepType.CLASSIC)
                             expect(res.body.error[10].description).to.eql('The names of the allowed data_set patterns are: ' +
@@ -950,20 +963,32 @@ describe('Routes: children.sleep', () => {
                         expect(res.body.error[11].message).to.eql(Strings.ERROR_MESSAGE.INVALID_FIELDS)
                         expect(res.body.error[11].description).to.eql('The names of the allowed data_set patterns are: ' +
                             'deep, light, rem, awake.')
-                        expect(res.body.error[12].message).to.eql('Datetime: null'.concat(Strings.ERROR_MESSAGE.INVALID_DATE))
-                        expect(res.body.error[12].description).to.eql(Strings.ERROR_MESSAGE.INVALID_DATE_DESC)
+                        expect(res.body.error[12].message).to.eql(Strings.ERROR_MESSAGE.INVALID_DATETIME_FORMAT.
+                        replace('{0}', 'null'))
+                        expect(res.body.error[12].description).to.eql(Strings.ERROR_MESSAGE.INVALID_DATETIME_FORMAT_DESC)
 
                         for (let i = 0; i < res.body.error.length; i++) {
                             expect(res.body.error[i].code).to.eql(HttpStatus.BAD_REQUEST)
-                            if (res.body.error[i].item.start_time)
-                                expect(res.body.error[i].item.start_time).to.eql(incorrectSleepArr[i].start_time!.toISOString())
-                            if (res.body.error[i].item.end_time)
-                                expect(res.body.error[i].item.end_time).to.eql(incorrectSleepArr[i].end_time!.toISOString())
+                            if (res.body.error[i].item.start_time) {
+                                const dateToBeCompared = i !== 12
+                                    ? incorrectSleepArr[i].start_time!.toISOString().substr(0, 19)
+                                    : incorrectSleepArr[i].start_time!.toISOString()
+                                expect(res.body.error[i].item.start_time)
+                                    .to.eql(dateToBeCompared)
+                            }
+                            if (res.body.error[i].item.end_time) {
+                                expect(res.body.error[i].item.end_time)
+                                    .to.eql(incorrectSleepArr[i].end_time!.toISOString().substr(0, 19))
+                            }
                             expect(res.body.error[i].item.duration).to.eql(incorrectSleepArr[i].duration)
                             if (i !== 0 && i !== 1 && i !== 5 && i !== 6 && i !== 8) {
                                 let index = 0
                                 for (const elem of incorrectSleepArr[i].pattern!.data_set) {
-                                    expect(res.body.error[i].item.pattern.data_set[index].start_time).to.eql(elem.start_time.toISOString())
+                                    const dateToBeCompared = i !== 12
+                                        ? elem.start_time.toISOString().substr(0, 19)
+                                        : elem.start_time.toISOString()
+                                    expect(res.body.error[i].item.pattern.data_set[index].start_time)
+                                        .to.eql(dateToBeCompared)
                                     expect(res.body.error[i].item.pattern.data_set[index].name).to.eql(elem.name)
                                     expect(res.body.error[i].item.pattern.data_set[index].duration).to.eql(elem.duration)
                                     index++
@@ -1010,12 +1035,12 @@ describe('Routes: children.sleep', () => {
                     .then(res => {
                         expect(res.body.length).to.eql(1)
                         expect(res.body[0]).to.have.property('id')
-                        expect(res.body[0].start_time).to.eql(defaultSleep.start_time!.toISOString())
-                        expect(res.body[0].end_time).to.eql(defaultSleep.end_time!.toISOString())
+                        expect(res.body[0].start_time).to.eql(defaultSleep.start_time!.toISOString().substr(0, 19))
+                        expect(res.body[0].end_time).to.eql(defaultSleep.end_time!.toISOString().substr(0, 19))
                         expect(res.body[0].duration).to.eql(defaultSleep.duration)
                         let index = 0
                         for (const elem of defaultSleep.pattern!.data_set) {
-                            expect(res.body[0].pattern.data_set[index].start_time).to.eql(elem.start_time.toISOString())
+                            expect(res.body[0].pattern.data_set[index].start_time).to.eql(elem.start_time.toISOString().substr(0, 19))
                             expect(res.body[0].pattern.data_set[index].name).to.eql(elem.name)
                             expect(res.body[0].pattern.data_set[index].duration).to.eql(elem.duration)
                             index++
@@ -1071,7 +1096,7 @@ describe('Routes: children.sleep', () => {
          * query-strings-parser library test
          */
         context('when use "query-strings-parser" library', () => {
-            let result3
+            let result
 
             before(async () => {
                 try {
@@ -1097,7 +1122,7 @@ describe('Routes: children.sleep', () => {
                         child_id: defaultSleep.child_id
                     })
 
-                    result3 = await createSleep({
+                    result = await createSleep({
                         start_time: new Date(1547953200000),
                         end_time: new Date(new Date(1547953200000)
                             .setMilliseconds(Math.floor(Math.random() * 35 + 10) * 60000)),
@@ -1124,12 +1149,12 @@ describe('Routes: children.sleep', () => {
                     .then(res => {
                         expect(res.body.length).to.eql(1)
                         expect(res.body[0]).to.have.property('id')
-                        expect(res.body[0].start_time).to.eql(result3.start_time!.toISOString())
-                        expect(res.body[0].end_time).to.eql(result3.end_time!.toISOString())
+                        expect(res.body[0].start_time).to.eql(result.start_time!.toISOString().substr(0, 19))
+                        expect(res.body[0].end_time).to.eql(result.end_time!.toISOString().substr(0, 19))
                         expect(res.body[0].duration).to.eql(defaultSleep.duration)
                         let index = 0
                         for (const elem of defaultSleep.pattern!.data_set) {
-                            expect(res.body[0].pattern.data_set[index].start_time).to.eql(elem.start_time.toISOString())
+                            expect(res.body[0].pattern.data_set[index].start_time).to.eql(elem.start_time.toISOString().substr(0, 19))
                             expect(res.body[0].pattern.data_set[index].name).to.eql(elem.name)
                             expect(res.body[0].pattern.data_set[index].duration).to.eql(elem.duration)
                             index++
@@ -1200,12 +1225,12 @@ describe('Routes: children.sleep', () => {
                     .expect(200)
                     .then(res => {
                         expect(res.body).to.have.property('id')
-                        expect(res.body.start_time).to.eql(result.start_time!.toISOString())
-                        expect(res.body.end_time).to.eql(result.end_time!.toISOString())
+                        expect(res.body.start_time).to.eql(result.start_time!.toISOString().substr(0, 19))
+                        expect(res.body.end_time).to.eql(result.end_time!.toISOString().substr(0, 19))
                         expect(res.body.duration).to.eql(result.duration)
                         let index = 0
                         for (const elem of defaultSleep.pattern!.data_set) {
-                            expect(res.body.pattern.data_set[index].start_time).to.eql(elem.start_time.toISOString())
+                            expect(res.body.pattern.data_set[index].start_time).to.eql(elem.start_time.toISOString().substr(0, 19))
                             expect(res.body.pattern.data_set[index].name).to.eql(elem.name)
                             expect(res.body.pattern.data_set[index].duration).to.eql(elem.duration)
                             index++
@@ -1579,7 +1604,7 @@ describe('Routes: children.sleep', () => {
     //                     expect(err.body.code).to.eql(400)
     //                     expect(err.body.message).to.eql('Duration field is invalid...')
     //                     expect(err.body.description).to.eql('Sleep validation failed: '
-    //                         .concat(Strings.ERROR_MESSAGE.INVALID_NUMBER))
+    //                         .concat(Strings.ERROR_MESSAGE.NEGATIVE_NUMBER))
     //                 })
     //         })
     //     })
@@ -2125,4 +2150,31 @@ async function createSleep(item): Promise<any> {
 
 async function deleteAllSleep() {
     return SleepRepoModel.deleteMany({})
+}
+
+function sleepToJSON(sleep: any): any {
+    return {
+        id: sleep.id,
+        start_time: sleep.start_time,
+        end_time: sleep.end_time,
+        duration: sleep.duration,
+        child_id: sleep.child_id,
+        type: sleep.type,
+        pattern: sleep.pattern ? patternToJSON(sleep.pattern) : sleep.pattern
+    }
+}
+
+function patternToJSON(pattern: SleepPattern): any {
+    return {
+        data_set: pattern.data_set ? pattern.data_set.map(item => dataSetItemToJSON(item)) : pattern.data_set,
+        summary: pattern.summary ? pattern.summary.toJSON() : pattern.summary
+    }
+}
+
+function dataSetItemToJSON(dataSetItem: SleepPatternDataSet): any {
+    return {
+        start_time: dataSetItem.start_time,
+        name: dataSetItem.name,
+        duration: dataSetItem.duration
+    }
 }

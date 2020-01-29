@@ -7,7 +7,7 @@ import { IQuery } from '../port/query.interface'
 import { Log } from '../domain/model/log'
 import { ILogRepository } from '../port/log.repository.interface'
 import { CreateLogValidator } from '../domain/validator/create.log.validator'
-import { LogDateValidator } from '../domain/validator/log.date.validator'
+import { DateValidator } from '../domain/validator/date.validator'
 import { ChildLog } from '../domain/model/child.log'
 import { MultiStatus } from '../domain/model/multi.status'
 import { StatusSuccess } from '../domain/model/status.success'
@@ -15,7 +15,7 @@ import { StatusError } from '../domain/model/status.error'
 import { ValidationException } from '../domain/exception/validation.exception'
 import { ObjectIdValidator } from '../domain/validator/object.id.validator'
 import { LogTypeValidator } from '../domain/validator/log.type.validator'
-import { LogDateRangeValidator } from '../domain/validator/log.date.range.validator'
+import { DateRangeValidator } from '../domain/validator/date.range.validator'
 
 /**
  * Implementing log service
@@ -120,9 +120,9 @@ export class LogService implements ILogService {
     public async getByChildAndDate(childId: string, dateStart: string, dateEnd: string): Promise<ChildLog> {
         try {
             ObjectIdValidator.validate(childId, Strings.CHILD.PARAM_ID_NOT_VALID_FORMAT)
-            LogDateValidator.validate(dateStart)
-            LogDateValidator.validate(dateEnd)
-            LogDateRangeValidator.validate(dateStart, dateEnd)
+            DateValidator.validate(dateStart)
+            DateValidator.validate(dateEnd)
+            DateRangeValidator.validate(dateStart, dateEnd)
 
             const result: ChildLog = await this._logRepository.findByChild(childId, dateStart, dateEnd) as ChildLog
 
@@ -149,9 +149,9 @@ export class LogService implements ILogService {
         try {
             ObjectIdValidator.validate(childId, Strings.CHILD.PARAM_ID_NOT_VALID_FORMAT)
             LogTypeValidator.validate(desiredResource)
-            LogDateValidator.validate(dateStart)
-            LogDateValidator.validate(dateEnd)
-            LogDateRangeValidator.validate(dateStart, dateEnd)
+            DateValidator.validate(dateStart)
+            DateValidator.validate(dateEnd)
+            DateRangeValidator.validate(dateStart, dateEnd)
 
             const result: Array<Log> = await this._logRepository.findByChild(
                 childId, dateStart, dateEnd, desiredResource) as Array<Log>

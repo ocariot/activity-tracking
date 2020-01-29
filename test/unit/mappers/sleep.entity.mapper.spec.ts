@@ -2,9 +2,7 @@ import { assert } from 'chai'
 import { SleepEntityMapper } from '../../../src/infrastructure/entity/mapper/sleep.entity.mapper'
 import { SleepMock } from '../../mocks/sleep.mock'
 import { Sleep, SleepType } from '../../../src/application/domain/model/sleep'
-import { SleepPatternDataSet } from '../../../src/application/domain/model/sleep.pattern.data.set'
 import { SleepEntity } from '../../../src/infrastructure/entity/sleep.entity'
-// import { SleepPattern } from '../../../src/application/domain/model/sleep.pattern'
 
 describe('Mappers: SleepEntityMapper', () => {
     const sleep: Sleep = new SleepMock()
@@ -36,8 +34,13 @@ describe('Mappers: SleepEntityMapper', () => {
                 assert.propertyVal(result, 'duration', sleep.duration)
                 assert.propertyVal(result, 'child_id', sleep.child_id)
                 assert.propertyVal(result, 'type', sleep.type)
-                assert.deepPropertyVal(result, 'pattern',
-                    sleep.pattern!.data_set.map((elem: SleepPatternDataSet) => elem.toJSON()))
+                let i = 0
+                for (const dataSetItem of result.pattern!) {
+                    assert.deepPropertyVal(dataSetItem, 'start_time', new Date(sleep.pattern!.data_set[i].start_time))
+                    assert.deepPropertyVal(dataSetItem, 'name', sleep.pattern!.data_set[i].name)
+                    assert.deepPropertyVal(dataSetItem, 'duration', sleep.pattern!.data_set[i].duration)
+                    i++
+                }
             })
         })
 

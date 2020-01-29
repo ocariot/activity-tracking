@@ -41,7 +41,13 @@ export class SleepEntityMapper implements IEntityMapper<Sleep, SleepEntity> {
          * the staging data set, ie it does not contain summary.
          */
         if (item.pattern) {
-            result.pattern = item.pattern.data_set.map((elem: SleepPatternDataSet) => elem.toJSON())
+            result.pattern = item.pattern.data_set.map((elem: SleepPatternDataSet) => {
+                return {
+                    start_time: elem.start_time,
+                    name: elem.name,
+                    duration: elem.duration
+                }
+            })
         }
         if (item.type) result.type = item.type
 
