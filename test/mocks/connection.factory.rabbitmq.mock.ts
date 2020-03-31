@@ -25,10 +25,13 @@ export class ConnectionFactoryRabbitMQMock implements IConnectionFactory {
         getChildren(query: string): Promise<any> {
             return Promise.resolve({})
         },
+        getEducators(query: string): Promise<any> {
+            return Promise.resolve({})
+        },
         getEducatorChildrenGroups(educatorId: string): Promise<any> {
             return Promise.resolve({})
         },
-        getEducators(query: string): Promise<any> {
+        getEducatorsFromChild(childId: string, callback?: (err: any, educators: any) => void): any {
             return Promise.resolve({})
         },
         getEnvironments(query: string): Promise<any> {
@@ -40,10 +43,13 @@ export class ConnectionFactoryRabbitMQMock implements IConnectionFactory {
         getFamilyChildren(familyId: string): Promise<any> {
             return Promise.resolve({})
         },
+        getHealthProfessionals(query: string): Promise<any> {
+            return Promise.resolve({})
+        },
         getHealthProfessionalChildrenGroups(healthProfessionalId: string): Promise<any> {
             return Promise.resolve({})
         },
-        getHealthProfessionals(query: string): Promise<any> {
+        getHealthProfessionalsFromChild(childId: string, callback?: (err: any, healthProfessionals: any) => void): any {
             return Promise.resolve({})
         },
         getInstitutions(query: string): Promise<any> {
@@ -79,10 +85,13 @@ export class ConnectionFactoryRabbitMQMock implements IConnectionFactory {
         provideChildren(listener: (query: string) => any): Promise<void> {
             return Promise.resolve()
         },
+        provideEducators(listener: (query: string) => any): Promise<void> {
+            return Promise.resolve()
+        },
         provideEducatorChildrenGroups(listener: (educatorId: string) => any): Promise<void> {
             return Promise.resolve()
         },
-        provideEducators(listener: (query: string) => any): Promise<void> {
+        provideEducatorsFromChild(listener: (childId: string) => any): Promise<void> {
             return Promise.resolve()
         },
         provideEnvironments(listener: (query: string) => any): Promise<void> {
@@ -94,10 +103,13 @@ export class ConnectionFactoryRabbitMQMock implements IConnectionFactory {
         provideFamilyChildren(listener: (familyId: string) => any): Promise<void> {
             return Promise.resolve()
         },
+        provideHealthProfessionals(listener: (query: string) => any): Promise<void> {
+            return Promise.resolve()
+        },
         provideHealthProfessionalChildrenGroups(listener: (healthProfessionalId: string) => any): Promise<void> {
             return Promise.resolve()
         },
-        provideHealthProfessionals(listener: (query: string) => any): Promise<void> {
+        provideHealthProfessionalsFromChild(listener: (childId: string) => any): Promise<void> {
             return Promise.resolve()
         },
         provideInstitutions(listener: (query: string) => any): Promise<void> {
