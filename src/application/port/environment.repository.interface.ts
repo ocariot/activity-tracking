@@ -46,4 +46,13 @@ export interface IEnvironmentRepository extends IRepository<Environment> {
      * @throws {RepositoryException}
      */
     countByInstitution(institutionId: string): Promise<number>
+
+    /**
+     * Returns the total of environments in a range of days (current date up to N days ago).
+     *
+     * @param numberOfDays Number of days used used to search for environments in a range of days (up to {numberOfDays} ago).
+     * @return {Promise<Array<Environment>>}
+     * @throws {RepositoryException}
+     */
+    findByTimestamp(numberOfDays: number): Promise<Array<Environment>>
 }

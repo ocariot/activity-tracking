@@ -106,4 +106,26 @@ export class EnvironmentRepository extends BaseRepository<Environment, Environme
     public countByInstitution(institutionId: string): Promise<number> {
         return super.count(new Query().fromJSON({ filters: { institution_id: institutionId } }))
     }
+
+    /**
+     * Returns the total of environments in a range of days (current date up to N days ago).
+     *
+     * @param numberOfDays Number of days used used to search for environments in a range of days (up to {numberOfDays} ago).
+     * @return {Promise<Array<Environment>>}
+     * @throws {RepositoryException}
+     */
+    public findByTimestamp(numberOfDays: number): Promise<Array<Environment>> {
+        // Sets the date object to be used in the search
+        const searchDate: Date = new Date()
+        searchDate.setDate(searchDate.getDate() - numberOfDays)
+
+        // Sets the date in string format
+        const searchDateStr: string = new Date(searchDate.getTime() - (searchDate.getTimezoneOffset() * 60000)).toISOString()
+
+        // Sets the query and search
+        const query: IQuery = new Query()
+        query.filters = { 'timestamp': { $gte: searchDateStr } }
+
+        return super.find(query)
+    }
 }
