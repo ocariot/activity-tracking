@@ -30,4 +30,8 @@ export abstract class Default {
     public static readonly SSL_KEY_PATH: string = '.certs/server.key'
     public static readonly SSL_CERT_PATH: string = '.certs/server.crt'
     public static readonly RABBITMQ_CA_PATH: string = '.certs/ca.crt'
+
+    // Notification task
+    public static readonly EXPRESSION_AUTO_NOTIFICATION: string = '0 0 * * * *'
+    public static readonly NUMBER_OF_DAYS: number = 3
 }

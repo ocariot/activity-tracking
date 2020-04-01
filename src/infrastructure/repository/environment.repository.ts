@@ -110,7 +110,7 @@ export class EnvironmentRepository extends BaseRepository<Environment, Environme
     /**
      * Returns the total of environments in a range of days (current date up to N days ago).
      *
-     * @param numberOfDays Number of days used used to search for environments in a range of days (up to {numberOfDays} ago).
+     * @param numberOfDays Number of days used to search for environments in a range of days (up to {numberOfDays} ago).
      * @return {Promise<Array<Environment>>}
      * @throws {RepositoryException}
      */
@@ -124,7 +124,7 @@ export class EnvironmentRepository extends BaseRepository<Environment, Environme
 
         // Sets the query and search
         const query: IQuery = new Query()
-        query.filters = { 'timestamp': { $gte: searchDateStr } }
+        query.filters = { 'timestamp': { $lt: searchDateStr } }
 
         return super.find(query)
     }

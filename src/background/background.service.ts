@@ -15,6 +15,7 @@ export class BackgroundService {
         @inject(Identifier.RABBITMQ_EVENT_BUS) private readonly _eventBus: IEventBus,
         @inject(Identifier.SUB_EVENT_BUS_TASK) private readonly _subscribeTask: IBackgroundTask,
         @inject(Identifier.PROVIDER_EVENT_BUS_TASK) private readonly _providerTask: IBackgroundTask,
+        @inject(Identifier.NOTIFICATION_TASK) private readonly _notificationTask: IBackgroundTask,
         @inject(Identifier.LOGGER) private readonly _logger: ILogger
     ) {
     }
@@ -42,6 +43,9 @@ export class BackgroundService {
 
             // All resource provider
             this._providerTask.run()
+
+            // Notification task
+            this._notificationTask.run()
         } catch (err) {
             return Promise.reject(new Error(`Error initializing services in background! ${err.message}`))
         }
@@ -50,7 +54,7 @@ export class BackgroundService {
     public async stopServices(): Promise<void> {
         try {
             await this._mongodb.dispose()
-            await this._subscribeTask.stop()
+            await this._notificationTask.stop()
         } catch (err) {
             return Promise.reject(new Error(`Error stopping MongoDB! ${err.message}`))
         }
