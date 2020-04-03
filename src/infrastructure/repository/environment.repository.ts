@@ -108,7 +108,7 @@ export class EnvironmentRepository extends BaseRepository<Environment, Environme
     }
 
     /**
-     * Returns the total of environments in a range of days (current date up to N days ago).
+     * Returns the total of environments in a range of days (up to N days ago).
      *
      * @param numberOfDays Number of days used to search for environments in a range of days (up to {numberOfDays} ago).
      * @return {Promise<Array<Environment>>}

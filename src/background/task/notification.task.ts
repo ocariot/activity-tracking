@@ -24,6 +24,7 @@ export class NotificationTask implements IBackgroundTask {
 
     public run(): void {
         this.job.start()
+        this._logger.debug('Notification task started successfully!')
     }
 
     public stop(): Promise<void> {
