@@ -124,7 +124,7 @@ export class EnvironmentRepository extends BaseRepository<Environment, Environme
 
         // Sets the query and search
         const query: IQuery = new Query()
-        query.filters = { 'timestamp': { $lt: searchDateStr } }
+        query.filters = { timestamp: { $lt: searchDateStr } }
 
         return super.find(query)
     }

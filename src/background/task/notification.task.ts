@@ -11,14 +11,14 @@ import { Environment } from '../../application/domain/model/environment'
 @injectable()
 export class NotificationTask implements IBackgroundTask {
     private job: any
-    private numberOfDays: number = Number(process.env.NUMBER_OF_DAYS) || Default.NUMBER_OF_DAYS
+    private numberOfDays: number = Default.NUMBER_OF_DAYS
 
     constructor(
         @inject(Identifier.RABBITMQ_EVENT_BUS) private readonly _eventBus: IEventBus,
         @inject(Identifier.ENVIRONMENT_REPOSITORY) private readonly _environmentRepository: IEnvironmentRepository,
         @inject(Identifier.LOGGER) private readonly _logger: ILogger
     ) {
-        this.job = new cron.CronJob(`${process.env.EXPRESSION_AUTO_NOTIFICATION || Default.EXPRESSION_AUTO_NOTIFICATION}`,
+        this.job = new cron.CronJob(`${Default.EXPRESSION_AUTO_NOTIFICATION}`,
             () => this.checkInactivity())
     }
 
@@ -33,13 +33,36 @@ export class NotificationTask implements IBackgroundTask {
     }
 
     private sendNotification(environments: Array<Environment>): void {
+        for (const environment of environments) {
+            this._eventBus.bus.pubSendNotification(this.buildNotification(environment))
+                .then(() => {
+                    this._logger.info('\'iot:miss_data\' notification sent')
+                })
+                .catch(err => {
+                    this._logger.error(`An error occurred while trying to send a notification about the Environment with ID: `
+                        .concat(`${environment.id}. ${err.message}`))
+                })
+        }
+    }
+
+    private buildNotification(environment: Environment): any {
         try {
-            for (const environment of environments) {
-                this._logger.info(`Sensor deployed in ${environment.location!.local + ', ' + environment.location!.room} `
-                    .concat(`didn't send data in the last ${this.numberOfDays} days.`))
+            const now = new Date()
+            const last_sync: Date = environment.timestamp
+            const diff = Math.abs(now.getTime() - last_sync.getTime())
+            const calc_days_since = Math.trunc(diff / (1000 * 60 * 60 * 24))
+
+            return {
+                notification_type: 'iot:miss_data',
+                institution_id: environment.id,
+                days_since: calc_days_since,
+                location: {
+                    local: environment.location!.local,
+                    room: environment.location!.room
+                }
             }
         } catch (err) {
-            this._logger.error(`An error occurred while trying to send a notification. ${err.message}`)
+            this._logger.error(`An error occurred while trying to build the notification. ${err.message}`)
         }
     }
 
