@@ -48,8 +48,8 @@ export class NotificationTask implements IBackgroundTask {
     private buildNotification(environment: Environment): any {
         try {
             const now = new Date()
-            const last_sync: Date = environment.timestamp
-            const diff = Math.abs(now.getTime() - last_sync.getTime())
+            const timestamp: Date = environment.timestamp
+            const diff = Math.abs(now.getTime() - timestamp.getTime())
             const calc_days_since = Math.trunc(diff / (1000 * 60 * 60 * 24))
 
             return {

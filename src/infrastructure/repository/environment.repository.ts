@@ -119,12 +119,9 @@ export class EnvironmentRepository extends BaseRepository<Environment, Environme
         const searchDate: Date = new Date()
         searchDate.setDate(searchDate.getDate() - numberOfDays)
 
-        // Sets the date in string format
-        const searchDateStr: string = new Date(searchDate.getTime() - (searchDate.getTimezoneOffset() * 60000)).toISOString()
-
         // Sets the query and search
         const query: IQuery = new Query()
-        query.filters = { timestamp: { $lt: searchDateStr } }
+        query.filters = { timestamp: { $lt: searchDate.toISOString() } }
 
         return super.find(query)
     }

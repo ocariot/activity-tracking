@@ -60,6 +60,9 @@ export class ConnectionFactoryRabbitMQMock implements IConnectionFactory {
         getFoods(childId: string, dateStart: string, dateEnd: string): Promise<any> {
             return Promise.resolve({})
         },
+        getProcessedDataChildren(childId?: string, callback?: (err: any, children: any) => void): any {
+            return Promise.resolve({})
+        },
         logger(level: string): void {
             //
         },
@@ -118,6 +121,9 @@ export class ConnectionFactoryRabbitMQMock implements IConnectionFactory {
             return Promise.resolve()
         },
         provideFoods(listener: (childId: string, dateStart: string, dateEnd: string) => any): Promise<void> {
+            return Promise.resolve()
+        },
+        provideProcessedDataChildren(listener: (childId?: string) => any): Promise<void> {
             return Promise.resolve()
         },
         pub(routingKey: string, body: any): Promise<void> {
