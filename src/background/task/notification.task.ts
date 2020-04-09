@@ -16,19 +16,23 @@ export class NotificationTask implements IBackgroundTask {
         @inject(Identifier.ENVIRONMENT_REPOSITORY) private readonly _environmentRepository: IEnvironmentRepository,
         @inject(Identifier.LOGGER) private readonly _logger: ILogger,
         private readonly numberOfDays: number,
-        private readonly expression_auto_notification: string
+        private readonly expression_auto_notification?: string
     ) {
-        this.job = new cron.CronJob(`${this.expression_auto_notification}`,
-            () => this.checkInactivity())
     }
 
     public run(): void {
-        this.job.start()
+        if (this.expression_auto_notification) {
+            this.job = new cron.CronJob(`${this.expression_auto_notification}`, () => this.checkInactivity())
+            this.job.start()
+            this._logger.debug('Notification task started successfully!')
+            return
+        }
+        this.checkInactivity()
         this._logger.debug('Notification task started successfully!')
     }
 
     public stop(): Promise<void> {
-        this.job.stop()
+        if (this.expression_auto_notification) this.job.stop()
         return this._eventBus.dispose()
     }
 
