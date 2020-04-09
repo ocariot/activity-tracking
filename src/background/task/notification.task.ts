@@ -5,20 +5,20 @@ import { IEventBus } from '../../infrastructure/port/eventbus.interface'
 import { IEnvironmentRepository } from '../../application/port/environment.repository.interface'
 import { ILogger } from '../../utils/custom.logger'
 import cron from 'cron'
-import { Default } from '../../utils/default'
 import { Environment } from '../../application/domain/model/environment'
 
 @injectable()
 export class NotificationTask implements IBackgroundTask {
     private job: any
-    private numberOfDays: number = Default.NUMBER_OF_DAYS
 
     constructor(
         @inject(Identifier.RABBITMQ_EVENT_BUS) private readonly _eventBus: IEventBus,
         @inject(Identifier.ENVIRONMENT_REPOSITORY) private readonly _environmentRepository: IEnvironmentRepository,
-        @inject(Identifier.LOGGER) private readonly _logger: ILogger
+        @inject(Identifier.LOGGER) private readonly _logger: ILogger,
+        private readonly numberOfDays: number,
+        private readonly expression_auto_notification: string
     ) {
-        this.job = new cron.CronJob(`${Default.EXPRESSION_AUTO_NOTIFICATION}`,
+        this.job = new cron.CronJob(`${this.expression_auto_notification}`,
             () => this.checkInactivity())
     }
 

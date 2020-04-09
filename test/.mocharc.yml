@@ -8,4 +8,4 @@ require:
   - 'ts-node/register'
   - 'reflect-metadata/Reflect'
 slow: 5000
-timeout: 30000 # same as "no-timeout: true" or "timeout: 0"
+timeout: 75000 # same as "no-timeout: true" or "timeout: 0"

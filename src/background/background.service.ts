@@ -6,16 +6,22 @@ import { Default } from '../utils/default'
 import fs from 'fs'
 import { IEventBus } from '../infrastructure/port/eventbus.interface'
 import { ILogger } from '../utils/custom.logger'
+import { NotificationTask } from './task/notification.task'
+import { DIContainer } from '../di/di'
+import { IEnvironmentRepository } from '../application/port/environment.repository.interface'
 
 @injectable()
 export class BackgroundService {
+    private _notificationTask: IBackgroundTask = new NotificationTask(
+        this._eventBus, DIContainer.get<IEnvironmentRepository>(Identifier.ENVIRONMENT_REPOSITORY), this._logger,
+        Default.NUMBER_OF_DAYS, Default.EXPRESSION_AUTO_NOTIFICATION
+    )
 
     constructor(
         @inject(Identifier.MONGODB_CONNECTION) private readonly _mongodb: IDatabase,
         @inject(Identifier.RABBITMQ_EVENT_BUS) private readonly _eventBus: IEventBus,
         @inject(Identifier.SUB_EVENT_BUS_TASK) private readonly _subscribeTask: IBackgroundTask,
         @inject(Identifier.PROVIDER_EVENT_BUS_TASK) private readonly _providerTask: IBackgroundTask,
-        @inject(Identifier.NOTIFICATION_TASK) private readonly _notificationTask: IBackgroundTask,
         @inject(Identifier.LOGGER) private readonly _logger: ILogger
     ) {
     }

@@ -41,8 +41,8 @@ export abstract class Default {
      * Seconds            Minutes            Hours            Day of Month            Months            Day of Week
      *  0-59               0-59               0-23                1-31            0-11 (Jan-Dec)       0-6 (Sun-Sat)
      */
-    public static readonly EXPRESSION_AUTO_NOTIFICATION: string = '0 0 9 * * *'
+    public static readonly EXPRESSION_AUTO_NOTIFICATION: string = '0,10,20,30,40,50 * * * * *'
 
     // The number of days to be used as a parameter for checking the need to send one or more notifications.
-    public static readonly NUMBER_OF_DAYS: number = 9
+    public static readonly NUMBER_OF_DAYS: number = 7
 }

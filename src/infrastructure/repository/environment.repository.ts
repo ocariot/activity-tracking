@@ -116,8 +116,7 @@ export class EnvironmentRepository extends BaseRepository<Environment, Environme
      */
     public findByTimestamp(numberOfDays: number): Promise<Array<Environment>> {
         // Sets the date object to be used in the search
-        const searchDate: Date = new Date()
-        searchDate.setDate(searchDate.getDate() - numberOfDays)
+        const searchDate: Date = new Date(new Date().getTime() - ((1000 * 60 * 60 * 24) * numberOfDays))
 
         // Sets the query and search
         const query: IQuery = new Query()
