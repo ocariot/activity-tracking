@@ -108,20 +108,29 @@ export class EnvironmentRepository extends BaseRepository<Environment, Environme
     }
 
     /**
-     * Returns the total of environments in a range of days (up to N days ago).
+     * Returns environments that were inserted in a range of days (up to N days ago).
      *
      * @param numberOfDays Number of days used to search for environments in a range of days (up to {numberOfDays} ago).
      * @return {Promise<Array<Environment>>}
      * @throws {RepositoryException}
      */
-    public findByTimestamp(numberOfDays: number): Promise<Array<Environment>> {
+    public findInactiveEnvironments(numberOfDays: number): Promise<Array<Environment>> {
         // Sets the date object to be used in the search
         const searchDate: Date = new Date(new Date().getTime() - ((1000 * 60 * 60 * 24) * numberOfDays))
 
-        // Sets the query and search
-        const query: IQuery = new Query()
-        query.filters = { timestamp: { $lt: searchDate.toISOString() } }
-
-        return super.find(query)
+        return new Promise<Array<Environment>>((resolve, reject) => {
+            this.environmentModel.aggregate([
+                { $match: { timestamp: { $lt: searchDate } } },
+                { $sort: { timestamp: -1 } },
+                { $group: { _id: '$location', environment: { $first: '$$ROOT' } } }
+            ])
+                .exec()
+                .then(result => {
+                    resolve(result.map(item => this.mapper.transform(item.environment)))
+                })
+                .catch(err => reject(this.mongoDBErrorListener(err)))
+        })
     }
 }
+
+

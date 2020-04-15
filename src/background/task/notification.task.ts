@@ -6,6 +6,7 @@ import { IEnvironmentRepository } from '../../application/port/environment.repos
 import { ILogger } from '../../utils/custom.logger'
 import cron from 'cron'
 import { Environment } from '../../application/domain/model/environment'
+import { Measurement } from '../../application/domain/model/measurement'
 
 @injectable()
 export class NotificationTask implements IBackgroundTask {
@@ -21,14 +22,16 @@ export class NotificationTask implements IBackgroundTask {
     }
 
     public run(): void {
-        if (this.expression_auto_notification) {
-            this.job = new cron.CronJob(`${this.expression_auto_notification}`, () => this.checkInactivity())
-            this.job.start()
+        try {
+            if (this.expression_auto_notification) {
+                this.job = new cron.CronJob(`${this.expression_auto_notification}`, () => this.checkInactivity())
+                this.job.start()
+            } else this.checkInactivity()
+
             this._logger.debug('Notification task started successfully!')
-            return
+        } catch (err) {
+            this._logger.error(`An error occurred initializing the Notification task. ${err.message}`)
         }
-        this.checkInactivity()
-        this._logger.debug('Notification task started successfully!')
     }
 
     public stop(): Promise<void> {
@@ -38,40 +41,50 @@ export class NotificationTask implements IBackgroundTask {
 
     private sendNotification(environments: Array<Environment>): void {
         for (const environment of environments) {
-            this._eventBus.bus.pubSendNotification(this.buildNotification(environment))
-                .then(() => {
-                    this._logger.info('\'iot:miss_data\' notification sent')
-                })
-                .catch(err => {
-                    this._logger.error(`An error occurred while trying to send a notification about the Environment with ID: `
-                        .concat(`${environment.id}. ${err.message}`))
-                })
+            let notification
+
+            for (const measurement of environment.measurements!) {
+                try {
+                    notification = this.buildNotification(environment, measurement)
+                } catch (err) {
+                    this._logger.error(`An error occurred while trying to build the notification. ${err.message}`)
+                }
+
+                if (notification) {
+                    this._eventBus.bus
+                        .pubSendNotification(notification)
+                        .then(() => {
+                            this._logger.info('\'iot:miss_data\' notification sent')
+                        })
+                        .catch(err => {
+                            this._logger.error(`An error occurred while trying to send a notification about the Environment with ID: `
+                                .concat(`${environment.id}. ${err.message}`))
+                        })
+                }
+            }
         }
     }
 
-    private buildNotification(environment: Environment): any {
-        try {
-            const now = new Date()
-            const timestamp: Date = environment.timestamp
-            const diff = Math.abs(now.getTime() - timestamp.getTime())
-            const calc_days_since = Math.trunc(diff / (1000 * 60 * 60 * 24))
+    private buildNotification(environment: Environment, measurement: Measurement): any {
+        const now = new Date()
+        const timestamp: Date = environment.timestamp
+        const diff = Math.abs(now.getTime() - timestamp.getTime())
+        const calc_days_since = Math.trunc(diff / (1000 * 60 * 60 * 24))
 
-            return {
-                notification_type: 'iot:miss_data',
-                institution_id: environment.id,
-                days_since: calc_days_since,
-                location: {
-                    local: environment.location!.local,
-                    room: environment.location!.room
-                }
+        return {
+            notification_type: 'iot:miss_data',
+            institution_id: environment.institution_id,
+            days_since: calc_days_since,
+            sensor_type: measurement.type,
+            location: {
+                local: environment.location!.local,
+                room: environment.location!.room
             }
-        } catch (err) {
-            this._logger.error(`An error occurred while trying to build the notification. ${err.message}`)
         }
     }
 
     private checkInactivity(): void {
-        this._environmentRepository.findByTimestamp(this.numberOfDays)
+        this._environmentRepository.findInactiveEnvironments(this.numberOfDays)
             .then(result => {
                 if (result.length) this.sendNotification(result)
             })

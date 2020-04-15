@@ -201,19 +201,19 @@ describe('Repositories: EnvironmentRepository', () => {
         })
     })
 
-    describe('findByTimestamp(numberOfDays: number)', () => {
+    describe('findInactiveEnvironments(numberOfDays: number)', () => {
         context('when there is at least one environment registered in the database within the last 3 days',
             () => {
                 it('should return how many environments there are in the database with these characteristics',
                     () => {
                         sinon
                             .mock(modelFake)
-                            .expects('find')
+                            .expects('aggregate')
                             .withArgs()
                             .chain('exec')
                             .resolves([new EnvironmentMock()])
 
-                        return environmentRepo.findByTimestamp(3)
+                        return environmentRepo.findInactiveEnvironments(3)
                             .then((result: Array<Environment>) => {
                                 assert.equal(result.length, 1)
                             })
@@ -224,7 +224,7 @@ describe('Repositories: EnvironmentRepository', () => {
             it('should throw a RepositoryException', () => {
                 sinon
                     .mock(modelFake)
-                    .expects('find')
+                    .expects('aggregate')
                     .withArgs()
                     .chain('exec')
                     .rejects({
@@ -232,7 +232,7 @@ describe('Repositories: EnvironmentRepository', () => {
                         description: 'Please try again later...'
                     })
 
-                return environmentRepo.findByTimestamp(3)
+                return environmentRepo.findInactiveEnvironments(3)
                     .catch(err => {
                         assert.propertyVal(err, 'message', 'An internal error has occurred in the database!')
                         assert.propertyVal(err, 'description', 'Please try again later...')
