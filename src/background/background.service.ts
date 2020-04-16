@@ -6,9 +6,16 @@ import { Default } from '../utils/default'
 import fs from 'fs'
 import { IEventBus } from '../infrastructure/port/eventbus.interface'
 import { ILogger } from '../utils/custom.logger'
+import { NotificationTask } from './task/notification.task'
+import { DIContainer } from '../di/di'
+import { IEnvironmentRepository } from '../application/port/environment.repository.interface'
 
 @injectable()
 export class BackgroundService {
+    private _notificationTask: IBackgroundTask = new NotificationTask(
+        this._eventBus, DIContainer.get<IEnvironmentRepository>(Identifier.ENVIRONMENT_REPOSITORY), this._logger,
+        Default.NUMBER_OF_DAYS, Default.EXPRESSION_AUTO_NOTIFICATION
+    )
 
     constructor(
         @inject(Identifier.MONGODB_CONNECTION) private readonly _mongodb: IDatabase,
@@ -42,6 +49,9 @@ export class BackgroundService {
 
             // All resource provider
             this._providerTask.run()
+
+            // Notification task
+            this._notificationTask.run()
         } catch (err) {
             return Promise.reject(new Error(`Error initializing services in background! ${err.message}`))
         }
@@ -50,7 +60,7 @@ export class BackgroundService {
     public async stopServices(): Promise<void> {
         try {
             await this._mongodb.dispose()
-            await this._subscribeTask.stop()
+            await this._notificationTask.stop()
         } catch (err) {
             return Promise.reject(new Error(`Error stopping MongoDB! ${err.message}`))
         }

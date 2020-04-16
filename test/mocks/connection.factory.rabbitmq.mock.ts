@@ -3,19 +3,6 @@ import { IOcariotRabbitMQClient } from '@ocariot/rabbitmq-client-node/lib'
 
 export class ConnectionFactoryRabbitMQMock implements IConnectionFactory {
     private eventBus: IOcariotRabbitMQClient = {
-        getFoods(childId: string, dateStart: string, dateEnd: string): Promise<any> {
-            return Promise.resolve({})
-        }, provideFoods(listener: (childId: string, dateStart: string, dateEnd: string) => any): Promise<void> {
-            return Promise.resolve()
-        }, pubSaveFood(food: any): Promise<void> {
-            return Promise.resolve()
-        }, pubUpdateFood(food: any): Promise<void> {
-            return Promise.resolve()
-        }, subSaveFood(callback: (message: any) => void): Promise<void> {
-            return Promise.resolve()
-        }, subUpdateFood(callback: (message: any) => void): Promise<void> {
-            return Promise.resolve()
-        },
         close(): Promise<void> {
             return Promise.resolve()
         },
@@ -25,10 +12,13 @@ export class ConnectionFactoryRabbitMQMock implements IConnectionFactory {
         getChildren(query: string): Promise<any> {
             return Promise.resolve({})
         },
+        getEducators(query: string): Promise<any> {
+            return Promise.resolve({})
+        },
         getEducatorChildrenGroups(educatorId: string): Promise<any> {
             return Promise.resolve({})
         },
-        getEducators(query: string): Promise<any> {
+        getEducatorsFromChild(childId: string, callback?: (err: any, educators: any) => void): any {
             return Promise.resolve({})
         },
         getEnvironments(query: string): Promise<any> {
@@ -40,10 +30,13 @@ export class ConnectionFactoryRabbitMQMock implements IConnectionFactory {
         getFamilyChildren(familyId: string): Promise<any> {
             return Promise.resolve({})
         },
+        getHealthProfessionals(query: string): Promise<any> {
+            return Promise.resolve({})
+        },
         getHealthProfessionalChildrenGroups(healthProfessionalId: string): Promise<any> {
             return Promise.resolve({})
         },
-        getHealthProfessionals(query: string): Promise<any> {
+        getHealthProfessionalsFromChild(childId: string, callback?: (err: any, healthProfessionals: any) => void): any {
             return Promise.resolve({})
         },
         getInstitutions(query: string): Promise<any> {
@@ -64,6 +57,12 @@ export class ConnectionFactoryRabbitMQMock implements IConnectionFactory {
         getWeights(query: string): Promise<any> {
             return Promise.resolve({})
         },
+        getFoods(childId: string, dateStart: string, dateEnd: string): Promise<any> {
+            return Promise.resolve({})
+        },
+        getProcessedDataChildren(childId?: string, callback?: (err: any, children: any) => void): any {
+            return Promise.resolve({})
+        },
         logger(level: string): void {
             //
         },
@@ -79,10 +78,13 @@ export class ConnectionFactoryRabbitMQMock implements IConnectionFactory {
         provideChildren(listener: (query: string) => any): Promise<void> {
             return Promise.resolve()
         },
+        provideEducators(listener: (query: string) => any): Promise<void> {
+            return Promise.resolve()
+        },
         provideEducatorChildrenGroups(listener: (educatorId: string) => any): Promise<void> {
             return Promise.resolve()
         },
-        provideEducators(listener: (query: string) => any): Promise<void> {
+        provideEducatorsFromChild(listener: (childId: string) => any): Promise<void> {
             return Promise.resolve()
         },
         provideEnvironments(listener: (query: string) => any): Promise<void> {
@@ -94,10 +96,13 @@ export class ConnectionFactoryRabbitMQMock implements IConnectionFactory {
         provideFamilyChildren(listener: (familyId: string) => any): Promise<void> {
             return Promise.resolve()
         },
+        provideHealthProfessionals(listener: (query: string) => any): Promise<void> {
+            return Promise.resolve()
+        },
         provideHealthProfessionalChildrenGroups(listener: (healthProfessionalId: string) => any): Promise<void> {
             return Promise.resolve()
         },
-        provideHealthProfessionals(listener: (query: string) => any): Promise<void> {
+        provideHealthProfessionalsFromChild(listener: (childId: string) => any): Promise<void> {
             return Promise.resolve()
         },
         provideInstitutions(listener: (query: string) => any): Promise<void> {
@@ -113,6 +118,12 @@ export class ConnectionFactoryRabbitMQMock implements IConnectionFactory {
             return Promise.resolve()
         },
         provideWeights(listener: (query: string) => any): Promise<void> {
+            return Promise.resolve()
+        },
+        provideFoods(listener: (childId: string, dateStart: string, dateEnd: string) => any): Promise<void> {
+            return Promise.resolve()
+        },
+        provideProcessedDataChildren(listener: (childId?: string) => any): Promise<void> {
             return Promise.resolve()
         },
         pub(routingKey: string, body: any): Promise<void> {
@@ -196,6 +207,15 @@ export class ConnectionFactoryRabbitMQMock implements IConnectionFactory {
         pubFitbitRevoke(fitbit: any): Promise<void> {
             return Promise.resolve()
         },
+        pubSaveFood(food: any): Promise<void> {
+            return Promise.resolve()
+        },
+        pubUpdateFood(food: any): Promise<void> {
+            return Promise.resolve()
+        },
+        pubSendNotification(notification: any): Promise<void> {
+            return Promise.resolve()
+        },
         sub(routingKey: string, callback: (message: any) => void): Promise<void> {
             return Promise.resolve()
         },
@@ -277,6 +297,15 @@ export class ConnectionFactoryRabbitMQMock implements IConnectionFactory {
         subFitbitRevoke(callback: (message: any) => void): Promise<void> {
             return Promise.resolve()
         },
+        subSaveFood(callback: (message: any) => void): Promise<void> {
+            return Promise.resolve()
+        },
+        subUpdateFood(callback: (message: any) => void): Promise<void> {
+            return Promise.resolve()
+        },
+        subSendNotification(callback: (message: any) => void): Promise<void> {
+            return Promise.resolve()
+        }
     }
 
     public createConnection(uri: string, options?: IEventBusOptions): Promise<any> {

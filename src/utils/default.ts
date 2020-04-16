@@ -30,4 +30,19 @@ export abstract class Default {
     public static readonly SSL_KEY_PATH: string = '.certs/server.key'
     public static readonly SSL_CERT_PATH: string = '.certs/server.crt'
     public static readonly RABBITMQ_CA_PATH: string = '.certs/ca.crt'
+
+    /**
+     * The frequency of time that the application will check, in the background, the need to send one or more
+     * notifications, according to the cron expression.
+     * For example, the value 0 0 9 * * *, means that the check it will occurs every day at 09:00:00.
+     *
+     * Cron ranges:
+     *
+     * Seconds            Minutes            Hours            Day of Month            Months            Day of Week
+     *  0-59               0-59               0-23                1-31            0-11 (Jan-Dec)       0-6 (Sun-Sat)
+     */
+    public static readonly EXPRESSION_AUTO_NOTIFICATION: string = '0 0 9 * * *'
+
+    // The number of days to be used as a parameter for checking the need to send one or more notifications.
+    public static readonly NUMBER_OF_DAYS: number = 7
 }
