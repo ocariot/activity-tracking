@@ -69,6 +69,7 @@ import { LogController } from '../ui/controller/log.controller'
 import { SubscribeEventBusTask } from '../background/task/subscribe.event.bus.task'
 import { IBackgroundTask } from '../application/port/background.task.interface'
 import { ProviderEventBusTask } from '../background/task/provider.event.bus.task'
+import { NotificationTask } from '../background/task/notification.task'
 
 export class IoC {
     private readonly _container: Container
@@ -189,6 +190,9 @@ export class IoC {
         this.container
             .bind<IBackgroundTask>(Identifier.PROVIDER_EVENT_BUS_TASK)
             .to(ProviderEventBusTask).inSingletonScope()
+        this.container
+            .bind<IBackgroundTask>(Identifier.NOTIFICATION_TASK)
+            .to(NotificationTask).inSingletonScope()
 
         // Log
         this.container.bind<ILogger>(Identifier.LOGGER).to(CustomLogger).inSingletonScope()

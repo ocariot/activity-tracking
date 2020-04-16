@@ -106,4 +106,31 @@ export class EnvironmentRepository extends BaseRepository<Environment, Environme
     public countByInstitution(institutionId: string): Promise<number> {
         return super.count(new Query().fromJSON({ filters: { institution_id: institutionId } }))
     }
+
+    /**
+     * Returns environments that were inserted in a range of days (up to N days ago).
+     *
+     * @param numberOfDays Number of days used to search for environments in a range of days (up to {numberOfDays} ago).
+     * @return {Promise<Array<Environment>>}
+     * @throws {RepositoryException}
+     */
+    public findInactiveEnvironments(numberOfDays: number): Promise<Array<Environment>> {
+        // Sets the date object to be used in the search
+        const searchDate: Date = new Date(new Date().getTime() - ((1000 * 60 * 60 * 24) * numberOfDays))
+
+        return new Promise<Array<Environment>>((resolve, reject) => {
+            this.environmentModel.aggregate([
+                { $match: { timestamp: { $lt: searchDate } } },
+                { $sort: { timestamp: -1 } },
+                { $group: { _id: '$location', environment: { $first: '$$ROOT' } } }
+            ])
+                .exec()
+                .then(result => {
+                    resolve(result.map(item => this.mapper.transform(item.environment)))
+                })
+                .catch(err => reject(this.mongoDBErrorListener(err)))
+        })
+    }
 }
+
+

@@ -7,6 +7,7 @@ import { EnvironmentRepository } from '../../../src/infrastructure/repository/en
 import { EntityMapperMock } from '../../mocks/entity.mapper.mock'
 import { CustomLoggerMock } from '../../mocks/custom.logger.mock'
 import { ObjectID } from 'bson'
+import { Environment } from '../../../src/application/domain/model/environment'
 
 require('sinon-mongoose')
 
@@ -192,6 +193,46 @@ describe('Repositories: EnvironmentRepository', () => {
                     })
 
                 return environmentRepo.countByInstitution(defaultEnvironment.institution_id!)
+                    .catch(err => {
+                        assert.propertyVal(err, 'message', 'An internal error has occurred in the database!')
+                        assert.propertyVal(err, 'description', 'Please try again later...')
+                    })
+            })
+        })
+    })
+
+    describe('findInactiveEnvironments(numberOfDays: number)', () => {
+        context('when there is at least one environment registered in the database within the last 3 days',
+            () => {
+                it('should return how many environments there are in the database with these characteristics',
+                    () => {
+                        sinon
+                            .mock(modelFake)
+                            .expects('aggregate')
+                            .withArgs()
+                            .chain('exec')
+                            .resolves([new EnvironmentMock()])
+
+                        return environmentRepo.findInactiveEnvironments(3)
+                            .then((result: Array<Environment>) => {
+                                assert.equal(result.length, 1)
+                            })
+                    })
+            })
+
+        context('when a database error occurs', () => {
+            it('should throw a RepositoryException', () => {
+                sinon
+                    .mock(modelFake)
+                    .expects('aggregate')
+                    .withArgs()
+                    .chain('exec')
+                    .rejects({
+                        message: 'An internal error has occurred in the database!',
+                        description: 'Please try again later...'
+                    })
+
+                return environmentRepo.findInactiveEnvironments(3)
                     .catch(err => {
                         assert.propertyVal(err, 'message', 'An internal error has occurred in the database!')
                         assert.propertyVal(err, 'description', 'Please try again later...')

@@ -60,4 +60,8 @@ export class EnvironmentRepositoryMock implements IEnvironmentRepository {
         return Promise.resolve(true)
     }
 
+    public findInactiveEnvironments(numberOfDays: number): Promise<Array<Environment>> {
+        return Promise.resolve([new EnvironmentMock()])
+    }
+
 }
