@@ -1,6 +1,6 @@
 {
   "name": "iot-tracking",
-  "version": "2.1.2",
+  "version": "2.2.0",
   "description": "Microservice responsible for tracking activities, sleep, environments and measurements on the OCARIoT platform",
   "main": "dist/server.js",
   "scripts": {
@@ -77,7 +77,7 @@
     "@types/express": "^4.17.6",
     "@types/helmet": "^0.0.45",
     "@types/mocha": "^7.0.2",
-    "@types/mongoose": "^5.7.10",
+    "@types/mongoose": "^5.7.11",
     "@types/morgan": "^1.9.0",
     "@types/swagger-ui-express": "^4.1.2",
     "chai": "^4.2.0",
