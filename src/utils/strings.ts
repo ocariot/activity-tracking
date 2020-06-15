@@ -46,6 +46,13 @@ export abstract class Strings {
         PARAM_ID_NOT_VALID_FORMAT: 'Parameter {institution_id} is not in valid format!'
     }
 
+    public static readonly DEVICE: any = {
+        NOT_FOUND: 'Device not found!',
+        NOT_FOUND_DESC: 'Device not found or already removed. A new operation for the same resource is required.',
+        ALREADY_REGISTERED: 'Device is already registered...',
+        PARAM_ID_NOT_VALID_FORMAT: 'Parameter {device_id} is not in valid format!'
+    }
+
     public static readonly ERROR_MESSAGE: any = {
         UNEXPECTED: 'An unexpected error has occurred. Please try again later...',
         UNABLE_UPDATE: 'Unable to update this attribute.',

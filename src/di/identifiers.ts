@@ -14,6 +14,7 @@ export abstract class Identifier {
     public static readonly BODY_FAT_CONTROLLER: any = Symbol.for('BodyFatController')
     public static readonly WEIGHT_CONTROLLER: any = Symbol.for('WeightController')
     public static readonly ENVIRONMENT_CONTROLLER: any = Symbol.for('EnvironmentController')
+    public static readonly DEVICE_CONTROLLER: any = Symbol.for('DevicesController')
 
     // Services
     public static readonly ACTIVITY_SERVICE: any = Symbol.for('PhysicalActivityService')
@@ -22,6 +23,7 @@ export abstract class Identifier {
     public static readonly BODY_FAT_SERVICE: any = Symbol.for('BodyFatService')
     public static readonly WEIGHT_SERVICE: any = Symbol.for('WeightService')
     public static readonly ENVIRONMENT_SERVICE: any = Symbol.for('EnvironmentService')
+    public static readonly DEVICE_SERVICE: any = Symbol.for('DeviceService')
 
     // Repositories
     public static readonly ACTIVITY_REPOSITORY: any = Symbol.for('PhysicalActivityRepository')
@@ -30,6 +32,7 @@ export abstract class Identifier {
     public static readonly BODY_FAT_REPOSITORY: any = Symbol.for('BodyFatRepository')
     public static readonly WEIGHT_REPOSITORY: any = Symbol.for('WeightRepository')
     public static readonly ENVIRONMENT_REPOSITORY: any = Symbol.for('EnvironmentRepository')
+    public static readonly DEVICE_REPOSITORY: any = Symbol.for('DeviceRepository')
 
     // Models
     public static readonly ACTIVITY_REPO_MODEL: any = Symbol.for('ActivityRepoModel')
@@ -37,6 +40,7 @@ export abstract class Identifier {
     public static readonly SLEEP_REPO_MODEL: any = Symbol.for('SleepRepoModel')
     public static readonly MEASUREMENT_REPO_MODEL: any = Symbol.for('MeasurementRepoModel')
     public static readonly ENVIRONMENT_REPO_MODEL: any = Symbol.for('EnvironmentRepoModel')
+    public static readonly DEVICE_REPO_MODEL: any = Symbol.for('DeviceRepoModel')
 
     // Mappers
     public static readonly ACTIVITY_ENTITY_MAPPER: any = Symbol.for('PhysicalActivityEntityMapper')
@@ -45,6 +49,7 @@ export abstract class Identifier {
     public static readonly SLEEP_ENTITY_MAPPER: any = Symbol.for('SleepEntityMapper')
     public static readonly BODY_FAT_ENTITY_MAPPER: any = Symbol.for('BodyFatEntityMapper')
     public static readonly WEIGHT_ENTITY_MAPPER: any = Symbol.for('WeightEntityMapper')
+    public static readonly DEVICE_ENTITY_MAPPER: any = Symbol.for('DeviceEntityMapper')
 
     // Background Services
     public static readonly RABBITMQ_EVENT_BUS: any = Symbol.for('RabbitMQ')

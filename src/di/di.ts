@@ -70,6 +70,15 @@ import { SubscribeEventBusTask } from '../background/task/subscribe.event.bus.ta
 import { IBackgroundTask } from '../application/port/background.task.interface'
 import { ProviderEventBusTask } from '../background/task/provider.event.bus.task'
 import { NotificationTask } from '../background/task/notification.task'
+import { IDeviceService } from '../application/port/device.service.interface'
+import { DeviceService } from '../application/service/device.service'
+import { IDeviceRepository } from '../application/port/device.repository.interface'
+import { Device } from '../application/domain/model/device'
+import { DeviceEntity } from '../infrastructure/entity/device.entity'
+import { DeviceEntityMapper } from '../infrastructure/entity/mapper/device.entity.mapper'
+import { DeviceRepoModel } from '../infrastructure/database/schema/device.schema'
+import { DeviceRepository } from '../infrastructure/repository/device.repository'
+import { DeviceController } from '../ui/controller/device.controller'
 
 export class IoC {
     private readonly _container: Container
@@ -110,6 +119,8 @@ export class IoC {
         this.container.bind<SleepController>(Identifier.SLEEP_CONTROLLER).to(SleepController).inSingletonScope()
         this.container.bind<BodyFatController>(Identifier.BODY_FAT_CONTROLLER).to(BodyFatController).inSingletonScope()
         this.container.bind<WeightController>(Identifier.WEIGHT_CONTROLLER).to(WeightController).inSingletonScope()
+        this.container.bind<DeviceController>(Identifier.DEVICE_CONTROLLER)
+            .to(DeviceController).inSingletonScope()
 
         // Services
         this.container.bind<IPhysicalActivityService>(Identifier.ACTIVITY_SERVICE).to(PhysicalActivityService).inSingletonScope()
@@ -118,6 +129,7 @@ export class IoC {
         this.container.bind<ISleepService>(Identifier.SLEEP_SERVICE).to(SleepService).inSingletonScope()
         this.container.bind<IBodyFatService>(Identifier.BODY_FAT_SERVICE).to(BodyFatService).inSingletonScope()
         this.container.bind<IWeightService>(Identifier.WEIGHT_SERVICE).to(WeightService).inSingletonScope()
+        this.container.bind<IDeviceService>(Identifier.DEVICE_SERVICE).to(DeviceService).inSingletonScope()
 
         // Repositories
         this.container
@@ -138,6 +150,8 @@ export class IoC {
         this.container
             .bind<IWeightRepository>(Identifier.WEIGHT_REPOSITORY)
             .to(WeightRepository).inSingletonScope()
+        this.container.bind<IDeviceRepository>(Identifier.DEVICE_REPOSITORY)
+            .to(DeviceRepository).inSingletonScope()
 
         // Models
         this.container.bind(Identifier.ACTIVITY_REPO_MODEL).toConstantValue(ActivityRepoModel)
@@ -145,6 +159,7 @@ export class IoC {
         this.container.bind(Identifier.ENVIRONMENT_REPO_MODEL).toConstantValue(EnvironmentRepoModel)
         this.container.bind(Identifier.SLEEP_REPO_MODEL).toConstantValue(SleepRepoModel)
         this.container.bind(Identifier.MEASUREMENT_REPO_MODEL).toConstantValue(MeasurementRepoModel)
+        this.container.bind(Identifier.DEVICE_REPO_MODEL).toConstantValue(DeviceRepoModel)
 
         // Mappers
         this.container
@@ -165,6 +180,9 @@ export class IoC {
         this.container
             .bind<IEntityMapper<Weight, WeightEntity>>(Identifier.WEIGHT_ENTITY_MAPPER)
             .to(WeightEntityMapper).inSingletonScope()
+        this._container
+            .bind<IEntityMapper<Device, DeviceEntity>>(Identifier.DEVICE_ENTITY_MAPPER)
+            .to(DeviceEntityMapper).inSingletonScope()
 
         // Background Services
         this.container
