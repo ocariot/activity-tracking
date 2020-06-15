@@ -86,7 +86,7 @@ export class App {
                 use_page: true,
                 default: {
                     pagination: { limit: 100 },
-                    sort: { created_at: 'desc' }
+                    sort: { created_at: -1 }
                 }
             }))
 

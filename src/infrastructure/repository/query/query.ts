@@ -36,7 +36,7 @@ export class Query implements IQuery {
     constructor(fields?: Array<string>, ordination?: Map<string, string>,
                 pagination?: IPagination, filters?: object) {
         this.fields = fields ? fields : []
-        this.ordination = ordination ? ordination : new Map().set('created_at', 'desc')
+        this.ordination = ordination ? ordination : new Map().set('created_at', -1)
         this.pagination = pagination ? pagination : new Pagination()
         this.filters = filters ? filters : {}
     }

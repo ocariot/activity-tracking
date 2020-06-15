@@ -12,7 +12,7 @@ export interface IQuery extends IJSONSerializable, IJSONDeserializable<IQuery> {
     pagination: IPagination
     filters: any
 
-    addOrdination(field: string, order: string): void
+    addOrdination(field: string, order: string | number): void
 
     addFilter(filter: object): void
 }

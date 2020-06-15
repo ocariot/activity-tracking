@@ -5,7 +5,7 @@ import { IQuery } from '../../../src/application/port/query.interface'
 describe('Repositories: Query', () => {
     const queryJSON: any = {
         fields: { id: 1, child_id: 1 },
-        sort: { created_at: 'desc' },
+        sort: { created_at: -1 },
         pagination: { page: 1, limit: 100 },
         filters: { id: '5a62be07de34500146d9c544' }
     }
@@ -17,12 +17,12 @@ describe('Repositories: Query', () => {
     describe('addOrdination(field: string, order: string)', () => {
         context('when the ordination has already been instantiated', () => {
             it('should normally execute the method', () => {
-                query.addOrdination('id', 'asc')
+                query.addOrdination('id', 1)
 
                 const ordinationMap = new Map()
 
-                ordinationMap.set('created_at', 'desc')
-                ordinationMap.set('id', 'asc')
+                ordinationMap.set('created_at', -1)
+                ordinationMap.set('id', 1)
 
                 assert.deepEqual(query.ordination, ordinationMap)
             })
