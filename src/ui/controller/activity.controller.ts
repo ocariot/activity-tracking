@@ -84,7 +84,7 @@ export class ActivityController {
         } catch (err) {
             const handlerError = ApiExceptionManager.build(err)
             return res.status(handlerError.code)
-                .send(handlerError.toJson())
+                .send(handlerError.toJSON())
         }
     }
 
@@ -109,7 +109,7 @@ export class ActivityController {
         } catch (err) {
             const handlerError = ApiExceptionManager.build(err)
             return res.status(handlerError.code)
-                .send(handlerError.toJson())
+                .send(handlerError.toJSON())
         }
     }
 
@@ -133,7 +133,7 @@ export class ActivityController {
         } catch (err) {
             const handlerError = ApiExceptionManager.build(err)
             return res.status(handlerError.code)
-                .send(handlerError.toJson())
+                .send(handlerError.toJSON())
         }
     }
 
@@ -159,7 +159,7 @@ export class ActivityController {
         //         .send(handlerError.toJson())
         // }
         return res.status(HttpStatus.METHOD_NOT_ALLOWED)
-            .send(new ApiException(HttpStatus.METHOD_NOT_ALLOWED, Strings.ERROR_MESSAGE.DISCONTINUED_METHOD).toJson())
+            .send(new ApiException(HttpStatus.METHOD_NOT_ALLOWED, Strings.ERROR_MESSAGE.DISCONTINUED_METHOD).toJSON())
     }
 
     /**
@@ -176,7 +176,7 @@ export class ActivityController {
         } catch (err) {
             const handlerError = ApiExceptionManager.build(err)
             return res.status(handlerError.code)
-                .send(handlerError.toJson())
+                .send(handlerError.toJSON())
         }
     }
 
@@ -188,6 +188,6 @@ export class ActivityController {
             HttpStatus.NOT_FOUND,
             'Physical Activity not found!',
             'Physical Activity not found or already removed. A new operation for the same resource is not required.'
-        ).toJson()
+        ).toJSON()
     }
 }

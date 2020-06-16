@@ -54,6 +54,9 @@ export abstract class Strings {
     }
 
     public static readonly ERROR_MESSAGE: any = {
+        REQUEST_BODY_INVALID: 'Unable to process request body!',
+        REQUEST_BODY_INVALID_DESC: 'Please verify that the JSON provided in the request body has a valid format and try again.',
+        ENDPOINT_NOT_FOUND: 'Endpoint {0} does not found!',
         UNEXPECTED: 'An unexpected error has occurred. Please try again later...',
         UNABLE_UPDATE: 'Unable to update this attribute.',
         UNABLE_UPDATE_DESC: 'Updateable attributes are: name, calories, steps, distance, levels ' +

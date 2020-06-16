@@ -85,7 +85,7 @@ export class WeightController {
         } catch (err) {
             const handlerError = ApiExceptionManager.build(err)
             return res.status(handlerError.code)
-                .send(handlerError.toJson())
+                .send(handlerError.toJSON())
         }
     }
 
@@ -110,7 +110,7 @@ export class WeightController {
         } catch (err) {
             const handlerError = ApiExceptionManager.build(err)
             return res.status(handlerError.code)
-                .send(handlerError.toJson())
+                .send(handlerError.toJSON())
         }
     }
 
@@ -134,7 +134,7 @@ export class WeightController {
         } catch (err) {
             const handlerError = ApiExceptionManager.build(err)
             return res.status(handlerError.code)
-                .send(handlerError.toJson())
+                .send(handlerError.toJSON())
         }
     }
 
@@ -152,7 +152,7 @@ export class WeightController {
         } catch (err) {
             const handlerError = ApiExceptionManager.build(err)
             return res.status(handlerError.code)
-                .send(handlerError.toJson())
+                .send(handlerError.toJSON())
         }
     }
 
@@ -164,6 +164,6 @@ export class WeightController {
             HttpStatus.NOT_FOUND,
             'Weight not found!',
             'Weight not found or already removed. A new operation for the same resource is not required.'
-        ).toJson()
+        ).toJSON()
     }
 }

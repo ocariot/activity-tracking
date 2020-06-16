@@ -8,7 +8,7 @@ export class Device extends Entity implements IJSONSerializable, IJSONDeserializ
     private _name?: string
     private _address?: string
     private _type?: string
-    private _model_number?: string
+    private _modelNumber?: string
     private _manufacturer?: string
     private _location?: Location
     private _createdAt?: string
@@ -42,12 +42,12 @@ export class Device extends Entity implements IJSONSerializable, IJSONDeserializ
         this._type = value
     }
 
-    get model_number(): string | undefined {
-        return this._model_number
+    get modelNumber(): string | undefined {
+        return this._modelNumber
     }
 
-    set model_number(value: string | undefined) {
-        this._model_number = value
+    set modelNumber(value: string | undefined) {
+        this._modelNumber = value
     }
 
     get manufacturer(): string | undefined {
@@ -92,10 +92,10 @@ export class Device extends Entity implements IJSONSerializable, IJSONDeserializ
         if (json.name !== undefined) this.name = json.name
         if (json.address !== undefined) this.address = json.address
         if (json.type !== undefined) this.type = json.type
-        if (json.model_number !== undefined) this.model_number = json.model_number
+        if (json.model_number !== undefined) this.modelNumber = json.model_number
         if (json.manufacturer !== undefined) this.manufacturer = json.manufacturer
         if (json.location !== undefined) this.location = new Location().fromJSON(json.location)
-        if (json.institution_id !== undefined) this.institutionId = json.institution_id
+
         return this
     }
 
@@ -105,7 +105,7 @@ export class Device extends Entity implements IJSONSerializable, IJSONDeserializ
             name: this.name,
             address: this.address,
             type: this.type,
-            model_number: this.model_number,
+            model_number: this.modelNumber,
             manufacturer: this.manufacturer,
             location: this.location?.toJSON(),
             created_at: this.createdAt

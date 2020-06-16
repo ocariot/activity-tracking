@@ -84,7 +84,7 @@ export class EnvironmentController {
         // }
         return res.status(HttpStatus.METHOD_NOT_ALLOWED)
             .send(new ApiException(HttpStatus.METHOD_NOT_ALLOWED, Strings.ERROR_MESSAGE.DISCONTINUED_METHOD,
-                'Now use the route \'/v1/institutions/{institution_id}/environments\'').toJson())
+                'Now use the route \'/v1/institutions/{institution_id}/environments\'').toJSON())
     }
 
     /**
@@ -110,7 +110,7 @@ export class EnvironmentController {
         // }
         return res.status(HttpStatus.METHOD_NOT_ALLOWED)
             .send(new ApiException(HttpStatus.METHOD_NOT_ALLOWED, Strings.ERROR_MESSAGE.DISCONTINUED_METHOD,
-                'Now use the route \'/v1/institutions/{institution_id}/environments\'').toJson())
+                'Now use the route \'/v1/institutions/{institution_id}/environments\'').toJSON())
     }
 
     /**
@@ -131,7 +131,7 @@ export class EnvironmentController {
         // }
         return res.status(HttpStatus.METHOD_NOT_ALLOWED)
             .send(new ApiException(HttpStatus.METHOD_NOT_ALLOWED, Strings.ERROR_MESSAGE.DISCONTINUED_METHOD,
-                'Now use the route \'/v1/institutions/{institution_id}/environments/{environment_id}\'').toJson())
+                'Now use the route \'/v1/institutions/{institution_id}/environments/{environment_id}\'').toJSON())
     }
 
     /**
@@ -185,7 +185,7 @@ export class EnvironmentController {
         } catch (err) {
             const handlerError = ApiExceptionManager.build(err)
             return res.status(handlerError.code)
-                .send(handlerError.toJson())
+                .send(handlerError.toJSON())
         }
     }
 
@@ -210,7 +210,7 @@ export class EnvironmentController {
         } catch (err) {
             const handlerError = ApiExceptionManager.build(err)
             return res.status(handlerError.code)
-                .send(handlerError.toJson())
+                .send(handlerError.toJSON())
         }
     }
 
@@ -230,7 +230,7 @@ export class EnvironmentController {
         } catch (err) {
             const handlerError = ApiExceptionManager.build(err)
             return res.status(handlerError.code)
-                .send(handlerError.toJson())
+                .send(handlerError.toJSON())
         }
     }
 
@@ -248,7 +248,7 @@ export class EnvironmentController {
         } catch (err) {
             const handlerError = ApiExceptionManager.build(err)
             return res.status(handlerError.code)
-                .send(handlerError.toJson())
+                .send(handlerError.toJSON())
         }
     }
 }

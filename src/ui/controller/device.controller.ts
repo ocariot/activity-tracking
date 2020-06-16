@@ -28,7 +28,7 @@ export class DeviceController {
         } catch (err) {
             const handlerError = ApiExceptionManager.build(err)
             return res.status(handlerError.code)
-                .send(handlerError.toJson())
+                .send(handlerError.toJSON())
         } finally {
             req.query = {}
         }
@@ -45,7 +45,7 @@ export class DeviceController {
         } catch (err) {
             const handlerError = ApiExceptionManager.build(err)
             return res.status(handlerError.code)
-                .send(handlerError.toJson())
+                .send(handlerError.toJSON())
         } finally {
             req.query = {}
         }
@@ -63,7 +63,7 @@ export class DeviceController {
         } catch (err) {
             const handlerError = ApiExceptionManager.build(err)
             return res.status(handlerError.code)
-                .send(handlerError.toJson())
+                .send(handlerError.toJSON())
         } finally {
             req.query = {}
         }
@@ -77,7 +77,7 @@ export class DeviceController {
         } catch (err) {
             const handlerError = ApiExceptionManager.build(err)
             return res.status(handlerError.code)
-                .send(handlerError.toJson())
+                .send(handlerError.toJSON())
         }
     }
 
@@ -91,6 +91,6 @@ export class DeviceController {
             HttpStatus.NOT_FOUND,
             Strings.DEVICE.NOT_FOUND,
             Strings.DEVICE.NOT_FOUND_DESC
-        ).toJson()
+        ).toJSON()
     }
 }

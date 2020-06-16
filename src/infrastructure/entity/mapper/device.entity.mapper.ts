@@ -21,7 +21,7 @@ export class DeviceEntityMapper implements IEntityMapper<Device, DeviceEntity> {
         if (item.name !== undefined) result.name = item.name
         if (item.address !== undefined) result.address = item.address
         if (item.type !== undefined) result.type = item.type
-        if (item.model_number !== undefined) result.model_number = item.model_number
+        if (item.modelNumber !== undefined) result.model_number = item.modelNumber
         if (item.manufacturer !== undefined) result.manufacturer = item.manufacturer
         if (item.location !== undefined) result.location = item.location.toJSON()
         if (item.institutionId !== undefined) result.institution_id = item.institutionId
@@ -29,7 +29,10 @@ export class DeviceEntityMapper implements IEntityMapper<Device, DeviceEntity> {
     }
 
     public jsonToModel(json: any): Device {
-        const result: Device = new Device()
-        return result.fromJSON(json)
+        const result: Device = new Device().fromJSON(json)
+        if (!json) return result
+
+        if (json.created_at !== undefined) result.createdAt = json.created_at
+        return result
     }
 }
