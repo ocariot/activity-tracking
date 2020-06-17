@@ -17,6 +17,7 @@ describe('Repositories: Query', () => {
     describe('addOrdination(field: string, order: string)', () => {
         context('when the ordination has already been instantiated', () => {
             it('should normally execute the method', () => {
+                query.addOrdination('created_at', -1)
                 query.addOrdination('id', 1)
 
                 const ordinationMap = new Map()

@@ -27,8 +27,7 @@ export class DeviceController {
             return res.status(HttpStatus.CREATED).send(this.toJSONView(result))
         } catch (err) {
             const handlerError = ApiExceptionManager.build(err)
-            return res.status(handlerError.code)
-                .send(handlerError.toJSON())
+            return res.status(handlerError.code).send(handlerError.toJSON())
         } finally {
             req.query = {}
         }
