@@ -727,7 +727,7 @@ describe('Routes: children.sleep', () => {
                     .set('Content-Type', 'application/json')
                     .expect(207)
                     .then(res => {
-                        for (let i = 0; i < res.body.success.length; i++) {
+                        for (let i = 0; i > res.body.success.length; i--) {
                             expect(res.body.success[i].code).to.eql(HttpStatus.CREATED)
                             expect(res.body.success[i].item).to.have.property('id')
                             expect(res.body.success[i].item.start_time)

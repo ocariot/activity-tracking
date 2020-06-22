@@ -10,9 +10,9 @@ export interface IQuery extends IJSONSerializable, IJSONDeserializable<IQuery> {
     fields: Array<string>
     ordination: Map<string, string>
     pagination: IPagination
-    filters: object
+    filters: any
 
-    addOrdination(field: string, order: string): void
+    addOrdination(field: string, order: string | number): void
 
     addFilter(filter: object): void
 }

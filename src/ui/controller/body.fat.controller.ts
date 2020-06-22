@@ -84,7 +84,7 @@ export class BodyFatController {
         } catch (err) {
             const handlerError = ApiExceptionManager.build(err)
             return res.status(handlerError.code)
-                .send(handlerError.toJson())
+                .send(handlerError.toJSON())
         }
     }
 
@@ -109,7 +109,7 @@ export class BodyFatController {
         } catch (err) {
             const handlerError = ApiExceptionManager.build(err)
             return res.status(handlerError.code)
-                .send(handlerError.toJson())
+                .send(handlerError.toJSON())
         }
     }
 
@@ -133,7 +133,7 @@ export class BodyFatController {
         } catch (err) {
             const handlerError = ApiExceptionManager.build(err)
             return res.status(handlerError.code)
-                .send(handlerError.toJson())
+                .send(handlerError.toJSON())
         }
     }
 
@@ -151,7 +151,7 @@ export class BodyFatController {
         } catch (err) {
             const handlerError = ApiExceptionManager.build(err)
             return res.status(handlerError.code)
-                .send(handlerError.toJson())
+                .send(handlerError.toJSON())
         }
     }
 
@@ -163,6 +163,6 @@ export class BodyFatController {
             HttpStatus.NOT_FOUND,
             'Body Fat not found!',
             'Body Fat not found or already removed. A new operation for the same resource is not required.'
-        ).toJson()
+        ).toJSON()
     }
 }

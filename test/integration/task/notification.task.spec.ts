@@ -96,7 +96,7 @@ describe('NOTIFICATION TASK', () => {
                         } catch (err) {
                             done(err)
                         }
-                    }, 5000)
+                    }, 6000)
                 })
 
             // Each environment mock has three measurements, so there are twenty one notifications
@@ -123,7 +123,7 @@ describe('NOTIFICATION TASK', () => {
                     } catch (err) {
                         done(err)
                     }
-                }, 5000)
+                }, 6000)
             })
         })
 

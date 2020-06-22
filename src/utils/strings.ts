@@ -46,7 +46,17 @@ export abstract class Strings {
         PARAM_ID_NOT_VALID_FORMAT: 'Parameter {institution_id} is not in valid format!'
     }
 
+    public static readonly DEVICE: any = {
+        NOT_FOUND: 'Device not found!',
+        NOT_FOUND_DESC: 'Device not found or already removed. A new operation for the same resource is required.',
+        ALREADY_REGISTERED: 'Device is already registered...',
+        PARAM_ID_NOT_VALID_FORMAT: 'Parameter {device_id} is not in valid format!'
+    }
+
     public static readonly ERROR_MESSAGE: any = {
+        REQUEST_BODY_INVALID: 'Unable to process request body!',
+        REQUEST_BODY_INVALID_DESC: 'Please verify that the JSON provided in the request body has a valid format and try again.',
+        ENDPOINT_NOT_FOUND: 'Endpoint {0} does not found!',
         UNEXPECTED: 'An unexpected error has occurred. Please try again later...',
         UNABLE_UPDATE: 'Unable to update this attribute.',
         UNABLE_UPDATE_DESC: 'Updateable attributes are: name, calories, steps, distance, levels ' +
