@@ -1,6 +1,6 @@
 {
   "name": "iot-tracking",
-  "version": "2.2.0",
+  "version": "2.3.0",
   "description": "Microservice responsible for tracking activities, sleep, environments and measurements on the OCARIoT platform",
   "main": "dist/server.js",
   "scripts": {
@@ -54,7 +54,7 @@
     "all": true
   },
   "dependencies": {
-    "@ocariot/rabbitmq-client-node": "1.6.1",
+    "@ocariot/rabbitmq-client-node": "^1.6.2",
     "body-parser": "^1.19.0",
     "cron": "^1.8.2",
     "dotenv": "^8.2.0",
