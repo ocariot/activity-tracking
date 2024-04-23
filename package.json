@@ -62,7 +62,7 @@
     "helmet": "^3.23.0",
     "inversify": "^5.0.1",
     "inversify-express-utils": "^6.3.2",
-    "mongoose": "5.8.2",
+    "mongoose": "5.13.20",
     "morgan": "^1.10.0",
     "query-strings-parser": "^2.1.5",
     "reflect-metadata": "^0.1.13",
